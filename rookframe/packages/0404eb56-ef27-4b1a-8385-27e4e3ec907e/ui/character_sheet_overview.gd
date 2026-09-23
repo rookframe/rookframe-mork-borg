@@ -1,5 +1,6 @@
 extends VBoxContainer
 
+signal companions_requested
 signal edit_requested
 signal value_save_requested(key: String, value: int)
 
@@ -9,6 +10,7 @@ var _editing := ""
 var _short_window := false
 
 func _ready() -> void:
+	get_node(^"Body/Context/Companions").pressed.connect(_open_companions)
 	resized.connect(_layout)
 	get_node(^"Body/Context/Identity/Content/Header/Edit").pressed.connect(_edit)
 	for resource in ["HitPoints", "Omens", "Silver"]:
@@ -31,9 +33,19 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 		button.text = "%+d" % modifier
 		button.accessibility_name = "%s modifier %s" % [ability, button.text]
 	get_node(^"Body/Context/Identity/Content/Description").text = str(data.get("description", ""))
-	var companions: Array = data.get("companion_sheets", [])
-	get_node(^"Body/Context/Companions").visible = not companions.is_empty()
-	get_node(^"Body/Context/Companions").text = "Companions: %d" % companions.size()
+	get_node(^"Body/Context/Identity/Content/Origin").text = str(data.get("class_title", "No Class")) + "\n" + str(data.get("origin", ""))
+	var rules := ""
+	var class_rules: Array = data.get("class_rules", [])
+	for rule in class_rules:
+		rules += str(rule) + "\n"
+	var traits: Array = data.get("traits", [])
+	for raw_trait in traits:
+		var trait_data: Dictionary = raw_trait
+		rules += str(trait_data.get("name", "")) + "\n" + str(trait_data.get("rules", "")) + "\n"
+	get_node(^"Body/Context/Identity/Content/Traits").text = rules.strip_edges()
+	var companions: Array = data.get("starting_creature_grants", [])
+	get_node(^"Body/Context/Companions").visible = true
+	get_node(^"Body/Context/Companions").text = "View companions (%d)" % companions.size()
 	var equipped := ""
 	var inventory: Array = data.get("inventory", [])
 	for entry in inventory:
@@ -84,3 +96,7 @@ func _edit_value(key: String) -> void:
 	display.visible = false
 	var edit := row.get_node(^"Edit") as Button
 	edit.icon = CHECK
+
+
+func _open_companions() -> void:
+	companions_requested.emit()

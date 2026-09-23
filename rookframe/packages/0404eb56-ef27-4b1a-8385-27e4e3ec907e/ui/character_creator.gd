@@ -1,6 +1,7 @@
 extends VBoxContainer
 
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 const CHARACTER_DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
 const FIRST_EQUIPMENT_NAMES := ["Rope", "Torch", "Lantern with oil", "Magnesium strip", "Unclean scroll", "Sharp needle", "Medicine box", "Metal file", "Bear trap", "Bomb", "Red poison", "Silver crucifix"]
 const SECOND_EQUIPMENT_NAMES := ["Life elixir", "Sacred scroll", "Small but vicious dog", "Monkeys", "Exquisite perfume", "Toolbox", "Heavy chain", "Grappling hook", "Shield", "Crowbar", "Lard", "Tent"]
@@ -12,6 +13,8 @@ const PACK_IDS := ["backpack", "sack", "small-wagon", "donkey"]
 const UNCLEAN_SCROLL_IDS := ["palms-open-the-southern-gate", "tongue-of-eris", "te-le-kin-esis", "lucy-fires-levitation", "daemon-of-capillaries", "nine-violet-signs-unknot-the-storm", "metzhuotl-blind-your-eye", "foul-psychompomp", "eyelid-blinds-the-mind", "death"]
 const SACRED_SCROLL_IDS := ["grace-of-a-dead-saint", "grace-for-a-sinner", "whispers-pass-the-gate", "aegis-of-sorrow", "unmet-fate", "bestial-speech", "false-dawn-nights-chariot", "hermetic-step", "roskoes-consuming-glare", "enochian-syntax"]
 
+signal scroll_choice_requested(slot: String)
+signal scroll_decided
 signal roll_requested
 signal stage_changed(step: int, title: String)
 signal status_changed(message: String, error: bool)
@@ -32,6 +35,7 @@ var _character_stage := "create-class"
 var _creation_generation := 0
 var _creation_active := false
 var _busy := false
+var _scroll_choice := ""
 var _roll_ready := false
 var _character_tab := "character"
 var _character_name_field
@@ -54,6 +58,31 @@ func configure(definitions: Array[SDK.ContentEntry], character_definition: SDK.C
 
 func begin() -> void:
 	_begin_character_creation()
+
+
+func select_class(class_id: String) -> void:
+	if not _creation_active or _character_stage != "create-class":
+		return
+	var profile: Dictionary = CLASSES.new().profile(class_id)
+	var definition := _find_definition(class_id + "-character")
+	if profile.is_empty() or definition == null:
+		return
+	_character_definition = definition
+	_character_draft["class_id"] = class_id
+	_character_draft["class_title"] = str(profile.get("title", ""))
+	_character_draft["class_profile"] = profile
+	_character_draft["class_rules"] = profile.get("rules", [])
+	_show_creation_route("create-class")
+
+
+func choose_scroll_disposition(slot: String, disposition: String) -> void:
+	if not _creation_active or _busy or str(_character_draft.get("scroll_choice_slot", "")) != slot:
+		return
+	if not ["reroll", "eat", "toilet-paper"].has(disposition):
+		return
+	_scroll_choice = disposition
+	_character_draft["scroll_choice_slot"] = ""
+	scroll_decided.emit()
 
 
 func primary() -> void:
@@ -81,6 +110,8 @@ func show_creation_route(route: String) -> void:
 
 
 func _ready() -> void:
+	_view.class_selected.connect(select_class)
+	_view.scroll_selected.connect(choose_scroll_disposition)
 	_character_content = self
 	_source_definition = CHARACTER_DEFINITION.new()
 	_view.get_node(^"Aside/Context/Content/Pack").pressed.connect(_on_pack_pressed)
@@ -149,6 +180,8 @@ func _begin_character_creation() -> void:
 	_character_draft = {
 		"class_id": "classless",
 		"class_title": "No Class",
+		"class_profile": CLASSES.new().profile("classless"),
+		"class_rules": [],
 		"abilities": {},
 		"equipment_rolls": {},
 		"inventory": [],
@@ -157,6 +190,8 @@ func _begin_character_creation() -> void:
 		"omens": 0,
 		"origin": "",
 		"traits": [],
+		"scroll_dispositions": [],
+		"scroll_choice_slot": "",
 		"name": "",
 		"description": "",
 		"preferred_miniature": {},
@@ -168,8 +203,9 @@ func _begin_character_creation() -> void:
 		"equipment_roll_pending": false,
 		"equipment_roll_failed": false,
 	}
+	_character_definition = _find_definition("classless-character")
 	_show_creation_route("create-class")
-	_set_status("Choose the source-backed No Class profile.")
+	_set_status("Choose a class to begin.")
 
 
 func _start_over_character() -> void:
@@ -181,6 +217,7 @@ func _discard_character_creation() -> void:
 		return
 	_creation_generation += 1
 	_creation_active = false
+	scroll_decided.emit()
 	_roll_ready = false
 	roll_requested.emit()
 	_character_draft = {}
@@ -214,8 +251,13 @@ func _on_character_primary_action() -> void:
 			_set_status("Start over to request fresh source Rolls.", true)
 			return
 		_character_stage = "create-origin"
+		_character_draft["roll_pending"] = str(_character_draft.get("class_id", "classless")) != "classless"
 		_show_creation_route(_character_stage)
+		if bool(_character_draft.get("roll_pending", false)):
+			_roll_character_origin(_creation_generation)
 	elif _character_stage == "create-origin":
+		if _route_blocked(_character_stage):
+			return
 		_character_stage = "create-equipment"
 		_character_draft["equipment_roll_pending"] = true
 		_character_draft["equipment_roll_failed"] = false
@@ -261,10 +303,14 @@ func _roll_character_abilities(token: int) -> void:
 			_show_creation_route(_character_stage)
 			_set_status(result.message, true)
 			return
-		var score := _roll_total(result)
+		if ability_name == "Agility":
+			_character_draft["creation_roll_sequence"] = result.sequence
+		var profile: Dictionary = _character_draft.get("class_profile", {})
+		var offsets: Dictionary = profile.get("ability_offsets", {})
+		var score := _roll_total(result) + int(offsets.get(ability_name, 0))
 		abilities[ability_name] = {"score": score, "modifier": _modifier(score)}
 	_character_draft["abilities"] = abilities
-	var hit_points_result: SDK.DiceRollResult = await _automatic_roll("Hit points", 8, 1, token)
+	var hit_points_result: SDK.DiceRollResult = await _automatic_roll("Hit points", int(_character_draft.get("class_profile", {}).get("hp_faces", 8)), 1, token)
 	if token != _creation_generation or not _creation_active:
 		return
 	if not hit_points_result.ok:
@@ -288,12 +334,36 @@ func _roll_character_abilities(token: int) -> void:
 	_set_status("Automatic Rolls complete. Continue to Origin & Traits.")
 
 
+func _roll_character_origin(token: int) -> void:
+	for title in ["Origin", "Class feature"]:
+		var result: SDK.DiceRollResult = await _automatic_roll(title, 6, 1, token)
+		if token != _creation_generation or not _creation_active:
+			return
+		if not result.ok:
+			_character_draft["roll_pending"] = false
+			_character_draft["roll_failed"] = true
+			_show_creation_route("create-origin")
+			_set_status(result.message, true)
+			return
+		var roll := _roll_total(result)
+		var class_id: String = _character_draft.get("class_id", "classless")
+		if title == "Origin":
+			_character_draft["origin_roll"] = roll
+			_character_draft["origin"] = CLASSES.new().origin(class_id, roll)
+		else:
+			_character_draft["feature_roll"] = roll
+			_character_draft["traits"] = [CLASSES.new().feature(class_id, roll)]
+	_character_draft["roll_pending"] = false
+	_show_creation_route("create-origin")
+
+
 func _roll_character_equipment(token: int) -> void:
 	if not _creation_active or token != _creation_generation:
 		return
 	var totals: Dictionary = {}
 	_character_draft["equipment_rolls"] = totals
-	var base_terms := [["Silver", 6, 2], ["Omens", 2, 1], ["Food", 4, 1], ["Equipment pack", 6, 1], ["Equipment first", 12, 1], ["Equipment second", 12, 1]]
+	var profile: Dictionary = _character_draft.get("class_profile", {})
+	var base_terms := [["Silver", 6, int(profile.get("silver_count", 2))], ["Omens", int(profile.get("omen_faces", 2)), 1], ["Food", 4, 1], ["Equipment pack", 6, 1], ["Equipment first", 12, 1], ["Equipment second", 12, 1]]
 	for term in base_terms:
 		var result: SDK.DiceRollResult = await _automatic_roll(term[0], term[1], term[2], token)
 		if token != _creation_generation or not _creation_active:
@@ -306,12 +376,18 @@ func _roll_character_equipment(token: int) -> void:
 			_set_status(result.message, true)
 			return
 		totals[term[0]] = _roll_total(result, term[1])
+	var scrolls_resolved: bool = await _resolve_starting_scrolls(totals, token)
+	if not scrolls_resolved:
+		return
 	var first_roll := int(totals.get("Equipment first", 0))
 	var second_roll := int(totals.get("Equipment second", 0))
 	var conditional_terms: Array = []
-	if first_roll == 5:
+	if str(_character_draft.get("class_id", "")) == "esoteric-hermit":
+		conditional_terms.append(["Hermit scroll family", 2, 1])
+		conditional_terms.append(["Hermit scroll", 10, 1])
+	if first_roll == 5 and not _scroll_was_disposed("first"):
 		conditional_terms.append(["Unclean scroll", 10, 1])
-	if second_roll == 2:
+	if second_roll == 2 and not _scroll_was_disposed("second"):
 		conditional_terms.append(["Sacred scroll", 10, 1])
 	if first_roll == 11:
 		conditional_terms.append(["Red poison doses", 4, 1])
@@ -330,7 +406,7 @@ func _roll_character_equipment(token: int) -> void:
 			_show_creation_route(_character_stage)
 			_set_status(conditional_result.message, true)
 			return
-		totals[term[0]] = _roll_total(conditional_result)
+		totals[term[0]] = _roll_total(conditional_result, term[1])
 	var creature_roll_result: Dictionary = await _roll_starting_creature_grants(second_roll, totals, token)
 	if token != _creation_generation or not _creation_active:
 		return
@@ -341,7 +417,10 @@ func _roll_character_equipment(token: int) -> void:
 		_show_creation_route(_character_stage)
 		_set_status(str(creature_roll_result.get("message", "Starting Creature Roll failed.")), true)
 		return
-	var weapon_faces := 6 if first_roll == 5 or second_roll == 2 else 10
+	var has_scroll := (first_roll == 5 and not _scroll_was_disposed("first")) or (second_roll == 2 and not _scroll_was_disposed("second"))
+	var weapon_faces := int(profile.get("weapon_faces", 10))
+	if has_scroll and weapon_faces > 6:
+		weapon_faces = 6
 	var weapon_result: SDK.DiceRollResult = await _automatic_roll("Weapon", weapon_faces, 1, token)
 	if token != _creation_generation or not _creation_active:
 		return
@@ -353,7 +432,9 @@ func _roll_character_equipment(token: int) -> void:
 		_set_status(weapon_result.message, true)
 		return
 	totals["Weapon"] = _roll_total(weapon_result)
-	var armor_faces := 2 if first_roll == 5 or second_roll == 2 else 4
+	var armor_faces := int(profile.get("armor_faces", 4))
+	if has_scroll and armor_faces > 2:
+		armor_faces = 2
 	var armor_result: SDK.DiceRollResult = await _automatic_roll("Armor", armor_faces, 1, token)
 	if token != _creation_generation or not _creation_active:
 		return
@@ -389,12 +470,16 @@ func _roll_character_equipment(token: int) -> void:
 		inventory.append({"name": _character_draft["pack"], "source_item_id": _pack_id(str(_character_draft["pack"]))})
 	var first_item := _first_equipment_item(first_roll, totals)
 	var second_item := _second_equipment_item(second_roll, totals)
-	if not first_item.is_empty():
+	if not first_item.is_empty() and not _scroll_was_disposed("first"):
 		inventory.append(first_item)
 	if first_roll == 8:
 		inventory.append({"name": "Lockpicks", "source_item_id": "lockpicks"})
-	if not second_item.is_empty():
+	if not second_item.is_empty() and not _scroll_was_disposed("second"):
 		inventory.append(second_item)
+	if totals.has("Hermit scroll"):
+		var sacred := int(totals.get("Hermit scroll family", 0)) == 1
+		var hermit_scroll := int(totals.get("Hermit scroll", 0))
+		inventory.append({"name": ("Sacred" if sacred else "Unclean") + " scroll %d" % hermit_scroll, "source_item_id": _indexed_item_id(SACRED_SCROLL_IDS if sacred else UNCLEAN_SCROLL_IDS, hermit_scroll), "roll": hermit_scroll})
 	var weapon_id := _indexed_item_id(WEAPON_IDS, int(totals.get("Weapon", 0)))
 	inventory.append({"name": weapon_name, "source_item_id": weapon_id, "roll": int(totals.get("Weapon", 0)), "kind": "Weapon", "equipped": true})
 	var presence: Dictionary = _character_draft.get("abilities", {}).get("Presence", {})
@@ -405,8 +490,16 @@ func _roll_character_equipment(token: int) -> void:
 		inventory.append({"name": "Bolt", "source_item_id": "bolt", "quantity": ammunition_quantity})
 	if armor_name != "No armor":
 		inventory.append({"name": armor_name, "source_item_id": _indexed_item_id(ARMOR_IDS, int(totals.get("Armor", 0))), "roll": int(totals.get("Armor", 0)), "kind": "Armor", "equipped": true})
+	var feature: Dictionary = CLASSES.new().feature(str(_character_draft.get("class_id", "classless")), int(_character_draft.get("feature_roll", 0)))
+	if feature.has("item"):
+		var feature_source: Dictionary = feature["item"]
+		var feature_item: Dictionary = feature_source.duplicate(true)
+		feature_item["rules"] = feature.get("rules", "")
+		inventory.append(feature_item)
 	_character_draft["inventory"] = inventory
 	var creature_grants: Array = creature_roll_result.get("grants", [])
+	if feature.has("creature"):
+		creature_grants.append({"definition_id": feature["creature"]})
 	var starting_creature_ids: Array = _starting_creature_ids_for_grants(creature_grants)
 	if starting_creature_ids.size() != creature_grants.size():
 		_character_draft["equipment_roll_pending"] = false
@@ -423,6 +516,47 @@ func _roll_character_equipment(token: int) -> void:
 	_character_stage = "create-equipment"
 	_show_creation_route(_character_stage)
 	_set_status("Starting equipment is ready. Choose a source-defined pack.")
+
+
+func _resolve_starting_scrolls(totals: Dictionary, token: int) -> bool:
+	if str(_character_draft.get("class_id", "")) != "fanged-deserter":
+		return true
+	for slot_data in [["first", "Equipment first", 5], ["second", "Equipment second", 2]]:
+		var slot: String = slot_data[0]
+		var title: String = slot_data[1]
+		while int(totals.get(title, 0)) == int(slot_data[2]):
+			_scroll_choice = ""
+			_character_draft["scroll_choice_slot"] = slot
+			_show_creation_route("create-equipment")
+			primary_changed.emit("Choose scroll use", true)
+			scroll_choice_requested.emit(slot)
+			await scroll_decided
+			if token != _creation_generation or not _creation_active:
+				return false
+			var dispositions: Array = _character_draft.get("scroll_dispositions", [])
+			dispositions.append({"slot": slot, "disposition": _scroll_choice, "equipment_roll": int(slot_data[2])})
+			if _scroll_choice != "reroll":
+				break
+			var result: SDK.DiceRollResult = await _automatic_roll(title, 12, 1, token)
+			if token != _creation_generation or not _creation_active:
+				return false
+			if not result.ok:
+				_character_draft["equipment_roll_pending"] = false
+				_character_draft["equipment_roll_failed"] = true
+				_show_creation_route("create-equipment")
+				_set_status(result.message, true)
+				return false
+			totals[title] = _roll_total(result)
+	return true
+
+
+func _scroll_was_disposed(slot: String) -> bool:
+	var dispositions: Array = _character_draft.get("scroll_dispositions", [])
+	for raw_disposition in dispositions:
+		var disposition: Dictionary = raw_disposition
+		if str(disposition.get("slot", "")) == slot and str(disposition.get("disposition", "")) != "reroll":
+			return true
+	return false
 
 
 func _first_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
@@ -512,6 +646,7 @@ func _starting_creature_ids_for_grants(grants: Array) -> Array:
 
 
 func _automatic_roll(name: String, faces: int, count: int, token: int) -> SDK.DiceRollResult:
+	_character_draft["active_roll_formula"] = "%dd%d" % [count, faces]
 	_character_draft["active_roll"] = name
 	_character_draft["roll_ready"] = true
 	_roll_ready = true
@@ -619,6 +754,7 @@ func _commit_character() -> void:
 		return
 	var token := _creation_generation
 	var choices: Dictionary = {
+		"creation_roll_sequence": _character_draft.get("creation_roll_sequence", 0),
 		"class_id": _character_draft.get("class_id", "classless"),
 		"class_title": _character_draft.get("class_title", "No Class"),
 		"abilities": _character_draft.get("abilities", {}),
@@ -631,6 +767,9 @@ func _commit_character() -> void:
 		"hit_points": _character_draft.get("hit_points", 1),
 		"maximum_hit_points": _character_draft.get("maximum_hit_points", 1),
 		"origin": _character_draft.get("origin", ""),
+		"origin_roll": _character_draft.get("origin_roll", 0),
+		"feature_roll": _character_draft.get("feature_roll", 0),
+		"scroll_dispositions": _character_draft.get("scroll_dispositions", []),
 		"preferred_miniature": _character_draft.get("preferred_miniature", {}),
 		"companion_sheets": _character_draft.get("companion_sheets", []),
 		"starting_creature_ids": _character_draft.get("starting_creature_ids", []),
@@ -651,6 +790,8 @@ func _commit_character() -> void:
 		var creature_choices: Dictionary = {}
 		if creature_index < choices["starting_creature_grants"].size():
 			creature_choices = choices["starting_creature_grants"][creature_index]
+		creature_choices = creature_choices.duplicate(true)
+		creature_choices["creation_roll_sequence"] = choices["creation_roll_sequence"]
 		child_requests.append({
 			"package_id": creature_definition.reference.package_id,
 			"local_id": creature_definition.reference.local_id,
@@ -664,6 +805,7 @@ func _commit_character() -> void:
 		_set_busy(false, result.message if not result.ok else "Character was not created.", true)
 		return
 	_creation_active = false
+	scroll_decided.emit()
 	_roll_ready = false
 	roll_requested.emit()
 	_character_draft = {}

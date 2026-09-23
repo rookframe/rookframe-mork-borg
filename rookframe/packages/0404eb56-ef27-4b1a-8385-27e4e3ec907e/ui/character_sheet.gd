@@ -1,8 +1,10 @@
 extends VBoxContainer
 
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const COMPANIONS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_companions.tscn")
 const CHARACTER_SHEET_VIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_view.tscn")
 
+signal companion_selected(actor: SDK.Actor)
 signal sheet_changed
 
 var sdk: SDK
@@ -47,7 +49,11 @@ func _render_character_sheet() -> void:
 	clear_character_sheet()
 	if _character_actor == null:
 		return
+	if _character_route == "companions":
+		_show_companions()
+		return
 	var view = CHARACTER_SHEET_VIEW_SCENE.instantiate()
+	view.companions_requested.connect(_on_companions_requested)
 	view.edit_requested.connect(_on_edit_requested)
 	view.value_save_requested.connect(_on_value_save_requested)
 	view.add_item_requested.connect(_on_add_item_requested)
@@ -217,3 +223,34 @@ func set_available_height(height: float) -> void:
 	if short_window != _short_window:
 		_short_window = short_window
 		_render_pending = true
+
+
+func _on_companions_requested() -> void:
+	_character_route = "companions"
+	_render_pending = true
+
+
+func _show_companions() -> void:
+	var result: SDK.ActorListResult = sdk.actors.list()
+	if not result.ok:
+		_set_status(result.message, true)
+		return
+	var companions: Array[SDK.Actor] = []
+	var character_data: Dictionary = _character_actor.data
+	var creation_roll := int(character_data.get("creation_roll_sequence", 0))
+	# The shared raw Roll sequence is durable creation provenance. It is included
+	# in every payload of the atomic grant, never inferred from names or catalogue IDs.
+	for actor in result.items:
+		var data: Dictionary = actor.data
+		if creation_roll > 0 and str(data.get("schema", "")) == "mork-borg-adversary/v1" and int(data.get("creation_roll_sequence", 0)) == creation_roll:
+			companions.append(actor)
+	var view = COMPANIONS_SCENE.instantiate()
+	view.back_requested.connect(_on_cancel_requested)
+	view.actor_requested.connect(_on_companion_selected)
+	_content.add_child(view)
+	view.configure(companions)
+	_character_view = view
+
+
+func _on_companion_selected(actor: SDK.Actor) -> void:
+	companion_selected.emit(actor)

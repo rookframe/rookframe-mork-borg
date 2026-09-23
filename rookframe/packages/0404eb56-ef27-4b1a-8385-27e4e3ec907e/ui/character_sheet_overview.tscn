@@ -457,9 +457,14 @@ theme_override_font_sizes/font_size = 14
 text = "No Class"
 autowrap_mode = 2
 
-[node name="Companions" type="Label" parent="Body/Context"]
+[node name="Companions" type="Button" parent="Body/Context"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 14
-text = ""
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "View companions"
+
+[node name="Traits" type="Label" parent="Body/Context/Identity/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+theme_override_font_sizes/font_size = 16
 autowrap_mode = 2

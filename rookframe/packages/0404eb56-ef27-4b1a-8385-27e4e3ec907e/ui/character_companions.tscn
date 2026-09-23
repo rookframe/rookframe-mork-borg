@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_companions.gd" id="1"]
+[node name="Companions" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+script = ExtResource("1")
+[node name="Back" type="Button" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeQuietButton"
+text = "Back to Character"
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+text = "GRANTED CREATURES"
+[node name="Items" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Empty" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 2
+text = "No granted Creature sheets are available to you."
+[node name="Hint" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+text = "Each creature has its own sheet. Open a sheet to name and place its Rook."

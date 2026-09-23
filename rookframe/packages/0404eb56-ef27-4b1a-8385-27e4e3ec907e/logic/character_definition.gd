@@ -1,11 +1,11 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/actor_definition.gd"
 
-## Source-backed classless character definition for the first creator slice.
+## Source-backed Character definitions for the first four creation branches.
 ## The UI owns the staged draft and physical Rolls; this resource owns the
 ## durable Character schema and validates the source-defined choices that can
 ## cross the SDK boundary.
-const CLASS_ID := "classless"
-const CLASS_TITLE := "No Class"
+const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
+@export var class_id := "classless"
 const ABILITY_NAMES := ["Agility", "Presence", "Strength", "Toughness"]
 const PACK_CHOICES: Array[String] = ["Nothing", "Backpack", "Sack", "Small wagon", "Donkey"]
 const WEAPON_RESULTS := ["Femur", "Staff", "Shortsword", "Knife", "Warhammer", "Sword", "Bow", "Flail", "Crossbow", "Zweihander"]
@@ -14,11 +14,15 @@ const ARMOR_RESULTS := ["No armor", "Light armor", "Medium armor", "Heavy armor"
 ## Creature grants are admitted only from SOURCE_CREATURE_CHOICES after the
 ## source equipment table selects a combat profile.
 const STARTING_CREATURES: Array[String] = []
-const SOURCE_CREATURE_CHOICES := ["dog-small-but-vicious", "monkey"]
+const SOURCE_CREATURE_CHOICES := ["dog-small-but-vicious", "monkey", "ancient-gore-hound", "hawk-as-weapon"]
 
 
 func create_data(raw_choices: Variant) -> Variant:
 	var choices: Dictionary = raw_choices
+	var profile: Dictionary = CLASSES.new().profile(class_id)
+	var feature_roll: int = choices.get("feature_roll", 0)
+	var origin_roll: int = choices.get("origin_roll", 0)
+	var feature: Dictionary = CLASSES.new().feature(class_id, feature_roll)
 	var abilities: Dictionary = {}
 	var submitted_abilities: Dictionary = choices.get("abilities", {})
 	for ability_name in ABILITY_NAMES:
@@ -66,10 +70,11 @@ func create_data(raw_choices: Variant) -> Variant:
 	var companion_sheets: Array = choices.get("companion_sheets", [])
 	var starting_creature_grants: Array = choices.get("starting_creature_grants", [])
 	return {
+		"creation_roll_sequence": choices.get("creation_roll_sequence", 0),
 		"schema": "mork-borg-character/v1",
-		"definition_id": CLASS_ID,
-		"class_id": CLASS_ID,
-		"class_title": CLASS_TITLE,
+		"definition_id": class_id,
+		"class_id": class_id,
+		"class_title": profile.get("title", "No Class"),
 		"name": name,
 		"description": description,
 		"abilities": abilities,
@@ -79,8 +84,12 @@ func create_data(raw_choices: Variant) -> Variant:
 		"omens": omens,
 		"pack": pack,
 		"inventory": inventory,
-		"origin": choices.get("origin", ""),
-		"traits": [],
+		"origin": CLASSES.new().origin(class_id, origin_roll),
+		"origin_roll": origin_roll,
+		"feature_roll": feature_roll,
+		"traits": [] if feature.is_empty() else [feature],
+		"class_rules": profile.get("rules", []),
+		"scroll_dispositions": choices.get("scroll_dispositions", []).duplicate(true),
 		"preferred_miniature": choices.get("preferred_miniature", {}),
 		"companion_sheets": companion_sheets,
 		"starting_creature_ids": starting_creatures,

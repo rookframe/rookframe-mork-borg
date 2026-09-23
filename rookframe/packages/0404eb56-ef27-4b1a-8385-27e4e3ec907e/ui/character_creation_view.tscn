@@ -1,9 +1,11 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_view.gd" id="1"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_area.tscn" id="4"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/choice_row.tscn" id="5"]
+
+[sub_resource type="ButtonGroup" id="Classes"]
 
 [node name="CreationView" type="BoxContainer"]
 layout_mode = 2
@@ -26,10 +28,10 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 theme_override_font_sizes/font_size = 16
-text = "CLASS"
+text = "CHOOSE A CLASS"
 autowrap_mode = 2
 
-[node name="Class" type="VBoxContainer" parent="Main/Content"]
+[node name="Class" type="GridContainer" parent="Main/Content"]
 layout_mode = 2
 visible = false
 theme_override_constants/separation = 8
@@ -65,6 +67,36 @@ custom_minimum_size = Vector2(0, 44)
 title = "NO CLASS"
 description = "Normal ability rolls"
 button_pressed = true
+button_group = SubResource("Classes")
+size_flags_horizontal = 3
+action_label = ""
+variant = 1
+
+[node name="FangedDeserter" parent="Main/Content/Class" instance=ExtResource("5")]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+title = "FANGED DESERTER"
+button_group = SubResource("Classes")
+action_label = ""
+variant = 1
+
+[node name="GutterbornScum" parent="Main/Content/Class" instance=ExtResource("5")]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+title = "GUTTERBORN SCUM"
+button_group = SubResource("Classes")
+action_label = ""
+variant = 1
+
+[node name="EsotericHermit" parent="Main/Content/Class" instance=ExtResource("5")]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+title = "ESOTERIC HERMIT"
+button_group = SubResource("Classes")
+action_label = ""
 variant = 1
 
 [node name="Explanation" type="Label" parent="Main/Content/Origin"]
@@ -81,6 +113,12 @@ theme_override_font_sizes/font_size = 16
 text = "Continue to starting equipment."
 autowrap_mode = 2
 
+[node name="OriginRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="FeatureRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+layout_mode = 2
+
 [node name="Agility" parent="Main/Content/Abilities" instance=ExtResource("2")]
 layout_mode = 2
 
@@ -95,6 +133,34 @@ layout_mode = 2
 
 [node name="HitPoints" parent="Main/Content/Abilities" instance=ExtResource("2")]
 layout_mode = 2
+
+[node name="ScrollChoice" type="VBoxContainer" parent="Main/Content/Equipment"]
+layout_mode = 2
+visible = false
+
+[node name="Explanation" type="Label" parent="Main/Content/Equipment/ScrollChoice"]
+layout_mode = 2
+text = "You cannot read this scroll. Choose what to do with it."
+autowrap_mode = 2
+theme_type_variation = &"RookframeBody"
+
+[node name="Reroll" type="Button" parent="Main/Content/Equipment/ScrollChoice"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Reroll equipment"
+
+[node name="Eat" type="Button" parent="Main/Content/Equipment/ScrollChoice"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Eat it"
+
+[node name="Paper" type="Button" parent="Main/Content/Equipment/ScrollChoice"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Use as toilet paper"
 
 [node name="Silver" parent="Main/Content/Equipment" instance=ExtResource("2")]
 layout_mode = 2
@@ -119,6 +185,10 @@ layout_mode = 2
 
 [node name="Armor" parent="Main/Content/Equipment" instance=ExtResource("2")]
 layout_mode = 2
+
+[node name="ExtraRoll" parent="Main/Content/Equipment" instance=ExtResource("2")]
+layout_mode = 2
+visible = false
 
 [node name="Name" parent="Main/Content/Identity" instance=ExtResource("3")]
 layout_mode = 2

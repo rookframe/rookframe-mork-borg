@@ -6,6 +6,7 @@ const CHARACTER_CREATOR_SCENE = preload("res://rookframe/packages/0404eb56-ef27-
 const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd")
 @onready var _creation_progress: CREATION_PROGRESS = get_node(^"Layout/CreationProgress")
 
+var _pending_companion: SDK.Actor
 var _character_actor: SDK.Actor
 var _character_content: VBoxContainer
 var _character_creator: Variant
@@ -33,6 +34,10 @@ var _character_miniature_choices: Array[Dictionary] = []
 
 
 func _process(_delta: float) -> void:
+	if _pending_companion != null:
+		var companion := _pending_companion
+		_pending_companion = null
+		_navigate_companion(companion)
 	_update_character_density()
 	if _character_sheet != null:
 		_character_sheet.set_available_height(size.y)
@@ -255,6 +260,7 @@ func _ensure_character_content() -> void:
 	creator.busy_changed.connect(_on_creator_busy)
 	creator.primary_changed.connect(_on_creator_primary)
 	creator.character_created.connect(_on_creator_created)
+	creator.scroll_choice_requested.connect(_on_scroll_choice_requested)
 	_content.add_child(creator)
 	_character_creator = creator
 	var sheet = CHARACTER_SHEET_SCENE.instantiate()
@@ -263,6 +269,7 @@ func _ensure_character_content() -> void:
 	_content.add_child(sheet)
 	_character_sheet = sheet
 	sheet.sheet_changed.connect(_on_sheet_changed)
+	sheet.companion_selected.connect(_open_companion)
 	creator.visible = false
 	sheet.visible = false
 
@@ -413,3 +420,15 @@ func _update_character_density() -> void:
 		_set_window_title("CREATE CHARACTER")
 	elif _character_actor != null:
 		_set_window_title(str(_character_actor.data.get("name", "Unnamed Character")))
+
+
+func _open_companion(actor: SDK.Actor) -> void:
+	_pending_companion = actor
+
+
+func _navigate_companion(_actor: SDK.Actor) -> void:
+	pass
+
+
+func _on_scroll_choice_requested(_slot: String) -> void:
+	_body.scroll_vertical = 0

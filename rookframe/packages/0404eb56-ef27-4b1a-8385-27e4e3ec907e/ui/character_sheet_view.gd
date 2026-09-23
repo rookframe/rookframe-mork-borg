@@ -7,6 +7,7 @@ const EDIT_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e
 const APPEARANCE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_appearance.tscn")
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 
+signal companions_requested
 signal edit_requested
 signal value_save_requested(key: String, value: int)
 signal add_item_requested
@@ -48,6 +49,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		inventory_view.configure(data, miniatures)
 		return
 	var overview_view = OVERVIEW_SCENE.instantiate()
+	overview_view.companions_requested.connect(_emit_companions_requested)
 	overview_view.edit_requested.connect(_emit_edit_requested)
 	overview_view.value_save_requested.connect(_emit_value_save_requested)
 	content.add_child(overview_view)
@@ -80,3 +82,7 @@ func _emit_appearance_save_requested(index: int) -> void:
 
 func _emit_value_save_requested(key: String, value: int) -> void:
 	value_save_requested.emit(key, value)
+
+
+func _emit_companions_requested() -> void:
+	companions_requested.emit()

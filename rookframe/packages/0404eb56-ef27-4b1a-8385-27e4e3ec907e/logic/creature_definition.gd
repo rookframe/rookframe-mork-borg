@@ -3,6 +3,8 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/actor
 ## Immutable MÖRK BORG core definitions. A live Actor receives a deep copy and
 ## can then edit its private encounter sheet without changing this catalogue.
 const CORE_DEFINITIONS: Dictionary = {
+	"hawk-as-weapon": {"display_name": "Hawk as weapon", "hit_points": 8, "morale": {"kind": "none"}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Claws / bite", "dice": "d4", "attack_dr": 10}], "defence_dr": 10, "rules": "Loyal only to its Hermit, who understands its cries. Keeps watch, scouts and attacks."},
+	"ancient-gore-hound": {"display_name": "Ancient gore-hound", "hit_points": 10, "morale": {"kind": "none"}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Bite", "dice": "d6", "attack_dr": 10}], "defence_dr": 12, "rules": "Sniffs out treasure in debris. Frenzied around goblins and berserkers."},
 	"dog-small-but-vicious": {"display_name": "Small but vicious dog", "hit_points": 8, "morale": {"kind": "none"}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Bite", "dice": "d4"}]},
 	"aland-wickhead": {"display_name": "Aland, Wickhead knife-wielder", "hit_points": 10, "morale": {"kind": "fixed", "value": 7}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Knife with dried blood", "dice": "d4"}]},
 	"arbint-troll": {"display_name": "Arbint, Troll", "hit_points": 32, "morale": {"kind": "special"}, "armor": {"name": "Thick hide", "reduction": "d2"}, "attacks": [{"name": "Fist", "dice": "2d6"}]},
@@ -33,7 +35,12 @@ func create_data(raw_choices: Variant) -> Variant:
 		"armor": definition.get("armor", {"name": "No armor", "reduction": ""}),
 		"attacks": definition.get("attacks", []),
 		"inventory": [],
+		"rules": definition.get("rules", ""),
 	}
+	if definition.has("defence_dr"):
+		data["defence_dr"] = definition["defence_dr"]
+	if choices.has("creation_roll_sequence"):
+		data["creation_roll_sequence"] = choices["creation_roll_sequence"]
 	for key in ["name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
 		if choices.has(key):
 			data[key] = choices[key]

@@ -1,6 +1,7 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_workflow.gd"
 
 const CREATURE_KIND := "actor_definition"
+var _pending_route := ""
 
 func ready() -> void:
 	if sdk == null:
@@ -137,7 +138,7 @@ func _render_definitions() -> void:
 	for child in _definition_list.get_children():
 		child.queue_free()
 	for entry in _definitions:
-		if entry.reference.local_id == "classless-character":
+		if ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character"].has(entry.reference.local_id):
 			continue
 		var button := Button.new()
 		button.text = entry.title
@@ -233,6 +234,8 @@ func _render_actor() -> void:
 	_rules.text = "Quick, attacks and defence are DR14."
 	if armor_name != "No armor":
 		_rules.text = "%s · quick, attacks and defence are DR14." % armor_name
+	if actor_data.has("defence_dr"):
+		_rules.text = "Defence DR%d. %s" % [int(actor_data["defence_dr"]), str(actor_data.get("rules", ""))]
 	_private_name.set("value", private_name)
 	_public_label.set("value", _selected_actor.public_label)
 	_hit_points.set("value", str(hit_points))
@@ -240,10 +243,10 @@ func _render_actor() -> void:
 	_morale.set("value", str(morale_number))
 	_render_equipment(attacks)
 	_render_inventory(attacks)
-	_save_button.disabled = not sdk.context().is_gm
+	_save_button.disabled = _selected_actor.access_level != "Owner"
 	_duplicate_button.disabled = not sdk.context().is_gm
-	_place_button.disabled = not sdk.context().is_gm
-	_edit_button.disabled = not sdk.context().is_gm
+	_place_button.disabled = _selected_actor.access_level != "Owner"
+	_edit_button.disabled = _selected_actor.access_level != "Owner"
 	_inventory_button.disabled = false
 
 
@@ -285,6 +288,8 @@ func _render_equipment(attacks: Array) -> void:
 		var attack_name: String = attack.get("name", "Attack")
 		var attack_dice: String = attack.get("dice", "—")
 		var detail: String = "%s · Equipped" % attack_dice
+		if attack.has("attack_dr"):
+			detail += " · Attack DR%d" % int(attack["attack_dr"])
 		row.text = "%s\n%s" % [attack_name, detail]
 		_equipment_list.add_child(row)
 
@@ -339,6 +344,18 @@ func _inventory_row(attack: Dictionary, equipped: bool) -> Control:
 
 
 func _show_route(route: String) -> void:
+	_pending_route = route
+
+
+func _process(delta: float) -> void:
+	super._process(delta)
+	if not _pending_route.is_empty():
+		var route := _pending_route
+		_pending_route = ""
+		_apply_route(route)
+
+
+func _apply_route(route: String) -> void:
 	if route.begins_with("create-") or route in ["character", "edit", "appearance"]:
 		_show_character_route(route)
 		return
@@ -380,11 +397,11 @@ func _show_route(route: String) -> void:
 	_inventory.visible = inventory
 	_action_bar.visible = sheet or edit
 	_create_button.visible = false
-	_edit_button.visible = sheet and sdk.context().is_gm
+	_edit_button.visible = sheet and _selected_actor != null and _selected_actor.access_level == "Owner"
 	_inventory_button.visible = sheet
 	_duplicate_button.visible = sheet and sdk.context().is_gm
-	_place_button.visible = sheet and sdk.context().is_gm
-	_save_button.visible = edit and sdk.context().is_gm
+	_place_button.visible = sheet and _selected_actor != null and _selected_actor.access_level == "Owner"
+	_save_button.visible = edit and _selected_actor != null and _selected_actor.access_level == "Owner"
 	_add_item_button.visible = false
 	_inventory_add.visible = inventory and sdk.context().is_gm
 	_back_button.visible = edit
@@ -611,3 +628,7 @@ func opened(actor_id: SDK.ActorId) -> void:
 		_select_actor(result.actor)
 	else:
 		_set_status(result.message, true)
+
+
+func _navigate_companion(actor: SDK.Actor) -> void:
+	_select_actor(actor)

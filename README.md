@@ -6,8 +6,9 @@ releases belong here. Rookframe application capabilities belong in
 [rookframe-godot](https://github.com/rookframe/rookframe-godot); shared authoring
 capabilities belong in the SDK and reusable UI components in the UI Kit.
 
-The first playable slices provide classless Character creation, editable
-Character sheets and the private Creature catalogue.
+The first playable slices provide No Class, Fanged Deserter, Gutterborn Scum
+and Esoteric Hermit creation, editable Character sheets, individual granted
+Creature Actors and the private Creature catalogue.
 
 ## Dependencies
 
@@ -63,3 +64,29 @@ publish the Package archive and public HTTPS Manifest. The
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
+
+## Character creation checks
+
+Run the focused Godot suite with the installed public dependencies:
+
+```sh
+godot --headless --path . --script tests/character_creation.gd
+```
+
+The suite exercises authored System actions through the generated public SDK.
+It covers all 18 Fanged Deserter, Gutterborn Scum and Esoteric Hermit features,
+source origins, class dice, scroll choices (including repeated equipment
+rerolls), late Roll/choice discard, atomic refusal/retry and companion projection.
+Only the external host randomness/storage boundary is substituted. Host authority,
+persistence and replication remain covered by the application's Package Services
+suite and the published Manifest journey.
+
+Bare Bones pages 46–49 and the retained Bevy optional-class creation branches are
+the rules sources. Benefits, daily uses, Omen effects and durations remain table
+managed. A Book of boiling blood or Invisible College feature does not summon
+Actors during creation. The gore-hound and hawk use only their printed profiles.
+
+Each atomic creation payload records its first committed raw Roll's shared Action
+Log sequence. The Character's companion list uses this durable creation provenance
+and the public Actor list, so same-named creatures from another creation are not
+mistaken for its grants. SDK Actor access controls the visible results.
