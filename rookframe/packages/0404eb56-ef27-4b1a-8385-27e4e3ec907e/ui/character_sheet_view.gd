@@ -8,6 +8,7 @@ const APPEARANCE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-83
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 
 signal edit_requested
+signal value_save_requested(key: String, value: int)
 signal add_item_requested
 signal item_save_requested(item_name: String)
 signal sheet_save_requested(private_name: String, description: String, hit_points: int, maximum_hit_points: int, silver: int, omens: int, abilities: Dictionary, inventory: Array)
@@ -48,6 +49,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		return
 	var overview_view = OVERVIEW_SCENE.instantiate()
 	overview_view.edit_requested.connect(_emit_edit_requested)
+	overview_view.value_save_requested.connect(_emit_value_save_requested)
 	content.add_child(overview_view)
 	overview_view.configure(data, miniatures)
 
@@ -74,3 +76,7 @@ func _emit_cancel_requested() -> void:
 
 func _emit_appearance_save_requested(index: int) -> void:
 	appearance_save_requested.emit(index)
+
+
+func _emit_value_save_requested(key: String, value: int) -> void:
+	value_save_requested.emit(key, value)

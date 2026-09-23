@@ -1,7 +1,6 @@
 extends VBoxContainer
 
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
-const SECTION_SCENE = preload("res://rookframe/ui/components/layout/section.tscn")
 const CHARACTER_DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
 const FIRST_EQUIPMENT_NAMES := ["Rope", "Torch", "Lantern with oil", "Magnesium strip", "Unclean scroll", "Sharp needle", "Medicine box", "Metal file", "Bear trap", "Bomb", "Red poison", "Silver crucifix"]
 const SECOND_EQUIPMENT_NAMES := ["Life elixir", "Sacred scroll", "Small but vicious dog", "Monkeys", "Exquisite perfume", "Toolbox", "Heavy chain", "Grappling hook", "Shield", "Crowbar", "Lard", "Tent"]
@@ -13,6 +12,8 @@ const PACK_IDS := ["backpack", "sack", "small-wagon", "donkey"]
 const UNCLEAN_SCROLL_IDS := ["palms-open-the-southern-gate", "tongue-of-eris", "te-le-kin-esis", "lucy-fires-levitation", "daemon-of-capillaries", "nine-violet-signs-unknot-the-storm", "metzhuotl-blind-your-eye", "foul-psychompomp", "eyelid-blinds-the-mind", "death"]
 const SACRED_SCROLL_IDS := ["grace-of-a-dead-saint", "grace-for-a-sinner", "whispers-pass-the-gate", "aegis-of-sorrow", "unmet-fate", "bestial-speech", "false-dawn-nights-chariot", "hermetic-step", "roskoes-consuming-glare", "enochian-syntax"]
 
+signal roll_requested
+signal stage_changed(step: int, title: String)
 signal status_changed(message: String, error: bool)
 signal busy_changed(value: bool)
 signal primary_changed(text: String, disabled: bool)
@@ -31,14 +32,14 @@ var _character_stage := "create-class"
 var _creation_generation := 0
 var _creation_active := false
 var _busy := false
+var _roll_ready := false
 var _character_tab := "character"
 var _character_name_field
 var _character_description_field
 var _character_fields: Dictionary = {}
 var _preferred_miniature_index := 0
 var _source_definition
-@onready var _progress := get_node(^"Progress") as Control
-@onready var _stage_body := get_node(^"StageBody") as VBoxContainer
+@onready var _view := get_node(^"View")
 
 
 func configure(definitions: Array[SDK.ContentEntry], character_definition: SDK.ContentEntry, miniatures: Array[SDK.ContentEntry], compact: bool, facade: SDK, miniature_choices: Array[Dictionary] = []) -> void:
@@ -73,9 +74,6 @@ func is_active() -> bool:
 
 func clear_creation() -> void:
 	_discard_character_creation()
-	for child in _stage_body.get_children():
-		_stage_body.remove_child(child)
-		child.queue_free()
 
 
 func show_creation_route(route: String) -> void:
@@ -85,31 +83,8 @@ func show_creation_route(route: String) -> void:
 func _ready() -> void:
 	_character_content = self
 	_source_definition = CHARACTER_DEFINITION.new()
-	_progress.set("accessible_label", "Character creation progress")
-
-func _label(text: String, variation: String = "RookframeBody") -> Label:
-	var label := Label.new()
-	label.text = text
-	label.theme_type_variation = variation
-	label.autowrap_mode = 2
-	return label
-
-
-func _button(text: String, primary: bool = false) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(0, 44)
-	button.focus_mode = 2
-	button.theme_type_variation = "RookframePrimaryButton" if primary else "RookframeSecondaryButton"
-	return button
-
-
-func _section(title: String, subtitle: String = "") -> VBoxContainer:
-	var section = SECTION_SCENE.instantiate()
-	section.set("title", title)
-	section.set("description", subtitle)
-	_stage_body.add_child(section)
-	return section.call("get_body_slot") as VBoxContainer
+	_view.get_node(^"Aside/Context/Content/Pack").pressed.connect(_on_pack_pressed)
+	_view.get_node(^"Aside/Context/Content/PreferredMiniature").pressed.connect(_cycle_preferred_miniature.bind(_view.get_node(^"Aside/Context/Content/PreferredMiniature")))
 
 
 func _stage_index(stage: String) -> int:
@@ -127,177 +102,30 @@ func _stage_index(stage: String) -> int:
 
 
 func _route_blocked(route: String) -> bool:
+	if _roll_ready:
+		return false
 	return bool(_character_draft.get("roll_pending", false)) or bool(_character_draft.get("equipment_roll_pending", false)) or bool(_character_draft.get("roll_failed", false)) or bool(_character_draft.get("equipment_roll_failed", false)) or route == "create-rolling"
 
 
 func _show_creation_route(route: String) -> void:
-	for child in _stage_body.get_children():
-		child.queue_free()
-	_character_fields = {}
-	_character_name_field = null
-	_character_description_field = null
 	_character_stage = route
-	_progress.set("current_step", _stage_index(route))
-	if route == "create-class":
-		_build_class_stage()
-	elif route == "create-rolling":
-		_build_abilities_stage()
-	elif route == "create-abilities":
-		_build_abilities_stage()
-	elif route == "create-origin":
-		_build_origin_stage()
-	elif route == "create-equipment":
-		_build_equipment_stage()
-	elif route == "create-identity":
-		_build_identity_stage()
-	elif route == "create-review":
-		_build_review_stage()
-	primary_changed.emit("Create character" if route == "create-review" else "Continue", _route_blocked(route))
+	_view.present_creation(route, _character_draft, _compact)
+	_character_name_field = _view.get_node(^"Main/Content/Identity/Name") if route == "create-identity" else null
+	_character_description_field = _view.get_node(^"Main/Content/Identity/Description") if route == "create-identity" else null
+	var title: String = ["Choose a class", "Abilities", "Origin & Traits", "Equipment", "Identity", "Review character"][_stage_index(route) - 1]
+	stage_changed.emit(_stage_index(route), title)
+	var primary := "Create character" if route == "create-review" else ("Review character" if route == "create-identity" else "Continue")
+	if bool(_character_draft.get("roll_pending", false)) or bool(_character_draft.get("equipment_roll_pending", false)):
+		primary = "Roll %s" % str(_character_draft.get("active_roll", "")) if _roll_ready else "Rolling…"
+	primary_changed.emit(primary, _route_blocked(route))
 
 
-func _build_class_stage() -> void:
-	var body: VBoxContainer = _section("CLASS", "Choose a class supplied by the installed MÖRK BORG source.")
-	var selected := _button("No Class\nNormal ability rolls · 1d8 hit points · 2d6 silver · 1d2 omens", true)
-	selected.alignment = 0
-	selected.disabled = true
-	body.add_child(selected)
-	body.add_child(_label("No class origin or traits are supplied by this source profile. The later stages remain explicit so the completed sheet keeps its source-backed shape.", "RookframeMeta"))
-	var facts := HBoxContainer.new()
-	facts.add_theme_constant_override("separation", 6)
-	for fact in ["3d6 abilities", "1d8 HP", "2d6 silver", "1d2 omens"]:
-		var fact_panel := PanelContainer.new()
-		fact_panel.theme_type_variation = "RookframeInsetSurface"
-		fact_panel.size_flags_horizontal = 3
-		fact_panel.add_child(_label(fact, "RookframeLabel"))
-		facts.add_child(fact_panel)
-	body.add_child(facts)
-
-
-func _build_abilities_stage() -> void:
-	var pending := bool(_character_draft.get("roll_pending", false))
-	var body: VBoxContainer = _section("ABILITIES", "Automatic physical Rolls are requested for the Player. No manual Throw is used.")
-	if pending:
-		body.add_child(_label("Rolling Agility, Presence, Strength, Toughness, and Hit points…", "RookframeMeta"))
-	elif bool(_character_draft.get("roll_failed", false)):
-		body.add_child(_label("The automatic Roll failed. Start over to request a fresh source Roll.", "RookframeError"))
-	else:
-		body.add_child(_label("The source uses normal ability rolls (3d6). The four modifiers stay visible on the completed sheet.", "RookframeMeta"))
-	var abilities: Dictionary = _character_draft.get("abilities", {})
-	for ability_name in ["Agility", "Presence", "Strength", "Toughness"]:
-		var value: Dictionary = abilities.get(ability_name, {})
-		var score := str(value.get("score", "—"))
-		var modifier := str(value.get("modifier", "—"))
-		body.add_child(_label("%s     %s     modifier %s" % [ability_name, score, modifier], "RookframeValue"))
-	var hp: Variant = _character_draft.get("hit_points", "—")
-	var maximum_hp: Variant = _character_draft.get("maximum_hit_points", hp)
-	body.add_child(_label("Hit points     %s / %s" % [hp, maximum_hp], "RookframeValue"))
-
-
-func _build_origin_stage() -> void:
-	var body: VBoxContainer = _section("ORIGIN & TRAITS", "The selected source profile does not declare an origin or traits.")
-	body.add_child(_label("No class origin or traits supplied by source", "RookframeValue"))
-	body.add_child(_label("Continue to choose the source-defined starting equipment pack.", "RookframeMeta"))
-
-
-func _build_equipment_stage() -> void:
-	var body: VBoxContainer = _section("EQUIPMENT", "Automatic source Rolls settle starting silver, omens, food, pack, weapon, and armor.")
-	var pending := bool(_character_draft.get("equipment_roll_pending", false))
-	if pending:
-		body.add_child(_label("Rolling starting equipment…", "RookframeMeta"))
-	elif bool(_character_draft.get("equipment_roll_failed", false)):
-		body.add_child(_label("The equipment Roll failed. Start over to request a fresh source Roll.", "RookframeError"))
+func _on_pack_pressed() -> void:
 	var totals: Dictionary = _character_draft.get("equipment_rolls", {})
-	for roll_name in ["Silver", "Omens", "Food", "Equipment pack", "Equipment first", "Equipment second", "Weapon", "Armor"]:
-		body.add_child(_label("%s     %s" % [roll_name, str(totals.get(roll_name, "—"))], "RookframeValue"))
-	body.add_child(_label("PACK", "RookframeSubtitle"))
-	var pack_roll := int(totals.get("Equipment pack", 0))
-	var choices: Array[String] = _source_definition.pack_choices_for_roll(pack_roll)
-	var selected_pack := str(_character_draft.get("pack", "Nothing"))
-	if choices.is_empty():
-		body.add_child(_label("Pack: %s" % selected_pack, "RookframeValue"))
-		choices = [selected_pack]
-	else:
-		var pack := _button("Pack: %s" % selected_pack)
-		pack.pressed.connect(_cycle_pack.bind(pack, choices))
-		body.add_child(pack)
-	var inventory: Array = _character_draft.get("inventory", [])
-	body.add_child(_label("Starting items: %s" % (_list_text(_inventory_names(inventory)) if not inventory.is_empty() else "none"), "RookframeMeta"))
-
-
-func _build_identity_stage() -> void:
-	var body: VBoxContainer = _section("IDENTITY", "Name and description are private Character data. Preferred Miniature is a published visual reference.")
-	_character_name_field = _new_line_field(body, "NAME", "Character name")
-	_character_name_field.set("value", str(_character_draft.get("name", "")))
-	_character_description_field = _new_text_field(body, "DESCRIPTION", "Describe this Character")
-	_character_description_field.set("value", str(_character_draft.get("description", "")))
-	var miniature: Button = _button("Choose a published Miniature")
-	miniature.name = "PreferredMiniature"
-	var selected_index := 0
-	var preferred_miniature: Dictionary = _character_draft.get("preferred_miniature", {})
-	var preferred_local_id: String = preferred_miniature.get("local_id", "")
-	for index in range(_character_miniature_choices.size()):
-		var choice: Dictionary = _character_miniature_choices[index]
-		if str(choice.get("local_id", "")) == preferred_local_id:
-			selected_index = index + 1
-	_preferred_miniature_index = selected_index
-	if selected_index > 0 and selected_index - 1 < _character_miniature_choices.size():
-		miniature.text = str(_character_miniature_choices[selected_index - 1].get("title", "Published Miniature"))
-	miniature.pressed.connect(_cycle_preferred_miniature.bind(miniature))
-	body.add_child(_label("PREFERRED MINIATURE", "RookframeLabel"))
-	body.add_child(miniature)
-	_character_fields["miniature"] = miniature
-
-
-func _build_review_stage() -> void:
-	var body: VBoxContainer = _section("REVIEW", "Review the complete staged Character before the all-or-nothing durable create.")
-	body.add_child(_label("%s · No Class" % str(_character_draft.get("name", "Unnamed Character")), "RookframeHeading"))
-	var abilities: Dictionary = _character_draft.get("abilities", {})
-	var ability_summary: Array[String] = []
-	for ability_name in ["Agility", "Presence", "Strength", "Toughness"]:
-		var ability: Dictionary = abilities.get(ability_name, {})
-		ability_summary.append("%s %s (%s)" % [ability_name, str(ability.get("score", "—")), str(ability.get("modifier", "—"))])
-	body.add_child(_label(_list_text(ability_summary, " · "), "RookframeMeta"))
-	body.add_child(_label("HP %s · Silver %s · Omens %s · Pack %s" % [str(_character_draft.get("hit_points", "—")), str(_character_draft.get("silver", 0)), str(_character_draft.get("omens", 0)), str(_character_draft.get("pack", "Nothing"))], "RookframeValue"))
-	body.add_child(_label("Origin & traits: none supplied by source", "RookframeMeta"))
-	var starting_creature_ids: Array = _character_draft.get("starting_creature_ids", [])
-	body.add_child(_label("Starting Creature grants: %s" % ("none" if starting_creature_ids.is_empty() else _list_text(starting_creature_ids)), "RookframeMeta"))
-
-
-func _inventory_names(items: Array) -> Array[String]:
-	var names: Array[String] = []
-	for item in items:
-		var item_data: Dictionary = item
-		var item_name: String = item_data.get("name", "Item")
-		names.append(item_name)
-	return names
-
-
-func _list_text(items: Array, separator: String = ", ") -> String:
-	if items.is_empty():
-		return ""
-	if items.size() == 1:
-		return items[0]
-	if items.size() == 2:
-		return "%s%s%s" % [items[0], separator, items[1]]
-	if items.size() == 3:
-		return "%s%s%s%s%s" % [items[0], separator, items[1], separator, items[2]]
-	return "%s%s%s%s%s%s%s" % [items[0], separator, items[1], separator, items[2], separator, items[3]]
-
-
-func _new_line_field(parent: VBoxContainer, label_text: String, placeholder: String):
-	var field = preload("res://rookframe/ui/components/forms/text_field.tscn").instantiate()
-	field.set("label_text", label_text)
-	field.set("placeholder", placeholder)
-	parent.add_child(field)
-	return field
-
-
-func _new_text_field(parent: VBoxContainer, label_text: String, placeholder: String):
-	var field = preload("res://rookframe/ui/components/forms/text_area.tscn").instantiate()
-	field.set("label_text", label_text)
-	field.set("placeholder", placeholder)
-	parent.add_child(field)
-	return field
+	var choices: Array[String] = _source_definition.pack_choices_for_roll(int(totals.get("Equipment pack", 0)))
+	if not choices.is_empty():
+		_cycle_pack(_view.get_node(^"Aside/Context/Content/Pack"), choices)
+		_view.present_creation(_character_stage, _character_draft, _compact)
 
 
 func _set_status(message: String, error: bool = false) -> void:
@@ -353,6 +181,8 @@ func _discard_character_creation() -> void:
 		return
 	_creation_generation += 1
 	_creation_active = false
+	_roll_ready = false
+	roll_requested.emit()
 	_character_draft = {}
 	_character_stage = "create-class"
 	_preferred_miniature_index = 0
@@ -363,6 +193,10 @@ func _discard_character_creation() -> void:
 
 func _on_character_primary_action() -> void:
 	if not _creation_active or _busy:
+		return
+	if _roll_ready:
+		_roll_ready = false
+		roll_requested.emit()
 		return
 	if _character_stage == "create-class":
 		_character_stage = "create-rolling"
@@ -415,6 +249,7 @@ func _roll_character_abilities(token: int) -> void:
 	if not _creation_active or token != _creation_generation:
 		return
 	var abilities: Dictionary = {}
+	_character_draft["abilities"] = abilities
 	for ability_name in ["Agility", "Presence", "Strength", "Toughness"]:
 		var result: SDK.DiceRollResult = await _automatic_roll(ability_name, 6, 3, token)
 		if token != _creation_generation or not _creation_active:
@@ -457,6 +292,7 @@ func _roll_character_equipment(token: int) -> void:
 	if not _creation_active or token != _creation_generation:
 		return
 	var totals: Dictionary = {}
+	_character_draft["equipment_rolls"] = totals
 	var base_terms := [["Silver", 6, 2], ["Omens", 2, 1], ["Food", 4, 1], ["Equipment pack", 6, 1], ["Equipment first", 12, 1], ["Equipment second", 12, 1]]
 	for term in base_terms:
 		var result: SDK.DiceRollResult = await _automatic_roll(term[0], term[1], term[2], token)
@@ -676,6 +512,15 @@ func _starting_creature_ids_for_grants(grants: Array) -> Array:
 
 
 func _automatic_roll(name: String, faces: int, count: int, token: int) -> SDK.DiceRollResult:
+	_character_draft["active_roll"] = name
+	_character_draft["roll_ready"] = true
+	_roll_ready = true
+	_show_creation_route(_character_stage)
+	await roll_requested
+	if token != _creation_generation or not _creation_active:
+		return SDK.DiceRollResult.new({"ok": false, "message": "Character creation was discarded."})
+	_character_draft["roll_ready"] = false
+	_show_creation_route(_character_stage)
 	_set_status("Rolling %s…" % name)
 	await get_tree().process_frame
 	if token != _creation_generation or not _creation_active:
@@ -712,9 +557,6 @@ func _sync_identity_fields() -> void:
 		_character_draft["name"] = _character_name_field.get("value")
 	if _character_description_field != null:
 		_character_draft["description"] = _character_description_field.get("value")
-	var miniature: Button = _character_fields.get("miniature") as Button
-	if miniature != null:
-		_set_preferred_miniature(_preferred_miniature_index, miniature)
 
 
 func _cycle_pack(pack: Button, choices: Array) -> void:
@@ -818,6 +660,8 @@ func _commit_character() -> void:
 		_set_busy(false, result.message if not result.ok else "Character was not created.", true)
 		return
 	_creation_active = false
+	_roll_ready = false
+	roll_requested.emit()
 	_character_draft = {}
 	_set_busy(false, "Character created with ordinary Owner access.")
 	character_created.emit(result.actor)

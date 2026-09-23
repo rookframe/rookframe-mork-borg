@@ -21,7 +21,7 @@ func _build() -> void:
 		for item in inventory:
 			var item_data: Dictionary = item
 			var item_name: String = item_data.get("name", "Item")
-			body.add_child(_label(item_name, "RookframeValue"))
+			body.add_child(_label(item_name, "RookframeBody"))
 	var add_item := _button("Add item")
 	add_item.pressed.connect(_emit_add_item_requested)
 	actions.add_child(add_item)
@@ -36,6 +36,7 @@ func _label(text: String, variation: String = "RookframeBody") -> Label:
 	label.text = text
 	label.theme_type_variation = variation
 	label.autowrap_mode = 2
+	label.set("theme_override_font_sizes/font_size", 16)
 	return label
 
 

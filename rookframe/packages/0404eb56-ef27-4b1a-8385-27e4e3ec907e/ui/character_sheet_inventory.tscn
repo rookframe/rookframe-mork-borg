@@ -12,4 +12,4 @@ script = ExtResource("1_script")
 [node name="InventorySection" parent="." instance=ExtResource("2_section")]
 layout_mode = 2
 title = "INVENTORY"
-description = "Durable Character inventory"
+description = "Carried items"

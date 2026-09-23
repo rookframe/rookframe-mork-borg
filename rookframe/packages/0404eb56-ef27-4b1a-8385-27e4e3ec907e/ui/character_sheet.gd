@@ -48,6 +48,7 @@ func _render_character_sheet() -> void:
 		return
 	var view = CHARACTER_SHEET_VIEW_SCENE.instantiate()
 	view.edit_requested.connect(_on_edit_requested)
+	view.value_save_requested.connect(_on_value_save_requested)
 	view.add_item_requested.connect(_on_add_item_requested)
 	view.item_save_requested.connect(_on_item_save_requested)
 	view.sheet_save_requested.connect(_on_sheet_save_requested)
@@ -184,3 +185,27 @@ func _modifier(score: int) -> int:
 	if score <= 16:
 		return 2
 	return 3
+
+
+func _on_value_save_requested(key: String, value: int) -> void:
+	if _busy or sdk == null:
+		return
+	var source: SDK.ActorResult = sdk.actors.read(_character_actor.id)
+	if not source.ok or source.actor == null:
+		_set_status(source.message if not source.ok else "Character data is unavailable.", true)
+		return
+	var data: Dictionary = source.actor.data.duplicate(true)
+	if ["hit_points", "omens", "silver"].has(key):
+		data[key] = value
+	elif ["Agility", "Presence", "Strength", "Toughness"].has(key):
+		var abilities: Dictionary = data.get("abilities", {}).duplicate(true)
+		abilities[key] = {"score": value, "modifier": _modifier(value)}
+		data["abilities"] = abilities
+	else:
+		return
+	_set_busy(true, "Saving…")
+	var result: SDK.ActorResult = await sdk.actors.update(_character_actor.id, data)
+	_set_busy(false, result.message if not result.ok else "", not result.ok)
+	if result.ok:
+		_character_actor = result.actor
+		_render_pending = true

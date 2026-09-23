@@ -12,4 +12,4 @@ script = ExtResource("1_script")
 [node name="EditSection" parent="." instance=ExtResource("2_section")]
 layout_mode = 2
 title = "EDIT CHARACTER"
-description = "Correct current values; accepted changes persist through the World authority."
+description = "Edit identity and recorded values."

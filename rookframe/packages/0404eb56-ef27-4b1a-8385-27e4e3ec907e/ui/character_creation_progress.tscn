@@ -1,0 +1,213 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="Marker"]
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.52, 0.58, 0.59, 1)
+corner_radius_top_left = 13
+corner_radius_top_right = 13
+corner_radius_bottom_left = 13
+corner_radius_bottom_right = 13
+[sub_resource type="StyleBoxFlat" id="Track"]
+bg_color = Color(0.13, 0.20, 0.21, 1)
+
+[node name="CreationProgress" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1")
+
+[node name="Wide" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Step1" type="VBoxContainer" parent="Wide"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step1"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Marker")
+
+[node name="Marker" type="Label" parent="Wide/Step1/Circle"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 16
+text = "1"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Wide/Step1"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 14
+text = "Class"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Step2" type="VBoxContainer" parent="Wide"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step2"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Marker")
+
+[node name="Marker" type="Label" parent="Wide/Step2/Circle"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 16
+text = "2"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Wide/Step2"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 14
+text = "Abilities"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Step3" type="VBoxContainer" parent="Wide"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step3"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Marker")
+
+[node name="Marker" type="Label" parent="Wide/Step3/Circle"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 16
+text = "3"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Wide/Step3"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 14
+text = "Origin & Traits"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Step4" type="VBoxContainer" parent="Wide"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step4"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Marker")
+
+[node name="Marker" type="Label" parent="Wide/Step4/Circle"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 16
+text = "4"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Wide/Step4"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 14
+text = "Equipment"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Step5" type="VBoxContainer" parent="Wide"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step5"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Marker")
+
+[node name="Marker" type="Label" parent="Wide/Step5/Circle"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 16
+text = "5"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Wide/Step5"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 14
+text = "Identity"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Step6" type="VBoxContainer" parent="Wide"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step6"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_horizontal = 4
+theme_override_styles/panel = SubResource("Marker")
+
+[node name="Marker" type="Label" parent="Wide/Step6/Circle"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 16
+text = "6"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Title" type="Label" parent="Wide/Step6"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_font_sizes/font_size = 14
+text = "Review"
+autowrap_mode = 2
+horizontal_alignment = 1
+
+[node name="Compact" type="HBoxContainer" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 36)
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="Compact"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+theme_override_font_sizes/font_size = 13
+text = "1 / 6 · CLASS"
+autowrap_mode = 2
+
+[node name="Track" type="ProgressBar" parent="Compact"]
+theme_override_styles/background = SubResource("Track")
+layout_mode = 2
+custom_minimum_size = Vector2(0, 4)
+size_flags_horizontal = 3
+size_flags_vertical = 4
+max_value = 6.0
+value = 1.0
+show_percentage = false
+
+[node name="Rule" type="HSeparator" parent="."]
+layout_mode = 2
+

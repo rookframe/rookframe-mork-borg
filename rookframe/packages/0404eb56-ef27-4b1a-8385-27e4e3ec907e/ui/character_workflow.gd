@@ -3,6 +3,9 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 const CHARACTER_SHEET_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.tscn")
 const CHARACTER_CREATOR_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.tscn")
 
+const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd")
+@onready var _creation_progress: CREATION_PROGRESS = get_node(^"Layout/CreationProgress")
+
 var _character_actor: SDK.Actor
 var _character_content: VBoxContainer
 var _character_creator: Variant
@@ -164,6 +167,8 @@ func character_select_actor(actor: SDK.Actor) -> void:
 
 
 func character_hide_surface() -> void:
+	_creation_progress.visible = false
+	_catalogue_create.visible = true
 	if _character_creator != null:
 		_character_creator.discard()
 		_character_creator.visible = false
@@ -235,6 +240,7 @@ func _ensure_character_content() -> void:
 	creator.name = "CharacterCreator"
 	creator.size_flags_horizontal = 3
 	creator.configure(_definitions, _character_definition, _character_miniatures, _compact, sdk, _character_miniature_choices)
+	creator.stage_changed.connect(_on_creation_stage_changed)
 	creator.status_changed.connect(_on_creator_status)
 	creator.busy_changed.connect(_on_creator_busy)
 	creator.primary_changed.connect(_on_creator_primary)
@@ -248,6 +254,11 @@ func _ensure_character_content() -> void:
 	_character_sheet = sheet
 	creator.visible = false
 	sheet.visible = false
+
+
+func _on_creation_stage_changed(step: int, title: String) -> void:
+	_header_subtitle.text = title
+	_creation_progress.present_progress(step, _compact)
 
 
 func _on_creator_status(message: String, error: bool) -> void:
@@ -303,6 +314,9 @@ func character_show_route(route: String) -> void:
 	_routes.visible = false
 	_character_tabs.visible = not creation
 	_catalogue_bar.visible = creation
+	_catalogue_create.visible = false
+	_creation_progress.visible = creation
+	_brand.visible = false
 	_catalogue_character.visible = creation
 	_catalogue_back.visible = creation
 	if creation:
@@ -313,6 +327,9 @@ func character_show_route(route: String) -> void:
 		_catalogue_character.disabled = _busy or _character_definition == null
 		_header_title.visible = not _compact
 		_header_subtitle.visible = not _compact
+		_header_title.text = "CREATE CHARACTER"
+		_header_title.set("theme_override_font_sizes/font_size", 32)
+		_set_window_title("CREATE CHARACTER")
 		_character_creator.show_creation_route(route)
 	else:
 		_character_creator.visible = false
