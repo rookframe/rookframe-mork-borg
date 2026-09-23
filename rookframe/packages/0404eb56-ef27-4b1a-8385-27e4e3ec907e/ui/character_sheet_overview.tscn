@@ -23,3 +23,44 @@ description = "Ordinary Actor Access"
 layout_mode = 2
 title = "COMPANIONS"
 description = "Descriptive companions stay on the Character sheet"
+
+[node name="ModifierActions" type="VBoxContainer" parent="CharacterSection/Content/BodySlot"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+
+[node name="RowOne" type="HBoxContainer" parent="CharacterSection/Content/BodySlot/ModifierActions"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Agility" type="Button" parent="CharacterSection/Content/BodySlot/ModifierActions/RowOne"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Agility"
+
+[node name="Presence" type="Button" parent="CharacterSection/Content/BodySlot/ModifierActions/RowOne"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Presence"
+
+[node name="RowTwo" type="HBoxContainer" parent="CharacterSection/Content/BodySlot/ModifierActions"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Strength" type="Button" parent="CharacterSection/Content/BodySlot/ModifierActions/RowTwo"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Strength"
+
+[node name="Toughness" type="Button" parent="CharacterSection/Content/BodySlot/ModifierActions/RowTwo"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Toughness"

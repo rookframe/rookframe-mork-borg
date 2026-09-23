@@ -5,5 +5,15 @@
 [node name="CharacterSheet" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 16
 script = ExtResource("1_script")
+
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+
+[node name="Status" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+visible = false

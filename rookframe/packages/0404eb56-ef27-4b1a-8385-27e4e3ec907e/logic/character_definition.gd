@@ -8,7 +8,13 @@ const CLASS_ID := "classless"
 const CLASS_TITLE := "No Class"
 const ABILITY_NAMES := ["Agility", "Presence", "Strength", "Toughness"]
 const PACK_CHOICES := ["Nothing", "Backpack", "Sack", "Small wagon", "Donkey"]
-const STARTING_CREATURES: Dictionary = {}
+const WEAPON_RESULTS := ["Femur", "Staff", "Shortsword", "Knife", "Warhammer", "Sword", "Bow", "Flail", "Crossbow", "Zweihander"]
+const ARMOR_RESULTS := ["No armor", "Light armor", "Medium armor", "Heavy armor"]
+## Fixed grants are empty for the classless profile. Conditional starting
+## Creature grants are admitted only from SOURCE_CREATURE_CHOICES after the
+## source equipment table selects a combat profile.
+const STARTING_CREATURES: Array[String] = []
+const SOURCE_CREATURE_CHOICES := ["dog-small-but-vicious", "monkey"]
 
 
 func create_data(raw_choices: Variant) -> Variant:
@@ -17,7 +23,8 @@ func create_data(raw_choices: Variant) -> Variant:
 	var submitted_abilities: Dictionary = choices.get("abilities", {})
 	for ability_name in ABILITY_NAMES:
 		if submitted_abilities.has(ability_name):
-			var score: int = submitted_abilities.get(ability_name, 1)
+			var score_data: Dictionary = submitted_abilities.get(ability_name, {})
+			var score: int = score_data.get("score", 1)
 			if score < 1:
 				score = 1
 			elif score > 20:
@@ -27,7 +34,12 @@ func create_data(raw_choices: Variant) -> Variant:
 	var pack: String = choices.get("pack", "Nothing")
 	if not PACK_CHOICES.has(pack):
 		pack = "Nothing"
-	var starting_creatures: Array = []
+	var starting_creatures: Array = STARTING_CREATURES.duplicate()
+	var requested_creatures: Array = choices.get("starting_creature_ids", [])
+	for creature_id in requested_creatures:
+		var creature_id_text: String = creature_id
+		if SOURCE_CREATURE_CHOICES.has(creature_id_text):
+			starting_creatures.append(creature_id_text)
 	var name: String = choices.get("name", "Unnamed Character")
 	if name.is_empty():
 		name = "Unnamed Character"
@@ -36,6 +48,13 @@ func create_data(raw_choices: Variant) -> Variant:
 	if hit_points < 1:
 		hit_points = 1
 	var maximum_hit_points: int = choices.get("maximum_hit_points", hit_points)
+	if not choices.has("maximum_hit_points") and submitted_abilities.has("Toughness"):
+		var toughness_data: Dictionary = submitted_abilities.get("Toughness", {})
+		var toughness_score: int = toughness_data.get("score", 1)
+		hit_points += _modifier(toughness_score)
+		if hit_points < 1:
+			hit_points = 1
+		maximum_hit_points = hit_points
 	if maximum_hit_points < hit_points:
 		maximum_hit_points = hit_points
 	var silver: int = choices.get("silver", 0)
@@ -45,6 +64,7 @@ func create_data(raw_choices: Variant) -> Variant:
 	if omens < 0:
 		omens = 0
 	var companion_sheets: Array = choices.get("companion_sheets", [])
+	var starting_creature_grants: Array = choices.get("starting_creature_grants", [])
 	return {
 		"schema": "mork-borg-character/v1",
 		"definition_id": CLASS_ID,
@@ -64,7 +84,31 @@ func create_data(raw_choices: Variant) -> Variant:
 		"preferred_miniature": choices.get("preferred_miniature", {}),
 		"companion_sheets": companion_sheets,
 		"starting_creature_ids": starting_creatures,
+		"starting_creature_grants": starting_creature_grants,
 	}
+
+
+func resolve_equipment_name(kind: String, roll: int) -> String:
+	var result_index := roll - 1
+	if result_index < 0:
+		result_index = 0
+	if kind == "Weapon":
+		if result_index >= WEAPON_RESULTS.size():
+			result_index = WEAPON_RESULTS.size() - 1
+		return WEAPON_RESULTS[result_index]
+	if kind == "Armor":
+		if result_index >= ARMOR_RESULTS.size():
+			result_index = ARMOR_RESULTS.size() - 1
+		return ARMOR_RESULTS[result_index]
+	return ""
+
+
+func pack_choices_for_roll(roll: int) -> Array[String]:
+	if roll == 5:
+		return ["Nothing", "Backpack", "Sack", "Small wagon"]
+	if roll == 6:
+		return PACK_CHOICES.duplicate()
+	return []
 
 
 func _modifier(score: int) -> int:

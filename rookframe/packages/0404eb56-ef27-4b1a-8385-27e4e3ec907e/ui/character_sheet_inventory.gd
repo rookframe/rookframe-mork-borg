@@ -3,6 +3,7 @@ extends VBoxContainer
 signal add_item_requested
 
 var _data: Dictionary = {}
+@onready var _section := get_node(^"InventorySection") as Control
 
 
 func configure(data: Dictionary, _miniatures: Array) -> void:
@@ -11,7 +12,8 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 
 
 func _build() -> void:
-	var body: VBoxContainer = _section("INVENTORY", "Durable Character inventory · no global footer actions")
+	var body: Container = _section.call("get_body_slot")
+	var actions: Container = _section.call("get_action_slot")
 	var inventory: Array = _data.get("inventory", [])
 	if inventory.is_empty():
 		body.add_child(_label("No items recorded.", "RookframeMeta"))
@@ -22,7 +24,7 @@ func _build() -> void:
 			body.add_child(_label(item_name, "RookframeValue"))
 	var add_item := _button("Add item")
 	add_item.pressed.connect(_emit_add_item_requested)
-	body.add_child(add_item)
+	actions.add_child(add_item)
 
 
 func _emit_add_item_requested() -> void:
@@ -44,17 +46,3 @@ func _button(text: String, primary: bool = false) -> Button:
 	button.focus_mode = 2
 	button.theme_type_variation = "RookframePrimaryButton" if primary else "RookframeSecondaryButton"
 	return button
-
-
-func _section(title: String, subtitle: String = "") -> VBoxContainer:
-	var panel := PanelContainer.new()
-	panel.theme_type_variation = "RookframeInsetSurface"
-	panel.size_flags_horizontal = 3
-	var body := VBoxContainer.new()
-	body.add_theme_constant_override("separation", 6)
-	body.add_child(_label(title.to_upper(), "RookframeSubtitle"))
-	if not subtitle.is_empty():
-		body.add_child(_label(subtitle, "RookframeMeta"))
-	panel.add_child(body)
-	add_child(panel)
-	return body

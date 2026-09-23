@@ -28,14 +28,26 @@
     }
   ],
   "content": [
-    {
-      "kind": "system",
-      "entries": [
+        {
+          "kind": "system",
+          "entries": [
         {
           "id": "classless-character",
           "type": "actor_definition",
           "payload": "content/classless-character.tres",
           "displayName": "No Class Character"
+        },
+        {
+          "id": "dog-small-but-vicious",
+          "type": "actor_definition",
+          "payload": "content/dog-small-but-vicious.tres",
+          "displayName": "Small but vicious dog"
+        },
+        {
+          "id": "monkey",
+          "type": "actor_definition",
+          "payload": "content/monkey.tres",
+          "displayName": "Monkey"
         },
         {
           "id": "aland-wickhead",
@@ -111,7 +123,7 @@
         }
       ],
       "targetSystemPackageId": "0404eb56-ef27-4b1a-8385-27e4e3ec907e",
-      "targetContractId": "mork-borg-adversary-v1",
+          "targetContractId": "mork-borg-adversary-v1",
       "compatibleVersions": ">=1.0.0 <2.0.0"
     },
     {
@@ -126,6 +138,6 @@
       ]
     }
   ],
-  "manifest": "https://github.com/rookframe/rookframe-fixtures/releases/download/v1.0.27/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.27.json",
-  "download": "https://github.com/rookframe/rookframe-fixtures/releases/download/v1.0.27/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.27.rookpackage"
+  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.27/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.27.json",
+  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.27/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.27.rookpackage"
 }

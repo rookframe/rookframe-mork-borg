@@ -11,6 +11,7 @@ script = ExtResource("1_script")
 
 [node name="Progress" parent="." instance=ExtResource("2_progress")]
 layout_mode = 2
+steps = PackedStringArray("Class", "Abilities", "Origin & Traits", "Equipment", "Identity", "Review")
 
 [node name="StageBody" type="VBoxContainer" parent="."]
 layout_mode = 2

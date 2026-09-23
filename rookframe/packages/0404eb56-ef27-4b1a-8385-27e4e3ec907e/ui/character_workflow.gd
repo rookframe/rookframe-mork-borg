@@ -1,7 +1,7 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 
-const CHARACTER_SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.gd")
-const CHARACTER_CREATOR = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.gd")
+const CHARACTER_SHEET_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.tscn")
+const CHARACTER_CREATOR_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.tscn")
 
 var _character_actor: SDK.Actor
 var _character_content: VBoxContainer
@@ -29,9 +29,36 @@ var _character_miniature_choices: Array[Dictionary] = []
 
 
 func _process(_delta: float) -> void:
+	if _surface_is_hidden() and _character_creator != null and _character_creator.is_active():
+		# The managed host closes this surface by hiding it. Treat that boundary
+		# exactly like a scene exit so pending creation can never resume hidden.
+		_character_creator.discard()
 	if _character_transition_pending:
 		_character_transition_pending = false
 		character_show_route("character")
+
+
+func _surface_is_hidden() -> bool:
+	var node: Node = self
+	while node != null:
+		var control := node as Control
+		if control != null and not control.visible:
+			return true
+		node = node.get_parent()
+	return false
+
+
+func opened(actor_id: SDK.ActorId) -> void:
+	if sdk == null:
+		return
+	var result: SDK.ActorResult = sdk.actors.read(actor_id)
+	if not result.ok or result.actor == null:
+		_set_status(result.message if not result.ok else "Actor data is unavailable.", true)
+		return
+	if str(result.actor.data.get("schema", "")) != "mork-borg-character/v1":
+		return
+	_character_actor = result.actor
+	character_show_route("character")
 
 @onready var _layout := get_node(^"Layout") as VBoxContainer
 @onready var _header := get_node(^"Layout/Header") as VBoxContainer
@@ -138,6 +165,7 @@ func character_select_actor(actor: SDK.Actor) -> void:
 
 func character_hide_surface() -> void:
 	if _character_creator != null:
+		_character_creator.discard()
 		_character_creator.visible = false
 	if _character_sheet != null:
 		_character_sheet.visible = false
@@ -150,6 +178,7 @@ func character_primary_button_pressed() -> void:
 	if _character_creator.is_active():
 		_character_creator.primary()
 	else:
+		character_show_route("create-class")
 		_character_creator.begin()
 
 
@@ -174,10 +203,9 @@ func _on_tab_appearance() -> void:
 	_select_character_tab("appearance")
 
 
-func _notification(what: int) -> void:
-	if what == 11:
-		if _character_creator != null:
-			_character_creator.discard()
+func _exit_tree() -> void:
+	if _character_creator != null:
+		_character_creator.discard()
 
 
 func _set_status(message: String, error: bool = false) -> void:
@@ -203,7 +231,7 @@ func _set_window_title(title: String) -> void:
 func _ensure_character_content() -> void:
 	if _character_creator != null:
 		return
-	var creator = CHARACTER_CREATOR.new()
+	var creator = CHARACTER_CREATOR_SCENE.instantiate()
 	creator.name = "CharacterCreator"
 	creator.size_flags_horizontal = 3
 	creator.configure(_definitions, _character_definition, _character_miniatures, _compact, sdk, _character_miniature_choices)
@@ -213,7 +241,7 @@ func _ensure_character_content() -> void:
 	creator.character_created.connect(_on_creator_created)
 	_content.add_child(creator)
 	_character_creator = creator
-	var sheet = CHARACTER_SHEET.new()
+	var sheet = CHARACTER_SHEET_SCENE.instantiate()
 	sheet.name = "CharacterSheet"
 	sheet.size_flags_horizontal = 3
 	_content.add_child(sheet)
@@ -318,6 +346,8 @@ func _build_character_sheet_route(route: String) -> void:
 
 func _refresh_character_body(route: String) -> void:
 	_clear_character_content()
+	_character_sheet.visible = true
+	_character_tabs.visible = true
 	_build_character_sheet_route(route)
 
 

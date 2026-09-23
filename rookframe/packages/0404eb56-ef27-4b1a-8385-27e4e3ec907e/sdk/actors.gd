@@ -20,6 +20,8 @@ func read(id: ActorId) -> ActorResult:
 	return ActorResult.new(_host.ReadActor(id.value))
 func create(definition: ContentReference, choices: Variant) -> ActorResult:
 	return ActorResult.new(await WorldCapability.new().complete(_host, _host.CreateActor(definition.package_id, definition.local_id, choices)))
+func create_atomic(definition: ContentReference, choices: Variant, child_requests: Array) -> ActorResult:
+	return ActorResult.new(await WorldCapability.new().complete(_host, _host.CreateActorsAtomically(definition.package_id, definition.local_id, choices, child_requests)))
 func update(id: ActorId, data: Variant) -> ActorResult:
 	return ActorResult.new(await WorldCapability.new().complete(_host, _host.UpdateActor(id.value, data)))
 func delete(id: ActorId) -> OperationResult:

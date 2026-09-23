@@ -362,13 +362,13 @@ func _show_route(route: String) -> void:
 	_header_title.visible = not _compact
 	_header_subtitle.visible = not _compact
 	_catalogue_bar.visible = catalogue
-	_catalogue_character.visible = false
+	_catalogue_character.visible = catalogue and _character_definition != null
 	_detail.visible = sheet or edit or inventory
 	_set_search_visible(catalogue)
 	_definition_heading.visible = catalogue
 	_definition_list.visible = catalogue
-	_live_heading.visible = catalogue and sdk.context().is_gm
-	_live_list.visible = catalogue and sdk.context().is_gm
+	_live_heading.visible = catalogue and not _actors.is_empty()
+	_live_list.visible = catalogue and not _actors.is_empty()
 	_public_heading.visible = false
 	_public_list.visible = false
 	_stats.visible = sheet
