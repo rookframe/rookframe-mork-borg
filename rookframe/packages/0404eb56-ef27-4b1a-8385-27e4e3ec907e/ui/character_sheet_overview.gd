@@ -14,7 +14,7 @@ func _ready() -> void:
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-		get_node("Body/Abilities/" + ability + "/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
 
 
 func configure(data: Dictionary, _miniatures: Array, short_window: bool = false) -> void:
@@ -26,7 +26,7 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	var abilities: Dictionary = data.get("abilities", {})
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		var value: Dictionary = abilities.get(ability, {})
-		var button = get_node("Body/Abilities/" + ability + "/Content/Row/Modifier")
+		var button = get_node("Body/Attributes/Content/Abilities/" + ability + "/Content/Row/Modifier")
 		var modifier: int = value.get("modifier", 0)
 		button.text = "%+d" % modifier
 		button.accessibility_name = "%s modifier %s" % [ability, button.text]
@@ -34,15 +34,28 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	var companions: Array = data.get("companion_sheets", [])
 	get_node(^"Body/Context/Companions").visible = not companions.is_empty()
 	get_node(^"Body/Context/Companions").text = "Companions: %d" % companions.size()
+	var equipped := ""
+	var inventory: Array = data.get("inventory", [])
+	for entry in inventory:
+		var item: Dictionary = entry
+		var is_equipped: bool = item.get("equipped", false)
+		if is_equipped:
+			equipped += ("\n" if not equipped.is_empty() else "") + str(item.get("name", "Item"))
+	get_node(^"Body/Context/Combat/Content/Equipment").text = equipped if not equipped.is_empty() else "No equipment equipped."
 	_layout()
 
 
 func _layout() -> void:
 	var compact := size.x < 600
+	var short := compact and _short_window
 	get_node(^"Body").vertical = compact
-	get_node(^"Body/Abilities").columns = 2 if compact and _short_window else 1
+	get_node(^"Body/Attributes").theme_type_variation = "RookframePackageInk" if short else "RookframeSection"
+	get_node(^"Body/Attributes/Content/Heading").visible = not short
+	get_node(^"Body/Attributes/Content/Abilities").columns = 2 if short else 1
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-		get_node("Body/Abilities/" + ability + "/Content").vertical = compact and _short_window
+		get_node("Body/Attributes/Content/Abilities/" + ability).theme_type_variation = "RookframeSubtleFrame" if short else "RookframePackageInk"
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Content/Title").set("theme_override_font_sizes/font_size", 13 if short else 16)
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Content").vertical = short
 
 
 func _edit() -> void:
@@ -51,7 +64,7 @@ func _edit() -> void:
 
 func _edit_value(key: String) -> void:
 	var resource_key: String = {"HitPoints": "hit_points", "Omens": "omens", "Silver": "silver"}.get(key, "")
-	var row: Node = get_node("Resources/" + key + "/Content/Row") if not resource_key.is_empty() else get_node("Body/Abilities/" + key + "/Content/Row")
+	var row: Node = get_node("Resources/" + key + "/Content/Row") if not resource_key.is_empty() else get_node("Body/Attributes/Content/Abilities/" + key + "/Content/Row")
 	var input := row.get_node(^"Input") as LineEdit
 	if _editing == key:
 		if input.text.is_valid_int():

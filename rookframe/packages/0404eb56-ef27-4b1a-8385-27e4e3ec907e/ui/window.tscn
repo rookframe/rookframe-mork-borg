@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creatures_window.gd" id="2_script"]
@@ -8,6 +8,15 @@
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_area.tscn" id="6_text_area"]
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.tscn" id="7_progress"]
+
+[sub_resource type="StyleBoxFlat" id="CharacterTabSelected"]
+content_margin_left = 12.0
+content_margin_top = 10.0
+content_margin_right = 12.0
+content_margin_bottom = 8.0
+bg_color = Color(0, 0, 0, 0)
+border_width_bottom = 3
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="CreatureSurface" type="Control"]
 layout_mode = 2
@@ -141,13 +150,15 @@ layout_mode = 2
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+theme_override_constants/separation = 0
 
 [node name="Character" type="Button" parent="Layout/CharacterTabs"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+theme_override_styles/pressed = SubResource("CharacterTabSelected")
+theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
 toggle_mode = true
 text = "Character"
 
@@ -156,6 +167,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+theme_override_styles/pressed = SubResource("CharacterTabSelected")
+theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
 toggle_mode = true
 text = "Inventory"
 
@@ -164,6 +177,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+theme_override_styles/pressed = SubResource("CharacterTabSelected")
+theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
 toggle_mode = true
 text = "Appearance"
 
