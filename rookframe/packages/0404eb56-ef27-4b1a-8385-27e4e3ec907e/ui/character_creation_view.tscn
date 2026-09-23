@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=9 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_view.gd" id="1"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="3"]
@@ -6,11 +6,39 @@
 
 [sub_resource type="ButtonGroup" id="Classes"]
 
-[sub_resource type="StyleBoxEmpty" id="CompactChoice"]
+[sub_resource type="StyleBoxFlat" id="CompactChoice"]
 content_margin_left = 4.0
 content_margin_right = 4.0
 content_margin_top = 0.0
 content_margin_bottom = 0.0
+bg_color = Color(0.043137, 0.066667, 0.078431, 1)
+border_width_bottom = 1
+border_color = Color(0.133333, 0.196078, 0.215686, 1)
+
+[sub_resource type="StyleBoxFlat" id="CompactChoiceHover"]
+content_margin_left = 4.0
+content_margin_right = 4.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.070588, 0.164706, 0.168627, 0.65)
+border_width_bottom = 1
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+[sub_resource type="StyleBoxFlat" id="CompactChoiceSelected"]
+content_margin_left = 4.0
+content_margin_right = 4.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+bg_color = Color(0.070588, 0.290196, 0.282353, 1)
+border_width_bottom = 1
+border_color = Color(0.509804, 0.972549, 0.956863, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
 
 [node name="CreationView" type="BoxContainer"]
 layout_mode = 2
@@ -74,7 +102,8 @@ custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeChoiceRow"
 theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/pressed = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 13
 text = "NO CLASS"
@@ -89,7 +118,8 @@ custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeChoiceRow"
 theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/pressed = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 13
 text = "FANGED DESERTER"
@@ -104,7 +134,8 @@ custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeChoiceRow"
 theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/pressed = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 13
 text = "GUTTERBORN SCUM"
@@ -119,7 +150,8 @@ custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeChoiceRow"
 theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/pressed = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
 theme_override_constants/h_separation = 4
 theme_override_font_sizes/font_size = 13
 text = "ESOTERIC HERMIT"
