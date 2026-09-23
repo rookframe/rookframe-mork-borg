@@ -3,6 +3,8 @@ signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 var equipped := false
 var item: Dictionary = {}
+func _ready() -> void:
+	resized.connect(_layout)
 func configure(value: Dictionary, catalogue: bool = false, read_only: bool = false) -> void:
 	for path in [^"Actions/Attack", ^"Actions/Edit", ^"Actions/Equip", ^"Actions/Add"]:
 		get_node(path).disabled = read_only
@@ -34,6 +36,7 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Actions/Edit").pressed.connect(_edit)
 	get_node(^"Actions/Equip").pressed.connect(_equip)
 	get_node(^"Actions/Add").pressed.connect(_add)
+	_layout()
 
 func _attack() -> void:
 	navigate_requested.emit("attack", str(item.get("inventory_id", "")))
@@ -46,3 +49,7 @@ func _equip() -> void:
 
 func _add() -> void:
 	mutation_requested.emit("add", [str(item.get("source_item_id", ""))])
+
+func _layout() -> void:
+	var title: String = item.get("name", "")
+	get_node(^"Actions").vertical = size.x < 480 and title.length() > 40
