@@ -11,12 +11,12 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Copy/Title").text = str(item.get("name", "Item"))
 	var details: Array[String] = []
 	if item.has("damage"):
-		details.append(str(item.damage) + " damage")
+		details.append(str(item.damage))
 	if item.has("range_feet"):
 		details.append(str(item.range_feet) + " ft")
 	if item.has("armor_tier"):
 		details.append("Tier " + str(item.armor_tier) + " · −" + str(item.get("reduction", "")))
-	if item.has("quantity"):
+	if item.has("quantity") and (int(item.quantity) != 1 or details.is_empty()):
 		details.append("Quantity " + str(item.quantity))
 	if item.has("uses"):
 		details.append(str(item.uses) + " uses")

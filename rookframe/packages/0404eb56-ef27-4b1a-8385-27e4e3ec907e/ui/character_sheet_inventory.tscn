@@ -19,22 +19,32 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Add Item"
-[node name="EquippedHeading" type="Label" parent="."]
+[node name="EquippedSection" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="EquippedSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="EquippedSection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "EQUIPPED"
-autowrap_mode = 2
-[node name="Equipped" type="VBoxContainer" parent="."]
+[node name="Items" type="VBoxContainer" parent="EquippedSection/Content"]
 layout_mode = 2
-theme_override_constants/separation = 16
-[node name="CarriedHeading" type="Label" parent="."]
+theme_override_constants/separation = 8
+[node name="CarriedSection" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="CarriedSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="CarriedSection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "CARRIED"
-autowrap_mode = 2
-[node name="Carried" type="VBoxContainer" parent="."]
+[node name="Items" type="VBoxContainer" parent="CarriedSection/Content"]
 layout_mode = 2
-theme_override_constants/separation = 16
+theme_override_constants/separation = 8
 [node name="Empty" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

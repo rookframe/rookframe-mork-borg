@@ -130,6 +130,7 @@ func _mutate(operation: String, arguments: Array) -> void:
 		return
 	_character_actor = result.actor
 	sheet_changed.emit()
+	_sync_chrome()
 	if operation in ["add", "custom", "remove"]:
 		_navigate("inventory", "")
 	elif not _character_route in ["edit", "item"]:
@@ -294,6 +295,11 @@ func _sync_chrome() -> void:
 		title = "Add Item"
 	elif _character_route == "item":
 		title = "Inventory Item"
+		var items: Array = data.get("inventory", [])
+		for raw in items:
+			var item: Dictionary = raw
+			if str(item.get("inventory_id", "")) == _item_id:
+				title = str(item.get("name", "Inventory Item"))
 	var count: int = data.get("omens", 0)
 	var route: String = _character_tab if _character_route == "character" else _character_route
 	workflow_changed.emit(route, title, count > 0 and _character_actor.access_level == "Owner", _busy)
