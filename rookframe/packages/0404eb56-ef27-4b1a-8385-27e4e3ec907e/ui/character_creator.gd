@@ -122,7 +122,7 @@ func _show_creation_route(route: String) -> void:
 
 func _on_pack_pressed() -> void:
 	var totals: Dictionary = _character_draft.get("equipment_rolls", {})
-	var choices: Array[String] = _source_definition.pack_choices_for_roll(int(totals.get("Equipment pack", 0)))
+	var choices: Array = _source_definition.pack_choices_for_roll(int(totals.get("Equipment pack", 0)))
 	if not choices.is_empty():
 		_cycle_pack(_view.get_node(^"Aside/Context/Content/Pack"), choices)
 		_view.present_creation(_character_stage, _character_draft, _compact)
@@ -371,7 +371,7 @@ func _roll_character_equipment(token: int) -> void:
 	var weapon_name: String = _source_definition.resolve_equipment_name("Weapon", int(totals.get("Weapon", 1)))
 	var armor_name: String = _source_definition.resolve_equipment_name("Armor", int(totals.get("Armor", 1)))
 	var pack_roll := int(totals.get("Equipment pack", 0))
-	var pack_choices: Array[String] = _source_definition.pack_choices_for_roll(pack_roll)
+	var pack_choices: Array = _source_definition.pack_choices_for_roll(pack_roll)
 	if pack_choices.is_empty():
 		if pack_roll == 3:
 			_character_draft["pack"] = "Backpack"

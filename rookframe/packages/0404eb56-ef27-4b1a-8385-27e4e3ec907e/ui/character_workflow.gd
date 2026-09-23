@@ -11,6 +11,7 @@ var _character_content: VBoxContainer
 var _character_creator: Variant
 var _character_sheet: Variant
 var _character_transition_pending := false
+var _creation_was_closed := false
 var _character_tab := "character"
 var _character_tabs: Control
 var _character_tab_character: Button
@@ -39,6 +40,11 @@ func _process(_delta: float) -> void:
 		# The managed host closes this surface by hiding it. Treat that boundary
 		# exactly like a scene exit so pending creation can never resume hidden.
 		_character_creator.discard()
+		_creation_was_closed = true
+	if _creation_was_closed and not _surface_is_hidden():
+		_creation_was_closed = false
+		character_show_route("create-class")
+		_character_creator.begin()
 	if _character_transition_pending:
 		_character_transition_pending = false
 		character_show_route("character")

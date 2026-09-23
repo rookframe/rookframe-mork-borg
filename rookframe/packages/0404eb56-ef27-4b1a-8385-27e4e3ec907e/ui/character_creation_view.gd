@@ -8,6 +8,7 @@ const EQUIPMENT_FORMULAS := ["2d6 × 10", "1d2", "1d4 days", "1d6", "1d12", "1d1
 
 func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	var equipment_pending: bool = draft.get("equipment_roll_pending", false)
+	var roll_ready: bool = draft.get("roll_ready", false)
 	var ability_pending: bool = draft.get("roll_pending", false)
 	vertical = compact
 	get_node(^"Main").theme_type_variation = "RookframePackageInk" if compact else "RookframeSection"
@@ -28,7 +29,7 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	if selected == "Abilities":
 		description = "Rolls resolve in order. Dice are rolled automatically on your behalf."
 		facts = "Normal ability rolls\n3d6 for each ability\n\nHit points\n1d8 + Toughness (minimum 1)"
-		hint = "Rolling %s…" % str(draft.get("active_roll", "abilities")) if ability_pending else "Continue when all ability rolls are complete."
+		hint = "Rolling %s…" % str(draft.get("active_roll", "abilities")) if ability_pending and not roll_ready else "Continue with the next ability when ready."
 		_present_abilities(draft, compact)
 	elif selected == "Origin":
 		description = "No class origin or traits."
@@ -36,7 +37,7 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	elif selected == "Equipment":
 		description = "Choose from the packs available for your roll."
 		facts = _inventory_text(draft.get("inventory", []))
-		hint = "Rolling %s…" % str(draft.get("active_roll", "equipment")) if equipment_pending else "Starting equipment is ready."
+		hint = "Rolling %s…" % str(draft.get("active_roll", "equipment")) if equipment_pending and not roll_ready else "Continue with the next roll when ready."
 		get_node(^"Aside/Context/Content/Pack").text = "Pack: %s" % str(draft.get("pack", "Nothing"))
 		_present_equipment(draft, compact)
 	elif selected == "Identity":

@@ -9,7 +9,9 @@ func present_progress(step: int, compact: bool) -> void:
 	get_node(^"Compact/Track").value = step
 	for index in range(6):
 		var cell := get_node(^"Wide").get_child(index) as VBoxContainer
-		var marker := cell.get_node(^"Circle/Marker") as Label
+		var underline := cell.get_node(^"Underline") as ProgressBar
+		underline.visible = index + 1 == step
+		var marker := cell.get_node(^"MarkerRow/Circle/Marker") as Label
 		var title := cell.get_node(^"Title") as Label
 		marker.text = "✓" if index + 1 < step else str(index + 1)
 		marker.theme_type_variation = "RookframeValue" if index + 1 <= step else "RookframeMeta"

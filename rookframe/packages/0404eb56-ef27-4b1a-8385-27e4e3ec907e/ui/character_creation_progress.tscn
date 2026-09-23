@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd" id="1"]
 
 [sub_resource type="StyleBoxFlat" id="Marker"]
@@ -15,6 +15,9 @@ corner_radius_bottom_right = 13
 [sub_resource type="StyleBoxFlat" id="Track"]
 bg_color = Color(0.13, 0.20, 0.21, 1)
 
+[sub_resource type="StyleBoxFlat" id="ActiveTrack"]
+bg_color = Color(0.266667, 0.913725, 0.913725, 1)
+
 [node name="CreationProgress" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -29,19 +32,33 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Circle" type="PanelContainer" parent="Wide/Step1"]
+[node name="MarkerRow" type="HBoxContainer" parent="Wide/Step1"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Before" type="HSeparator" parent="Wide/Step1/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 0)
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step1/MarkerRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(26, 26)
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("Marker")
 
-[node name="Marker" type="Label" parent="Wide/Step1/Circle"]
+[node name="Marker" type="Label" parent="Wide/Step1/MarkerRow/Circle"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "1"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="After" type="HSeparator" parent="Wide/Step1/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
 
 [node name="Title" type="Label" parent="Wide/Step1"]
 layout_mode = 2
@@ -51,24 +68,48 @@ text = "Class"
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="Underline" type="ProgressBar" parent="Wide/Step1"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 3)
+theme_override_styles/background = SubResource("Track")
+theme_override_styles/fill = SubResource("ActiveTrack")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+mouse_filter = 2
+
 [node name="Step2" type="VBoxContainer" parent="Wide"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Circle" type="PanelContainer" parent="Wide/Step2"]
+[node name="MarkerRow" type="HBoxContainer" parent="Wide/Step2"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Before" type="HSeparator" parent="Wide/Step2/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step2/MarkerRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(26, 26)
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("Marker")
 
-[node name="Marker" type="Label" parent="Wide/Step2/Circle"]
+[node name="Marker" type="Label" parent="Wide/Step2/MarkerRow/Circle"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "2"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="After" type="HSeparator" parent="Wide/Step2/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
 
 [node name="Title" type="Label" parent="Wide/Step2"]
 layout_mode = 2
@@ -78,24 +119,48 @@ text = "Abilities"
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="Underline" type="ProgressBar" parent="Wide/Step2"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 3)
+theme_override_styles/background = SubResource("Track")
+theme_override_styles/fill = SubResource("ActiveTrack")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+mouse_filter = 2
+
 [node name="Step3" type="VBoxContainer" parent="Wide"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Circle" type="PanelContainer" parent="Wide/Step3"]
+[node name="MarkerRow" type="HBoxContainer" parent="Wide/Step3"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Before" type="HSeparator" parent="Wide/Step3/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step3/MarkerRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(26, 26)
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("Marker")
 
-[node name="Marker" type="Label" parent="Wide/Step3/Circle"]
+[node name="Marker" type="Label" parent="Wide/Step3/MarkerRow/Circle"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "3"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="After" type="HSeparator" parent="Wide/Step3/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
 
 [node name="Title" type="Label" parent="Wide/Step3"]
 layout_mode = 2
@@ -105,24 +170,48 @@ text = "Origin & Traits"
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="Underline" type="ProgressBar" parent="Wide/Step3"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 3)
+theme_override_styles/background = SubResource("Track")
+theme_override_styles/fill = SubResource("ActiveTrack")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+mouse_filter = 2
+
 [node name="Step4" type="VBoxContainer" parent="Wide"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Circle" type="PanelContainer" parent="Wide/Step4"]
+[node name="MarkerRow" type="HBoxContainer" parent="Wide/Step4"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Before" type="HSeparator" parent="Wide/Step4/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step4/MarkerRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(26, 26)
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("Marker")
 
-[node name="Marker" type="Label" parent="Wide/Step4/Circle"]
+[node name="Marker" type="Label" parent="Wide/Step4/MarkerRow/Circle"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "4"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="After" type="HSeparator" parent="Wide/Step4/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
 
 [node name="Title" type="Label" parent="Wide/Step4"]
 layout_mode = 2
@@ -132,24 +221,48 @@ text = "Equipment"
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="Underline" type="ProgressBar" parent="Wide/Step4"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 3)
+theme_override_styles/background = SubResource("Track")
+theme_override_styles/fill = SubResource("ActiveTrack")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+mouse_filter = 2
+
 [node name="Step5" type="VBoxContainer" parent="Wide"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Circle" type="PanelContainer" parent="Wide/Step5"]
+[node name="MarkerRow" type="HBoxContainer" parent="Wide/Step5"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Before" type="HSeparator" parent="Wide/Step5/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step5/MarkerRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(26, 26)
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("Marker")
 
-[node name="Marker" type="Label" parent="Wide/Step5/Circle"]
+[node name="Marker" type="Label" parent="Wide/Step5/MarkerRow/Circle"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "5"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="After" type="HSeparator" parent="Wide/Step5/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
 
 [node name="Title" type="Label" parent="Wide/Step5"]
 layout_mode = 2
@@ -159,24 +272,48 @@ text = "Identity"
 autowrap_mode = 2
 horizontal_alignment = 1
 
+[node name="Underline" type="ProgressBar" parent="Wide/Step5"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 3)
+theme_override_styles/background = SubResource("Track")
+theme_override_styles/fill = SubResource("ActiveTrack")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+mouse_filter = 2
+
 [node name="Step6" type="VBoxContainer" parent="Wide"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Circle" type="PanelContainer" parent="Wide/Step6"]
+[node name="MarkerRow" type="HBoxContainer" parent="Wide/Step6"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Before" type="HSeparator" parent="Wide/Step6/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 1)
+
+[node name="Circle" type="PanelContainer" parent="Wide/Step6/MarkerRow"]
 layout_mode = 2
 custom_minimum_size = Vector2(26, 26)
 size_flags_horizontal = 4
 theme_override_styles/panel = SubResource("Marker")
 
-[node name="Marker" type="Label" parent="Wide/Step6/Circle"]
+[node name="Marker" type="Label" parent="Wide/Step6/MarkerRow/Circle"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "6"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="After" type="HSeparator" parent="Wide/Step6/MarkerRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+modulate = Color(1, 1, 1, 0)
 
 [node name="Title" type="Label" parent="Wide/Step6"]
 layout_mode = 2
@@ -185,6 +322,16 @@ theme_override_font_sizes/font_size = 14
 text = "Review"
 autowrap_mode = 2
 horizontal_alignment = 1
+
+[node name="Underline" type="ProgressBar" parent="Wide/Step6"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 3)
+theme_override_styles/background = SubResource("Track")
+theme_override_styles/fill = SubResource("ActiveTrack")
+max_value = 1.0
+value = 1.0
+show_percentage = false
+mouse_filter = 2
 
 [node name="Compact" type="HBoxContainer" parent="."]
 layout_mode = 2

@@ -1,4 +1,4 @@
-extends PanelContainer
+extends Control
 
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const DICE = preload("res://rookframe/ui/icons/dice.svg")
@@ -6,6 +6,7 @@ const SPINNER = preload("res://rookframe/ui/icons/spinner.svg")
 const LOCK = preload("res://rookframe/ui/icons/lock.svg")
 
 func present_roll(title: String, formula: String, result: String, state: String, ordinal: int, compact: bool) -> void:
+	get_node(^"Highlight").visible = state in ["current", "pending"]
 	get_node(^"Row/Identity/Title").text = title
 	get_node(^"Row/Identity/Title").set("theme_override_font_sizes/font_size", 14 if compact else 16)
 	get_node(^"Row/Identity/Formula").text = formula

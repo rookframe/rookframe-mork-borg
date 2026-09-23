@@ -7,7 +7,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/actor
 const CLASS_ID := "classless"
 const CLASS_TITLE := "No Class"
 const ABILITY_NAMES := ["Agility", "Presence", "Strength", "Toughness"]
-const PACK_CHOICES := ["Nothing", "Backpack", "Sack", "Small wagon", "Donkey"]
+const PACK_CHOICES: Array[String] = ["Nothing", "Backpack", "Sack", "Small wagon", "Donkey"]
 const WEAPON_RESULTS := ["Femur", "Staff", "Shortsword", "Knife", "Warhammer", "Sword", "Bow", "Flail", "Crossbow", "Zweihander"]
 const ARMOR_RESULTS := ["No armor", "Light armor", "Medium armor", "Heavy armor"]
 ## Fixed grants are empty for the classless profile. Conditional starting
