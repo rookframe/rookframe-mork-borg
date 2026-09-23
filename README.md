@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.17.1` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.18.1` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9de97beeede7f9d803e6ea0abef67730cdc84692` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -66,7 +66,7 @@ provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
 
-## Character creation checks
+## Character and inventory checks
 
 Run the focused Godot suite with the installed public dependencies:
 
@@ -106,3 +106,17 @@ The source does not allocate doses between recipes. Daily eligibility, brewing
 in play, expiry, and ongoing effects remain at the table in this creation slice.
 Horn, Bible, sword and laboratory remaining uses use ordinary completed-sheet
 corrections; creation mechanics remain fixed until confirmation.
+
+## Completed sheets
+
+Completed Characters support field-local corrections, including the played ability
+modifier, current resources, class text and live equipment quantities/uses. The
+core equipment catalogue creates independent carried items; custom live items
+expose their supported mechanics. Item identities remain stable after removal.
+Equip/unequip and Attack entries stay on their inventory item. Attack resolution
+belongs to the combat slices. Spending an Omen changes only its remaining count.
+
+Actor-default appearance and the selected linked Rook are separate choices from
+available published Miniatures. The SDK authorizes and persists all writes. Open
+sheets refresh replicated Actor state, preserve unsaved field text and clear their
+private presentation when access disappears.

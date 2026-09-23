@@ -8,6 +8,11 @@ signal TabletopCommandCompleted(result: Dictionary)
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 static var creation_serial := 0
 var reject_creation := false
+var defer_update := false
+var pending_update: Dictionary = {}
+var selected_rook := ""
+var rooks: Dictionary = {}
+var appearance_changes := 0
 var pending_roll := ""
 var pending_result: Dictionary = {}
 var outcomes: Dictionary = {}
@@ -69,6 +74,26 @@ func ReadActor(id: String) -> Dictionary:
 func UpdateActor(id: String, data: Variant) -> Dictionary:
 	for actor in actors:
 		if actor.id == id:
+			if defer_update:
+				pending_update = {"id": id, "data": data.duplicate(true)}
+				return {"ok": false, "code": "pending", "requestId": 43}
 			actor.data = data.duplicate(true)
 			return {"ok": true, "value": actor.duplicate(true)}
 	return {"ok": false, "message": "Actor unavailable."}
+
+func SelectedRookContext() -> Dictionary:
+	return {"id": selected_rook}
+
+func complete_update() -> void:
+	defer_update = false
+	var result: Dictionary = UpdateActor(pending_update.id, pending_update.data)
+	result["requestId"] = 43
+	TabletopCommandCompleted.emit(result)
+
+func ReadRook(id: String) -> Dictionary:
+	return {"ok": true, "value": rooks[id].duplicate(true)} if rooks.has(id) else {"ok": false, "message": "Rook unavailable."}
+
+func SetRookMiniature(id: String, package: String, miniature: String) -> Dictionary:
+	appearance_changes += 1
+	rooks[id].miniature = {"packageId": package, "localId": miniature}
+	return ReadRook(id)

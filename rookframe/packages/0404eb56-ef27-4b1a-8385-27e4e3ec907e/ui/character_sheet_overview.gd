@@ -2,7 +2,8 @@ extends VBoxContainer
 
 signal companions_requested
 signal edit_requested
-signal value_save_requested(key: String, value: int)
+signal omens_requested
+signal value_save_requested(key: String, value: String)
 
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 var _data: Dictionary = {}
@@ -12,6 +13,7 @@ var _short_window := false
 func _ready() -> void:
 	get_node(^"Body/Context/Companions").pressed.connect(_open_companions)
 	resized.connect(_layout)
+	get_node(^"OmensAction").pressed.connect(_open_omens)
 	get_node(^"Body/Context/Identity/Content/Header/Edit").pressed.connect(_edit)
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
@@ -22,6 +24,11 @@ func _ready() -> void:
 func configure(data: Dictionary, _miniatures: Array, short_window: bool = false) -> void:
 	_short_window = short_window
 	_data = data
+	var read_only: bool = data.get("read_only", false)
+	get_node(^"Body/Context/Identity/Content/Header/Edit").disabled = read_only
+	get_node(^"OmensAction").disabled = read_only
+	for resource in ["HitPoints", "Omens", "Silver"]:
+		get_node("Resources/" + resource + "/Content/Row/Edit").disabled = read_only
 	get_node(^"Resources/HitPoints/Content/Row/Value").text = "%s / %s" % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	get_node(^"Resources/Omens/Content/Row/Value").text = str(data.get("omens", 0))
 	get_node(^"Resources/Silver/Content/Row/Value").text = str(data.get("silver", 0))
@@ -31,6 +38,8 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 		var button = get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Modifier")
 		var modifier: int = value.get("modifier", 0)
 		button.text = "%+d" % modifier
+		button.disabled = read_only
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").disabled = read_only
 		button.accessibility_name = "%s modifier %s" % [ability, button.text]
 	get_node(^"Body/Context/Identity/Content/Description").text = str(data.get("description", ""))
 	get_node(^"Body/Context/Identity/Content/Origin").text = str(data.get("class_title", "No Class")) + "\n" + str(data.get("origin", ""))
@@ -80,8 +89,7 @@ func _edit_value(key: String) -> void:
 	var row: Node = get_node("Resources/" + key + "/Content/Row") if not resource_key.is_empty() else get_node("Body/Attributes/Content/Abilities/" + key + "/Padding/Content/Row")
 	var input := row.get_node(^"Input") as LineEdit
 	if _editing == key:
-		if input.text.is_valid_int():
-			value_save_requested.emit(resource_key if not resource_key.is_empty() else key, int(input.text))
+		value_save_requested.emit(resource_key if not resource_key.is_empty() else key, input.text)
 		return
 	if not _editing.is_empty():
 		return
@@ -90,7 +98,7 @@ func _edit_value(key: String) -> void:
 	if resource_key.is_empty():
 		var abilities: Dictionary = _data.get("abilities", {})
 		var ability: Dictionary = abilities.get(key, {})
-		value = ability.get("score", 0)
+		value = ability.get("modifier", 0)
 	input.text = str(value)
 	input.visible = true
 	var display := row.get_node(^"Value" if not resource_key.is_empty() else ^"Modifier") as Control
@@ -101,3 +109,13 @@ func _edit_value(key: String) -> void:
 
 func _open_companions() -> void:
 	companions_requested.emit()
+
+func _open_omens() -> void:
+	omens_requested.emit()
+
+func field_result(key: String, message: String, error: bool) -> void:
+	var paths: Dictionary = {"hit_points": ^"Resources/HitPoints/Content/Error", "omens": ^"Resources/Omens/Content/Error", "silver": ^"Resources/Silver/Content/Error", "Agility": ^"Body/Attributes/Content/Abilities/Agility/Padding/Content/Error", "Presence": ^"Body/Attributes/Content/Abilities/Presence/Padding/Content/Error", "Strength": ^"Body/Attributes/Content/Abilities/Strength/Padding/Content/Error", "Toughness": ^"Body/Attributes/Content/Abilities/Toughness/Padding/Content/Error"}
+	var path: NodePath = paths.get(key, ^"Resources/HitPoints/Content/Error")
+	var label := get_node(path) as Label
+	label.text = message
+	label.visible = error

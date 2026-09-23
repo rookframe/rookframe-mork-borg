@@ -1,60 +1,32 @@
 extends VBoxContainer
-
-signal add_item_requested
-
-var _data: Dictionary = {}
-@onready var _section := get_node(^"InventorySection") as Control
-
-
+signal mutation_requested(operation: String, arguments: Array)
+signal navigate_requested(route: String, item_id: String)
+const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
+func _ready() -> void:
+	get_node(^"Toolbar/Add").pressed.connect(_add_item)
 func configure(data: Dictionary, _miniatures: Array) -> void:
-	_data = data
-	_build()
+	var read_only: bool = data.get("read_only", false)
+	get_node(^"Toolbar/Add").disabled = read_only
+	var inventory: Array = data.get("inventory", [])
+	get_node(^"Toolbar/Count").text = "%d items · %s silver" % [inventory.size(), str(data.get("silver", 0))]
+	get_node(^"Empty").visible = inventory.is_empty()
+	for raw in inventory:
+		var item: Dictionary = raw
+		var row = ROW.instantiate()
+		var equipped: bool = item.get("equipped", false)
+		var target: NodePath = ^"Equipped" if equipped else ^"Carried"
+		get_node(target).add_child(row)
+		row.configure(item, false, read_only)
+		row.mutation_requested.connect(_mutation)
+		row.navigate_requested.connect(_navigate)
+	get_node(^"EquippedHeading").visible = get_node(^"Equipped").get_child_count() > 0
+	get_node(^"CarriedHeading").visible = get_node(^"Carried").get_child_count() > 0
 
+func _add_item() -> void:
+	navigate_requested.emit("catalogue", "")
 
-func _build() -> void:
-	var body: Container = _section.call("get_body_slot")
-	var actions: Container = _section.call("get_action_slot")
-	var inventory: Array = _data.get("inventory", [])
-	if inventory.is_empty():
-		body.add_child(_label("No items recorded.", "RookframeMeta"))
-	else:
-		for item in inventory:
-			var item_data: Dictionary = item
-			var item_name: String = item_data.get("name", "Item")
-			body.add_child(_label(item_name, "RookframeBody"))
-			var details := ""
-			if item_data.has("quantity"):
-				details = "Quantity: %s" % str(item_data["quantity"])
-			if item_data.has("uses"):
-				details += ("\n" if not details.is_empty() else "") + "Remaining uses: %s" % str(item_data["uses"])
-			if item_data.has("dose_pool"):
-				details += ("\n" if not details.is_empty() else "") + "Uses the portable laboratory’s shared doses."
-			if item_data.has("rules"):
-				details += ("\n" if not details.is_empty() else "") + str(item_data["rules"])
-			if not details.is_empty():
-				body.add_child(_label(details, "RookframeMeta"))
-	var add_item := _button("Add item")
-	add_item.pressed.connect(_emit_add_item_requested)
-	actions.add_child(add_item)
+func _mutation(operation: String, arguments: Array) -> void:
+	mutation_requested.emit(operation, arguments)
 
-
-func _emit_add_item_requested() -> void:
-	add_item_requested.emit()
-
-
-func _label(text: String, variation: String = "RookframeBody") -> Label:
-	var label := Label.new()
-	label.text = text
-	label.theme_type_variation = variation
-	label.autowrap_mode = 2
-	label.set("theme_override_font_sizes/font_size", 16)
-	return label
-
-
-func _button(text: String, primary: bool = false) -> Button:
-	var button := Button.new()
-	button.text = text
-	button.custom_minimum_size = Vector2(0, 44)
-	button.focus_mode = 2
-	button.theme_type_variation = "RookframePrimaryButton" if primary else "RookframeSecondaryButton"
-	return button
+func _navigate(route: String, id: String) -> void:
+	navigate_requested.emit(route, id)

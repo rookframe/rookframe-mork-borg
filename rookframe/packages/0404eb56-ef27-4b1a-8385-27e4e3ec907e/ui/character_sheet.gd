@@ -6,6 +6,10 @@ const CHARACTER_SHEET_VIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef
 
 signal companion_selected(actor: SDK.Actor)
 signal sheet_changed
+signal workflow_changed(route: String, title: String, can_spend: bool, busy: bool)
+signal actor_unavailable
+var _refresh_pending := false
+var _observed_selection := ""
 
 var sdk: SDK
 var _character_actor: SDK.Actor
@@ -13,11 +17,15 @@ var _character_miniatures: Array[SDK.ContentEntry] = []
 var _character_miniature_choices: Array[Dictionary] = []
 var _character_tab := "character"
 var _character_route := "character"
-var _character_view: Variant
+const SHEET_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_view.gd")
+var _character_view: SHEET_VIEW
 var _status: Label
 var _busy := false
 var _render_pending := false
 var _short_window := false
+var _item_id := ""
+var _selected_rook: SDK.RookId
+const ACTIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_actions.gd")
 @onready var _content := get_node(^"Content") as VBoxContainer
 
 
@@ -28,10 +36,23 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 	_character_miniatures = miniatures
 	_character_miniature_choices = miniature_choices
 	sdk = facade
-	_render_character_sheet()
+	if not sdk.world_changed.is_connected(_world_changed):
+		sdk.world_changed.connect(_world_changed)
+	_render_pending = true
 
 
 func _process(_delta: float) -> void:
+	if not visible:
+		return
+	if _refresh_pending and not _busy:
+		_refresh_pending = false
+		refresh_from_world()
+	if sdk != null and _character_tab == "appearance" and not _busy:
+		var selected: SDK.RookId = sdk.rooks.selected()
+		var identity: String = selected.value if selected != null else ""
+		if identity != _observed_selection:
+			_observed_selection = identity
+			_render_pending = true
 	if _render_pending:
 		_render_pending = false
 		_render_character_sheet()
@@ -54,105 +75,95 @@ func _render_character_sheet() -> void:
 		return
 	var view = CHARACTER_SHEET_VIEW_SCENE.instantiate()
 	view.companions_requested.connect(_on_companions_requested)
-	view.edit_requested.connect(_on_edit_requested)
-	view.value_save_requested.connect(_on_value_save_requested)
-	view.add_item_requested.connect(_on_add_item_requested)
-	view.item_save_requested.connect(_on_item_save_requested)
-	view.sheet_save_requested.connect(_on_sheet_save_requested)
-	view.cancel_requested.connect(_on_cancel_requested)
+	view.mutation_requested.connect(_mutate)
+	view.navigate_requested.connect(_navigate)
 	view.appearance_save_requested.connect(_on_appearance_save_requested)
 	_content.add_child(view)
-	view.configure(_character_actor.data, _character_tab, _character_route, _character_miniatures, _character_miniature_choices, _short_window)
+	var source_data: Dictionary = _character_actor.data
+	var data: Dictionary = source_data.duplicate(true)
+	_selected_rook = sdk.rooks.selected()
+	if _selected_rook != null:
+		var selected: SDK.RookResult = sdk.rooks.read(_selected_rook)
+		if selected.ok and selected.rook.actor != null and selected.rook.actor.value == _character_actor.id.value:
+			data["selected_rook_available"] = true
+			data["selected_miniature"] = {"package_id": selected.rook.miniature.package_id, "local_id": selected.rook.miniature.local_id}
+		else:
+			_selected_rook = null
+	data["read_only"] = _character_actor.access_level != "Owner"
+	data["inventory"] = ACTIONS.new(sdk, _character_actor.id).inventory(data)
+	view.configure(data, _character_tab, _character_route, _character_miniatures, _character_miniature_choices, _short_window, _item_id)
 	_character_view = view
 	_status.visible = false
+	_sync_chrome()
 
 
-func _on_edit_requested() -> void:
-	_character_route = "edit"
+func _navigate(route: String, item_id: String) -> void:
+	if _busy:
+		return
+	if _character_actor.access_level != "Owner" and route in ["attack", "edit", "item", "custom", "catalogue", "omens"]:
+		_set_status("Owner access is required to change this Character.", true)
+		return
+	if route == "attack":
+		_set_status("Weapon attacks will be available with the combat actions.", true)
+		return
+	_character_route = route
+	_item_id = item_id
+	if route in ["character", "inventory", "appearance"]:
+		_character_tab = route
 	_render_pending = true
-
 
 func _on_cancel_requested() -> void:
-	_character_route = "character"
-	_render_pending = true
+	_navigate("character", "")
 
-
-func _on_add_item_requested() -> void:
-	_character_route = "item"
-	_render_pending = true
-
-
-func _on_item_save_requested(item_name: String) -> void:
-	if item_name.is_empty() or _busy or sdk == null:
-		_set_status("Enter an item name before saving.", true)
+func _mutate(operation: String, arguments: Array) -> void:
+	if _busy or sdk == null:
+		if _character_view != null and operation in ["correct", "item"]:
+			_character_view.field_result(str(arguments[0] if operation == "correct" else arguments[1]), "Wait for the current save, then retry.", true)
 		return
-	var source: SDK.ActorResult = sdk.actors.read(_character_actor.id)
-	if not source.ok or source.actor == null:
-		_set_status(source.message if not source.ok else "Character data is unavailable.", true)
+	var actions = ACTIONS.new(sdk, _character_actor.id)
+	_set_busy(true, "Saving…")
+	var result: SDK.ActorResult = await _perform(actions, operation, arguments)
+	_set_busy(false, result.message if not result.ok else "Saved.", not result.ok)
+	if _character_view != null and operation in ["correct", "item"]:
+		_character_view.field_result(str(arguments[0] if operation == "correct" else arguments[1]), "Saved." if result.ok else result.message, not result.ok)
+	if not result.ok:
 		return
-	var data: Dictionary = source.actor.data.duplicate(true)
-	var inventory: Array = data.get("inventory", []).duplicate(true)
-	inventory.append({"name": item_name})
-	data["inventory"] = inventory
-	_set_busy(true, "Saving Character inventory…")
-	var result: SDK.ActorResult = await sdk.actors.update(_character_actor.id, data)
-	_set_busy(false, result.message if not result.ok else "Inventory saved.", not result.ok)
-	if result.ok:
-		_character_actor = result.actor
-		sheet_changed.emit()
-		_character_tab = "inventory"
-		_character_route = "character"
+	_character_actor = result.actor
+	sheet_changed.emit()
+	if operation in ["add", "custom", "remove"]:
+		_navigate("inventory", "")
+	elif not _character_route in ["edit", "item"]:
 		_render_pending = true
 
 
-func _on_sheet_save_requested(private_name: String, description: String, hit_points: int, maximum_hit_points: int, silver: int, omens: int, abilities: Dictionary, inventory: Array) -> void:
-	if private_name.is_empty() or _busy or sdk == null:
-		_set_status("Enter a Character name before saving.", true)
-		return
-	var source: SDK.ActorResult = sdk.actors.read(_character_actor.id)
-	if not source.ok or source.actor == null:
-		_set_status(source.message if not source.ok else "Character data is unavailable.", true)
-		return
-	var data: Dictionary = source.actor.data.duplicate(true)
-	data["name"] = private_name
-	data["description"] = description
-	data["hit_points"] = hit_points
-	data["maximum_hit_points"] = maximum_hit_points
-	data["silver"] = silver
-	data["omens"] = omens
-	data["inventory"] = inventory.duplicate(true)
-	var normalized_abilities: Dictionary = {}
-	for ability_name in ["Agility", "Presence", "Strength", "Toughness"]:
-		var submitted: Dictionary = abilities.get(ability_name, {})
-		var score: int = submitted.get("score", 1)
-		if score < 1:
-			score = 1
-		elif score > 20:
-			score = 20
-		normalized_abilities[ability_name] = {"score": score, "modifier": _modifier(score)}
-	data["abilities"] = normalized_abilities
-	_set_busy(true, "Saving Character sheet…")
-	var result: SDK.ActorResult = await sdk.actors.update(_character_actor.id, data)
-	_set_busy(false, result.message if not result.ok else "Character changes saved.", not result.ok)
-	if result.ok:
-		_character_actor = result.actor
-		sheet_changed.emit()
-		_character_route = "character"
-		_render_pending = true
-
-
-func _on_appearance_save_requested(index: int) -> void:
+func _on_appearance_save_requested(scope: String, index: int) -> void:
 	if index <= 0 or index - 1 >= _character_miniature_choices.size() or _busy or sdk == null:
 		_set_status("Choose a published Miniature before saving.", true)
+		return
+	if scope == "Selected":
+		var current_rook: SDK.RookId = sdk.rooks.selected()
+		if _selected_rook == null or current_rook == null or current_rook.value != _selected_rook.value:
+			_set_status("Select this Character’s Rook first.", true)
+			return
+		var selected: SDK.RookResult = sdk.rooks.read(_selected_rook)
+		if not selected.ok or selected.rook.actor == null or selected.rook.actor.value != _character_actor.id.value:
+			_set_status("The selected Rook is no longer linked to this Character.", true)
+			return
+		var selected_choice: Dictionary = _character_miniature_choices[index - 1]
+		_set_busy(true, "Saving this Rook’s appearance…")
+		var changed: SDK.RookResult = await sdk.rooks.set_miniature(_selected_rook, SDK.ContentReference.new(str(selected_choice.package_id), str(selected_choice.local_id)))
+		_set_busy(false, "Appearance saved." if changed.ok else changed.message, not changed.ok)
+		if changed.ok:
+			_render_pending = true
 		return
 	var source: SDK.ActorResult = sdk.actors.read(_character_actor.id)
 	if not source.ok or source.actor == null:
 		_set_status(source.message if not source.ok else "Character data is unavailable.", true)
 		return
 	var choice: Dictionary = _character_miniature_choices[index - 1]
-	var data: Dictionary = source.actor.data.duplicate(true)
+	var source_data: Dictionary = source.actor.data
+	var data: Dictionary = source_data.duplicate(true)
 	data["preferred_miniature"] = choice.duplicate(true)
-	data["preferred_miniature"]["choice_index"] = index
 	_set_busy(true, "Saving Character appearance…")
 	var result: SDK.ActorResult = await sdk.actors.update(_character_actor.id, data)
 	_set_busy(false, result.message if not result.ok else "Appearance saved.", not result.ok)
@@ -167,55 +178,16 @@ func _on_appearance_save_requested(index: int) -> void:
 func _set_status(message: String, error: bool = false) -> void:
 	if _status == null:
 		return
+	_status.theme_type_variation = "RookframeError" if error else "RookframeMeta"
 	_status.text = message
 	_status.tooltip_text = message
-	_status.visible = error or _busy
+	_status.visible = not message.is_empty()
 
 
 func _set_busy(value: bool, message: String, error: bool = false) -> void:
 	_busy = value
 	_set_status(message, error)
-
-
-func _modifier(score: int) -> int:
-	if score <= 4:
-		return -3
-	if score <= 6:
-		return -2
-	if score <= 8:
-		return -1
-	if score <= 12:
-		return 0
-	if score <= 14:
-		return 1
-	if score <= 16:
-		return 2
-	return 3
-
-
-func _on_value_save_requested(key: String, value: int) -> void:
-	if _busy or sdk == null:
-		return
-	var source: SDK.ActorResult = sdk.actors.read(_character_actor.id)
-	if not source.ok or source.actor == null:
-		_set_status(source.message if not source.ok else "Character data is unavailable.", true)
-		return
-	var data: Dictionary = source.actor.data.duplicate(true)
-	if ["hit_points", "omens", "silver"].has(key):
-		data[key] = value
-	elif ["Agility", "Presence", "Strength", "Toughness"].has(key):
-		var abilities: Dictionary = data.get("abilities", {}).duplicate(true)
-		abilities[key] = {"score": value, "modifier": _modifier(value)}
-		data["abilities"] = abilities
-	else:
-		return
-	_set_busy(true, "Saving…")
-	var result: SDK.ActorResult = await sdk.actors.update(_character_actor.id, data)
-	_set_busy(false, result.message if not result.ok else "", not result.ok)
-	if result.ok:
-		_character_actor = result.actor
-		sheet_changed.emit()
-		_render_pending = true
+	_sync_chrome()
 
 
 func set_available_height(height: float) -> void:
@@ -249,8 +221,79 @@ func _show_companions() -> void:
 	view.actor_requested.connect(_on_companion_selected)
 	_content.add_child(view)
 	view.configure(companions, character_data.get("companion_sheets", []))
-	_character_view = view
 
 
 func _on_companion_selected(actor: SDK.Actor) -> void:
 	companion_selected.emit(actor)
+
+func _perform(actions: ACTIONS, operation: String, arguments: Array) -> SDK.ActorResult:
+	if operation == "correct":
+		return await actions.correct(str(arguments[0]), str(arguments[1]))
+	if operation == "omen":
+		return await actions.spend_omen()
+	if operation == "add":
+		return await actions.add_equipment(str(arguments[0]))
+	if operation == "custom":
+		return await actions.add_custom(arguments[0])
+	if operation == "item":
+		return await actions.change_item(str(arguments[0]), str(arguments[1]), str(arguments[2]))
+	if operation == "remove":
+		return await actions.remove_item(str(arguments[0]))
+	return SDK.ActorResult.new({"ok": false, "message": "Unknown Character action."})
+
+
+func _world_changed() -> void:
+	_refresh_pending = true
+
+func refresh_from_world() -> void:
+	if _character_actor == null or sdk == null:
+		return
+	var latest: SDK.ActorResult = sdk.actors.read(_character_actor.id)
+	if not latest.ok or latest.actor == null:
+		_character_actor = null
+		clear_character_sheet()
+		_set_status("Character data is no longer available.", true)
+		actor_unavailable.emit()
+		return
+	var access_changed := latest.actor.access_level != _character_actor.access_level
+	if not access_changed and latest.actor.data == _character_actor.data:
+		if _character_tab == "appearance":
+			_render_pending = true
+		return
+	_character_actor = latest.actor
+	sheet_changed.emit()
+	if access_changed:
+		_character_route = "character"
+		_render_pending = true
+	elif (_character_route in ["edit", "item", "custom"] or (_character_route == "character" and _character_tab == "character")) and _character_view != null:
+		var current: Dictionary = _character_actor.data
+		var data: Dictionary = current.duplicate(true)
+		data["inventory"] = ACTIONS.new(sdk, _character_actor.id).inventory(data)
+		data["read_only"] = _character_actor.access_level != "Owner"
+		_character_view.refresh_data(data)
+		_sync_chrome()
+	else:
+		_render_pending = true
+
+func cancel_workflow() -> void:
+	_navigate("character", "")
+
+func spend_omen() -> void:
+	_mutate("omen", [])
+
+func _sync_chrome() -> void:
+	if _character_actor == null:
+		return
+	var data: Dictionary = _character_actor.data
+	var title := str(data.get("name", "Character"))
+	if _character_route == "omens":
+		title = "Spend an Omen"
+	elif _character_route == "edit":
+		title = "Edit Character"
+	elif _character_route in ["catalogue", "custom"]:
+		title = "Add Item"
+	elif _character_route == "item":
+		title = "Inventory Item"
+	var count: int = data.get("omens", 0)
+	var route: String = _character_tab if _character_route == "character" else _character_route
+	workflow_changed.emit(route, title, count > 0 and _character_actor.access_level == "Owner", _busy)

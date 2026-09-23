@@ -1,0 +1,6 @@
+[gd_scene format=3]
+[node name="MiniatureChoice" type="Button"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+toggle_mode = true

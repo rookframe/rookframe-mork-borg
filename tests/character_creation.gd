@@ -92,17 +92,24 @@ func _correct_class_uses() -> void:
 		root.add_child(sheet)
 		var miniatures: Array[SDK.ContentEntry] = []
 		var choices: Array[Dictionary] = []
-		sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "edit", miniatures, choices, SDK.new(host))
+		sheet.set_character(SDK.Actor.new(host.actors[0]), "inventory", "character", miniatures, choices, SDK.new(host))
+		await process_frame
+		await process_frame
 		var found := false
-		for editor in sheet.find_children("*", "LineEdit", true, false):
-			var field: Node = editor.get_parent()
-			if field.get_node(^"Label").text == str(case[2]).to_upper() + " USES":
-				field.set("value", "0")
+		for row in sheet.find_children("*", "HBoxContainer", true, false):
+			if row.get_script() != load(ROOT + "ui/inventory_row.gd"):
+				continue
+			if row.item.name == case[2]:
+				row.get_node(^"Actions/Edit").pressed.emit()
 				found = true
-		_check(found, "Completed class resource has an ordinary correction field.")
-		for button in sheet.find_children("*", "Button", true, false):
-			if button.text == "Save changes":
-				button.pressed.emit()
+				break
+		await process_frame
+		await process_frame
+		_check(found, "Completed class resource has an item-local correction entry.")
+		for field in sheet.find_children("*", "VBoxContainer", true, false):
+			if field.get_script() == load(ROOT + "ui/sheet_field.gd") and field.field == "uses":
+				field.get_node(^"Field").set("value", "0")
+				field.get_node(^"Actions/Save").pressed.emit()
 				break
 		await process_frame
 		var stored: SDK.ActorResult = SDK.new(host).actors.read(SDK.ActorId.new("character"))
@@ -152,6 +159,8 @@ func _descriptive_companions(host) -> void:
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
 	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "companions", miniatures, choices, SDK.new(host))
+	await process_frame
+	await process_frame
 	var labels: Array = sheet.find_children("*", "Label", true, false)
 	var expected_name: String = host.actors[0].data.companion_sheets[0].name
 	_check(labels.any(func(label): return label.text.contains(expected_name)), "Descriptive companions are visible in the ordinary companion route.")
@@ -490,6 +499,8 @@ func _companions_projection() -> void:
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
 	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "character", miniatures, choices, SDK.new(host))
+	await process_frame
+	await process_frame
 	var overview = sheet.find_child("CharacterOverview", true, false)
 	_check(overview.get_node("Body/Context/Identity/Content/Traits").text.contains("Ancient gore-hound"), "The completed sheet projects the actual feature.")
 	overview.get_node("Body/Context/Companions").pressed.emit()

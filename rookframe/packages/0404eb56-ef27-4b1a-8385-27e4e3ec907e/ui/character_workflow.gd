@@ -1,7 +1,5 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 
-const CHARACTER_SHEET_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.tscn")
-const CHARACTER_CREATOR_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.tscn")
 
 const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd")
 @onready var _creation_progress: CREATION_PROGRESS = get_node(^"Layout/CreationProgress")
@@ -9,8 +7,11 @@ const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8
 var _pending_companion: SDK.Actor
 var _character_actor: SDK.Actor
 var _character_content: VBoxContainer
-var _character_creator: Variant
-var _character_sheet: Variant
+const CHARACTER_CREATOR = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.gd")
+var _character_creator: CHARACTER_CREATOR
+var _last_sheet_route := ""
+const CHARACTER_SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.gd")
+var _character_sheet: CHARACTER_SHEET
 var _character_transition_pending := false
 var _creation_was_closed := false
 var _character_tab := "character"
@@ -72,7 +73,8 @@ func opened(actor_id: SDK.ActorId) -> void:
 	if not result.ok or result.actor == null:
 		_set_status(result.message if not result.ok else "Actor data is unavailable.", true)
 		return
-	if str(result.actor.data.get("schema", "")) != "mork-borg-character/v1":
+	var data: Dictionary = result.actor.data
+	if str(data.get("schema", "")) != "mork-borg-character/v1":
 		return
 	_character_actor = result.actor
 	character_show_route("character")
@@ -165,6 +167,7 @@ func character_setup() -> void:
 	_character_tab_character.pressed.connect(_on_tab_character)
 	_character_tab_inventory.pressed.connect(_on_tab_inventory)
 	_character_tab_appearance.pressed.connect(_on_tab_appearance)
+	_setup_character_content()
 
 
 func character_set_content(definitions: Array[SDK.ContentEntry], character_definition: SDK.ContentEntry, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary] = []) -> void:
@@ -194,7 +197,6 @@ func character_hide_surface() -> void:
 
 
 func character_primary_button_pressed() -> void:
-	_ensure_character_content()
 	if _character_creator.is_active():
 		_character_creator.primary()
 	else:
@@ -203,7 +205,6 @@ func character_primary_button_pressed() -> void:
 
 
 func character_back_button_pressed() -> void:
-	_ensure_character_content()
 	if _character_creator.is_active():
 		_character_creator.start_over()
 	else:
@@ -248,30 +249,21 @@ func _set_window_title(title: String) -> void:
 		_set_status(result.message, true)
 
 
-func _ensure_character_content() -> void:
-	if _character_creator != null:
-		return
-	var creator = CHARACTER_CREATOR_SCENE.instantiate()
-	creator.name = "CharacterCreator"
-	creator.size_flags_horizontal = 3
-	creator.configure(_definitions, _character_definition, _character_miniatures, _compact, sdk, _character_miniature_choices)
-	creator.stage_changed.connect(_on_creation_stage_changed)
-	creator.status_changed.connect(_on_creator_status)
-	creator.busy_changed.connect(_on_creator_busy)
-	creator.primary_changed.connect(_on_creator_primary)
-	creator.character_created.connect(_on_creator_created)
-	creator.scroll_choice_requested.connect(_on_scroll_choice_requested)
-	_content.add_child(creator)
-	_character_creator = creator
-	var sheet = CHARACTER_SHEET_SCENE.instantiate()
-	sheet.name = "CharacterSheet"
-	sheet.size_flags_horizontal = 3
-	_content.add_child(sheet)
-	_character_sheet = sheet
-	sheet.sheet_changed.connect(_on_sheet_changed)
-	sheet.companion_selected.connect(_open_companion)
-	creator.visible = false
-	sheet.visible = false
+func _setup_character_content() -> void:
+	_character_creator = get_node(^"Layout/Body/Content/CharacterCreator")
+	_character_sheet = get_node(^"Layout/Body/Content/CharacterSheet")
+	_character_creator.stage_changed.connect(_on_creation_stage_changed)
+	_character_creator.status_changed.connect(_on_creator_status)
+	_character_creator.busy_changed.connect(_on_creator_busy)
+	_character_creator.primary_changed.connect(_on_creator_primary)
+	_character_creator.character_created.connect(_on_creator_created)
+	_character_creator.scroll_choice_requested.connect(_on_scroll_choice_requested)
+	_character_sheet.sheet_changed.connect(_on_sheet_changed)
+	_character_sheet.actor_unavailable.connect(_on_character_unavailable)
+	_character_sheet.workflow_changed.connect(_on_sheet_workflow_changed)
+	get_node(^"Layout/SheetActions/Back").pressed.connect(_cancel_sheet_workflow)
+	get_node(^"Layout/SheetActions/Spend").pressed.connect(_spend_sheet_omen)
+	_character_sheet.companion_selected.connect(_open_companion)
 
 
 func _on_creation_stage_changed(step: int, title: String) -> void:
@@ -301,8 +293,8 @@ func _on_creator_created(actor: SDK.Actor) -> void:
 
 
 func _clear_character_content() -> void:
-	_ensure_character_content()
 	_character_creator.clear_creation()
+	get_node(^"Layout/SheetActions").visible = false
 	_character_sheet.clear_character_sheet()
 	_character_creator.visible = false
 	_character_sheet.visible = false
@@ -317,7 +309,6 @@ func character_show_route(route: String) -> void:
 	if sdk == null:
 		return
 	_route = route
-	_ensure_character_content()
 	_clear_character_content()
 	var creation := route.begins_with("create-")
 	_set_search_visible(false)
@@ -398,7 +389,8 @@ func _on_sheet_changed() -> void:
 	var latest: SDK.ActorResult = sdk.actors.read(_character_actor.id)
 	if latest.ok and latest.actor != null:
 		_character_actor = latest.actor
-		var name: String = _character_actor.data.get("name", "Unnamed Character")
+		var data: Dictionary = _character_actor.data
+		var name: String = data.get("name", "Unnamed Character")
 		_header_title.text = name.to_upper()
 		_set_window_title(name)
 
@@ -419,7 +411,8 @@ func _update_character_density() -> void:
 	if _route.begins_with("create-"):
 		_set_window_title("CREATE CHARACTER")
 	elif _character_actor != null:
-		_set_window_title(str(_character_actor.data.get("name", "Unnamed Character")))
+		var data: Dictionary = _character_actor.data
+		_set_window_title(str(data.get("name", "Unnamed Character")))
 
 
 func _open_companion(actor: SDK.Actor) -> void:
@@ -432,3 +425,27 @@ func _navigate_companion(_actor: SDK.Actor) -> void:
 
 func _on_scroll_choice_requested(_slot: String) -> void:
 	_body.scroll_vertical = 0
+
+func _on_character_unavailable() -> void:
+	get_node(^"Layout/SheetActions").visible = false
+	_character_actor = null
+	_header_title.text = "CHARACTER UNAVAILABLE"
+	_header_subtitle.text = ""
+	_set_window_title("Character unavailable")
+	_character_tabs.visible = false
+
+func _on_sheet_workflow_changed(route: String, title: String, can_spend: bool, busy: bool) -> void:
+	if route != _last_sheet_route:
+		get_node(^"Layout/Body").scroll_vertical = 0
+		_last_sheet_route = route
+	_character_tabs.visible = route in ["character", "inventory", "appearance"]
+	get_node(^"Layout/SheetActions").visible = route == "omens"
+	get_node(^"Layout/SheetActions/Spend").disabled = not can_spend or busy
+	get_node(^"Layout/SheetActions/Back").disabled = busy
+	_set_window_title(title)
+
+func _cancel_sheet_workflow() -> void:
+	_character_sheet.cancel_workflow()
+
+func _spend_sheet_omen() -> void:
+	_character_sheet.spend_omen()

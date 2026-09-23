@@ -499,3 +499,51 @@ layout_mode = 2
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
+
+[node name="OmensAction" type="Button" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Spend Omen"
+
+[node name="Error" type="Label" parent="Resources/HitPoints/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="Resources/Omens/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="Resources/Silver/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2

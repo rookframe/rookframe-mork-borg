@@ -235,7 +235,8 @@ func _render_actor() -> void:
 	if armor_name != "No armor":
 		_rules.text = "%s · quick, attacks and defence are DR14." % armor_name
 	if actor_data.has("defence_dr"):
-		_rules.text = "Defence DR%d. %s" % [int(actor_data["defence_dr"]), str(actor_data.get("rules", ""))]
+		var defence_dr: int = actor_data["defence_dr"]
+		_rules.text = "Defence DR%d. %s" % [defence_dr, str(actor_data.get("rules", ""))]
 	_private_name.set("value", private_name)
 	_public_label.set("value", _selected_actor.public_label)
 	_hit_points.set("value", str(hit_points))
@@ -289,7 +290,8 @@ func _render_equipment(attacks: Array) -> void:
 		var attack_dice: String = attack.get("dice", "—")
 		var detail: String = "%s · Equipped" % attack_dice
 		if attack.has("attack_dr"):
-			detail += " · Attack DR%d" % int(attack["attack_dr"])
+			var attack_dr: int = attack["attack_dr"]
+			detail += " · Attack DR%d" % attack_dr
 		row.text = "%s\n%s" % [attack_name, detail]
 		_equipment_list.add_child(row)
 

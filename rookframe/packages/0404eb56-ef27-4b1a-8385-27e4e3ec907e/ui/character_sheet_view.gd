@@ -7,82 +7,111 @@ const EDIT_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e
 const APPEARANCE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_appearance.tscn")
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 
+const OVERVIEW_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.gd")
+var _overview: OVERVIEW_SCRIPT
+var _short_window := false
+const ITEM_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_item.gd")
+const EDIT_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_edit.gd")
+var _item_editor: ITEM_SCRIPT
+var _character_editor: EDIT_SCRIPT
+
 signal companions_requested
-signal edit_requested
-signal value_save_requested(key: String, value: int)
-signal add_item_requested
-signal item_save_requested(item_name: String)
-signal sheet_save_requested(private_name: String, description: String, hit_points: int, maximum_hit_points: int, silver: int, omens: int, abilities: Dictionary, inventory: Array)
-signal cancel_requested
-signal appearance_save_requested(index: int)
-
-
-func configure(data: Dictionary, tab: String, route: String, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary], short_window: bool = false) -> void:
-	var content := get_node(^"Content") as VBoxContainer
-	for child in content.get_children():
-		content.remove_child(child)
-		child.queue_free()
-	if route == "edit":
-		var edit_view = EDIT_SCENE.instantiate()
-		edit_view.sheet_save_requested.connect(_emit_sheet_save_requested)
-		edit_view.cancel_requested.connect(_emit_cancel_requested)
-		content.add_child(edit_view)
-		edit_view.configure(data, miniatures)
-		return
-	if route == "item":
+signal mutation_requested(operation: String, arguments: Array)
+signal navigate_requested(route: String, item_id: String)
+signal appearance_save_requested(scope: String, index: int)
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/equipment_catalogue.tscn")
+const OMENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_omens.tscn")
+func configure(data: Dictionary, tab: String, route: String, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary], short_window: bool = false, item_id: String = "") -> void:
+	_short_window = short_window
+	if route in ["item", "custom"]:
 		var item_view = ITEM_SCENE.instantiate()
-		item_view.item_save_requested.connect(_emit_item_save_requested)
-		item_view.cancel_requested.connect(_emit_cancel_requested)
-		content.add_child(item_view)
-		item_view.configure(data, miniatures)
+		_item_editor = item_view
+		_connect_form(item_view)
+		var item: Dictionary = {}
+		var inventory: Array = data.get("inventory", [])
+		for raw in inventory:
+			var entry: Dictionary = raw
+			if str(entry.get("inventory_id", "")) == item_id:
+				item = entry
+		if route == "item" and item.is_empty():
+			item_view.show_missing()
+		else:
+			item_view.configure(item, miniatures)
+		return
+	if route == "edit":
+		var edit = EDIT_SCENE.instantiate()
+		_character_editor = edit
+		_connect_form(edit)
+		edit.configure(data, miniatures)
+		return
+	if route == "catalogue":
+		var catalogue = CATALOGUE.instantiate()
+		_connect_form(catalogue)
+		catalogue.configure(data, miniatures)
+		return
+	if route == "omens":
+		var omens = OMENS.instantiate()
+		_connect_form(omens)
+		omens.configure(data, miniatures)
 		return
 	if route == "appearance" or tab == "appearance":
-		var appearance_view = APPEARANCE_SCENE.instantiate()
-		appearance_view.appearance_save_requested.connect(_emit_appearance_save_requested)
-		content.add_child(appearance_view)
-		appearance_view.configure(data, miniature_choices.size(), miniature_choices)
+		var appearance = APPEARANCE_SCENE.instantiate()
+		appearance.appearance_save_requested.connect(_appearance)
+		get_node(^"Content").add_child(appearance)
+		appearance.configure(data, miniature_choices.size(), miniature_choices)
 		return
-	if tab == "inventory":
+	if route == "inventory" or tab == "inventory":
 		var inventory_view = INVENTORY_SCENE.instantiate()
-		inventory_view.add_item_requested.connect(_emit_add_item_requested)
-		content.add_child(inventory_view)
+		_connect_form(inventory_view)
 		inventory_view.configure(data, miniatures)
 		return
-	var overview_view = OVERVIEW_SCENE.instantiate()
-	overview_view.companions_requested.connect(_emit_companions_requested)
-	overview_view.edit_requested.connect(_emit_edit_requested)
-	overview_view.value_save_requested.connect(_emit_value_save_requested)
-	content.add_child(overview_view)
-	overview_view.configure(data, miniatures, short_window)
+	var overview = OVERVIEW_SCENE.instantiate()
+	_overview = overview
+	overview.companions_requested.connect(_companions)
+	overview.edit_requested.connect(_edit)
+	overview.omens_requested.connect(_omens)
+	overview.value_save_requested.connect(_correct)
+	get_node(^"Content").add_child(overview)
+	overview.configure(data, miniatures, short_window)
 
+func _connect_form(view: Control) -> void:
+	view.mutation_requested.connect(_mutation)
+	view.navigate_requested.connect(_navigate)
+	get_node(^"Content").add_child(view)
 
-func _emit_edit_requested() -> void:
-	edit_requested.emit()
+func _appearance(scope: String, index: int) -> void:
+	appearance_save_requested.emit(scope, index)
 
-
-func _emit_add_item_requested() -> void:
-	add_item_requested.emit()
-
-
-func _emit_item_save_requested(item_name: String) -> void:
-	item_save_requested.emit(item_name)
-
-
-func _emit_sheet_save_requested(private_name: String, description: String, hit_points: int, maximum_hit_points: int, silver: int, omens: int, abilities: Dictionary, inventory: Array) -> void:
-	sheet_save_requested.emit(private_name, description, hit_points, maximum_hit_points, silver, omens, abilities, inventory)
-
-
-func _emit_cancel_requested() -> void:
-	cancel_requested.emit()
-
-
-func _emit_appearance_save_requested(index: int) -> void:
-	appearance_save_requested.emit(index)
-
-
-func _emit_value_save_requested(key: String, value: int) -> void:
-	value_save_requested.emit(key, value)
-
-
-func _emit_companions_requested() -> void:
+func _companions() -> void:
 	companions_requested.emit()
+
+func _edit() -> void:
+	navigate_requested.emit("edit", "")
+
+func _omens() -> void:
+	navigate_requested.emit("omens", "")
+
+func _correct(key: String, value: String) -> void:
+	mutation_requested.emit("correct", [key, str(value)])
+
+func _mutation(operation: String, arguments: Array) -> void:
+	mutation_requested.emit(operation, arguments)
+
+func _navigate(next_route: String, id: String) -> void:
+	navigate_requested.emit(next_route, id)
+
+func field_result(key: String, message: String, error: bool) -> void:
+	if _overview != null:
+		_overview.field_result(key, message, error)
+	if _item_editor != null:
+		_item_editor.field_result(key, message, error)
+	if _character_editor != null:
+		_character_editor.field_result(key, message, error)
+
+func refresh_data(data: Dictionary) -> void:
+	if _overview != null:
+		_overview.configure(data, [], _short_window)
+	if _item_editor != null:
+		_item_editor.refresh_data(data)
+	if _character_editor != null:
+		_character_editor.refresh_data(data)
