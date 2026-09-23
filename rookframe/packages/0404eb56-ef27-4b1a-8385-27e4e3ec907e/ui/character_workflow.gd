@@ -371,7 +371,7 @@ func _build_character_sheet_route(route: String) -> void:
 	var data: Dictionary = _character_actor.data
 	var name: String = data.get("name", "Unnamed Character")
 	_header_title.text = name.to_upper()
-	_header_subtitle.text = "No Class Character · private sheet"
+	_header_subtitle.text = str(data.get("class_title", "No Class")) + " Character · private sheet"
 	_set_window_title(name)
 	_character_tabs.visible = true
 	_character_tab_character.button_pressed = _character_tab == "character"
