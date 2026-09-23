@@ -17,7 +17,7 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	for stage in stages:
 		get_node("Main/Content/" + stage).visible = stage == selected
 	get_node(^"Main/Content/Title").text = "ROLL ABILITIES" if selected == "Abilities" else ("STARTING EQUIPMENT" if selected == "Equipment" else selected.to_upper())
-	get_node(^"Main/Content/Title").visible = not (compact and selected == "Abilities")
+	get_node(^"Main/Content/Title").visible = not (compact and selected in ["Abilities", "Class"])
 	get_node(^"Aside").visible = not (compact and selected == "Abilities")
 	get_node(^"Aside/Context/Content/Pack").visible = selected == "Equipment" and not equipment_pending
 	get_node(^"Aside/Context/Content/PreferredMiniature").visible = selected == "Identity"

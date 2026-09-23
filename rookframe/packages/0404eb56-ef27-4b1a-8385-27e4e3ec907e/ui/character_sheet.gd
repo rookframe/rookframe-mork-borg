@@ -92,6 +92,7 @@ func _on_item_save_requested(item_name: String) -> void:
 	_set_busy(false, result.message if not result.ok else "Inventory saved.", not result.ok)
 	if result.ok:
 		_character_actor = result.actor
+		sheet_changed.emit()
 		_character_tab = "inventory"
 		_character_route = "character"
 		_render_pending = true
@@ -108,12 +109,8 @@ func _on_sheet_save_requested(private_name: String, description: String, hit_poi
 	var data: Dictionary = source.actor.data.duplicate(true)
 	data["name"] = private_name
 	data["description"] = description
-	var normalized_maximum_hit_points := maximum_hit_points if maximum_hit_points > 0 else 1
-	var normalized_hit_points := hit_points if hit_points > 0 else 1
-	if normalized_maximum_hit_points < normalized_hit_points:
-		normalized_maximum_hit_points = normalized_hit_points
-	data["hit_points"] = normalized_hit_points
-	data["maximum_hit_points"] = normalized_maximum_hit_points
+	data["hit_points"] = hit_points
+	data["maximum_hit_points"] = maximum_hit_points
 	data["silver"] = silver
 	data["omens"] = omens
 	data["inventory"] = inventory.duplicate(true)
@@ -132,6 +129,7 @@ func _on_sheet_save_requested(private_name: String, description: String, hit_poi
 	_set_busy(false, result.message if not result.ok else "Character changes saved.", not result.ok)
 	if result.ok:
 		_character_actor = result.actor
+		sheet_changed.emit()
 		_character_route = "character"
 		_render_pending = true
 
@@ -153,6 +151,7 @@ func _on_appearance_save_requested(index: int) -> void:
 	_set_busy(false, result.message if not result.ok else "Appearance saved.", not result.ok)
 	if result.ok:
 		_character_actor = result.actor
+		sheet_changed.emit()
 		_character_tab = "appearance"
 		_character_route = "character"
 		_render_pending = true
@@ -208,4 +207,5 @@ func _on_value_save_requested(key: String, value: int) -> void:
 	_set_busy(false, result.message if not result.ok else "", not result.ok)
 	if result.ok:
 		_character_actor = result.actor
+		sheet_changed.emit()
 		_render_pending = true

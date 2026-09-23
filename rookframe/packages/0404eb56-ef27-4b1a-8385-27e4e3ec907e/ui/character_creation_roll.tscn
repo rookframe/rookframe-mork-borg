@@ -35,7 +35,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14
 text = "1"
-autowrap_mode = 2
+autowrap_mode = 0
 
 [node name="Die" type="TextureRect" parent="Row"]
 layout_mode = 2
@@ -69,5 +69,5 @@ layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 18
 text = "—"
-autowrap_mode = 2
+autowrap_mode = 0
 

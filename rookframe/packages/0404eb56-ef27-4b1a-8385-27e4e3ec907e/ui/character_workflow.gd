@@ -252,6 +252,7 @@ func _ensure_character_content() -> void:
 	sheet.size_flags_horizontal = 3
 	_content.add_child(sheet)
 	_character_sheet = sheet
+	sheet.sheet_changed.connect(_on_sheet_changed)
 	creator.visible = false
 	sheet.visible = false
 
@@ -371,3 +372,14 @@ func _refresh_character_body(route: String) -> void:
 func _select_character_tab(tab: String) -> void:
 	_character_tab = tab
 	call_deferred("_refresh_character_body", "character")
+
+
+func _on_sheet_changed() -> void:
+	if _character_actor == null:
+		return
+	var latest: SDK.ActorResult = sdk.actors.read(_character_actor.id)
+	if latest.ok and latest.actor != null:
+		_character_actor = latest.actor
+		var name: String = _character_actor.data.get("name", "Unnamed Character")
+		_header_title.text = name.to_upper()
+		_set_window_title(name)

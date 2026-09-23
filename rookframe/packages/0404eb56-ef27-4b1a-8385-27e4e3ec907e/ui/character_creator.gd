@@ -305,7 +305,7 @@ func _roll_character_equipment(token: int) -> void:
 			_show_creation_route(_character_stage)
 			_set_status(result.message, true)
 			return
-		totals[term[0]] = _roll_total(result)
+		totals[term[0]] = _roll_total(result, term[1])
 	var first_roll := int(totals.get("Equipment first", 0))
 	var second_roll := int(totals.get("Equipment second", 0))
 	var conditional_terms: Array = []
@@ -364,7 +364,7 @@ func _roll_character_equipment(token: int) -> void:
 		_show_creation_route(_character_stage)
 		_set_status(armor_result.message, true)
 		return
-	totals["Armor"] = _roll_total(armor_result)
+	totals["Armor"] = _roll_total(armor_result, armor_faces)
 	_character_draft["equipment_rolls"] = totals
 	_character_draft["silver"] = int(totals.get("Silver", 0)) * 10
 	_character_draft["omens"] = int(totals.get("Omens", 0))
@@ -525,14 +525,18 @@ func _automatic_roll(name: String, faces: int, count: int, token: int) -> SDK.Di
 	await get_tree().process_frame
 	if token != _creation_generation or not _creation_active:
 		return SDK.DiceRollResult.new({"ok": false, "message": "Character creation was discarded."})
-	return await sdk.dice.roll(SDK.DiceRequest.new([SDK.DiceTerm.new(name, faces, count)]))
+	# A d2 uses a physical d4, with each face pair mapped to one outcome.
+	# Keep the physical result intact; apply the source die conversion when read.
+	var physical_faces := 4 if faces == 2 else faces
+	var roll_name := name + " (d2: d4 / 2, round up)" if faces == 2 else name
+	return await sdk.dice.roll(SDK.DiceRequest.new([SDK.DiceTerm.new(roll_name, physical_faces, count)]))
 
 
-func _roll_total(result: SDK.DiceRollResult) -> int:
+func _roll_total(result: SDK.DiceRollResult, source_faces: int = 0) -> int:
 	var total := 0
 	for term in result.terms:
 		for value in term.results:
-			total += int(value)
+			total += int((int(value) + 1) / 2) if source_faces == 2 else int(value)
 	return total
 
 

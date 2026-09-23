@@ -196,7 +196,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 13
 text = "1 / 6 · CLASS"
-autowrap_mode = 2
+autowrap_mode = 0
 
 [node name="Track" type="ProgressBar" parent="Compact"]
 theme_override_styles/background = SubResource("Track")
