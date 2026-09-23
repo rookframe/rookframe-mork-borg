@@ -32,6 +32,9 @@ var _character_miniature_choices: Array[Dictionary] = []
 
 
 func _process(_delta: float) -> void:
+	_update_character_density()
+	if _character_sheet != null:
+		_character_sheet.set_available_height(size.y)
 	if _surface_is_hidden() and _character_creator != null and _character_creator.is_active():
 		# The managed host closes this surface by hiding it. Treat that boundary
 		# exactly like a scene exit so pending creation can never resume hidden.
@@ -142,10 +145,10 @@ func character_setup() -> void:
 	_action_bar = get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar") as Control
 	_catalogue_bar = get_node(^"Layout/CatalogueBar") as Control
 	_status = get_node(^"Layout/Status") as Label
-	_character_tabs = get_node(^"Layout/Body/Content/CharacterTabs") as Control
-	_character_tab_character = get_node(^"Layout/Body/Content/CharacterTabs/Character") as Button
-	_character_tab_inventory = get_node(^"Layout/Body/Content/CharacterTabs/Inventory") as Button
-	_character_tab_appearance = get_node(^"Layout/Body/Content/CharacterTabs/Appearance") as Button
+	_character_tabs = get_node(^"Layout/CharacterTabs") as Control
+	_character_tab_character = get_node(^"Layout/CharacterTabs/Character") as Button
+	_character_tab_inventory = get_node(^"Layout/CharacterTabs/Inventory") as Button
+	_character_tab_appearance = get_node(^"Layout/CharacterTabs/Appearance") as Button
 	_catalogue_character = get_node(^"Layout/CatalogueBar/TrailingSlot/CreateCharacter") as Button
 	_catalogue_back = get_node(^"Layout/CatalogueBar/LeadingSlot/Back") as Button
 	_character_tab_character.pressed.connect(_on_tab_character)
@@ -167,6 +170,7 @@ func character_select_actor(actor: SDK.Actor) -> void:
 
 
 func character_hide_surface() -> void:
+	_header.visible = true
 	_creation_progress.visible = false
 	_catalogue_create.visible = true
 	if _character_creator != null:
@@ -318,6 +322,7 @@ func character_show_route(route: String) -> void:
 	_catalogue_create.visible = false
 	_creation_progress.visible = creation
 	_brand.visible = false
+	_header.visible = not _compact
 	_catalogue_character.visible = creation
 	_catalogue_back.visible = creation
 	if creation:
@@ -383,3 +388,22 @@ func _on_sheet_changed() -> void:
 		var name: String = _character_actor.data.get("name", "Unnamed Character")
 		_header_title.text = name.to_upper()
 		_set_window_title(name)
+
+
+func _update_character_density() -> void:
+	if _character_creator == null or not (_route.begins_with("create-") or _route == "character"):
+		return
+	var compact := size.x < 600 or size.y < 500
+	if compact == _compact:
+		return
+	_compact = compact
+	_header.visible = not compact
+	_header_title.visible = not compact
+	_header_subtitle.visible = not compact
+	_content.custom_minimum_size = Vector2(0, 0) if compact else Vector2(0, 520)
+	_layout.add_theme_constant_override("separation", 6 if compact else 10)
+	_character_creator.set_compact(compact)
+	if _route.begins_with("create-"):
+		_set_window_title("CREATE CHARACTER")
+	elif _character_actor != null:
+		_set_window_title(str(_character_actor.data.get("name", "Unnamed Character")))

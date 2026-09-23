@@ -137,6 +137,36 @@ autowrap_mode = 2
 visible = false
 layout_mode = 2
 
+[node name="CharacterTabs" type="HBoxContainer" parent="Layout"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Character" type="Button" parent="Layout/CharacterTabs"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeTabButton"
+toggle_mode = true
+text = "Character"
+
+[node name="Inventory" type="Button" parent="Layout/CharacterTabs"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeTabButton"
+toggle_mode = true
+text = "Inventory"
+
+[node name="Appearance" type="Button" parent="Layout/CharacterTabs"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeTabButton"
+toggle_mode = true
+text = "Appearance"
+
 [node name="Body" type="ScrollContainer" parent="Layout"]
 follow_focus = true
 layout_mode = 2
@@ -173,36 +203,6 @@ layout_mode = 2
 [node name="CharacterItemField" parent="Layout/Body/Content" instance=ExtResource("4_text_field")]
 visible = false
 layout_mode = 2
-
-[node name="CharacterTabs" type="HBoxContainer" parent="Layout/Body/Content"]
-visible = false
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
-
-[node name="Character" type="Button" parent="Layout/Body/Content/CharacterTabs"]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-toggle_mode = true
-text = "Character"
-
-[node name="Inventory" type="Button" parent="Layout/Body/Content/CharacterTabs"]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-toggle_mode = true
-text = "Inventory"
-
-[node name="Appearance" type="Button" parent="Layout/Body/Content/CharacterTabs"]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-toggle_mode = true
-text = "Appearance"
 
 [node name="Search" parent="Layout/Body/Content" instance=ExtResource("3_search_field")]
 layout_mode = 2

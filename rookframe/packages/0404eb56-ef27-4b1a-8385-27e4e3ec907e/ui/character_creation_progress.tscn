@@ -188,7 +188,7 @@ horizontal_alignment = 1
 
 [node name="Compact" type="HBoxContainer" parent="."]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 36)
+custom_minimum_size = Vector2(0, 24)
 theme_override_constants/separation = 12
 
 [node name="Label" type="Label" parent="Compact"]

@@ -6,6 +6,7 @@ signal value_save_requested(key: String, value: int)
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 var _data: Dictionary = {}
 var _editing := ""
+var _short_window := false
 
 func _ready() -> void:
 	resized.connect(_layout)
@@ -16,9 +17,10 @@ func _ready() -> void:
 		get_node("Body/Abilities/" + ability + "/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
 
 
-func configure(data: Dictionary, _miniatures: Array) -> void:
+func configure(data: Dictionary, _miniatures: Array, short_window: bool = false) -> void:
+	_short_window = short_window
 	_data = data
-	get_node(^"Resources/HitPoints/Content/Row/Value").text = str(data.get("hit_points", 0))
+	get_node(^"Resources/HitPoints/Content/Row/Value").text = "%s / %s" % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	get_node(^"Resources/Omens/Content/Row/Value").text = str(data.get("omens", 0))
 	get_node(^"Resources/Silver/Content/Row/Value").text = str(data.get("silver", 0))
 	var abilities: Dictionary = data.get("abilities", {})
@@ -38,7 +40,9 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 func _layout() -> void:
 	var compact := size.x < 600
 	get_node(^"Body").vertical = compact
-	get_node(^"Body/Abilities").columns = 2 if compact else 1
+	get_node(^"Body/Abilities").columns = 2 if compact and _short_window else 1
+	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+		get_node("Body/Abilities/" + ability + "/Content").vertical = compact and _short_window
 
 
 func _edit() -> void:

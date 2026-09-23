@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.gd" id="1"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/edit.svg" id="2"]
 [sub_resource type="StyleBoxFlat" id="Cell"]
@@ -12,6 +12,8 @@ border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.133333, 0.196078, 0.215686, 1)
+
+[sub_resource type="StyleBoxEmpty" id="QuietValue"]
 
 [node name="CharacterOverview" type="VBoxContainer"]
 layout_mode = 2
@@ -48,7 +50,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 22
 text = "0"
-autowrap_mode = 2
+autowrap_mode = 0
 size_flags_horizontal = 3
 
 [node name="Input" type="LineEdit" parent="Resources/HitPoints/Content/Row"]
@@ -63,6 +65,9 @@ accessibility_name = "Edit HitPoints"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit HP"
 
@@ -91,7 +96,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 22
 text = "0"
-autowrap_mode = 2
+autowrap_mode = 0
 size_flags_horizontal = 3
 
 [node name="Input" type="LineEdit" parent="Resources/Omens/Content/Row"]
@@ -106,6 +111,9 @@ accessibility_name = "Edit Omens"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit OMENS"
 
@@ -134,7 +142,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 22
 text = "0"
-autowrap_mode = 2
+autowrap_mode = 0
 size_flags_horizontal = 3
 
 [node name="Input" type="LineEdit" parent="Resources/Silver/Content/Row"]
@@ -149,6 +157,9 @@ accessibility_name = "Edit Silver"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit SILVER"
 
@@ -168,12 +179,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("Cell")
 
-[node name="Content" type="VBoxContainer" parent="Body/Abilities/Agility"]
+[node name="Content" type="BoxContainer" parent="Body/Abilities/Agility"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="Title" type="Label" parent="Body/Abilities/Agility/Content"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 13
 text = "Agility"
@@ -188,6 +200,9 @@ layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
 
@@ -203,6 +218,9 @@ accessibility_name = "Edit Agility"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Agility"
 
@@ -211,12 +229,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("Cell")
 
-[node name="Content" type="VBoxContainer" parent="Body/Abilities/Presence"]
+[node name="Content" type="BoxContainer" parent="Body/Abilities/Presence"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="Title" type="Label" parent="Body/Abilities/Presence/Content"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 13
 text = "Presence"
@@ -231,6 +250,9 @@ layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
 
@@ -246,6 +268,9 @@ accessibility_name = "Edit Presence"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Presence"
 
@@ -254,12 +279,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("Cell")
 
-[node name="Content" type="VBoxContainer" parent="Body/Abilities/Strength"]
+[node name="Content" type="BoxContainer" parent="Body/Abilities/Strength"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="Title" type="Label" parent="Body/Abilities/Strength/Content"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 13
 text = "Strength"
@@ -274,6 +300,9 @@ layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
 
@@ -289,6 +318,9 @@ accessibility_name = "Edit Strength"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Strength"
 
@@ -297,12 +329,13 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_styles/panel = SubResource("Cell")
 
-[node name="Content" type="VBoxContainer" parent="Body/Abilities/Toughness"]
+[node name="Content" type="BoxContainer" parent="Body/Abilities/Toughness"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="Title" type="Label" parent="Body/Abilities/Toughness/Content"]
 layout_mode = 2
+size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 13
 text = "Toughness"
@@ -317,6 +350,9 @@ layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
 
@@ -332,6 +368,9 @@ accessibility_name = "Edit Toughness"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Toughness"
 
@@ -364,6 +403,9 @@ size_flags_horizontal = 3
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("QuietValue")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 text = "Edit sheet"
 
 [node name="Description" type="Label" parent="Body/Context/Identity/Content"]

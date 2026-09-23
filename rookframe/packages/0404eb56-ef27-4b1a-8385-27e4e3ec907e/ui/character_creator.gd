@@ -676,3 +676,10 @@ func _find_definition(local_id: String) -> SDK.ContentEntry:
 		if entry.reference.local_id == local_id:
 			return entry
 	return null
+
+
+func set_compact(compact: bool) -> void:
+	_sync_identity_fields()
+	_compact = compact
+	if _creation_active:
+		_show_creation_route(_character_stage)

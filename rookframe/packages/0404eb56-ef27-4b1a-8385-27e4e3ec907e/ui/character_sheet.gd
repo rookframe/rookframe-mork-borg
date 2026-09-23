@@ -15,6 +15,7 @@ var _character_view: Variant
 var _status: Label
 var _busy := false
 var _render_pending := false
+var _short_window := false
 @onready var _content := get_node(^"Content") as VBoxContainer
 
 
@@ -55,7 +56,7 @@ func _render_character_sheet() -> void:
 	view.cancel_requested.connect(_on_cancel_requested)
 	view.appearance_save_requested.connect(_on_appearance_save_requested)
 	_content.add_child(view)
-	view.configure(_character_actor.data, _character_tab, _character_route, _character_miniatures, _character_miniature_choices)
+	view.configure(_character_actor.data, _character_tab, _character_route, _character_miniatures, _character_miniature_choices, _short_window)
 	_character_view = view
 	_status.visible = false
 
@@ -208,4 +209,11 @@ func _on_value_save_requested(key: String, value: int) -> void:
 	if result.ok:
 		_character_actor = result.actor
 		sheet_changed.emit()
+		_render_pending = true
+
+
+func set_available_height(height: float) -> void:
+	var short_window := height < 500
+	if short_window != _short_window:
+		_short_window = short_window
 		_render_pending = true

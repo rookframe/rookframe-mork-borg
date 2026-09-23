@@ -16,7 +16,7 @@ signal cancel_requested
 signal appearance_save_requested(index: int)
 
 
-func configure(data: Dictionary, tab: String, route: String, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary]) -> void:
+func configure(data: Dictionary, tab: String, route: String, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary], short_window: bool = false) -> void:
 	var content := get_node(^"Content") as VBoxContainer
 	for child in content.get_children():
 		content.remove_child(child)
@@ -51,7 +51,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 	overview_view.edit_requested.connect(_emit_edit_requested)
 	overview_view.value_save_requested.connect(_emit_value_save_requested)
 	content.add_child(overview_view)
-	overview_view.configure(data, miniatures)
+	overview_view.configure(data, miniatures, short_window)
 
 
 func _emit_edit_requested() -> void:

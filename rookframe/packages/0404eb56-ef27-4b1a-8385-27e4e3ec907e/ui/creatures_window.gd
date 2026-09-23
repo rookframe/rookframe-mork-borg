@@ -603,3 +603,11 @@ func _character_primary_button_pressed() -> void:
 
 func _character_back_button_pressed() -> void:
 	character_back_button_pressed()
+
+
+func opened(actor_id: SDK.ActorId) -> void:
+	var result: SDK.ActorResult = sdk.actors.read(actor_id)
+	if result.ok and result.actor != null:
+		_select_actor(result.actor)
+	else:
+		_set_status(result.message, true)
