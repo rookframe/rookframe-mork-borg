@@ -70,7 +70,7 @@ stores are not part of this workflow.
 Run the focused Godot suite with the installed public dependencies:
 
 ```sh
-godot --headless --path . --script tests/character_creation.gd
+python3 tests/run_character_creation.py --godot /path/to/godot
 ```
 
 The suite exercises authored System actions through the generated public SDK.

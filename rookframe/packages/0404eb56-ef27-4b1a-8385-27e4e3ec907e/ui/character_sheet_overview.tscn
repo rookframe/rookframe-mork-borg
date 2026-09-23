@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.gd" id="1"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/edit.svg" id="2"]
 [sub_resource type="StyleBoxFlat" id="Cell"]
@@ -14,6 +14,9 @@ border_width_bottom = 1
 border_color = Color(0.133333, 0.196078, 0.215686, 1)
 
 [sub_resource type="StyleBoxEmpty" id="QuietValue"]
+
+[sub_resource type="StyleBoxEmpty" id="AbilityValue"]
+content_margin_left = 12.0
 
 [node name="CharacterOverview" type="VBoxContainer"]
 layout_mode = 2
@@ -194,11 +197,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
-[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Agility"]
+[node name="Padding" type="MarginContainer" parent="Body/Attributes/Content/Abilities/Agility"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 2
+
+[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Agility/Padding"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Agility/Content"]
+[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
@@ -206,22 +215,23 @@ theme_override_font_sizes/font_size = 13
 text = "Agility"
 autowrap_mode = 2
 
-[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Agility/Content"]
+[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Agility/Content/Row"]
+[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
-theme_override_styles/normal = SubResource("QuietValue")
+theme_override_styles/normal = SubResource("AbilityValue")
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
+alignment = 0
 
-[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Agility/Content/Row"]
+[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content/Row"]
 visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(52, 44)
@@ -229,7 +239,7 @@ size_flags_horizontal = 3
 expand_to_text_length = false
 accessibility_name = "Edit Agility"
 
-[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Agility/Content/Row"]
+[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
@@ -244,11 +254,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
-[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Presence"]
+[node name="Padding" type="MarginContainer" parent="Body/Attributes/Content/Abilities/Presence"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 2
+
+[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Presence/Padding"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Presence/Content"]
+[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
@@ -256,22 +272,23 @@ theme_override_font_sizes/font_size = 13
 text = "Presence"
 autowrap_mode = 2
 
-[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Presence/Content"]
+[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Presence/Content/Row"]
+[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
-theme_override_styles/normal = SubResource("QuietValue")
+theme_override_styles/normal = SubResource("AbilityValue")
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
+alignment = 0
 
-[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Presence/Content/Row"]
+[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content/Row"]
 visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(52, 44)
@@ -279,7 +296,7 @@ size_flags_horizontal = 3
 expand_to_text_length = false
 accessibility_name = "Edit Presence"
 
-[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Presence/Content/Row"]
+[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
@@ -294,11 +311,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
-[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Strength"]
+[node name="Padding" type="MarginContainer" parent="Body/Attributes/Content/Abilities/Strength"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 2
+
+[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Strength/Padding"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Strength/Content"]
+[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
@@ -306,22 +329,23 @@ theme_override_font_sizes/font_size = 13
 text = "Strength"
 autowrap_mode = 2
 
-[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Strength/Content"]
+[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Strength/Content/Row"]
+[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
-theme_override_styles/normal = SubResource("QuietValue")
+theme_override_styles/normal = SubResource("AbilityValue")
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
+alignment = 0
 
-[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Strength/Content/Row"]
+[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content/Row"]
 visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(52, 44)
@@ -329,7 +353,7 @@ size_flags_horizontal = 3
 expand_to_text_length = false
 accessibility_name = "Edit Strength"
 
-[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Strength/Content/Row"]
+[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
@@ -344,11 +368,17 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
-[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Toughness"]
+[node name="Padding" type="MarginContainer" parent="Body/Attributes/Content/Abilities/Toughness"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_top = 2
+
+[node name="Content" type="BoxContainer" parent="Body/Attributes/Content/Abilities/Toughness/Padding"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Toughness/Content"]
+[node name="Title" type="Label" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
@@ -356,22 +386,23 @@ theme_override_font_sizes/font_size = 13
 text = "Toughness"
 autowrap_mode = 2
 
-[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Toughness/Content"]
+[node name="Row" type="HBoxContainer" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Toughness/Content/Row"]
+[node name="Modifier" type="Button" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(56, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeQuietButton"
-theme_override_styles/normal = SubResource("QuietValue")
+theme_override_styles/normal = SubResource("AbilityValue")
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_font_sizes/font_size = 24
 text = "+0"
+alignment = 0
 
-[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Toughness/Content/Row"]
+[node name="Input" type="LineEdit" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content/Row"]
 visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(52, 44)
@@ -379,7 +410,7 @@ size_flags_horizontal = 3
 expand_to_text_length = false
 accessibility_name = "Edit Toughness"
 
-[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Toughness/Content/Row"]
+[node name="Edit" type="Button" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"

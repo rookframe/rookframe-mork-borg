@@ -16,7 +16,7 @@ func _ready() -> void:
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
 
 
 func configure(data: Dictionary, _miniatures: Array, short_window: bool = false) -> void:
@@ -28,7 +28,7 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	var abilities: Dictionary = data.get("abilities", {})
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		var value: Dictionary = abilities.get(ability, {})
-		var button = get_node("Body/Attributes/Content/Abilities/" + ability + "/Content/Row/Modifier")
+		var button = get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Modifier")
 		var modifier: int = value.get("modifier", 0)
 		button.text = "%+d" % modifier
 		button.accessibility_name = "%s modifier %s" % [ability, button.text]
@@ -66,8 +66,8 @@ func _layout() -> void:
 	get_node(^"Body/Attributes/Content/Abilities").columns = 2 if short else 1
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		get_node("Body/Attributes/Content/Abilities/" + ability).theme_type_variation = "RookframeSubtleFrame" if short else "RookframePackageInk"
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Content/Title").set("theme_override_font_sizes/font_size", 13 if short else 16)
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Content").vertical = short
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Title").set("theme_override_font_sizes/font_size", 13 if short else 16)
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content").vertical = short
 
 
 func _edit() -> void:
@@ -76,7 +76,7 @@ func _edit() -> void:
 
 func _edit_value(key: String) -> void:
 	var resource_key: String = {"HitPoints": "hit_points", "Omens": "omens", "Silver": "silver"}.get(key, "")
-	var row: Node = get_node("Resources/" + key + "/Content/Row") if not resource_key.is_empty() else get_node("Body/Attributes/Content/Abilities/" + key + "/Content/Row")
+	var row: Node = get_node("Resources/" + key + "/Content/Row") if not resource_key.is_empty() else get_node("Body/Attributes/Content/Abilities/" + key + "/Padding/Content/Row")
 	var input := row.get_node(^"Input") as LineEdit
 	if _editing == key:
 		if input.text.is_valid_int():
