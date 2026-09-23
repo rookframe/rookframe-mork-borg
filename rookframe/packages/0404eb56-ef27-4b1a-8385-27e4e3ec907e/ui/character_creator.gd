@@ -47,7 +47,7 @@ var _source_definition
 
 func configure(definitions: Array[SDK.ContentEntry], character_definition: SDK.ContentEntry, miniatures: Array[SDK.ContentEntry], compact: bool, facade: SDK, miniature_choices: Array[Dictionary] = []) -> void:
 	_definitions = definitions
-	_character_definition = character_definition
+	_character_definition = _find_definition(str(_character_draft.get("class_id", "classless")) + "-character") if _creation_active else character_definition
 	_character_miniatures = miniatures
 	_character_miniature_choices = miniature_choices
 	_compact = compact

@@ -26,6 +26,7 @@ func _run() -> void:
 	await _discard_pending()
 	await _companions_projection()
 	await _atomic_refusal()
+	await _refresh_during_creation()
 	print("CHARACTER_CREATION %s" % ("PASS" if failures == 0 else "FAIL"))
 	quit(0 if failures == 0 else 1)
 
@@ -317,6 +318,21 @@ func _atomic_refusal() -> void:
 	await process_frame
 	_check(host.actors.size() == 2 and not creator.is_active(), "Retry confirms the complete bundle once.")
 	_check(host.requests.size() == roll_count, "Retrying a failed confirmation never rerolls mechanics.")
+	creator.free()
+
+
+func _refresh_during_creation() -> void:
+	var host = _host_for("gutterborn-scum", 2)
+	var creator = _creator_for(host, "gutterborn-scum")
+	creator.primary()
+	await process_frame
+	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("gutterborn-scum-character", "actor_definition")]
+	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
+	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
+	# A remote Actor update refreshes the public catalogue while creation is active.
+	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	await _finish(creator)
+	_check(host.actors.size() == 1 and host.actors[0].data.class_id == "gutterborn-scum", "Catalogue refresh must preserve the selected class definition.")
 	creator.free()
 
 

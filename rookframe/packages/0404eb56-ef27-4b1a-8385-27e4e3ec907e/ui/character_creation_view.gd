@@ -1,5 +1,6 @@
 extends BoxContainer
 
+const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
 
 signal class_selected(class_id: String)
@@ -30,7 +31,9 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	_scroll_slot = str(draft.get("scroll_choice_slot", ""))
 	get_node(^"Main/Content/Class").columns = 2
 	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit"]:
-		get_node("Main/Content/Class/" + node).button_pressed = CLASS_NODES[node] == draft.get("class_id", "classless")
+		var choice := get_node("Main/Content/Class/" + node) as Button
+		choice.button_pressed = CLASS_NODES[node] == draft.get("class_id", "classless")
+		choice.icon = CHECK if choice.button_pressed else null
 	get_node(^"Main/Content/Equipment/ScrollChoice").visible = not _scroll_slot.is_empty()
 	var equipment_pending: bool = draft.get("equipment_roll_pending", false)
 	var roll_ready: bool = draft.get("roll_ready", false)
