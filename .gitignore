@@ -5,5 +5,3 @@ build/
 rookframe/ui/
 __pycache__/
 *.pyc
-
-.rookframe/
