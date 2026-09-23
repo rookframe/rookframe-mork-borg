@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_inventory.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/section.tscn" id="2_section"]
+
+[node name="CharacterInventory" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+script = ExtResource("1_script")
+
+[node name="InventorySection" parent="." instance=ExtResource("2_section")]
+layout_mode = 2
+title = "INVENTORY"
+description = "Durable Character inventory"

@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.gd" id="1_script"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/feedback/step_progress.tscn" id="2_progress"]
+
+[node name="CharacterCreator" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+script = ExtResource("1_script")
+
+[node name="Progress" parent="." instance=ExtResource("2_progress")]
+layout_mode = 2
+
+[node name="StageBody" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16

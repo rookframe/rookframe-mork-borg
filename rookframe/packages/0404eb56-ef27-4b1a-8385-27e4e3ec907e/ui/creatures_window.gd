@@ -1,0 +1,605 @@
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_workflow.gd"
+
+const CREATURE_KIND := "actor_definition"
+
+func ready() -> void:
+	if sdk == null:
+		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
+		return
+	character_setup()
+	_compact = not sdk.presentation_experience().is_desktop
+	_routes_desktop.visible = not _compact
+	_routes_compact.visible = _compact
+	var route_group: Node = _routes_compact if _compact else _routes_desktop
+	_route_creatures = route_group.get_node(^"Creatures") as Button
+	_route_creature = route_group.get_node(^"Creature") as Button
+	_route_edit = route_group.get_node(^"EditCreature") as Button
+	_route_inventory = route_group.get_node(^"CreatureInventory") as Button
+
+	_create_button = _action_bar.get_node(^"LeadingSlot/CreateCreature") as Button
+	_edit_button = _action_bar.get_node(^"LeadingSlot/EditCreature") as Button
+	_inventory_button = _action_bar.get_node(^"LeadingSlot/CreatureInventory") as Button
+	_duplicate_button = _action_bar.get_node(^"LeadingSlot/Duplicate") as Button
+	_place_button = _action_bar.get_node(^"LeadingSlot/PlaceRook") as Button
+	_save_button = _action_bar.get_node(^"LeadingSlot/SaveChanges") as Button
+	_add_item_button = _action_bar.get_node(^"LeadingSlot/AddItem") as Button
+	_back_button = _action_bar.get_node(^"LeadingSlot/Back") as Button
+	_catalogue_create = _catalogue_bar.get_node(^"TrailingSlot/CreateCreature") as Button
+	_catalogue_character = _catalogue_bar.get_node(^"TrailingSlot/CreateCharacter") as Button
+	_catalogue_back = _catalogue_bar.get_node(^"LeadingSlot/Back") as Button
+
+	for button in [
+		_route_creatures,
+		_route_creature,
+		_route_edit,
+		_route_inventory,
+		_search,
+		_create_button,
+		_edit_button,
+		_inventory_button,
+		_duplicate_button,
+		_place_button,
+		_save_button,
+		_add_item_button,
+		_inventory_add,
+		_back_button,
+		_catalogue_create,
+		_catalogue_character,
+		_catalogue_back,
+	]:
+		button.focus_mode = 2
+
+	_search.value_changed.connect(_filter_definitions)
+	_route_creatures.pressed.connect(_on_creatures_route)
+	_route_creature.pressed.connect(_on_creature_route)
+	_route_edit.pressed.connect(_on_edit_route)
+	_route_inventory.pressed.connect(_on_inventory_route)
+	_edit_button.pressed.connect(_on_edit_route)
+	_inventory_button.pressed.connect(_on_inventory_route)
+	_create_button.pressed.connect(_create_creature)
+	_catalogue_create.pressed.connect(_create_creature)
+	_catalogue_character.pressed.connect(_character_primary_button_pressed)
+	_duplicate_button.pressed.connect(_duplicate_creature)
+	_save_button.pressed.connect(_save_creature)
+	_place_button.pressed.connect(_place_rook)
+	_add_item_button.pressed.connect(_add_item)
+	_inventory_add.pressed.connect(_add_item)
+	_back_button.pressed.connect(_on_back)
+	_catalogue_back.pressed.connect(_character_back_button_pressed)
+	if sdk.world_changed.is_connected(_refresh_world) == false:
+		sdk.world_changed.connect(_refresh_world)
+	_apply_density()
+	_show_route("creatures")
+	_refresh_world()
+
+
+func _apply_density() -> void:
+	_layout.add_theme_constant_override("separation", 6 if _compact else 10)
+	_header.add_theme_constant_override("separation", 2 if _compact else 4)
+	_content.add_theme_constant_override("separation", 8 if _compact else 12)
+	_detail.add_theme_constant_override("separation", 8 if _compact else 12)
+	_sheet_grid.vertical = _compact
+	_sheet_grid.add_theme_constant_override("separation", 12 if _compact else 20)
+	_content.custom_minimum_size = Vector2(0, 0) if _compact else Vector2(0, 520)
+	# The managed host chrome already identifies the Package. Keep the body
+	# focused on the active route so desktop does not repeat that identity above
+	# the actor title.
+	_brand.visible = false
+	_header_subtitle.visible = not _compact
+	_header_title.visible = true
+	_status.visible = not _compact
+	_body.add_theme_constant_override("scrollbar_width", 8 if _compact else 12)
+	_stats.add_theme_constant_override("separation", 2 if _compact else 4)
+	if _compact:
+		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Description").visible = false
+		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Description").visible = false
+		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
+		get_node(^"Layout/Body/Content/Detail/Inventory/Content/Header/Description").visible = false
+		_protection_label.text = "ARMOR"
+
+
+func _refresh_world() -> void:
+	if _busy or _preserve_error or sdk == null:
+		return
+	_set_status("Loading Creature catalogue…")
+	var content: SDK.ContentEntryListResult = sdk.content.list(SDK.ContentKind.Value.ACTOR_DEFINITION)
+	if not content.ok:
+		_set_status(content.message, true)
+		return
+	_definitions = []
+	for entry in content.items:
+		if entry.kind == SDK.ContentKind.Value.ACTOR_DEFINITION:
+			_definitions.append(entry)
+			if entry.reference.local_id == "classless-character":
+				_character_definition = entry
+	_render_definitions()
+	var miniatures: SDK.ContentEntryListResult = sdk.content.list(SDK.ContentKind.Value.MINIATURE)
+	_character_miniatures = miniatures.items if miniatures.ok else []
+	var miniature_choices: Array[Dictionary] = []
+	for entry in _character_miniatures:
+		miniature_choices.append({
+			"package_id": entry.reference.package_id,
+			"local_id": entry.reference.local_id,
+			"title": entry.title,
+		})
+	character_set_content(_definitions, _character_definition, _character_miniatures, miniature_choices)
+	var actors: SDK.ActorListResult = sdk.actors.list()
+	if not actors.ok:
+		_set_status(actors.message, true)
+		return
+	_actors = actors.items
+	_render_live_actors()
+	_render_public_names()
+	_set_status("Ready — immutable definitions are available to the GM.")
+
+
+func _render_definitions() -> void:
+	for child in _definition_list.get_children():
+		child.queue_free()
+	for entry in _definitions:
+		if entry.reference.local_id == "classless-character":
+			continue
+		var button := Button.new()
+		button.text = entry.title
+		button.custom_minimum_size = Vector2(0, 44)
+		button.focus_mode = 2
+		button.alignment = 0
+		button.theme_type_variation = "RookframeSecondaryButton"
+		button.pressed.connect(_select_definition.bind(entry))
+		_definition_list.add_child(button)
+
+
+func _render_live_actors() -> void:
+	for child in _live_list.get_children():
+		child.queue_free()
+	for actor in _actors:
+		var button := Button.new()
+		var actor_data: Dictionary = actor.data
+		var private_name: String = actor_data.get("name", "Private Creature")
+		var public_name := actor.public_label if not actor.public_label.is_empty() else "Public name pending"
+		button.text = "%s  ·  Public: %s" % [private_name, public_name]
+		button.custom_minimum_size = Vector2(0, 44)
+		button.focus_mode = 2
+		button.alignment = 0
+		button.theme_type_variation = "RookframeSecondaryButton"
+		button.pressed.connect(_select_actor.bind(actor))
+		_live_list.add_child(button)
+
+
+func _render_public_names() -> void:
+	for child in _public_list.get_children():
+		child.queue_free()
+	if sdk == null:
+		return
+	var identities: SDK.PublicIdentityListResult = sdk.public_identities.list()
+	if not identities.ok:
+		_set_status(identities.message, true)
+		return
+	for identity in identities.items:
+		var label := Label.new()
+		label.text = identity.label
+		label.autowrap_mode = 2
+		_public_list.add_child(label)
+
+
+func _select_definition(entry: SDK.ContentEntry) -> void:
+	_selected_definition = entry
+	_create_button.disabled = false
+	_catalogue_create.disabled = false
+	_set_status("Selected %s. Create a private Actor to edit its encounter sheet." % entry.title)
+	_show_route("creatures")
+
+
+func _select_actor(actor: SDK.Actor) -> void:
+	_selected_actor = actor
+	var actor_data: Dictionary = actor.data
+	if actor_data.get("schema", "") == "mork-borg-character/v1":
+		character_select_actor(actor)
+		_show_route("character")
+	else:
+		_show_route("creature")
+		_render_actor()
+
+
+func _render_actor() -> void:
+	if _selected_actor == null:
+		return
+	var actor_data: Dictionary = _selected_actor.data
+	var private_name: String = actor_data.get("name", "Creature")
+	var hit_points: int = actor_data.get("hit_points", 0)
+	var maximum_hit_points: int = actor_data.get("maximum_hit_points", hit_points)
+	var morale_data: Dictionary = actor_data.get("morale", {})
+	var morale_kind: String = morale_data.get("kind", "none")
+	var morale_number: int = morale_data.get("value", 0)
+	var morale_value: String = "Special"
+	if morale_kind == "fixed":
+		morale_value = "%d" % morale_number
+	var armor: Dictionary = actor_data.get("armor", {})
+	var armor_name: String = armor.get("name", "No armor")
+	var armor_reduction: String = armor.get("reduction", "")
+	var attacks: Array = actor_data.get("attacks", [])
+
+	_header_title.text = private_name.to_upper()
+	_header_subtitle.text = "Private Creature sheet · GM"
+	_set_window_title(private_name)
+	if _compact:
+		_header_subtitle.visible = false
+	_detail_title_if_present(private_name)
+	_public_identity.text = _selected_actor.public_label if not _selected_actor.public_label.is_empty() else "Public name pending"
+	_hit_points_metric.text = "%d / %d" % [hit_points, maximum_hit_points]
+	_morale_metric.text = morale_value
+	_protection_label.text = armor_name.to_upper()
+	_protection_metric.text = armor_reduction if not armor_reduction.is_empty() else "—"
+	_rules.text = "Quick, attacks and defence are DR14."
+	if armor_name != "No armor":
+		_rules.text = "%s · quick, attacks and defence are DR14." % armor_name
+	_private_name.set("value", private_name)
+	_public_label.set("value", _selected_actor.public_label)
+	_hit_points.set("value", str(hit_points))
+	_maximum_hit_points.set("value", str(maximum_hit_points))
+	_morale.set("value", str(morale_number))
+	_render_equipment(attacks)
+	_render_inventory(attacks)
+	_save_button.disabled = not sdk.context().is_gm
+	_duplicate_button.disabled = not sdk.context().is_gm
+	_place_button.disabled = not sdk.context().is_gm
+	_edit_button.disabled = not sdk.context().is_gm
+	_inventory_button.disabled = false
+
+
+func _detail_title_if_present(private_name: String) -> void:
+	var title := get_node(^"Layout/Body/Content/Detail/Title") as Label
+	var summary := get_node(^"Layout/Body/Content/Detail/Summary") as Label
+	title.text = private_name.to_upper()
+	summary.text = "Private Creature sheet · GM"
+	# The host/header already owns the route title. Keep the sheet body focused
+	# on its stats and sections at every profile, including desktop.
+	title.visible = false
+	summary.visible = false
+
+
+func _set_window_title(title: String) -> void:
+	if sdk == null:
+		return
+	var result: SDK.OperationResult = sdk.windows.set_title(title if _compact else "MÖRK BORG")
+	if not result.ok:
+		_set_status(result.message, true)
+
+
+func _render_equipment(attacks: Array) -> void:
+	for child in _equipment_list.get_children():
+		child.queue_free()
+	if attacks.is_empty():
+		var empty := Label.new()
+		empty.text = "No private attacks recorded."
+		empty.theme_type_variation = "RookframeMeta"
+		_equipment_list.add_child(empty)
+		return
+	for index in range(attacks.size()):
+		var attack: Dictionary = attacks[index]
+		var row := Button.new()
+		row.custom_minimum_size = Vector2(0, 54)
+		row.alignment = 0
+		row.focus_mode = 2
+		row.theme_type_variation = "RookframeSecondaryButton"
+		var attack_name: String = attack.get("name", "Attack")
+		var attack_dice: String = attack.get("dice", "—")
+		var detail: String = "%s · Equipped" % attack_dice
+		row.text = "%s\n%s" % [attack_name, detail]
+		_equipment_list.add_child(row)
+
+
+func _render_inventory(attacks: Array) -> void:
+	for child in _inventory_items.get_children():
+		child.queue_free()
+	for child in _inventory_carried.get_children():
+		child.queue_free()
+	if attacks.is_empty():
+		var empty := Label.new()
+		empty.text = "No private items recorded."
+		empty.theme_type_variation = "RookframeMeta"
+		_inventory_items.add_child(empty)
+		return
+	for index in range(attacks.size()):
+		var attack: Dictionary = attacks[index]
+		var target := _inventory_items if index == 0 else _inventory_carried
+		target.add_child(_inventory_row(attack, index == 0))
+	if _inventory_carried.get_child_count() == 0:
+		var carried_empty := Label.new()
+		carried_empty.text = "No carried items recorded."
+		carried_empty.theme_type_variation = "RookframeMeta"
+		_inventory_carried.add_child(carried_empty)
+
+
+func _inventory_row(attack: Dictionary, equipped: bool) -> Control:
+	var row := HBoxContainer.new()
+	row.custom_minimum_size = Vector2(0, 58)
+	row.add_theme_constant_override("separation", 8)
+	var details := VBoxContainer.new()
+	details.size_flags_horizontal = 3
+	var attack_name: String = attack.get("name", "Item")
+	var attack_dice: String = attack.get("dice", "—")
+	var item_label := Label.new()
+	item_label.text = attack_name
+	item_label.theme_type_variation = "RookframeBody"
+	var detail := Label.new()
+	detail.text = "%s · %s" % [attack_dice, "Equipped" if equipped else "Carried"]
+	detail.theme_type_variation = "RookframeMeta"
+	details.add_child(item_label)
+	details.add_child(detail)
+	row.add_child(details)
+	var action := Button.new()
+	action.custom_minimum_size = Vector2(96, 44)
+	action.focus_mode = 2
+	action.theme_type_variation = "RookframeSecondaryButton"
+	action.text = "Attack" if equipped else "Equip"
+	action.pressed.connect(_set_status.bind("Inventory action is ready for the private Creature sheet."))
+	row.add_child(action)
+	return row
+
+
+func _show_route(route: String) -> void:
+	if route.begins_with("create-") or route in ["character", "edit", "appearance"]:
+		_show_character_route(route)
+		return
+	character_hide_surface()
+	_preserve_error = false
+	_route = route
+	var catalogue := route == "creatures"
+	var sheet := route == "creature"
+	var edit := route == "edit-creature"
+	var inventory := route == "creature-inventory"
+	_sheet_grid.vertical = _compact or edit
+	_routes.visible = not catalogue and not edit
+	_route_creatures.visible = false
+	_route_creature.visible = not catalogue
+	_route_edit.visible = false
+	_route_inventory.visible = not catalogue
+	_route_creatures.button_pressed = catalogue
+	_route_creature.button_pressed = sheet
+	_route_edit.button_pressed = edit
+	_route_inventory.button_pressed = inventory
+	_header_title.visible = not _compact
+	_header_subtitle.visible = not _compact
+	_catalogue_bar.visible = catalogue
+	_catalogue_character.visible = false
+	_detail.visible = sheet or edit or inventory
+	_set_search_visible(catalogue)
+	_definition_heading.visible = catalogue
+	_definition_list.visible = catalogue
+	_live_heading.visible = catalogue and sdk.context().is_gm
+	_live_list.visible = catalogue and sdk.context().is_gm
+	_public_heading.visible = false
+	_public_list.visible = false
+	_stats.visible = sheet
+	_identity_section.visible = sheet
+	_equipment_section.visible = sheet
+	_rules_section.visible = sheet
+	_access_section.visible = sheet
+	_edit_fields.visible = edit
+	_inventory.visible = inventory
+	_action_bar.visible = sheet or edit
+	_create_button.visible = false
+	_edit_button.visible = sheet and sdk.context().is_gm
+	_inventory_button.visible = sheet
+	_duplicate_button.visible = sheet and sdk.context().is_gm
+	_place_button.visible = sheet and sdk.context().is_gm
+	_save_button.visible = edit and sdk.context().is_gm
+	_add_item_button.visible = false
+	_inventory_add.visible = inventory and sdk.context().is_gm
+	_back_button.visible = edit
+	_back_button.text = "Cancel"
+	if catalogue:
+		_header_title.text = "CREATURES"
+		_header_subtitle.text = "Immutable definitions · private Actors"
+		_set_window_title("CREATURES")
+		_header_title.visible = not _compact
+		_header_subtitle.visible = not _compact
+		_set_status("Ready — immutable definitions are available to the GM.")
+	elif _selected_actor != null:
+		_render_actor()
+	if edit:
+		_header_title.text = "EDIT CREATURE"
+		_header_subtitle.text = "Private values · public name"
+		_set_window_title("EDIT CREATURE")
+	elif inventory:
+		var selected_data: Dictionary = _selected_actor.data
+		var inventory_name: String = selected_data.get("name", "CREATURE")
+		_header_title.text = inventory_name.to_upper()
+		_header_subtitle.text = "Private inventory · GM"
+		_set_window_title(inventory_name)
+	_set_status(_status.text)
+
+
+func _show_character_route(route: String) -> void:
+	if sdk == null:
+		return
+	_route = route
+	_preserve_error = false
+	_routes.visible = false
+	_set_search_visible(false)
+	_definition_heading.visible = false
+	_definition_list.visible = false
+	_live_heading.visible = false
+	_live_list.visible = false
+	_public_heading.visible = false
+	_public_list.visible = false
+	_detail.visible = false
+	_action_bar.visible = false
+	character_show_route(route)
+
+
+func _on_creatures_route() -> void:
+	_show_route("creatures")
+
+
+func _on_creature_route() -> void:
+	_show_route("creature")
+
+
+func _on_edit_route() -> void:
+	_show_route("edit-creature")
+
+
+func _on_inventory_route() -> void:
+	_show_route("creature-inventory")
+
+
+func _filter_definitions(_query: String) -> void:
+	var query := str(_search.get("value")).strip_edges().to_lower()
+	for child in _definition_list.get_children():
+		var button := child as Button
+		if button != null:
+			button.visible = query.is_empty() or button.text.to_lower().contains(query)
+
+
+func _create_creature() -> void:
+	if _busy or _selected_definition == null or sdk == null:
+		return
+	_set_busy(true, "Creating private Creature sheet…")
+	var result: SDK.ActorResult = await sdk.actors.create(_selected_definition.reference, {})
+	_set_busy(false, result.message if not result.ok else "Creature created.", not result.ok)
+	if result.ok:
+		_selected_actor = result.actor
+		_render_live_actors()
+		_show_route("creature")
+
+
+func _duplicate_creature() -> void:
+	if _busy or _selected_actor == null or sdk == null:
+		return
+	var source: SDK.ActorResult = sdk.actors.read(_selected_actor.id)
+	if not source.ok or source.actor == null:
+		_set_status(source.message if not source.ok else "Private Creature data is unavailable.", true)
+		return
+	var source_data: Dictionary = source.actor.data
+	var definition_id: String = source_data["definition_id"]
+	var definition: SDK.ContentEntry
+	for entry in _definitions:
+		if entry.reference.local_id == definition_id:
+			definition = entry
+			break
+	if definition == null:
+		_set_status("The saved Creature definition is unavailable; duplicate was not created.", true)
+		return
+	var data: Dictionary = source_data.duplicate(true)
+	_set_busy(true, "Duplicating private Creature sheet…")
+	var result: SDK.ActorResult = await sdk.actors.create(definition.reference, data)
+	_set_busy(false, result.message if not result.ok else "Creature duplicated.", not result.ok)
+	if result.ok:
+		_selected_actor = result.actor
+		_render_live_actors()
+		_show_route("creature")
+
+
+func _save_creature() -> void:
+	if _busy or _selected_actor == null or sdk == null:
+		return
+	var source: SDK.ActorResult = sdk.actors.read(_selected_actor.id)
+	if not source.ok or source.actor == null:
+		_set_status(source.message if not source.ok else "Private Creature data is unavailable.", true)
+		return
+	var original_data: Dictionary = source.actor.data
+	var data: Dictionary = original_data.duplicate(true)
+	var original_label: String = source.actor.public_label
+	data["name"] = str(_private_name.get("value")).strip_edges()
+	data["hit_points"] = int(_hit_points.get("value"))
+	data["maximum_hit_points"] = int(_maximum_hit_points.get("value"))
+	data["morale"] = {"kind": "fixed", "value": int(_morale.get("value"))}
+	_set_busy(true, "Saving private Creature sheet…")
+	# Keep the pending state observable for one rendered frame before the
+	# authority update completes.
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var updated: SDK.ActorResult = await sdk.actors.update(_selected_actor.id, data)
+	if updated.ok and sdk.context().is_gm:
+		var label := str(_public_label.get("value")).strip_edges()
+		var identity: SDK.OperationResult = await sdk.public_identities.assign(_selected_actor.id, label)
+		if not identity.ok:
+			var rollback: SDK.ActorResult = await sdk.actors.update(_selected_actor.id, original_data)
+			var rollback_message := ""
+			if rollback.ok:
+				var restored_identity: SDK.OperationResult = await sdk.public_identities.assign(_selected_actor.id, original_label)
+				if not restored_identity.ok:
+					rollback_message = " Identity rollback failed: %s" % restored_identity.message
+			else:
+				rollback_message = " Actor rollback failed: %s" % rollback.message
+			updated.ok = false
+			updated.message = identity.message + rollback_message
+		else:
+			updated.actor.public_label = label
+	_set_busy(false, updated.message if not updated.ok else "Creature changes saved.", not updated.ok)
+	if updated.ok:
+		_selected_actor = updated.actor
+		_render_live_actors()
+		_show_route("creature")
+
+
+func _place_rook() -> void:
+	if _busy or _selected_actor == null or sdk == null:
+		return
+	var miniatures: SDK.ContentEntryListResult = sdk.content.list(SDK.ContentKind.Value.MINIATURE)
+	if not miniatures.ok or miniatures.items.is_empty():
+		_set_status("Choose a published Miniature Package before placing this Rook.", true)
+		return
+	var label := _selected_actor.public_label.strip_edges()
+	if label.is_empty():
+		_set_busy(false, "Choose a public name before placing this Rook.", true)
+		return
+	_set_busy(true, "Placing Rook and assigning its public identity…")
+	var created: SDK.RookResult = await sdk.rooks.create(miniatures.items[0].reference, SDK.SceneId.new("main"), Vector2(0, 0))
+	if not created.ok:
+		_set_busy(false, created.message, true)
+		return
+	var linked: SDK.OperationResult = await sdk.rooks.link(created.rook.id, _selected_actor.id)
+	if not linked.ok:
+		var deleted: SDK.OperationResult = await sdk.rooks.delete(created.rook.id)
+		var link_message := linked.message
+		if not deleted.ok:
+			link_message += " Cleanup failed: %s" % deleted.message
+		_set_busy(false, link_message, true)
+		return
+	_selected_actor.public_label = label
+	_refresh_world()
+	_set_busy(false, "Rook placed with public identity: %s." % label)
+
+
+func _add_item() -> void:
+	if _selected_actor == null:
+		return
+	_set_status("Inventory is durable Actor data. Add an item through the private sheet editor.")
+
+
+func _on_back() -> void:
+	if _route == "creature-inventory":
+		_show_route("creature")
+	else:
+		_show_route("creatures")
+
+
+func _set_busy(value: bool, message: String, error: bool = false) -> void:
+	_busy = value
+	_preserve_error = not value and error
+	_set_status(message, error)
+	_create_button.disabled = value or _selected_definition == null
+	_catalogue_create.disabled = value or _selected_definition == null
+	_catalogue_character.disabled = value or _character_definition == null
+	_duplicate_button.disabled = value
+	_save_button.disabled = value
+	_place_button.disabled = value
+	_add_item_button.disabled = value
+	_inventory_add.disabled = value
+
+
+func _set_status(message: String, error: bool = false) -> void:
+	_status.text = message
+	_status.tooltip_text = message
+	_status.visible = error or _busy
+
+
+func _character_primary_button_pressed() -> void:
+	character_primary_button_pressed()
+
+
+func _character_back_button_pressed() -> void:
+	character_back_button_pressed()
