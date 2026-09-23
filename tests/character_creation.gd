@@ -17,6 +17,13 @@ func _initialize() -> void:
 	_run.call_deferred()
 
 func _run() -> void:
+	await _royalty()
+	await _priest()
+	await _herbmaster()
+	await _remaining_class_tables()
+	await _remaining_class_lifetimes()
+	await _correct_class_uses()
+	await _required_pack_choice()
 	await _fanged_hound()
 	await _fanged_scrolls()
 	await _gutterborn_fingersmith()
@@ -30,7 +37,210 @@ func _run() -> void:
 	print("CHARACTER_CREATION %s" % ("PASS" if failures == 0 else "FAIL"))
 	quit(0 if failures == 0 else 1)
 
+func _required_pack_choice() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	host.outcomes["Equipment pack"] = [[6]]
+	var creator = _creator_for(host, "occult-herbmaster")
+	for iteration in range(180):
+		await process_frame
+		if stage == 4 and not host.requests.is_empty() and str(host.requests[-1].name).begins_with("Armor"):
+			await process_frame
+			break
+		if not disabled:
+			creator.primary()
+	creator.primary()
+	_check(stage == 4 and host.actors.is_empty(), "Equipment waits for the required source pack choice.")
+	creator.get_node(^"View/Aside/Context/Content/Pack").pressed.emit()
+	await _finish(creator)
+	_check(host.actors.size() == 1 and host.actors[0].data.pack == "Nothing", "Nothing is an explicit legal pack choice.")
+	creator.free()
+
+
+func _remaining_class_lifetimes() -> void:
+	for case in [["wretched-royalty", "Second gift"], ["wretched-royalty", "Armor"], ["heretical-priest", "Class feature"], ["occult-herbmaster", "Second decoction"], ["occult-herbmaster", "Decoction doses"]]:
+		for restart in [false, true]:
+			var host = _host_for(case[0], 1)
+			host.pending_roll = case[1]
+			var creator = _creator_for(host, case[0])
+			for iteration in range(160):
+				await process_frame
+				if not host.pending_result.is_empty():
+					break
+				if not disabled:
+					creator.primary()
+			_check(not host.pending_result.is_empty(), "The class Roll reaches the pending public SDK boundary.")
+			var rolls_before: int = host.requests.size()
+			if restart:
+				creator.start_over()
+			else:
+				creator.discard()
+			host.complete_pending()
+			await process_frame
+			_check(host.actors.is_empty() and host.requests.size() == rolls_before, "Late class Rolls cannot create Actors or continue generation.")
+			creator.discard()
+			creator.free()
+
+
+func _correct_class_uses() -> void:
+	for case in [["wretched-royalty", 6, "Horn of the Schleswig lords"], ["heretical-priest", 4, "The blasphemous Nechrubel Bible"], ["occult-herbmaster", 1, "Portable laboratory"]]:
+		var host = _host_for(case[0], case[1])
+		var creator = _creator_for(host, case[0])
+		await _finish(creator)
+		creator.free()
+		var roll_count: int = host.requests.size()
+		var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
+		root.add_child(sheet)
+		var miniatures: Array[SDK.ContentEntry] = []
+		var choices: Array[Dictionary] = []
+		sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "edit", miniatures, choices, SDK.new(host))
+		var found := false
+		for editor in sheet.find_children("*", "LineEdit", true, false):
+			var field: Node = editor.get_parent()
+			if field.get_node(^"Label").text == str(case[2]).to_upper() + " USES":
+				field.set("value", "0")
+				found = true
+		_check(found, "Completed class resource has an ordinary correction field.")
+		for button in sheet.find_children("*", "Button", true, false):
+			if button.text == "Save changes":
+				button.pressed.emit()
+				break
+		await process_frame
+		var stored: SDK.ActorResult = SDK.new(host).actors.read(SDK.ActorId.new("character"))
+		_check(stored.ok and stored.actor.data.inventory.any(func(item): return item.get("name", "") == case[2] and item.get("uses", -1) == 0), "Ordinary sheet save retains corrected remaining uses through public Actor state.")
+		_check(host.requests.size() == roll_count, "Corrections do not regenerate class mechanics.")
+		sheet.free()
+
+
+func _remaining_class_tables() -> void:
+	var priest := ["sacred-shepherds-crook", "stolen-mitre", "list-of-sins", "blasphemous-nechrubel-bible", "stones-taken-from-thel-emas-lost-temple", "wrong-jesus-crucifix"]
+	var royalty := ["blade-of-your-ancestors", "poltroon-the-court-jester", "barbarister-the-incredible-horse", "hamfund-the-squire", "snake-skin-gift", "horn-of-the-schleswig-lords"]
+	var decoctions := ["red-poison-decoction", "ezumiels-vapor", "southern-frog-stew", "elixir-vitalis", "spider-owl-soup", "fernors-philtre", "hyphos-enervating-snuff", "black-poison-decoction"]
+	for class_id in ["wretched-royalty", "heretical-priest", "occult-herbmaster"]:
+		for index in range(8 if class_id == "occult-herbmaster" else 6):
+			var host = _host_for(class_id, index + 1)
+			var creator = _creator_for(host, class_id)
+			await _finish(creator)
+			if _check(host.actors.size() == 1, "Class gifts never invent Creature combat profiles."):
+				var data: Dictionary = host.actors[0].data
+				var expected: String = (royalty if class_id == "wretched-royalty" else decoctions if class_id == "occult-herbmaster" else priest)[index]
+				_check(data.traits[0].id == expected and not data.origin.is_empty(), "Every source class outcome survives confirmation.")
+				if class_id == "wretched-royalty":
+					_check(data.traits.size() == 2 and data.traits[1].id == expected, "Duplicate gifts are retained independently.")
+					if index in [1, 2, 3]:
+						_check(data.companion_sheets.size() == 2 and data.companion_sheets[0].source_item_id == expected, "Royalty companions remain descriptive sheet data.")
+						await _descriptive_companions(host)
+						if index == 3:
+							_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "eurekia" and item.get("damage", "") == "2d6" and item.get("uses", 0) == 1), "Hamfund retains the conditional cursed sword as special equipment.")
+					else:
+						_check(data.inventory.filter(func(item): return item.get("source_item_id", "") == expected).size() == 2, "Royalty equipment grants retain duplicates.")
+				elif class_id == "heretical-priest":
+					_check(data.inventory.any(func(item): return item.get("source_item_id", "") == expected), "Every Priest feature grants its actual equipment.")
+					if index == 3:
+						_check(data.inventory.any(func(item): return item.get("source_item_id", "") == expected and item.get("uses", 0) == 1), "The Bible starts with one daily use.")
+				else:
+					_check(data.decoction_rolls == [index + 1, index + 1], "Duplicate decoctions are retained without a reroll rule.")
+					_check(data.inventory.filter(func(item): return item.get("kind", "") == "Decoction").size() == 2, "All eight decoction recipes are available.")
+					if index < 3:
+						_check(data.origin == "Calm isolation in the Sarkash dark.", "Herbmaster origin outcomes 1–3 share the printed origin.")
+			_check(host.errors.is_empty(), "Every source outcome uses its prescribed physical dice: %s" % str(host.errors))
+			creator.free()
+
+
+func _descriptive_companions(host) -> void:
+	var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
+	root.add_child(sheet)
+	var miniatures: Array[SDK.ContentEntry] = []
+	var choices: Array[Dictionary] = []
+	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "companions", miniatures, choices, SDK.new(host))
+	var labels: Array = sheet.find_children("*", "Label", true, false)
+	var expected_name: String = host.actors[0].data.companion_sheets[0].name
+	_check(labels.any(func(label): return label.text.contains(expected_name)), "Descriptive companions are visible in the ordinary companion route.")
+	_check(not sheet.find_children("*", "Button", true, false).any(func(button): return button.text.contains("Open sheet")), "Descriptive companions do not offer invented Creature sheets.")
+	sheet.free()
+
+
+func _herbmaster() -> void:
+	var host = _host_for("occult-herbmaster", 8)
+	host.outcomes["Silver"] = [[2, 3]]
+	host.outcomes["Toughness"] = [[6, 6, 6]]
+	host.outcomes["Strength"] = [[1, 1, 1]]
+	host.outcomes["First decoction"] = [[4]]
+	host.outcomes["Second decoction"] = [[8]]
+	host.outcomes["Decoction doses"] = [[3]]
+	host.outcomes["Equipment second"] = [[4]]
+	host.outcomes["Monkey count"] = [[2]]
+	host.outcomes["Monkey 1 hit points"] = [[1]]
+	host.outcomes["Monkey 2 hit points"] = [[4]]
+	var creator = _creator_for(host, "occult-herbmaster")
+	await _finish(creator)
+	if _check(host.actors.size() == 3, "Herbmaster and two starting monkeys confirm as one bundle."):
+		var data: Dictionary = host.actors[0].data
+		_check(data.class_id == "occult-herbmaster" and data.abilities.Toughness.score == 20 and data.abilities.Strength.score == 1, "Herbmaster class and ability adjustments survive creation.")
+		_check(data.hit_points == 7 and data.silver == 50 and data.omens == 2, "Herbmaster has Toughness+d6 HP, 2d6×10 silver and d2 Omens.")
+		_check(data.origin.contains("Shadow King") and data.origin_roll == 8, "Herbmaster uses its d8 origin table.")
+		_check(data.decoction_rolls == [4, 8] and data.traits.size() == 2, "Two d8 decoctions survive confirmation.")
+		var labs: Array = data.inventory.filter(func(item): return item.get("source_item_id", "") == "portable-laboratory")
+		_check(labs.size() == 1 and labs[0].uses == 3, "The portable laboratory holds one shared d4 dose pool, not d4 per recipe.")
+		var recipes: Array = data.inventory.filter(func(item): return item.get("kind", "") == "Decoction")
+		_check(recipes.size() == 2 and recipes[0].name == "Elixir vitalis" and recipes[1].name == "Black poison" and not recipes[0].has("uses"), "Named recipes use the shared pool without an invented allocation.")
+		_check(host.actors[1].data.hit_points == 3 and host.actors[2].data.hit_points == 6, "Starting monkeys retain individual source HP rolls.")
+	_check(host.requests.filter(func(term): return term.name == "Origin")[0].faces == 8, "Herbmaster origin requests a physical d8.")
+	_check(host.errors.is_empty(), "Herbmaster does not request a class-feature d6: %s" % str(host.errors))
+	creator.free()
+
+
+func _priest() -> void:
+	var host = _host_for("heretical-priest", 6)
+	host.outcomes["Silver"] = [[2, 3, 4]]
+	host.outcomes["Presence"] = [[6, 6, 6]]
+	host.outcomes["Strength"] = [[1, 1, 1]]
+	host.outcomes["Hit points"] = [[8]]
+	host.outcomes["Equipment second"] = [[2]]
+	host.outcomes["Sacred scroll"] = [[7]]
+	host.outcomes["Weapon"] = [[8]]
+	host.outcomes["Armor"] = [[3]]
+	var creator = _creator_for(host, "heretical-priest")
+	await _finish(creator)
+	if _check(host.actors.size() == 1, "Priest creates one Character."):
+		var data: Dictionary = host.actors[0].data
+		_check(data.class_id == "heretical-priest" and data.silver == 90 and data.hit_points == 8 and data.omens == 4, "Priest uses its class resource dice.")
+		_check(data.abilities.Presence.score == 20 and data.abilities.Strength.score == 1, "Priest adjusts Presence +2 and Strength -2.")
+		_check(data.feature_roll == 6 and data.traits[0].printed_roll == 666, "Physical d6 face 6 grants the printed 666 crucifix.")
+		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "wrong-jesus-crucifix"), "Priest retains its special equipment.")
+		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "false-dawn-nights-chariot"), "Ordinary Priest scroll resolves to its named Power.")
+		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "medium-armor"), "Priest retains the class armor table with a scroll.")
+		_check(data.class_rules.any(func(rule): return str(rule).contains("medium armor")), "Priest retains the medium-armor Powers exception.")
+	_check(host.errors.is_empty(), "Priest physical dice match the source: %s" % str(host.errors))
+	creator.free()
+
+
+func _royalty() -> void:
+	var host = _host_for("wretched-royalty", 6)
+	host.outcomes["Silver"] = [[1, 2, 3, 4]]
+	host.outcomes["First gift"] = [[6]]
+	host.outcomes["Second gift"] = [[6]]
+	host.outcomes["Armor"] = [[4], [4], [3]]
+	host.outcomes["Equipment first"] = [[5]]
+	host.outcomes["Unclean scroll"] = [[7]]
+	host.outcomes["Weapon"] = [[8]]
+	var creator = _creator_for(host, "wretched-royalty")
+	await _finish(creator)
+	_check(host.actors.size() == 1, "Royalty creates one Character without invented companion profiles.")
+	if not host.actors.is_empty():
+		var data: Dictionary = host.actors[0].data
+		_check(data.class_id == "wretched-royalty" and data.silver == 100, "Royalty keeps its class and 4d6 × 10 silver.")
+		_check(data.traits.size() == 2 and data.traits[0].id == "horn-of-the-schleswig-lords" and data.traits[1].id == "horn-of-the-schleswig-lords", "The two independent gifts retain duplicates without discretionary rerolls.")
+		var horns: Array = data.inventory.filter(func(item): return item.get("source_item_id", "") == "horn-of-the-schleswig-lords")
+		_check(horns.size() == 2 and horns[0].uses == 1 and horns[1].uses == 1, "Each horn retains its own daily use.")
+		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "medium-armor"), "Royalty rerolls every heavy armor result until a legal result.")
+		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "flail"), "Royalty retains its class d8 weapon table even with a scroll.")
+	_check(host.requests.filter(func(term): return term.name == "Armor").size() == 3, "Heavy armor requires repeated physical Rolls.")
+	_check(host.errors.is_empty(), "Royalty uses only its source dice: %s" % str(host.errors))
+	creator.free()
+
+
 func _fanged_hound() -> void:
+	stages.clear()
 	var creator = CREATOR.instantiate()
 	root.add_child(creator)
 	if not _check(creator.has_method("select_class"), "The System creation action must offer Fanged Deserter selection."):
@@ -215,7 +425,7 @@ func _scroll_rerolls() -> void:
 	creator.free()
 
 func _discard_pending() -> void:
-	for class_id in ["fanged-deserter", "gutterborn-scum", "esoteric-hermit"]:
+	for class_id in ["fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]:
 		for restart in [false, true]:
 			var host = _host_for(class_id, 1)
 			host.pending_roll = "Origin"
@@ -346,13 +556,25 @@ func _host_for(class_id: String, feature_roll: int):
 	if class_id == "esoteric-hermit":
 		host.outcomes["Hermit scroll family"] = [[1]]
 		host.outcomes["Hermit scroll"] = [[7]]
+	if class_id == "wretched-royalty":
+		host.outcomes["Silver"] = [[1, 2, 3, 4]]
+		host.outcomes["First gift"] = [[feature_roll]]
+		host.outcomes["Second gift"] = [[feature_roll]]
+		host.outcomes["Armor"] = [[3]]
+	elif class_id == "heretical-priest":
+		host.outcomes["Silver"] = [[1, 2, 3]]
+	elif class_id == "occult-herbmaster":
+		host.outcomes["Silver"] = [[2, 3]]
+		host.outcomes["First decoction"] = [[feature_roll]]
+		host.outcomes["Second decoction"] = [[feature_roll]]
+		host.outcomes["Decoction doses"] = [[4]]
 	return host
 
 func _creator_for(host, class_id: String):
 	var creator = CREATOR.instantiate()
 	root.add_child(creator)
 	var entries: Array[SDK.ContentEntry] = []
-	for id in ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character", "ancient-gore-hound", "hawk-as-weapon", "dog-small-but-vicious", "monkey"]:
+	for id in ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character", "wretched-royalty-character", "heretical-priest-character", "occult-herbmaster-character", "ancient-gore-hound", "hawk-as-weapon", "dog-small-but-vicious", "monkey"]:
 		entries.append(_entry(id, "actor_definition"))
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
@@ -361,7 +583,7 @@ func _creator_for(host, class_id: String):
 	creator.primary_changed.connect(_primary_changed)
 	creator.begin()
 	# Exercise the authored class button, not an implementation helper.
-	var node: String = {"fanged-deserter": "FangedDeserter", "gutterborn-scum": "GutterbornScum", "esoteric-hermit": "EsotericHermit"}[class_id]
+	var node: String = {"fanged-deserter": "FangedDeserter", "gutterborn-scum": "GutterbornScum", "esoteric-hermit": "EsotericHermit", "wretched-royalty": "WretchedRoyalty", "heretical-priest": "HereticalPriest", "occult-herbmaster": "OccultHerbmaster"}[class_id]
 	creator.get_node("View/Main/Content/Class/" + node).pressed.emit()
 	return creator
 

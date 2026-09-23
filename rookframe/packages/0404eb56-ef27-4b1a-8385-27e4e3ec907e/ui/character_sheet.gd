@@ -248,7 +248,7 @@ func _show_companions() -> void:
 	view.back_requested.connect(_on_cancel_requested)
 	view.actor_requested.connect(_on_companion_selected)
 	_content.add_child(view)
-	view.configure(companions)
+	view.configure(companions, character_data.get("companion_sheets", []))
 	_character_view = view
 
 

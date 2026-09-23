@@ -138,7 +138,7 @@ func _render_definitions() -> void:
 	for child in _definition_list.get_children():
 		child.queue_free()
 	for entry in _definitions:
-		if ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character"].has(entry.reference.local_id):
+		if ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character", "wretched-royalty-character", "heretical-priest-character", "occult-herbmaster-character"].has(entry.reference.local_id):
 			continue
 		var button := Button.new()
 		button.text = entry.title

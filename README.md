@@ -6,9 +6,10 @@ releases belong here. Rookframe application capabilities belong in
 [rookframe-godot](https://github.com/rookframe/rookframe-godot); shared authoring
 capabilities belong in the SDK and reusable UI components in the UI Kit.
 
-The first playable slices provide No Class, Fanged Deserter, Gutterborn Scum
-and Esoteric Hermit creation, editable Character sheets, individual granted
-Creature Actors and the private Creature catalogue.
+The first playable slices provide No Class and all six optional classes, editable
+Character sheets, individual granted Creature Actors and the private Creature
+catalogue. Royalty receives two independent gifts, Priest receives its special
+equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 ## Dependencies
 
@@ -74,14 +75,14 @@ python3 tests/run_character_creation.py --godot /path/to/godot
 ```
 
 The suite exercises authored System actions through the generated public SDK.
-It covers all 18 Fanged Deserter, Gutterborn Scum and Esoteric Hermit features,
+It covers all six optional class branches and their complete feature tables,
 source origins, class dice, scroll choices (including repeated equipment
 rerolls), late Roll/choice discard, atomic refusal/retry and companion projection.
 Only the external host randomness/storage boundary is substituted. Host authority,
 persistence and replication remain covered by the application's Package Services
 suite and the published Manifest journey.
 
-Bare Bones pages 46–49 and the retained Bevy optional-class creation branches are
+Bare Bones pages 46–57 and the retained Bevy optional-class creation branches are
 the rules sources. Benefits, daily uses, Omen effects and durations remain table
 managed. A Book of boiling blood or Invisible College feature does not summon
 Actors during creation. The gore-hound and hawk use only their printed profiles.
@@ -91,3 +92,17 @@ allocated through the public SDK, and the first raw Roll's Action Log sequence.
 The Character's companion list matches the UUID through the public Actor list;
 the Roll sequence is provenance only because copied Worlds have fresh local logs.
 SDK Actor access controls the visible results.
+
+RFG-283 also covers repeated Royalty heavy-armor rerolls, duplicate gifts and
+decoctions, the Priest’s physical 6/printed 666 result, all eight Herbmaster
+origins and decoctions, explicit pack choices, and late class-roll discard.
+Royalty’s three named companions have no printed combat profiles and remain
+descriptive sheet data. Hamfund retains Eurekia as conditional equipment.
+Starting dogs and monkeys remain individual Creature Actors.
+
+The portable laboratory’s `uses` is the one shared remaining dose total; the two
+recipe entries reference that pool and do not each receive a separate quantity.
+The source does not allocate doses between recipes. Daily eligibility, brewing
+in play, expiry, and ongoing effects remain at the table in this creation slice.
+Horn, Bible, sword and laboratory remaining uses use ordinary completed-sheet
+corrections; creation mechanics remain fixed until confirmation.

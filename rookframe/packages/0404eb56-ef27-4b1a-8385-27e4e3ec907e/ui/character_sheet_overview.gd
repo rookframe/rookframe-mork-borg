@@ -45,7 +45,8 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	get_node(^"Body/Context/Identity/Content/Traits").text = rules.strip_edges()
 	var companions: Array = data.get("starting_creature_grants", [])
 	get_node(^"Body/Context/Companions").visible = true
-	get_node(^"Body/Context/Companions").text = "View companions (%d)" % companions.size()
+	var descriptions: Array = data.get("companion_sheets", [])
+	get_node(^"Body/Context/Companions").text = "View companions (%d)" % (companions.size() + descriptions.size())
 	var equipped := ""
 	var inventory: Array = data.get("inventory", [])
 	for entry in inventory:

@@ -160,6 +160,66 @@ icon_alignment = 2
 toggle_mode = true
 button_group = SubResource("Classes")
 
+[node name="WretchedRoyalty" type="Button" parent="Main/Content/Class"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeChoiceRow"
+theme_override_styles/normal = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 13
+text = "WRETCHED ROYALTY"
+alignment = 0
+icon_alignment = 2
+toggle_mode = true
+button_group = SubResource("Classes")
+
+[node name="HereticalPriest" type="Button" parent="Main/Content/Class"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeChoiceRow"
+theme_override_styles/normal = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 13
+text = "HERETICAL PRIEST"
+alignment = 0
+icon_alignment = 2
+toggle_mode = true
+button_group = SubResource("Classes")
+
+[node name="OccultHerbmaster" type="Button" parent="Main/Content/Class"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeChoiceRow"
+theme_override_styles/normal = SubResource("CompactChoice")
+theme_override_styles/hover = SubResource("CompactChoiceHover")
+theme_override_styles/pressed = SubResource("CompactChoiceSelected")
+theme_override_constants/h_separation = 4
+theme_override_font_sizes/font_size = 13
+text = "OCCULT HERBMASTER"
+alignment = 0
+icon_alignment = 2
+toggle_mode = true
+button_group = SubResource("Classes")
+
+[node name="OriginRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="FeatureRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="SecondFeatureRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="DoseRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+layout_mode = 2
+
 [node name="Explanation" type="Label" parent="Main/Content/Origin"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
@@ -173,12 +233,6 @@ theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 16
 text = "Continue to starting equipment."
 autowrap_mode = 2
-
-[node name="OriginRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="FeatureRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
-layout_mode = 2
 
 [node name="Agility" parent="Main/Content/Abilities" instance=ExtResource("2")]
 layout_mode = 2

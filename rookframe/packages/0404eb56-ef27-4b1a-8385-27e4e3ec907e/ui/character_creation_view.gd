@@ -7,10 +7,10 @@ signal class_selected(class_id: String)
 signal scroll_selected(slot: String, disposition: String)
 
 var _scroll_slot := ""
-const CLASS_NODES: Dictionary = {"NoClass": "classless", "FangedDeserter": "fanged-deserter", "GutterbornScum": "gutterborn-scum", "EsotericHermit": "esoteric-hermit"}
+const CLASS_NODES: Dictionary = {"NoClass": "classless", "FangedDeserter": "fanged-deserter", "GutterbornScum": "gutterborn-scum", "EsotericHermit": "esoteric-hermit", "WretchedRoyalty": "wretched-royalty", "HereticalPriest": "heretical-priest", "OccultHerbmaster": "occult-herbmaster"}
 
 func _ready() -> void:
-	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit"]:
+	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit", "WretchedRoyalty", "HereticalPriest", "OccultHerbmaster"]:
 		get_node("Main/Content/Class/" + node).pressed.connect(_select_class.bind(CLASS_NODES[node]))
 	for choice in ["Reroll", "Eat", "Paper"]:
 		get_node("Main/Content/Equipment/ScrollChoice/" + choice).pressed.connect(_select_scroll.bind({"Reroll": "reroll", "Eat": "eat", "Paper": "toilet-paper"}[choice]))
@@ -30,12 +30,13 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	var class_title: String = draft.get("class_title", "No Class")
 	_scroll_slot = str(draft.get("scroll_choice_slot", ""))
 	get_node(^"Main/Content/Class").columns = 2
-	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit"]:
+	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit", "WretchedRoyalty", "HereticalPriest", "OccultHerbmaster"]:
 		var choice := get_node("Main/Content/Class/" + node) as Button
 		choice.button_pressed = CLASS_NODES[node] == draft.get("class_id", "classless")
 		choice.icon = CHECK if choice.button_pressed else null
 	get_node(^"Main/Content/Equipment/ScrollChoice").visible = not _scroll_slot.is_empty()
 	var equipment_pending: bool = draft.get("equipment_roll_pending", false)
+	var pack_pending: bool = draft.get("pack_choice_pending", false)
 	var roll_ready: bool = draft.get("roll_ready", false)
 	var ability_pending: bool = draft.get("roll_pending", false)
 	vertical = compact
@@ -70,7 +71,7 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 		description = "Choose from the packs available for your roll."
 		facts = _inventory_text(draft.get("inventory", []))
 		hint = "Rolling %s…" % str(draft.get("active_roll", "equipment")) if equipment_pending and not roll_ready else "Continue with the next roll when ready."
-		get_node(^"Aside/Context/Content/Pack").text = "Pack: %s" % str(draft.get("pack", "Nothing"))
+		get_node(^"Aside/Context/Content/Pack").text = "Pack: Choose" if pack_pending else "Pack: %s" % str(draft.get("pack", "Nothing"))
 		_present_equipment(draft, compact)
 	elif selected == "Identity":
 		description = "Preferred appearance for this Actor’s Rooks."
@@ -165,7 +166,8 @@ func _equipment_formula(title: String, draft: Dictionary, fallback: String) -> S
 	if title == "Weapon" or title == "Armor":
 		var faces: int = profile.get("weapon_faces" if title == "Weapon" else "armor_faces", 10 if title == "Weapon" else 4)
 		var totals: Dictionary = draft.get("equipment_rolls", {})
-		if totals.has("Unclean scroll") or totals.has("Sacred scroll"):
+		var fixed_arms: bool = profile.get("fixed_arms", false)
+		if not fixed_arms and (totals.has("Unclean scroll") or totals.has("Sacred scroll")):
 			var limit := 6 if title == "Weapon" else 2
 			if faces > limit:
 				faces = limit
@@ -174,16 +176,34 @@ func _equipment_formula(title: String, draft: Dictionary, fallback: String) -> S
 
 
 func _present_origin(draft: Dictionary, compact: bool) -> void:
-	var classless := str(draft.get("class_id", "classless")) == "classless"
-	get_node(^"Main/Content/Origin/Explanation").text = "No class origin or traits." if classless else str(draft.get("origin", "Your origin and class feature are determined by two Rolls."))
+	var class_id: String = draft.get("class_id", "classless")
+	var classless := class_id == "classless"
+	var royalty := class_id == "wretched-royalty"
+	var herbmaster := class_id == "occult-herbmaster"
+	get_node(^"Main/Content/Origin/Explanation").text = "No class origin or traits." if classless else str(draft.get("origin", ""))
 	get_node(^"Main/Content/Origin/Continue").text = "Continue to starting equipment." if classless else _traits_text(draft)
-	for entry in [["OriginRoll", "Origin", "origin_roll"], ["FeatureRoll", "Class feature", "feature_roll"]]:
-		var row: ROLL_ROW = get_node("Main/Content/Origin/" + entry[0])
+	get_node(^"Main/Content/Origin/SecondFeatureRoll").visible = royalty or herbmaster
+	get_node(^"Main/Content/Origin/DoseRoll").visible = herbmaster
+	var entries := [["OriginRoll", "Origin", "origin_roll", 8 if herbmaster else 6]]
+	if herbmaster:
+		entries.append(["FeatureRoll", "First decoction", "first_decoction_roll", 8])
+		entries.append(["SecondFeatureRoll", "Second decoction", "second_decoction_roll", 8])
+		entries.append(["DoseRoll", "Decoction doses", "decoction_doses", 4])
+	else:
+		entries.append(["FeatureRoll", "First gift" if royalty else "Class feature", "feature_roll", 6])
+		if royalty:
+			entries.append(["SecondFeatureRoll", "Second gift", "second_feature_roll", 6])
+	var rows := [get_node(^"Main/Content/Origin/OriginRoll"), get_node(^"Main/Content/Origin/FeatureRoll"), get_node(^"Main/Content/Origin/SecondFeatureRoll"), get_node(^"Main/Content/Origin/DoseRoll")]
+	for index in range(entries.size()):
+		var entry: Array = entries[index]
+		var row: ROLL_ROW = rows[index]
 		row.visible = not classless
 		var complete := draft.has(entry[2])
 		var current: bool = str(draft.get("active_roll", "")) == entry[1]
 		var ready: bool = draft.get("roll_ready", false)
-		row.present_roll(entry[1], "1d6", str(draft[entry[2]]) if complete else ("Rolling…" if current and not ready else "—"), "complete" if complete else ("current" if current and ready else "pending" if current else "locked"), 1 if entry[0] == "OriginRoll" else 2, compact)
+		var value: int = draft.get(entry[2], 0)
+		var faces: int = entry[3]
+		row.present_roll(entry[1], "1d%d" % faces, str(value) if complete else ("Rolling…" if current and not ready else "—"), "complete" if complete else ("current" if current and ready else "pending" if current else "locked"), index + 1, compact)
 
 
 func _rules_text(draft: Dictionary) -> String:
@@ -199,7 +219,12 @@ func _traits_text(draft: Dictionary) -> String:
 	var traits: Array = draft.get("traits", [])
 	for raw_trait in traits:
 		var trait_data: Dictionary = raw_trait
-		result += str(trait_data.get("name", "")) + "\n" + str(trait_data.get("rules", ""))
+		result += ("
+
+" if not result.is_empty() else "") + str(trait_data.get("name", "")) + "\n" + str(trait_data.get("rules", ""))
+	if draft.has("decoction_doses"):
+		var doses: int = draft.get("decoction_doses", 0)
+		result += "\n\nShared decoction doses: %d" % doses
 	return result
 
 

@@ -59,3 +59,16 @@ func ListActors() -> Dictionary:
 func NewHumanThrowRequestId() -> String:
 	creation_serial += 1
 	return "33333333-3333-4333-8333-%012d" % creation_serial
+
+func ReadActor(id: String) -> Dictionary:
+	for actor in actors:
+		if actor.id == id:
+			return {"ok": true, "value": actor.duplicate(true)}
+	return {"ok": false, "message": "Actor unavailable."}
+
+func UpdateActor(id: String, data: Variant) -> Dictionary:
+	for actor in actors:
+		if actor.id == id:
+			actor.data = data.duplicate(true)
+			return {"ok": true, "value": actor.duplicate(true)}
+	return {"ok": false, "message": "Actor unavailable."}

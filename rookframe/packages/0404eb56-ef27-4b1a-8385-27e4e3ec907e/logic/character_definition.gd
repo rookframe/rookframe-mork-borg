@@ -1,6 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/actor_definition.gd"
 
-## Source-backed Character definitions for the first four creation branches.
+## Source-backed Character definitions for the seven creation branches.
 ## The UI owns the staged draft and physical Rolls; this resource owns the
 ## durable Character schema and validates the source-defined choices that can
 ## cross the SDK boundary.
@@ -23,6 +23,15 @@ func create_data(raw_choices: Variant) -> Variant:
 	var feature_roll: int = choices.get("feature_roll", 0)
 	var origin_roll: int = choices.get("origin_roll", 0)
 	var feature: Dictionary = CLASSES.new().feature(class_id, feature_roll)
+	var traits: Array = [] if feature.is_empty() else [feature]
+	var second_feature_roll: int = choices.get("second_feature_roll", 0)
+	if class_id == "wretched-royalty":
+		traits.append(CLASSES.new().feature(class_id, second_feature_roll))
+	var decoction_rolls: Array = choices.get("decoction_rolls", [])
+	if class_id == "occult-herbmaster":
+		for roll in decoction_rolls:
+			var decoction_roll: int = roll
+			traits.append(CLASSES.new().decoction(decoction_roll))
 	var abilities: Dictionary = {}
 	var submitted_abilities: Dictionary = choices.get("abilities", {})
 	for ability_name in ABILITY_NAMES:
@@ -88,7 +97,9 @@ func create_data(raw_choices: Variant) -> Variant:
 		"origin": CLASSES.new().origin(class_id, origin_roll),
 		"origin_roll": origin_roll,
 		"feature_roll": feature_roll,
-		"traits": [] if feature.is_empty() else [feature],
+		"second_feature_roll": second_feature_roll,
+		"decoction_rolls": decoction_rolls,
+		"traits": traits,
 		"class_rules": profile.get("rules", []),
 		"scroll_dispositions": choices.get("scroll_dispositions", []).duplicate(true),
 		"preferred_miniature": choices.get("preferred_miniature", {}),

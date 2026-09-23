@@ -25,6 +25,10 @@ func _build() -> void:
 			var details := ""
 			if item_data.has("quantity"):
 				details = "Quantity: %s" % str(item_data["quantity"])
+			if item_data.has("uses"):
+				details += ("\n" if not details.is_empty() else "") + "Remaining uses: %s" % str(item_data["uses"])
+			if item_data.has("dose_pool"):
+				details += ("\n" if not details.is_empty() else "") + "Uses the portable laboratory’s shared doses."
 			if item_data.has("rules"):
 				details += ("\n" if not details.is_empty() else "") + str(item_data["rules"])
 			if not details.is_empty():
