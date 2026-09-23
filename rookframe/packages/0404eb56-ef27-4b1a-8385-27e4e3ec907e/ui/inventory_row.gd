@@ -16,7 +16,8 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 		details.append(str(item.range_feet) + " ft")
 	if item.has("armor_tier"):
 		details.append("Tier " + str(item.armor_tier) + " · −" + str(item.get("reduction", "")))
-	if item.has("quantity") and (int(item.quantity) != 1 or details.is_empty()):
+	var quantity: int = item.get("quantity", 1)
+	if item.has("quantity") and (quantity != 1 or details.is_empty()):
 		details.append("Quantity " + str(item.quantity))
 	if item.has("uses"):
 		details.append(str(item.uses) + " uses")
