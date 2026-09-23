@@ -500,6 +500,9 @@ func _duplicate_creature() -> void:
 		_set_status("The saved Creature definition is unavailable; duplicate was not created.", true)
 		return
 	var data: Dictionary = source_data.duplicate(true)
+	# A separate duplicate is not another grant from the original creation.
+	data.erase("creation_id")
+	data.erase("creation_roll_sequence")
 	_set_busy(true, "Duplicating private Creature sheet…")
 	var result: SDK.ActorResult = await sdk.actors.create(definition.reference, data)
 	_set_busy(false, result.message if not result.ok else "Creature duplicated.", not result.ok)

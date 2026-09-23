@@ -6,6 +6,7 @@ signal FeedbackActionSelected
 signal WorldChanged
 signal TabletopCommandCompleted(result: Dictionary)
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+static var creation_serial := 0
 var reject_creation := false
 var pending_roll := ""
 var pending_result: Dictionary = {}
@@ -53,3 +54,8 @@ func CreateActorsAtomically(_package: String, definition: String, choices: Varia
 
 func ListActors() -> Dictionary:
 	return {"ok": true, "value": actors}
+
+
+func NewHumanThrowRequestId() -> String:
+	creation_serial += 1
+	return "33333333-3333-4333-8333-%012d" % creation_serial

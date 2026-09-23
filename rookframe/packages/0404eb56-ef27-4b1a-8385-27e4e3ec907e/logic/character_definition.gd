@@ -70,6 +70,7 @@ func create_data(raw_choices: Variant) -> Variant:
 	var companion_sheets: Array = choices.get("companion_sheets", [])
 	var starting_creature_grants: Array = choices.get("starting_creature_grants", [])
 	return {
+		"creation_id": choices.get("creation_id", ""),
 		"creation_roll_sequence": choices.get("creation_roll_sequence", 0),
 		"schema": "mork-borg-character/v1",
 		"definition_id": class_id,

@@ -1,6 +1,7 @@
 extends VBoxContainer
 
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SCROLLS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/starting_scrolls.gd")
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 const CHARACTER_DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
 const FIRST_EQUIPMENT_NAMES := ["Rope", "Torch", "Lantern with oil", "Magnesium strip", "Unclean scroll", "Sharp needle", "Medicine box", "Metal file", "Bear trap", "Bomb", "Red poison", "Silver crucifix"]
@@ -10,8 +11,6 @@ const SECOND_EQUIPMENT_IDS := ["life-elixir", "sacred-scroll", "dog-small-but-vi
 const WEAPON_IDS := ["femur", "staff", "shortsword", "knife", "warhammer", "sword", "bow", "flail", "crossbow", "zweihander"]
 const ARMOR_IDS := ["", "light-armor", "medium-armor", "heavy-armor"]
 const PACK_IDS := ["backpack", "sack", "small-wagon", "donkey"]
-const UNCLEAN_SCROLL_IDS := ["palms-open-the-southern-gate", "tongue-of-eris", "te-le-kin-esis", "lucy-fires-levitation", "daemon-of-capillaries", "nine-violet-signs-unknot-the-storm", "metzhuotl-blind-your-eye", "foul-psychompomp", "eyelid-blinds-the-mind", "death"]
-const SACRED_SCROLL_IDS := ["grace-of-a-dead-saint", "grace-for-a-sinner", "whispers-pass-the-gate", "aegis-of-sorrow", "unmet-fate", "bestial-speech", "false-dawn-nights-chariot", "hermetic-step", "roskoes-consuming-glare", "enochian-syntax"]
 
 signal scroll_choice_requested(slot: String)
 signal scroll_decided
@@ -178,6 +177,7 @@ func _begin_character_creation() -> void:
 	_character_stage = "create-class"
 	_character_tab = "character"
 	_character_draft = {
+		"creation_id": sdk.dice.new_request_id(),
 		"class_id": "classless",
 		"class_title": "No Class",
 		"class_profile": CLASSES.new().profile("classless"),
@@ -479,7 +479,7 @@ func _roll_character_equipment(token: int) -> void:
 	if totals.has("Hermit scroll"):
 		var sacred := int(totals.get("Hermit scroll family", 0)) == 1
 		var hermit_scroll := int(totals.get("Hermit scroll", 0))
-		inventory.append({"name": ("Sacred" if sacred else "Unclean") + " scroll %d" % hermit_scroll, "source_item_id": _indexed_item_id(SACRED_SCROLL_IDS if sacred else UNCLEAN_SCROLL_IDS, hermit_scroll), "roll": hermit_scroll})
+		inventory.append(SCROLLS.new().item("sacred" if sacred else "unclean", hermit_scroll))
 	var weapon_id := _indexed_item_id(WEAPON_IDS, int(totals.get("Weapon", 0)))
 	inventory.append({"name": weapon_name, "source_item_id": weapon_id, "roll": int(totals.get("Weapon", 0)), "kind": "Weapon", "equipped": true})
 	var presence: Dictionary = _character_draft.get("abilities", {}).get("Presence", {})
@@ -569,9 +569,7 @@ func _first_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
 		item["quantity"] = 1 if torch_quantity < 1 else torch_quantity
 	if roll == 5:
 		var scroll_roll := int(totals.get("Unclean scroll", 0))
-		item["roll"] = scroll_roll
-		item["source_item_id"] = _indexed_item_id(UNCLEAN_SCROLL_IDS, scroll_roll)
-		item["name"] = "Unclean scroll %d" % scroll_roll
+		item = SCROLLS.new().item("unclean", scroll_roll)
 	if roll == 7:
 		var medicine_presence: Dictionary = _character_draft.get("abilities", {}).get("Presence", {})
 		var medicine_uses := int(medicine_presence.get("modifier", 0)) + 4
@@ -589,9 +587,7 @@ func _second_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
 		item["uses"] = int(totals.get("Life elixir doses", 0))
 	if roll == 2:
 		var scroll_roll := int(totals.get("Sacred scroll", 0))
-		item["roll"] = scroll_roll
-		item["source_item_id"] = _indexed_item_id(SACRED_SCROLL_IDS, scroll_roll)
-		item["name"] = "Sacred scroll %d" % scroll_roll
+		item = SCROLLS.new().item("sacred", scroll_roll)
 	if roll == 4:
 		item["quantity"] = int(totals.get("Monkey count", 0))
 	return item
@@ -754,6 +750,7 @@ func _commit_character() -> void:
 		return
 	var token := _creation_generation
 	var choices: Dictionary = {
+		"creation_id": _character_draft.get("creation_id", ""),
 		"creation_roll_sequence": _character_draft.get("creation_roll_sequence", 0),
 		"class_id": _character_draft.get("class_id", "classless"),
 		"class_title": _character_draft.get("class_title", "No Class"),
@@ -791,6 +788,7 @@ func _commit_character() -> void:
 		if creature_index < choices["starting_creature_grants"].size():
 			creature_choices = choices["starting_creature_grants"][creature_index]
 		creature_choices = creature_choices.duplicate(true)
+		creature_choices["creation_id"] = choices["creation_id"]
 		creature_choices["creation_roll_sequence"] = choices["creation_roll_sequence"]
 		child_requests.append({
 			"package_id": creature_definition.reference.package_id,

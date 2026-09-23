@@ -86,7 +86,8 @@ the rules sources. Benefits, daily uses, Omen effects and durations remain table
 managed. A Book of boiling blood or Invisible College feature does not summon
 Actors during creation. The gore-hound and hawk use only their printed profiles.
 
-Each atomic creation payload records its first committed raw Roll's shared Action
-Log sequence. The Character's companion list uses this durable creation provenance
-and the public Actor list, so same-named creatures from another creation are not
-mistaken for its grants. SDK Actor access controls the visible results.
+Each atomic creation payload records a stable Package-owned creation request UUID,
+allocated through the public SDK, and the first raw Roll's Action Log sequence.
+The Character's companion list matches the UUID through the public Actor list;
+the Roll sequence is provenance only because copied Worlds have fresh local logs.
+SDK Actor access controls the visible results.

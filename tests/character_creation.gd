@@ -157,7 +157,7 @@ func _hermit_hawk() -> void:
 		_check(data.class_id == "esoteric-hermit", "The Hermit class survives confirmation.")
 		_check(data.abilities.Presence == {"score": 20, "modifier": 3} and data.abilities.Strength.score == 1, "Hermit ability adjustments reach both source endpoints.")
 		_check(data.hit_points == 4 and data.silver == 50 and data.omens == 4, "Hermit resources use the class dice.")
-		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "metzhuotl-blind-your-eye"), "The Hermit always gains its random scroll.")
+		_check(data.inventory.any(func(item): return item.get("source_item_id", "") == "metzhuotl-blind-your-eye" and item.name == "Metzhuotl blind your eye" and item.rules.contains("invisible")), "The Hermit always gains its random scroll.")
 		_check(host.actors[1].data.hit_points == 8 and host.actors[1].data.defence_dr == 10, "Hawk has 8 HP and DR10 defence.")
 		_check(host.actors[1].data.attacks[0].dice == "d4", "Hawk claws/bite deals d4.")
 	_check(host.requests.filter(func(term): return term.name == "Weapon")[0].faces == 4, "Hermit uses the d4 weapon table.")
@@ -263,9 +263,14 @@ func _companions_projection() -> void:
 		return
 	var provenance: int = host.actors[0].data.get("creation_roll_sequence", 0)
 	_check(provenance > 0 and host.actors[1].data.get("creation_roll_sequence", 0) == provenance, "Both atomic payloads retain their shared source Roll provenance.")
-	var unrelated: Dictionary = host.actors[1].duplicate(true)
+	var second_host = _host_for("fanged-deserter", 5)
+	var second_creator = _creator_for(second_host, "fanged-deserter")
+	await _finish(second_creator)
+	var unrelated: Dictionary = second_host.actors[1].duplicate(true)
 	unrelated.id = "other-hound"
-	unrelated.data.creation_roll_sequence = 900
+	_check(unrelated.data.creation_roll_sequence == provenance, "Separate Worlds can repeat local Roll sequences.")
+	_check(unrelated.data.creation_id != host.actors[0].data.creation_id, "Distinct creation bundles have distinct stable IDs.")
+	second_creator.free()
 	host.actors.append(unrelated)
 	var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
 	root.add_child(sheet)
@@ -283,7 +288,7 @@ func _companions_projection() -> void:
 	_check(companion_view != null, "The Character sheet opens its companions route.")
 	if companion_view != null:
 		var rows = companion_view.get_node("Items").get_children()
-		_check(rows.size() == 1, "Same-named grants from another Character are excluded.")
+		_check(rows.size() == 1, "A same-named grant with a colliding local Roll sequence stays excluded.")
 		if rows.size() == 1:
 			rows[0].pressed.emit()
 			_check(selected == ["child-1"], "Open sheet targets the individual granted Actor.")

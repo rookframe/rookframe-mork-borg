@@ -237,12 +237,12 @@ func _show_companions() -> void:
 		return
 	var companions: Array[SDK.Actor] = []
 	var character_data: Dictionary = _character_actor.data
-	var creation_roll := int(character_data.get("creation_roll_sequence", 0))
-	# The shared raw Roll sequence is durable creation provenance. It is included
-	# in every payload of the atomic grant, never inferred from names or catalogue IDs.
+	var creation_request: String = character_data.get("creation_id", "")
+	# Match the stable Package-owned creation request, preserved by World copies.
+	# Raw Roll sequences are provenance only: local logs can restart in a copy.
 	for actor in result.items:
 		var data: Dictionary = actor.data
-		if creation_roll > 0 and str(data.get("schema", "")) == "mork-borg-adversary/v1" and int(data.get("creation_roll_sequence", 0)) == creation_roll:
+		if not creation_request.is_empty() and str(data.get("schema", "")) == "mork-borg-adversary/v1" and str(data.get("creation_id", "")) == creation_request:
 			companions.append(actor)
 	var view = COMPANIONS_SCENE.instantiate()
 	view.back_requested.connect(_on_cancel_requested)

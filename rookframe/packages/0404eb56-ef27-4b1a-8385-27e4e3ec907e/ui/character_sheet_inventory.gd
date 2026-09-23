@@ -22,6 +22,13 @@ func _build() -> void:
 			var item_data: Dictionary = item
 			var item_name: String = item_data.get("name", "Item")
 			body.add_child(_label(item_name, "RookframeBody"))
+			var details := ""
+			if item_data.has("quantity"):
+				details = "Quantity: %s" % str(item_data["quantity"])
+			if item_data.has("rules"):
+				details += ("\n" if not details.is_empty() else "") + str(item_data["rules"])
+			if not details.is_empty():
+				body.add_child(_label(details, "RookframeMeta"))
 	var add_item := _button("Add item")
 	add_item.pressed.connect(_emit_add_item_requested)
 	actions.add_child(add_item)

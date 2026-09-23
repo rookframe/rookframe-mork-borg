@@ -39,6 +39,8 @@ func create_data(raw_choices: Variant) -> Variant:
 	}
 	if definition.has("defence_dr"):
 		data["defence_dr"] = definition["defence_dr"]
+	if choices.has("creation_id"):
+		data["creation_id"] = choices["creation_id"]
 	if choices.has("creation_roll_sequence"):
 		data["creation_roll_sequence"] = choices["creation_roll_sequence"]
 	for key in ["name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
