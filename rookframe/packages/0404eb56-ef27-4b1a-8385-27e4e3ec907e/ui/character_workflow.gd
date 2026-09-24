@@ -188,7 +188,8 @@ func character_hide_surface() -> void:
 	_header.visible = true
 	_creation_progress.visible = false
 	_catalogue_create.visible = true
-	if _character_creator != null:
+	if _character_creator != null and _character_creator.is_active():
+		_creation_was_closed = true
 		_character_creator.discard()
 		_character_creator.visible = false
 	if _character_sheet != null:
