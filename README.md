@@ -175,3 +175,23 @@ with only the external host boundary substituted.
 
 Melee d2 damage or protection uses a physical d4: 1–2 gives 1, 3–4 gives 2.
 The raw d4 remains in the Roll record; the result explains this conversion.
+
+
+## Automated tests
+
+All extension suites use official GdUnit4 6.2.1, pinned by commit in `plug.gd`
+and verified with stock Godot 4.7.2 Mono. Install development dependencies and run:
+
+```sh
+godot --headless --path . --script plug.gd install
+python3 tests/run_character_creation.py --godot /Applications/Godot_mono.app/Contents/MacOS/Godot
+```
+
+The runner discovers every suite under `tests/` (24 cases at migration),
+imports resources, and requires a fresh nonempty passing JUnit report. Reports
+are written under `reports/<run>/report_1/` as XML and HTML. Failures, native
+errors, timeouts, orphan Nodes and skips fail the run. Tests extend
+`GdUnitTestSuite`; use `test_*`, native assertions, `auto_free` and signal/await
+completion. The host boundary is substituted where required; real host and
+platform acceptance checks live in rookframe-godot. Tests, reports and GdUnit
+are excluded from Package exports.

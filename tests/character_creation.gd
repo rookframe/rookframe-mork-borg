@@ -1,4 +1,4 @@
-extends SceneTree
+extends GdUnitTestSuite
 
 # Deterministic rule cases use the real authored creator and generated public
 # SDK. Only the host's randomness/storage boundary is substituted here; the
@@ -7,44 +7,19 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CREATOR = preload(ROOT + "ui/character_creator.tscn")
 const BOUNDARY = preload("res://tests/creation_sdk_boundary.gd")
-var failures := 0
 var stage := 0
 var stages: Array[int] = []
 var primary := ""
 var disabled := false
 
-func _initialize() -> void:
-	_run.call_deferred()
-
-func _run() -> void:
-	await _royalty()
-	await _priest()
-	await _herbmaster()
-	await _remaining_class_tables()
-	await _remaining_class_lifetimes()
-	await _correct_class_uses()
-	await _required_pack_choice()
-	await _fanged_hound()
-	await _fanged_scrolls()
-	await _gutterborn_fingersmith()
-	await _hermit_hawk()
-	await _feature_tables()
-	await _scroll_rerolls()
-	await _discard_pending()
-	await _companions_projection()
-	await _atomic_refusal()
-	await _refresh_during_creation()
-	print("CHARACTER_CREATION %s" % ("PASS" if failures == 0 else "FAIL"))
-	quit(0 if failures == 0 else 1)
-
-func _required_pack_choice() -> void:
+func test_required_pack_choice() -> void:
 	var host = _host_for("occult-herbmaster", 1)
 	host.outcomes["Equipment pack"] = [[6]]
 	var creator = _creator_for(host, "occult-herbmaster")
 	for iteration in range(180):
-		await process_frame
+		await get_tree().process_frame
 		if stage == 4 and not host.requests.is_empty() and str(host.requests[-1].name).begins_with("Armor"):
-			await process_frame
+			await get_tree().process_frame
 			break
 		if not disabled:
 			creator.primary()
@@ -56,14 +31,14 @@ func _required_pack_choice() -> void:
 	creator.free()
 
 
-func _remaining_class_lifetimes() -> void:
+func test_remaining_class_lifetimes() -> void:
 	for case in [["wretched-royalty", "Second gift"], ["wretched-royalty", "Armor"], ["heretical-priest", "Class feature"], ["occult-herbmaster", "Second decoction"], ["occult-herbmaster", "Decoction doses"]]:
 		for restart in [false, true]:
 			var host = _host_for(case[0], 1)
 			host.pending_roll = case[1]
 			var creator = _creator_for(host, case[0])
 			for iteration in range(160):
-				await process_frame
+				await get_tree().process_frame
 				if not host.pending_result.is_empty():
 					break
 				if not disabled:
@@ -75,13 +50,13 @@ func _remaining_class_lifetimes() -> void:
 			else:
 				creator.discard()
 			host.complete_pending()
-			await process_frame
+			await get_tree().process_frame
 			_check(host.actors.is_empty() and host.requests.size() == rolls_before, "Late class Rolls cannot create Actors or continue generation.")
 			creator.discard()
 			creator.free()
 
 
-func _correct_class_uses() -> void:
+func test_correct_class_uses() -> void:
 	for case in [["wretched-royalty", 6, "Horn of the Schleswig lords"], ["heretical-priest", 4, "The blasphemous Nechrubel Bible"], ["occult-herbmaster", 1, "Portable laboratory"]]:
 		var host = _host_for(case[0], case[1])
 		var creator = _creator_for(host, case[0])
@@ -89,12 +64,12 @@ func _correct_class_uses() -> void:
 		creator.free()
 		var roll_count: int = host.requests.size()
 		var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
-		root.add_child(sheet)
+		add_child(auto_free(sheet))
 		var miniatures: Array[SDK.ContentEntry] = []
 		var choices: Array[Dictionary] = []
 		sheet.set_character(SDK.Actor.new(host.actors[0]), "inventory", "character", miniatures, choices, SDK.new(host))
-		await process_frame
-		await process_frame
+		await get_tree().process_frame
+		await get_tree().process_frame
 		var found := false
 		for row in sheet.find_children("*", "HBoxContainer", true, false):
 			if row.get_script() != load(ROOT + "ui/inventory_row.gd"):
@@ -103,22 +78,22 @@ func _correct_class_uses() -> void:
 				row.get_node(^"Actions/Edit").pressed.emit()
 				found = true
 				break
-		await process_frame
-		await process_frame
+		await get_tree().process_frame
+		await get_tree().process_frame
 		_check(found, "Completed class resource has an item-local correction entry.")
 		for field in sheet.find_children("*", "VBoxContainer", true, false):
 			if field.get_script() == load(ROOT + "ui/sheet_field.gd") and field.field == "uses":
 				field.get_node(^"Field").set("value", "0")
 				field.get_node(^"Actions/Save").pressed.emit()
 				break
-		await process_frame
+		await get_tree().process_frame
 		var stored: SDK.ActorResult = SDK.new(host).actors.read(SDK.ActorId.new("character"))
 		_check(stored.ok and stored.actor.data.inventory.any(func(item): return item.get("name", "") == case[2] and item.get("uses", -1) == 0), "Ordinary sheet save retains corrected remaining uses through public Actor state.")
 		_check(host.requests.size() == roll_count, "Corrections do not regenerate class mechanics.")
 		sheet.free()
 
 
-func _remaining_class_tables() -> void:
+func test_remaining_class_tables() -> void:
 	var priest := ["sacred-shepherds-crook", "stolen-mitre", "list-of-sins", "blasphemous-nechrubel-bible", "stones-taken-from-thel-emas-lost-temple", "wrong-jesus-crucifix"]
 	var royalty := ["blade-of-your-ancestors", "poltroon-the-court-jester", "barbarister-the-incredible-horse", "hamfund-the-squire", "snake-skin-gift", "horn-of-the-schleswig-lords"]
 	var decoctions := ["red-poison-decoction", "ezumiels-vapor", "southern-frog-stew", "elixir-vitalis", "spider-owl-soup", "fernors-philtre", "hyphos-enervating-snuff", "black-poison-decoction"]
@@ -155,12 +130,12 @@ func _remaining_class_tables() -> void:
 
 func _descriptive_companions(host) -> void:
 	var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
-	root.add_child(sheet)
+	add_child(auto_free(sheet))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
 	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "companions", miniatures, choices, SDK.new(host))
-	await process_frame
-	await process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 	var labels: Array = sheet.find_children("*", "Label", true, false)
 	var expected_name: String = host.actors[0].data.companion_sheets[0].name
 	_check(labels.any(func(label): return label.text.contains(expected_name)), "Descriptive companions are visible in the ordinary companion route.")
@@ -168,7 +143,7 @@ func _descriptive_companions(host) -> void:
 	sheet.free()
 
 
-func _herbmaster() -> void:
+func test_herbmaster() -> void:
 	var host = _host_for("occult-herbmaster", 8)
 	host.outcomes["Silver"] = [[2, 3]]
 	host.outcomes["Toughness"] = [[6, 6, 6]]
@@ -198,7 +173,7 @@ func _herbmaster() -> void:
 	creator.free()
 
 
-func _priest() -> void:
+func test_priest() -> void:
 	var host = _host_for("heretical-priest", 6)
 	host.outcomes["Silver"] = [[2, 3, 4]]
 	host.outcomes["Presence"] = [[6, 6, 6]]
@@ -223,7 +198,7 @@ func _priest() -> void:
 	creator.free()
 
 
-func _royalty() -> void:
+func test_royalty() -> void:
 	var host = _host_for("wretched-royalty", 6)
 	host.outcomes["Silver"] = [[1, 2, 3, 4]]
 	host.outcomes["First gift"] = [[6]]
@@ -248,10 +223,10 @@ func _royalty() -> void:
 	creator.free()
 
 
-func _fanged_hound() -> void:
+func test_fanged_hound() -> void:
 	stages.clear()
 	var creator = CREATOR.instantiate()
-	root.add_child(creator)
+	add_child(auto_free(creator))
 	if not _check(creator.has_method("select_class"), "The System creation action must offer Fanged Deserter selection."):
 		creator.free()
 		return
@@ -289,9 +264,9 @@ func _fanged_hound() -> void:
 	creator.free()
 
 
-func _fanged_scrolls() -> void:
+func test_fanged_scrolls() -> void:
 	var creator = CREATOR.instantiate()
-	root.add_child(creator)
+	add_child(auto_free(creator))
 	if not _check(creator.has_method("choose_scroll_disposition"), "Illiteracy requires an explicit choice for each starting scroll."):
 		creator.free()
 		return
@@ -323,7 +298,7 @@ func _fanged_scrolls() -> void:
 	creator.free()
 
 
-func _gutterborn_fingersmith() -> void:
+func test_gutterborn_fingersmith() -> void:
 	var host = BOUNDARY.new()
 	host.outcomes = {
 		"Agility": [[3, 3, 3]], "Presence": [[3, 3, 3]], "Strength": [[1, 1, 1]], "Toughness": [[3, 3, 3]], "Hit points": [[6]],
@@ -331,7 +306,7 @@ func _gutterborn_fingersmith() -> void:
 		"Equipment pack": [[1]], "Equipment first": [[1]], "Equipment second": [[6]], "Weapon": [[6]], "Armor": [[4]],
 	}
 	var creator = CREATOR.instantiate()
-	root.add_child(creator)
+	add_child(auto_free(creator))
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("gutterborn-scum-character", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
@@ -353,7 +328,7 @@ func _gutterborn_fingersmith() -> void:
 	_check(host.errors.is_empty(), "Scum dice plan matches the source: %s" % str(host.errors))
 	creator.free()
 
-func _hermit_hawk() -> void:
+func test_hermit_hawk() -> void:
 	var host = BOUNDARY.new()
 	host.outcomes = {
 		"Agility": [[3, 3, 3]], "Presence": [[6, 6, 6]], "Strength": [[1, 1, 1]], "Toughness": [[3, 3, 3]], "Hit points": [[4]],
@@ -361,7 +336,7 @@ func _hermit_hawk() -> void:
 		"Equipment pack": [[1]], "Equipment first": [[1]], "Equipment second": [[6]], "Hermit scroll family": [[4]], "Hermit scroll": [[7]], "Weapon": [[4]], "Armor": [[4]],
 	}
 	var creator = CREATOR.instantiate()
-	root.add_child(creator)
+	add_child(auto_free(creator))
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("esoteric-hermit-character", "actor_definition"), _entry("hawk-as-weapon", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
@@ -387,7 +362,7 @@ func _hermit_hawk() -> void:
 
 # Every feature exercises the System action, emitted physical dice requests,
 # and final Actor payload. Expectations are source facts, not profile introspection.
-func _feature_tables() -> void:
+func test_feature_tables() -> void:
 	var cases := {
 		"fanged-deserter": ["crumpled-monster-mask", "brown-scimitar-of-galgenbeck", "wizard-teeth", "old-sigurds-sling", "ancient-gore-hound", "shoe-of-deaths-horse"],
 		"gutterborn-scum": ["cowards-jab", "filthy-fingersmith", "abominable-gob-lobber", "escaping-fate", "excretal-stealth", "dodging-death"],
@@ -415,7 +390,7 @@ func _feature_tables() -> void:
 			_check(host.errors.is_empty(), "All features use the source dice plan: %s" % str(host.errors))
 			creator.free()
 
-func _scroll_rerolls() -> void:
+func test_scroll_rerolls() -> void:
 	var host = _host_for("fanged-deserter", 1)
 	host.outcomes["Equipment first"] = [[5], [5], [11]]
 	host.outcomes["Equipment second"] = [[2], [3]]
@@ -433,14 +408,14 @@ func _scroll_rerolls() -> void:
 	_check(host.errors.is_empty(), "Rerolled scrolls do not request Power dice: %s" % str(host.errors))
 	creator.free()
 
-func _discard_pending() -> void:
+func test_discard_pending() -> void:
 	for class_id in ["fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]:
 		for restart in [false, true]:
 			var host = _host_for(class_id, 1)
 			host.pending_roll = "Origin"
 			var creator = _creator_for(host, class_id)
 			for iteration in range(100):
-				await process_frame
+				await get_tree().process_frame
 				if host.pending_result.size() > 0:
 					break
 				if not disabled:
@@ -451,7 +426,7 @@ func _discard_pending() -> void:
 			else:
 				creator.discard()
 			host.complete_pending()
-			await process_frame
+			await get_tree().process_frame
 			_check(host.actors.is_empty(), "Late class roll cannot create any Actors after discard.")
 			_check(host.requests.size() == 6, "Late class result cannot request another die after discard.")
 			_check(stage == 1 if restart else not creator.is_active(), "Start over returns to Class; closing keeps the draft discarded.")
@@ -461,7 +436,7 @@ func _discard_pending() -> void:
 	host.outcomes["Equipment first"] = [[5]]
 	var creator = _creator_for(host, "fanged-deserter")
 	for iteration in range(160):
-		await process_frame
+		await get_tree().process_frame
 		if primary == "Choose scroll use":
 			break
 		if not disabled:
@@ -469,12 +444,12 @@ func _discard_pending() -> void:
 	_check(primary == "Choose scroll use", "Illiteracy blocks progression until a choice.")
 	creator.start_over()
 	creator.choose_scroll_disposition("first", "eat")
-	await process_frame
+	await get_tree().process_frame
 	_check(stage == 1 and host.actors.is_empty(), "A late scroll choice cannot revive a discarded draft.")
 	creator.discard()
 	creator.free()
 
-func _companions_projection() -> void:
+func test_companions_projection() -> void:
 	var host = _host_for("fanged-deserter", 5)
 	var creator = _creator_for(host, "fanged-deserter")
 	await _finish(creator)
@@ -493,19 +468,19 @@ func _companions_projection() -> void:
 	second_creator.free()
 	host.actors.append(unrelated)
 	var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
-	root.add_child(sheet)
+	add_child(auto_free(sheet))
 	var selected: Array[String] = []
 	sheet.companion_selected.connect(func(actor: SDK.Actor): selected.append(actor.id.value))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
 	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "character", miniatures, choices, SDK.new(host))
-	await process_frame
-	await process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 	var overview = sheet.find_child("CharacterOverview", true, false)
 	_check(overview.get_node("Body/Context/Identity/Content/Traits").text.contains("Ancient gore-hound"), "The completed sheet projects the actual feature.")
 	overview.get_node("Body/Context/Companions").pressed.emit()
-	await process_frame
-	await process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
 	var companion_view = sheet.find_child("Companions", true, false)
 	_check(companion_view != null, "The Character sheet opens its companions route.")
 	if companion_view != null:
@@ -517,12 +492,12 @@ func _companions_projection() -> void:
 	sheet.free()
 	creator.free()
 
-func _atomic_refusal() -> void:
+func test_atomic_refusal() -> void:
 	var host = _host_for("esoteric-hermit", 6)
 	host.reject_creation = true
 	var creator = _creator_for(host, "esoteric-hermit")
 	for iteration in range(220):
-		await process_frame
+		await get_tree().process_frame
 		if stage == 6:
 			break
 		if not disabled:
@@ -531,22 +506,22 @@ func _atomic_refusal() -> void:
 				creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
 			creator.primary()
 	creator.primary()
-	await process_frame
+	await get_tree().process_frame
 	_check(host.actors.is_empty() and creator.is_active(), "An atomic refusal leaves no Character or hawk and retains the review.")
 	var roll_count: int = host.requests.size()
 	host.reject_creation = false
 	creator.primary()
-	await process_frame
+	await get_tree().process_frame
 	_check(host.actors.size() == 2 and not creator.is_active(), "Retry confirms the complete bundle once.")
 	_check(host.requests.size() == roll_count, "Retrying a failed confirmation never rerolls mechanics.")
 	creator.free()
 
 
-func _refresh_during_creation() -> void:
+func test_refresh_during_creation() -> void:
 	var host = _host_for("gutterborn-scum", 2)
 	var creator = _creator_for(host, "gutterborn-scum")
 	creator.primary()
-	await process_frame
+	await get_tree().process_frame
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("gutterborn-scum-character", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
@@ -583,7 +558,7 @@ func _host_for(class_id: String, feature_roll: int):
 
 func _creator_for(host, class_id: String):
 	var creator = CREATOR.instantiate()
-	root.add_child(creator)
+	add_child(auto_free(creator))
 	var entries: Array[SDK.ContentEntry] = []
 	for id in ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character", "wretched-royalty-character", "heretical-priest-character", "occult-herbmaster-character", "ancient-gore-hound", "hawk-as-weapon", "dog-small-but-vicious", "monkey"]:
 		entries.append(_entry(id, "actor_definition"))
@@ -601,7 +576,7 @@ func _creator_for(host, class_id: String):
 
 func _finish(creator: Node) -> void:
 	for iteration in range(240):
-		await process_frame
+		await get_tree().process_frame
 		if not creator.is_active():
 			return
 		if disabled:
@@ -625,7 +600,14 @@ func _primary_changed(text: String, blocked: bool) -> void:
 	disabled = blocked
 
 func _check(condition: bool, message: String) -> bool:
-	if not condition:
-		failures += 1
-		push_error(message)
+	assert_bool(condition).override_failure_message(message).is_true()
 	return condition
+
+func after_test() -> void:
+	await get_tree().process_frame
+
+func before_test() -> void:
+	stage = 0
+	stages.clear()
+	primary = ""
+	disabled = false

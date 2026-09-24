@@ -5,3 +5,7 @@ build/
 rookframe/ui/
 __pycache__/
 *.pyc
+
+# GdUnit4 development dependency and generated reports
+/addons/gdUnit4/
+/reports/

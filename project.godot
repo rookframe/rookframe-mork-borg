@@ -3,6 +3,14 @@ config_version=5
 config/name="MÖRK BORG System"
 run/main_scene="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window.tscn"
 [editor_plugins]
-enabled=PackedStringArray("res://addons/rookframe_sdk/plugin.cfg")
+enabled=PackedStringArray("res://addons/rookframe_sdk/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
 [rendering]
 renderer/rendering_method="gl_compatibility"
+
+[gdunit4]
+
+report/godot/push_error=true
+report/godot/script_error=true
+settings/test/test_timeout_seconds=90
+settings/test/flaky_check_enable=false
+settings/common/update_notification_enabled=false
