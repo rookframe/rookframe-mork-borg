@@ -97,3 +97,37 @@ func SetRookMiniature(id: String, package: String, miniature: String) -> Diction
 	appearance_changes += 1
 	rooks[id].miniature = {"packageId": package, "localId": miniature}
 	return ReadRook(id)
+
+var defer_human := false
+var pending_human: Dictionary = {}
+var human_requests: Array[Dictionary] = []
+var human_results: Dictionary = {}
+var reports: Array[Dictionary] = []
+var access_entries: Array[Dictionary] = []
+var game_master := false
+func WorldContext() -> Dictionary:
+	return {"ok": true, "value": {"participant_id": "gm" if game_master else "player", "session_id": "session", "is_gm": game_master, "is_authority": game_master}}
+func ListActorAccess(_id: String) -> Dictionary:
+	return {"ok": true, "value": access_entries}
+func RequestSessionThrow(id: String, participant: String, terms: Array) -> Dictionary:
+	if not human_results.has(id):
+		human_requests.append({"id": id, "participant": participant, "terms": terms.duplicate(true)})
+		human_results[id] = {"status": "pending", "terms": [], "sequence": 0}
+	var value: Dictionary = human_results[id].duplicate(true)
+	value["request_id"] = id
+	value["participant_id"] = participant
+	value["plan"] = terms
+	if defer_human:
+		pending_human = {"ok": true, "value": value, "requestId": 44}
+		return {"ok": false, "code": "pending", "requestId": 44}
+	return {"ok": true, "value": value}
+func complete_human() -> void:
+	defer_human = false
+	TabletopCommandCompleted.emit(pending_human)
+func CancelHumanThrow(id: String) -> Dictionary:
+	if human_results.has(id) and human_results[id].status == "pending":
+		human_results[id].status = "cancelled"
+	return {"ok": true, "value": human_results.get(id, {})}
+func PublishActionLog(report: Dictionary) -> Dictionary:
+	reports.append(report.duplicate(true))
+	return {"ok": true, "value": {"sequence": reports.size() + 42}}

@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.18.1` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.19.0` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9de97beeede7f9d803e6ea0abef67730cdc84692` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -120,3 +120,24 @@ Actor-default appearance and the selected linked Rook are separate choices from
 available published Miniatures. The SDK authorizes and persists all writes. Open
 sheets refresh replicated Actor state, preserve unsaved field text and clear their
 private presentation when access disappears.
+
+## Modifier Throws
+
+Activate a Character modifier to request one physical d20 through the native Dice
+Tray. The initiating Player rolls for their owned Character. A GM opening a
+Character with one Player Owner sends the Throw to that Player; an offline Owner
+is never replaced by the GM. With multiple Player Owners, the responsible Player
+initiates from their own sheet. A Character without Player Owners is rolled by
+its GM. Viewer access cannot originate an action.
+
+The Action Log retains the unchanged raw Roll and a separate ability name,
+modifier and total. This direct interaction supplies no DR: the table compares
+the total with its agreed difficulty. It does not invent a success/failure or
+apply situational modifiers automatically.
+
+Closing the sheet, cancelling the tray or losing a required Participant ends the
+action. Temporary tray hiding preserves the live sheet. Completed Rolls and
+accepted sheet changes remain; late results never resume a cancelled action.
+There are no recovery, undo or GM takeover controls. The focused ability suite
+covers the System/public-SDK boundary; host lifetime, durable-save failure and
+replication checks live in rookframe-godot.

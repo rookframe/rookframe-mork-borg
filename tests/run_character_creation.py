@@ -7,7 +7,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--godot', default='/Applications/Godot_mono.app/Contents/MacOS/Godot')
 args = parser.parse_args()
 passed = True
-for suite in ("character_creation", "character_inventory"):
+for suite in ("character_creation", "character_inventory", "ability_throw"):
     result = subprocess.run(
         [args.godot, '--headless', '--path', str(Path(__file__).resolve().parents[1]),
          '--script', f'tests/{suite}.gd'],

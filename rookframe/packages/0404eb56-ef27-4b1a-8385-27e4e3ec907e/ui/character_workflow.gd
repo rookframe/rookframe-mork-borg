@@ -143,6 +143,7 @@ var _catalogue_back: Button
 
 
 func character_setup() -> void:
+	closed.connect(_window_closed)
 	_header_title = get_node(^"Layout/Header/Title") as Label
 	_header_subtitle = get_node(^"Layout/Header/Subtitle") as Label
 	_content = get_node(^"Layout/Body/Content") as VBoxContainer
@@ -449,3 +450,9 @@ func _cancel_sheet_workflow() -> void:
 
 func _spend_sheet_omen() -> void:
 	_character_sheet.spend_omen()
+
+func _window_closed() -> void:
+	if _character_sheet != null:
+		_character_sheet.close_action()
+	if _character_creator != null:
+		_character_creator.discard()

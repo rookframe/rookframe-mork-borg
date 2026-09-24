@@ -1,10 +1,12 @@
 extends VBoxContainer
 
+signal modifier_requested(ability: String)
 signal companions_requested
 signal edit_requested
 signal omens_requested
 signal value_save_requested(key: String, value: String)
 
+const SPINNER = preload("res://rookframe/ui/icons/spinner.svg")
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 var _data: Dictionary = {}
 var _editing := ""
@@ -18,6 +20,7 @@ func _ready() -> void:
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Modifier").pressed.connect(_roll.bind(ability))
 		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
 
 
@@ -38,9 +41,12 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 		var button = get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Modifier")
 		var modifier: int = value.get("modifier", 0)
 		button.text = "%+d" % modifier
-		button.disabled = read_only
+		var pending: String = data.get("pending_ability", "")
+		button.icon = SPINNER if pending == ability else null
+		button.text = "" if pending == ability else button.text
+		button.disabled = read_only or not pending.is_empty()
 		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").disabled = read_only
-		button.accessibility_name = "%s modifier %s" % [ability, button.text]
+		button.accessibility_name = "Waiting for %s Throw" % ability if pending == ability else "Roll %s %s" % [ability, button.text]
 	get_node(^"Body/Context/Identity/Content/Description").text = str(data.get("description", ""))
 	get_node(^"Body/Context/Identity/Content/Origin").text = str(data.get("class_title", "No Class")) + "\n" + str(data.get("origin", ""))
 	var rules := ""
@@ -119,3 +125,6 @@ func field_result(key: String, message: String, error: bool) -> void:
 	var label := get_node(path) as Label
 	label.text = message
 	label.visible = error
+
+func _roll(ability: String) -> void:
+	modifier_requested.emit(ability)

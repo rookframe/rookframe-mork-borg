@@ -8,6 +8,9 @@ signal companion_selected(actor: SDK.Actor)
 signal sheet_changed
 signal workflow_changed(route: String, title: String, can_spend: bool, busy: bool)
 signal actor_unavailable
+const ABILITY_THROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/ability_throw.gd")
+var _ability_throw: ABILITY_THROW
+var _throw_refresh_pending := false
 var _refresh_pending := false
 var _observed_selection := ""
 
@@ -30,6 +33,11 @@ const ACTIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3
 
 
 func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary], facade: SDK) -> void:
+	if _character_actor != null and _character_actor.id.value != actor.id.value:
+		close_action()
+		_ability_throw = null
+	if _ability_throw != null and not _ability_throw.pending:
+		_ability_throw = null
 	_character_actor = actor
 	_character_tab = tab
 	_character_route = route
@@ -42,6 +50,10 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 
 
 func _process(_delta: float) -> void:
+	if _throw_refresh_pending:
+		_throw_refresh_pending = false
+		if _ability_throw != null:
+			_ability_throw.refresh()
 	if not visible:
 		return
 	if _refresh_pending and not _busy:
@@ -74,6 +86,7 @@ func _render_character_sheet() -> void:
 		_show_companions()
 		return
 	var view = CHARACTER_SHEET_VIEW_SCENE.instantiate()
+	view.modifier_requested.connect(_roll_ability)
 	view.companions_requested.connect(_on_companions_requested)
 	view.mutation_requested.connect(_mutate)
 	view.navigate_requested.connect(_navigate)
@@ -89,11 +102,14 @@ func _render_character_sheet() -> void:
 			data["selected_miniature"] = {"package_id": selected.rook.miniature.package_id, "local_id": selected.rook.miniature.local_id}
 		else:
 			_selected_rook = null
+	data["pending_ability"] = _ability_throw.ability if _ability_throw != null and _ability_throw.pending else ""
 	data["read_only"] = _character_actor.access_level != "Owner"
 	data["inventory"] = ACTIONS.new(sdk, _character_actor.id).inventory(data)
 	view.configure(data, _character_tab, _character_route, _character_miniatures, _character_miniature_choices, _short_window, _item_id)
 	_character_view = view
 	_status.visible = false
+	if _ability_throw != null and not _ability_throw.pending:
+		_set_status(_ability_throw.message, _ability_throw.failed)
 	_sync_chrome()
 
 
@@ -245,6 +261,7 @@ func _perform(actions: ACTIONS, operation: String, arguments: Array) -> SDK.Acto
 
 func _world_changed() -> void:
 	_refresh_pending = true
+	_throw_refresh_pending = true
 
 func refresh_from_world() -> void:
 	if _character_actor == null or sdk == null:
@@ -277,6 +294,7 @@ func refresh_from_world() -> void:
 		_render_pending = true
 
 func cancel_workflow() -> void:
+	close_action()
 	_navigate("character", "")
 
 func spend_omen() -> void:
@@ -303,3 +321,20 @@ func _sync_chrome() -> void:
 	var count: int = data.get("omens", 0)
 	var route: String = _character_tab if _character_route == "character" else _character_route
 	workflow_changed.emit(route, title, count > 0 and _character_actor.access_level == "Owner", _busy)
+
+func _roll_ability(ability: String) -> void:
+	if _busy or sdk == null or (_ability_throw != null and _ability_throw.pending):
+		return
+	_ability_throw = ABILITY_THROW.new(sdk, _character_actor.id)
+	_ability_throw.changed.connect(_ability_changed)
+	await _ability_throw.start(ability)
+
+func _ability_changed() -> void:
+	_render_pending = true
+
+func close_action() -> void:
+	if _ability_throw != null:
+		_ability_throw.cancel()
+
+func _exit_tree() -> void:
+	close_action()

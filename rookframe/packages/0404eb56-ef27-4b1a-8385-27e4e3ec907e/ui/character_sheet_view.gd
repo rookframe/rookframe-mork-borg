@@ -15,6 +15,7 @@ const EDIT_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27
 var _item_editor: ITEM_SCRIPT
 var _character_editor: EDIT_SCRIPT
 
+signal modifier_requested(ability: String)
 signal companions_requested
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
@@ -67,6 +68,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		return
 	var overview = OVERVIEW_SCENE.instantiate()
 	_overview = overview
+	overview.modifier_requested.connect(_roll)
 	overview.companions_requested.connect(_companions)
 	overview.edit_requested.connect(_edit)
 	overview.omens_requested.connect(_omens)
@@ -115,3 +117,6 @@ func refresh_data(data: Dictionary) -> void:
 		_item_editor.refresh_data(data)
 	if _character_editor != null:
 		_character_editor.refresh_data(data)
+
+func _roll(ability: String) -> void:
+	modifier_requested.emit(ability)
