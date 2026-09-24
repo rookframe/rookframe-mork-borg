@@ -84,8 +84,11 @@ func owned(data: Dictionary, id: String) -> Dictionary:
 		var traits: Array = data.get("traits", [])
 		for raw in traits:
 			var trait_data: Dictionary = raw
-			if "feature:" + str(trait_data.get("id", "")) == id:
-				var feature := {"source_item_id": str(trait_data.id), "inventory_id": id, "name": str(trait_data.get("name", trait_data.id)), "rules": str(trait_data.get("rules", ""))}
+			var feature_id: String = trait_data.get("id", "")
+			if "feature:" + feature_id == id:
+				var name: String = trait_data.get("name", feature_id)
+				var rules: String = trait_data.get("rules", "")
+				var feature := {"source_item_id": feature_id, "inventory_id": id, "name": name, "rules": rules}
 				if trait_data.has("uses"):
 					var uses: int = trait_data.uses
 					feature["uses"] = uses
