@@ -35,7 +35,8 @@ func inventory(data: Dictionary) -> Array:
 	for raw in copies:
 		var original: Dictionary = raw
 		var entry: Dictionary = {}
-		for key: String in original:
+		for raw_key in original:
+			var key: String = raw_key
 			entry[key] = original[key]
 		items.append(entry)
 		if not entry.has("inventory_id"):
