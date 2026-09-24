@@ -26,10 +26,12 @@ func test_recovery_panel_eligibility_focus_pending_and_result() -> void:
 	var breath: Button = panel.get_node("Columns/Task/Rest/Content/Breath")
 	var sleep: Button = panel.get_node("Columns/Task/Rest/Content/Sleep")
 	sleep.button_pressed = true
+	sleep.pressed.emit()
 	assert_bool(breath.button_pressed).is_false()
 	assert_object(sleep.icon).is_not_null()
 	assert_object(breath.icon).is_null()
 	breath.button_pressed = true
+	breath.pressed.emit()
 	assert_bool(sleep.button_pressed).is_false()
 	assert_str(breath.accessibility_description).is_equal("Selected")
 	await panel.submit()

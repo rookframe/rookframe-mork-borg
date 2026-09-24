@@ -23,11 +23,11 @@ var _terminal_shown := false
 func _ready() -> void:
 	resized.connect(_layout)
 	get_node(^"Columns/Context/Content/Authorize").pressed.connect(_authorize)
-	get_node(^"Columns/Task/Rest/Content/Breath").toggled.connect(_rest_changed)
-	get_node(^"Columns/Task/Rest/Content/Sleep").toggled.connect(_rest_changed)
-	_rest_changed(true)
+	get_node(^"Columns/Task/Rest/Content/Breath").pressed.connect(_rest_changed)
+	get_node(^"Columns/Task/Rest/Content/Sleep").pressed.connect(_rest_changed)
+	_rest_changed()
 
-func _rest_changed(_pressed: bool) -> void:
+func _rest_changed() -> void:
 	var breath: Button = get_node(^"Columns/Task/Rest/Content/Breath")
 	var sleep: Button = get_node(^"Columns/Task/Rest/Content/Sleep")
 	for choice in [breath, sleep]:
