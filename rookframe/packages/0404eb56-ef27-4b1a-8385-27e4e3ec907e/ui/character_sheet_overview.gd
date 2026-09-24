@@ -17,6 +17,8 @@ var _editing := ""
 var _short_window := false
 
 func _ready() -> void:
+	for route in ["rest", "improve", "broken"]:
+		get_node("HealthActions/" + route).pressed.connect(_open_action.bind(route, ""))
 	get_node(^"Body/Context/Companions").pressed.connect(_open_companions)
 	resized.connect(_layout)
 	get_node(^"OmensAction").pressed.connect(_open_omens)
@@ -33,6 +35,8 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	_short_window = short_window
 	_data = data
 	var read_only: bool = data.get("read_only", false)
+	for button in get_node(^"HealthActions").get_children():
+		(button as Button).disabled = read_only
 	get_node(^"Body/Context/Identity/Content/Header/Edit").disabled = read_only
 	get_node(^"OmensAction").disabled = read_only
 	for resource in ["HitPoints", "Omens", "Silver"]:

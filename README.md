@@ -333,3 +333,39 @@ weapon or Item view. The [behavior ledger](docs/class-actions.md) records every
 class entry, immediate outcome, range, source choice and manual boundary.
 Daily/fight eligibility is confirmed at the table; remaining uses are editable,
 and ongoing effects and all Omen benefits stay manual.
+
+## Recovery, improvement and Broken (RFG-293)
+
+Rest, Getting better and Broken & death are Character-sheet actions. The table
+confirms rest eligibility, food/drink and infection. Recovery requests a human
+d4 (catch breath) or d6 (full sleep), caps healing at maximum HP and never
+replenishes Omens. No food/drink or infection restores no HP; daily loss remains
+manual. Negative HP means dead and rest cannot resurrect the Character.
+
+The GM authorizes one improvement from Getting better. This durable authorization
+changes no Actor Access and is consumed when an Owner begins. Human Throws resolve
+6d10 against maximum HP (equality qualifies), the conditional d6 maximum-HP increase,
+d6 debris, conditional 3d10 Silver, and one d6 per ability in order. Increasing
+maximum HP does not heal current HP. Found sacred/unclean scroll identity is chosen
+with the table; the source supplies only its family. The ordinary scroll is added
+to Inventory. Abilities stay within −3…+6, including the special low-ability rule.
+Gutterborn Scum gains a second rolled specialty on the first improvement and may
+keep or reroll either/both on later improvements. Starting-only equipment is not
+re-granted. Interrupted improvements retain accepted steps and the spent grant;
+finish unfinished steps with ordinary dice and sheet corrections.
+
+At zero HP, Broken requests d4 and the prescribed injury/recovery parameters.
+Unconsciousness, limb/eye loss, hemorrhage and death are reported. Delayed recovery
+never changes current HP or creates conditions/timers. Hemorrhage d2 uses physical
+d4 (1–2 → 1, 3–4 → 2); the report retains the source's first/last-hour DR wording.
+Negative HP reports death directly without another Broken roll. Class exceptions
+remain available from their existing class actions and table adjudication.
+
+Rules: Bare Bones OCR pp. 29, 31, 33 and 49, plus its quick-reference infection
+entry. The main Rest extraction omits daily starvation/infection damage clauses;
+they are not interpreted as absent or automated by this action. Eligibility,
+fictional time, conditions, daily loss, Omen benefits, and delayed HP application
+remain manual. The approved September 22 docked `rest` and `improve` routes guide
+composition. Existing public SDK System intents own authorization, persistence,
+complete World replication, raw Throws and Action Log commits. No new host API,
+transport, Prop, effect engine, resumption, Undo or GM takeover is introduced.

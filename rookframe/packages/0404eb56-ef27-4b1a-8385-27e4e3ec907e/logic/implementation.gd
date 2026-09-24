@@ -8,7 +8,12 @@ var _powers := POWERS.new()
 const SPECIAL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_authority.gd")
 var _special := SPECIAL.new()
 
+const HEALTH = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/health_authority.gd")
+var _health := HEALTH.new()
+
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("health."):
+		return _health.handle(context, name, payload)
 	if name.begins_with("special."):
 		return _special.handle(context, name, payload)
 	if name.begins_with("power."):

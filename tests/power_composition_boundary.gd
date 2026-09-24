@@ -14,3 +14,6 @@ func ReadPublicIdentity(id: String) -> Dictionary:
 
 func RookDistance(from: String, to: String) -> Dictionary:
 	return SystemIntentDistance("", from, to)
+
+func WorldContext() -> Dictionary:
+	return {"ok": true, "value": {"is_authority": true, "is_gm": game_master, "participant_id": participant, "session_id": session}}

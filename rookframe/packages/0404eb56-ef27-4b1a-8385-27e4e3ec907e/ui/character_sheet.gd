@@ -24,6 +24,10 @@ const POWERS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-2
 const POWERS_PANEL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.gd")
 const SPECIAL_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_panel.tscn")
 const SPECIAL_PANEL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_panel.gd")
+const HEALTH_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/health_panel.tscn")
+const HEALTH_PANEL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/health_panel.gd")
+var _health_panel: HEALTH_PANEL
+var _health_action: MELEE_ACTION
 var _special_panel: SPECIAL_PANEL
 var _special_action: MELEE_ACTION
 var _powers_panel: POWERS_PANEL
@@ -119,6 +123,12 @@ func _process(_delta: float) -> void:
 
 
 func clear_character_sheet() -> void:
+	if _health_panel != null:
+		_health_panel.close_action()
+	_health_panel = null
+	if _health_action != null:
+		_health_action.retire()
+	_health_action = null
 	if _special_panel != null:
 		_special_panel.close_action()
 	_special_panel = null
@@ -141,6 +151,18 @@ func clear_character_sheet() -> void:
 
 
 func _render_character_sheet() -> void:
+	if _character_route in ["rest", "improve", "broken"] and _character_actor != null:
+		if _health_panel == null:
+			clear_character_sheet()
+			var panel := HEALTH_SCENE.instantiate()
+			_content.add_child(panel)
+			_health_panel = panel
+			_health_panel.navigate_requested.connect(_navigate)
+			_health_panel.action_created.connect(_health_action_created)
+			_health_panel.workflow_changed.connect(_power_chrome)
+		_health_panel.configure(_character_actor, sdk, _character_route)
+		_status.visible = false
+		return
 	if _character_route == "use-item" and _character_actor != null:
 		if _special_panel == null:
 			clear_character_sheet()
@@ -215,9 +237,9 @@ func _render_character_sheet() -> void:
 func _navigate(route: String, item_id: String) -> void:
 	if _busy:
 		return
-	if (_powers_panel != null or _special_panel != null) and (route != _character_route or item_id != _item_id):
+	if (_powers_panel != null or _special_panel != null or _health_panel != null) and (route != _character_route or item_id != _item_id):
 		clear_character_sheet()
-	if _character_actor.access_level != "Owner" and route in ["attack", "cast", "use-item", "edit", "item", "custom", "catalogue", "omens"]:
+	if _character_actor.access_level != "Owner" and route in ["rest", "improve", "broken", "attack", "cast", "use-item", "edit", "item", "custom", "catalogue", "omens"]:
 		_set_status("Owner access is required to change this Character.", true)
 		return
 	if route == "attack":
@@ -417,6 +439,8 @@ func spend_omen() -> void:
 	_mutate("omen", [])
 
 func _sync_chrome() -> void:
+	if _character_route in ["rest", "improve", "broken"] and _health_panel != null:
+		return
 	if _character_route == "use-item" and _special_panel != null:
 		return
 	if _character_route in ["powers", "cast"] and _powers_panel != null:
@@ -461,6 +485,8 @@ func _ability_changed() -> void:
 	_render_pending = true
 
 func close_action() -> void:
+	if _health_panel != null:
+		_health_panel.close_action()
 	if _special_panel != null:
 		_special_panel.close_action()
 	if _powers_panel != null:
@@ -501,6 +527,9 @@ func _render_attack() -> void:
 	_sync_chrome()
 
 func roll_attack() -> void:
+	if _character_route in ["rest", "improve", "broken"] and _health_panel != null:
+		await _health_panel.submit()
+		return
 	if _character_route == "use-item" and _special_panel != null:
 		await _special_panel.submit()
 		return
@@ -633,4 +662,11 @@ func special_primary_text() -> String:
 
 func _special_action_created(action: MELEE_ACTION) -> void:
 	_special_action = action
+	add_child(action)
+
+func health_primary_text() -> String:
+	return _health_panel.primary_text() if _health_panel != null else "Roll recovery"
+
+func _health_action_created(action: MELEE_ACTION) -> void:
+	_health_action = action
 	add_child(action)

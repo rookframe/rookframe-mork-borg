@@ -1,0 +1,256 @@
+[gd_scene load_steps=5 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/health_panel.gd" id="1"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.tscn" id="2"]
+[sub_resource type="ButtonGroup" id="RestGroup"]
+resource_local_to_scene = true
+[sub_resource type="ButtonGroup" id="ScrollGroup"]
+resource_local_to_scene = true
+
+[node name="HealthPanel" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+script = ExtResource("1")
+
+[node name="Columns" type="BoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Task" type="VBoxContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Rest" type="PanelContainer" parent="Columns/Task"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+
+[node name="Content" type="VBoxContainer" parent="Columns/Task/Rest"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Columns/Task/Rest/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeSectionHeading"
+autowrap_mode = 2
+text = "RECOVERY"
+
+[node name="Breath" type="CheckBox" parent="Columns/Task/Rest/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Catch your breath · d4 HP"
+button_group = SubResource("RestGroup")
+button_pressed = true
+
+[node name="Sleep" type="CheckBox" parent="Columns/Task/Rest/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Full night’s sleep · d6 HP"
+button_group = SubResource("RestGroup")
+
+[node name="Improvement" type="VBoxContainer" parent="Columns/Task"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="MoreHP" parent="Columns/Task/Improvement" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="Debris" parent="Columns/Task/Improvement" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="Abilities" parent="Columns/Task/Improvement" instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="Broken" type="PanelContainer" parent="Columns/Task"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+
+[node name="Content" type="VBoxContainer" parent="Columns/Task/Broken"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Columns/Task/Broken/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeSectionHeading"
+autowrap_mode = 2
+text = "BROKEN · d4"
+
+[node name="Rules" type="Label" parent="Columns/Task/Broken/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+autowrap_mode = 2
+text = "1 · Unconscious\n2 · Broken limb or lost eye\n3 · Hemorrhage\n4 · Dead"
+
+[node name="Context" type="PanelContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSection"
+
+[node name="Content" type="VBoxContainer" parent="Columns/Context"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Columns/Context/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeSectionHeading"
+autowrap_mode = 2
+text = "BEFORE ROLLING"
+
+[node name="Copy" type="Label" parent="Columns/Context/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+text = ""
+
+[node name="Values" type="Label" parent="Columns/Context/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+autowrap_mode = 2
+text = ""
+
+[node name="Authorization" type="Label" parent="Columns/Context/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+text = ""
+
+[node name="Authorize" type="Button" parent="Columns/Context/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Authorize improvement"
+
+[node name="Eligible" type="CheckBox" parent="Columns/Context/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Table confirms eligibility"
+
+
+[node name="Restrictions" type="VBoxContainer" parent="Columns/Context/Content"]
+layout_mode = 2
+
+
+[node name="Food" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Had food and drink"
+button_pressed = true
+
+[node name="Infected" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Currently infected"
+
+
+[node name="Scrolls" type="VBoxContainer" parent="."]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Scrolls"]
+layout_mode = 2
+theme_type_variation = &"RookframeSectionHeading"
+autowrap_mode = 2
+text = "CHOOSE THE FOUND SCROLL"
+
+[node name="Choices" type="VBoxContainer" parent="Scrolls"]
+layout_mode = 2
+
+
+[node name="Scroll0" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll1" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll2" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll3" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll4" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll5" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll6" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll7" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll8" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Scroll9" type="CheckBox" parent="Scrolls/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+button_group = SubResource("ScrollGroup")
+
+[node name="Specialties" type="VBoxContainer" parent="."]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 8
+
+[node name="Heading" type="Label" parent="Specialties"]
+layout_mode = 2
+theme_type_variation = &"RookframeSectionHeading"
+autowrap_mode = 2
+text = "GUTTERBORN SPECIALTIES"
+
+[node name="Copy" type="Label" parent="Specialties"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+text = "Leave both unchecked to keep them."
+
+[node name="Choices" type="VBoxContainer" parent="Specialties"]
+layout_mode = 2
+
+
+[node name="Specialty0" type="CheckBox" parent="Specialties/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+
+
+[node name="Specialty1" type="CheckBox" parent="Specialties/Choices"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = ""
+
+
+[node name="Outcome" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+text = ""
