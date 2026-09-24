@@ -38,7 +38,10 @@ func test_cast_controls_and_terminal_gm_report_in_phone_body() -> void:
 	host.roll(host.last_request, [20])
 	host.WorldChanged.emit()
 	await get_tree().create_timer(0.6).timeout
-	assert_str(panel.get_node("Outcome").text).contains("Power critical: GM determines the outcome").contains("ended")
+	assert_str(panel.get_node("Result/Section/Content/Copy").text).contains("Power critical: GM determines the outcome")
+	assert_str(panel.get_node("Metrics/Uses/Content/Value").text).is_equal("20")
+	assert_str(panel.get_node("Metrics/Presence/Content/Value").text).is_equal("Critical")
+	assert_str(panel.primary_text()).is_equal("Done")
 	assert_bool(panel.get_node("Cast").visible).is_false()
 	assert_int(host.actors.hero.data.power_uses).is_equal(3)
 

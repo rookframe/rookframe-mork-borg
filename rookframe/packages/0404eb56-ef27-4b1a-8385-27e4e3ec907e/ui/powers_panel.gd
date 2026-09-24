@@ -72,18 +72,23 @@ func _render() -> void:
 	var state := _action.state if _action != null else "ready"
 	var casting := not _item.is_empty()
 	var terminal := casting and state in ["resolved", "ended"]
+	var adjudication := str(_action.snapshot.get("adjudication", "")) if _action != null and state == "resolved" else ""
 	get_node(^"Browse").visible = not casting
 	get_node(^"Scrolls").visible = not casting
 	get_node(^"Daily").visible = not casting
 	get_node(^"Daily/Roll").disabled = _actor.access_level != "Owner" or (_action != null and _action.pending)
-	get_node(^"Metrics").visible = not terminal
+	get_node(^"Metrics").visible = not terminal or not adjudication.is_empty()
+	get_node(^"Metrics/Difficulty").visible = not terminal
+	get_node(^"Result").visible = terminal
 	get_node(^"Cast").visible = casting and not terminal
 	get_node(^"Empty").visible = not casting and get_node(^"Scrolls").get_child_count() == 0
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Presence", {})
 	var presence: int = ability.get("modifier", 0)
-	get_node(^"Metrics/Uses/Content/Value").text = str(data.get("power_uses", 0))
-	get_node(^"Metrics/Presence/Content/Value").text = "%+d" % presence
+	get_node(^"Metrics/Uses/Content/Label").text = "NATURAL ROLL" if terminal else "DAILY USES"
+	get_node(^"Metrics/Presence/Content/Label").text = "RESULT" if terminal else "PRESENCE"
+	get_node(^"Metrics/Uses/Content/Value").text = str(_action.snapshot.get("natural_face", 0)) if terminal else str(data.get("power_uses", 0))
+	get_node(^"Metrics/Presence/Content/Value").text = ("Critical" if adjudication == "critical" else "Fumble") if terminal else "%+d" % presence
 	get_node(^"Metrics/Difficulty/Content/Value").text = "DR10" if str(data.get("class_id", "")) == "gutterborn-scum" else "DR12"
 	get_node(^"Cast/Columns/Power/Content/Copy").text = str(_power.get("rules", "This scroll is unavailable."))
 	var mode := str(_power.get("target_mode", ""))
@@ -93,17 +98,21 @@ func _render() -> void:
 	get_node(^"Cast/Columns/Targets/Content/Change").disabled = state == "pending"
 	get_node(^"Cast/Options").visible = state in ["ready", "error"]
 	if _action != null:
-		var text := _action.message
-		if state == "resolved":
-			text = "Power %s: GM determines the outcome. The casting workflow has ended. See the Action Log; use ordinary dice and sheet edits." % ("critical" if text.contains("Power critical:") else "fumble") if text.contains("GM determines the outcome") else "Resolved. See the Action Log for rolled quantities and manual handling."
-		_status(text, state == "error")
+		_status(_action.message, state == "error")
 	var title := str(_power.get("name", "Cast a Power")) if casting else "Powers & scrolls"
 	if terminal:
-		title = "Action ended" if state == "ended" else ("GM judgment required" if _action.message.contains("GM determines the outcome") else "Power resolved")
-	workflow_changed.emit("cast" if casting else "powers", title, casting and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and _power.get("playable", false), state == "pending")
+		title = "Action ended" if state == "ended" else ("Power " + adjudication if not adjudication.is_empty() else "Power resolved")
+		get_node(^"Outcome").visible = false
+		get_node(^"Result/Power").text = str(_power.get("name", "Power"))
+		get_node(^"Result/Section/Content/Heading").text = "The action was interrupted" if state == "ended" else ("GM determines the outcome" if not adjudication.is_empty() else "Manual outcome")
+		get_node(^"Result/Section/Content/Copy").text = _action.message
+	workflow_changed.emit("cast" if casting else "powers", title, terminal or (casting and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and _power.get("playable", false)), state == "pending")
 	_layout()
 
 func submit() -> void:
+	if _action != null and _action.state in ["resolved", "ended"]:
+		_back()
+		return
 	if _action != null and _action.state == "targets":
 		await _action.confirm_targets()
 		return
@@ -118,6 +127,8 @@ func submit() -> void:
 	await _action.start(input)
 
 func primary_text() -> String:
+	if _action != null and _action.state in ["resolved", "ended"]:
+		return "Done"
 	return "Confirm targets" if _action != null and _action.state == "targets" else "Roll casting test"
 
 func _daily() -> void:
@@ -186,4 +197,5 @@ func _status(text: String, error: bool = false) -> void:
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if error else "RookframeMeta"
 
 func _layout() -> void:
+	get_node(^"Metrics").columns = 2 if size.x < 480 or not get_node(^"Metrics/Difficulty").visible else 3
 	get_node(^"Cast/Columns").vertical = size.x < 600

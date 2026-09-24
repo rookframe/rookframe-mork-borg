@@ -8,5 +8,5 @@ func request_quit(exit_code := -1) -> bool:
 func _plugging() -> void:
 	# GdUnit4 v6.2.1: development dependency, excluded from exported Packages.
 	plug("godot-gdunit-labs/gdUnit4", {"commit": "08ffc7c65b61b1b2edd545616061a99973c13ce1", "include": ["addons/gdUnit4"]})
-	plug("rookframe/rookframe-sdk", {"tag": "v0.22.2", "include": ["addons/rookframe_sdk"]})
+	plug("rookframe/rookframe-sdk", {"tag": "v0.22.4", "include": ["addons/rookframe_sdk"]})
 	plug("rookframe/rookframe-ui-kit", {"commit": "9de97beeede7f9d803e6ea0abef67730cdc84692", "include": ["rookframe/ui"]})

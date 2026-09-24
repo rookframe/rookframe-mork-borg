@@ -271,3 +271,8 @@ Throws. Closing, loss of ownership or a required session ending terminates them;
 accepted daily-use changes and raw Rolls remain. The focused `power_casting.gd`
 and `power_composition.gd` suites cover this seam and authored UI. App acceptance
 uses the published Manifest with the existing RFG-281 `--powers-only` journey.
+
+Casting metric strips use two columns below 480px. Presence is a small label
+with the signed modifier as its value, avoiding the approved fixture’s split
+word in the phone dock. Natural critical/fumble results use a terminal report
+with the natural face, result and ordinary Character/Done navigation.

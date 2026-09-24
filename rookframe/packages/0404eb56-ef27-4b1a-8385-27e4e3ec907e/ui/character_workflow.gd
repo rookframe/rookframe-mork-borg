@@ -475,6 +475,8 @@ func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, 
 	if route == "cast" and not busy:
 		get_node(^"Layout/SheetActions/Attack").text = _character_sheet.power_primary_text()
 	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route in ["attack", "defence", "cast"] and not can_submit and not busy else "Cancel"
+	if route == "cast" and _character_sheet.power_primary_text() == "Done":
+		get_node(^"Layout/SheetActions/Back").text = "Character"
 	get_node(^"Layout/SheetActions/Spend").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Back").disabled = busy and not route in ["attack", "defence", "cast"]
 	_set_window_title(title)

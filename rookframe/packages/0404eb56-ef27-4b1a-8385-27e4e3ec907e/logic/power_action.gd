@@ -19,6 +19,8 @@ func confirm_targets() -> void:
 	_reading = false
 	if not _closed:
 		_accept(result)
+	if _retired and not _cancelling:
+		queue_free()
 
 func _process(delta: float) -> void:
 	_elapsed += delta

@@ -130,19 +130,25 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _end(context, action)
 	if result.status == "pending":
 		return _public(action)
+	var presence: int = action.presence
+	var sequence: int = action.get("sequence", 0)
+	var power: Dictionary = action.get("scroll", {})
 	if action["phase"] == "daily":
-		var count: int = int(result.terms[0].results[0]) + int(action.presence)
+		var daily_face: int = result.terms[0].results[0]
+		var count: int = daily_face + presence
 		data = data.duplicate(true)
-		data["power_uses"] = count if count > 0 else 0
-		return _complete(context, action, [SDK.ActorChange.new(source.actor.id, data)], "Daily allowance", "Morning allowance: Presence %+d + d4 %d = %d. %d usable Powers today. The table establishes the morning; no time or replenishment is automatic. Raw Roll #%d." % [presence, daily_face, count, data.power_uses, result.sequence])
+		var usable: int = count if count > 0 else 0
+		data["power_uses"] = usable
+		return _complete(context, action, [SDK.ActorChange.new(source.actor.id, data)], "Daily allowance", "Morning allowance: Presence %+d + d4 %d = %d. %d usable Powers today. The table establishes the morning; no time or replenishment is automatic. Raw Roll #%d." % [presence, daily_face, count, usable, result.sequence])
 	if action["phase"] == "casting" and (_scroll(data, action.item).is_empty() or not _restriction(data).is_empty()):
 		return _end(context, action)
 	if action["phase"] == "resistance":
 		return _sleep_result(context, action, result.terms[0].results, result.sequence)
-	if action.phase in ["parameters", "bolts"]:
+	if str(action.phase) in ["parameters", "bolts"]:
 		var values: Array[int] = []
 		for term in result.terms:
-			values.append_array(term.results)
+			for value in term.results:
+				values.append(value)
 		if action["phase"] == "parameters" and str(power.source_item_id) == "eyelid-blinds-the-mind":
 			action["count"] = values[0]
 			action["quantity_sequence"] = result.sequence
@@ -162,6 +168,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	action["sequence"] = result.sequence
 	if face in [1, 20]:
 		var kind := "critical" if face == 20 else "fumble"
+		action["natural_face"] = face
+		action["adjudication"] = kind
 		return _complete(context, action, [], "GM adjudication", "Power %s: GM determines the outcome. %s · natural %d. Raw Roll #%d. Resolve the outcome and any resource changes with ordinary dice and sheet editing." % [kind, str(power.name), face, result.sequence])
 	var modifier: int = action.modifier
 	var difficulty: int = action.difficulty
@@ -211,7 +219,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
-	return {"state": action.state, "message": action.message, "request": action.get("request", "")}
+	return {"state": action.state, "message": action.message, "request": action.get("request", ""), "natural_face": action.get("natural_face", 0), "adjudication": action.get("adjudication", "")}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}
@@ -298,7 +306,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 	var outside := ""
 	var invalid := ""
 	var actors: Array[String] = []
-	var reach: int = power.get("area_feet", power.range_feet)
+	var reach: int = power.area_feet if mode == "area" else power.range_feet
 	for id in target_ids:
 		var target_rook := context.read_rook(SDK.RookId.new(id))
 		if not target_rook.ok:
@@ -415,7 +423,7 @@ func _sleep_result(context: SDK.SystemActionContext, action: Dictionary, values:
 	var count: int = action.count
 	var casting_sequence: int = action.sequence
 	var quantity_sequence: int = action.quantity_sequence
-	var description := "Eyelid blinds the mind. %d creatures; resistance DR14. " % count
+	var description := "Eyelid blinds the mind. %d creatures fall asleep for one hour unless they succeed a DR14 test. " % count
 	var index := 0
 	var targets: Array = action.targets
 	for raw in targets:

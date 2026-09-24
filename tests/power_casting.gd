@@ -236,6 +236,19 @@ func test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance() -> v
 	assert_int(host.actors.hero.data.power_uses).is_equal(2)
 	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
 
+func test_eyelid_pc_only_outcome_reports_manual_test_and_one_hour() -> void:
+	var host := _host("eyelid-blinds-the-mind")
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("power.start", _cast_input())
+	host.roll("cast", [11])
+	await sdk.system_actions.submit("power.advance", {"id": "cast"})
+	host.roll(host.last_request, [1])
+	await sdk.system_actions.submit("power.advance", {"id": "cast"})
+	host.targets = PackedStringArray(["hero-rook"])
+	var result := await sdk.system_actions.submit("power.targets", {"id": "cast"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_str(str(host.reports[-1])).contains("one hour").contains("PC ability").contains("DR14")
+
 func test_owner_routing_malformed_inputs_and_failed_commits() -> void:
 	for field in ["source", "rook", "item", "eligible", "modifier"]:
 		var host := _host()
