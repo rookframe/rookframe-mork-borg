@@ -2,7 +2,7 @@ extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
-const ITEMS = preload(ROOT + "logic/character_actions.gd")
+const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 
 func plan(actor: SDK.Actor, faces: int, infection: bool) -> Dictionary:
 	var data: Dictionary = actor.data

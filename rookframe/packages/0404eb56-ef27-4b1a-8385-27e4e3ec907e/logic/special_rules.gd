@@ -77,7 +77,7 @@ func definition(key: String) -> Dictionary:
 	return {}
 
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
-const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_actions.gd")
+const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd")
 
 func owned(data: Dictionary, id: String) -> Dictionary:
 	if id.begins_with("feature:"):
