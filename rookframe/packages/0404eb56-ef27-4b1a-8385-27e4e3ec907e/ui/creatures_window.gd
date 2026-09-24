@@ -1,13 +1,20 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_workflow.gd"
+const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
 const CREATURE_KIND := "actor_definition"
 var _pending_route := ""
+const ATTACK_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
+var _creature_attack: Dictionary = {}
+var _creature_rook: SDK.RookId
+var _checking_range := false
+var _pending_creature_attack := ""
 
 func ready() -> void:
 	if sdk == null:
 		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
 		return
 	character_setup()
+	get_node(^"Layout/Body/Content/CreatureAttack").targets_requested.connect(_choose_creature_targets)
 	_compact = not sdk.presentation_experience().is_desktop
 	_routes_desktop.visible = not _compact
 	_routes_compact.visible = _compact
@@ -218,7 +225,7 @@ func _render_actor() -> void:
 	var armor: Dictionary = actor_data.get("armor", {})
 	var armor_name: String = armor.get("name", "No armor")
 	var armor_reduction: String = armor.get("reduction", "")
-	var attacks: Array = actor_data.get("attacks", [])
+	var attacks: Array = CREATURES.new().attack_options(actor_data)
 
 	_header_title.text = private_name.to_upper()
 	_header_subtitle.text = "Private Creature sheet · GM"
@@ -231,9 +238,7 @@ func _render_actor() -> void:
 	_morale_metric.text = morale_value
 	_protection_label.text = armor_name.to_upper()
 	_protection_metric.text = armor_reduction if not armor_reduction.is_empty() else "—"
-	_rules.text = "Quick, attacks and defence are DR14."
-	if armor_name != "No armor":
-		_rules.text = "%s · quick, attacks and defence are DR14." % armor_name
+	_rules.text = str(actor_data.get("rules", ""))
 	if actor_data.has("defence_dr"):
 		var defence_dr: int = actor_data["defence_dr"]
 		_rules.text = "Defence DR%d. %s" % [defence_dr, str(actor_data.get("rules", ""))]
@@ -288,12 +293,14 @@ func _render_equipment(attacks: Array) -> void:
 		row.theme_type_variation = "RookframeSecondaryButton"
 		var attack_name: String = attack.get("name", "Attack")
 		var attack_dice: String = attack.get("dice", "—")
-		var detail: String = "%s · Equipped" % attack_dice
+		var detail: String = "%s · %s ft" % [attack_dice, str(attack.get("range_feet", "—"))]
 		if attack.has("attack_dr"):
 			var attack_dr: int = attack["attack_dr"]
 			detail += " · Attack DR%d" % attack_dr
 		row.text = "%s\n%s" % [attack_name, detail]
 		_equipment_list.add_child(row)
+		row.disabled = _selected_actor.access_level != "Owner"
+		row.pressed.connect(_open_creature_attack.bind(str(attack.get("id", ""))))
 
 
 func _render_inventory(attacks: Array) -> void:
@@ -309,8 +316,7 @@ func _render_inventory(attacks: Array) -> void:
 		return
 	for index in range(attacks.size()):
 		var attack: Dictionary = attacks[index]
-		var target := _inventory_items if index == 0 else _inventory_carried
-		target.add_child(_inventory_row(attack, index == 0))
+		_inventory_items.add_child(_inventory_row(attack, true))
 	if _inventory_carried.get_child_count() == 0:
 		var carried_empty := Label.new()
 		carried_empty.text = "No carried items recorded."
@@ -318,30 +324,12 @@ func _render_inventory(attacks: Array) -> void:
 		_inventory_carried.add_child(carried_empty)
 
 
-func _inventory_row(attack: Dictionary, equipped: bool) -> Control:
-	var row := HBoxContainer.new()
-	row.custom_minimum_size = Vector2(0, 58)
-	row.add_theme_constant_override("separation", 8)
-	var details := VBoxContainer.new()
-	details.size_flags_horizontal = 3
-	var attack_name: String = attack.get("name", "Item")
-	var attack_dice: String = attack.get("dice", "—")
-	var item_label := Label.new()
-	item_label.text = attack_name
-	item_label.theme_type_variation = "RookframeBody"
-	var detail := Label.new()
-	detail.text = "%s · %s" % [attack_dice, "Equipped" if equipped else "Carried"]
-	detail.theme_type_variation = "RookframeMeta"
-	details.add_child(item_label)
-	details.add_child(detail)
-	row.add_child(details)
-	var action := Button.new()
-	action.custom_minimum_size = Vector2(96, 44)
-	action.focus_mode = 2
-	action.theme_type_variation = "RookframeSecondaryButton"
-	action.text = "Attack" if equipped else "Equip"
-	action.pressed.connect(_set_status.bind("Inventory action is ready for the private Creature sheet."))
-	row.add_child(action)
+func _inventory_row(attack: Dictionary, _equipped: bool) -> Control:
+	var row = ATTACK_ROW.instantiate()
+	row.configure({"name": str(attack.get("name", "Attack")), "inventory_id": str(attack.get("id", "")), "kind": "Weapon", "damage": str(attack.get("dice", "")), "range_feet": attack.get("range_feet", 0), "equipped": true}, false, _selected_actor.access_level != "Owner")
+	row.get_node(^"Actions/Edit").visible = false
+	row.get_node(^"Actions/Equip").visible = false
+	row.navigate_requested.connect(_creature_attack_requested)
 	return row
 
 
@@ -351,6 +339,10 @@ func _show_route(route: String) -> void:
 
 func _process(delta: float) -> void:
 	super._process(delta)
+	if not _pending_creature_attack.is_empty():
+		var id := _pending_creature_attack
+		_pending_creature_attack = ""
+		_present_creature_attack(id)
 	if not _pending_route.is_empty():
 		var route := _pending_route
 		_pending_route = ""
@@ -358,6 +350,8 @@ func _process(delta: float) -> void:
 
 
 func _apply_route(route: String) -> void:
+	get_node(^"Layout/Body/Content/CreatureAttack").visible = false
+	get_node(^"Layout/SheetActions").visible = false
 	if route.begins_with("create-") or route in ["character", "edit", "appearance"]:
 		_show_character_route(route)
 		return
@@ -637,3 +631,76 @@ func opened(actor_id: SDK.ActorId) -> void:
 
 func _navigate_companion(actor: SDK.Actor) -> void:
 	_select_actor(actor)
+
+func _creature_attack_requested(_next_route: String, id: String) -> void:
+	_open_creature_attack(id)
+
+func _open_creature_attack(id: String) -> void:
+	_pending_creature_attack = id
+
+func _present_creature_attack(id: String) -> void:
+	if _selected_actor == null or _selected_actor.access_level != "Owner":
+		return
+	var data: Dictionary = _selected_actor.data
+	var attacks: Array = CREATURES.new().attack_options(data)
+	_creature_attack = {}
+	for raw in attacks:
+		var attack: Dictionary = raw
+		if str(attack.get("id", "")) == id:
+			_creature_attack = attack
+	if _creature_attack.is_empty():
+		return
+	_apply_route("creature-attack")
+	_creature_rook = sdk.rooks.selected()
+	var title := str(_creature_attack.get("name", "Attack")) + " attack"
+	_header_title.text = title.to_upper()
+	_header_subtitle.visible = false
+	_set_window_title(title)
+	_routes.visible = false
+	var view = get_node(^"Layout/Body/Content/CreatureAttack")
+	view.visible = true
+	view.configure(data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "selected", str(_creature_attack.get("rules", "")))
+	view.get_node(^"Metrics/Strength").visible = false
+	view.get_node(^"Context").text = str(data.get("name", "Creature")) + " · Selected attack"
+	view.set_targets("Choose one target, then check range")
+	get_node(^"Layout/SheetActions").visible = true
+	get_node(^"Layout/SheetActions/Spend").visible = false
+	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory"
+	get_node(^"Layout/SheetActions/Back").disabled = false
+	get_node(^"Layout/SheetActions/Attack").visible = true
+	get_node(^"Layout/SheetActions/Attack").text = "Check range"
+	get_node(^"Layout/SheetActions/Attack").disabled = false
+	_body.scroll_vertical = 0
+
+func _choose_creature_targets() -> void:
+	var result := sdk.targeting.choose()
+	if not result.ok:
+		_set_status(result.message, true)
+
+func _roll_sheet_attack() -> void:
+	if _route != "creature-attack":
+		super._roll_sheet_attack()
+		return
+	if _checking_range:
+		return
+	if _creature_rook == null:
+		_set_status("Select this Creature’s source Rook before opening its attack.", true)
+		return
+	_checking_range = true
+	get_node(^"Layout/SheetActions/Attack").disabled = true
+	var result: SDK.DataResult = await sdk.system_actions.submit("attack.validate", {"source": _selected_actor.id.value, "rook": _creature_rook.value, "attack": str(_creature_attack.id)})
+	_checking_range = false
+	if _route != "creature-attack":
+		return
+	get_node(^"Layout/SheetActions/Attack").disabled = false
+	var outcome: Dictionary = result.value if result.ok else {"state": "error", "message": result.message}
+	var view = get_node(^"Layout/Body/Content/CreatureAttack")
+	view.get_node(^"Outcome").visible = true
+	view.get_node(^"Outcome").text = str(outcome.message)
+	view.get_node(^"Outcome").theme_type_variation = "RookframeError" if str(outcome.state) == "error" else "RookframeMeta"
+
+func _cancel_sheet_workflow() -> void:
+	if _route == "creature-attack":
+		_show_route("creature-inventory")
+	else:
+		super._cancel_sheet_workflow()

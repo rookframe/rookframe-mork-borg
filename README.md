@@ -141,7 +141,7 @@ There are no recovery, undo or GM takeover controls. The focused ability suite
 covers the System/public-SDK boundary; host lifetime, durable-save failure and
 replication checks live in rookframe-godot.
 
-## Melee attacks
+## Weapon attacks
 
 Select the Character’s linked Rook, open its equipped weapon in Inventory, and
 choose one Creature through tabletop targeting. Done restores the same managed
@@ -159,7 +159,7 @@ from Bare Bones pages 58–62. Ordinary melee comes from pages 28–29. The Bevy
 weapon-attack-rules and weapon-attack-executor at 61ea4098 provide reuse evidence.
 
 One tabletop unit is one metre. Authored reach is explicit: 5 ft = 1.524 m and
-10 ft = 3.048 m. The SDK measures committed logical Rook centers, without line of
+10 ft = 3.048 m and 30 ft = 9.144 m. The SDK measures committed logical Rook centers, without line of
 sight. Every out-of-range target is reported as `target {public name} not in range`;
 an invalid set stops the entire action. All Participants receive the complete
 World state, including Creature data. Privacy is only UI display: inaccessible
@@ -175,6 +175,26 @@ with only the external host boundary substituted.
 
 Melee d2 damage or protection uses a physical d4: 1–2 gives 1, 3–4 gives 2.
 The raw d4 remains in the Roll record; the result explains this conversion.
+
+
+Bow, shortbow, crossbow and sling attacks use Presence. Gutterborn Scum retains
+its printed −2 Presence DR. Bow/shortbow spend one arrow and crossbow spends one
+bolt when the accepted attack roll is interpreted, including misses and fumbles.
+The action view identifies the next available matching stack in inventory order.
+Single ammunition items use quantity; bundles use remaining uses. A cancelled
+pre-roll action spends nothing; ending after the shot preserves the accepted
+spend, raw Roll and report. Sling and unrelated use counters are not depleted.
+Custom weapons without authored attack rules retain only the supported 5/10-ft
+melee case; choose the core catalogue for a ranged attack.
+
+Creature inventory exposes every authored alternative before reach validation,
+including Goblin knife/shortbow and Grotesque claws/eye-beam. Existing saved core
+Actors receive these choices without replacing their live damage or sheet values.
+Contact, extended and projectile alternatives have separate 5/10/30-ft reaches;
+source attack DRs, automatic hits and table-managed special consequences remain
+visible on the selected action. This slice checks Creature targeting and reach;
+Player defence, companion attack resolution and class special actions are owned
+by RFG-288, RFG-291 and RFG-292.
 
 
 ## Automated tests

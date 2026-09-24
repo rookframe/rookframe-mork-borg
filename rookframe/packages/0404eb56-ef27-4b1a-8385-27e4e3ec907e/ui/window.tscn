@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creatures_window.gd" id="2_script"]
@@ -11,6 +11,8 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.tscn" id="8_creator"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.tscn" id="9_sheet"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.tscn" id="10_attack"]
 
 [sub_resource type="StyleBoxFlat" id="CharacterTabSelected"]
 content_margin_left = 12.0
@@ -704,3 +706,7 @@ size_flags_horizontal = 3
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="CreatureAttack" parent="Layout/Body/Content" instance=ExtResource("10_attack")]
+visible = false
+layout_mode = 2

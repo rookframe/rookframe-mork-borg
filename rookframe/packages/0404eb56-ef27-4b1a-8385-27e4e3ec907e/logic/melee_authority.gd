@@ -3,8 +3,10 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/imple
 ## One live System action per supplied UUID, resolved on World Authority.
 ## World data is shared in full; Actor privacy applies only to UI display.
 ## Reopening has no actions to resume; durable session Throw IDs cannot restart one.
+const AMMUNITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/ammunition.gd")
 const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_actions.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
+const TARGETING = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/attack_targeting.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Dictionary = {}
 
@@ -12,6 +14,8 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 	if typeof(payload) != TYPE_DICTIONARY:
 		return _error("The melee action is malformed.")
 	var input: Dictionary = payload
+	if name == "attack.validate":
+		return TARGETING.new().validate_creature(context, input)
 	if typeof(input.get("id", "")) != TYPE_STRING:
 		return _error("The action identity must be text.")
 	if name == "melee.start" and not _valid_options(input):
@@ -67,11 +71,19 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var quantity: int = weapon.get("quantity", 0)
 	var broken: bool = weapon.get("broken", false)
 	if weapon.is_empty() or not equipped or quantity < 1 or broken:
-		return _error("Choose an equipped, usable melee weapon in Inventory.")
+		return _error("Choose an equipped, usable weapon in Inventory.")
 	var reach: int = weapon.get("range_feet", 0)
 	var damage := _dice(str(weapon.get("damage", "")), "Damage")
-	if str(weapon.get("kind", "")) != "Weapon" or not reach in [5, 10] or damage == null:
-		return _error("This item has no supported 5 ft or 10 ft melee attack.")
+	if str(weapon.get("kind", "")) != "Weapon" or reach <= 0 or damage == null:
+		return _error("This item has no supported attack with an authored range.")
+	if not weapon.has("attack_ability") and not reach in [5, 10]:
+		return _error("This weapon needs explicit attack rules. Choose a core ranged weapon from the catalogue.")
+	var ammunition := _ammunition(items, weapon, str(input.get("ammunition", "")))
+	if not str(weapon.get("ammunition", "")).is_empty() and ammunition.is_empty():
+		return _error("Choose available %s ammunition in Inventory." % str(weapon.ammunition))
+	var ability_name := str(weapon.get("attack_ability", "Strength"))
+	if not ability_name in ["Strength", "Presence"]:
+		return _error("Choose a supported attack ability.")
 	var difficulty: int = input.get("difficulty", 0)
 	var modifier: int = input.get("modifier", 0)
 	var fumble := str(input.get("fumble", "break"))
@@ -139,15 +151,18 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		var piercing: bool = input.get("piercing", false)
 		if piercing:
 			difficulty = target_data.get("piercing_defence_dr", definition.get("piercing_defence_dr", difficulty))
+	if ability_name == "Presence" and str(data.get("class_id", "")) == "gutterborn-scum":
+		var presence_difficulty: int = difficulty
+		difficulty = presence_difficulty - 2
 	var armor: Dictionary = target_data.get("armor", {})
 	var protection_text := str(armor.get("reduction", ""))
 	if not protection_text in ["", "d2", "d4", "d6"]:
 		return _error("This Creature's protection requires a table ruling.")
 	var abilities: Dictionary = data.get("abilities", {})
-	var strength: Dictionary = abilities.get("Strength", {})
-	var strength_modifier: int = strength.get("modifier", 0)
+	var ability: Dictionary = abilities.get(ability_name, {})
+	var ability_modifier: int = ability.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "modifier": strength_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "damage": str(weapon.damage), "protection": protection_text, "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "damage": str(weapon.damage), "protection": protection_text, "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, owner, [SDK.DiceTerm.new("Attack", 20)]))
 	if not requested.ok:
 		return _error(requested.message)
@@ -183,6 +198,8 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 	if action.phase == "attack":
 		action.raw = result.terms[0].results[0]
 		action.sequence = result.sequence
+		if not _spend_ammunition(context, action, source.actor):
+			return _end(context, action)
 		if action.raw == 1:
 			return _fumble(context, action, source.actor)
 		var raw_face: int = action.raw
@@ -318,7 +335,7 @@ func _face_value(formula: String, value: int) -> int:
 	return int((value + 1) / 2) if formula.ends_with("d2") else value
 
 func _valid_options(input: Dictionary) -> bool:
-	for key in ["source", "rook", "item", "fumble"]:
+	for key in ["source", "rook", "item", "fumble", "ammunition"]:
 		if typeof(input.get(key, "")) != TYPE_STRING:
 			return false
 	for key in ["difficulty", "modifier"]:
@@ -330,20 +347,21 @@ func _valid_character(data: Dictionary) -> bool:
 	if str(data.get("schema", "")) != "mork-borg-character/v1" or typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT or typeof(data.get("abilities", {})) != TYPE_DICTIONARY:
 		return false
 	var abilities: Dictionary = data.get("abilities", {})
-	if typeof(abilities.get("Strength", {})) != TYPE_DICTIONARY:
-		return false
-	var strength: Dictionary = abilities.get("Strength", {})
-	if typeof(strength.get("modifier", 0)) != TYPE_INT:
-		return false
+	for name in ["Strength", "Presence"]:
+		if typeof(abilities.get(name, {})) != TYPE_DICTIONARY:
+			return false
+		var ability: Dictionary = abilities.get(name, {})
+		if typeof(ability.get("modifier", 0)) != TYPE_INT:
+			return false
 	var items: Array = data.get("inventory", [])
 	for raw in items:
 		if typeof(raw) != TYPE_DICTIONARY:
 			return false
 		var item: Dictionary = raw
-		for key in ["inventory_id", "source_item_id", "name", "kind", "damage"]:
+		for key in ["inventory_id", "source_item_id", "name", "kind", "damage", "attack_ability", "ammunition", "resource_field"]:
 			if typeof(item.get(key, "")) != TYPE_STRING:
 				return false
-		for key in ["quantity", "range_feet"]:
+		for key in ["quantity", "range_feet", "uses"]:
 			if typeof(item.get(key, 0)) != TYPE_INT:
 				return false
 		for key in ["equipped", "broken"]:
@@ -369,3 +387,37 @@ func _short_name(text: String, limit: int) -> String:
 			break
 		result += character
 	return result
+
+func _ammunition(items: Array, weapon: Dictionary, id: String) -> Dictionary:
+	for item in AMMUNITION.new().available(items, str(weapon.get("ammunition", ""))):
+		if str(item.get("inventory_id", "")) == id:
+			return item
+	return {}
+
+func _spend_ammunition(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor) -> bool:
+	if str(action.ammunition).is_empty() or action.resource_spent:
+		return true
+	var current: Dictionary = source.data
+	var data := current.duplicate(true)
+	var items := ITEMS.new(null, source.id).inventory(data)
+	var resource := _ammunition(items, {"ammunition": action.ammunition_kind}, action.ammunition)
+	if resource.is_empty():
+		return false
+	var field := str(resource.get("resource_field", "quantity"))
+	var remaining: int = resource.get(field, 0)
+	if field == "uses":
+		resource["uses"] = remaining - 1
+	else:
+		resource["quantity"] = remaining - 1
+	data["inventory"] = items
+	var report := SDK.ActionLogMessage.new("Ammunition used")
+	var sequence: int = action.sequence
+	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.name), str(action.ammunition_kind), sequence])]
+	report.result = "1 spent"
+	var saved := context.commit([SDK.ActorChange.new(source.id, data)], report)
+	if not saved.ok:
+		return false
+	action.resource_spent = true
+	# The same callback can resolve a fumble; keep its source snapshot current.
+	source.data = data
+	return true

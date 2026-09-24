@@ -98,7 +98,7 @@ func inventory(data: Dictionary) -> Array:
 			serial += 1
 			entry["inventory_id"] = str(serial)
 		var defaults: Dictionary = EQUIPMENT.new().item(str(entry.get("source_item_id", "")))
-		for key in ["name", "kind", "rules", "price", "source", "damage", "reduction"]:
+		for key in ["name", "kind", "rules", "price", "source", "damage", "reduction", "attack_ability", "ammunition", "resource_field"]:
 			if defaults.has(key) and not entry.has(key):
 				entry[key] = str(defaults.get(key, ""))
 		for key in ["quantity", "range_feet", "armor_tier", "uses"]:

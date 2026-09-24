@@ -69,6 +69,18 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Change"
+[node name="Ammunition" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Ammunition"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+text = "AMMUNITION"
+[node name="Resource" type="Label" parent="Ammunition"]
+layout_mode = 2
+theme_type_variation = &"RookframeError"
+text = "No ammunition available. Add it in Inventory."
+autowrap_mode = 2
 [node name="Outcome" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

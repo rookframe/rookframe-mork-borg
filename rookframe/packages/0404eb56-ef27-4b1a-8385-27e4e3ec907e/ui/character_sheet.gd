@@ -379,7 +379,9 @@ func _exit_tree() -> void:
 
 func _render_attack() -> void:
 	var data: Dictionary = _character_actor.data
+	data = data.duplicate(true)
 	var items := ACTIONS.new(sdk, _character_actor.id).inventory(data)
+	data["inventory"] = items
 	_attack_item = {}
 	for raw in items:
 		var item: Dictionary = raw

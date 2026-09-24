@@ -14,6 +14,7 @@ var actors := {
 var rooks := {"hero-rook": "hero", "enemy-rook": "enemy"}
 var targets := PackedStringArray(["enemy-rook"])
 var distance := 1.2192
+var distances: Dictionary = {}
 var requests: Dictionary = {}
 var reports: Array = []
 var request_serial := 0
@@ -59,7 +60,7 @@ func SystemIntentReadRook(_token: String, id: String) -> Dictionary:
 func SystemIntentActorAccess(_token: String, _id: String) -> Dictionary:
  return {"ok": true, "value": access_entries}
 func SystemIntentDistance(_token: String, _from: String, _to: String) -> Dictionary:
- return {"ok": true, "value": distance}
+ return {"ok": true, "value": distances.get(_to, distance)}
 func SystemIntentReadThrow(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": requests[id].result.duplicate(true)} if requests.has(id) else {"ok": false}
 func SystemIntentRequestThrow(token: String, id: String, target: String, terms: Array) -> Dictionary:
