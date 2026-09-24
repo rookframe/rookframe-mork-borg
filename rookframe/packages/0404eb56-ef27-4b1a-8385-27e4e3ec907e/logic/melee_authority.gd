@@ -78,7 +78,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			var feature: Dictionary = raw
 			if str(feature.get("id", "")) == "cowards-jab":
 				permitted = true
-		if not permitted or not input.get("eligible", false) or int(weapon.get("range_feet", 0)) != 5 or weapon.get("two_handed", false) or str(weapon.get("source_item_id", "")) == "zweihander":
+		var weapon_range: int = weapon.get("range_feet", 0)
+		if not permitted or not input.get("eligible", false) or weapon_range != 5 or weapon.get("two_handed", false) or str(weapon.get("source_item_id", "")) == "zweihander":
 			return _error("Coward's jab requires surprise and a light one-handed equipped weapon, confirmed with the table.")
 		weapon["attack_dr"] = 10
 		weapon["attack_ability"] = "Agility"
@@ -92,7 +93,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Confirm the target's size or faithless-human status with the table.")
 	if special == "sacred-shepherds-crook" and input.get("faithless_human", false):
 		weapon["damage"] = "d4"
-	if special == "eurekia" and (not input.get("eligible", false) or (not weapon.get("drawn", false) and int(weapon.get("uses", 0)) < 1)):
+	var weapon_uses: int = weapon.get("uses", 0)
+	if special == "eurekia" and (not input.get("eligible", false) or (not weapon.get("drawn", false) and weapon_uses < 1)):
 		return _error("Find Hamfund and confirm drawing Eurekia once this combat; correct the sword's remaining draws when the table agrees.")
 	var reach: int = weapon.get("range_feet", 0)
 	var damage := _dice(str(weapon.get("damage", "")), "Damage")
