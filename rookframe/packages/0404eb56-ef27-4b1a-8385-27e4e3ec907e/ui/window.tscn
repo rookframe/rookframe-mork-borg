@@ -587,57 +587,9 @@ layout_mode = 2
 label_text = "MORALE"
 placeholder = "Private morale"
 
-[node name="Inventory" type="PanelContainer" parent="Layout/Body/Content/Detail"]
-layout_mode = 2
-theme_type_variation = &"RookframeSection"
-visible = false
-
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Inventory"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Header" type="HBoxContainer" parent="Layout/Body/Content/Detail/Inventory/Content"]
-layout_mode = 2
-
-[node name="Title" type="Label" parent="Layout/Body/Content/Detail/Inventory/Content/Header"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-text = "INVENTORY"
-
-[node name="Description" type="Label" parent="Layout/Body/Content/Detail/Inventory/Content/Header"]
+[node name="Inventory" type="VBoxContainer" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeMeta"
-text = "Equipped attacks and carried equipment."
-autowrap_mode = 2
-
-[node name="AddItem" type="Button" parent="Layout/Body/Content/Detail/Inventory/Content/Header"]
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-theme_type_variation = &"RookframePrimaryButton"
-text = "Add item"
-
-[node name="BodySlot" type="VBoxContainer" parent="Layout/Body/Content/Detail/Inventory/Content"]
-layout_mode = 2
-theme_override_constants/separation = 10
-
-[node name="EquippedHeading" type="Label" parent="Layout/Body/Content/Detail/Inventory/Content/BodySlot"]
-layout_mode = 2
-theme_type_variation = &"RookframeSubtitle"
-text = "EQUIPPED"
-
-[node name="Items" type="VBoxContainer" parent="Layout/Body/Content/Detail/Inventory/Content/BodySlot"]
-layout_mode = 2
-theme_override_constants/separation = 6
-
-[node name="CarriedHeading" type="Label" parent="Layout/Body/Content/Detail/Inventory/Content/BodySlot"]
-layout_mode = 2
-theme_type_variation = &"RookframeSubtitle"
-text = "CARRIED"
-
-[node name="CarriedItems" type="VBoxContainer" parent="Layout/Body/Content/Detail/Inventory/Content/BodySlot"]
-layout_mode = 2
-theme_override_constants/separation = 6
 
 [node name="CatalogueBar" type="HBoxContainer" parent="Layout"]
 layout_mode = 2

@@ -114,7 +114,7 @@ func test_gm_cast_for_player_grants_the_casters_normal_access() -> void:
 	assert_int(host.actors.size()).is_equal(3)
 	assert_str(host.created_for).is_equal("player")
 
-func test_owned_creature_requests_the_other_characters_defence() -> void:
+func _combat_host() -> BOUNDARY:
 	var host := _host()
 	host.actors.hero.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
 	host.actors.enemy.data = {"schema": "mork-borg-character/v1", "name": "Mira", "hit_points": 8, "abilities": {"Agility": {"modifier": 1}}, "inventory": []}
@@ -122,6 +122,10 @@ func test_owned_creature_requests_the_other_characters_defence() -> void:
 	host.access_by_actor = {
 		"hero": [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "player-session"}],
 		"enemy": [{"participant_id": "defender", "display_name": "Mira", "access_level": "Owner", "is_connected": true, "session_id": "defender-session"}]}
+	return host
+
+func test_owned_creature_requests_the_other_characters_defence() -> void:
+	var host := _combat_host()
 	var sdk := SDK.new(host)
 	var result := await sdk.system_actions.submit("defence.start", {"id": "bite", "source": "hero", "rook": "hero-rook", "attack": "bite"})
 	assert_str(result.value.state).is_equal("ready")
@@ -179,3 +183,107 @@ func test_companion_rows_keep_owner_actions_at_touch_size(access: String, _test_
 	assert_float(open.size.y).is_greater_equal(44.0)
 	assert_float(place.size.y).is_greater_equal(44.0)
 	assert_float(row.size.x).is_less_equal(343.0)
+
+func test_creature_inventory_edits_preserve_profiles_and_individual_state() -> void:
+	var host := _host()
+	host.actors.hero.data = load(ROOT + "content/belze-skeleton.tres").create_data({})
+	var actions = load(ROOT + "logic/creature_actions.gd").new(SDK.new(host), SDK.ActorId.new("hero"))
+	var result: SDK.ActorResult = await actions.add_equipment("sword")
+	assert_bool(result.ok).is_true()
+	if not result.ok:
+		return
+	assert_int(result.actor.data.inventory.size()).is_equal(4)
+	var sword: Dictionary = result.actor.data.inventory[-1]
+	assert_str(sword.damage).is_equal("d6")
+	await actions.change_item(str(sword.inventory_id), "equipped", "true")
+	result = await actions.change_item(str(sword.inventory_id), "quantity", "2")
+	assert_int(result.actor.data.inventory[-1].quantity).is_equal(2)
+	var creatures = load(ROOT + "logic/creature_definition.gd").new()
+	var attacks: Array = creatures.attack_options(result.actor.data)
+	assert_int(attacks.size()).is_equal(4)
+	assert_str(attacks[-1].dice).is_equal("d6")
+	assert_bool(attacks[-1].equipped).is_true()
+	await actions.remove_item("creature:shortsword")
+	result = await actions.add_equipment("torch")
+	attacks = creatures.attack_options(result.actor.data)
+	assert_int(attacks.size()).is_equal(3)
+	assert_bool(attacks.any(func(attack): return attack.id == "shortsword")).is_false()
+	await actions.change_item("creature:knife", "equipped", "false")
+	var sdk := SDK.new(host)
+	var prepared := await sdk.system_actions.submit("attack.validate", {"source": "hero", "rook": "hero-rook", "attack": "knife"})
+	assert_str(prepared.value.message).contains("equipped")
+	assert_int(host.actors.hero.data.hit_points).is_equal(7)
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+	host.actors.hero.access_level = "Viewer"
+	result = await actions.remove_item(str(sword.inventory_id))
+	assert_bool(result.ok).is_false()
+
+func test_companion_ranged_resource_is_spent_once_after_defence_roll() -> void:
+	var host := _combat_host()
+	var sdk := SDK.new(host)
+	var actions = load(ROOT + "logic/creature_actions.gd").new(sdk, SDK.ActorId.new("hero"))
+	var added: SDK.ActorResult = await actions.add_equipment("shortbow")
+	var bow: Dictionary = added.actor.data.inventory[-1]
+	await actions.change_item(str(bow.inventory_id), "equipped", "true")
+	var input := {"id": "ranged", "source": "hero", "rook": "hero-rook", "attack": str(bow.inventory_id)}
+	var result := await sdk.system_actions.submit("defence.start", input)
+	assert_str(result.value.state).is_equal("error")
+	added = await actions.add_equipment("arrow")
+	var arrow: Dictionary = added.actor.data.inventory[-1]
+	await actions.change_item(str(arrow.inventory_id), "quantity", "2")
+	result = await sdk.system_actions.submit("defence.start", input)
+	assert_str(result.value.state).is_equal("ready")
+	host.participant = "defender"
+	host.session = "defender-session"
+	await sdk.system_actions.submit("defence.roll", {"id": "ranged"})
+	host.roll("ranged", [2])
+	await sdk.system_actions.submit("defence.advance", {"id": "ranged"})
+	assert_int(host.actors.hero.data.inventory[-1].quantity).is_equal(1)
+	var damage_request := host.last_request
+	await sdk.system_actions.submit("defence.cancel", {"id": "ranged"})
+	host.roll(damage_request, [4])
+	await sdk.system_actions.submit("defence.advance", {"id": "ranged"})
+	assert_int(host.actors.hero.data.inventory[-1].quantity).is_equal(1)
+	assert_int(host.actors.enemy.data.hit_points).is_equal(8)
+
+func test_critical_armor_damage_survives_unrelated_creature_inventory_edit() -> void:
+	var host := _host()
+	host.actors.enemy.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
+	host.actors.enemy.access_level = "Owner"
+	var sdk := SDK.new(host)
+	var actions = load(ROOT + "logic/creature_actions.gd").new(sdk, SDK.ActorId.new("enemy"))
+	await actions.add_equipment("torch")
+	await sdk.system_actions.submit("melee.start", {"id": "critical", "source": "hero", "rook": "hero-rook", "item": "1", "difficulty": 12, "modifier": 0, "fumble": "break"})
+	host.roll("critical", [20])
+	await sdk.system_actions.submit("melee.advance", {"id": "critical"})
+	host.roll(host.last_request, [1, 4])
+	await sdk.system_actions.submit("melee.advance", {"id": "critical"})
+	assert_str(host.actors.enemy.data.armor.reduction).is_empty()
+	await actions.add_equipment("torch")
+	assert_str(host.actors.enemy.data.armor.reduction).is_empty()
+	assert_int(host.actors.enemy.data.hit_points).is_equal(7)
+
+func test_equipped_creature_shield_reduces_melee_and_power_damage(operation: String, _test_parameters := [["melee"], ["power"]]) -> void:
+	var host := _host("palms-open-the-southern-gate")
+	host.actors.enemy.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
+	host.actors.enemy.access_level = "Owner"
+	var sdk := SDK.new(host)
+	var actions = load(ROOT + "logic/creature_actions.gd").new(sdk, SDK.ActorId.new("enemy"))
+	var added: SDK.ActorResult = await actions.add_equipment("shield")
+	await actions.change_item(str(added.actor.data.inventory[-1].inventory_id), "equipped", "true")
+	if operation == "melee":
+		await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "1", "difficulty": 12, "modifier": 0, "fumble": "break"})
+		host.roll("attack", [17])
+		await sdk.system_actions.submit("melee.advance", {"id": "attack"})
+		host.roll(host.last_request, [5, 4])
+		await sdk.system_actions.submit("melee.advance", {"id": "attack"})
+	else:
+		await sdk.system_actions.submit("power.start", _cast_input())
+		host.roll("cast", [11])
+		await sdk.system_actions.submit("power.advance", {"id": "cast"})
+		host.roll(host.last_request, [1])
+		await sdk.system_actions.submit("power.advance", {"id": "cast"})
+		await sdk.system_actions.submit("power.targets", {"id": "cast", "self": false})
+		host.roll(host.last_request, [5, 4])
+		await sdk.system_actions.submit("power.advance", {"id": "cast"})
+	assert_int(host.actors.enemy.data.hit_points).is_equal(5)

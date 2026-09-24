@@ -6,7 +6,7 @@ var equipped := false
 var item: Dictionary = {}
 func _ready() -> void:
 	resized.connect(_layout)
-func configure(value: Dictionary, catalogue: bool = false, read_only: bool = false) -> void:
+func configure(value: Dictionary, catalogue: bool = false, read_only: bool = false, can_cast: bool = true) -> void:
 	for path in [^"Actions/Attack", ^"Actions/Edit", ^"Actions/Equip", ^"Actions/Add"]:
 		get_node(path).disabled = read_only
 	item = value
@@ -40,7 +40,7 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Actions/Equip").text = "Unequip" if equipped else "Equip"
 	get_node(^"Actions/Attack").visible = not catalogue and equipped and str(item.get("kind", "")) == "Weapon"
 	var power := POWERS.new().definition(str(item.get("source_item_id", "")))
-	if not catalogue and not power.is_empty():
+	if not catalogue and can_cast and not power.is_empty():
 		get_node(^"Actions/Attack").visible = true
 		get_node(^"Actions/Attack").text = "Cast"
 		get_node(^"Actions/Attack").disabled = read_only or not power.playable or quantity < 1

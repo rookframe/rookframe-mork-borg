@@ -28,7 +28,8 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 			selected = attack
 	if selected.is_empty() or typeof(selected.get("range_feet", 0)) != TYPE_INT:
 		return _error("Select one attack with an authored range.")
-	if typeof(selected.get("equipped", true)) != TYPE_BOOL or not selected.get("equipped", true) or selected.get("broken", false):
+	var quantity: int = selected.get("quantity", 1)
+	if typeof(selected.get("equipped", true)) != TYPE_BOOL or not selected.get("equipped", true) or selected.get("broken", false) or quantity < 1:
 		return _error("Choose an equipped, usable Creature attack in Inventory.")
 	var reach: int = selected.get("range_feet", 0)
 	if reach <= 0:

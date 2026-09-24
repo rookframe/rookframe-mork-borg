@@ -4,7 +4,14 @@ const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 
 const CREATURE_KIND := "actor_definition"
 var _pending_route := ""
-const ATTACK_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
+const CREATURE_ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_actions.gd")
+const INVENTORY_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_inventory.tscn")
+const CATALOGUE_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/equipment_catalogue.tscn")
+const ITEM_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_item.tscn")
+const ITEM_EDITOR = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_item.gd")
+var _creature_item_view: ITEM_EDITOR
+var _creature_item_refresh_pending := false
+var _creature_item_id := ""
 const DEFENCE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_action.gd")
 var _initiated_defence: DEFENCE_ACTION
 var _responsible_owner := ""
@@ -59,7 +66,6 @@ func ready() -> void:
 		_place_button,
 		_save_button,
 		_add_item_button,
-		_inventory_add,
 		_back_button,
 		_catalogue_create,
 		_catalogue_character,
@@ -81,7 +87,6 @@ func ready() -> void:
 	_save_button.pressed.connect(_save_creature)
 	_place_button.pressed.connect(_place_rook)
 	_add_item_button.pressed.connect(_add_item)
-	_inventory_add.pressed.connect(_add_item)
 	_back_button.pressed.connect(_on_back)
 	_catalogue_back.pressed.connect(_character_back_button_pressed)
 	if sdk.world_changed.is_connected(_refresh_world) == false:
@@ -112,7 +117,6 @@ func _apply_density() -> void:
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Description").visible = false
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Description").visible = false
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
-		get_node(^"Layout/Body/Content/Detail/Inventory/Content/Header/Description").visible = false
 		_protection_label.text = "ARMOR"
 
 
@@ -150,7 +154,7 @@ func _reload_world() -> void:
 		_set_status(actors.message, true)
 		return
 	_actors = actors.items
-	if _selected_actor != null and _route in ["creature", "edit-creature", "creature-inventory", "creature-attack"]:
+	if _selected_actor != null and _route in ["creature", "edit-creature", "creature-inventory", "creature-attack", "creature-catalogue", "creature-item", "creature-custom"]:
 		var latest := sdk.actors.read(_selected_actor.id)
 		if not latest.ok or latest.actor == null:
 			_selected_actor = null
@@ -161,6 +165,8 @@ func _reload_world() -> void:
 				_render_actor()
 			elif latest.actor.access_level != "Owner":
 				_show_route("creature")
+			elif _route == "creature-item" and _creature_item_view != null:
+				_creature_item_refresh_pending = true
 	_render_live_actors()
 	_render_public_names()
 
@@ -273,7 +279,8 @@ func _render_actor() -> void:
 	_maximum_hit_points.set("value", str(maximum_hit_points))
 	_morale.set("value", str(morale_number))
 	_render_equipment(attacks)
-	_render_inventory(attacks)
+	if _route in ["creature-inventory", "creature-catalogue", "creature-item", "creature-custom"]:
+		_inventory_refresh_pending = true
 	_save_button.disabled = _selected_actor.access_level != "Owner"
 	_duplicate_button.disabled = not sdk.context().is_gm
 	_place_button.disabled = _selected_actor.access_level != "Owner"
@@ -318,59 +325,93 @@ func _render_equipment(attacks: Array) -> void:
 		_equipment_list.add_child(row)
 
 
-func _render_inventory(attacks: Array) -> void:
-	for child in _inventory_items.get_children():
+func _render_inventory() -> void:
+	_creature_item_view = null
+	for child in _inventory.get_children():
+		_inventory.remove_child(child)
 		child.queue_free()
-	for child in _inventory_carried.get_children():
-		child.queue_free()
-	if attacks.is_empty():
-		var empty := Label.new()
-		empty.text = "No private items recorded."
-		empty.theme_type_variation = "RookframeMeta"
-		_inventory_items.add_child(empty)
+	var current: Dictionary = _selected_actor.data
+	var data: Dictionary = current.duplicate(true)
+	data["inventory"] = CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
+	data["read_only"] = _selected_actor.access_level != "Owner"
+	if _route in ["creature-item", "creature-custom"]:
+		var item_view = ITEM_VIEW.instantiate()
+		_creature_item_view = item_view
+		_connect_creature_inventory(item_view)
+		if _route == "creature-custom":
+			item_view.configure({}, [])
+			return
+		var items: Array = data.inventory
+		for raw in items:
+			var item: Dictionary = raw
+			if str(item.inventory_id) == _creature_item_id:
+				item_view.configure(item, [])
+				return
+		item_view.show_missing()
 		return
-	for index in range(attacks.size()):
-		var attack: Dictionary = attacks[index]
-		var equipped: bool = attack.get("equipped", true)
-		var list := _inventory_items if equipped else _inventory_carried
-		list.add_child(_inventory_row(attack, equipped))
-	if _inventory_carried.get_child_count() == 0:
-		var carried_empty := Label.new()
-		carried_empty.text = "No carried items recorded."
-		carried_empty.theme_type_variation = "RookframeMeta"
-		_inventory_carried.add_child(carried_empty)
+	if _route == "creature-catalogue":
+		var catalogue = CATALOGUE_VIEW.instantiate()
+		_connect_creature_inventory(catalogue)
+		catalogue.configure(data, [])
+		return
+	var view = INVENTORY_VIEW.instantiate()
+	_connect_creature_inventory(view)
+	view.configure(data, [])
 
+func _connect_creature_inventory(view: Control) -> void:
+	_inventory.add_child(view)
+	view.mutation_requested.connect(_change_creature_item)
+	view.navigate_requested.connect(_navigate_creature_inventory)
 
-func _inventory_row(attack: Dictionary, equipped: bool) -> Control:
-	var row = ATTACK_ROW.instantiate()
-	row.configure({"name": str(attack.get("name", "Attack")), "inventory_id": str(attack.get("id", "")), "kind": "Weapon", "damage": str(attack.get("dice", "")), "range_feet": attack.get("range_feet", 0), "equipped": equipped, "broken": attack.get("broken", false)}, false, _selected_actor.access_level != "Owner")
-	row.get_node(^"Actions/Edit").visible = false
-	row.mutation_requested.connect(_change_creature_equipment)
-	row.navigate_requested.connect(_creature_attack_requested)
-	return row
-
-
-func _change_creature_equipment(_operation: String, arguments: Array) -> void:
+func _navigate_creature_inventory(route: String, id: String) -> void:
 	if _busy or _selected_actor == null:
 		return
-	var current := sdk.actors.read(_selected_actor.id)
-	if not current.ok or current.actor.access_level != "Owner":
-		_set_status("Owner access is required to edit this Creature.", true)
+	if route == "attack":
+		var data: Dictionary = _selected_actor.data
+		var items := CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
+		for raw in items:
+			var item: Dictionary = raw
+			if str(item.inventory_id) == id:
+				_open_creature_attack(str(item.get("source_attack_id", id)))
 		return
-	var current_data: Dictionary = current.actor.data
-	var data: Dictionary = current_data.duplicate(true)
-	var attacks := CREATURES.new().attack_options(data)
-	for raw in attacks:
-		var attack: Dictionary = raw
-		if str(attack.get("id", "")) == str(arguments[0]):
-			attack["equipped"] = str(arguments[2]) == "true"
-	data["attacks"] = attacks
-	_set_busy(true, "Saving equipment…")
-	var updated := await sdk.actors.update(current.actor.id, data)
-	_set_busy(false, "Equipment saved." if updated.ok else updated.message, not updated.ok)
-	if updated.ok:
-		_selected_actor = updated.actor
-		_inventory_refresh_pending = true
+	if route in ["catalogue", "item", "custom"] and _selected_actor.access_level != "Owner":
+		return
+	_creature_item_id = id
+	_show_route("creature-" + route)
+
+func _change_creature_item(operation: String, arguments: Array) -> void:
+	if _busy or _selected_actor == null:
+		if _creature_item_view != null and operation == "item":
+			_creature_field_result(str(arguments[1]), "Wait for the current save, then retry.", true)
+		return
+	var actions := CREATURE_ITEMS.new(sdk, _selected_actor.id)
+	_set_busy(true, "Saving Inventory…")
+	var result: SDK.ActorResult = await _perform_creature_item(actions, operation, arguments)
+	_set_busy(false, "Inventory saved." if result.ok else result.message, not result.ok)
+	if _creature_item_view != null and operation == "item":
+		_creature_field_result(str(arguments[1]), "Saved." if result.ok else result.message, not result.ok)
+	if result.ok:
+		_selected_actor = result.actor
+		if operation in ["add", "custom", "remove"]:
+			_show_route("creature-inventory")
+		elif _route != "creature-item":
+			_inventory_refresh_pending = true
+
+
+func _creature_field_result(field: String, message: String, error: bool) -> void:
+	_creature_item_view.field_result(field, message, error)
+
+
+func _perform_creature_item(actions: CREATURE_ITEMS, operation: String, arguments: Array) -> SDK.ActorResult:
+	if operation == "add":
+		return await actions.add_equipment(str(arguments[0]))
+	if operation == "custom":
+		return await actions.add_custom(arguments[0])
+	if operation == "item":
+		return await actions.change_item(str(arguments[0]), str(arguments[1]), str(arguments[2]))
+	if operation == "remove":
+		return await actions.remove_item(str(arguments[0]))
+	return SDK.ActorResult.new({"ok": false, "message": "Unknown Inventory edit."})
 
 
 func _show_route(route: String) -> void:
@@ -378,12 +419,17 @@ func _show_route(route: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if _creature_item_refresh_pending and not _busy:
+		_creature_item_refresh_pending = false
+		if _creature_item_view != null and _selected_actor != null:
+			_creature_item_view.refresh_data(_selected_actor.data)
 	if _world_refresh_pending and not _busy:
 		_world_refresh_pending = false
 		_reload_world()
-	if _inventory_refresh_pending:
+	if _inventory_refresh_pending and not _busy:
 		_inventory_refresh_pending = false
-		_render_actor()
+		if _selected_actor != null and _route in ["creature-inventory", "creature-catalogue", "creature-item", "creature-custom"]:
+			_render_inventory()
 	if _defence_update_pending:
 		_defence_update_pending = false
 		_present_initiated_defence()
@@ -413,9 +459,10 @@ func _apply_route(route: String) -> void:
 	var catalogue := route == "creatures"
 	var sheet := route == "creature"
 	var edit := route == "edit-creature"
-	var inventory := route == "creature-inventory"
+	var inventory := route in ["creature-inventory", "creature-catalogue", "creature-item", "creature-custom"]
 	_sheet_grid.vertical = _compact or edit
-	_routes.visible = not catalogue and not edit
+	var inventory_edit := route in ["creature-catalogue", "creature-item", "creature-custom"]
+	_routes.visible = not catalogue and not edit and not inventory_edit
 	_route_creatures.visible = false
 	_route_creature.visible = not catalogue
 	_route_edit.visible = false
@@ -451,7 +498,6 @@ func _apply_route(route: String) -> void:
 	_place_button.visible = sheet and _selected_actor != null and _selected_actor.access_level == "Owner"
 	_save_button.visible = edit and _selected_actor != null and _selected_actor.access_level == "Owner"
 	_add_item_button.visible = false
-	_inventory_add.visible = inventory and sdk.context().is_gm
 	_back_button.visible = edit
 	_back_button.text = "Cancel"
 	if catalogue:
@@ -635,9 +681,7 @@ func _place_rook() -> void:
 
 
 func _add_item() -> void:
-	if _selected_actor == null:
-		return
-	_set_status("Inventory is durable Actor data. Add an item through the private sheet editor.")
+	_navigate_creature_inventory("catalogue", "")
 
 
 func _on_back() -> void:
@@ -658,7 +702,6 @@ func _set_busy(value: bool, message: String, error: bool = false) -> void:
 	_save_button.disabled = value
 	_place_button.disabled = value
 	_add_item_button.disabled = value
-	_inventory_add.disabled = value
 
 
 func _set_status(message: String, error: bool = false) -> void:

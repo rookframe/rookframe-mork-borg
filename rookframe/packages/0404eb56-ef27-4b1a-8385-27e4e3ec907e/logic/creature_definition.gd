@@ -44,7 +44,7 @@ func create_data(raw_choices: Variant) -> Variant:
 		data["creation_id"] = choices["creation_id"]
 	if choices.has("creation_roll_sequence"):
 		data["creation_roll_sequence"] = choices["creation_roll_sequence"]
-	for key in ["summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
+	for key in ["creature_inventory", "inventory_serial", "summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
 		if choices.has(key):
 			data[key] = choices[key]
 	return data
@@ -52,6 +52,11 @@ func create_data(raw_choices: Variant) -> Variant:
 ## Older saved core Actors used one entry for paired attacks. Resolve those
 ## source entries into authored alternatives without mutating the live sheet.
 func attack_options(data: Dictionary) -> Array:
+	if data.get("creature_inventory", false):
+		return _inventory_attacks(data)
+	return _profile_attacks(data)
+
+func _profile_attacks(data: Dictionary) -> Array:
 	var saved: Array = data.get("attacks", [])
 	var definition_id := str(data.get("definition_id", ""))
 	var definition: Dictionary = CORE_DEFINITIONS.get(definition_id, {})
@@ -77,4 +82,33 @@ func attack_options(data: Dictionary) -> Array:
 		if not paired and previous.has("name"):
 			option["name"] = previous["name"]
 		result.append(option)
+	return result
+
+func _inventory_attacks(data: Dictionary) -> Array:
+	var result: Array = []
+	var profiles := _profile_attacks(data)
+	var items: Array = data.get("inventory", [])
+	for raw in items:
+		if typeof(raw) != TYPE_DICTIONARY:
+			return []
+		var item: Dictionary = raw
+		if str(item.get("kind", "")) != "Weapon":
+			continue
+		var attack: Dictionary = {}
+		for raw_profile in profiles:
+			var profile: Dictionary = raw_profile
+			if str(profile.get("id", "")) == str(item.get("source_attack_id", "")):
+				attack = profile.duplicate(true)
+		var inventory_id: String = item.get("inventory_id", "")
+		var source_attack: String = item.get("source_attack_id", "")
+		attack["id"] = inventory_id if source_attack.is_empty() else source_attack
+		attack["inventory_id"] = str(item.get("inventory_id", ""))
+		attack["name"] = str(item.get("name", "Attack"))
+		attack["dice"] = str(item.get("damage", ""))
+		attack["range_feet"] = item.get("range_feet", 0)
+		attack["equipped"] = item.get("equipped", false)
+		attack["broken"] = item.get("broken", false)
+		attack["quantity"] = item.get("quantity", 0)
+		attack["ammunition"] = item.get("ammunition", "")
+		result.append(attack)
 	return result

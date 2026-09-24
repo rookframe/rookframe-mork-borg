@@ -10,7 +10,8 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 	var read_only: bool = data.get("read_only", false)
 	get_node(^"Toolbar/Add").disabled = read_only
 	var inventory: Array = data.get("inventory", [])
-	get_node(^"Toolbar/Count").text = "%d items · %s silver" % [inventory.size(), str(data.get("silver", 0))]
+	var creature := str(data.get("schema", "")) == "mork-borg-adversary/v1"
+	get_node(^"Toolbar/Count").text = "Inventory · %d items" % inventory.size() if creature else "%d items · %s silver" % [inventory.size(), str(data.get("silver", 0))]
 	get_node(^"Empty").visible = inventory.is_empty()
 	for raw in inventory:
 		var item: Dictionary = raw
@@ -20,7 +21,7 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 		if get_node(target).get_child_count() > 0:
 			get_node(target).add_child(DIVIDER.instantiate())
 		get_node(target).add_child(row)
-		row.configure(item, false, read_only)
+		row.configure(item, false, read_only, not creature)
 		row.mutation_requested.connect(_mutation)
 		row.navigate_requested.connect(_navigate)
 	get_node(^"EquippedSection").visible = get_node(^"EquippedSection/Content/Items").get_child_count() > 0

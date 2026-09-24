@@ -143,9 +143,6 @@ var _route_inventory: Button
 @onready var _maximum_hit_points = get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints")
 @onready var _morale = get_node(^"Layout/Body/Content/Detail/EditFields/Morale")
 @onready var _inventory := get_node(^"Layout/Body/Content/Detail/Inventory") as Control
-@onready var _inventory_items := get_node(^"Layout/Body/Content/Detail/Inventory/Content/BodySlot/Items") as VBoxContainer
-@onready var _inventory_carried := get_node(^"Layout/Body/Content/Detail/Inventory/Content/BodySlot/CarriedItems") as VBoxContainer
-@onready var _inventory_add := get_node(^"Layout/Body/Content/Detail/Inventory/Content/Header/AddItem") as Button
 @onready var _action_bar := get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar") as Control
 @onready var _catalogue_bar := get_node(^"Layout/CatalogueBar") as Control
 @onready var _status := get_node(^"Layout/Status") as Label

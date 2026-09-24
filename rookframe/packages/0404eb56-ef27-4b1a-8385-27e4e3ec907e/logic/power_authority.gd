@@ -2,6 +2,7 @@ extends RefCounted
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
@@ -334,6 +335,7 @@ func _protection(data: Dictionary) -> Dictionary:
 		if typeof(armor.get("reduction", "")) != TYPE_STRING:
 			return {"error": "Target armor data is malformed. Correct its sheet before casting."}
 		formula = str(armor.get("reduction", ""))
+		shield = CREATURE_ITEMS.new(null, SDK.ActorId.new("")).shield_reduction(data)
 	else:
 		if typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT:
 			return {"error": "Target inventory is malformed. Correct its sheet before casting."}

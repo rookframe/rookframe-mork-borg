@@ -326,6 +326,7 @@ func _show_companions() -> void:
 	view.placement_requested.connect(_on_companion_placement_requested)
 	_content.add_child(view)
 	view.configure(companions, character_data.get("companion_sheets", []))
+	_sync_chrome()
 
 
 func _on_companion_placement_requested(actor: SDK.Actor) -> void:

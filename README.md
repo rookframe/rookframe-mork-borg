@@ -238,7 +238,7 @@ are excluded from Package exports.
 
 Owned core scrolls have Cast entries in Inventory and the Powers & scrolls view.
 All twenty definitions retain their Bare Bones pp. 34–35 rules and an explicit
-handling classification. Foul Psychopomp remains unavailable until RFG-291.
+handling classification. Foul Psychopomp materializes individual Creatures as described below.
 Catalogue text is not a claim that the summon action works.
 
 Ordinary casting requests a human Presence d20 against DR12 (the Scum’s printed
@@ -313,3 +313,10 @@ Creature attacking a Character requests the defending Character's controlling
 Participant. Creature-versus-Creature combat remains unavailable pending the
 explicit source-rule decision tracked in RFG-291; this release does not invent
 a roll convention for that case.
+
+Owner Players can add catalogue equipment or custom items, edit quantities and
+uses, equip or unequip, and remove items from each Creature's Inventory. Profile
+attacks keep their original source rules when first exposed as editable items;
+removed attacks do not return. Ranged equipment spends its ammunition once after
+the accepted defence Roll. Equipped shields reduce supported damage, and armor
+lost to a critical remains damaged through subsequent inventory edits.

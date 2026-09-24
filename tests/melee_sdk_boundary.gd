@@ -124,3 +124,12 @@ func SystemIntentCreateActors(_token: String, creator: String, entries: Array, r
  if not report.is_empty():
   reports.append(report.duplicate(true))
  return {"ok": true, "value": created}
+
+func ReadActor(id: String) -> Dictionary:
+ return {"ok": true, "value": actors[id].duplicate(true)} if actors.has(id) else {"ok": false, "message": "Unavailable"}
+
+func UpdateActor(id: String, data: Dictionary) -> Dictionary:
+ if not actors.has(id) or actors[id].access_level != "Owner" or fail_commit:
+  return {"ok": false, "message": "Update rejected"}
+ actors[id].data = data.duplicate(true)
+ return ReadActor(id)

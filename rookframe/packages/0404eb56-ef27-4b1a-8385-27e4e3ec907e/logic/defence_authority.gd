@@ -4,6 +4,8 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const TARGETING = preload(ROOT + "logic/attack_targeting.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
+const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const AMMUNITION = preload(ROOT + "logic/ammunition.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
 
@@ -71,6 +73,8 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		if not result.ok or result.status == "cancelled":
 			return _end(context, action)
 		if result.ok and result.status == "rolled":
+			if not _spend_source_resource(context, action, result.sequence):
+				return _end(context, action)
 			if action.phase == "damage":
 				return _damage_rolled(context, action, result)
 			var raw: int = result.terms[0].results[0]
@@ -150,9 +154,21 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _error("The GM must be connected to defend this Character.")
 	var source := context.read_actor(SDK.ActorId.new(input.source))
 	var attack: Dictionary = validated.attack
+	var ammunition: Dictionary = {}
+	var kind := str(attack.get("ammunition", ""))
+	if not kind.is_empty():
+		var source_data: Dictionary = source.actor.data
+		var inventory := CREATURE_ITEMS.new(null, source.actor.id).inventory(source_data)
+		var resources := AMMUNITION.new().available(inventory, kind)
+		if resources.is_empty():
+			return _error("Add available %s ammunition in this Creature’s Inventory." % kind)
+		ammunition = resources[0]
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Agility", {})
 	var action := {"id": input.id, "source": input.source, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "agility": ability.get("modifier", 0), "difficulty": attack.get("defence_dr", 12), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	action["ammunition"] = str(ammunition.get("inventory_id", ""))
+	action["ammunition_kind"] = kind
+	action["resource_spent"] = false
 	for raw_item in ITEMS.new(null, target.actor.id).inventory(data):
 		var item: Dictionary = raw_item
 		var equipped: bool = item.equipped
@@ -378,3 +394,34 @@ func _find(id: String) -> Dictionary:
 		if str(action.id) == id:
 			return action
 	return {}
+
+func _spend_source_resource(context: SDK.SystemActionContext, action: Dictionary, sequence: int) -> bool:
+	if str(action.ammunition).is_empty() or action.resource_spent:
+		return true
+	var source := context.read_actor(SDK.ActorId.new(str(action.source)))
+	if not source.ok:
+		return false
+	var current: Dictionary = source.actor.data
+	var data: Dictionary = current.duplicate(true)
+	var items := CREATURE_ITEMS.new(null, source.actor.id).inventory(data)
+	var resource: Dictionary = {}
+	for item in AMMUNITION.new().available(items, str(action.ammunition_kind)):
+		if str(item.inventory_id) == str(action.ammunition):
+			resource = item
+	if resource.is_empty():
+		return false
+	var field := str(resource.get("resource_field", "quantity"))
+	var remaining: int = resource.get(field, 0)
+	if field == "uses":
+		resource["uses"] = remaining - 1
+	else:
+		resource["quantity"] = remaining - 1
+	data["inventory"] = items
+	var report := SDK.ActionLogMessage.new("Ammunition used")
+	report.result = "1 spent"
+	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.attacker), str(action.ammunition_kind), sequence])]
+	var saved := context.commit([SDK.ActorChange.new(source.actor.id, data)], report)
+	if not saved.ok:
+		return false
+	action["resource_spent"] = true
+	return true

@@ -4,6 +4,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/imple
 ## World data is shared in full; Actor privacy applies only to UI display.
 ## Reopening has no actions to resume; durable session Throw IDs cannot restart one.
 const AMMUNITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/ammunition.gd")
+const CREATURE_ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_actions.gd")
 const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_actions.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 const TARGETING = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/attack_targeting.gd")
@@ -162,7 +163,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var ability: Dictionary = abilities.get(ability_name, {})
 	var ability_modifier: int = ability.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "damage": str(weapon.damage), "protection": protection_text, "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "damage": str(weapon.damage), "protection": protection_text, "shield": CREATURE_ITEMS.new(null, targets[0].id).shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, owner, [SDK.DiceTerm.new("Attack", 20)]))
 	if not requested.ok:
 		return _error(requested.message)
@@ -237,7 +238,8 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	if result.terms.size() > 1:
 		for value in result.terms[1].results:
 			protection += _face_value(action.protection, value)
-	var lost: int = damage - protection
+	var shield: int = action.get("shield", 0)
+	var lost: int = damage - protection - shield
 	if lost < 0:
 		lost = 0
 	var hit_points: int = data.get("hit_points", 0)
@@ -246,10 +248,7 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	if threshold > 0 and lost >= threshold and hit_points - lost > 0:
 		data["hit_points"] = 0
 	if action.raw == 20:
-		var armor: Dictionary = data.get("armor", {}).duplicate(true)
-		var reduction := str(armor.get("reduction", ""))
-		armor["reduction"] = {"d6": "d4", "d4": "d2", "d2": "", "": ""}.get(reduction, reduction)
-		data["armor"] = armor
+		CREATURE_ITEMS.new(null, target.actor.id).damage_armor(data)
 	var sequence: int = action.sequence
 	var text := "%s hits %s for %d damage after protection. Raw Rolls #%d and #%d." % [str(action.name), str(action.label), lost, sequence, result.sequence]
 	if str(action.damage).ends_with("d2") or str(action.protection).ends_with("d2"):
