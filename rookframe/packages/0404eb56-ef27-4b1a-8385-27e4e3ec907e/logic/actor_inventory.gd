@@ -29,10 +29,15 @@ const EQUIPMENT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 ## The Actor-local serial never reuses removed identities.
 func inventory(data: Dictionary) -> Array:
 	var source_items: Array = data.get("inventory", [])
-	var items: Array = source_items.duplicate(true)
-	var serial: int = _serial(data, items)
-	for raw in items:
-		var entry: Dictionary = raw
+	var copies: Array = source_items.duplicate(true)
+	var items: Array = []
+	var serial: int = _serial(data, copies)
+	for raw in copies:
+		var original: Dictionary = raw
+		var entry: Dictionary = {}
+		for key: String in original:
+			entry[key] = original[key]
+		items.append(entry)
 		if not entry.has("inventory_id"):
 			serial += 1
 			entry["inventory_id"] = str(serial)
