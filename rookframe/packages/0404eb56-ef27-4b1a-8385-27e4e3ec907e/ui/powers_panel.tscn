@@ -89,6 +89,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
 [node name="Outcome" type="Label" parent="."]
+visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
