@@ -64,9 +64,30 @@ func _run() -> void:
 	_check(host.human_requests.size() == 5, "The authored modifier directly originates its human Throw.")
 	button = sheet.find_child("Strength", true, false).get_node("Padding/Content/Row/Modifier")
 	_check(button.disabled and button.icon != null, "Pending modifier is explicit and prevents duplicate actions.")
+	host.actors[0].data["silver"] = 23
+	host.WorldChanged.emit()
+	await process_frame
+	await process_frame
+	button = sheet.find_child("Strength", true, false).get_node("Padding/Content/Row/Modifier")
+	_check(button.disabled and button.icon != null, "Actor changes retain the pending modifier state.")
 	sheet.close_action()
 	await process_frame
 	_check(host.human_results[host.human_requests[4].id].status == "cancelled", "Sheet closure ends its pending request.")
+	sheet._roll_ability("Strength")
+	await process_frame
+	host.defer_human = true
+	host.WorldChanged.emit()
+	await process_frame
+	await process_frame
+	var queued_id: String = host.human_requests[-1].id
+	host.human_results[queued_id] = {"status": "rolled", "sequence": 49, "terms": [{"name": "Strength", "faces": 20, "results": [19]}]}
+	host.WorldChanged.emit()
+	await process_frame
+	await process_frame
+	host.complete_human()
+	await process_frame
+	await process_frame
+	_check(host.reports[-1].result == "18", "A final update during an older pending reply is not lost.")
 	sheet.free()
 	host.defer_human = true
 	var delayed = ACTION.new(SDK.new(host), SDK.ActorId.new("character"))

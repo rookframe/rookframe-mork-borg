@@ -288,6 +288,7 @@ func refresh_from_world() -> void:
 		var data: Dictionary = current.duplicate(true)
 		data["inventory"] = ACTIONS.new(sdk, _character_actor.id).inventory(data)
 		data["read_only"] = _character_actor.access_level != "Owner"
+		data["pending_ability"] = _ability_throw.ability if _ability_throw != null and _ability_throw.pending else ""
 		_character_view.refresh_data(data)
 		_sync_chrome()
 	else:

@@ -2,6 +2,7 @@ extends RefCounted
 
 ## One live modifier action. No draft or reconnect state is retained by the System.
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const ENDED_MESSAGE := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 signal changed
 var pending := false
 var request_id := ""
@@ -15,6 +16,7 @@ var _modifier := 0
 var _name := ""
 var _ended := false
 var _reading := false
+var _refresh_requested := false
 var _submitted := false
 
 func _init(facade: SDK, actor: SDK.ActorId) -> void:
@@ -73,24 +75,31 @@ func start(selected_ability: String) -> void:
 			await _sdk.dice.cancel_throw(request_id)
 		return
 	await _accept(result)
+	if _refresh_requested:
+		await refresh()
 
 func refresh() -> void:
-	if not pending or _ended or _reading or _request == null:
+	if not pending or _ended or _request == null:
 		return
-	var source: SDK.ActorResult = _sdk.actors.read(_actor)
-	if not source.ok or source.actor == null or source.actor.access_level != "Owner":
-		await cancel()
+	_refresh_requested = true
+	if _reading:
 		return
-	_reading = true
-	var result: SDK.HumanThrowResult = await _sdk.dice.request_session_throw(_request)
-	_reading = false
-	if not _ended:
-		await _accept(result)
+	while _refresh_requested and pending and not _ended:
+		_refresh_requested = false
+		var source: SDK.ActorResult = _sdk.actors.read(_actor)
+		if not source.ok or source.actor == null or source.actor.access_level != "Owner":
+			await cancel()
+			return
+		_reading = true
+		var result: SDK.HumanThrowResult = await _sdk.dice.request_session_throw(_request)
+		_reading = false
+		if not _ended:
+			await _accept(result)
 
 func cancel() -> void:
 	if not pending or _ended:
 		return
-	_finish("Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing.", false)
+	_finish(ENDED_MESSAGE, false)
 	if _submitted:
 		await _sdk.dice.cancel_throw(request_id)
 	await _report_ended()
@@ -102,7 +111,7 @@ func _accept(result: SDK.HumanThrowResult) -> void:
 	if result.status == "pending":
 		return
 	if result.status == "cancelled":
-		_finish("Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing.", false)
+		_finish(ENDED_MESSAGE, false)
 		await _report_ended()
 		return
 	if result.status != "rolled" or result.terms.size() != 1 or result.terms[0].results.size() != 1:
