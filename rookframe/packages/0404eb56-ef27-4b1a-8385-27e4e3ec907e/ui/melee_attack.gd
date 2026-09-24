@@ -6,6 +6,26 @@ var _options := {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": 
 
 func configure(character: Dictionary, item: Dictionary, options: Dictionary, state: String, message: String) -> void:
 	_options = options.duplicate(true)
+	var special := str(item.get("source_item_id", ""))
+	var traits: Array = character.get("traits", [])
+	var jab := false
+	for raw in traits:
+		var trait_data: Dictionary = raw
+		if str(trait_data.get("id", "")) == "cowards-jab":
+			jab = true
+	var reach: int = item.get("range_feet", 0)
+	get_node(^"Rules/Jab").visible = jab and not item.get("natural", false) and reach == 5
+	get_node(^"Rules/Jab").button_pressed = str(options.get("mode", "")) == "jab"
+	get_node(^"Rules/Eligible").visible = jab or special in ["shoe-of-deaths-horse", "sacred-shepherds-crook", "eurekia"]
+	var eligible: bool = options.get("eligible", false)
+	get_node(^"Rules/Eligible").button_pressed = eligible
+	get_node(^"Rules/SmallMedium").visible = special == "shoe-of-deaths-horse"
+	get_node(^"Rules/Faithless").visible = special == "sacred-shepherds-crook"
+	var small_medium: bool = options.get("small_medium", false)
+	get_node(^"Rules/SmallMedium").button_pressed = small_medium
+	var faithless_human: bool = options.get("faithless_human", false)
+	get_node(^"Rules/Faithless").button_pressed = faithless_human
+	var disappointed: bool = options.get("disappointed", false)
 	get_node(^"Context").text = "%s · Equipped %s" % [str(character.get("name", "Character")), str(item.get("name", "weapon"))]
 	get_node(^"Metrics/Damage/Content/Value").text = str(item.get("damage", "—"))
 	get_node(^"Metrics/Reach/Content/Value").text = str(item.get("range_feet", 0)) + " ft"
@@ -51,7 +71,7 @@ func options() -> Dictionary:
 	var modifier: String = get_node(^"Rules/Modifier").value.strip_edges()
 	if (not difficulty.is_empty() and not difficulty.is_valid_int()) or not modifier.is_valid_int():
 		return {}
-	return {"ammunition": _ammunition, "difficulty": int(difficulty), "modifier": int(modifier), "fumble": "lose" if get_node(^"Rules/Lose").button_pressed else "break", "piercing": get_node(^"Rules/Piercing").button_pressed}
+	return {"mode": "jab" if get_node(^"Rules/Jab").button_pressed else "attack", "eligible": get_node(^"Rules/Eligible").button_pressed, "small_medium": get_node(^"Rules/SmallMedium").button_pressed, "faithless_human": get_node(^"Rules/Faithless").button_pressed, "ammunition": _ammunition, "difficulty": int(difficulty), "modifier": int(modifier), "fumble": "lose" if get_node(^"Rules/Lose").button_pressed else "break", "piercing": get_node(^"Rules/Piercing").button_pressed}
 
 func _ready() -> void:
 	get_node(^"Target/Change").pressed.connect(_choose_targets)

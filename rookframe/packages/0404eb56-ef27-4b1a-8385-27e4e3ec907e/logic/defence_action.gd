@@ -6,6 +6,7 @@ func _init(facade: SDK) -> void:
 	_active_states = ["ready", "pending", "shield"]
 
 func adopt(outcome: Dictionary) -> void:
+	_operation = str(outcome.get("operation", "defence"))
 	_id = str(outcome.id)
 	_submitted = true
 	_accept(SDK.DataResult.new({"ok": true, "value": outcome}))
@@ -25,7 +26,7 @@ func _command(operation: String, input: Dictionary) -> void:
 	_reading = true
 	message = "Saving…" if operation == "choose" else "Requesting the Throw…"
 	changed.emit()
-	var result: SDK.DataResult = await _submit("defence." + operation, input)
+	var result: SDK.DataResult = await _submit(_operation + "." + operation, input)
 	_reading = false
 	if not _closed:
 		_accept(result)

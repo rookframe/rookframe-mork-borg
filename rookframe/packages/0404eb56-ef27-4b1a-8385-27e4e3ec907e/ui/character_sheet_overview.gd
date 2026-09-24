@@ -1,5 +1,8 @@
 extends VBoxContainer
 
+signal navigate_requested(route: String, item_id: String)
+const RULES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
+const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/power_row.tscn")
 signal modifier_requested(ability: String)
 signal companions_requested
 signal edit_requested
@@ -55,9 +58,18 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	var class_rules: Array = data.get("class_rules", [])
 	for rule in class_rules:
 		rules += str(rule) + "\n"
+	var actions := get_node(^"Body/Context/Identity/Content/ClassActions")
+	for child in actions.get_children():
+		actions.remove_child(child)
+		child.queue_free()
+	if str(data.get("class_id", "")) == "fanged-deserter":
+		_action_row(actions, "Bite", "DR10 · d6 · 5 ft. Enemy free attack on 1–2 on d6.", "attack", "class:bite", read_only)
 	var traits: Array = data.get("traits", [])
 	for raw_trait in traits:
 		var trait_data: Dictionary = raw_trait
+		var key := str(trait_data.get("id", ""))
+		if not trait_data.has("item") and not RULES.new().definition(key).is_empty():
+			_action_row(actions, str(trait_data.get("name", key)), str(trait_data.get("rules", "")), "use-item", "feature:" + key, read_only)
 		rules += str(trait_data.get("name", "")) + "\n" + str(trait_data.get("rules", "")) + "\n"
 	get_node(^"Body/Context/Identity/Content/Traits").text = rules.strip_edges()
 	var companions: Array = data.get("starting_creature_grants", [])
@@ -133,3 +145,16 @@ func _roll(ability: String) -> void:
 
 func _open_powers() -> void:
 	powers_requested.emit()
+
+func _action_row(parent: Node, title: String, rules: String, route: String, id: String, read_only: bool) -> void:
+	var row := ROW.instantiate()
+	parent.add_child(row)
+	(row.get_node(^"Copy/Name") as Label).text = title
+	(row.get_node(^"Copy/Rules") as Label).text = rules
+	(row.get_node(^"Copy/Handling") as Label).visible = false
+	(row.get_node(^"Cast") as Button).text = "Attack" if route == "attack" else "Use"
+	(row.get_node(^"Cast") as Button).disabled = read_only
+	(row.get_node(^"Cast") as Button).pressed.connect(_open_action.bind(route, id))
+
+func _open_action(route: String, id: String) -> void:
+	navigate_requested.emit(route, id)

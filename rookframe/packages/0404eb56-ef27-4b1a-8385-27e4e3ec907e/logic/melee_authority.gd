@@ -67,11 +67,33 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Select this Actor’s source Rook in the current Scene.")
 	var items := _inventory(source.actor.id, data)
 	var weapon := _weapon(items, str(input.get("item", "")))
+	var bite := str(input.get("item", "")) == "class:bite" and str(data.get("class_id", "")) == "fanged-deserter"
+	if bite:
+		weapon = {"inventory_id": "class:bite", "source_item_id": "bite", "name": "Bite", "kind": "Weapon", "damage": "d6", "range_feet": 5, "attack_dr": 10, "equipped": true, "quantity": 1}
+	var jab := str(input.get("mode", "")) == "jab"
+	if jab:
+		var permitted := false
+		var traits: Array = data.get("traits", [])
+		for raw in traits:
+			var feature: Dictionary = raw
+			if str(feature.get("id", "")) == "cowards-jab":
+				permitted = true
+		if not permitted or not input.get("eligible", false) or int(weapon.get("range_feet", 0)) != 5 or weapon.get("two_handed", false) or str(weapon.get("source_item_id", "")) == "zweihander":
+			return _error("Coward's jab requires surprise and a light one-handed equipped weapon, confirmed with the table.")
+		weapon["attack_dr"] = 10
+		weapon["attack_ability"] = "Agility"
 	var equipped: bool = weapon.get("equipped", false)
 	var quantity: int = weapon.get("quantity", 0)
 	var broken: bool = weapon.get("broken", false)
 	if weapon.is_empty() or not equipped or quantity < 1 or broken:
 		return _error("Choose an equipped, usable weapon in Inventory.")
+	var special := str(weapon.get("source_item_id", ""))
+	if special in ["shoe-of-deaths-horse", "sacred-shepherds-crook"] and not input.get("eligible", false):
+		return _error("Confirm the target's size or faithless-human status with the table.")
+	if special == "sacred-shepherds-crook" and input.get("faithless_human", false):
+		weapon["damage"] = "d4"
+	if special == "eurekia" and (not input.get("eligible", false) or (not weapon.get("drawn", false) and int(weapon.get("uses", 0)) < 1)):
+		return _error("Find Hamfund and confirm drawing Eurekia once this combat; correct the sword's remaining draws when the table agrees.")
 	var reach: int = weapon.get("range_feet", 0)
 	var damage := _dice(str(weapon.get("damage", "")), "Damage")
 	if str(weapon.get("kind", "")) != "Weapon" or reach <= 0 or damage == null:
@@ -88,7 +110,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			if str(option.get("inventory_id", "creature:" + str(option.id))) == str(weapon.inventory_id):
 				profile = option
 	var ability_name := str(weapon.get("attack_ability", "Strength"))
-	if not ability_name in ["Strength", "Presence"]:
+	if not ability_name in ["Strength", "Presence", "Agility"]:
 		return _error("Choose a supported attack ability.")
 	var difficulty: int = input.get("difficulty", 0)
 	var modifier: int = input.get("modifier", 0)
@@ -158,6 +180,12 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		difficulty = CREATURES.new().target_attack_difficulty(target_data, input.get("piercing", false))
 		if creature_source:
 			difficulty += CREATURES.new().attack_test_difficulty(profile) - 12
+	if difficulty == 0:
+		return _error("Attack difficulty is unavailable.")
+	var specified_dr: int = input.get("difficulty", 0)
+	if not creature_source and specified_dr == 0:
+		var weapon_dr: int = weapon.get("attack_dr", 12)
+		difficulty += weapon_dr - 12
 	if not creature_source and ability_name == "Presence" and str(data.get("class_id", "")) == "gutterborn-scum":
 		var presence_difficulty: int = difficulty
 		difficulty = presence_difficulty - 2
@@ -169,8 +197,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var ability: Dictionary = abilities.get(ability_name, {})
 	var ability_modifier: int = 0 if creature_source else ability.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "natural": profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "protection": protection_text, "shield": CREATURE_ITEMS.new(null, targets[0].id).shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "jab": jab, "natural": bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": CREATURE_ITEMS.new(null, targets[0].id).shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var initial_terms: Array[SDK.DiceTerm] = [SDK.DiceTerm.new("Attack", 20)]
+	if bite or special == "eurekia":
+		initial_terms.append(SDK.DiceTerm.new("Free attack chance" if bite else "Eurekia consequence", 6))
 	if action.automatic_hit:
 		action.phase = "damage"
 		action.message = "This attack always hits. Waiting for damage and protection in the Dice Tray."
@@ -224,17 +254,25 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 		action.sequence = result.sequence
 		if not _spend_ammunition(context, action, source.actor):
 			return _end(context, action)
-		if action.raw == 1:
+		if str(action.special) == "bite":
+			action["free_attack"] = result.terms[1].results[0] <= 2
+		if str(action.special) == "eurekia" and not _eurekia(context, action, source.actor, result.terms[1].results[0]):
+			return _end(context, action)
+		if action.raw == 1 and action.get("vanished", false):
+			return _complete(context, action, [], "Fumble", "Eurekia vanishes; the attack misses.")
+		if action.raw == 1 and not action.jab:
 			return _fumble(context, action, source.actor)
 		var raw_face: int = action.raw
 		var modifier: int = action.modifier
 		var difficulty: int = action.difficulty
 		var sequence: int = action.sequence
 		if raw_face != 20 and raw_face + modifier < difficulty:
-			return _complete(context, action, [], "Miss", "%s misses %s. d20 %d %+d. Raw Roll #%d." % [str(action.name), str(action.label), raw_face, modifier, sequence])
+			return _complete(context, action, [], "Miss", "%s misses %s. d20 %d %+d. Raw Roll #%d." % [str(action.name), str(action.label), raw_face, modifier, sequence] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
 		var terms: Array[SDK.DiceTerm] = [_dice(action.damage, "Damage")]
 		if not str(action.protection).is_empty():
 			terms.append(_dice(action.protection, "Protection"))
+		if str(action.special) in ["brown-scimitar-of-galgenbeck", "shoe-of-deaths-horse"]:
+			terms.append(SDK.DiceTerm.new("Special consequence", 6))
 		action.phase = "damage"
 		action.request = context.new_request_id()
 		var damage_request := context.request_throw(SDK.HumanThrowRequest.new(action.request, action.owner, terms))
@@ -259,10 +297,14 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	var damage := 0
 	for value in result.terms[0].results:
 		damage += _face_value(action.damage, value)
-	if action.raw == 20:
+	if str(action.damage).contains("+"):
+		damage += int(str(action.damage).split("+")[1])
+	if action.jab:
+		damage += 3
+	if action.raw == 20 and not action.jab:
 		damage *= 2
 	var protection := 0
-	if result.terms.size() > 1:
+	if not str(action.protection).is_empty():
 		for value in result.terms[1].results:
 			protection += _face_value(action.protection, value)
 	var shield: int = action.get("shield", 0)
@@ -274,22 +316,39 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	var threshold: int = action.get("destroy_at_damage", 0)
 	if threshold > 0 and lost >= threshold and hit_points - lost > 0:
 		data["hit_points"] = 0
-	if action.raw == 20:
+	var poisoned := str(action.get("special", "")) == "snake-skin-gift" and result.terms[0].results[0] == 1
+	var secondary := 0
+	if str(action.special) in ["brown-scimitar-of-galgenbeck", "shoe-of-deaths-horse"]:
+		secondary = result.terms[-1].results[0]
+	var skull: bool = str(action.special) == "shoe-of-deaths-horse" and action.small_medium and secondary == 1
+	if poisoned or skull:
+		data["hit_points"] = 0
+	if action.raw == 20 and not action.jab:
 		CREATURE_ITEMS.new(null, target.actor.id).damage_armor(data)
 	var sequence: int = action.sequence
 	var text := "%s hits %s for %d damage after protection. Raw Rolls #%d and #%d." % [str(action.name), str(action.label), lost, sequence, result.sequence]
+	if action.get("free_attack", false):
+		text += " The enemy gains a free attack; resolve it from its sheet."
+	if str(action.special) == "sacred-shepherds-crook" and action.faithless_human:
+		text += " Against a faithless human, use ordinary staff d4 damage."
+	if skull:
+		text += " The shoe smashes the skull, instantly killing the small-to-medium creature."
+	if str(action.special) == "brown-scimitar-of-galgenbeck" and lost > 0 and secondary == 1:
+		text += " Sepsis: the wounded enemy dies in 10 minutes. Resolve this delayed consequence manually."
+	if poisoned:
+		text += " The snake-skin gift: damage die 1; the target dies immediately from poison."
 	if action.automatic_hit:
 		text = "%s hits %s for %d damage after protection. This attack always hits. Raw Roll #%d." % [str(action.name), str(action.label), lost, result.sequence]
 	if str(action.damage).ends_with("d2") or str(action.protection).ends_with("d2"):
 		text += " d2 uses each physical d4 halved, rounded up."
-	if action.raw == 20:
+	if action.raw == 20 and not action.jab:
 		text += " Critical: double damage and protection reduced one tier."
 	return _complete(context, action, [SDK.ActorChange.new(target.actor.id, data)], str(lost) + " damage", text)
 
 func _fumble(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor) -> Dictionary:
 	if action.natural:
 		var roll_sequence: int = action.sequence
-		return _complete(context, action, [], "Fumble", "%s: natural-weapon fumble. The GM determines the consequence. Natural 1; Raw Roll #%d." % [str(action.name), roll_sequence])
+		return _complete(context, action, [], "Fumble", "%s: natural-weapon fumble. The GM determines the consequence. Natural 1; Raw Roll #%d." % [str(action.name), roll_sequence] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
 	var data: Dictionary = source.data
 	data = data.duplicate(true)
 	var items := _inventory(source.id, data)
@@ -355,7 +414,8 @@ func _weapon(items: Array, id: String) -> Dictionary:
 	return {}
 
 func _dice(formula: String, name: String) -> SDK.DiceTerm:
-	var parts := formula.to_lower().split("d")
+	var base := formula.to_lower().split("+")[0]
+	var parts := base.split("d")
 	if parts.size() != 2 or not parts[1].is_valid_int():
 		return null
 	var count := 1 if parts[0].is_empty() else int(parts[0])
@@ -374,7 +434,10 @@ func _valid_options(input: Dictionary) -> bool:
 	for key in ["difficulty", "modifier"]:
 		if typeof(input.get(key, 0)) != TYPE_INT:
 			return false
-	return typeof(input.get("piercing", false)) == TYPE_BOOL
+	for key in ["piercing", "eligible", "small_medium", "faithless_human"]:
+		if typeof(input.get(key, false)) != TYPE_BOOL:
+			return false
+	return true
 
 func _valid_character(data: Dictionary) -> bool:
 	if str(data.get("schema", "")) != "mork-borg-character/v1" or typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT or typeof(data.get("abilities", {})) != TYPE_DICTIONARY:
@@ -464,3 +527,35 @@ func _inventory(id: SDK.ActorId, data: Dictionary) -> Array:
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
 		return CREATURE_ITEMS.new(null, id).inventory(data)
 	return ITEMS.new(null, id).inventory(data)
+
+func _eurekia(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor, face: int) -> bool:
+	var current: Dictionary = source.data
+	var data := current.duplicate(true)
+	var items := _inventory(source.id, data)
+	var item := _weapon(items, str(action.item))
+	if item.is_empty():
+		return false
+	if not item.get("drawn", false):
+		var uses: int = item.get("uses", 0)
+		if uses < 1:
+			return false
+		item["uses"] = uses - 1
+		item["drawn"] = true
+	var text := "Eurekia drawn for this combat. Reset its remaining draw manually for a later combat."
+	if face == 1:
+		action["vanished"] = true
+		item["quantity"] = 0
+		item["equipped"] = false
+		var companions: Array = data.get("companion_sheets", [])
+		for raw in companions:
+			var companion: Dictionary = raw
+			if str(companion.get("id", "")) == "hamfund-the-squire":
+				companion["slain"] = true
+		text = "Eurekia consequence 1: Hamfund is slain and Eurekia vanishes forever."
+	data["inventory"] = items
+	var report := SDK.ActionLogMessage.new("Eurekia")
+	report.text = [SDK.ActionLogText.new(text)]
+	if not context.commit([SDK.ActorChange.new(source.id, data)], report).ok:
+		return false
+	source.data = data
+	return true

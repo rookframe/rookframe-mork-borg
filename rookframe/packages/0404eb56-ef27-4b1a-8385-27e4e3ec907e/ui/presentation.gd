@@ -39,7 +39,7 @@ func _check_defences() -> void:
 	for raw in inbox:
 		var outcome: Dictionary = raw
 		var id := str(outcome.id)
-		if not _seen_defences.has(id) and outcome.state == "ready":
+		if not _seen_defences.has(id) and str(outcome.state) in ["ready", "shield"]:
 			_seen_defences[id] = true
 			if str(outcome.initiator) == sdk.context().participant_id:
 				continue

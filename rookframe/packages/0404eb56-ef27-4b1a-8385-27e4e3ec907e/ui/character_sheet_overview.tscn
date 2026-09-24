@@ -565,3 +565,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Powers & scrolls"
+
+[node name="ClassActions" type="VBoxContainer" parent="Body/Context/Identity/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8

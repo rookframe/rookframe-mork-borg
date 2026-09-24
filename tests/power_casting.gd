@@ -562,3 +562,14 @@ func test_all_twenty_core_scrolls_have_an_explicit_playable_boundary() -> void:
 	commands.roll("cast", [11])
 	await SDK.new(commands).system_actions.submit("power.advance", {"id": "cast"})
 	assert_str(str(commands.reports[-1])).contains("single command")
+
+func test_invisible_college_scroll_is_consumed_after_successful_cast() -> void:
+	var host := _host("enochian-syntax")
+	host.actors.hero.data.inventory[-1]["single_use"] = true
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("power.start", _cast_input())
+	host.roll("cast", [11])
+	var result := await sdk.system_actions.submit("power.advance", {"id": "cast"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.actors.hero.data.inventory[-1].quantity).is_equal(0)
+	assert_int(host.actors.hero.data.power_uses).is_equal(2)

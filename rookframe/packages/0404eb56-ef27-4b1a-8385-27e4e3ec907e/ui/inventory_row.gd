@@ -2,6 +2,7 @@ extends HBoxContainer
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 const POWERS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/powers.gd")
+const SPECIAL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 var equipped := false
 var item: Dictionary = {}
 func _ready() -> void:
@@ -36,7 +37,7 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Copy/Details").text = detail_text
 	get_node(^"Actions/Add").visible = catalogue
 	get_node(^"Actions/Edit").visible = not catalogue
-	get_node(^"Actions/Equip").visible = not catalogue and str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"]
+	get_node(^"Actions/Equip").visible = not catalogue and (str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre")
 	get_node(^"Actions/Equip").text = "Unequip" if equipped else "Equip"
 	get_node(^"Actions/Attack").visible = not catalogue and equipped and str(item.get("kind", "")) == "Weapon"
 	var power := POWERS.new().definition(str(item.get("source_item_id", "")))
@@ -45,6 +46,10 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 		get_node(^"Actions/Attack").text = "Cast"
 		get_node(^"Actions/Attack").disabled = read_only or not power.playable or quantity < 1
 		get_node(^"Copy/Details").text += " · " + (str(power.handling) if power.playable else "Not playable yet")
+	if not catalogue and can_cast and str(item.get("kind", "")) != "Weapon" and not SPECIAL.new().definition(str(item.get("source_item_id", ""))).is_empty():
+		get_node(^"Actions/Attack").visible = true
+		get_node(^"Actions/Attack").text = "Use"
+		get_node(^"Actions/Attack").disabled = read_only or quantity < 1 or broken
 	get_node(^"Actions/Attack").pressed.connect(_attack)
 	get_node(^"Actions/Edit").pressed.connect(_edit)
 	get_node(^"Actions/Equip").pressed.connect(_equip)
@@ -52,6 +57,9 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	_layout()
 
 func _attack() -> void:
+	if str(item.get("kind", "")) != "Weapon" and not SPECIAL.new().definition(str(item.get("source_item_id", ""))).is_empty():
+		navigate_requested.emit("use-item", str(item.get("inventory_id", "")))
+		return
 	navigate_requested.emit("cast" if not POWERS.new().definition(str(item.get("source_item_id", ""))).is_empty() else "attack", str(item.get("inventory_id", "")))
 
 func _edit() -> void:

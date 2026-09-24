@@ -28,6 +28,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframePrimaryButton"
 text = "Add custom item"
+[node name="Use" type="Button" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframePrimaryButton"
+text = "Use item"
 [node name="Remove" type="Button" parent="."]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)

@@ -22,6 +22,10 @@ const SHIELD_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-2
 const SHIELD_DIALOG = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.gd")
 const POWERS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.tscn")
 const POWERS_PANEL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.gd")
+const SPECIAL_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_panel.tscn")
+const SPECIAL_PANEL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_panel.gd")
+var _special_panel: SPECIAL_PANEL
+var _special_action: MELEE_ACTION
 var _powers_panel: POWERS_PANEL
 var _powers_action: MELEE_ACTION
 var _defence_update_pending := false
@@ -115,6 +119,12 @@ func _process(_delta: float) -> void:
 
 
 func clear_character_sheet() -> void:
+	if _special_panel != null:
+		_special_panel.close_action()
+	_special_panel = null
+	if _special_action != null:
+		_special_action.retire()
+	_special_action = null
 	if _powers_panel != null:
 		_powers_panel.close_action()
 	_powers_panel = null
@@ -131,6 +141,18 @@ func clear_character_sheet() -> void:
 
 
 func _render_character_sheet() -> void:
+	if _character_route == "use-item" and _character_actor != null:
+		if _special_panel == null:
+			clear_character_sheet()
+			var panel := SPECIAL_SCENE.instantiate()
+			_content.add_child(panel)
+			_special_panel = panel
+			_special_panel.navigate_requested.connect(_navigate)
+			_special_panel.action_created.connect(_special_action_created)
+			_special_panel.workflow_changed.connect(_power_chrome)
+		_special_panel.configure(_character_actor, sdk, _item_id)
+		_status.visible = false
+		return
 	if _character_route in ["powers", "cast"] and _character_actor != null:
 		if _powers_panel == null:
 			clear_character_sheet()
@@ -193,9 +215,9 @@ func _render_character_sheet() -> void:
 func _navigate(route: String, item_id: String) -> void:
 	if _busy:
 		return
-	if _powers_panel != null and (route != _character_route or item_id != _item_id):
+	if (_powers_panel != null or _special_panel != null) and (route != _character_route or item_id != _item_id):
 		clear_character_sheet()
-	if _character_actor.access_level != "Owner" and route in ["attack", "cast", "edit", "item", "custom", "catalogue", "omens"]:
+	if _character_actor.access_level != "Owner" and route in ["attack", "cast", "use-item", "edit", "item", "custom", "catalogue", "omens"]:
 		_set_status("Owner access is required to change this Character.", true)
 		return
 	if route == "attack":
@@ -395,6 +417,8 @@ func spend_omen() -> void:
 	_mutate("omen", [])
 
 func _sync_chrome() -> void:
+	if _character_route == "use-item" and _special_panel != null:
+		return
 	if _character_route in ["powers", "cast"] and _powers_panel != null:
 		return
 	if _character_actor == null:
@@ -437,6 +461,8 @@ func _ability_changed() -> void:
 	_render_pending = true
 
 func close_action() -> void:
+	if _special_panel != null:
+		_special_panel.close_action()
 	if _powers_panel != null:
 		_powers_panel.close_action()
 	if _defence != null:
@@ -463,6 +489,8 @@ func _render_attack() -> void:
 		var item: Dictionary = raw
 		if str(item.get("inventory_id", "")) == _item_id:
 			_attack_item = item
+	if _item_id == "class:bite" and str(data.get("class_id", "")) == "fanged-deserter":
+		_attack_item = {"name": "Bite", "damage": "d6", "range_feet": 5, "attack_ability": "Strength", "natural": true}
 	var view := MELEE_SCENE.instantiate()
 	_content.add_child(view)
 	_melee_view = view
@@ -473,6 +501,9 @@ func _render_attack() -> void:
 	_sync_chrome()
 
 func roll_attack() -> void:
+	if _character_route == "use-item" and _special_panel != null:
+		await _special_panel.submit()
+		return
 	if _character_route == "cast" and _powers_panel != null:
 		await _powers_panel.submit()
 		return
@@ -595,4 +626,11 @@ func power_primary_text() -> String:
 
 func _power_action_created(action: MELEE_ACTION) -> void:
 	_powers_action = action
+	add_child(action)
+
+func special_primary_text() -> String:
+	return _special_panel.primary_text() if _special_panel != null else "Use item"
+
+func _special_action_created(action: MELEE_ACTION) -> void:
+	_special_action = action
 	add_child(action)

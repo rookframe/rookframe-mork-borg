@@ -1,4 +1,5 @@
 extends RefCounted
+const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 const SCROLLS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/starting_scrolls.gd")
 
 ## Core equipment facts from Bare Bones pp. 21–26; Bevy catalogue is reuse evidence.
@@ -103,6 +104,23 @@ func entries() -> Array[Dictionary]:
 	return result
 
 func item(id: String) -> Dictionary:
+	for class_id in ["fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]:
+		var profile := CLASSES.new().profile(class_id)
+		var features: Array = profile.get("features", [])
+		for raw in features:
+			var feature: Dictionary = raw
+			var original: Dictionary = feature.get("item", {})
+			if str(original.get("source_item_id", "")) == id:
+				var special := original.duplicate(true)
+				special["rules"] = str(feature.rules)
+				if str(special.get("kind", "")) == "Weapon":
+					special["range_feet"] = {"old-sigurds-sling": 30, "shoe-of-deaths-horse": 30, "sacred-shepherds-crook": 10}.get(id, 5)
+					special["attack_ability"] = "Presence" if id in ["old-sigurds-sling", "shoe-of-deaths-horse"] else "Strength"
+				if id in ["book-of-boiling-blood", "stones-taken-from-thel-emas-lost-temple", "blasphemous-nechrubel-bible"]:
+					special["uses"] = 1
+				if id == "stolen-mitre":
+					special["defence_dr"] = 10
+				return special
 	for row in ROWS:
 		if str(row[0]) == id:
 			return _entry(row)
@@ -117,6 +135,8 @@ func item(id: String) -> Dictionary:
 
 func _entry(row: Array) -> Dictionary:
 	var entry: Dictionary = {"source_item_id": str(row[0]), "name": str(row[1]), "kind": str(row[2]), "rules": str(row[3]), "price": str(row[4]), "source": str(row[5]), "quantity": 1, "equipped": false}
+	if str(entry.source_item_id) in ["waterskin", "lard"]:
+		entry["uses"] = 4 if str(entry.source_item_id) == "waterskin" else 5
 	var damage: String = row[6]
 	var weapon_range: int = row[7]
 	var tier: int = row[8]

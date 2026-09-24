@@ -171,6 +171,17 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if creature_target:
 		var source_dr: int = action.difficulty
 		action["difficulty"] = source_dr + CREATURES.new().defence_test_difficulty(data, input.get("piercing", false)) - 12
+	if not creature_target:
+		var base_dr := 12
+		for raw_item in _inventory(target.actor.id, data):
+			var item: Dictionary = raw_item
+			var quantity: int = item.get("quantity", 0)
+			if item.get("equipped", false) and quantity > 0 and not item.get("broken", false):
+				var item_dr: int = item.get("defence_dr", 12)
+				if item_dr < base_dr:
+					base_dr = item_dr
+		var current_dr: int = action.difficulty
+		action["difficulty"] = current_dr + base_dr - 12 - (2 if str(data.get("class_id", "")) == "gutterborn-scum" else 0)
 	action["ammunition"] = str(ammunition.get("inventory_id", ""))
 	action["ammunition_kind"] = kind
 	action["resource_spent"] = false

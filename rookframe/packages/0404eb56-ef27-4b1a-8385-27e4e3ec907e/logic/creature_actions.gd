@@ -74,5 +74,6 @@ func damage_armor(data: Dictionary) -> void:
 		worn["broken"] = true
 		worn["ruined"] = true
 	data["inventory"] = items
-	data["creature_inventory"] = true
-	data["armor"] = {"name": str(worn.get("name", "Armor")), "reduction": str(worn.reduction)}
+	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
+		data["creature_inventory"] = true
+		data["armor"] = {"name": str(worn.get("name", "Armor")), "reduction": str(worn.reduction)}

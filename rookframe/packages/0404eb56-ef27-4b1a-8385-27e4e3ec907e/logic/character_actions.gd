@@ -38,10 +38,12 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 		var key := "traits" if parts[0] == "trait" else "companion_sheets"
 		var source_entries: Array = data.get(key, [])
 		var entries: Array = source_entries.duplicate(true)
-		if parts.size() != 3 or not parts[1].is_valid_int() or int(parts[1]) < 0 or int(parts[1]) >= entries.size() or not parts[2] in ["name", "rules"]:
+		if parts.size() != 3 or not parts[1].is_valid_int() or int(parts[1]) < 0 or int(parts[1]) >= entries.size() or not parts[2] in ["name", "rules", "uses"]:
 			return _failure("This Character field is unavailable. Reopen the sheet.")
 		var entry: Dictionary = entries[int(parts[1])]
-		entry[parts[2]] = text
+		if parts[2] == "uses" and (not text.is_valid_int() or int(text) < 0):
+			return _failure("Enter a non-negative whole number of remaining uses.")
+		entry[parts[2]] = int(text) if parts[2] == "uses" else text
 		data[key] = entries
 	else:
 		return _failure("This Character field is not editable.")

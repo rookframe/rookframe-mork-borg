@@ -3,6 +3,7 @@ extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
@@ -35,7 +36,7 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		return _error("This action belongs to another Participant session.")
 	if not action.state in ["pending", "targets"]:
 		return _public(action)
-	if not _alive(context, action):
+	if not PARTICIPANTS.new().alive(context, action):
 		return _end(context, action)
 	if operation == "power.targets" and action["state"] == "targets":
 		var source := context.read_actor(SDK.ActorId.new(action.source))
@@ -91,12 +92,12 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var data: Dictionary = source.actor.data
 	if not _valid_character(data):
 		return _error("Character casting data is malformed.")
-	var owner := _owner(context, caller, source.actor.id)
+	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(owner.error)
 	for previous in _actions:
 		if str(previous.state) in ["pending", "targets"] and previous.get("source", "") == source.actor.id.value:
-			if _alive(context, previous):
+			if PARTICIPANTS.new().alive(context, previous):
 				return _error("Finish the current Power action before starting another.")
 			_end(context, previous)
 	var abilities: Dictionary = data.abilities
@@ -142,7 +143,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	return action
 
 func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
-	if not _alive(context, action):
+	if not PARTICIPANTS.new().alive(context, action):
 		return _end(context, action)
 	var source := context.read_actor(SDK.ActorId.new(action.source))
 	if not source.ok or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
@@ -220,6 +221,12 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _end(context, action)
 	data = data.duplicate(true)
 	data["power_uses"] = uses - 1
+	var inventory: Array = data.inventory
+	for raw in inventory:
+		var item: Dictionary = raw
+		if str(item.get("inventory_id", "")) == str(action.item) and item.get("single_use", false):
+			var quantity: int = item.get("quantity", 1)
+			item["quantity"] = quantity - 1
 	var terms := POWERS.new().parameters(str(power.source_item_id))
 	if terms.is_empty():
 		return _manual_result(context, action, [SDK.ActorChange.new(source.actor.id, data)], [], result.sequence)
@@ -560,51 +567,6 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 	if mode == "object" and targets.size() > 1:
 		return _error("Choose one object; describe an unrepresented object with the table.")
 	return {"state": "ready", "label": labels if not labels.is_empty() else ("All creatures in the 30 ft area" if mode == "area" else "Table-selected object"), "targets": targets}
-
-func _owner(context: SDK.SystemActionContext, caller: Dictionary, source: SDK.ActorId) -> Dictionary:
-	var owner := {"id": str(caller.participant_id), "session": str(caller.session_id)}
-	if caller.is_gm:
-		var access := context.actor_access(source)
-		if not access.ok:
-			return {"error": access.message}
-		var count := 0
-		for entry in access.items:
-			if entry.access_level == "Owner":
-				count += 1
-				if not entry.is_connected:
-					return {"error": "This Character’s Player is not connected."}
-				owner = {"id": entry.participant_id, "session": entry.session_id}
-		if count > 1:
-			return {"error": "Several Players own this Character. The responsible Player casts from their sheet."}
-	return owner
-
-func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
-	var sessions := context.participant_sessions()
-	if not sessions.ok:
-		return false
-	var resister := not action.has("resister_session")
-	var initiator := false
-	var owner := false
-	var participants: Array = sessions.value
-	for raw in participants:
-		var session: Dictionary = raw
-		if session.session_id == action.get("resister_session", ""):
-			resister = true
-		if session.participant_id == action.participant and session.session_id == action.session:
-			initiator = true
-		if session.participant_id == action.owner and session.session_id == action.owner_session:
-			owner = true
-	if not initiator or not owner or not resister:
-		return false
-	if action.owner != action.participant:
-		var access := context.actor_access(SDK.ActorId.new(action.source))
-		if not access.ok:
-			return false
-		for entry in access.items:
-			if entry.participant_id == action.owner and entry.access_level == "Owner" and entry.is_connected and entry.session_id == action.owner_session:
-				return true
-		return false
-	return true
 
 func _resist(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	var creatures := 0

@@ -282,3 +282,22 @@ func test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_cur
 	assert_int(choice.value.hp).is_equal(8)
 	await sdk.system_actions.submit("defence.choose", {"id": "editable", "choice": "take"})
 	assert_int(host.actors.hero.data.hit_points).is_equal(5)
+
+func test_equipped_class_defence_exception_and_scum_keep_armor_penalty(key: String, class_id: String, expected: int, _test_parameters := [["brown-scimitar-of-galgenbeck", "fanged-deserter", 10], ["blade-of-your-ancestors", "wretched-royalty", 10], ["stolen-mitre", "heretical-priest", 10], ["sword", "gutterborn-scum", 10]]) -> void:
+	var host := BOUNDARY.new()
+	host.handler = auto_free(SYSTEM.new())
+	add_child(host.handler)
+	host.actors.enemy.data.attacks[0].defence_dr = 12
+	host.actors.hero.data.class_id = class_id
+	host.actors.hero.data.inventory = [{"inventory_id": "special", "source_item_id": key, "quantity": 1, "equipped": true}]
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("defence.start", _attack("plain"))
+	assert_int(result.value.difficulty).is_equal(expected)
+	host.as_player()
+	await sdk.system_actions.submit("defence.cancel", {"id": "plain"})
+	host.participant = "gm"
+	host.session = "gm-session"
+	host.game_master = true
+	host.actors.hero.data.inventory.append({"inventory_id": "armor", "source_item_id": "medium-armor", "equipped": true, "quantity": 1})
+	result = await sdk.system_actions.submit("defence.start", _attack("armor"))
+	assert_int(result.value.difficulty).is_equal(expected + 2)

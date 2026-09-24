@@ -73,6 +73,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 	overview.edit_requested.connect(_edit)
 	overview.omens_requested.connect(_omens)
 	overview.powers_requested.connect(_powers)
+	overview.navigate_requested.connect(_navigate)
 	overview.value_save_requested.connect(_correct)
 	get_node(^"Content").add_child(overview)
 	overview.configure(data, miniatures, short_window)

@@ -40,10 +40,15 @@ func inventory(data: Dictionary) -> Array:
 		for key in ["name", "kind", "rules", "price", "source", "damage", "reduction", "attack_ability", "ammunition", "resource_field"]:
 			if defaults.has(key) and not entry.has(key):
 				entry[key] = str(defaults.get(key, ""))
-		for key in ["quantity", "range_feet", "armor_tier", "uses"]:
+		for key in ["quantity", "range_feet", "armor_tier", "uses", "attack_dr", "defence_dr"]:
 			if defaults.has(key) and not entry.has(key):
 				var number: int = defaults.get(key, 0)
 				entry[key] = number
+		if str(entry.get("source_item_id", "")) == "medicine-box" and not entry.has("uses"):
+			var abilities: Dictionary = data.get("abilities", {})
+			var presence: Dictionary = abilities.get("Presence", {})
+			var modifier: int = presence.get("modifier", 0)
+			entry["uses"] = modifier + 4
 		if not entry.has("quantity"):
 			entry["quantity"] = 1
 		if not entry.has("equipped"):
@@ -127,7 +132,7 @@ func _edit_item(item: Dictionary, field: String, text: String) -> String:
 			return "Armor tiers range from 0 to 3."
 		item[field] = int(text)
 	elif field == "equipped":
-		if not str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"]:
+		if not str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] and str(item.get("source_item_id", "")) != "stolen-mitre":
 			return "This item is carried without an equipment state."
 		item[field] = text == "true"
 	elif field == "name" or (custom and field in ["rules", "kind", "damage", "reduction"]):

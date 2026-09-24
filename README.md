@@ -325,3 +325,11 @@ attacks keep their original source rules when first exposed as editable items;
 removed attacks do not return. Ranged equipment spends its ammunition once after
 the accepted hit test. Equipped shields reduce supported damage, and armor
 lost to a critical remains damaged through subsequent inventory edits.
+
+## Class abilities and consumables
+
+Retained class actions and special equipment use the owning Character, equipped
+weapon or Item view. The [behavior ledger](docs/class-actions.md) records every
+class entry, immediate outcome, range, source choice and manual boundary.
+Daily/fight eligibility is confirmed at the table; remaining uses are editable,
+and ongoing effects and all Omen benefits stay manual.

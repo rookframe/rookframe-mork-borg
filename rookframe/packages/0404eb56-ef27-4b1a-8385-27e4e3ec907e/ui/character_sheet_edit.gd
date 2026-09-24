@@ -1,6 +1,7 @@
 extends VBoxContainer
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
+const RULES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 const FIELD_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_field.gd")
 var _fields: Array[FIELD_SCRIPT] = []
 const FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_field.tscn")
@@ -20,6 +21,11 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 			var entry: Dictionary = entries[index]
 			var prefix := "trait" if key == "traits" else "companion"
 			_add("%s:%d:name" % [prefix, index], ("Trait" if key == "traits" else "Companion") + " name", str(entry.get("name", "")))
+			var rule := RULES.new().definition(str(entry.get("id", "")))
+			if key == "traits" and rule.has("uses") and not entry.has("item"):
+				var default_uses: int = rule.get("uses", 0)
+				var uses: int = entry.get("uses", default_uses)
+				_add("trait:%d:uses" % index, str(entry.get("name", "")) + " remaining uses", str(uses))
 			_add("%s:%d:rules" % [prefix, index], str(entry.get("name", "")) + " rules", str(entry.get("rules", "")))
 func _add(key: String, title: String, value: String) -> void:
 	var field = FIELD.instantiate()

@@ -2,11 +2,13 @@ extends VBoxContainer
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 const FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_field.tscn")
+const RULES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 var _id := ""
 var _new := false
 var _fields: Array = []
 func _ready() -> void:
 	get_node(^"Back").pressed.connect(_back)
+	get_node(^"Use").pressed.connect(_use)
 	get_node(^"Remove").pressed.connect(_remove)
 	get_node(^"Create").pressed.connect(_create)
 func configure(item: Dictionary, _miniatures: Array) -> void:
@@ -14,6 +16,7 @@ func configure(item: Dictionary, _miniatures: Array) -> void:
 	_id = str(item.get("inventory_id", ""))
 	get_node(^"Title").text = "CUSTOM ITEM" if _new else str(item.get("name", "Item"))
 	get_node(^"Rules").text = str(item.get("rules", ""))
+	get_node(^"Use").visible = not RULES.new().definition(str(item.get("source_item_id", ""))).is_empty()
 	get_node(^"Remove").visible = not _new
 	get_node(^"Create").visible = _new
 	for key in ["name", "quantity", "uses"]:
@@ -53,6 +56,7 @@ func field_result(key: String, message: String, error: bool) -> void:
 			field.show_result(message, error, not error)
 
 func show_missing() -> void:
+	get_node(^"Use").visible = false
 	get_node(^"Title").text = "Item unavailable"
 	get_node(^"Rules").text = "This item was removed. Return to Inventory to see the current items."
 	get_node(^"Remove").visible = false
@@ -71,3 +75,6 @@ func refresh_data(data: Dictionary) -> void:
 		return
 	show_missing()
 	get_node(^"Fields").visible = false
+
+func _use() -> void:
+	navigate_requested.emit("use-item", _id)
