@@ -1,6 +1,7 @@
 extends VBoxContainer
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ACTION = preload(ROOT + "logic/health_action.gd")
 const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
@@ -22,6 +23,16 @@ var _terminal_shown := false
 func _ready() -> void:
 	resized.connect(_layout)
 	get_node(^"Columns/Context/Content/Authorize").pressed.connect(_authorize)
+	get_node(^"Columns/Task/Rest/Content/Breath").toggled.connect(_rest_changed)
+	get_node(^"Columns/Task/Rest/Content/Sleep").toggled.connect(_rest_changed)
+	_rest_changed(true)
+
+func _rest_changed(_pressed: bool) -> void:
+	var breath: Button = get_node(^"Columns/Task/Rest/Content/Breath")
+	var sleep: Button = get_node(^"Columns/Task/Rest/Content/Sleep")
+	for choice in [breath, sleep]:
+		choice.icon = CHECK if choice.button_pressed else null
+		choice.accessibility_description = "Selected" if choice.button_pressed else "Not selected"
 
 func configure(actor: SDK.Actor, facade: SDK, route: String) -> void:
 	_actor = actor

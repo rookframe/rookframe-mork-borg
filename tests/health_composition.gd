@@ -23,6 +23,15 @@ func test_recovery_panel_eligibility_focus_pending_and_result() -> void:
 	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
 	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "rest")
 	await get_tree().process_frame
+	var breath: Button = panel.get_node("Columns/Task/Rest/Content/Breath")
+	var sleep: Button = panel.get_node("Columns/Task/Rest/Content/Sleep")
+	sleep.button_pressed = true
+	assert_bool(breath.button_pressed).is_false()
+	assert_object(sleep.icon).is_not_null()
+	assert_object(breath.icon).is_null()
+	breath.button_pressed = true
+	assert_bool(sleep.button_pressed).is_false()
+	assert_str(breath.accessibility_description).is_equal("Selected")
 	await panel.submit()
 	assert_int(host.requests.size()).is_equal(0)
 	await get_tree().process_frame

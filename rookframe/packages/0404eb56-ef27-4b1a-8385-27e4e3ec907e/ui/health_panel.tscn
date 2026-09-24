@@ -30,20 +30,28 @@ theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="Columns/Task/Rest/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeSectionHeading"
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 text = "RECOVERY"
 
-[node name="Breath" type="CheckBox" parent="Columns/Task/Rest/Content"]
+[node name="Breath" type="Button" parent="Columns/Task/Rest/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeChoiceRow"
+alignment = 0
+icon_alignment = 2
+toggle_mode = true
 text = "Catch your breath · d4 HP"
 button_group = SubResource("RestGroup")
 button_pressed = true
 
-[node name="Sleep" type="CheckBox" parent="Columns/Task/Rest/Content"]
+[node name="Sleep" type="Button" parent="Columns/Task/Rest/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeChoiceRow"
+alignment = 0
+icon_alignment = 2
+toggle_mode = true
 text = "Full night’s sleep · d6 HP"
 button_group = SubResource("RestGroup")
 
@@ -70,7 +78,7 @@ theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="Columns/Task/Broken/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeSectionHeading"
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 text = "BROKEN · d4"
 
@@ -91,7 +99,7 @@ theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="Columns/Context/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeSectionHeading"
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 text = "BEFORE ROLLING"
 
@@ -148,7 +156,7 @@ theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="Scrolls"]
 layout_mode = 2
-theme_type_variation = &"RookframeSectionHeading"
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 text = "CHOOSE THE FOUND SCROLL"
 
@@ -223,7 +231,7 @@ theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="Specialties"]
 layout_mode = 2
-theme_type_variation = &"RookframeSectionHeading"
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 text = "GUTTERBORN SPECIALTIES"
 
@@ -265,7 +273,7 @@ theme_override_constants/separation = 8
 [node name="Heading" type="Label" parent="Result/Content"]
 layout_mode = 2
 focus_mode = 2
-theme_type_variation = &"RookframeSectionHeading"
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 [node name="Copy" type="Label" parent="Result/Content"]
 layout_mode = 2
