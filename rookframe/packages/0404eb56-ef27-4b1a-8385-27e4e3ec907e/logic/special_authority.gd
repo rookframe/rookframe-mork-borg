@@ -90,8 +90,9 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var teeth := str(item.get("source_item_id", "")) == "wizard-teeth"
 	var healing: bool = rule.get("healing", false)
 	var consumes: bool = rule.get("consume", false) or rule.has("uses")
-	var resource := _resource(data, item)
-	var uses: int = resource.get("uses", rule.get("uses", 0))
+	var resource: Dictionary = _resource(data, item)
+	var default_uses: int = rule.get("uses", 0)
+	var uses: int = resource.get("uses", default_uses)
 	if consumes and uses < 1 and not (rule.get("gob", false) and input.get("new_fight", false)):
 		return _error("No uses remain. Correct remaining uses on the item when the table agrees.")
 	var target := _target(context, caller, input, source.actor.id, rule.range_feet)
@@ -438,8 +439,9 @@ func _consume(data: Dictionary, action: Dictionary) -> bool:
 		return false
 	if not rule.get("consume", false) and not rule.has("uses"):
 		return true
-	var resource := _resource(data, item)
-	var uses: int = resource.get("uses", rule.get("uses", 0))
+	var resource: Dictionary = _resource(data, item)
+	var default_uses: int = rule.get("uses", 0)
+	var uses: int = resource.get("uses", default_uses)
 	if uses < 1:
 		return false
 	var items := ITEMS.new(null, SDK.ActorId.new("")).inventory(data)
@@ -843,7 +845,8 @@ func _witnesses(context: SDK.SystemActionContext, action: Dictionary, caller: Di
 		var actor := context.read_actor(rook.rook.actor)
 		if not actor.ok or typeof(actor.actor.data) != TYPE_DICTIONARY:
 			return _end(context, action)
-		var schema := str(actor.actor.data.get("schema", ""))
+		var witness_data: Dictionary = actor.actor.data
+		var schema := str(witness_data.get("schema", ""))
 		if not schema in ["mork-borg-character/v1", "mork-borg-adversary/v1"]:
 			action["message"] = "Select only Character or Creature witnesses."
 			return _public(action)
