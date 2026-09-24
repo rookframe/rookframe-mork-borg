@@ -276,13 +276,6 @@ func _detail_title_if_present(private_name: String) -> void:
 	summary.visible = false
 
 
-func _set_window_title(title: String) -> void:
-	if sdk == null:
-		return
-	var result: SDK.OperationResult = sdk.windows.set_title(title if _compact else "MÖRK BORG")
-	if not result.ok:
-		_set_status(result.message, true)
-
 
 func _render_equipment(attacks: Array) -> void:
 	for child in _equipment_list.get_children():

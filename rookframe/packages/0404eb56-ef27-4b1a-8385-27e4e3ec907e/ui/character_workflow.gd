@@ -12,6 +12,8 @@ var _character_creator: CHARACTER_CREATOR
 var _last_sheet_route := ""
 var _sheet_workflow_title := ""
 var _restore_shield_focus := false
+var _window_title_pending := false
+var _requested_window_title := "MÖRK BORG"
 const CHARACTER_SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.gd")
 var _character_sheet: CHARACTER_SHEET
 var _character_transition_pending := false
@@ -37,6 +39,9 @@ var _character_miniature_choices: Array[Dictionary] = []
 
 
 func _process(_delta: float) -> void:
+	if _window_title_pending and sdk != null and not _surface_is_hidden():
+		var result: SDK.OperationResult = sdk.windows.set_title(_requested_window_title if _compact else "MÖRK BORG")
+		_window_title_pending = not result.ok
 	if _restore_shield_focus:
 		_restore_shield_focus = false
 		if _last_sheet_route == "defence":
@@ -259,11 +264,10 @@ func _set_busy(value: bool, message: String, error: bool = false) -> void:
 
 
 func _set_window_title(title: String) -> void:
-	if sdk == null:
-		return
-	var result: SDK.OperationResult = sdk.windows.set_title(title if _compact else "MÖRK BORG")
-	if not result.ok:
-		_set_status(result.message, true)
+	# Closing can produce a terminal report while the managed surface is absent.
+	# Publish its current title after the ordinary surface becomes visible again.
+	_requested_window_title = title
+	_window_title_pending = true
 
 
 func _setup_character_content() -> void:
