@@ -71,7 +71,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _error("This Character already has an unused improvement authorization.")
 		var granted := data.duplicate(true)
 		granted["improvement_grant"] = str(input.id)
-		return _finish(context, {"state": "ready", "message": ""}, [SDK.ActorChange.new(source.actor.id, granted)], "GM authorized one improvement. The Character's Owner may begin Getting better.")
+		return _finish(context, {"state": "ready", "message": ""}, [SDK.ActorChange.new(source.actor.id, granted)], "GM authorized one improvement. The Character's Owner may begin Getting better.", "Authorized")
 	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(str(owner.error))
@@ -81,7 +81,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		if hp > 0:
 			return _error("Broken requires zero HP; negative HP means dead.")
 		if hp < 0:
-			return _finish(context, action, [], "Dead: negative HP. No Broken roll or restored HP. Resolve any applicable class exception with the table.")
+			return _finish(context, action, [], "Dead: negative HP. No Broken roll or restored HP. Resolve any applicable class exception with the table.", "Dead", "attention")
 		return _request(context, action, "broken", [SDK.DiceTerm.new("Broken", 4)], true)
 	if str(input.kind) == "improve":
 		if not _improvable(data):
@@ -108,7 +108,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if hp < 0:
 		return _error("Negative HP means dead. Rest does not resurrect a Character.")
 	if not input.food_and_drink or input.infected:
-		return _finish(context, action, [], "No HP restored: resting requires food and drink and does not heal an infected Character. Resolve daily starvation or infection HP loss manually; no time has been advanced.")
+		return _finish(context, action, [], "No HP restored: resting requires food and drink and does not heal an infected Character. Resolve daily starvation or infection HP loss manually; no time has been advanced.", "0 HP")
 	var faces := 4 if str(input.rest) == "breath" else 6
 	var request := context.request_throw(SDK.HumanThrowRequest.new(str(input.id), str(owner.id), [SDK.DiceTerm.new("Recovery", faces)]))
 	return action if request.ok else _error(request.message)
@@ -134,7 +134,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 	if recovered < 0:
 		recovered = 0
 	data["hit_points"] = hp + recovered
-	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Recovery: regained %d HP; now %d / %d. Raw Roll #%d. Omens and timed consequences remain table-managed." % [recovered, hp + recovered, maximum, roll.sequence])
+	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Recovery: regained %d HP; now %d / %d. Raw Roll #%d. Omens and timed consequences remain table-managed." % [recovered, hp + recovered, maximum, roll.sequence], "+%d HP" % recovered, "success")
 
 func _valid(value: Variant) -> bool:
 	if typeof(value) != TYPE_DICTIONARY:
@@ -149,23 +149,25 @@ func _valid(value: Variant) -> bool:
 	var maximum: int = data.maximum_hit_points
 	return maximum > 0
 
-func _finish(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], text: String) -> Dictionary:
-	if not _record(context, changes, text):
+func _finish(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], text: String, result: String = "Resolved", tone: String = "info") -> Dictionary:
+	if not _record(context, changes, text, result, tone):
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
 	return action
 
-func _record(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], text: String) -> bool:
+func _record(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], text: String, result: String = "", tone: String = "info") -> bool:
 	var report := SDK.ActionLogMessage.new("Recovery and improvement")
 	report.text = [SDK.ActionLogText.new(text)]
+	report.result = result
+	report.tone = tone
 	return context.commit(changes, report).ok
 
 func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	action["state"] = "ended"
 	action["message"] = ENDED
 	context.cancel_throw(str(action.get("request", "")))
-	_record(context, [], ENDED)
+	_record(context, [], ENDED, "Ended", "attention")
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
@@ -376,7 +378,7 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 	var suffix := " Raw Roll #%d." % roll.sequence
 	if phase == "broken":
 		if face == 4:
-			return _finish(context, action, [], "Dead. Resolve any applicable class exception with the table; no restored HP or automatic resurrection." + suffix)
+			return _finish(context, action, [], "Dead. Resolve any applicable class exception with the table; no restored HP or automatic resurrection." + suffix, "Dead", "attention")
 		var branch := "Unconscious" if face == 1 else ("Injury" if face == 2 else "Hemorrhage")
 		if not _record(context, [], "Broken: " + branch + suffix):
 			return _end(context, action)
@@ -393,7 +395,7 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 	else:
 		var hours := int((face + 1) / 2)
 		text = "Hemorrhage: death in %d hours unless treated. All tests DR16 the first hour, DR18 the last hour. Physical d4 %d → d2 %d." % [hours, face, hours]
-	return _finish(context, action, [], text + " Apply delayed recovery, restrictions and death manually; current HP is unchanged." + suffix)
+	return _finish(context, action, [], text + " Apply delayed recovery, restrictions and death manually; current HP is unchanged." + suffix, "Broken", "attention")
 
 func _valid_rerolls(selected: Array) -> bool:
 	for index in selected:

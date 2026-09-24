@@ -31,6 +31,8 @@ func test_recovery_uses_human_throw_caps_hp_and_keeps_omens() -> void:
 	assert_int(host.actors.hero.data.hit_points).is_equal(8)
 	assert_int(host.actors.hero.data.omens).is_equal(0)
 	assert_str(str(host.reports)).contains("regained 4 HP").contains("Raw Roll #1")
+	assert_str(host.reports[-1].result).is_equal("+4 HP")
+	assert_str(host.reports[-1].tone).is_equal("success")
 	await sdk.system_actions.submit("health.advance", {"id": "health"})
 	assert_int(host.reports.size()).is_equal(1)
 
@@ -232,6 +234,9 @@ func test_interruption_rejects_late_changes_and_preserves_accepted_improvement(c
 	assert_int(host.actors.hero.data.silver).is_equal(10)
 	assert_str(host.requests[unfinished].result.status).is_equal("rolled")
 	assert_str(host.actors.hero.data.improvement_grant).is_empty()
+	if cause == "cancel":
+		assert_str(host.reports[-1].result).is_equal("Ended")
+		assert_str(host.reports[-1].tone).is_equal("attention")
 
 func test_broken_requires_zero_and_negative_hp_reports_death(hp: int, expected: String, _test_parameters := [[5, "error"], [-2, "resolved"]]) -> void:
 	var host := _host()
