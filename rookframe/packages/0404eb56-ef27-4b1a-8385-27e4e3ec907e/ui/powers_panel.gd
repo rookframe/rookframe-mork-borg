@@ -98,13 +98,13 @@ func _render() -> void:
 	get_node(^"Cast/Columns/Targets/Content/Change").disabled = state == "pending"
 	get_node(^"Cast/Options").visible = state in ["ready", "error"]
 	if _action != null:
-		_status(_action.message, state == "error")
+		_status(_action.message, state == "error" or _action.snapshot.get("target_error", false))
 	var title := str(_power.get("name", "Cast a Power")) if casting else "Powers & scrolls"
 	if terminal:
 		title = "Action ended" if state == "ended" else ("Power " + adjudication if not adjudication.is_empty() else "Power resolved")
 		get_node(^"Outcome").visible = false
 		get_node(^"Result/Power").text = str(_power.get("name", "Power"))
-		get_node(^"Result/Section/Content/Heading").text = "The action was interrupted" if state == "ended" else ("GM determines the outcome" if not adjudication.is_empty() else "Manual outcome")
+		get_node(^"Result/Section/Content/Heading").text = "The action was interrupted" if state == "ended" else ("GM determines the outcome" if not adjudication.is_empty() else str(_action.snapshot.get("outcome", "Manual outcome")))
 		get_node(^"Result/Section/Content/Copy").text = _action.message
 	workflow_changed.emit("cast" if casting else "powers", title, terminal or (casting and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and _power.get("playable", false)), state == "pending")
 	_layout()

@@ -47,3 +47,43 @@ func test_cast_controls_and_terminal_gm_report_in_phone_body() -> void:
 
 func after_test() -> void:
 	await get_tree().process_frame
+
+func test_immediate_healing_guides_count_errors_and_reports_applied_hp() -> void:
+	var host := BOUNDARY.new()
+	host.handler = auto_free(SYSTEM.new())
+	add_child(host.handler)
+	host.actors.hero.data["power_uses"] = 3
+	host.actors.hero.data["hit_points"] = 7
+	host.actors.enemy.data["maximum_hit_points"] = 12
+	host.actors.hero.data.inventory.append({"inventory_id": "scroll", "source_item_id": "grace-of-a-dead-saint", "quantity": 1})
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(375, 369)
+	add_child(viewport)
+	var panel = auto_free(PANEL.instantiate())
+	viewport.add_child(panel)
+	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
+	panel.size = Vector2(351, 260)
+	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "scroll")
+	await get_tree().process_frame
+	panel.get_node("Cast/Options/Eligible").button_pressed = true
+	await panel.submit()
+	host.roll(host.last_request, [12])
+	await get_tree().create_timer(0.6).timeout
+	host.roll(host.last_request, [1])
+	await get_tree().create_timer(0.6).timeout
+	assert_str(panel.primary_text()).is_equal("Confirm targets")
+	assert_str(panel.get_node("Outcome").text).contains("exactly 1")
+	assert_bool(panel.get_node("Cast/Columns/Targets/Content/Change").disabled).is_false()
+	host.targets = PackedStringArray()
+	await panel.submit()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_str(panel.get_node("Outcome").theme_type_variation).is_equal("RookframeError")
+	host.targets = PackedStringArray(["enemy-rook"])
+	await panel.submit()
+	host.roll(host.last_request, [4])
+	await get_tree().create_timer(0.6).timeout
+	assert_str(panel.get_node("Result/Section/Content/Heading").text).is_equal("Healing applied")
+	assert_str(panel.get_node("Result/Section/Content/Copy").text).contains("regained 4 HP")
+	assert_str(panel.primary_text()).is_equal("Done")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(10)

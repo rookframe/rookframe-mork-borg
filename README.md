@@ -238,9 +238,8 @@ are excluded from Package exports.
 
 Owned core scrolls have Cast entries in Inventory and the Powers & scrolls view.
 All twenty definitions retain their Bare Bones pp. 34–35 rules and an explicit
-handling classification. Palms open the southern gate, Grace of a dead saint and
-Roskoe’s consuming glare remain unavailable until RFG-290; Foul Psychopomp remains
-unavailable until RFG-291. Catalogue text is not a claim that those actions work.
+handling classification. Foul Psychopomp remains unavailable until RFG-291.
+Catalogue text is not a claim that the summon action works.
 
 Ordinary casting requests a human Presence d20 against DR12 (the Scum’s printed
 Presence reduction gives DR10). Success spends one daily use; ordinary failure
@@ -276,3 +275,22 @@ Casting metric strips use two columns below 480px. Presence is a small label
 with the signed modifier as its value, avoiding the approved fixture’s split
 word in the phone dock. Natural critical/fumble results use a terminal report
 with the natural face, result and ordinary Character/Done navigation.
+
+## Immediate Power consequences (RFG-290)
+
+Palms and Grace request d2 creatures (physical d4 halved, rounded up); Roskoe
+requests d4. Confirm exactly that many distinct Character or Creature targets
+within 30 ft, then throw independently for each. Grace restores d10 HP up to
+maximum HP without resurrecting a dead target. Roskoe removes d8 HP directly.
+Palms deals d8 damage reduced by equipped, intact armor and the shield’s −1;
+damage cannot fall below zero. This situational Palms ruling was approved on
+24 September 2026 following the creator’s specific clarification. Breaking a
+shield against Palms stays with the table: close the action before applying
+damage, then resolve it with ordinary dice and sheet edits.
+
+Targets are frozen at confirmation and the whole set is revalidated before one
+durable multi-Actor commit. Changed links, range or protection, malformed data,
+failed saves and interrupted sessions cannot cause partial or late HP changes.
+The accepted casting use and raw Rolls remain. Reports use public target names
+and reference all casting, count and consequence Rolls. Allocation, temporary
+HP, resurrection HP, ongoing effects and critical/fumble rulings stay manual.

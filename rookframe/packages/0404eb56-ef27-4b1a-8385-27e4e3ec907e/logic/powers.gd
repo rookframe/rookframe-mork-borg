@@ -6,7 +6,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const HANDLING: Dictionary = {
-	"palms-open-the-southern-gate": ["immediate · RFG-290", "multiple", 30, false],
+	"palms-open-the-southern-gate": ["immediate damage", "multiple", 30, true],
 	"tongue-of-eris": ["narrative", "single", 30, true],
 	"te-le-kin-esis": ["narrative", "object", 30, true],
 	"lucy-fires-levitation": ["ongoing", "self", 0, true],
@@ -16,7 +16,7 @@ const HANDLING: Dictionary = {
 	"foul-psychompomp": ["summon · RFG-291", "self", 0, false],
 	"eyelid-blinds-the-mind": ["resistance; manual sleep / PC ability", "multiple", 30, true],
 	"death": ["manual allocation", "area", 0, true],
-	"grace-of-a-dead-saint": ["immediate · RFG-290", "multiple", 30, false],
+	"grace-of-a-dead-saint": ["immediate healing", "multiple", 30, true],
 	"grace-for-a-sinner": ["ongoing", "single", 30, true],
 	"whispers-pass-the-gate": ["narrative", "single", 30, true],
 	"aegis-of-sorrow": ["manual temporary HP", "single", 30, true],
@@ -24,7 +24,7 @@ const HANDLING: Dictionary = {
 	"bestial-speech": ["narrative", "self", 0, true],
 	"false-dawn-nights-chariot": ["ongoing", "self", 0, true],
 	"hermetic-step": ["narrative", "self", 0, true],
-	"roskoes-consuming-glare": ["immediate · RFG-290", "multiple", 30, false],
+	"roskoes-consuming-glare": ["immediate HP loss", "multiple", 30, true],
 	"enochian-syntax": ["narrative", "single", 30, true]
 }
 
@@ -49,6 +49,8 @@ func definition(id: String) -> Dictionary:
 	return {}
 
 func parameters(id: String) -> Array[SDK.DiceTerm]:
+	if id in ["grace-of-a-dead-saint", "palms-open-the-southern-gate"]:
+		return [SDK.DiceTerm.new("Creatures (d2)", 4)]
 	if id in ["te-le-kin-esis"]:
 		return [SDK.DiceTerm.new("Movement (tens of feet)", 10), SDK.DiceTerm.new("Minutes", 6)]
 	if id in ["lucy-fires-levitation"]:
@@ -57,7 +59,7 @@ func parameters(id: String) -> Array[SDK.DiceTerm]:
 		return [SDK.DiceTerm.new("Rounds", 6)]
 	if id in ["nine-violet-signs-unknot-the-storm"]:
 		return [SDK.DiceTerm.new("Bolts (d2)", 4)]
-	if id in ["eyelid-blinds-the-mind"]:
+	if id in ["eyelid-blinds-the-mind", "roskoes-consuming-glare"]:
 		return [SDK.DiceTerm.new("Creatures", 4)]
 	if id in ["death"]:
 		return [SDK.DiceTerm.new("Shared HP loss", 10, 4)]

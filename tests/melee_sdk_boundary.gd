@@ -65,7 +65,11 @@ func SystemIntentDistance(_token: String, _from: String, _to: String) -> Diction
 func SystemIntentReadThrow(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": requests[id].result.duplicate(true)} if requests.has(id) else {"ok": false}
 func SystemIntentRequestThrow(token: String, id: String, target: String, terms: Array) -> Dictionary:
+ var names: Array[String] = []
  for term in terms:
+  if str(term.name) in names or str(term.name).to_utf16_buffer().size() / 2 > 64:
+   return {"ok": false, "message": "Throw terms must have unique names of at most 64 characters"}
+  names.append(str(term.name))
   if not term.faces in [4, 6, 8, 10, 12, 20]:
    return {"ok": false, "message": "Unsupported physical die"}
  if not requests.has(id):

@@ -44,9 +44,33 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		var selected := _targets(context, caller, action.rook, source.actor.id, action.scroll, count)
 		if selected.state == "error":
 			action["message"] = selected.message
+			action["target_error"] = true
 			return _public(action)
+		action["target_error"] = false
 		action["targets"] = selected.targets
+		action["target_rooks"] = caller.targets
 		action["label"] = selected.label
+		var power: Dictionary = action.scroll
+		if str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate"]:
+			var healing: bool = str(power.source_item_id) == "grace-of-a-dead-saint"
+			var damage: bool = str(power.source_item_id) == "palms-open-the-southern-gate"
+			var purpose := "healing" if healing else ("damage" if damage else "HP loss")
+			var terms: Array[SDK.DiceTerm] = []
+			var targets: Array = selected.targets
+			for index in range(targets.size()):
+				var target: Dictionary = targets[index]
+				# Unique, bounded term names preserve the mapping even for identical public labels.
+				var label := "%d. %s" % [index + 1, _dice_label(str(target.label))]
+				terms.append(SDK.DiceTerm.new(label + " · " + purpose, 10 if healing else 8))
+				if damage:
+					var protection: Dictionary = target.protection
+					var formula: String = protection.formula
+					if not formula.is_empty():
+						terms.append(_armor_die(formula, label + " · armor"))
+			var message := "Throw %s for each confirmed target in the Dice Tray." % purpose
+			if damage:
+				message += " Armor and shield reduction apply. d2 armor uses a physical d4 halved, rounded up. Shield breaking stays at the table; close before applying damage if the table chooses it."
+			return _request(context, action, "hp", terms, message)
 		return _resist(context, action)
 	if operation == "power.cancel":
 		return _end(context, action)
@@ -133,6 +157,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var presence: int = action.presence
 	var sequence: int = action.get("sequence", 0)
 	var power: Dictionary = action.get("scroll", {})
+	if action["phase"] == "hp":
+		return _hp_result(context, action, result)
 	if action["phase"] == "daily":
 		var daily_face: int = result.terms[0].results[0]
 		var count: int = daily_face + presence
@@ -149,6 +175,17 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		for term in result.terms:
 			for value in term.results:
 				values.append(value)
+		if action["phase"] == "parameters" and str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate"]:
+			var d2: bool = str(power.source_item_id) != "roskoes-consuming-glare"
+			var count: int = int((values[0] + 1) / 2) if d2 else values[0]
+			action["count"] = count
+			action["quantity_sequence"] = result.sequence
+			action["state"] = "targets"
+			var message := "Choose exactly %d distinct creatures within 30 ft, then confirm targets." % count
+			if d2:
+				message += " d2 count used a physical d4 halved, rounded up."
+			action["message"] = message
+			return _public(action)
 		if action["phase"] == "parameters" and str(power.source_item_id) == "eyelid-blinds-the-mind":
 			action["count"] = values[0]
 			action["quantity_sequence"] = result.sequence
@@ -197,6 +234,128 @@ func _manual_result(context: SDK.SystemActionContext, action: Dictionary, change
 	var description := POWERS.new().report(str(power.source_item_id), values, presence)
 	return _complete(context, action, changes, "Manual outcome", "%s · %s. %s Handle at the table; no effects or expiry are automated. One daily use spent. Raw Rolls #%d / #%d." % [str(power.name), str(action.label), description, casting_sequence, sequence])
 
+func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanThrowResult) -> Dictionary:
+	var power: Dictionary = action.scroll
+	var healing: bool = str(power.source_item_id) == "grace-of-a-dead-saint"
+	var damage: bool = str(power.source_item_id) == "palms-open-the-southern-gate"
+	var term_index := 0
+	var changes: Array[SDK.ActorChange] = []
+	var details := ""
+	var targets: Array = action.targets
+	var count: int = action.count
+	var selected := _targets(context, {"targets": action.target_rooks}, action.rook, SDK.ActorId.new(action.source), power, count)
+	if selected.state == "error":
+		return _end(context, action)
+	var checked: Array = selected.targets
+	for index in range(targets.size()):
+		var target: Dictionary = targets[index]
+		var confirmed: Dictionary = checked[index]
+		if target.actor != confirmed.actor or target.schema != confirmed.schema:
+			return _end(context, action)
+		var current := context.read_actor(SDK.ActorId.new(target.actor))
+		if not current.ok or typeof(current.actor.data) != TYPE_DICTIONARY:
+			return _end(context, action)
+		var data: Dictionary = current.actor.data.duplicate(true)
+		if typeof(data.get("hit_points")) != TYPE_INT or (healing and typeof(data.get("maximum_hit_points")) != TYPE_INT):
+			return _end(context, action)
+		var hp: int = data.hit_points
+		var rolled: int = roll.terms[term_index].results[0]
+		term_index += 1
+		var amount := rolled
+		var reduction: int = 0
+		var shield: int = 0
+		if damage:
+			var protection: Dictionary = target.protection
+			if protection != confirmed.protection:
+				return _end(context, action)
+			var formula: String = protection.formula
+			shield = protection.shield
+			if not formula.is_empty():
+				for face in roll.terms[term_index].results:
+					reduction += int((face + 1) / 2) if formula == "d2" else face
+				if formula == "d4+1":
+					reduction += 1
+				term_index += 1
+			amount = rolled - reduction - shield
+			if amount < 0:
+				amount = 0
+		if healing:
+			var maximum: int = data.maximum_hit_points
+			if hp >= maximum:
+				amount = 0
+			elif amount > maximum - hp:
+				amount = maximum - hp
+		data["hit_points"] = hp + amount if healing else hp - amount
+		changes.append(SDK.ActorChange.new(current.actor.id, data))
+		if damage:
+			details += "%s: lost %d HP (damage %d, armor %d, shield %d). " % [str(confirmed.label), amount, rolled, reduction, shield]
+		else:
+			details += "%s: %s %d HP (rolled %d). " % [str(confirmed.label), "regained" if healing else "lost", amount, rolled]
+	var cast_sequence: int = action.sequence
+	var count_sequence: int = action.quantity_sequence
+	if damage:
+		details += "d2 armor used a physical d4 halved, rounded up. "
+	var outcome := "Healing applied" if healing else ("Damage applied" if damage else "HP loss applied")
+	return _complete(context, action, changes, outcome, "%s. %sOne daily use spent. Raw Rolls #%d, #%d, #%d." % [str(power.name), details, cast_sequence, count_sequence, roll.sequence])
+
+func _protection(data: Dictionary) -> Dictionary:
+	var formula := ""
+	var shield: int = 0
+	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
+		if typeof(data.get("armor", {})) != TYPE_DICTIONARY:
+			return {"error": "Target armor data is malformed. Correct its sheet before casting."}
+		var armor: Dictionary = data.get("armor", {})
+		if typeof(armor.get("reduction", "")) != TYPE_STRING:
+			return {"error": "Target armor data is malformed. Correct its sheet before casting."}
+		formula = str(armor.get("reduction", ""))
+	else:
+		if typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT:
+			return {"error": "Target inventory is malformed. Correct its sheet before casting."}
+		var inventory: Array = data.get("inventory", [])
+		for raw in inventory:
+			if typeof(raw) != TYPE_DICTIONARY:
+				return {"error": "Target inventory is malformed. Correct its sheet before casting."}
+			var item: Dictionary = raw
+			for key in ["equipped", "broken"]:
+				if typeof(item.get(key, false)) != TYPE_BOOL:
+					return {"error": "Target equipment is malformed. Correct its sheet before casting."}
+			if typeof(item.get("quantity", 1)) != TYPE_INT:
+				return {"error": "Target equipment is malformed. Correct its sheet before casting."}
+			for key in ["kind", "source_item_id", "inventory_id", "reduction"]:
+				if typeof(item.get(key, "")) != TYPE_STRING:
+					return {"error": "Target equipment is malformed. Correct its sheet before casting."}
+		for raw in ITEMS.new(null, SDK.ActorId.new("")).inventory(data):
+			var item: Dictionary = raw
+			var quantity: int = item.quantity
+			if not item.equipped or item.get("broken", false) or quantity < 1:
+				continue
+			if str(item.get("kind", "")) == "Armor":
+				formula = str(item.get("reduction", ""))
+			elif str(item.get("kind", "")) == "Shield":
+				shield = 1
+	if not formula.is_empty() and _armor_die(formula, "Armor") == null:
+		return {"error": "Target armor dice are unsupported. Correct its sheet before casting."}
+	return {"formula": formula, "shield": shield}
+
+func _armor_die(formula: String, label: String) -> SDK.DiceTerm:
+	# These are the reduction formulas supported by ordinary item editing.
+	var dice: Dictionary = {"d2": [4, 1], "d4": [4, 1], "d6": [6, 1], "d8": [8, 1], "d10": [10, 1], "d12": [12, 1], "2d6": [6, 2], "2d8": [8, 2], "d4+1": [4, 1]}
+	if not dice.has(formula):
+		return null
+	var parts: Array = dice.get(formula, [])
+	var faces: int = parts[0]
+	var count: int = parts[1]
+	return SDK.DiceTerm.new(label, faces, count)
+
+func _dice_label(label: String) -> String:
+	# Leave room for numbering and purpose within the host's 64 UTF-16-unit limit.
+	var result := ""
+	for character in label.split(""):
+		if result.length() >= 16:
+			break
+		result += character
+	return result
+
 func _complete(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], outcome: String, text: String) -> Dictionary:
 	var report := SDK.ActionLogMessage.new("Power casting")
 	report.result = outcome
@@ -206,6 +365,7 @@ func _complete(context: SDK.SystemActionContext, action: Dictionary, changes: Ar
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
+	action["outcome"] = outcome
 	return _public(action)
 
 func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
@@ -219,7 +379,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
-	return {"state": action.state, "message": action.message, "request": action.get("request", ""), "natural_face": action.get("natural_face", 0), "adjudication": action.get("adjudication", "")}
+	return {"state": action.state, "message": action.message, "request": action.get("request", ""), "natural_face": action.get("natural_face", 0), "adjudication": action.get("adjudication", ""), "outcome": action.get("outcome", ""), "target_error": action.get("target_error", false)}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}
@@ -315,6 +475,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 		var label := "Object"
 		var schema := ""
 		var actor_id := ""
+		var protection: Dictionary = {}
 		if target_rook.rook.actor != null:
 			var target := context.read_actor(target_rook.rook.actor)
 			if not target.ok or typeof(target.actor.data) != TYPE_DICTIONARY:
@@ -324,6 +485,24 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 			schema = str(target_data.get("schema", ""))
 			actor_id = target.actor.id.value
 			label = target.actor.public_label if not target.actor.public_label.is_empty() else "Creature"
+			if str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate"]:
+				if typeof(target_data.get("hit_points")) != TYPE_INT:
+					invalid = "Target HP data is malformed. Correct its sheet before casting."
+				if str(power.source_item_id) == "palms-open-the-southern-gate":
+					protection = _protection(target_data)
+					if protection.has("error"):
+						invalid = str(protection.error)
+				if str(power.source_item_id) == "grace-of-a-dead-saint":
+					if typeof(target_data.get("maximum_hit_points")) != TYPE_INT:
+						invalid = "Target maximum HP is malformed. Correct its sheet before casting."
+					else:
+						var maximum_hp: int = target_data.maximum_hit_points
+						if maximum_hp < 1:
+							invalid = "Target maximum HP must be positive. Correct its sheet before casting."
+					if typeof(target_data.get("hit_points")) == TYPE_INT:
+						var hp: int = target_data.hit_points
+						if hp < 0:
+							invalid = "Grace of a dead saint restores HP; it does not resurrect a dead target."
 		if mode != "object" and not schema in ["mork-borg-character/v1", "mork-borg-adversary/v1"]:
 			invalid = "Every target must be a Character or Creature."
 		if not actor_id.is_empty() and actor_id in actors:
@@ -334,7 +513,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 			invalid = distance.message
 		elif distance.distance > float(reach) * 0.3048 + 0.000001:
 			outside += ("\n" if not outside.is_empty() else "") + "target %s not in range" % label
-		targets.append({"actor": actor_id, "schema": schema, "label": label})
+		targets.append({"actor": actor_id, "schema": schema, "label": label, "protection": protection})
 		labels += (", " if not labels.is_empty() else "") + label
 	if not outside.is_empty():
 		var report := SDK.ActionLogMessage.new("Power out of range")
@@ -347,8 +526,9 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 		return _error(invalid)
 	if mode == "single" and targets.size() != 1:
 		return _error("Choose exactly one creature target.")
-	if mode == "multiple" and ((count > 0 and targets.size() != count) or targets.size() > 4):
-		return _error("Choose exactly %d distinct creature targets." % count if count > 0 else "Choose up to four creature targets; the Throw determines the count.")
+	var maximum := 2 if str(power.source_item_id) in ["grace-of-a-dead-saint", "palms-open-the-southern-gate"] else 4
+	if mode == "multiple" and ((count > 0 and targets.size() != count) or targets.size() > maximum):
+		return _error("Choose exactly %d distinct creature targets." % count if count > 0 else "Choose up to %d creature targets; the Throw determines the count." % maximum)
 	if mode == "object" and targets.size() > 1:
 		return _error("Choose one object; describe an unrepresented object with the table.")
 	return {"state": "ready", "label": labels if not labels.is_empty() else ("All creatures in the 30 ft area" if mode == "area" else "Table-selected object"), "targets": targets}
