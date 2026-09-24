@@ -269,14 +269,16 @@ func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.
 			if protection != confirmed.protection:
 				return _end(context, action)
 			var formula: String = protection.formula
-			shield = protection.shield
+			var shield_reduction: int = protection.shield
+			shield = shield_reduction
 			if not formula.is_empty():
 				for face in roll.terms[term_index].results:
 					reduction += int((face + 1) / 2) if formula == "d2" else face
 				if formula == "d4+1":
 					reduction += 1
 				term_index += 1
-			amount = rolled - reduction - shield
+			var after_armor: int = rolled - reduction
+			amount = after_armor - shield
 			if amount < 0:
 				amount = 0
 		if healing:
@@ -294,7 +296,7 @@ func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.
 	var cast_sequence: int = action.sequence
 	var count_sequence: int = action.quantity_sequence
 	if damage:
-		details += "d2 armor used a physical d4 halved, rounded up. "
+		details += "d2 armor uses a physical d4 halved, rounded up. "
 	var outcome := "Healing applied" if healing else ("Damage applied" if damage else "HP loss applied")
 	return _complete(context, action, changes, outcome, "%s. %sOne daily use spent. Raw Rolls #%d, #%d, #%d." % [str(power.name), details, cast_sequence, count_sequence, roll.sequence])
 
