@@ -175,6 +175,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		for term in result.terms:
 			for value in term.results:
 				values.append(value)
+		if action["phase"] == "parameters" and str(power.source_item_id) == "foul-psychompomp":
+			return _summon(context, action, values, result.sequence)
 		if action["phase"] == "parameters" and str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate"]:
 			var d2: bool = str(power.source_item_id) != "roskoes-consuming-glare"
 			var count: int = int((values[0] + 1) / 2) if d2 else values[0]
@@ -226,6 +228,28 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	if not context.commit([SDK.ActorChange.new(source.actor.id, data)], report).ok:
 		return _end(context, action)
 	return _request(context, action, "parameters", terms, "Power activated. Throw its stated quantities in the Dice Tray.")
+
+func _summon(context: SDK.SystemActionContext, action: Dictionary, values: Array[int], sequence: int) -> Dictionary:
+	var skeletons: bool = values[0] <= 3
+	var kind := "Skeleton" if skeletons else "Zombie"
+	var definition := "belze-skeleton" if skeletons else "nodh-zombie"
+	var requests: Array = []
+	for index in range(values[1]):
+		requests.append({"package_id": "0404eb56-ef27-4b1a-8385-27e4e3ec907e", "local_id": definition, "choices": {
+			"name": "%s %d" % [kind, index + 1], "summoner_actor": str(action.source),
+			"summon_action": str(action.id), "grant_source": "Foul Psychopomp"}})
+	var casting_sequence: int = action.sequence
+	var text := "Foul Psychopomp summoned %d %s Actors. Each has its own sheet; place their Rooks from Companions. One daily use spent. Raw Rolls #%d and #%d." % [values[1], "skeleton" if skeletons else "zombie", casting_sequence, sequence]
+	var report := SDK.ActionLogMessage.new("Power casting")
+	report.result = "Creatures summoned"
+	report.text = [SDK.ActionLogText.new(text)]
+	var created := context.create_actors(requests, str(action.owner), report)
+	if not created.ok:
+		return _end(context, action)
+	action["state"] = "resolved"
+	action["outcome"] = "Creatures summoned"
+	action["message"] = text
+	return _public(action)
 
 func _manual_result(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], values: Array[int], sequence: int) -> Dictionary:
 	var power: Dictionary = action.scroll

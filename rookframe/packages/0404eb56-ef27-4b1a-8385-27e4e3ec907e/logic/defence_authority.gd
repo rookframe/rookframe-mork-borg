@@ -97,8 +97,6 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 	return _public(action)
 
 func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Dictionary) -> Dictionary:
-	if not caller.is_gm:
-		return _error("The GM starts a Creature attack against a Character.")
 	if context.read_throw(str(input.id)).ok:
 		return {"state": "ended", "message": ENDED}
 	var validated := TARGETING.new().validate_creature(context, input)
@@ -133,11 +131,28 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		owners = selected
 	if owners.size() == 1 and not owners[0].is_connected:
 		return _error("This Character’s Player is not connected.")
+	var defender := str(caller.participant_id)
+	var defender_session := str(caller.session_id)
+	if owners.size() == 1:
+		defender = owners[0].participant_id
+		defender_session = owners[0].session_id
+	elif not caller.is_gm:
+		defender = ""
+		var sessions := context.participant_sessions()
+		if sessions.ok:
+			var participants: Array = sessions.value
+			for raw in participants:
+				var participant: Dictionary = raw
+				if participant.is_gm:
+					defender = str(participant.participant_id)
+					defender_session = str(participant.session_id)
+		if defender.is_empty():
+			return _error("The GM must be connected to defend this Character.")
 	var source := context.read_actor(SDK.ActorId.new(input.source))
 	var attack: Dictionary = validated.attack
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Agility", {})
-	var action := {"id": input.id, "source": input.source, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": owners[0].participant_id if owners.size() == 1 else caller.participant_id, "owner_session": owners[0].session_id if owners.size() == 1 else caller.session_id, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "agility": ability.get("modifier", 0), "difficulty": attack.get("defence_dr", 12), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	var action := {"id": input.id, "source": input.source, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "agility": ability.get("modifier", 0), "difficulty": attack.get("defence_dr", 12), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
 	for raw_item in ITEMS.new(null, target.actor.id).inventory(data):
 		var item: Dictionary = raw_item
 		var equipped: bool = item.equipped
@@ -307,13 +322,15 @@ func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 	if not sessions.ok:
 		return false
 	var initiator_present := false
+	var initiator_is_gm := false
 	var defender_present := false
 	var defender_is_gm := false
 	var entries: Array = sessions.value
 	for raw_entry in entries:
 		var entry: Dictionary = raw_entry
-		if entry.participant_id == action.participant and entry.session_id == action.session and entry.is_gm:
+		if entry.participant_id == action.participant and entry.session_id == action.session:
 			initiator_present = true
+			initiator_is_gm = entry.is_gm
 		if entry.participant_id == action.owner and entry.session_id == action.owner_session:
 			defender_present = true
 			defender_is_gm = entry.is_gm
@@ -323,6 +340,15 @@ func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 	var target := context.read_actor(SDK.ActorId.new(action.target))
 	if not source.ok or not target.ok:
 		return false
+	if not initiator_is_gm:
+		var source_access := context.actor_access(source.actor.id)
+		var permitted := false
+		if source_access.ok:
+			for entry in source_access.items:
+				if entry.participant_id == action.participant and entry.access_level == "Owner":
+					permitted = true
+		if not permitted:
+			return false
 	var target_data: Dictionary = target.actor.data
 	action["hp"] = target_data.get("hit_points", 0)
 	if defender_is_gm:

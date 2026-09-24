@@ -8,7 +8,7 @@ const CORE_DEFINITIONS: Dictionary = {
 	"dog-small-but-vicious": {"display_name": "Small but vicious dog", "hit_points": 8, "morale": {"kind": "none"}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Bite", "dice": "d4", "id": "bite", "range_feet": 5}]},
 	"aland-wickhead": {"display_name": "Aland, Wickhead knife-wielder", "hit_points": 10, "morale": {"kind": "fixed", "value": 7}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Knife with dried blood", "dice": "d4", "id": "knife-with-dried-blood", "range_feet": 5}]},
 	"arbint-troll": {"defence_dr": 10, "display_name": "Arbint, Troll", "hit_points": 32, "morale": {"kind": "special"}, "armor": {"name": "Thick hide", "reduction": "d2"}, "attacks": [{"name": "Fist", "dice": "2d6", "id": "fist", "range_feet": 5}]},
-	"belze-skeleton": {"piercing_defence_dr": 14, "destroy_at_damage": 5, "display_name": "Belze, blood-drenched skeleton", "hit_points": 7, "morale": {"kind": "fixed", "value": 8}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Shortsword", "dice": "d4", "id": "shortsword", "range_feet": 5}, {"name": "Knife", "dice": "d4", "id": "knife", "range_feet": 5}, {"name": "Bony knuckles", "dice": "d2", "id": "bony-knuckles", "range_feet": 5}]},
+	"belze-skeleton": {"rules": "Moves silently and attacks by surprise. Can repeat voices it has heard. Piercing attacks against it are DR14. Any strike dealing 5 or more damage destroys it completely.", "piercing_defence_dr": 14, "destroy_at_damage": 5, "display_name": "Belze, blood-drenched skeleton", "hit_points": 7, "morale": {"kind": "fixed", "value": 8}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Shortsword", "dice": "d4", "id": "shortsword", "range_feet": 5}, {"name": "Knife", "dice": "d4", "id": "knife", "range_feet": 5}, {"name": "Bony knuckles", "dice": "d2", "id": "bony-knuckles", "range_feet": 5}]},
 	"bent-scum": {"display_name": "Bent, Scum", "hit_points": 7, "morale": {"kind": "fixed", "value": 8}, "armor": {"name": "No armor", "reduction": ""}, "attacks": [{"name": "Poisoned knife", "dice": "d4", "id": "poisoned-knife", "range_feet": 5}]},
 	"eulotha-wyvern": {"display_name": "Eulotha, Wyvern", "hit_points": 25, "morale": {"kind": "fixed", "value": 10}, "armor": {"name": "Thick hide", "reduction": "d4"}, "attacks": [{"id": "bite", "name": "Bite", "dice": "d6", "range_feet": 5, "rules": "60% chance of biting; otherwise use Sting."}, {"id": "sting", "name": "Sting", "dice": "d6", "range_feet": 5, "rules": "Toughness DR14 avoids one painful hour of paralysis; duration is table managed."}]},
 	"lady-porcelain": {"display_name": "Lady Porcelain, undead doll", "hit_points": 11, "morale": {"kind": "none"}, "armor": {"name": "Porcelain", "reduction": "d2"}, "attacks": [{"id": "claws", "name": "Claws", "dice": "d4", "range_feet": 5}, {"id": "piercing-bite", "name": "Piercing bite", "dice": "d4", "range_feet": 5}]},
@@ -44,7 +44,7 @@ func create_data(raw_choices: Variant) -> Variant:
 		data["creation_id"] = choices["creation_id"]
 	if choices.has("creation_roll_sequence"):
 		data["creation_roll_sequence"] = choices["creation_roll_sequence"]
-	for key in ["name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
+	for key in ["summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
 		if choices.has(key):
 			data[key] = choices[key]
 	return data

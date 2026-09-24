@@ -5,6 +5,7 @@ const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8
 @onready var _creation_progress: CREATION_PROGRESS = get_node(^"Layout/CreationProgress")
 
 var _pending_companion: SDK.Actor
+var _placing_companion := false
 var _character_actor: SDK.Actor
 var _character_content: VBoxContainer
 const CHARACTER_CREATOR = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.gd")
@@ -287,6 +288,7 @@ func _setup_character_content() -> void:
 	get_node(^"Layout/SheetActions/Spend").pressed.connect(_spend_sheet_omen)
 	get_node(^"Layout/SheetActions/Attack").pressed.connect(_roll_sheet_attack)
 	_character_sheet.companion_selected.connect(_open_companion)
+	_character_sheet.companion_placement_requested.connect(_open_companion_for_placement)
 
 
 func _on_creation_stage_changed(step: int, title: String) -> void:
@@ -438,6 +440,10 @@ func _update_character_density() -> void:
 		var data: Dictionary = _character_actor.data
 		_set_window_title(_sheet_workflow_title if not _sheet_workflow_title.is_empty() else str(data.get("name", "Unnamed Character")))
 
+
+func _open_companion_for_placement(actor: SDK.Actor) -> void:
+	_placing_companion = true
+	_pending_companion = actor
 
 func _open_companion(actor: SDK.Actor) -> void:
 	_pending_companion = actor

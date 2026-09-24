@@ -13,7 +13,7 @@ const HANDLING: Dictionary = {
 	"daemon-of-capillaries": ["ongoing", "single", 30, true],
 	"nine-violet-signs-unknot-the-storm": ["manual allocation", "allocation", 30, true],
 	"metzhuotl-blind-your-eye": ["ongoing", "single", 30, true],
-	"foul-psychompomp": ["summon · RFG-291", "self", 0, false],
+	"foul-psychompomp": ["individual Creatures", "self", 0, true],
 	"eyelid-blinds-the-mind": ["resistance; manual sleep / PC ability", "multiple", 30, true],
 	"death": ["manual allocation", "area", 0, true],
 	"grace-of-a-dead-saint": ["immediate healing", "multiple", 30, true],
@@ -49,6 +49,8 @@ func definition(id: String) -> Dictionary:
 	return {}
 
 func parameters(id: String) -> Array[SDK.DiceTerm]:
+	if id == "foul-psychompomp":
+		return [SDK.DiceTerm.new("Creature type", 6), SDK.DiceTerm.new("Creatures", 4)]
 	if id in ["grace-of-a-dead-saint", "palms-open-the-southern-gate"]:
 		return [SDK.DiceTerm.new("Creatures (d2)", 4)]
 	if id in ["te-le-kin-esis"]:

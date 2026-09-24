@@ -401,7 +401,7 @@ func test_lightning_reports_each_bolt_without_assigning_damage() -> void:
 	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
 
 func test_restrictions_and_unfinished_powers_refuse_before_any_throw() -> void:
-	for restriction in ["uses", "viewer", "illiterate", "armor", "zweihand", "dizzy", "unowned", "foul-psychompomp"]:
+	for restriction in ["uses", "viewer", "illiterate", "armor", "zweihand", "dizzy", "unowned"]:
 		var host := _host(restriction if restriction.contains("-") else "tongue-of-eris")
 		var input := _cast_input()
 		match restriction:
@@ -556,11 +556,7 @@ func test_all_twenty_core_scrolls_have_an_explicit_playable_boundary() -> void:
 	for id in expected:
 		var host := _host(id)
 		var result := await SDK.new(host).system_actions.submit("power.start", _cast_input())
-		if id in ["foul-psychompomp"]:
-			assert_str(result.value.state).is_equal("error")
-			assert_str(result.value.message).contains("not playable yet")
-		else:
-			assert_str(result.value.state).override_failure_message(id).is_equal("pending")
+		assert_str(result.value.state).override_failure_message(id).is_equal("pending")
 	var commands := _host("enochian-syntax")
 	await SDK.new(commands).system_actions.submit("power.start", _cast_input())
 	commands.roll("cast", [11])

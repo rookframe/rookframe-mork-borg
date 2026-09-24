@@ -467,9 +467,17 @@ func test_companions_projection() -> void:
 	_check(unrelated.data.creation_id != host.actors[0].data.creation_id, "Distinct creation bundles have distinct stable IDs.")
 	second_creator.free()
 	host.actors.append(unrelated)
+	var summoned: Dictionary = unrelated.duplicate(true)
+	summoned.id = "summoned-creature"
+	summoned.data.erase("creation_id")
+	summoned.data["summoner_actor"] = host.actors[0].id
+	summoned.data["grant_source"] = "Foul Psychopomp"
+	host.actors.append(summoned)
 	var sheet = load(ROOT + "ui/character_sheet.tscn").instantiate()
 	add_child(auto_free(sheet))
 	var selected: Array[String] = []
+	var placed: Array[String] = []
+	sheet.companion_placement_requested.connect(func(actor: SDK.Actor): placed.append(actor.id.value))
 	sheet.companion_selected.connect(func(actor: SDK.Actor): selected.append(actor.id.value))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
@@ -485,10 +493,12 @@ func test_companions_projection() -> void:
 	_check(companion_view != null, "The Character sheet opens its companions route.")
 	if companion_view != null:
 		var rows = companion_view.get_node("Items").get_children()
-		_check(rows.size() == 1, "A same-named grant with a colliding local Roll sequence stays excluded.")
-		if rows.size() == 1:
-			rows[0].pressed.emit()
+		_check(rows.size() == 2, "Starting and summoned Actors share one list; unrelated Actors stay excluded.")
+		if rows.size() == 2:
+			rows[0].get_node("Actions/Open").pressed.emit()
 			_check(selected == ["child-1"], "Open sheet targets the individual granted Actor.")
+			rows[1].get_node("Actions/Place").pressed.emit()
+			_check(placed == ["summoned-creature"], "Placement targets the individual summoned Actor.")
 	sheet.free()
 	creator.free()
 

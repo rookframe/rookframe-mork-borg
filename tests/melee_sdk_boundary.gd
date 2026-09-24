@@ -23,9 +23,11 @@ var session := "player-session"
 var participant := "player"
 var game_master := false
 var access_entries: Array = []
+var access_by_actor: Dictionary = {}
 var fail_commit := false
 var active := false
 var last_request := ""
+var created_for := ""
 var defer_reply := false
 var queued_reply: Dictionary = {}
 var transient_failures: Dictionary = {}
@@ -58,10 +60,10 @@ func SystemIntentReadActor(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": actors[id].duplicate(true)} if actors.has(id) else {"ok": false, "message": "Actor unavailable"}
 func SystemIntentReadRook(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": {"id": id, "actor": rooks[id], "scene": "main", "position": Vector2.ZERO, "yaw": 0.0, "miniature": {"packageId": "", "localId": ""}}} if rooks.has(id) else {"ok": false}
-func SystemIntentActorAccess(_token: String, _id: String) -> Dictionary:
- return {"ok": true, "value": access_entries}
+func SystemIntentActorAccess(_token: String, id: String) -> Dictionary:
+ return {"ok": true, "value": access_by_actor.get(id, access_entries)}
 func SystemIntentDistance(_token: String, _from: String, _to: String) -> Dictionary:
- return {"ok": true, "value": distances.get(_to, distance)}
+ return {"ok": true, "value": distances.get(_from + "->" + _to, distances.get(_to, distance))}
 func SystemIntentReadThrow(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": requests[id].result.duplicate(true)} if requests.has(id) else {"ok": false}
 func SystemIntentRequestThrow(token: String, id: String, target: String, terms: Array) -> Dictionary:
@@ -106,3 +108,19 @@ func roll(id: String, values: Array) -> void:
 
 func SystemIntentParticipantSessions(_token: String) -> Dictionary:
  return {"ok": active, "value": sessions.duplicate(true)}
+
+func SystemIntentCreateActors(_token: String, creator: String, entries: Array, report: Dictionary) -> Dictionary:
+ if fail_commit:
+  return {"ok": false, "message": "Save failed"}
+ created_for = creator
+ var created: Array = []
+ for entry in entries:
+  var definition = load(ROOT + "content/" + str(entry.local_id) + ".tres")
+  var data: Variant = definition.create_data(entry.choices)
+  var id := "created-%d" % actors.size()
+  var actor := {"id": id, "data": data, "access_level": "Owner" if creator == participant or game_master else "None", "public_label": ""}
+  actors[id] = actor
+  created.append(actor.duplicate(true))
+ if not report.is_empty():
+  reports.append(report.duplicate(true))
+ return {"ok": true, "value": created}

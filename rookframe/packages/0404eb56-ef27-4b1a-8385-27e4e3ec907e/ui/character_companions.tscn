@@ -25,4 +25,4 @@ text = "No granted Creature sheets are available to you."
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
-text = "Each creature has its own sheet. Open a sheet to name and place its Rook."
+text = "Each creature has its own sheet. Place its Rook after creation."

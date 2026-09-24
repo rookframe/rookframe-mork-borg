@@ -6,6 +6,7 @@ const COMPANIONS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-83
 const CHARACTER_SHEET_VIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_view.tscn")
 
 signal companion_selected(actor: SDK.Actor)
+signal companion_placement_requested(actor: SDK.Actor)
 signal sheet_changed
 signal workflow_changed(route: String, title: String, can_submit: bool, busy: bool)
 signal shield_decision_closed
@@ -315,14 +316,20 @@ func _show_companions() -> void:
 	# Raw Roll sequences are provenance only: local logs can restart in a copy.
 	for actor in result.items:
 		var data: Dictionary = actor.data
-		if not creation_request.is_empty() and str(data.get("schema", "")) == "mork-borg-adversary/v1" and str(data.get("creation_id", "")) == creation_request:
+		var starting := not creation_request.is_empty() and str(data.get("creation_id", "")) == creation_request
+		var summoned := str(data.get("summoner_actor", "")) == _character_actor.id.value
+		if str(data.get("schema", "")) == "mork-borg-adversary/v1" and (starting or summoned):
 			companions.append(actor)
 	var view = COMPANIONS_SCENE.instantiate()
 	view.back_requested.connect(_on_cancel_requested)
 	view.actor_requested.connect(_on_companion_selected)
+	view.placement_requested.connect(_on_companion_placement_requested)
 	_content.add_child(view)
 	view.configure(companions, character_data.get("companion_sheets", []))
 
+
+func _on_companion_placement_requested(actor: SDK.Actor) -> void:
+	companion_placement_requested.emit(actor)
 
 func _on_companion_selected(actor: SDK.Actor) -> void:
 	companion_selected.emit(actor)
@@ -360,7 +367,7 @@ func refresh_from_world() -> void:
 		return
 	var access_changed := latest.actor.access_level != _character_actor.access_level
 	if not access_changed and latest.actor.data == _character_actor.data:
-		if _character_tab == "appearance":
+		if _character_tab == "appearance" or _character_route == "companions":
 			_render_pending = true
 		return
 	_character_actor = latest.actor

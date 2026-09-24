@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.22.5` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.23.0` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `0c152a804332dd5571caa8a2c3dd161aa21fb7f7` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -294,3 +294,22 @@ failed saves and interrupted sessions cannot cause partial or late HP changes.
 The accepted casting use and raw Rolls remain. Reports use public target names
 and reference all casting, count and consequence Rolls. Allocation, temporary
 HP, resurrection HP, ongoing effects and critical/fumble rulings stay manual.
+
+
+### Individual summons and granted Creatures (RFG-291)
+
+Foul Psychopomp requests its source d6 type and d4 count after an accepted
+casting test. SDK 2029 revision 15 atomically materializes individual skeleton
+or zombie Actors with the supplied profiles and ordinary Owner access for the
+caster's controlling Participant. The action retains its casting use, raw Rolls
+and one terminal report. Cancellation, disconnect, lost access, failed saves,
+restart and repeated requests cannot create late or duplicate summons. No
+allegiance, duration or automatic Rook placement is added.
+
+Starting and summoned Creatures share the Character's Companions list. Open
+sheet and Place Rook address each individual Actor. Equipped Inventory attacks
+validate that Creature's own selected source Rook and authored reach. An owned
+Creature attacking a Character requests the defending Character's controlling
+Participant. Creature-versus-Creature combat remains unavailable pending the
+explicit source-rule decision tracked in RFG-291; this release does not invent
+a roll convention for that case.

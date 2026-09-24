@@ -15,6 +15,8 @@ var _checking_range := false
 var _creature_targets_pending := false
 var _creature_targets_reading := false
 var _pending_creature_attack := ""
+var _inventory_refresh_pending := false
+var _world_refresh_pending := false
 
 func ready() -> void:
 	if sdk == null:
@@ -116,9 +118,12 @@ func _apply_density() -> void:
 
 func _refresh_world() -> void:
 	_creature_targets_pending = true
-	if _busy or _preserve_error or sdk == null:
+	_world_refresh_pending = true
+
+
+func _reload_world() -> void:
+	if sdk == null:
 		return
-	_set_status("Loading Creature catalogue…")
 	var content: SDK.ContentEntryListResult = sdk.content.list(SDK.ContentKind.Value.ACTOR_DEFINITION)
 	if not content.ok:
 		_set_status(content.message, true)
@@ -145,9 +150,19 @@ func _refresh_world() -> void:
 		_set_status(actors.message, true)
 		return
 	_actors = actors.items
+	if _selected_actor != null and _route in ["creature", "edit-creature", "creature-inventory", "creature-attack"]:
+		var latest := sdk.actors.read(_selected_actor.id)
+		if not latest.ok or latest.actor == null:
+			_selected_actor = null
+			_show_route("creatures")
+		elif _selected_actor.data != latest.actor.data or _selected_actor.access_level != latest.actor.access_level:
+			_selected_actor = latest.actor
+			if _route in ["creature", "creature-inventory"]:
+				_render_actor()
+			elif latest.actor.access_level != "Owner":
+				_show_route("creature")
 	_render_live_actors()
 	_render_public_names()
-	_set_status("Ready — immutable definitions are available to the GM.")
 
 
 func _render_definitions() -> void:
@@ -228,7 +243,7 @@ func _render_actor() -> void:
 	var morale_data: Dictionary = actor_data.get("morale", {})
 	var morale_kind: String = morale_data.get("kind", "none")
 	var morale_number: int = morale_data.get("value", 0)
-	var morale_value: String = "Special"
+	var morale_value: String = "—" if morale_kind == "none" else "Special"
 	if morale_kind == "fixed":
 		morale_value = "%d" % morale_number
 	var armor: Dictionary = actor_data.get("armor", {})
@@ -237,7 +252,7 @@ func _render_actor() -> void:
 	var attacks: Array = CREATURES.new().attack_options(actor_data)
 
 	_header_title.text = private_name.to_upper()
-	_header_subtitle.text = "Private Creature sheet · GM"
+	_header_subtitle.text = "Creature sheet · " + _selected_actor.access_level
 	_set_window_title(private_name)
 	if _compact:
 		_header_subtitle.visible = false
@@ -253,6 +268,7 @@ func _render_actor() -> void:
 		_rules.text = "Defence DR%d. %s" % [defence_dr, str(actor_data.get("rules", ""))]
 	_private_name.set("value", private_name)
 	_public_label.set("value", _selected_actor.public_label)
+	_public_label.visible = sdk.context().is_gm
 	_hit_points.set("value", str(hit_points))
 	_maximum_hit_points.set("value", str(maximum_hit_points))
 	_morale.set("value", str(morale_number))
@@ -288,11 +304,10 @@ func _render_equipment(attacks: Array) -> void:
 		return
 	for index in range(attacks.size()):
 		var attack: Dictionary = attacks[index]
-		var row := Button.new()
+		var row := Label.new()
 		row.custom_minimum_size = Vector2(0, 54)
-		row.alignment = 0
-		row.focus_mode = 2
-		row.theme_type_variation = "RookframeSecondaryButton"
+		row.autowrap_mode = 2
+		row.theme_type_variation = "RookframeBody"
 		var attack_name: String = attack.get("name", "Attack")
 		var attack_dice: String = attack.get("dice", "—")
 		var detail: String = "%s · %s ft" % [attack_dice, str(attack.get("range_feet", "—"))]
@@ -301,8 +316,6 @@ func _render_equipment(attacks: Array) -> void:
 			detail += " · Attack DR%d" % attack_dr
 		row.text = "%s\n%s" % [attack_name, detail]
 		_equipment_list.add_child(row)
-		row.disabled = _selected_actor.access_level != "Owner"
-		row.pressed.connect(_open_creature_attack.bind(str(attack.get("id", ""))))
 
 
 func _render_inventory(attacks: Array) -> void:
@@ -318,7 +331,9 @@ func _render_inventory(attacks: Array) -> void:
 		return
 	for index in range(attacks.size()):
 		var attack: Dictionary = attacks[index]
-		_inventory_items.add_child(_inventory_row(attack, true))
+		var equipped: bool = attack.get("equipped", true)
+		var list := _inventory_items if equipped else _inventory_carried
+		list.add_child(_inventory_row(attack, equipped))
 	if _inventory_carried.get_child_count() == 0:
 		var carried_empty := Label.new()
 		carried_empty.text = "No carried items recorded."
@@ -326,13 +341,36 @@ func _render_inventory(attacks: Array) -> void:
 		_inventory_carried.add_child(carried_empty)
 
 
-func _inventory_row(attack: Dictionary, _equipped: bool) -> Control:
+func _inventory_row(attack: Dictionary, equipped: bool) -> Control:
 	var row = ATTACK_ROW.instantiate()
-	row.configure({"name": str(attack.get("name", "Attack")), "inventory_id": str(attack.get("id", "")), "kind": "Weapon", "damage": str(attack.get("dice", "")), "range_feet": attack.get("range_feet", 0), "equipped": true}, false, _selected_actor.access_level != "Owner")
+	row.configure({"name": str(attack.get("name", "Attack")), "inventory_id": str(attack.get("id", "")), "kind": "Weapon", "damage": str(attack.get("dice", "")), "range_feet": attack.get("range_feet", 0), "equipped": equipped, "broken": attack.get("broken", false)}, false, _selected_actor.access_level != "Owner")
 	row.get_node(^"Actions/Edit").visible = false
-	row.get_node(^"Actions/Equip").visible = false
+	row.mutation_requested.connect(_change_creature_equipment)
 	row.navigate_requested.connect(_creature_attack_requested)
 	return row
+
+
+func _change_creature_equipment(_operation: String, arguments: Array) -> void:
+	if _busy or _selected_actor == null:
+		return
+	var current := sdk.actors.read(_selected_actor.id)
+	if not current.ok or current.actor.access_level != "Owner":
+		_set_status("Owner access is required to edit this Creature.", true)
+		return
+	var current_data: Dictionary = current.actor.data
+	var data: Dictionary = current_data.duplicate(true)
+	var attacks := CREATURES.new().attack_options(data)
+	for raw in attacks:
+		var attack: Dictionary = raw
+		if str(attack.get("id", "")) == str(arguments[0]):
+			attack["equipped"] = str(arguments[2]) == "true"
+	data["attacks"] = attacks
+	_set_busy(true, "Saving equipment…")
+	var updated := await sdk.actors.update(current.actor.id, data)
+	_set_busy(false, "Equipment saved." if updated.ok else updated.message, not updated.ok)
+	if updated.ok:
+		_selected_actor = updated.actor
+		_inventory_refresh_pending = true
 
 
 func _show_route(route: String) -> void:
@@ -340,6 +378,12 @@ func _show_route(route: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if _world_refresh_pending and not _busy:
+		_world_refresh_pending = false
+		_reload_world()
+	if _inventory_refresh_pending:
+		_inventory_refresh_pending = false
+		_render_actor()
 	if _defence_update_pending:
 		_defence_update_pending = false
 		_present_initiated_defence()
@@ -393,10 +437,10 @@ func _apply_route(route: String) -> void:
 	_public_heading.visible = false
 	_public_list.visible = false
 	_stats.visible = sheet
-	_identity_section.visible = sheet
+	_identity_section.visible = sheet and sdk.context().is_gm
 	_equipment_section.visible = sheet
 	_rules_section.visible = sheet
-	_access_section.visible = sheet
+	_access_section.visible = false
 	_edit_fields.visible = edit
 	_inventory.visible = inventory
 	_action_bar.visible = sheet or edit
@@ -427,7 +471,7 @@ func _apply_route(route: String) -> void:
 		var selected_data: Dictionary = _selected_actor.data
 		var inventory_name: String = selected_data.get("name", "CREATURE")
 		_header_title.text = inventory_name.to_upper()
-		_header_subtitle.text = "Private inventory · GM"
+		_header_subtitle.text = "Creature inventory · " + _selected_actor.access_level
 		_set_window_title(inventory_name)
 	_set_status(_status.text)
 
@@ -507,6 +551,9 @@ func _duplicate_creature() -> void:
 	# A separate duplicate is not another grant from the original creation.
 	data.erase("creation_id")
 	data.erase("creation_roll_sequence")
+	data.erase("summoner_actor")
+	data.erase("summon_action")
+	data.erase("grant_source")
 	_set_busy(true, "Duplicating private Creature sheet…")
 	var result: SDK.ActorResult = await sdk.actors.create(definition.reference, data)
 	_set_busy(false, result.message if not result.ok else "Creature duplicated.", not result.ok)
@@ -529,7 +576,9 @@ func _save_creature() -> void:
 	data["name"] = str(_private_name.get("value")).strip_edges()
 	data["hit_points"] = int(_hit_points.get("value"))
 	data["maximum_hit_points"] = int(_maximum_hit_points.get("value"))
-	data["morale"] = {"kind": "fixed", "value": int(_morale.get("value"))}
+	var original_morale: Dictionary = original_data.get("morale", {})
+	if str(original_morale.get("kind", "none")) == "fixed":
+		data["morale"] = {"kind": "fixed", "value": int(_morale.get("value"))}
 	_set_busy(true, "Saving private Creature sheet…")
 	# Keep the pending state observable for one rendered frame before the
 	# authority update completes.
@@ -567,10 +616,7 @@ func _place_rook() -> void:
 		_set_status("Choose a published Miniature Package before placing this Rook.", true)
 		return
 	var label := _selected_actor.public_label.strip_edges()
-	if label.is_empty():
-		_set_busy(false, "Choose a public name before placing this Rook.", true)
-		return
-	_set_busy(true, "Placing Rook and assigning its public identity…")
+	_set_busy(true, "Placing Creature Rook…")
 	var created: SDK.RookResult = await sdk.rooks.create(miniatures.items[0].reference, SDK.SceneId.new("main"), Vector2(0, 0))
 	if not created.ok:
 		_set_busy(false, created.message, true)
@@ -585,7 +631,7 @@ func _place_rook() -> void:
 		return
 	_selected_actor.public_label = label
 	_refresh_world()
-	_set_busy(false, "Rook placed with public identity: %s." % label)
+	_set_busy(false, "Creature Rook placed. Select it on the tabletop to act.")
 
 
 func _add_item() -> void:
@@ -639,6 +685,9 @@ func opened(actor_id: SDK.ActorId) -> void:
 
 func _navigate_companion(actor: SDK.Actor) -> void:
 	_select_actor(actor)
+	if _placing_companion:
+		_placing_companion = false
+		_place_rook()
 
 func _creature_attack_requested(_next_route: String, id: String) -> void:
 	_open_creature_attack(id)
