@@ -27,7 +27,9 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		if operation != "special.start" or context.read_throw(id).ok:
 			return {"state": "ended", "message": ENDED}
 		action = _start(context, participant, input)
-		action.merge({"id": id, "participant": participant.participant_id, "session": participant.session_id})
+		action["id"] = id
+		action["participant"] = participant.participant_id
+		action["session"] = participant.session_id
 		_actions.append(action)
 		return _public(action)
 	var shield_owner: Dictionary = action.get("shield_owner", {})
