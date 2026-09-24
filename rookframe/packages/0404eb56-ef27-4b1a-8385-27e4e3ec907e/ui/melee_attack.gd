@@ -12,7 +12,7 @@ func configure(character: Dictionary, item: Dictionary, options: Dictionary, sta
 	var strength_modifier: int = strength.get("modifier", 0)
 	get_node(^"Metrics/Strength/Content/Value").text = "%+d" % strength_modifier
 	var difficulty: int = _options.get("difficulty", 0)
-	get_node(^"Rules/Difficulty").value = "" if difficulty == 0 else str(difficulty)
+	get_node(^"Rules/Difficulty/Editor").text = "" if difficulty == 0 else str(difficulty)
 	get_node(^"Rules/Modifier").value = str(_options.modifier)
 	get_node(^"Rules/Lose").button_pressed = str(_options.fumble) == "lose"
 	var piercing: bool = _options.get("piercing", false)
@@ -27,7 +27,7 @@ func set_targets(text: String) -> void:
 	get_node(^"Target/Copy").text = text
 
 func options() -> Dictionary:
-	var difficulty: String = get_node(^"Rules/Difficulty").value.strip_edges()
+	var difficulty: String = get_node(^"Rules/Difficulty/Editor").text.strip_edges()
 	var modifier: String = get_node(^"Rules/Modifier").value.strip_edges()
 	if (not difficulty.is_empty() and not difficulty.is_valid_int()) or not modifier.is_valid_int():
 		return {}

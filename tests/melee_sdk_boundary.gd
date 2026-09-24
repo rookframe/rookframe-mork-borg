@@ -63,6 +63,9 @@ func SystemIntentDistance(_token: String, _from: String, _to: String) -> Diction
 func SystemIntentReadThrow(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": requests[id].result.duplicate(true)} if requests.has(id) else {"ok": false}
 func SystemIntentRequestThrow(token: String, id: String, target: String, terms: Array) -> Dictionary:
+ for term in terms:
+  if not term.faces in [4, 6, 8, 10, 12, 20]:
+   return {"ok": false, "message": "Unsupported physical die"}
  if not requests.has(id):
   requests[id] = {"participant": target, "terms": terms.duplicate(true), "result": {"request_id": id, "participant_id": target, "status": "pending", "plan": terms.duplicate(true), "terms": [], "sequence": 0}}
  last_request = id

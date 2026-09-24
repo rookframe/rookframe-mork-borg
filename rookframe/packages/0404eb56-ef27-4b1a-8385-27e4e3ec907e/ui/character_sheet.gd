@@ -429,6 +429,11 @@ func _choose_attack_targets() -> void:
 		var options := _melee_view.options()
 		if not options.is_empty():
 			_melee_options = options
+	if _melee != null and _melee.state == "error":
+		_melee.retire()
+		_melee = null
+		_melee_view.configure(_character_actor.data, _attack_item, _melee_options, "ready", "")
+		_sync_chrome()
 	var result: SDK.OperationResult = sdk.targeting.choose()
 	if not result.ok:
 		_set_status(result.message, true)

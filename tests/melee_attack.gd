@@ -18,8 +18,8 @@ func _run() -> void:
 	_check(host.requests["action-1"].terms == [{"name": "Attack", "faces": 20, "count": 1}], "The attack plan contains one Strength d20.")
 	host.roll("action-1", [17])
 	await sdk.system_actions.submit("melee.advance", {"id": "action-1"})
-	_check(host.requests[host.last_request].terms == [{"name": "Damage", "faces": 6, "count": 1}, {"name": "Protection", "faces": 2, "count": 1}], "A hit requests source damage and authority-derived protection.")
-	host.roll(host.last_request, [5, 2])
+	_check(host.requests[host.last_request].terms == [{"name": "Damage", "faces": 6, "count": 1}, {"name": "Protection", "faces": 4, "count": 1}], "A hit requests source damage and authority-derived protection.")
+	host.roll(host.last_request, [5, 4])
 	var finished: SDK.DataResult = await sdk.system_actions.submit("melee.advance", {"id": "action-1"})
 	_check(finished.ok and finished.value.state == "resolved" and host.actors.enemy.data.hit_points == 3, "A 5 minus 2 hit changes private HP from 6 to 3.")
 	_check(host.actors.enemy.access_level == "None" and not str(finished.value).contains("Seth"), "Public result retains the chosen label without granting private access.")
@@ -31,7 +31,7 @@ func _run() -> void:
 	await sdk.system_actions.submit("melee.start", _input("critical"))
 	host.roll("critical", [20])
 	await sdk.system_actions.submit("melee.advance", {"id": "critical"})
-	host.roll(host.last_request, [5, 2])
+	host.roll(host.last_request, [5, 4])
 	await sdk.system_actions.submit("melee.advance", {"id": "critical"})
 	_check(host.actors.enemy.data.hit_points == 12 and host.actors.enemy.data.armor.reduction == "", "Critical doubles damage before protection and reduces protection one tier.")
 	await sdk.system_actions.submit("melee.start", _input("fumble"))
@@ -52,6 +52,7 @@ func _run() -> void:
 		host.roll("quick-creature", [13])
 		await sdk.system_actions.submit("melee.advance", {"id": "quick-creature"})
 		_check(host.reports[-1].result == "Miss", "The Goblin's DR14 applies to a total of 12.")
+	await _d2_faces()
 	await _boundaries()
 	await _lifetime()
 	await _review_regressions()
@@ -65,6 +66,25 @@ func _check(value: bool, message: String) -> void:
 
 func _input(id: String) -> Dictionary:
 	return {"id": id, "source": "hero", "rook": "hero-rook", "item": "1", "difficulty": 12, "modifier": 0, "fumble": "break"}
+
+func _d2_faces() -> void:
+	for face in [1, 2, 3, 4]:
+		var host = BOUNDARY.new()
+		var system = SYSTEM.new()
+		root.add_child(system)
+		host.handler = system
+		var sdk := SDK.new(host)
+		host.actors.hero.data.inventory[0].damage = "d2"
+		host.actors.enemy.data.armor.reduction = ""
+		await sdk.system_actions.submit("melee.start", _input("d2-weapon"))
+		host.roll("d2-weapon", [17])
+		await sdk.system_actions.submit("melee.advance", {"id": "d2-weapon"})
+		_check(host.requests[host.last_request].terms[0].faces == 4, "d2 weapons request a supported physical d4.")
+		host.roll(host.last_request, [face])
+		await sdk.system_actions.submit("melee.advance", {"id": "d2-weapon"})
+		_check(host.actors.enemy.data.hit_points == [5, 5, 4, 4][face - 1], "Each raw d4 face gives the prescribed d2 damage.")
+		_check(str(host.reports[-1]).contains("d4 halved, rounded up"), "d2 interpretation preserves and explains its raw d4.")
+		system.free()
 
 func _boundaries() -> void:
 	for reach in [5, 10]:
@@ -103,12 +123,12 @@ func _boundaries() -> void:
 			host.roll("cancel", [17])
 			await sdk.system_actions.submit("melee.advance", {"id": "cancel"})
 		if stage == "after-damage":
-			host.roll(host.last_request, [5, 2])
+			host.roll(host.last_request, [5, 4])
 			await sdk.system_actions.submit("melee.advance", {"id": "cancel"})
 		await sdk.system_actions.submit("melee.cancel", {"id": "cancel"})
 		var expected := 3 if stage == "after-damage" else 6
 		if stage != "after-damage":
-			host.roll(host.last_request, [17] if stage == "before-roll" else [5, 2])
+			host.roll(host.last_request, [17] if stage == "before-roll" else [5, 4])
 		await sdk.system_actions.submit("melee.advance", {"id": "cancel"})
 		_check(host.actors.enemy.data.hit_points == expected, "Closure at %s preserves accepted consequences and refuses late results." % stage)
 		system.free()
@@ -205,7 +225,7 @@ func _review_regressions() -> void:
 	await sdk.system_actions.submit("melee.start", _input("long-names"))
 	host.roll("long-names", [17])
 	await sdk.system_actions.submit("melee.advance", {"id": "long-names"})
-	host.roll(host.last_request, [5, 2])
+	host.roll(host.last_request, [5, 4])
 	var hit: SDK.DataResult = await sdk.system_actions.submit("melee.advance", {"id": "long-names"})
 	_check(hit.value.state == "resolved" and host.actors.enemy.data.hit_points == 3 and host.reports[-1].title.length() <= 72, "Long editable names cannot prevent the accepted damage/report commit.")
 	host.actors.enemy.data.defence_dr = 29

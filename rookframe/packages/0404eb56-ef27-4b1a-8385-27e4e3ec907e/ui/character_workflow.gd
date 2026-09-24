@@ -10,6 +10,7 @@ var _character_content: VBoxContainer
 const CHARACTER_CREATOR = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.gd")
 var _character_creator: CHARACTER_CREATOR
 var _last_sheet_route := ""
+var _sheet_workflow_title := ""
 const CHARACTER_SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.gd")
 var _character_sheet: CHARACTER_SHEET
 var _character_transition_pending := false
@@ -393,8 +394,9 @@ func _on_sheet_changed() -> void:
 		_character_actor = latest.actor
 		var data: Dictionary = _character_actor.data
 		var name: String = data.get("name", "Unnamed Character")
-		_header_title.text = name.to_upper()
-		_set_window_title(name)
+		if _last_sheet_route in ["character", "inventory", "appearance"]:
+			_header_title.text = name.to_upper()
+			_set_window_title(name)
 
 
 func _update_character_density() -> void:
@@ -406,7 +408,7 @@ func _update_character_density() -> void:
 	_compact = compact
 	_header.visible = not compact
 	_header_title.visible = not compact
-	_header_subtitle.visible = not compact
+	_header_subtitle.visible = not compact and _last_sheet_route != "attack"
 	_content.custom_minimum_size = Vector2(0, 0) if compact else Vector2(0, 520)
 	_layout.add_theme_constant_override("separation", 6 if compact else 10)
 	_character_creator.set_compact(compact)
@@ -414,7 +416,7 @@ func _update_character_density() -> void:
 		_set_window_title("CREATE CHARACTER")
 	elif _character_actor != null:
 		var data: Dictionary = _character_actor.data
-		_set_window_title(str(data.get("name", "Unnamed Character")))
+		_set_window_title(_sheet_workflow_title if not _sheet_workflow_title.is_empty() else str(data.get("name", "Unnamed Character")))
 
 
 func _open_companion(actor: SDK.Actor) -> void:
@@ -437,6 +439,13 @@ func _on_character_unavailable() -> void:
 	_character_tabs.visible = false
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
+	_sheet_workflow_title = title
+	if route == "attack":
+		_header_title.text = title.to_upper()
+	elif _character_actor != null:
+		var data: Dictionary = _character_actor.data
+		_header_title.text = str(data.get("name", "Unnamed Character")).to_upper()
+	_header_subtitle.visible = not _compact and route != "attack"
 	if route != _last_sheet_route:
 		get_node(^"Layout/Body").scroll_vertical = 0
 		_last_sheet_route = route

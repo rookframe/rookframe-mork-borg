@@ -4,7 +4,7 @@
 [node name="MeleeAttack" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+theme_override_constants/separation = 8
 script = ExtResource("1")
 [node name="Context" type="Label" parent="."]
 layout_mode = 2
@@ -12,17 +12,17 @@ theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
 [node name="Metrics" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 8
+theme_override_constants/separation = 0
 [node name="Damage" type="PanelContainer" parent="Metrics"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSection"
+theme_type_variation = &"RookframeInsetSurface"
 [node name="Content" type="VBoxContainer" parent="Metrics/Damage"]
 layout_mode = 2
 theme_override_constants/separation = 4
 [node name="Label" type="Label" parent="Metrics/Damage/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
+theme_type_variation = &"RookframeLabel"
 text = "DAMAGE"
 [node name="Value" type="Label" parent="Metrics/Damage/Content"]
 layout_mode = 2
@@ -30,13 +30,13 @@ theme_type_variation = &"RookframeValue"
 [node name="Reach" type="PanelContainer" parent="Metrics"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSection"
+theme_type_variation = &"RookframeInsetSurface"
 [node name="Content" type="VBoxContainer" parent="Metrics/Reach"]
 layout_mode = 2
 theme_override_constants/separation = 4
 [node name="Label" type="Label" parent="Metrics/Reach/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
+theme_type_variation = &"RookframeLabel"
 text = "REACH"
 [node name="Value" type="Label" parent="Metrics/Reach/Content"]
 layout_mode = 2
@@ -44,13 +44,13 @@ theme_type_variation = &"RookframeValue"
 [node name="Strength" type="PanelContainer" parent="Metrics"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSection"
+theme_type_variation = &"RookframeInsetSurface"
 [node name="Content" type="VBoxContainer" parent="Metrics/Strength"]
 layout_mode = 2
 theme_override_constants/separation = 4
 [node name="Label" type="Label" parent="Metrics/Strength/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
+theme_type_variation = &"RookframeLabel"
 text = "STRENGTH"
 [node name="Value" type="Label" parent="Metrics/Strength/Content"]
 layout_mode = 2
@@ -76,10 +76,17 @@ autowrap_mode = 2
 [node name="Rules" type="VBoxContainer" parent="."]
 layout_mode = 2
 theme_override_constants/separation = 8
-[node name="Difficulty" parent="Rules" instance=ExtResource("2")]
+[node name="Difficulty" type="HBoxContainer" parent="Rules"]
 layout_mode = 2
-label_text = "Difficulty override"
-placeholder = "Source difficulty"
+[node name="Label" type="Label" parent="Rules/Difficulty"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeLabel"
+text = "DIFFICULTY"
+[node name="Editor" type="LineEdit" parent="Rules/Difficulty"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 44)
+accessibility_name = "Difficulty override, blank uses source rule"
 [node name="Modifier" parent="Rules" instance=ExtResource("2")]
 layout_mode = 2
 label_text = "Situational modifier"

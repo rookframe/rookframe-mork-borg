@@ -213,13 +213,13 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	data = data.duplicate(true)
 	var damage := 0
 	for value in result.terms[0].results:
-		damage += value
+		damage += _face_value(action.damage, value)
 	if action.raw == 20:
 		damage *= 2
 	var protection := 0
 	if result.terms.size() > 1:
 		for value in result.terms[1].results:
-			protection += value
+			protection += _face_value(action.protection, value)
 	var lost: int = damage - protection
 	if lost < 0:
 		lost = 0
@@ -235,6 +235,8 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 		data["armor"] = armor
 	var sequence: int = action.sequence
 	var text := "%s hits %s for %d damage after protection. Raw Rolls #%d and #%d." % [str(action.name), str(action.label), lost, sequence, result.sequence]
+	if str(action.damage).ends_with("d2") or str(action.protection).ends_with("d2"):
+		text += " d2 uses each physical d4 halved, rounded up."
 	if action.raw == 20:
 		text += " Critical: double damage and protection reduced one tier."
 	return _complete(context, action, [SDK.ActorChange.new(target.actor.id, data)], str(lost) + " damage", text)
@@ -310,7 +312,10 @@ func _dice(formula: String, name: String) -> SDK.DiceTerm:
 	var faces := int(parts[1])
 	if count < 1 or count > 15 or not faces in [2, 4, 6, 8, 10, 12, 20]:
 		return null
-	return SDK.DiceTerm.new(name, faces, count)
+	return SDK.DiceTerm.new(name, 4 if faces == 2 else faces, count)
+
+func _face_value(formula: String, value: int) -> int:
+	return int((value + 1) / 2) if formula.ends_with("d2") else value
 
 func _valid_options(input: Dictionary) -> bool:
 	for key in ["source", "rook", "item", "fumble"]:

@@ -172,3 +172,6 @@ ending prevents further interpretation. Completed raw Rolls and accepted HP,
 armor, equipment and public reports remain; reopening does not resume an action.
 The focused melee suite exercises this through generated public SDK actions,
 with only the external host boundary substituted.
+
+Melee d2 damage or protection uses a physical d4: 1–2 gives 1, 3–4 gives 2.
+The raw d4 remains in the Roll record; the result explains this conversion.
