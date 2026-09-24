@@ -13,12 +13,19 @@ var _creature_item_view: ITEM_EDITOR
 var _creature_item_refresh_pending := false
 var _creature_item_id := ""
 const DEFENCE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_action.gd")
+const CREATURE_MELEE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_action.gd")
+const CREATURE_DEFENCE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_defence_flow.gd")
+@onready var _creature_defence: CREATURE_DEFENCE = get_node(^"Layout/Body/Content/CreatureDefence")
+var _creature_melee: CREATURE_MELEE
+var _creature_melee_update := false
+var _creature_roll_mode := ""
 var _initiated_defence: DEFENCE_ACTION
 var _responsible_owner := ""
 var _defence_update_pending := false
 var _creature_attack: Dictionary = {}
 var _creature_rook: SDK.RookId
 var _checking_range := false
+var _creature_preparation := 0
 var _creature_targets_pending := false
 var _creature_targets_reading := false
 var _pending_creature_attack := ""
@@ -30,6 +37,9 @@ func ready() -> void:
 		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
 		return
 	character_setup()
+	_creature_defence.changed.connect(_creature_defence_changed)
+	_creature_defence.resolved.connect(_creature_defence_resolved)
+	_creature_defence.decision_closed.connect(_creature_decision_closed)
 	sdk.targeting.changed.connect(_creature_targets_changed)
 	get_node(^"Layout/Body/Content/CreatureAttack").targets_requested.connect(_choose_creature_targets)
 	_compact = not sdk.presentation_experience().is_desktop
@@ -122,6 +132,8 @@ func _apply_density() -> void:
 
 func _refresh_world() -> void:
 	_creature_targets_pending = true
+	if _creature_melee != null:
+		_creature_melee.refresh()
 	_world_refresh_pending = true
 
 
@@ -229,6 +241,7 @@ func _select_definition(entry: SDK.ContentEntry) -> void:
 
 
 func _select_actor(actor: SDK.Actor) -> void:
+	_close_creature_actions()
 	_selected_actor = actor
 	var actor_data: Dictionary = actor.data
 	if actor_data.get("schema", "") == "mork-borg-character/v1":
@@ -419,6 +432,9 @@ func _show_route(route: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if _creature_melee_update:
+		_creature_melee_update = false
+		_present_creature_melee()
 	if _creature_item_refresh_pending and not _busy:
 		_creature_item_refresh_pending = false
 		if _creature_item_view != null and _selected_actor != null:
@@ -448,6 +464,7 @@ func _process(delta: float) -> void:
 
 
 func _apply_route(route: String) -> void:
+	_creature_defence.visible = false
 	get_node(^"Layout/Body/Content/CreatureAttack").visible = false
 	get_node(^"Layout/SheetActions").visible = false
 	if route.begins_with("create-") or route in ["character", "edit", "appearance"]:
@@ -722,6 +739,14 @@ func opened(actor_id: SDK.ActorId) -> void:
 	var result: SDK.ActorResult = sdk.actors.read(actor_id)
 	if result.ok and result.actor != null:
 		_select_actor(result.actor)
+		var inbox := await sdk.system_actions.submit("defence.inbox", {})
+		if inbox.ok and typeof(inbox.value) == TYPE_ARRAY:
+			var actions: Array = inbox.value
+			for raw in actions:
+				var action: Dictionary = raw
+				if str(action.target) == actor_id.value and action.state in ["ready", "pending", "shield"]:
+					_offer_actor_defence(result.actor, action)
+					break
 	else:
 		_set_status(result.message, true)
 
@@ -750,6 +775,8 @@ func _present_creature_attack(id: String) -> void:
 			_creature_attack = attack
 	if _creature_attack.is_empty():
 		return
+	_close_creature_actions()
+	_creature_roll_mode = ""
 	_apply_route("creature-attack")
 	_creature_rook = sdk.rooks.selected()
 	_responsible_owner = ""
@@ -761,8 +788,10 @@ func _present_creature_attack(id: String) -> void:
 	_routes.visible = false
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
 	view.visible = true
-	view.configure(data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "selected", "")
-	view.get_node(^"Metrics/Strength").visible = false
+	var combat_data := data.duplicate(true)
+	combat_data["inventory"] = CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
+	view.configure(combat_data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet, "ammunition": _creature_attack.get("ammunition", "")}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "ready", "")
+	view.get_node(^"Metrics/Strength").visible = true
 	view.get_node(^"Context").text = str(data.get("name", "Creature")) + " · Selected attack"
 	_creature_targets_pending = true
 	var source_rules := str(_creature_attack.get("rules", ""))
@@ -777,7 +806,7 @@ func _present_creature_attack(id: String) -> void:
 	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory"
 	get_node(^"Layout/SheetActions/Back").disabled = false
 	get_node(^"Layout/SheetActions/Attack").visible = true
-	get_node(^"Layout/SheetActions/Attack").text = "Request defence"
+	get_node(^"Layout/SheetActions/Attack").text = "Use attack"
 	get_node(^"Layout/SheetActions/Attack").disabled = false
 	_body.scroll_vertical = 0
 
@@ -788,6 +817,9 @@ func _choose_creature_targets() -> void:
 		_set_status(result.message, true)
 
 func _roll_sheet_attack() -> void:
+	if _route == "creature-defence":
+		_creature_defence.roll()
+		return
 	if _route != "creature-attack":
 		super._roll_sheet_attack()
 		return
@@ -796,15 +828,69 @@ func _roll_sheet_attack() -> void:
 	if _creature_rook == null:
 		_set_status("Select this Creature’s source Rook before opening its attack.", true)
 		return
-	if _initiated_defence != null and _initiated_defence.pending:
+	if (_initiated_defence != null and _initiated_defence.pending) or (_creature_melee != null and _creature_melee.pending):
 		return
-	if _initiated_defence != null:
-		_initiated_defence.retire()
-	var action := DEFENCE_ACTION.new(sdk)
-	add_child(action)
-	_initiated_defence = action
-	_initiated_defence.changed.connect(_initiated_defence_changed)
-	await _initiated_defence.start({"source": _selected_actor.id.value, "rook": _creature_rook.value, "attack": str(_creature_attack.id), "owner": _responsible_owner})
+	var view = get_node(^"Layout/Body/Content/CreatureAttack")
+	var options: Dictionary = view.options()
+	if options.is_empty():
+		_creature_attack_error("Enter whole numbers for difficulty and modifier.")
+		return
+	var input := {"source": _selected_actor.id.value, "rook": _creature_rook.value, "attack": str(_creature_attack.id), "owner": _responsible_owner}
+	for key in ["difficulty", "modifier", "fumble", "piercing", "ammunition"]:
+		input[key] = options[key]
+	_checking_range = true
+	var preparation := _creature_preparation
+	var prepared := await sdk.system_actions.submit("attack.validate", input)
+	_checking_range = false
+	if preparation != _creature_preparation or _route != "creature-attack" or _surface_is_hidden():
+		return
+	if not prepared.ok:
+		_creature_attack_error(prepared.message)
+		return
+	var outcome: Dictionary = prepared.value
+	if outcome.state != "ready":
+		_creature_attack_error(str(outcome.message))
+		return
+	_creature_roll_mode = str(outcome.resolution)
+	if _creature_roll_mode == "attack":
+		if _creature_melee != null:
+			_creature_melee.retire()
+		var melee := CREATURE_MELEE.new(sdk)
+		add_child(melee)
+		_creature_melee = melee
+		_creature_melee.changed.connect(_creature_melee_changed)
+		input["item"] = str(_creature_attack.get("inventory_id", "creature:" + str(_creature_attack.id)))
+		await _creature_melee.start(input)
+	else:
+		if _initiated_defence != null:
+			_initiated_defence.retire()
+		var action := DEFENCE_ACTION.new(sdk)
+		add_child(action)
+		_initiated_defence = action
+		_initiated_defence.changed.connect(_initiated_defence_changed)
+		await _initiated_defence.start(input)
+
+func _creature_attack_error(message: String) -> void:
+	var outcome: Label = get_node(^"Layout/Body/Content/CreatureAttack/Outcome")
+	outcome.visible = true
+	outcome.text = message
+	outcome.theme_type_variation = "RookframeError"
+
+func _creature_melee_changed() -> void:
+	_creature_melee_update = true
+
+func _present_creature_melee() -> void:
+	if _route != "creature-attack" or _creature_melee == null:
+		return
+	var action := _creature_melee
+	get_node(^"Layout/SheetActions/Attack").disabled = action.pending or action.state in ["resolved", "ended"]
+	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if action.pending else "Roll attack"
+	var view = get_node(^"Layout/Body/Content/CreatureAttack")
+	view.get_node(^"Target/Change").disabled = action.pending
+	view.get_node(^"Rules").visible = action.state == "error"
+	view.get_node(^"Outcome").visible = true
+	view.get_node(^"Outcome").text = action.message
+	view.get_node(^"Outcome").theme_type_variation = "RookframeError" if action.state == "error" else "RookframeMeta"
 
 func _initiated_defence_changed() -> void:
 	_defence_update_pending = true
@@ -813,10 +899,7 @@ func _present_initiated_defence() -> void:
 	if _initiated_defence.state == "ready" and str(_initiated_defence.snapshot.get("defender", "")) == sdk.context().participant_id:
 		var target := sdk.actors.read(SDK.ActorId.new(str(_initiated_defence.snapshot.target)))
 		if target.ok:
-			_character_actor = target.actor
-			character_show_route("character")
-			get_node(^"Layout/Body/Content/CreatureAttack").visible = false
-			_character_sheet.offer_defence(_initiated_defence.snapshot)
+			_offer_actor_defence(target.actor, _initiated_defence.snapshot)
 		return
 	if _route != "creature-attack":
 		return
@@ -849,13 +932,20 @@ func _select_defender(id: String) -> void:
 
 func _window_closed() -> void:
 	super._window_closed()
+	_close_creature_actions()
+
+func _close_creature_actions() -> void:
+	_creature_preparation += 1
+	if _creature_melee != null:
+		_creature_melee.cancel()
 	if _initiated_defence != null:
 		_initiated_defence.cancel()
+	if _creature_defence != null:
+		_creature_defence.close()
 
 func _cancel_sheet_workflow() -> void:
-	if _route == "creature-attack":
-		if _initiated_defence != null:
-			_initiated_defence.cancel()
+	if _route in ["creature-attack", "creature-defence"]:
+		_close_creature_actions()
 		_show_route("creature-inventory")
 	else:
 		super._cancel_sheet_workflow()
@@ -870,3 +960,43 @@ func _refresh_creature_targets() -> void:
 	_creature_targets_reading = false
 	if _route == "creature-attack":
 		get_node(^"Layout/Body/Content/CreatureAttack").set_targets(summary)
+
+func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
+	var data: Dictionary = actor.data
+	_pending_route = ""
+	if str(data.get("schema", "")) == "mork-borg-character/v1":
+		_character_actor = actor
+		character_show_route("character")
+		get_node(^"Layout/Body/Content/CreatureAttack").visible = false
+		_character_sheet.offer_defence(outcome)
+		return
+	_selected_actor = actor
+	_apply_route("creature-defence")
+	_routes.visible = false
+	_header_title.text = str(data.get("name", "Creature")).to_upper() + " · DEFENCE"
+	_header_subtitle.visible = false
+	_set_window_title(str(data.get("name", "Creature")) + " · Defence")
+	_creature_defence.visible = true
+	_creature_defence.present(sdk, outcome)
+	_body.scroll_vertical = 0
+	get_node(^"Layout/SheetActions").visible = true
+	get_node(^"Layout/SheetActions/Spend").visible = false
+	get_node(^"Layout/SheetActions/Back").text = "Cancel"
+	get_node(^"Layout/SheetActions/Back").disabled = false
+
+func _creature_defence_changed(state: String, can_roll: bool, automatic_hit: bool) -> void:
+	if _route != "creature-defence":
+		return
+	var button: Button = get_node(^"Layout/SheetActions/Attack")
+	button.visible = true
+	button.disabled = not can_roll
+	button.text = ("Roll damage" if automatic_hit else "Roll defence") if state == "ready" else "Waiting…"
+	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory" if state in ["ended", "resolved"] else "Cancel"
+
+func _creature_defence_resolved() -> void:
+	if _route == "creature-defence":
+		_show_route("creature-inventory")
+		_inventory_refresh_pending = true
+
+func _creature_decision_closed() -> void:
+	get_node(^"Layout/SheetActions/Back").grab_focus()

@@ -287,3 +287,195 @@ func test_equipped_creature_shield_reduces_melee_and_power_damage(operation: Str
 		host.roll(host.last_request, [5, 4])
 		await sdk.system_actions.submit("power.advance", {"id": "cast"})
 	assert_int(host.actors.enemy.data.hit_points).is_equal(5)
+
+func test_companion_flat_attack_combines_printed_drs_and_hides_private_target() -> void:
+	var host := _host()
+	host.actors.hero.data = load(ROOT + "content/ancient-gore-hound.tres").create_data({})
+	# No Character abilities are used, even if unrelated data contains them.
+	host.actors.hero.data["abilities"] = {"Strength": {"modifier": 6}}
+	host.actors.enemy.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("melee.start", {"id": "hound", "source": "hero", "rook": "hero-rook", "item": "creature:bite"})
+	assert_str(result.value.state).is_equal("pending")
+	if result.value.state != "pending":
+		return
+	assert_str(host.requests.hound.participant).is_equal("player")
+	host.roll("hound", [11]) # Own DR10 plus target DR14 => DR12: flat 11 misses.
+	result = await sdk.system_actions.submit("melee.advance", {"id": "hound"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.requests.size()).is_equal(1)
+	assert_str(result.value.message).contains("misses Hooded stranger").not_contains("Seth")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+	result = await sdk.system_actions.submit("melee.start", {"id": "hound-hit", "source": "hero", "rook": "hero-rook", "item": "creature:bite"})
+	host.roll("hound-hit", [12])
+	await sdk.system_actions.submit("melee.advance", {"id": "hound-hit"})
+	host.roll(host.last_request, [5, 4]) # d6 damage 5, physical d4 -> d2 protection 2.
+	result = await sdk.system_actions.submit("melee.advance", {"id": "hound-hit"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(3)
+	assert_str(result.value.message).contains("Raw Rolls").not_contains("Seth")
+	await sdk.system_actions.submit("melee.advance", {"id": "hound-hit"})
+	assert_int(host.actors.enemy.data.hit_points).is_equal(3)
+
+func test_companion_defends_flat_with_printed_exceptions_and_its_own_armor() -> void:
+	var host := _combat_host()
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
+	host.actors.enemy.data["abilities"] = {"Agility": {"modifier": 6}}
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("defence.start", {"id": "hawk", "source": "hero", "rook": "hero-rook", "attack": "knife"})
+	assert_str(result.value.state).is_equal("ready")
+	if result.value.state != "ready":
+		return
+	assert_int(result.value.agility).is_equal(0)
+	assert_int(result.value.difficulty).is_equal(12) # Hawk DR10 + goblin's difficult-to-defend DR14.
+	assert_bool(result.value.flat_test).is_true()
+	host.participant = "defender"
+	host.session = "defender-session"
+	await sdk.system_actions.submit("defence.roll", {"id": "hawk"})
+	assert_str(host.requests.hawk.participant).is_equal("defender")
+	host.roll("hawk", [11])
+	await sdk.system_actions.submit("defence.advance", {"id": "hawk"})
+	host.roll(host.last_request, [3])
+	result = await sdk.system_actions.submit("defence.advance", {"id": "hawk"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(5)
+	assert_int(host.requests.size()).is_equal(2) # Defence and damage, no attacking d20 as well.
+
+func test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks(weapon: String, natural: bool, _test_parameters := [["bony-knuckles", true], ["knife", false]]) -> void:
+	var host := _host()
+	host.actors.hero.data = load(ROOT + "content/belze-skeleton.tres").create_data({})
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("melee.start", {"id": "fumble", "source": "hero", "rook": "hero-rook", "item": "creature:" + weapon})
+	assert_str(result.value.state).is_equal("pending")
+	if result.value.state != "pending":
+		return
+	host.roll("fumble", [1])
+	result = await sdk.system_actions.submit("melee.advance", {"id": "fumble"})
+	assert_str(result.value.state).is_equal("resolved")
+	if natural:
+		assert_str(result.value.message).contains("GM").not_contains("broken")
+	result = await sdk.system_actions.submit("attack.validate", {"source": "hero", "rook": "hero-rook", "attack": weapon})
+	assert_str(result.value.state).is_equal("ready" if natural else "error")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+
+func test_companion_defence_fumble_and_shield_choice_persist_individual_equipment() -> void:
+	var host := _combat_host()
+	host.actors.enemy.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
+	host.actors.enemy.access_level = "Owner"
+	var sdk := SDK.new(host)
+	var actions = load(ROOT + "logic/creature_actions.gd").new(sdk, SDK.ActorId.new("enemy"))
+	var added: SDK.ActorResult = await actions.add_equipment("shield")
+	var shield: String = added.actor.data.inventory[-1].inventory_id
+	await actions.change_item(shield, "quantity", "2")
+	await actions.change_item(shield, "equipped", "true")
+	await sdk.system_actions.submit("defence.start", {"id": "undead", "source": "hero", "rook": "hero-rook", "attack": "bite"})
+	host.participant = "defender"
+	host.session = "defender-session"
+	await sdk.system_actions.submit("defence.roll", {"id": "undead"})
+	host.roll("undead", [1])
+	await sdk.system_actions.submit("defence.advance", {"id": "undead"})
+	host.roll(host.last_request, [4, 1]) # d2 damage 2 doubled, d2 armor 1, shield 1 => 2.
+	var result := await sdk.system_actions.submit("defence.advance", {"id": "undead"})
+	assert_str(result.value.state).is_equal("shield")
+	assert_str(host.actors.enemy.data.armor.reduction).is_empty()
+	assert_int(host.actors.enemy.data.hit_points).is_equal(7)
+	result = await sdk.system_actions.submit("defence.choose", {"id": "undead", "choice": "break"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(7)
+	await actions.add_equipment("torch")
+	assert_str(host.actors.enemy.data.armor.reduction).is_empty()
+	var shields: Array = host.actors.enemy.data.inventory.filter(func(item): return item.get("kind", "") == "Shield")
+	assert_int(shields.size()).is_equal(2)
+	assert_int(shields[0].quantity).is_equal(1)
+	assert_bool(shields[1].broken).is_true()
+
+func test_companion_attack_termination_rejects_late_damage(reason: String, _test_parameters := [["cancel"], ["disconnect"], ["access"], ["save"]]) -> void:
+	var host := _host()
+	host.actors.hero.data = load(ROOT + "content/dog-small-but-vicious.tres").create_data({})
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("melee.start", {"id": "dog", "source": "hero", "rook": "hero-rook", "item": "creature:bite"})
+	host.roll("dog", [16])
+	await sdk.system_actions.submit("melee.advance", {"id": "dog"})
+	var damage_request := host.last_request
+	if reason == "cancel":
+		await sdk.system_actions.submit("melee.cancel", {"id": "dog"})
+	elif reason == "disconnect":
+		host.sessions = []
+	elif reason == "access":
+		host.actors.hero.access_level = "Viewer"
+	else:
+		host.fail_commit = true
+	host.roll(damage_request, [4, 1])
+	var result := await sdk.system_actions.submit("melee.advance", {"id": "dog"})
+	assert_str(result.value.state).is_equal("ended")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+	host.fail_commit = false
+	host.actors.hero.access_level = "Owner"
+	await sdk.system_actions.submit("melee.advance", {"id": "dog"})
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+
+func test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions() -> void:
+	var host := _host()
+	host.actors.hero.data = load(ROOT + "content/thinx-grotesque.tres").create_data({})
+	host.actors.enemy.data = load(ROOT + "content/belze-skeleton.tres").create_data({})
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("melee.start", {"id": "beam", "source": "hero", "rook": "hero-rook", "item": "creature:eye-beam"})
+	assert_str(result.value.state).is_equal("pending")
+	if result.value.state != "pending":
+		return
+	assert_array(host.requests.beam.terms).is_equal([{"name": "Damage", "faces": 8, "count": 1}])
+	if host.requests.beam.terms[0].faces != 8:
+		return
+	host.roll("beam", [5])
+	result = await sdk.system_actions.submit("melee.advance", {"id": "beam"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(0)
+	assert_int(host.requests.size()).is_equal(1)
+	assert_str(result.value.message).contains("always hits")
+
+func test_creature_targeting_selects_one_rolling_side_from_ordinary_access(owned: bool, _test_parameters := [[false], [true]]) -> void:
+	var host := _host()
+	host.actors.hero.data = load(ROOT + "content/dog-small-but-vicious.tres").create_data({})
+	if owned:
+		host.access_by_actor["enemy"] = [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "player-session"}]
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("attack.validate", {"source": "hero", "rook": "hero-rook", "attack": "bite"})
+	assert_str(str(result.value.get("resolution", ""))).is_equal("defence" if owned else "attack")
+	assert_bool(host.requests.is_empty()).is_true()
+
+func test_companion_defence_presentation_offers_flat_test_at_phone_dock_width() -> void:
+	var host := _combat_host()
+	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("defence.start", {"id": "view", "source": "hero", "rook": "hero-rook", "attack": "bite"})
+	host.participant = "defender"
+	host.session = "defender-session"
+	var view = load(ROOT + "ui/creature_defence_flow.tscn").instantiate()
+	add_child(auto_free(view))
+	view.size = Vector2(343, 270)
+	view.present(sdk, result.value)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var rules: Label = view.get_node("CompanionDefenceView/Sections/PlayerRolls/Content/BodySlot/Rules")
+	assert_str(rules.text).contains("flat d20").not_contains("Roll Agility")
+	assert_str(view.get_node("CompanionDefenceView/Sections/YourDefence/Content/BodySlot/Agility/Label").text).is_equal("Flat test")
+	await view.roll()
+	assert_str(host.requests.view.participant).is_equal("defender")
+	await view.close()
+	assert_str(host.requests.view.result.status).is_equal("cancelled")
+
+func test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence() -> void:
+	var host := _combat_host()
+	host.actors.hero.data = load(ROOT + "content/ancient-gore-hound.tres").create_data({})
+	host.actors.enemy.data = load(ROOT + "content/belze-skeleton.tres").create_data({})
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("defence.start", {"id": "skeleton", "source": "hero", "rook": "hero-rook", "attack": "bite"})
+	host.participant = "defender"
+	host.session = "defender-session"
+	await sdk.system_actions.submit("defence.roll", {"id": "skeleton"})
+	host.roll("skeleton", [2])
+	await sdk.system_actions.submit("defence.advance", {"id": "skeleton"})
+	host.roll(host.last_request, [5])
+	await sdk.system_actions.submit("defence.advance", {"id": "skeleton"})
+	assert_int(host.actors.enemy.data.hit_points).is_equal(0)

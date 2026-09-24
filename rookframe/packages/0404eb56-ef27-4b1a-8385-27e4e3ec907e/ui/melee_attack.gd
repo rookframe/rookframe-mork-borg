@@ -13,7 +13,10 @@ func configure(character: Dictionary, item: Dictionary, options: Dictionary, sta
 	var ability_name := str(item.get("attack_ability", "Strength"))
 	var ability: Dictionary = abilities.get(ability_name, {})
 	get_node(^"Metrics/Strength/Content/Label").text = ability_name.to_upper()
-	var ability_modifier: int = ability.get("modifier", 0)
+	var creature := str(character.get("schema", "")) == "mork-borg-adversary/v1"
+	if creature:
+		get_node(^"Metrics/Strength/Content/Label").text = "FLAT TEST"
+	var ability_modifier: int = 0 if creature else ability.get("modifier", 0)
 	get_node(^"Metrics/Strength/Content/Value").text = "%+d" % ability_modifier
 	var ammunition_kind := str(item.get("ammunition", ""))
 	get_node(^"Ammunition").visible = not ammunition_kind.is_empty()

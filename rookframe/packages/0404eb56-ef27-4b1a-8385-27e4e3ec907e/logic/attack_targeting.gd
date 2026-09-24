@@ -2,7 +2,7 @@ extends RefCounted
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
 ## Creature selection/range preparation. Defence and companion resolution use
-## the chosen source action; preparation never invents a Creature attack roll.
+## the chosen source action. One rolling side is selected by ordinary Access.
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 
 func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> Dictionary:
@@ -72,7 +72,25 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 		return _error(message)
 	if target_count != 1:
 		return _error("Choose exactly one target. Nothing has been rolled.")
-	return {"state": "ready", "message": "Target in range. Attack selected.", "attack": selected.duplicate(true), "target": target_actor}
+	var target := context.read_actor(SDK.ActorId.new(target_actor))
+	var resolution := resolution_for(context, target.actor)
+	if resolution.is_empty():
+		return _error("Target Access is unavailable.")
+	return {"resolution": resolution, "state": "ready", "message": "Target in range. Attack selected.", "attack": selected.duplicate(true), "target": target_actor}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}
+
+## Characters and granted Creatures use their defender. Other Creatures are
+## attacked with the acting Creature's flat test, including GM-owned encounters.
+func resolution_for(context: SDK.SystemActionContext, target: SDK.Actor) -> String:
+	var data: Dictionary = target.data
+	if str(data.get("schema", "")) == "mork-borg-character/v1":
+		return "defence"
+	var access := context.actor_access(target.id)
+	if not access.ok:
+		return ""
+	for entry in access.items:
+		if entry.access_level == "Owner":
+			return "defence"
+	return "attack"

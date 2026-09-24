@@ -17,11 +17,13 @@ func configure(outcome: Dictionary, state: String, message: String) -> void:
 	get_node(^"Metrics/Attack/Content/Value").text = "%s · %s" % [str(outcome.get("attack", "Attack")), str(outcome.get("damage", ""))]
 	var difficulty: int = outcome.get("difficulty", 12)
 	get_node(^"Metrics/Difficulty/Content/Value").text = "Always hits" if outcome.get("automatic_hit", false) else "DR%d" % difficulty
+	var flat: bool = outcome.get("flat_test", false)
+	get_node(^"Sections/YourDefence/Content/BodySlot/Agility/Label").text = "Flat test" if flat else "Agility"
 	var agility: int = outcome.get("agility", 0)
 	get_node(^"Sections/YourDefence/Content/BodySlot/Agility/Value").text = "%+d" % agility
 	get_node(^"Sections/YourDefence/Content/BodySlot/Armor/Value").text = "−" + str(outcome.protection) if not str(outcome.get("protection", "")).is_empty() else "—"
 	get_node(^"Sections/YourDefence/Content/BodySlot/Shield/Value").text = "−1 damage" if outcome.get("has_shield", false) else "—"
-	get_node(^"Sections/PlayerRolls/Content/BodySlot/Rules").text = "This attack always hits. Roll damage and protection." if outcome.get("automatic_hit", false) else "Roll Agility against DR%d. A failed defence lets the attack hit. Natural 20: free attack. Natural 1: double damage and armor loses one tier; its penalties remain." % difficulty
+	get_node(^"Sections/PlayerRolls/Content/BodySlot/Rules").text = "This attack always hits. Roll damage and protection." if outcome.get("automatic_hit", false) else "Roll %s against DR%d. A failed defence lets the attack hit. Natural 20: free attack. Natural 1: double damage and armor loses one tier; its penalties remain." % ["a flat d20" if flat else "Agility", difficulty]
 	get_node(^"Options").visible = state == "ready" and not outcome.get("automatic_hit", false)
 	get_node(^"Outcome").visible = not message.is_empty() and state != "resolved"
 	get_node(^"Outcome").text = message

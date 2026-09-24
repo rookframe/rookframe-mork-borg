@@ -1,0 +1,71 @@
+extends VBoxContainer
+
+const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const ACTION = preload(ROOT + "logic/defence_action.gd")
+const VIEW = preload(ROOT + "ui/defence_view.gd")
+const SHIELD = preload(ROOT + "ui/shield_dialog.gd")
+signal changed(state: String, can_roll: bool, automatic_hit: bool)
+signal resolved
+signal decision_closed
+var _action: ACTION
+var _update_pending := false
+@onready var _view: VIEW = get_node(^"CompanionDefenceView")
+@onready var _shield: SHIELD = get_node(^"Shield")
+@onready var _backdrop: CanvasLayer = get_node(^"Backdrop")
+
+func _ready() -> void:
+	_shield.choice_requested.connect(_choose)
+	_shield.cancelled.connect(close)
+
+func present(sdk: SDK, outcome: Dictionary) -> void:
+	if _action != null:
+		if str(_action.snapshot.get("id", "")) == str(outcome.id):
+			return
+		_action.retire()
+	var action := ACTION.new(sdk)
+	add_child(action)
+	_action = action
+	_action.changed.connect(_changed)
+	_action.adopt(outcome)
+
+func _changed() -> void:
+	_update_pending = true
+
+func _process(_delta: float) -> void:
+	if not _update_pending or _action == null:
+		return
+	_update_pending = false
+	var action := _action
+	_view.configure(action.snapshot, action.state, action.message)
+	if action.state == "shield":
+		_backdrop.visible = true
+		_shield.present(action.snapshot)
+		_shield.set_pending(action.is_submitting())
+	else:
+		var was_open := _backdrop.visible
+		_backdrop.visible = false
+		_shield.dismiss()
+		if was_open:
+			decision_closed.emit()
+	changed.emit(action.state, action.state == "ready" and not action.is_submitting(), action.snapshot.get("automatic_hit", false))
+	if action.state == "resolved":
+		resolved.emit()
+
+func roll() -> void:
+	if _action == null:
+		return
+	var options := _view.options()
+	if options.is_empty():
+		_view.configure(_action.snapshot, "error", "Enter whole numbers for difficulty and modifier.")
+		return
+	await _action.roll(options)
+
+func _choose(choice: String) -> void:
+	await _action.choose(choice)
+
+func close() -> void:
+	_backdrop.visible = false
+	_shield.dismiss()
+	if _action != null:
+		await _action.cancel()

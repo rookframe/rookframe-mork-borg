@@ -1,0 +1,19 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_defence_flow.gd" id="1"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/defence_view.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_backdrop.tscn" id="4"]
+
+[node name="CreatureDefence" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+script = ExtResource("1")
+
+[node name="CompanionDefenceView" parent="." instance=ExtResource("2")]
+layout_mode = 2
+
+[node name="Backdrop" parent="." instance=ExtResource("4")]
+visible = false
+
+[node name="Shield" parent="." instance=ExtResource("3")]

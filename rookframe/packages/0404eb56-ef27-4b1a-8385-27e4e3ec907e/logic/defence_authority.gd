@@ -2,6 +2,7 @@ extends RefCounted
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const TARGETING = preload(ROOT + "logic/attack_targeting.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
@@ -106,14 +107,15 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var validated := TARGETING.new().validate_creature(context, input)
 	if validated.state != "ready":
 		return validated
+	if validated.resolution != "defence":
+		return _error("Roll the acting Creature’s attack against this target.")
 	var target := context.read_actor(SDK.ActorId.new(str(validated.target)))
 	var data: Dictionary = target.actor.data
-	if str(data.get("schema", "")) != "mork-borg-character/v1":
-		return _error("Choose a Character to defend against this attack.")
+	var creature_target := str(data.get("schema", "")) == "mork-borg-adversary/v1"
 	for previous in _actions:
 		if str(previous.target) == target.actor.id.value and str(previous.state) in ["ready", "pending", "shield"]:
 			if _alive(context, previous):
-				return _error("Finish this Character’s current defence first.")
+				return _error("Finish this Actor’s current defence first.")
 			_end(context, previous)
 	var access := context.actor_access(target.actor.id)
 	if not access.ok:
@@ -131,10 +133,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			if owner.participant_id == str(input.get("owner", "")):
 				selected.append(owner)
 		if selected.is_empty():
-			return {"state": "error", "message": "Choose the responsible Player for this Character.", "owners": choices}
+			return {"state": "error", "message": "Choose the responsible Player for this Actor.", "owners": choices}
 		owners = selected
 	if owners.size() == 1 and not owners[0].is_connected:
-		return _error("This Character’s Player is not connected.")
+		return _error("This Actor’s Player is not connected.")
 	var defender := str(caller.participant_id)
 	var defender_session := str(caller.session_id)
 	if owners.size() == 1:
@@ -151,7 +153,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 					defender = str(participant.participant_id)
 					defender_session = str(participant.session_id)
 		if defender.is_empty():
-			return _error("The GM must be connected to defend this Character.")
+			return _error("The GM must be connected to defend this Actor.")
 	var source := context.read_actor(SDK.ActorId.new(input.source))
 	var attack: Dictionary = validated.attack
 	var ammunition: Dictionary = {}
@@ -165,11 +167,14 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		ammunition = resources[0]
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Agility", {})
-	var action := {"id": input.id, "source": input.source, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "agility": ability.get("modifier", 0), "difficulty": attack.get("defence_dr", 12), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	var action := {"id": input.id, "source": input.source, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new().attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	if creature_target:
+		var source_dr: int = action.difficulty
+		action["difficulty"] = source_dr + CREATURES.new().defence_test_difficulty(data, input.get("piercing", false)) - 12
 	action["ammunition"] = str(ammunition.get("inventory_id", ""))
 	action["ammunition_kind"] = kind
 	action["resource_spent"] = false
-	for raw_item in ITEMS.new(null, target.actor.id).inventory(data):
+	for raw_item in _inventory(target.actor.id, data):
 		var item: Dictionary = raw_item
 		var equipped: bool = item.equipped
 		var quantity: int = item.quantity
@@ -192,7 +197,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
-	return {"initiator": action.participant, "defender": action.owner, "automatic_hit": action.automatic_hit, "id": action.id, "state": action.state, "request": action.request, "message": action.message, "target": action.target, "attacker": action.attacker, "character": action.character, "attack": action.attack, "damage": action.damage, "agility": action.agility, "difficulty": action.difficulty, "loss": action.loss, "hp": action.hp, "protection": action.protection, "has_shield": not str(action.shield).is_empty()}
+	return {"initiator": action.participant, "defender": action.owner, "automatic_hit": action.automatic_hit, "id": action.id, "state": action.state, "request": action.request, "message": action.message, "target": action.target, "attacker": action.attacker, "character": action.character, "attack": action.attack, "damage": action.damage, "agility": action.agility, "flat_test": action.flat_test, "difficulty": action.difficulty, "loss": action.loss, "hp": action.hp, "protection": action.protection, "has_shield": not str(action.shield).is_empty()}
 
 func _retry(action: Dictionary, message: String) -> Dictionary:
 	action["message"] = message
@@ -225,7 +230,16 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 		return false
 	var current: Dictionary = target.actor.data
 	var data := current.duplicate(true)
-	var items := ITEMS.new(null, target.actor.id).inventory(data)
+	if action.flat_test:
+		CREATURE_ITEMS.new(null, target.actor.id).damage_armor(data)
+		var creature_report := SDK.ActionLogMessage.new("Defence fumble")
+		creature_report.result = "Armor damaged"
+		creature_report.text = [SDK.ActionLogText.new("Natural 1: double damage; armor reduced one tier. Existing penalties remain.")]
+		var creature_saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], creature_report)
+		if creature_saved.ok:
+			action["armor_damaged"] = true
+		return creature_saved.ok
+	var items := _inventory(target.actor.id, data)
 	for raw_item in items:
 		var item: Dictionary = raw_item
 		if str(item.inventory_id) != str(action.armor):
@@ -255,7 +269,7 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 		return _end(context, action)
 	var current: Dictionary = target.actor.data
 	var data := current.duplicate(true)
-	var items := ITEMS.new(null, target.actor.id).inventory(data)
+	var items := _inventory(target.actor.id, data)
 	var shield_present := str(action.shield).is_empty()
 	for raw_item in items:
 		var item: Dictionary = raw_item
@@ -283,7 +297,12 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 	var loss: int = 0 if break_shield else action.loss
 	var hp: int = data.hit_points
 	data.hit_points = hp - loss
+	var threshold: int = data.get("destroy_at_damage", 0)
+	if threshold > 0 and loss >= threshold and hp - loss > 0:
+		data.hit_points = 0
 	data.inventory = items
+	if action.flat_test:
+		data["creature_inventory"] = true
 	var report := SDK.ActionLogMessage.new("Defence")
 	report.result = "Shield broken" if break_shield else "%d damage" % loss
 	var sequence: int = action.sequence
@@ -417,6 +436,7 @@ func _spend_source_resource(context: SDK.SystemActionContext, action: Dictionary
 	else:
 		resource["quantity"] = remaining - 1
 	data["inventory"] = items
+	data["creature_inventory"] = true
 	var report := SDK.ActionLogMessage.new("Ammunition used")
 	report.result = "1 spent"
 	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.attacker), str(action.ammunition_kind), sequence])]
@@ -425,3 +445,8 @@ func _spend_source_resource(context: SDK.SystemActionContext, action: Dictionary
 		return false
 	action["resource_spent"] = true
 	return true
+
+func _inventory(id: SDK.ActorId, data: Dictionary) -> Array:
+	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
+		return CREATURE_ITEMS.new(null, id).inventory(data)
+	return ITEMS.new(null, id).inventory(data)
