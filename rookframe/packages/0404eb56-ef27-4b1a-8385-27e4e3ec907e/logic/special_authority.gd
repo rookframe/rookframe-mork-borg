@@ -282,7 +282,12 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var target_data: Dictionary = data if target.actor == action.source else recipient.actor.data.duplicate(true)
 	var hp: int = target_data.hit_points
 	var maximum: int = target_data.maximum_hit_points
-	var amount := mini(roll.terms[0].results[0], maxi(0, maximum - hp))
+	var room := maximum - hp
+	if room < 0:
+		room = 0
+	var amount: int = roll.terms[0].results[0]
+	if amount > room:
+		amount = room
 	target_data["hit_points"] = hp + amount
 	for raw in inventory:
 		var entry: Dictionary = raw

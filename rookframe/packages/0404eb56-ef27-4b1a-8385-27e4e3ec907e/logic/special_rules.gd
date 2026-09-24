@@ -85,9 +85,10 @@ func owned(data: Dictionary, id: String) -> Dictionary:
 		for raw in traits:
 			var trait_data: Dictionary = raw
 			if "feature:" + str(trait_data.get("id", "")) == id:
-				var feature := trait_data.duplicate(true)
-				feature["source_item_id"] = str(trait_data.id)
-				feature["inventory_id"] = id
+				var feature := {"source_item_id": str(trait_data.id), "inventory_id": id, "name": str(trait_data.get("name", trait_data.id)), "rules": str(trait_data.get("rules", ""))}
+				if trait_data.has("uses"):
+					var uses: int = trait_data.uses
+					feature["uses"] = uses
 				return feature
 		return {}
 	for raw in ITEMS.new(null, SDK.ActorId.new("")).inventory(data):
