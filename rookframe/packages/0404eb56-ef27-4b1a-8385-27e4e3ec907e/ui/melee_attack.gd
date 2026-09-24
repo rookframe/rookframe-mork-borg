@@ -35,7 +35,7 @@ func configure(character: Dictionary, item: Dictionary, options: Dictionary, sta
 	get_node(^"Rules/Piercing").button_pressed = piercing
 	get_node(^"Rules").visible = state in ["ready", "error"]
 	get_node(^"Target/Change").disabled = state == "pending"
-	get_node(^"Outcome").visible = not message.is_empty()
+	get_node(^"Outcome").visible = state != "resolved" and not message.is_empty()
 	get_node(^"Outcome").text = message
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if state == "error" else "RookframeMeta"
 

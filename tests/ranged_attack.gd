@@ -115,6 +115,20 @@ func test_equipped_bow_view_selects_only_matching_ammunition() -> void:
 	view.configure({"inventory": [arrows]}, bow, {"difficulty": 0, "modifier": 0, "fumble": "break", "ammunition": "arrows"}, "pending", "Waiting for the attack Throw")
 	assert_str(view.options().ammunition).is_equal("arrows")
 
+func test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log() -> void:
+	var view = auto_free(load(ROOT + "ui/melee_attack.tscn").instantiate())
+	add_child(view)
+	var bow: Dictionary = EQUIPMENT.new().item("bow")
+	var options := {"difficulty": 0, "modifier": 0, "fumble": "break"}
+	view.configure({}, bow, options, "resolved", "Graveworm hits Hooded stranger for 5 damage after protection.")
+	assert_bool(view.get_node("Outcome").is_visible_in_tree()).is_false()
+	view.configure({}, bow, options, "pending", "Waiting for the attack Throw")
+	assert_bool(view.get_node("Outcome").is_visible_in_tree()).is_true()
+	assert_str(view.get_node("Outcome").text).is_equal("Waiting for the attack Throw")
+	view.configure({}, bow, options, "error", "target Hooded stranger not in range")
+	assert_bool(view.get_node("Outcome").is_visible_in_tree()).is_true()
+	assert_str(view.get_node("Outcome").text).is_equal("target Hooded stranger not in range")
+
 func after_test() -> void:
 	await get_tree().process_frame
 
