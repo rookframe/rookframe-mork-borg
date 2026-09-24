@@ -6,9 +6,9 @@ const DESKTOP_WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/package
 func compose() -> void:
 	var timer := Timer.new()
 	timer.wait_time = 0.5
+	timer.autostart = true
 	timer.timeout.connect(_check_defences)
 	add_child(timer)
-	timer.start()
 	var experience: SDK.DeviceExperience = sdk.presentation_experience()
 	var rail: SDK.Rail = sdk.rails.left
 	rail.push(DESKTOP_WINDOW_BUTTON if experience.is_desktop else WINDOW_BUTTON)

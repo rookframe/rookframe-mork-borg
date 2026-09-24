@@ -64,43 +64,60 @@ layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
-[node name="YourDefence" parent="." instance=ExtResource("2")]
+[node name="Sections" type="GridContainer" parent="."]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 8
+columns = 2
+[node name="YourDefence" parent="Sections" instance=ExtResource("2")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
 title = "Your defence"
-[node name="Agility" type="HBoxContainer" parent="YourDefence/Content/BodySlot"]
+[node name="Agility" type="VBoxContainer" parent="Sections/YourDefence/Content/BodySlot"]
 layout_mode = 2
-[node name="Label" type="Label" parent="YourDefence/Content/BodySlot/Agility"]
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Sections/YourDefence/Content/BodySlot/Agility"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 text = "Agility"
-[node name="Value" type="Label" parent="YourDefence/Content/BodySlot/Agility"]
+[node name="Value" type="Label" parent="Sections/YourDefence/Content/BodySlot/Agility"]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
-[node name="Armor" type="HBoxContainer" parent="YourDefence/Content/BodySlot"]
+theme_type_variation = &"RookframeMeta"
+[node name="ArmorRule" type="HSeparator" parent="Sections/YourDefence/Content/BodySlot"]
 layout_mode = 2
-[node name="Label" type="Label" parent="YourDefence/Content/BodySlot/Armor"]
+[node name="Armor" type="VBoxContainer" parent="Sections/YourDefence/Content/BodySlot"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Sections/YourDefence/Content/BodySlot/Armor"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 text = "Armor"
-[node name="Value" type="Label" parent="YourDefence/Content/BodySlot/Armor"]
+[node name="Value" type="Label" parent="Sections/YourDefence/Content/BodySlot/Armor"]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
-[node name="Shield" type="HBoxContainer" parent="YourDefence/Content/BodySlot"]
+theme_type_variation = &"RookframeMeta"
+[node name="ShieldRule" type="HSeparator" parent="Sections/YourDefence/Content/BodySlot"]
 layout_mode = 2
-[node name="Label" type="Label" parent="YourDefence/Content/BodySlot/Shield"]
+[node name="Shield" type="VBoxContainer" parent="Sections/YourDefence/Content/BodySlot"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Sections/YourDefence/Content/BodySlot/Shield"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 text = "Shield"
-[node name="Value" type="Label" parent="YourDefence/Content/BodySlot/Shield"]
+[node name="Value" type="Label" parent="Sections/YourDefence/Content/BodySlot/Shield"]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
-[node name="PlayerRolls" parent="." instance=ExtResource("2")]
+theme_type_variation = &"RookframeMeta"
+[node name="PlayerRolls" parent="Sections" instance=ExtResource("2")]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
 title = "Player rolls"
-[node name="Rules" type="Label" parent="PlayerRolls/Content/BodySlot"]
+[node name="Rules" type="Label" parent="Sections/PlayerRolls/Content/BodySlot"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
