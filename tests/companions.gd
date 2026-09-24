@@ -505,3 +505,47 @@ func test_companion_defence_presentation_hides_when_owner_access_is_lost() -> vo
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_bool(view.visible).is_false()
+
+func test_companion_defence_scene_resolves_the_compact_shield_choice() -> void:
+	var host := _combat_host()
+	host.actors.hero.data = load(ROOT + "content/arbint-troll.tres").create_data({})
+	host.actors.enemy.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
+	host.actors.enemy.access_level = "Owner"
+	var sdk := SDK.new(host)
+	var items = load(ROOT + "logic/creature_actions.gd").new(sdk, SDK.ActorId.new("enemy"))
+	var added: SDK.ActorResult = await items.add_equipment("shield")
+	await items.change_item(str(added.actor.data.inventory[-1].inventory_id), "equipped", "true")
+	var result := await sdk.system_actions.submit("defence.start", {"id": "shield-scene", "source": "hero", "rook": "hero-rook", "attack": "fist"})
+	host.participant = "defender"
+	host.session = "defender-session"
+	var view = load(ROOT + "ui/creature_defence_flow.tscn").instantiate()
+	view.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
+	var viewport := SubViewport.new()
+	viewport.size = Vector2i(844, 390)
+	viewport.gui_embed_subwindows = true
+	add_child(auto_free(viewport))
+	viewport.add_child(view)
+	view.size = Vector2(343, 270)
+	view.present(sdk, result.value)
+	await get_tree().process_frame
+	await view.roll()
+	host.roll("shield-scene", [2])
+	await get_tree().create_timer(0.6).timeout
+	host.roll(host.last_request, [4, 4, 1])
+	await get_tree().create_timer(0.6).timeout
+	var shield: Window = view.get_node("Shield")
+	assert_bool(shield.visible).is_true()
+	# Native Window geometry belongs to the display driver; the existing
+	# defence composition suite covers authored bounds in headless runs.
+	if DisplayServer.get_name() != "headless":
+		assert_vector(shield.size).is_equal(Vector2i(368, 224))
+	assert_bool(view.get_node("Backdrop").visible).is_true()
+	var destroy: Button = shield.get_node("Shell/Content/Actions/Break")
+	assert_float(destroy.size.y).is_greater_equal(44.0)
+	destroy.pressed.emit()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(shield.visible).is_false()
+	assert_bool(view.get_node("Backdrop").visible).is_false()
+	assert_bool(host.actors.enemy.data.inventory[-1].broken).is_true()
+	assert_int(host.actors.enemy.data.hit_points).is_equal(7)
