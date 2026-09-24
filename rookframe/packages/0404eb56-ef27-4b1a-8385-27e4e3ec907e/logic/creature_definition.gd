@@ -139,5 +139,6 @@ func _authored_attack_defaults(saved: Array, authored: Array) -> Array:
 		var attack: Dictionary = raw
 		for entry in authored:
 			if str(entry.get("id", "")) == str(attack.get("id", "")) and not attack.has("natural"):
-				attack["natural"] = entry.get("natural", false)
+				var natural: bool = entry.get("natural", false)
+				attack["natural"] = natural
 	return result

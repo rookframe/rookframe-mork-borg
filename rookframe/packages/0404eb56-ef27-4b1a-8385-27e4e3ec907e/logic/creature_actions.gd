@@ -67,7 +67,8 @@ func damage_armor(data: Dictionary) -> void:
 	var tier: int = worn.get("armor_tier", {"d2": 1, "d4": 2, "d6": 3}.get(reduction, 0))
 	if tier < 1:
 		return
-	worn["penalty_tier"] = worn.get("penalty_tier", tier)
+	var penalty_tier: int = worn.get("penalty_tier", tier)
+	worn["penalty_tier"] = penalty_tier
 	worn["armor_tier"] = tier - 1
 	worn["reduction"] = ["", "d2", "d4"][tier - 1]
 	if tier == 1:

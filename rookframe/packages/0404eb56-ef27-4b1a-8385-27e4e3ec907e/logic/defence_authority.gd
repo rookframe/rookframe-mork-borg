@@ -258,7 +258,8 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 		var tier: int = item.get("armor_tier", 0)
 		if tier < 1:
 			return true
-		item["penalty_tier"] = item.get("penalty_tier", tier)
+		var penalty_tier: int = item.get("penalty_tier", tier)
+		item["penalty_tier"] = penalty_tier
 		item["armor_tier"] = tier - 1
 		item["reduction"] = ["", "d2", "d4"][tier - 1]
 		if tier == 1:
