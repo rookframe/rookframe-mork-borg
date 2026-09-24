@@ -1,4 +1,5 @@
 extends RefCounted
+const SCROLLS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/starting_scrolls.gd")
 
 ## Core equipment facts from Bare Bones pp. 21–26; Bevy catalogue is reuse evidence.
 ## Ranges are the approved application convention, not printed weapon ranges.
@@ -93,12 +94,25 @@ func entries() -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	for row in ROWS:
 		result.append(_entry(row))
+	var tables: Dictionary = SCROLLS.TABLES
+	for family in ["unclean", "sacred"]:
+		var entries: Array = tables.get(family, [])
+		for raw in entries:
+			var entry: Dictionary = raw
+			result.append(entry.duplicate(true))
 	return result
 
 func item(id: String) -> Dictionary:
 	for row in ROWS:
 		if str(row[0]) == id:
 			return _entry(row)
+	var tables: Dictionary = SCROLLS.TABLES
+	for family in ["unclean", "sacred"]:
+		var entries: Array = tables.get(family, [])
+		for raw in entries:
+			var entry: Dictionary = raw
+			if str(entry.source_item_id) == id:
+				return entry.duplicate(true)
 	return {}
 
 func _entry(row: Array) -> Dictionary:

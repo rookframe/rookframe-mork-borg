@@ -6,6 +6,7 @@ signal WorldChanged
 signal TabletopCommandCompleted(result: Dictionary)
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+var sessions := [{"participant_id": "player", "session_id": "player-session", "is_gm": false}, {"participant_id": "gm", "session_id": "gm-session", "is_gm": true}]
 var handler: Node
 var actors := {
  "hero": {"id": "hero", "access_level": "Owner", "public_label": "", "data": {"schema": "mork-borg-character/v1", "name": "Graveworm", "abilities": {"Strength": {"modifier": -1}}, "inventory": [{"inventory_id": "1", "source_item_id": "sword", "name": "Sword", "kind": "Weapon", "damage": "d6", "range_feet": 5, "quantity": 1, "equipped": true}]}},
@@ -98,3 +99,6 @@ func roll(id: String, values: Array) -> void:
  request.result.terms = terms
  request.result.status = "rolled"
  request.result.sequence = requests.size()
+
+func SystemIntentParticipantSessions(_token: String) -> Dictionary:
+ return {"ok": active, "value": sessions.duplicate(true)}

@@ -72,6 +72,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 	overview.companions_requested.connect(_companions)
 	overview.edit_requested.connect(_edit)
 	overview.omens_requested.connect(_omens)
+	overview.powers_requested.connect(_powers)
 	overview.value_save_requested.connect(_correct)
 	get_node(^"Content").add_child(overview)
 	overview.configure(data, miniatures, short_window)
@@ -120,3 +121,6 @@ func refresh_data(data: Dictionary) -> void:
 
 func _roll(ability: String) -> void:
 	modifier_requested.emit(ability)
+
+func _powers() -> void:
+	navigate_requested.emit("powers", "")

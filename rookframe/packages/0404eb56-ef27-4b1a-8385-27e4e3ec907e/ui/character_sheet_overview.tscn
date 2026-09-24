@@ -559,3 +559,9 @@ layout_mode = 2
 visible = false
 theme_type_variation = &"RookframeError"
 autowrap_mode = 2
+
+[node name="PowersAction" type="Button" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Powers & scrolls"

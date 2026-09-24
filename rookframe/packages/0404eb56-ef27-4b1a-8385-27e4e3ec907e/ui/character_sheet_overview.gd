@@ -3,6 +3,7 @@ extends VBoxContainer
 signal modifier_requested(ability: String)
 signal companions_requested
 signal edit_requested
+signal powers_requested
 signal omens_requested
 signal value_save_requested(key: String, value: String)
 
@@ -16,6 +17,7 @@ func _ready() -> void:
 	get_node(^"Body/Context/Companions").pressed.connect(_open_companions)
 	resized.connect(_layout)
 	get_node(^"OmensAction").pressed.connect(_open_omens)
+	get_node(^"PowersAction").pressed.connect(_open_powers)
 	get_node(^"Body/Context/Identity/Content/Header/Edit").pressed.connect(_edit)
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
@@ -128,3 +130,6 @@ func field_result(key: String, message: String, error: bool) -> void:
 
 func _roll(ability: String) -> void:
 	modifier_requested.emit(ability)
+
+func _open_powers() -> void:
+	powers_requested.emit()

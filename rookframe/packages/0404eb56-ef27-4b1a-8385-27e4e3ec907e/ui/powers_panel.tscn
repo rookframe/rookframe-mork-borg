@@ -1,0 +1,154 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.gd" id="1"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="2"]
+[node name="PowersPanel" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+script = ExtResource("1")
+[node name="Browse" type="HBoxContainer" parent="."]
+layout_mode = 2
+[node name="Back" type="Button" parent="Browse"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeQuietButton"
+text = "‹ Character"
+[node name="Title" type="Label" parent="Browse"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeHeading"
+text = "POWERS & SCROLLS"
+autowrap_mode = 2
+[node name="Metrics" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Uses" type="PanelContainer" parent="Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Metrics/Uses"]
+layout_mode = 2
+[node name="Label" type="Label" parent="Metrics/Uses/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+text = "DAILY USES"
+[node name="Value" type="Label" parent="Metrics/Uses/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+autowrap_mode = 2
+[node name="Presence" type="PanelContainer" parent="Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Metrics/Presence"]
+layout_mode = 2
+[node name="Label" type="Label" parent="Metrics/Presence/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+text = "TEST"
+[node name="Value" type="Label" parent="Metrics/Presence/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+autowrap_mode = 2
+[node name="Difficulty" type="PanelContainer" parent="Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Metrics/Difficulty"]
+layout_mode = 2
+[node name="Label" type="Label" parent="Metrics/Difficulty/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+text = "DIFFICULTY"
+[node name="Value" type="Label" parent="Metrics/Difficulty/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+autowrap_mode = 2
+[node name="Outcome" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+[node name="Scrolls" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Empty" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+text = "No core scrolls carried. Add a scroll from the Inventory catalogue."
+autowrap_mode = 2
+[node name="Daily" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Hint" type="Label" parent="Daily"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+text = "Every morning: Presence + d4 uses. Confirm the morning with the table before rolling. Current uses can also be corrected in Edit Character."
+autowrap_mode = 2
+[node name="Roll" type="Button" parent="Daily"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Morning: roll daily uses"
+[node name="Cast" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Columns" type="BoxContainer" parent="Cast"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Power" type="PanelContainer" parent="Cast/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="Cast/Columns/Power"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="Cast/Columns/Power/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+text = "POWER"
+[node name="Copy" type="Label" parent="Cast/Columns/Power/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+[node name="Targets" type="PanelContainer" parent="Cast/Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="Cast/Columns/Targets"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="Cast/Columns/Targets/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+text = "TARGETS"
+[node name="Copy" type="Label" parent="Cast/Columns/Targets/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+[node name="Range" type="Label" parent="Cast/Columns/Power/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+autowrap_mode = 2
+[node name="Change" type="Button" parent="Cast/Columns/Targets/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Change targets"
+[node name="Options" type="VBoxContainer" parent="Cast"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Modifier" parent="Cast/Options" instance=ExtResource("2")]
+layout_mode = 2
+label_text = "Situational modifier"
+value = "0"
+[node name="Eligible" type="Button" parent="Cast/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+text = "Not dizzy; requirements met"
+toggle_mode = true
+theme_type_variation = &"RookframeSecondaryButton"
+[node name="Rules" type="Label" parent="Cast"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+text = "Confirm fictional requirements with the table, including a deceased target or death within a week where stated. Failure: lose d2 HP; dizziness is manual. Critical/fumble: GM decides. Armor and zweihand restrictions apply."
+autowrap_mode = 2

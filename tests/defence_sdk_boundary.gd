@@ -1,6 +1,6 @@
 extends "res://tests/melee_sdk_boundary.gd"
 
-var sessions := [{"participant_id": "gm", "session_id": "gm-session", "is_gm": true}, {"participant_id": "player", "session_id": "player-session", "is_gm": false}]
+
 
 func _init() -> void:
 	participant = "gm"

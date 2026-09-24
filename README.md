@@ -233,3 +233,41 @@ errors, timeouts, orphan Nodes and skips fail the run. Tests extend
 completion. The host boundary is substituted where required; real host and
 platform acceptance checks live in rookframe-godot. Tests, reports and GdUnit
 are excluded from Package exports.
+
+## Core Power casting (RFG-289)
+
+Owned core scrolls have Cast entries in Inventory and the Powers & scrolls view.
+All twenty definitions retain their Bare Bones pp. 34–35 rules and an explicit
+handling classification. Palms open the southern gate, Grace of a dead saint and
+Roskoe’s consuming glare remain unavailable until RFG-290; Foul Psychopomp remains
+unavailable until RFG-291. Catalogue text is not a claim that those actions work.
+
+Ordinary casting requests a human Presence d20 against DR12 (the Scum’s printed
+Presence reduction gives DR10). Success spends one daily use; ordinary failure
+requests physical d4-as-d2 HP loss without spending a use. Dizziness lasts one
+hour and is table-managed. Before casting, the table confirms that the caster is
+not dizzy and the Power’s fictional requirements are met. Medium/heavy armor,
+zweihand weapons and Deserter illiteracy block casting; the Priest can use medium
+armor. The explicit morning button requests Presence + d4; there is no clock or
+automatic daily refresh. Sheet corrections remain available.
+
+Natural 1 and 20 finish with “Power fumble/critical: GM determines the outcome.”
+No catastrophe, damage multiplier, ruling form or waiting state is invented.
+Other supported Powers request their printed quantities and report manual
+outcomes. Nine Violet Signs reports each bolt without assigning damage; Death
+reports its shared 4d10 total without allocating it. Aegis never writes temporary
+HP and Unmet Fate never invents restored HP. Ongoing damage, movement, answers,
+commands, bonuses, sleep and expiry remain at the table.
+
+Eyelid rolls d4, asks for that many distinct targets, then requests the GM’s
+unmodified Creature resistance dice against DR14. The source leaves PC ability
+selection unspecified; the report preserves that manual test boundary. Selected
+targets use authored 30-ft range (9.144 tabletop units), with all out-of-range
+targets reported by public label. Death’s area and Telekinesis movement are
+separate from casting range. An unrepresented object is agreed with the table.
+
+Power actions use existing public SDK System intents and session-bound requested
+Throws. Closing, loss of ownership or a required session ending terminates them;
+accepted daily-use changes and raw Rolls remain. The focused `power_casting.gd`
+and `power_composition.gd` suites cover this seam and authored UI. App acceptance
+uses the published Manifest with the existing RFG-281 `--powers-only` journey.

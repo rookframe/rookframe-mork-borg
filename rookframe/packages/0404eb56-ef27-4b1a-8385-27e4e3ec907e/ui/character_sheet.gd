@@ -19,6 +19,10 @@ const DEFENCE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-
 const DEFENCE_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/defence_view.gd")
 const SHIELD_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.tscn")
 const SHIELD_DIALOG = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.gd")
+const POWERS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.tscn")
+const POWERS_PANEL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.gd")
+var _powers_panel: POWERS_PANEL
+var _powers_action: MELEE_ACTION
 var _defence_update_pending := false
 var _defence: DEFENCE_ACTION
 var _defence_view: DEFENCE_VIEW
@@ -110,6 +114,12 @@ func _process(_delta: float) -> void:
 
 
 func clear_character_sheet() -> void:
+	if _powers_panel != null:
+		_powers_panel.close_action()
+	_powers_panel = null
+	if _powers_action != null:
+		_powers_action.retire()
+	_powers_action = null
 	for child in _content.get_children():
 		_content.remove_child(child)
 		child.queue_free()
@@ -120,6 +130,18 @@ func clear_character_sheet() -> void:
 
 
 func _render_character_sheet() -> void:
+	if _character_route in ["powers", "cast"] and _character_actor != null:
+		if _powers_panel == null:
+			clear_character_sheet()
+			var panel := POWERS_SCENE.instantiate()
+			_content.add_child(panel)
+			_powers_panel = panel
+			_powers_panel.navigate_requested.connect(_navigate)
+			_powers_panel.action_created.connect(_power_action_created)
+			_powers_panel.workflow_changed.connect(_power_chrome)
+		_powers_panel.configure(_character_actor, sdk, _item_id if _character_route == "cast" else "")
+		_status.visible = false
+		return
 	if _character_route == "defence" and _defence != null:
 		if _defence_view == null:
 			clear_character_sheet()
@@ -170,7 +192,9 @@ func _render_character_sheet() -> void:
 func _navigate(route: String, item_id: String) -> void:
 	if _busy:
 		return
-	if _character_actor.access_level != "Owner" and route in ["attack", "edit", "item", "custom", "catalogue", "omens"]:
+	if _powers_panel != null and (route != _character_route or item_id != _item_id):
+		clear_character_sheet()
+	if _character_actor.access_level != "Owner" and route in ["attack", "cast", "edit", "item", "custom", "catalogue", "omens"]:
 		_set_status("Owner access is required to change this Character.", true)
 		return
 	if route == "attack":
@@ -363,6 +387,8 @@ func spend_omen() -> void:
 	_mutate("omen", [])
 
 func _sync_chrome() -> void:
+	if _character_route in ["powers", "cast"] and _powers_panel != null:
+		return
 	if _character_actor == null:
 		return
 	var data: Dictionary = _character_actor.data
@@ -403,6 +429,8 @@ func _ability_changed() -> void:
 	_render_pending = true
 
 func close_action() -> void:
+	if _powers_panel != null:
+		_powers_panel.close_action()
 	if _defence != null:
 		_defence.cancel()
 	if _shield != null:
@@ -437,6 +465,9 @@ func _render_attack() -> void:
 	_sync_chrome()
 
 func roll_attack() -> void:
+	if _character_route == "cast" and _powers_panel != null:
+		await _powers_panel.submit()
+		return
 	if _character_route == "defence" and _defence != null and _defence_view != null:
 		var options := _defence_view.options()
 		if options.is_empty():
@@ -547,3 +578,13 @@ func _choose_shield(choice: String) -> void:
 
 func _cancel_defence() -> void:
 	await _defence.cancel()
+
+func _power_chrome(route: String, title: String, can_submit: bool, busy: bool) -> void:
+	workflow_changed.emit(route, title, can_submit, busy)
+
+func power_primary_text() -> String:
+	return _powers_panel.primary_text() if _powers_panel != null else "Roll casting test"
+
+func _power_action_created(action: MELEE_ACTION) -> void:
+	_powers_action = action
+	add_child(action)
