@@ -5,6 +5,10 @@ const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 const CREATURE_KIND := "actor_definition"
 var _pending_route := ""
 const ATTACK_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
+const DEFENCE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_action.gd")
+var _initiated_defence: DEFENCE_ACTION
+var _responsible_owner := ""
+var _defence_update_pending := false
 var _creature_attack: Dictionary = {}
 var _creature_rook: SDK.RookId
 var _checking_range := false
@@ -343,6 +347,9 @@ func _show_route(route: String) -> void:
 
 
 func _process(delta: float) -> void:
+	if _defence_update_pending:
+		_defence_update_pending = false
+		_present_initiated_defence()
 	super._process(delta)
 	if _creature_targets_pending and not _creature_targets_reading and _route == "creature-attack":
 		_creature_targets_pending = false
@@ -660,6 +667,8 @@ func _present_creature_attack(id: String) -> void:
 		return
 	_apply_route("creature-attack")
 	_creature_rook = sdk.rooks.selected()
+	_responsible_owner = ""
+	get_node(^"Layout/Body/Content/CreatureAttack/Owners").visible = false
 	var title := str(_creature_attack.get("name", "Attack")) + " attack"
 	_header_title.text = title.to_upper()
 	_header_subtitle.visible = false
@@ -683,7 +692,7 @@ func _present_creature_attack(id: String) -> void:
 	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory"
 	get_node(^"Layout/SheetActions/Back").disabled = false
 	get_node(^"Layout/SheetActions/Attack").visible = true
-	get_node(^"Layout/SheetActions/Attack").text = "Check range"
+	get_node(^"Layout/SheetActions/Attack").text = "Request defence"
 	get_node(^"Layout/SheetActions/Attack").disabled = false
 	_body.scroll_vertical = 0
 
@@ -702,21 +711,66 @@ func _roll_sheet_attack() -> void:
 	if _creature_rook == null:
 		_set_status("Select this Creature’s source Rook before opening its attack.", true)
 		return
-	_checking_range = true
-	get_node(^"Layout/SheetActions/Attack").disabled = true
-	var result: SDK.DataResult = await sdk.system_actions.submit("attack.validate", {"source": _selected_actor.id.value, "rook": _creature_rook.value, "attack": str(_creature_attack.id)})
-	_checking_range = false
+	if _initiated_defence != null and _initiated_defence.pending:
+		return
+	if _initiated_defence != null:
+		_initiated_defence.retire()
+	var action := DEFENCE_ACTION.new(sdk)
+	add_child(action)
+	_initiated_defence = action
+	_initiated_defence.changed.connect(_initiated_defence_changed)
+	await _initiated_defence.start({"source": _selected_actor.id.value, "rook": _creature_rook.value, "attack": str(_creature_attack.id), "owner": _responsible_owner})
+
+func _initiated_defence_changed() -> void:
+	_defence_update_pending = true
+
+func _present_initiated_defence() -> void:
+	if _initiated_defence.state == "ready" and str(_initiated_defence.snapshot.get("defender", "")) == sdk.context().participant_id:
+		var target := sdk.actors.read(SDK.ActorId.new(str(_initiated_defence.snapshot.target)))
+		if target.ok:
+			_character_actor = target.actor
+			character_show_route("character")
+			get_node(^"Layout/Body/Content/CreatureAttack").visible = false
+			_character_sheet.offer_defence(_initiated_defence.snapshot)
+		return
 	if _route != "creature-attack":
 		return
-	get_node(^"Layout/SheetActions/Attack").disabled = false
-	var outcome: Dictionary = result.value if result.ok else {"state": "error", "message": result.message}
+	var action := _initiated_defence
+	get_node(^"Layout/SheetActions/Attack").disabled = action.pending or action.state in ["resolved", "ended"]
+	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if action.pending else "Request defence"
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
-	view.get_node(^"Outcome").visible = true
-	view.get_node(^"Outcome").text = str(outcome.message)
-	view.get_node(^"Outcome").theme_type_variation = "RookframeError" if str(outcome.state) == "error" else "RookframeMeta"
+	view.get_node(^"Target/Change").disabled = action.pending
+	view.get_node(^"Outcome").visible = action.state != "resolved"
+	view.get_node(^"Outcome").text = "Waiting for the defending Player." if action.state in ["ready", "shield"] else action.message
+	view.get_node(^"Outcome").theme_type_variation = "RookframeError" if action.state == "error" else "RookframeMeta"
+	var choices: Array = action.snapshot.get("owners", [])
+	var owners: VBoxContainer = view.get_node(^"Owners")
+	for child in owners.get_children():
+		owners.remove_child(child)
+		child.queue_free()
+	owners.visible = not choices.is_empty()
+	for raw in choices:
+		var choice: Dictionary = raw
+		var button := Button.new()
+		button.text = str(choice.name)
+		button.custom_minimum_size = Vector2(0, 44)
+		button.theme_type_variation = "RookframeSecondaryButton"
+		button.pressed.connect(_select_defender.bind(str(choice.id)))
+		owners.add_child(button)
+
+func _select_defender(id: String) -> void:
+	_responsible_owner = id
+	_roll_sheet_attack()
+
+func _window_closed() -> void:
+	super._window_closed()
+	if _initiated_defence != null:
+		_initiated_defence.cancel()
 
 func _cancel_sheet_workflow() -> void:
 	if _route == "creature-attack":
+		if _initiated_defence != null:
+			_initiated_defence.cancel()
 		_show_route("creature-inventory")
 	else:
 		super._cancel_sheet_workflow()

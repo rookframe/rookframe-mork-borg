@@ -79,6 +79,14 @@ func opened(actor_id: SDK.ActorId) -> void:
 		return
 	_character_actor = result.actor
 	character_show_route("character")
+	var inbox: SDK.DataResult = await sdk.system_actions.submit("defence.inbox", {})
+	if inbox.ok and typeof(inbox.value) == TYPE_ARRAY:
+		var actions: Array = inbox.value
+		for raw in actions:
+			var action: Dictionary = raw
+			if str(action.target) == actor_id.value and action.state in ["ready", "pending", "shield"]:
+				_character_sheet.offer_defence(action)
+				break
 
 @onready var _layout := get_node(^"Layout") as VBoxContainer
 @onready var _header := get_node(^"Layout/Header") as VBoxContainer
@@ -408,7 +416,7 @@ func _update_character_density() -> void:
 	_compact = compact
 	_header.visible = not compact
 	_header_title.visible = not compact
-	_header_subtitle.visible = not compact and _last_sheet_route != "attack"
+	_header_subtitle.visible = not compact and not _last_sheet_route in ["attack", "defence"]
 	_content.custom_minimum_size = Vector2(0, 0) if compact else Vector2(0, 520)
 	_layout.add_theme_constant_override("separation", 6 if compact else 10)
 	_character_creator.set_compact(compact)
@@ -440,25 +448,25 @@ func _on_character_unavailable() -> void:
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
 	_sheet_workflow_title = title
-	_header_title.theme_type_variation = "RookframeTitle" if route == "attack" else "RookframeHeading"
-	if route == "attack":
+	_header_title.theme_type_variation = "RookframeTitle" if route in ["attack", "defence"] else "RookframeHeading"
+	if route in ["attack", "defence"]:
 		_header_title.text = title.to_upper()
 	elif _character_actor != null:
 		var data: Dictionary = _character_actor.data
 		_header_title.text = str(data.get("name", "Unnamed Character")).to_upper()
-	_header_subtitle.visible = not _compact and route != "attack"
+	_header_subtitle.visible = not _compact and not route in ["attack", "defence"]
 	if route != _last_sheet_route:
 		get_node(^"Layout/Body").scroll_vertical = 0
 		_last_sheet_route = route
 	_character_tabs.visible = route in ["character", "inventory", "appearance"]
-	get_node(^"Layout/SheetActions").visible = route in ["omens", "attack"]
+	get_node(^"Layout/SheetActions").visible = route in ["omens", "attack", "defence"]
 	get_node(^"Layout/SheetActions/Spend").visible = route == "omens"
-	get_node(^"Layout/SheetActions/Attack").visible = route == "attack"
+	get_node(^"Layout/SheetActions/Attack").visible = route in ["attack", "defence"]
 	get_node(^"Layout/SheetActions/Attack").disabled = not can_submit or busy
-	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if busy else "Roll attack"
-	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route == "attack" and not can_submit and not busy else "Cancel"
+	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if busy else (("Roll damage" if title == "Roll damage" else "Roll defence") if route == "defence" else "Roll attack")
+	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route in ["attack", "defence"] and not can_submit and not busy else "Cancel"
 	get_node(^"Layout/SheetActions/Spend").disabled = not can_submit or busy
-	get_node(^"Layout/SheetActions/Back").disabled = busy and route != "attack"
+	get_node(^"Layout/SheetActions/Back").disabled = busy and not route in ["attack", "defence"]
 	_set_window_title(title)
 
 func _cancel_sheet_workflow() -> void:

@@ -39,11 +39,13 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 	var targets: PackedStringArray = values.targets
 	var outside: Array[String] = []
 	var target_count := 0
+	var target_actor := ""
 	for target_id in targets:
 		target_count += 1
 		var target_rook := context.read_rook(SDK.RookId.new(target_id))
 		if not target_rook.ok or target_rook.rook.actor == null or target_rook.rook.actor.value == source.actor.id.value:
 			return _error("Choose a Character or Creature target.")
+		target_actor = target_rook.rook.actor.value
 		var target := context.read_actor(target_rook.rook.actor)
 		if not target.ok or typeof(target.actor.data) != TYPE_DICTIONARY:
 			return _error("The target is unavailable.")
@@ -67,7 +69,7 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 		return _error(message)
 	if target_count != 1:
 		return _error("Choose exactly one target. Nothing has been rolled.")
-	return {"state": "ready", "message": "Target in range. Attack selected.", "attack": selected.duplicate(true)}
+	return {"state": "ready", "message": "Target in range. Attack selected.", "attack": selected.duplicate(true), "target": target_actor}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}

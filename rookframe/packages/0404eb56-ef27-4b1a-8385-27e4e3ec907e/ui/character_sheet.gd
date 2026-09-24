@@ -13,6 +13,15 @@ const ABILITY_THROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-
 const MELEE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_action.gd")
 const MELEE_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.gd")
 const MELEE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.tscn")
+const DEFENCE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_action.gd")
+const DEFENCE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/defence_view.tscn")
+const DEFENCE_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/defence_view.gd")
+const SHIELD_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.tscn")
+const SHIELD_DIALOG = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.gd")
+var _defence_update_pending := false
+var _defence: DEFENCE_ACTION
+var _defence_view: DEFENCE_VIEW
+var _shield: SHIELD_DIALOG
 var _melee: MELEE_ACTION
 var _melee_view: MELEE_VIEW
 var _melee_options := {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}
@@ -49,6 +58,10 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 		if _melee != null:
 			_melee.retire()
 		_melee = null
+		if _defence != null:
+			_defence.retire()
+		_defence = null
+		_defence_update_pending = false
 	if _ability_throw != null and not _ability_throw.pending:
 		_ability_throw = null
 	_character_actor = actor
@@ -65,6 +78,9 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 
 
 func _process(_delta: float) -> void:
+	if _defence_update_pending:
+		_defence_update_pending = false
+		_present_defence_update()
 	if _throw_refresh_pending:
 		_throw_refresh_pending = false
 		if _ability_throw != null:
@@ -96,10 +112,21 @@ func clear_character_sheet() -> void:
 		child.queue_free()
 	_character_view = null
 	_melee_view = null
+	_defence_view = null
 	_status = get_node(^"Status") as Label
 
 
 func _render_character_sheet() -> void:
+	if _character_route == "defence" and _defence != null:
+		if _defence_view == null:
+			clear_character_sheet()
+			var view := DEFENCE_SCENE.instantiate()
+			_content.add_child(view)
+			_defence_view = view
+		_defence_view.configure(_defence.snapshot, _defence.state, _defence.message)
+		_status.visible = false
+		_sync_chrome()
+		return
 	clear_character_sheet()
 	if _character_actor == null:
 		return
@@ -355,6 +382,9 @@ func _sync_chrome() -> void:
 	var count: int = data.get("omens", 0)
 	var route: String = _character_tab if _character_route == "character" else _character_route
 	var can_act := count > 0 and _character_actor.access_level == "Owner"
+	if route == "defence" and _defence != null:
+		workflow_changed.emit(route, "Roll damage" if _defence.snapshot.get("automatic_hit", false) else "Defend against attack", _defence.state == "ready", _defence.state == "pending" or _defence.is_submitting())
+		return
 	if route == "attack":
 		can_act = _melee == null or _melee.state == "error"
 	workflow_changed.emit(route, title, can_act, _busy or (_melee != null and _melee.pending))
@@ -370,6 +400,10 @@ func _ability_changed() -> void:
 	_render_pending = true
 
 func close_action() -> void:
+	if _defence != null:
+		_defence.cancel()
+	if _shield != null:
+		_shield.dismiss()
 	if _melee != null:
 		_melee.cancel()
 	if _ability_throw != null:
@@ -398,6 +432,13 @@ func _render_attack() -> void:
 	_sync_chrome()
 
 func roll_attack() -> void:
+	if _character_route == "defence" and _defence != null and _defence_view != null:
+		var options := _defence_view.options()
+		if options.is_empty():
+			_set_status("Enter whole numbers for difficulty and modifier.", true)
+			return
+		await _defence.roll(options)
+		return
 	if _busy or _melee_view == null or (_melee != null and _melee.pending):
 		return
 	var options := _melee_view.options()
@@ -451,3 +492,44 @@ func _refresh_attack_targets() -> void:
 	_target_reading = false
 	if _melee_view == view:
 		view.set_targets(summary)
+
+func offer_defence(outcome: Dictionary) -> void:
+	if _defence != null and str(_defence.snapshot.get("id", "")) == str(outcome.id):
+		return
+	close_action()
+	if _defence != null:
+		_defence.retire()
+	var action := DEFENCE_ACTION.new(sdk)
+	add_child(action)
+	_defence = action
+	_defence.changed.connect(_defence_changed.bind(action))
+	_defence.adopt(outcome)
+
+func _defence_changed(action: DEFENCE_ACTION) -> void:
+	if action == _defence:
+		_defence_update_pending = true
+
+func _present_defence_update() -> void:
+	if _defence == null:
+		return
+	_character_route = "character" if _defence.state in ["shield", "resolved"] else "defence"
+	_character_tab = "character"
+	_render_pending = true
+	_refresh_pending = true
+	if _defence.state == "shield":
+		if _shield == null:
+			var dialog := SHIELD_SCENE.instantiate()
+			add_child(dialog)
+			_shield = dialog
+			_shield.choice_requested.connect(_choose_shield)
+			_shield.cancelled.connect(_cancel_defence)
+		_shield.present(_defence.snapshot)
+		_shield.set_pending(_defence.is_submitting())
+	elif _shield != null:
+		_shield.dismiss()
+
+func _choose_shield(choice: String) -> void:
+	await _defence.choose(choice)
+
+func _cancel_defence() -> void:
+	await _defence.cancel()

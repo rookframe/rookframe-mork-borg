@@ -1,0 +1,138 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/defence_view.gd" id="1"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/section.tscn" id="2"]
+[node name="Defence" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+script = ExtResource("1")
+[node name="Outcome" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+[node name="Metrics" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Attacker" type="PanelContainer" parent="Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Metrics/Attacker"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Metrics/Attacker/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+theme_override_font_sizes/font_size = 12
+text = "ATTACKER"
+[node name="Value" type="Label" parent="Metrics/Attacker/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+[node name="Attack" type="PanelContainer" parent="Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Metrics/Attack"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Metrics/Attack/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+theme_override_font_sizes/font_size = 12
+text = "ATTACK"
+[node name="Value" type="Label" parent="Metrics/Attack/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+[node name="Difficulty" type="PanelContainer" parent="Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Metrics/Difficulty"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Metrics/Difficulty/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeLabel"
+theme_override_font_sizes/font_size = 12
+text = "DEFENCE"
+[node name="Value" type="Label" parent="Metrics/Difficulty/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 2
+[node name="YourDefence" parent="." instance=ExtResource("2")]
+layout_mode = 2
+title = "Your defence"
+[node name="Agility" type="HBoxContainer" parent="YourDefence/Content/BodySlot"]
+layout_mode = 2
+[node name="Label" type="Label" parent="YourDefence/Content/BodySlot/Agility"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeBody"
+text = "Agility"
+[node name="Value" type="Label" parent="YourDefence/Content/BodySlot/Agility"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+[node name="Armor" type="HBoxContainer" parent="YourDefence/Content/BodySlot"]
+layout_mode = 2
+[node name="Label" type="Label" parent="YourDefence/Content/BodySlot/Armor"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeBody"
+text = "Armor"
+[node name="Value" type="Label" parent="YourDefence/Content/BodySlot/Armor"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+[node name="Shield" type="HBoxContainer" parent="YourDefence/Content/BodySlot"]
+layout_mode = 2
+[node name="Label" type="Label" parent="YourDefence/Content/BodySlot/Shield"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeBody"
+text = "Shield"
+[node name="Value" type="Label" parent="YourDefence/Content/BodySlot/Shield"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+[node name="PlayerRolls" parent="." instance=ExtResource("2")]
+layout_mode = 2
+title = "Player rolls"
+[node name="Rules" type="Label" parent="PlayerRolls/Content/BodySlot"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+[node name="Options" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Difficulty" type="HBoxContainer" parent="Options"]
+layout_mode = 2
+[node name="Label" type="Label" parent="Options/Difficulty"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeLabel"
+text = "Difficulty override"
+[node name="Editor" type="LineEdit" parent="Options/Difficulty"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 44)
+text = ""
+accessibility_name = "Difficulty override"
+[node name="Modifier" type="HBoxContainer" parent="Options"]
+layout_mode = 2
+[node name="Label" type="Label" parent="Options/Modifier"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeLabel"
+text = "Situational modifier"
+[node name="Editor" type="LineEdit" parent="Options/Modifier"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 44)
+text = "0"
+accessibility_name = "Situational modifier"
+[node name="Hint" type="Label" parent="Options"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+text = "Blank difficulty uses the source rule and armor. Agree situational changes with the table."
+autowrap_mode = 2

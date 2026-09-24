@@ -192,10 +192,28 @@ including Goblin knife/shortbow and Grotesque claws/eye-beam. Existing saved cor
 Actors receive these choices without replacing their live damage or sheet values.
 Contact, extended and projectile alternatives have separate 5/10/30-ft reaches;
 source attack DRs, automatic hits and table-managed special consequences remain
-visible on the selected action. This slice checks Creature targeting and reach;
-Player defence, companion attack resolution and class special actions are owned
-by RFG-288, RFG-291 and RFG-292.
+visible on the selected action. Creature attacks request the responsible Character owner’s defence. Companion
+attack resolution and class special actions remain owned by RFG-291 and RFG-292.
 
+
+## Player defence
+
+A GM selects an equipped Creature attack and one Character target. The connected
+Player owner receives an Agility defence in their existing sheet; multiple owners
+require an explicit choice. A Character with no Player owner is handled by the
+initiating GM. Creatures do not roll an ordinary attack. Printed automatic-hit
+attacks request damage directly. Medium/heavy armor adds its printed defence
+penalty. The table may agree a difficulty or situational modifier.
+
+On a failed defence the defender throws damage and armor protection. Natural 20
+reports a free attack for ordinary weapon selection; natural 1 doubles damage
+before protection and reduces armor one tier, retaining its penalties. Shield
+reduction applies before a compact 368 × 224 decision offers the current HP
+consequence or destruction of one shield to ignore that attack’s damage. Closing
+the decision terminates the action; already rolled dice and accepted armor damage
+remain. Participant disconnect, loss of ownership, and closure cannot resume the
+action or transfer it to the GM. Effects, Omens, timers and unfinished outcomes
+remain table-managed. SDK 2029 revision 14 supplies the live session boundary.
 
 ## Automated tests
 
