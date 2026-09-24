@@ -1,4 +1,4 @@
-extends RefCounted
+extends Node
 
 ## Live presentation of an authority-owned action; never saved or restored.
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
@@ -13,6 +13,8 @@ var _reading := false
 var _refresh_requested := false
 var _closed := false
 var _submitted := false
+var _retired := false
+var _cancelling := false
 
 func _init(facade: SDK) -> void:
 	_sdk = facade
@@ -27,12 +29,16 @@ func start(input: Dictionary) -> void:
 	message = "Requesting the attack Throw…"
 	changed.emit()
 	_reading = true
-	var result: SDK.DataResult = await _sdk.system_actions.submit("melee.start", input)
+	var result: SDK.DataResult = await _submit("melee.start", input)
 	_reading = false
 	_submitted = result.ok
 	if _closed:
 		if _submitted:
-			await _sdk.system_actions.submit("melee.cancel", {"id": _id})
+			_cancelling = true
+			await _submit("melee.cancel", {"id": _id})
+			_cancelling = false
+		if _retired:
+			queue_free()
 		return
 	_accept(result)
 	if _refresh_requested:
@@ -47,10 +53,19 @@ func refresh() -> void:
 	while _refresh_requested and pending and not _closed:
 		_refresh_requested = false
 		_reading = true
-		var result: SDK.DataResult = await _sdk.system_actions.submit("melee.advance", {"id": _id})
+		var result: SDK.DataResult = await _submit("melee.advance", {"id": _id})
 		_reading = false
 		if not _closed:
 			_accept(result)
+
+	if _retired and not _cancelling:
+		queue_free()
+
+func retire() -> void:
+	_retired = true
+	await cancel()
+	if not _reading and not _cancelling:
+		queue_free()
 
 func cancel() -> void:
 	if _closed:
@@ -63,7 +78,11 @@ func cancel() -> void:
 	message = ENDED
 	changed.emit()
 	if _submitted:
-		await _sdk.system_actions.submit("melee.cancel", {"id": _id})
+		_cancelling = true
+		await _submit("melee.cancel", {"id": _id})
+		_cancelling = false
+	if _retired and not _reading:
+		queue_free()
 
 func _accept(result: SDK.DataResult) -> void:
 	if not result.ok:
@@ -75,3 +94,15 @@ func _accept(result: SDK.DataResult) -> void:
 		message = str(outcome.get("message", ENDED))
 	pending = state == "pending"
 	changed.emit()
+
+func _submit(name: String, input: Dictionary) -> SDK.DataResult:
+	while true:
+		if _closed and name != "melee.cancel":
+			return SDK.DataResult.new({"ok": false, "code": "closed", "message": ENDED})
+		var result: SDK.DataResult = await _sdk.system_actions.submit(name, input)
+		if result.ok or not result.code in ["busy", "rate_limited", "not_ready", "operation_in_progress"] or (_closed and name != "melee.cancel"):
+			return result
+		# Retry this live transport operation. Closure stops new advances; a
+		# cancellation keeps retrying until acknowledged or its Session ends.
+		await get_tree().create_timer(0.5).timeout
+	return SDK.DataResult.new({"ok": false, "message": ENDED})

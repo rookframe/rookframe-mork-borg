@@ -26,12 +26,18 @@ var active := false
 var last_request := ""
 var defer_reply := false
 var queued_reply: Dictionary = {}
+var transient_failures: Dictionary = {}
+var submissions: Dictionary = {}
 func PackageId() -> String:
  return "0404eb56-ef27-4b1a-8385-27e4e3ec907e"
 func NewHumanThrowRequestId() -> String:
  request_serial += 1
  return "damage-%d" % request_serial
 func SubmitSystemIntent(name: String, data: Variant) -> Dictionary:
+ submissions[name] = int(submissions.get(name, 0)) + 1
+ if int(transient_failures.get(name, 0)) > 0:
+  transient_failures[name] -= 1
+  return {"ok": false, "code": "rate_limited", "message": "Retry later"}
  active = true
  var outcome: Variant = handler.handle_system_intent(SDK.SystemActionContext.new(self, "active"), name, data)
  active = false
@@ -66,6 +72,8 @@ func SystemIntentCancelThrow(token: String, id: String) -> Dictionary:
   requests[id].result.status = "cancelled"
  return SystemIntentReadThrow(token, id)
 func SystemIntentCommit(_token: String, changes: Array, report: Dictionary) -> Dictionary:
+ if str(report.get("title", "")).to_utf16_buffer().size() / 2 > 72:
+  return {"ok": false, "message": "Title too long"}
  if fail_commit:
   return {"ok": false, "message": "Save failed"}
  for change in changes:

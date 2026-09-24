@@ -436,7 +436,7 @@ func _on_character_unavailable() -> void:
 	_set_window_title("Character unavailable")
 	_character_tabs.visible = false
 
-func _on_sheet_workflow_changed(route: String, title: String, can_spend: bool, busy: bool) -> void:
+func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
 	if route != _last_sheet_route:
 		get_node(^"Layout/Body").scroll_vertical = 0
 		_last_sheet_route = route
@@ -444,10 +444,10 @@ func _on_sheet_workflow_changed(route: String, title: String, can_spend: bool, b
 	get_node(^"Layout/SheetActions").visible = route in ["omens", "attack"]
 	get_node(^"Layout/SheetActions/Spend").visible = route == "omens"
 	get_node(^"Layout/SheetActions/Attack").visible = route == "attack"
-	get_node(^"Layout/SheetActions/Attack").disabled = not can_spend or busy
+	get_node(^"Layout/SheetActions/Attack").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if busy else "Roll attack"
-	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route == "attack" and not can_spend and not busy else "Cancel"
-	get_node(^"Layout/SheetActions/Spend").disabled = not can_spend or busy
+	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route == "attack" and not can_submit and not busy else "Cancel"
+	get_node(^"Layout/SheetActions/Spend").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Back").disabled = busy and route != "attack"
 	_set_window_title(title)
 

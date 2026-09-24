@@ -6,7 +6,7 @@ const CHARACTER_SHEET_VIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef
 
 signal companion_selected(actor: SDK.Actor)
 signal sheet_changed
-signal workflow_changed(route: String, title: String, can_spend: bool, busy: bool)
+signal workflow_changed(route: String, title: String, can_submit: bool, busy: bool)
 signal actor_unavailable
 const ABILITY_THROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/ability_throw.gd")
 const MELEE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_action.gd")
@@ -45,6 +45,8 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 	if _character_actor != null and _character_actor.id.value != actor.id.value:
 		close_action()
 		_ability_throw = null
+		if _melee != null:
+			_melee.retire()
 		_melee = null
 	if _ability_throw != null and not _ability_throw.pending:
 		_ability_throw = null
@@ -145,6 +147,8 @@ func _navigate(route: String, item_id: String) -> void:
 			_set_status("Finish the current Throw before starting another action.", true)
 			return
 		_selected_rook = sdk.rooks.selected()
+		if _melee != null:
+			_melee.retire()
 		_melee = null
 		_melee_options = {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}
 	_character_route = route
@@ -405,7 +409,11 @@ func roll_attack() -> void:
 	input["source"] = _character_actor.id.value
 	input["rook"] = _selected_rook.value
 	input["item"] = _item_id
-	_melee = MELEE_ACTION.new(sdk)
+	if _melee != null:
+		_melee.retire()
+	var action := MELEE_ACTION.new(sdk)
+	add_child(action)
+	_melee = action
 	_melee.changed.connect(_melee_changed)
 	await _melee.start(input)
 

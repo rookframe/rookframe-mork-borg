@@ -54,6 +54,7 @@ func _run() -> void:
 		_check(host.reports[-1].result == "Miss", "The Goblin's DR14 applies to a total of 12.")
 	await _boundaries()
 	await _lifetime()
+	await _review_regressions()
 	system.free()
 	print("MELEE_ATTACK %s" % ("PASS" if failures == 0 else "FAIL"))
 	quit(0 if failures == 0 else 1)
@@ -157,6 +158,7 @@ func _lifetime() -> void:
 	ended = await sdk.system_actions.submit("melee.start", _input("restart"))
 	_check(ended.value.state == "ended", "Reopened System does not resume a durable Throw identity.")
 	var delayed := ACTION.new(sdk)
+	root.add_child(delayed)
 	host.defer_reply = true
 	delayed.start(_input("ignored"))
 	var request: String = host.last_request
@@ -165,6 +167,7 @@ func _lifetime() -> void:
 	await process_frame
 	_check(not delayed.pending and host.requests[request].result.status == "cancelled", "Close before acknowledgement cancels the accepted Throw.")
 	var coalesced := ACTION.new(sdk)
+	root.add_child(coalesced)
 	await coalesced.start(_input("ignored"))
 	request = host.last_request
 	host.defer_reply = true
@@ -174,4 +177,75 @@ func _lifetime() -> void:
 	host.complete_reply()
 	await process_frame
 	_check(coalesced.state == "resolved" and coalesced.message.contains("misses"), "A settled update during a pending reply is not lost.")
+	system.free()
+
+func _review_regressions() -> void:
+	var host = BOUNDARY.new()
+	var system = SYSTEM.new()
+	root.add_child(system)
+	host.handler = system
+	var sdk := SDK.new(host)
+	for field in ["id", "source", "rook", "item", "difficulty", "modifier", "fumble", "piercing"]:
+		var malformed := _input("bad-" + field)
+		malformed[field] = []
+		var refused: SDK.DataResult = await sdk.system_actions.submit("melee.start", malformed)
+		_check(refused.ok and refused.value.state == "error" and host.requests.is_empty(), "Malformed %s is refused without failing the World." % field)
+	host.game_master = true
+	host.participant = "gm"
+	host.access_entries = [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "owner-session"}]
+	await sdk.system_actions.submit("melee.start", _input("revoked-owner"))
+	host.access_entries[0].access_level = "Viewer"
+	host.roll("revoked-owner", [20])
+	var ended: SDK.DataResult = await sdk.system_actions.submit("melee.advance", {"id": "revoked-owner"})
+	_check(ended.value.state == "ended" and host.requests.size() == 1 and host.actors.enemy.data.hit_points == 6, "Revoked delegated ownership ends a GM-started action without consequence.")
+	host.game_master = false
+	host.participant = "player"
+	host.actors.hero.data.name = "😀".repeat(40)
+	host.actors.hero.data.inventory[0].name = "🗡".repeat(40)
+	await sdk.system_actions.submit("melee.start", _input("long-names"))
+	host.roll("long-names", [17])
+	await sdk.system_actions.submit("melee.advance", {"id": "long-names"})
+	host.roll(host.last_request, [5, 2])
+	var hit: SDK.DataResult = await sdk.system_actions.submit("melee.advance", {"id": "long-names"})
+	_check(hit.value.state == "resolved" and host.actors.enemy.data.hit_points == 3 and host.reports[-1].title.length() <= 72, "Long editable names cannot prevent the accepted damage/report commit.")
+	host.actors.enemy.data.defence_dr = 29
+	var automatic := _input("private-miss")
+	automatic.difficulty = 0
+	await sdk.system_actions.submit("melee.start", automatic)
+	host.roll("private-miss", [13])
+	await sdk.system_actions.submit("melee.advance", {"id": "private-miss"})
+	_check(not str(host.reports[-1]).contains("29") and not str(host.reports[-1]).contains("DR"), "A miss report does not expose private defence difficulty.")
+	var action := ACTION.new(sdk)
+	root.add_child(action)
+	await action.start(_input("unused"))
+	var request: String = host.last_request
+	host.roll(request, [2])
+	host.transient_failures["melee.advance"] = 1
+	await action.refresh()
+	_check(action.state == "resolved" and not action.pending, "A transient advance reply retries the same live action to its accepted result.")
+	await action.retire()
+	action = ACTION.new(sdk)
+	root.add_child(action)
+	await action.start(_input("unused"))
+	request = host.last_request
+	host.transient_failures["melee.cancel"] = 1
+	await action.cancel()
+	_check(host.requests[request].result.status == "cancelled" and action.state == "ended", "A transient cancellation retries until the outstanding Throw is cancelled.")
+	await action.retire()
+	action = ACTION.new(sdk)
+	root.add_child(action)
+	await action.start(_input("unused"))
+	request = host.last_request
+	host.roll(request, [17])
+	host.transient_failures["melee.advance"] = 1
+	host.transient_failures["melee.cancel"] = 2
+	var advances_before: int = host.submissions.get("melee.advance", 0)
+	action.refresh()
+	action.cancel()
+	action.retire()
+	await create_timer(1.2).timeout
+	var closed: SDK.DataResult = await sdk.system_actions.submit("melee.start", {"id": request})
+	_check(closed.value.state == "ended" and host.last_request == request, "Retirement waits for concurrent cancellation retries and cannot start a damage Throw after closure.")
+	_check(host.submissions["melee.advance"] == advances_before + 1, "Closure stops an advance before its retry is sent.")
+	_check(not is_instance_valid(action), "Retired action releases its Node after cancellation is acknowledged.")
 	system.free()

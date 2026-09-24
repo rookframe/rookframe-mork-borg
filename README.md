@@ -161,8 +161,10 @@ weapon-attack-rules and weapon-attack-executor at 61ea4098 provide reuse evidenc
 One tabletop unit is one metre. Authored reach is explicit: 5 ft = 1.524 m and
 10 ft = 3.048 m. The SDK measures committed logical Rook centers, without line of
 sight. Every out-of-range target is reported as `target {public name} not in range`;
-an invalid set stops the entire action. Private Creature data remains on World
-Authority. Consequences do not grant the Player Actor access.
+an invalid set stops the entire action. All Participants receive the complete
+World state, including Creature data. Privacy is only UI display: inaccessible
+sheets stay hidden and action text uses public labels. Consequences do not grant
+the Player additional display or action access.
 
 Action identities belong to one live Participant session. Duplicate calls retain
 the existing result. Closure, cancellation, lost access or a required session

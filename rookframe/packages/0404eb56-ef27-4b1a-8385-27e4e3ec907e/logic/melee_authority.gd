@@ -1,6 +1,7 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/implementation.gd"
 
-## One live System action per supplied UUID. Private state stays on World Authority.
+## One live System action per supplied UUID, resolved on World Authority.
+## World data is shared in full; Actor privacy applies only to UI display.
 ## Reopening has no actions to resume; durable session Throw IDs cannot restart one.
 const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_actions.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
@@ -11,6 +12,10 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 	if typeof(payload) != TYPE_DICTIONARY:
 		return _error("The melee action is malformed.")
 	var input: Dictionary = payload
+	if typeof(input.get("id", "")) != TYPE_STRING:
+		return _error("The action identity must be text.")
+	if name == "melee.start" and not _valid_options(input):
+		return _error("The melee action options are malformed.")
 	var caller_result := context.caller()
 	if not caller_result.ok:
 		return _error(caller_result.message)
@@ -45,7 +50,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var source := context.read_actor(SDK.ActorId.new(str(input.get("source", ""))))
 	if not source.ok or source.actor.access_level != "Owner":
 		return _error("Owner access is required to attack with this Character.")
+	if typeof(source.actor.data) != TYPE_DICTIONARY:
+		return _error("Character data is malformed.")
 	var data: Dictionary = source.actor.data
+	if not _valid_character(data):
+		return _error("Character combat data is malformed.")
 	if str(data.get("schema", "")) != "mork-borg-character/v1":
 		return _error("Choose a Character for this melee attack.")
 	var rook_id := SDK.RookId.new(str(input.get("rook", "")))
@@ -78,7 +87,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		var target := context.read_actor(target_rook.rook.actor)
 		if not target.ok:
 			return _error("A targeted Creature is unavailable.")
+		if typeof(target.actor.data) != TYPE_DICTIONARY:
+			return _error("Creature data is malformed.")
 		var creature: Dictionary = target.actor.data
+		if not _valid_creature(creature):
+			return _error("Creature combat data is malformed.")
 		if str(creature.get("schema", "")) != "mork-borg-adversary/v1" or target.actor.id.value == source.actor.id.value:
 			return _error("Choose a Creature target for this attack.")
 		var distance := context.distance(rook_id, SDK.RookId.new(target_id))
@@ -88,7 +101,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			outside.append("target %s not in range" % _public_name(target.actor))
 		targets.append(target.actor)
 	if not outside.is_empty():
-		var report := SDK.ActionLogMessage.new("%s attack" % str(weapon.name))
+		var weapon_name: String = str(weapon.name)
+		var report := SDK.ActionLogMessage.new("%s attack" % _short_name(weapon_name, 16))
 		for line in outside:
 			report.text.append(SDK.ActionLogText.new(line))
 		report.result = "Stopped"
@@ -133,7 +147,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var strength: Dictionary = abilities.get("Strength", {})
 	var strength_modifier: int = strength.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": str(weapon.name), "name": str(data.get("name", "Character")), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "modifier": strength_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "damage": str(weapon.damage), "protection": protection_text, "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "modifier": strength_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "damage": str(weapon.damage), "protection": protection_text, "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, owner, [SDK.DiceTerm.new("Attack", 20)]))
 	if not requested.ok:
 		return _error(requested.message)
@@ -147,14 +161,17 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 	if action.state != "pending":
 		return _public(action)
 	var source := context.read_actor(SDK.ActorId.new(action.source))
-	if not source.ok or source.actor.access_level != "Owner":
+	if not source.ok or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
+		return _end(context, action)
+	var current_source: Dictionary = source.actor.data
+	if not _valid_character(current_source):
 		return _end(context, action)
 	if action.owner != action.participant:
 		var access := context.actor_access(source.actor.id)
 		var connected := false
 		if access.ok:
 			for entry in access.items:
-				if entry.participant_id == action.owner and entry.is_connected and entry.session_id == action.owner_session:
+				if entry.participant_id == action.owner and entry.access_level == "Owner" and entry.is_connected and entry.session_id == action.owner_session:
 					connected = true
 		if not connected:
 			return _end(context, action)
@@ -173,7 +190,7 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 		var difficulty: int = action.difficulty
 		var sequence: int = action.sequence
 		if raw_face != 20 and raw_face + modifier < difficulty:
-			return _complete(context, action, [], "Miss", "%s misses %s. d20 %d %+d against DR %d. Raw Roll #%d." % [str(action.name), str(action.label), raw_face, modifier, difficulty, sequence])
+			return _complete(context, action, [], "Miss", "%s misses %s. d20 %d %+d. Raw Roll #%d." % [str(action.name), str(action.label), raw_face, modifier, sequence])
 		var terms: Array[SDK.DiceTerm] = [_dice(action.damage, "Damage")]
 		if not str(action.protection).is_empty():
 			terms.append(_dice(action.protection, "Protection"))
@@ -188,9 +205,11 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 
 func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.HumanThrowResult) -> Dictionary:
 	var target := context.read_actor(SDK.ActorId.new(action.target))
-	if not target.ok:
+	if not target.ok or typeof(target.actor.data) != TYPE_DICTIONARY:
 		return _end(context, action)
 	var data: Dictionary = target.actor.data
+	if not _valid_creature(data):
+		return _end(context, action)
 	data = data.duplicate(true)
 	var damage := 0
 	for value in result.terms[0].results:
@@ -292,3 +311,56 @@ func _dice(formula: String, name: String) -> SDK.DiceTerm:
 	if count < 1 or count > 15 or not faces in [2, 4, 6, 8, 10, 12, 20]:
 		return null
 	return SDK.DiceTerm.new(name, faces, count)
+
+func _valid_options(input: Dictionary) -> bool:
+	for key in ["source", "rook", "item", "fumble"]:
+		if typeof(input.get(key, "")) != TYPE_STRING:
+			return false
+	for key in ["difficulty", "modifier"]:
+		if typeof(input.get(key, 0)) != TYPE_INT:
+			return false
+	return typeof(input.get("piercing", false)) == TYPE_BOOL
+
+func _valid_character(data: Dictionary) -> bool:
+	if str(data.get("schema", "")) != "mork-borg-character/v1" or typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT or typeof(data.get("abilities", {})) != TYPE_DICTIONARY:
+		return false
+	var abilities: Dictionary = data.get("abilities", {})
+	if typeof(abilities.get("Strength", {})) != TYPE_DICTIONARY:
+		return false
+	var strength: Dictionary = abilities.get("Strength", {})
+	if typeof(strength.get("modifier", 0)) != TYPE_INT:
+		return false
+	var items: Array = data.get("inventory", [])
+	for raw in items:
+		if typeof(raw) != TYPE_DICTIONARY:
+			return false
+		var item: Dictionary = raw
+		for key in ["inventory_id", "source_item_id", "name", "kind", "damage"]:
+			if typeof(item.get(key, "")) != TYPE_STRING:
+				return false
+		for key in ["quantity", "range_feet"]:
+			if typeof(item.get(key, 0)) != TYPE_INT:
+				return false
+		for key in ["equipped", "broken"]:
+			if typeof(item.get(key, false)) != TYPE_BOOL:
+				return false
+	return true
+
+func _valid_creature(data: Dictionary) -> bool:
+	if str(data.get("schema", "")) != "mork-borg-adversary/v1" or typeof(data.get("armor", {})) != TYPE_DICTIONARY:
+		return false
+	for key in ["hit_points", "defence_dr", "piercing_defence_dr", "destroy_at_damage"]:
+		if typeof(data.get(key, 0)) != TYPE_INT:
+			return false
+	var armor: Dictionary = data.get("armor", {})
+	return typeof(armor.get("reduction", "")) == TYPE_STRING
+
+## Reserve two UTF-16 units per character for the host report title limit,
+## including supplementary Unicode names and the longest ended suffix.
+func _short_name(text: String, limit: int) -> String:
+	var result := ""
+	for character in text.split(""):
+		if result.length() >= limit:
+			break
+		result += character
+	return result
