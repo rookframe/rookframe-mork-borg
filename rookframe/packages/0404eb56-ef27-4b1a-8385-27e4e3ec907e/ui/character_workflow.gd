@@ -440,6 +440,7 @@ func _on_character_unavailable() -> void:
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
 	_sheet_workflow_title = title
+	_header_title.theme_type_variation = "RookframeTitle" if route == "attack" else "RookframeHeading"
 	if route == "attack":
 		_header_title.text = title.to_upper()
 	elif _character_actor != null:

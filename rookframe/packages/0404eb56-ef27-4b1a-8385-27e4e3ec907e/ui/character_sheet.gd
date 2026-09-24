@@ -460,7 +460,7 @@ func _refresh_attack_targets() -> void:
 			if distance.ok:
 				var feet := distance.distance / 0.3048
 				var reach: float = _attack_item.get("range_feet", 0)
-				line += " · %.1f ft · %s" % [feet, "In range" if feet <= reach + 0.00001 else "Out of range"]
+				line += "\n%.1f ft · %s" % [feet, "In range" if feet <= reach + 0.00001 else "Out of range"]
 		lines.append(line)
 	var summary := ""
 	for line in lines:
