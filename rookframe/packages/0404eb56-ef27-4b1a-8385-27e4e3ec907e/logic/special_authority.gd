@@ -104,7 +104,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(str(owner.error))
-	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "item": str(input.item), "kind": str(item.source_item_id), "target": target, "rook": str(input.get("rook", "")), "resource": str(resource.get("inventory_id", "")), "rule": rule, "adjustment": input.get("adjustment", 0), "request": str(input.id), "state": "pending", "message": "Throw healing in the Dice Tray."}
+	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "item": str(input.item), "kind": str(item.source_item_id), "target": target, "rook": str(input.get("rook", "")), "resource": str(resource.get("inventory_id", "")), "rule": rule, "adjustment": input.get("adjustment", 0), "request": str(input.id), "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
 	var terms: Array[SDK.DiceTerm] = []
 	if rule.get("poison", false) or rule.get("book", false) or rule.get("resistance", false):
 		if rule.get("book", false) and str(target.actor) == source.actor.id.value:
