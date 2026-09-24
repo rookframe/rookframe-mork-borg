@@ -1,5 +1,6 @@
 extends VBoxContainer
 
+const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_targets.gd")
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 const COMPANIONS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_companions.tscn")
 const CHARACTER_SHEET_VIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_view.tscn")
@@ -445,26 +446,8 @@ func _refresh_attack_targets() -> void:
 		return
 	var view := _melee_view
 	_target_reading = true
-	var targets: SDK.TargetSnapshotResult = await sdk.targeting.snapshot()
+	var reach: float = _attack_item.get("range_feet", 0)
+	var summary: String = await TARGETS.new().describe(sdk, _selected_rook, reach)
 	_target_reading = false
-	if _melee_view != view:
-		return
-	if not targets.ok:
-		view.set_targets(targets.message)
-		return
-	var lines: Array[String] = []
-	for rook in targets.snapshot.rooks:
-		var identity: SDK.PublicIdentityResult = sdk.public_identities.read(rook)
-		var label := identity.public_identity.label if identity.ok else "Creature"
-		var line: String = label
-		if _selected_rook != null:
-			var distance: SDK.DistanceResult = sdk.scenes.distance(_selected_rook, rook)
-			if distance.ok:
-				var feet := distance.distance / 0.3048
-				var reach: float = _attack_item.get("range_feet", 0)
-				line += "\n%.1f ft · %s" % [feet, "In range" if feet <= reach + 0.00001 else "Out of range"]
-		lines.append(line)
-	var summary := ""
-	for line in lines:
-		summary += ("\n" if not summary.is_empty() else "") + line
-	view.set_targets(summary if not lines.is_empty() else "Choose one Creature target")
+	if _melee_view == view:
+		view.set_targets(summary)

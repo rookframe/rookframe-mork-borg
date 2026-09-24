@@ -1,4 +1,5 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_workflow.gd"
+const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_targets.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
 const CREATURE_KIND := "actor_definition"
@@ -7,6 +8,8 @@ const ATTACK_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e
 var _creature_attack: Dictionary = {}
 var _creature_rook: SDK.RookId
 var _checking_range := false
+var _creature_targets_pending := false
+var _creature_targets_reading := false
 var _pending_creature_attack := ""
 
 func ready() -> void:
@@ -14,6 +17,7 @@ func ready() -> void:
 		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
 		return
 	character_setup()
+	sdk.targeting.changed.connect(_creature_targets_changed)
 	get_node(^"Layout/Body/Content/CreatureAttack").targets_requested.connect(_choose_creature_targets)
 	_compact = not sdk.presentation_experience().is_desktop
 	_routes_desktop.visible = not _compact
@@ -107,6 +111,7 @@ func _apply_density() -> void:
 
 
 func _refresh_world() -> void:
+	_creature_targets_pending = true
 	if _busy or _preserve_error or sdk == null:
 		return
 	_set_status("Loading Creature catalogue…")
@@ -339,6 +344,9 @@ func _show_route(route: String) -> void:
 
 func _process(delta: float) -> void:
 	super._process(delta)
+	if _creature_targets_pending and not _creature_targets_reading and _route == "creature-attack":
+		_creature_targets_pending = false
+		_refresh_creature_targets()
 	if not _pending_creature_attack.is_empty():
 		var id := _pending_creature_attack
 		_pending_creature_attack = ""
@@ -659,10 +667,17 @@ func _present_creature_attack(id: String) -> void:
 	_routes.visible = false
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
 	view.visible = true
-	view.configure(data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "selected", str(_creature_attack.get("rules", "")))
+	view.configure(data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "selected", "")
 	view.get_node(^"Metrics/Strength").visible = false
 	view.get_node(^"Context").text = str(data.get("name", "Creature")) + " · Selected attack"
-	view.set_targets("Choose one target, then check range")
+	_creature_targets_pending = true
+	var source_rules := str(_creature_attack.get("rules", ""))
+	if _creature_attack.has("defence_dr"):
+		source_rules = "Defence DR%s. %s" % [str(_creature_attack.defence_dr), source_rules]
+	if _creature_attack.has("attack_dr"):
+		source_rules = "Attack DR%s. %s" % [str(_creature_attack.attack_dr), source_rules]
+	view.get_node(^"SourceRules").text = source_rules.strip_edges()
+	view.get_node(^"SourceRules").visible = not source_rules.is_empty()
 	get_node(^"Layout/SheetActions").visible = true
 	get_node(^"Layout/SheetActions/Spend").visible = false
 	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory"
@@ -673,6 +688,7 @@ func _present_creature_attack(id: String) -> void:
 	_body.scroll_vertical = 0
 
 func _choose_creature_targets() -> void:
+	get_node(^"Layout/Body/Content/CreatureAttack/Outcome").visible = false
 	var result := sdk.targeting.choose()
 	if not result.ok:
 		_set_status(result.message, true)
@@ -704,3 +720,14 @@ func _cancel_sheet_workflow() -> void:
 		_show_route("creature-inventory")
 	else:
 		super._cancel_sheet_workflow()
+
+func _creature_targets_changed(_snapshot: SDK.TargetSnapshot) -> void:
+	_creature_targets_pending = true
+
+func _refresh_creature_targets() -> void:
+	_creature_targets_reading = true
+	var reach: float = _creature_attack.get("range_feet", 0)
+	var summary: String = await TARGETS.new().describe(sdk, _creature_rook, reach)
+	_creature_targets_reading = false
+	if _route == "creature-attack":
+		get_node(^"Layout/Body/Content/CreatureAttack").set_targets(summary)
