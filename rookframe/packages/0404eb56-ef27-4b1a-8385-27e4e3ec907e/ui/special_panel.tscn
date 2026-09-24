@@ -1,6 +1,13 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=7 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_panel.gd" id="1"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="2"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_choice.tscn" id="3"]
+[sub_resource type="ButtonGroup" id="Abilities"]
+resource_local_to_scene = true
+[sub_resource type="ButtonGroup" id="FirstScroll"]
+resource_local_to_scene = true
+[sub_resource type="ButtonGroup" id="SecondScroll"]
+resource_local_to_scene = true
 [node name="SpecialPanel" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -105,3 +112,108 @@ text = "Subtract Presence (otherwise add)"
 layout_mode = 2
 label_text = "Table-agreed Morale if none printed (2–12)"
 value = "0"
+
+[node name="Adjustment" parent="Options" instance=ExtResource("2")]
+layout_mode = 2
+label_text = "Agreed DR adjustment (load / situation)"
+value = "0"
+
+[node name="Agility" parent="Options/Ability/Choices" instance=ExtResource("3")]
+layout_mode = 2
+text = "Agility"
+button_group = SubResource("Abilities")
+
+[node name="Presence" parent="Options/Ability/Choices" instance=ExtResource("3")]
+layout_mode = 2
+text = "Presence"
+button_group = SubResource("Abilities")
+
+[node name="Strength" parent="Options/Ability/Choices" instance=ExtResource("3")]
+layout_mode = 2
+text = "Strength"
+button_group = SubResource("Abilities")
+
+[node name="Toughness" parent="Options/Ability/Choices" instance=ExtResource("3")]
+layout_mode = 2
+text = "Toughness"
+button_group = SubResource("Abilities")
+
+[node name="Scroll0" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll1" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll2" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll3" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll4" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll5" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll6" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll7" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll8" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll9" parent="Scrolls/First" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("FirstScroll")
+
+[node name="Scroll0" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll1" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll2" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll3" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll4" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll5" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll6" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll7" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll8" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")
+
+[node name="Scroll9" parent="Scrolls/Second" instance=ExtResource("3")]
+layout_mode = 2
+button_group = SubResource("SecondScroll")

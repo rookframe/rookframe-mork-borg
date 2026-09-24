@@ -44,6 +44,8 @@ func terms(plan: Dictionary) -> Array[SDK.DiceTerm]:
 	return result
 
 func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Dictionary:
+	if not protection_current(actor, plan):
+		return {"error": "Recipient protection changed. Start a new action."}
 	var current: Dictionary = actor.data
 	if typeof(current.get("hit_points")) != TYPE_INT:
 		return {"error": "Recipient HP is malformed."}
@@ -72,3 +74,9 @@ func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Di
 
 func damage_armor(id: SDK.ActorId, data: Dictionary) -> void:
 	CREATURE_ITEMS.new(null, id).damage_armor(data)
+
+func protection_current(actor: SDK.Actor, original: Dictionary) -> bool:
+	var faces: int = original.faces
+	var infection: bool = original.infection
+	var current := plan(actor, faces, infection)
+	return not current.has("error") and current.protection == original.protection and current.shield == original.shield and current.shield_id == original.shield_id

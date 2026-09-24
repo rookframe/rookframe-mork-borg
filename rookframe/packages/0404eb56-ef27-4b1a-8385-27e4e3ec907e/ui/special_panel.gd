@@ -9,7 +9,6 @@ const SHIELD_SCRIPT = preload(ROOT + "ui/shield_dialog.gd")
 const BACKDROP = preload(ROOT + "ui/shield_backdrop.tscn")
 var _shield: SHIELD_SCRIPT
 var _backdrop: CanvasLayer
-const CHOICE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_choice.tscn")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
@@ -31,11 +30,9 @@ var _ability := ""
 
 func _ready() -> void:
 	resized.connect(_layout)
-	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-		var choice := CHOICE.instantiate() as Button
-		get_node(^"Options/Ability/Choices").add_child(choice)
-		choice.text = ability
-		choice.pressed.connect(_choose_ability.bind(ability))
+	for node in get_node(^"Options/Ability/Choices").get_children():
+		var choice := node as Button
+		choice.pressed.connect(_choose_ability.bind(choice.text))
 	get_node(^"Columns/Recipient/Content/Change").pressed.connect(_choose_targets)
 	get_node(^"Columns/Recipient/Content/Self").pressed.connect(_self_changed)
 
@@ -51,6 +48,8 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 		_sdk.world_changed.connect(_world_changed)
 	if _source_rook == null:
 		_source_rook = _sdk.rooks.selected()
+	if _rule.get("book", false):
+		get_node(^"Columns/Recipient/Content/Self").button_pressed = false
 	_targets_pending = true
 	_render()
 
@@ -82,6 +81,7 @@ func _render() -> void:
 		get_node(^"Columns/Recipient/Content/Copy").text = "%s\n%s / %s HP" % [str(data.get("name", "Character")), str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	get_node(^"Options").visible = editing
 	get_node(^"Options/Ability").visible = _rule.get("ability_choice", false) or _rule.get("book", false)
+	get_node(^"Options/Adjustment").visible = _rule.has("ability") or _rule.get("book", false) or _rule.get("resistance", false)
 	get_node(^"Options/NewFight").visible = _rule.get("gob", false)
 	get_node(^"Options/Morale").visible = _rule.get("morale", false)
 	get_node(^"Columns/Recipient/Content/Change").disabled = not editing and state != "witnesses"
@@ -92,13 +92,13 @@ func _render() -> void:
 		_scroll_options = SCROLLS.TABLES.get(str(_action.snapshot.get("family", "")), [])
 		for index in range(2):
 			var list := get_node(^"Scrolls/First" if index == 0 else ^"Scrolls/Second")
-			for raw in _scroll_options:
-				var scroll: Dictionary = raw
-				var row := CHOICE.instantiate() as Button
-				list.add_child(row)
+			for number in range(_scroll_options.size()):
+				var scroll: Dictionary = _scroll_options[number]
+				var row := list.get_child(number) as Button
 				row.text = str(scroll.name)
 				row.pressed.connect(_choose_scroll.bind(index, str(scroll.source_item_id)))
-		get_node(^"Scrolls/Second").visible = int(_action.snapshot.get("count", 0)) == 2
+		var count: int = _action.snapshot.get("count", 0)
+		get_node(^"Scrolls/Second").visible = count == 2
 	if state == "shield":
 		if _shield == null:
 			var backdrop := BACKDROP.instantiate()
@@ -127,7 +127,8 @@ func submit() -> void:
 		return
 	if _action != null and _action.state == "scrolls":
 		var ids: Array[String] = []
-		for index in range(int(_action.snapshot.get("count", 0))):
+		var count: int = _action.snapshot.get("count", 0)
+		for index in range(count):
 			ids.append(_first_scroll if index == 0 else _second_scroll)
 		await _action.choose_scrolls(ids)
 		return
@@ -136,12 +137,22 @@ func submit() -> void:
 		return
 	if _action != null and _action.pending:
 		return
+	var adjustment_text: String = get_node(^"Options/Adjustment").value
+	if not adjustment_text.is_valid_int():
+		get_node(^"Outcome").text = "Enter a whole-number DR adjustment agreed with the table."
+		get_node(^"Outcome").visible = true
+		get_node(^"Outcome").theme_type_variation = "RookframeError"
+		return
+	var adjustment := int(adjustment_text)
 	if _action != null:
 		_action.retire()
-	_action = ACTION.new(_sdk)
-	action_created.emit(_action)
+	var action := ACTION.new(_sdk)
+	action_created.emit(action)
+	_action = action
 	_action.changed.connect(_world_changed)
-	await _action.start({"source": _actor.id.value, "rook": _source_rook.value if _source_rook != null else "", "item": _item, "self": get_node(^"Columns/Recipient/Content/Self").button_pressed and not _rule.get("book", false), "ability": _ability, "new_fight": get_node(^"Options/NewFight").button_pressed, "presence_sign": -1 if get_node(^"Options/Morale/Subtract").button_pressed else 1, "morale": int(get_node(^"Options/Morale/Value").value), "eligible": get_node(^"Options/Eligible").button_pressed})
+	var morale_text: String = get_node(^"Options/Morale/Value").value
+	var morale := int(morale_text)
+	await _action.start({"adjustment": adjustment, "source": _actor.id.value, "rook": _source_rook.value if _source_rook != null else "", "item": _item, "self": get_node(^"Columns/Recipient/Content/Self").button_pressed and not _rule.get("book", false), "ability": _ability, "new_fight": get_node(^"Options/NewFight").button_pressed, "presence_sign": -1 if get_node(^"Options/Morale/Subtract").button_pressed else 1, "morale": morale, "eligible": get_node(^"Options/Eligible").button_pressed})
 
 func primary_text() -> String:
 	var state := _action.state if _action != null else "ready"
@@ -202,19 +213,12 @@ func _layout() -> void:
 
 func _choose_ability(ability: String) -> void:
 	_ability = ability
-	for choice in get_node(^"Options/Ability/Choices").get_children():
-		var button := choice as Button
-		button.button_pressed = button.text == ability
 
 func _choose_scroll(index: int, id: String) -> void:
 	if index == 0:
 		_first_scroll = id
 	else:
 		_second_scroll = id
-	var list := get_node(^"Scrolls/First" if index == 0 else ^"Scrolls/Second")
-	for number in range(_scroll_options.size()):
-		var scroll: Dictionary = _scroll_options[number]
-		(list.get_child(number) as Button).button_pressed = str(scroll.source_item_id) == id
 
 func _choose_shield(choice: String) -> void:
 	await _action.choose_shield(choice)

@@ -131,6 +131,8 @@ func _edit_item(item: Dictionary, field: String, text: String) -> String:
 		if field == "armor_tier" and int(text) > 3:
 			return "Armor tiers range from 0 to 3."
 		item[field] = int(text)
+		if field == "uses" and str(item.get("source_item_id", "")) == "eurekia":
+			item["drawn"] = false
 	elif field == "equipped":
 		if not str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] and str(item.get("source_item_id", "")) != "stolen-mitre":
 			return "This item is carried without an equipment state."

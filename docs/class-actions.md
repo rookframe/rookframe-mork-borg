@@ -94,3 +94,22 @@ required Participant session ends the action. Completed rolls, uses and HP
 changes remain; late results and repeated terminal requests cannot apply twice.
 Unsupported/malformed input is refused before new rolls or mutation. Day/fight
 eligibility and remaining uses can be corrected explicitly on the owning sheet.
+
+## Review regressions
+
+Every continuation, including scroll selection and the shield decision, rechecks
+source ownership, item existence and the pinned recipient's Rook/range. Accepted
+bomb damage consumes the item before the shield decision; cancelling that decision
+does not refund the bomb. Changed armor/shield protection ends a pending damage
+interpretation. Taking caltrops damage preserves the infection result.
+
+Class Agility tests apply worn medium/heavy armor penalties (+2/+4 DR, including
+the original penalty tier after damage). The table can enter an additional DR
+adjustment for load or fictional circumstances; the inventory does not infer item
+size or encumbrance. Correcting Eurekia's remaining draws also clears its drawn
+state for the next combat. No combat or rest timer resets these resources.
+
+Ability and scroll choices use stock CheckBox radio behavior with scene-local
+ButtonGroups. The Book previews the selected enemy, and malformed DR text requests
+no dice. Tests cover independent sheet choices, source removal during a choice,
+changed reach/protection, bomb cancellation, armor DR and the next Eurekia draw.

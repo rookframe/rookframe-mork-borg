@@ -433,3 +433,102 @@ func test_treacherous_blade_offers_existing_shield_choice_before_hp_change() -> 
 	assert_int(host.actors.hero.data.hit_points).is_equal(7)
 	assert_bool(host.actors.hero.data.inventory[-1].broken).is_true()
 	assert_str(str(host.reports)).contains("Shield")
+
+func test_removed_college_ends_before_chosen_scrolls_are_created() -> void:
+	var host := _host()
+	host.actors.hero.data.traits = [{"id": "initiate-of-the-invisible-college", "uses": 1}]
+	var input := _use_input()
+	input.item = "feature:initiate-of-the-invisible-college"
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("special.start", input)
+	host.roll("use", [1, 1])
+	await sdk.system_actions.submit("special.advance", {"id": "use"})
+	host.actors.hero.data.traits = []
+	var result := await sdk.system_actions.submit("special.scrolls", {"id": "use", "scrolls": ["enochian-syntax"]})
+	assert_str(result.value.state).is_equal("ended")
+	assert_int(host.actors.hero.data.inventory.size()).is_equal(2)
+
+func test_class_agility_tests_include_worn_armor(key: String, tier: int, expected_dr: int, _test_parameters := [["filthy-fingersmith", 2, 10], ["stolen-mitre", 3, 12]]) -> void:
+	var host := _host(key)
+	host.actors.hero.data.inventory[-1]["equipped"] = true
+	host.actors.hero.data.inventory.append({"inventory_id": "armor", "kind": "Armor", "quantity": 1, "equipped": true, "armor_tier": tier})
+	var input := _use_input()
+	input["ability"] = "Agility"
+	if key == "filthy-fingersmith":
+		host.actors.hero.data.traits = [{"id": key}]
+		input.item = "feature:" + key
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("special.start", input)
+	host.roll("use", [7])
+	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_str(result.value.message).contains("DR%d" % expected_dr)
+
+func test_special_damage_rejects_changed_protection() -> void:
+	var host := _host("bomb")
+	var input := _use_input()
+	input.self = false
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("special.start", input)
+	host.roll("use", [6, 2])
+	host.actors.enemy.data.armor.reduction = "d4"
+	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})
+	assert_str(result.value.state).is_equal("ended")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+
+func test_shield_continuation_requires_source_item_and_range(change: String, _test_parameters := [["item"], ["range"]]) -> void:
+	var host := _host("blade-of-your-ancestors")
+	host.actors.hero.data.inventory[-1]["equipped"] = true
+	host.actors.enemy.data["creature_inventory"] = true
+	host.actors.enemy.data["inventory"] = [{"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true}]
+	var input := _use_input()
+	input.self = false
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("special.start", input)
+	host.roll("use", [1])
+	await sdk.system_actions.submit("special.advance", {"id": "use"})
+	host.roll(host.last_request, [11])
+	await sdk.system_actions.submit("special.advance", {"id": "use"})
+	host.roll(host.last_request, [3])
+	await sdk.system_actions.submit("special.advance", {"id": "use"})
+	if change == "item":
+		host.actors.hero.data.inventory = []
+	else:
+		host.distance = 8.0
+	host.participant = "gm"
+	host.session = "gm-session"
+	host.game_master = true
+	host.access_by_actor.hero = [{"participant_id": "player", "session_id": "player-session", "display_name": "Player", "is_connected": true, "access_level": "Owner"}]
+	var result := await sdk.system_actions.submit("special.choose", {"id": "use", "choice": "take"})
+	assert_str(result.value.state).is_equal("ended")
+	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
+
+func test_bomb_spends_once_before_shield_and_never_refunds_on_cancel(choice: String, _test_parameters := [["break"], ["cancel"]]) -> void:
+	var host := _host("bomb")
+	host.actors.hero.data.inventory.append({"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true})
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("special.start", _use_input())
+	host.roll("use", [5])
+	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})
+	assert_str(result.value.state).is_equal("shield")
+	assert_int(host.actors.hero.data.inventory[1].quantity).is_equal(0)
+	assert_int(host.actors.hero.data.hit_points).is_equal(7)
+	if result.value.state != "shield":
+		return
+	result = await sdk.system_actions.submit("special.cancel" if choice == "cancel" else "special.choose", {"id": "use", "choice": choice})
+	assert_str(result.value.state).is_equal("ended" if choice == "cancel" else "resolved")
+	assert_int(host.actors.hero.data.inventory[1].quantity).is_equal(0)
+	assert_int(host.actors.hero.data.hit_points).is_equal(7)
+
+func test_taking_caltrops_damage_preserves_rolled_infection_report() -> void:
+	var host := _host("caltrops")
+	host.actors.hero.data.inventory.append({"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true})
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("special.start", _use_input())
+	host.roll("use", [4, 1])
+	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})
+	assert_str(result.value.state).is_equal("shield")
+	result = await sdk.system_actions.submit("special.choose", {"id": "use", "choice": "take"})
+	assert_str(result.value.state).is_equal("resolved")
+	assert_str(result.value.message).contains("Infection")
+	assert_int(host.actors.hero.data.hit_points).is_equal(4)
