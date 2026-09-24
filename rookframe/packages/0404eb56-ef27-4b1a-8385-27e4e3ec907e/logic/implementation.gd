@@ -15,7 +15,8 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 		return _powers.handle(context, name, payload)
 	if name == "defence.inbox":
 		var inbox: Array = _defence.handle(context, name, payload)
-		inbox.append_array(_special.shield_inbox(context))
+		for action in _special.shield_inbox(context):
+			inbox.append(action)
 		return inbox
 	if name.begins_with("defence."):
 		return _defence.handle(context, name, payload)
