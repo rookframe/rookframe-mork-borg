@@ -492,7 +492,7 @@ func test_companions_projection() -> void:
 	var companion_view = sheet.find_child("Companions", true, false)
 	_check(companion_view != null, "The Character sheet opens its companions route.")
 	if companion_view != null:
-		var rows = companion_view.get_node("Items").get_children()
+		var rows = companion_view.get_node("Section/Content/Items").get_children().filter(func(row): return row.has_node("Actions/Open"))
 		_check(rows.size() == 2, "Starting and summoned Actors share one list; unrelated Actors stay excluded.")
 		if rows.size() == 2:
 			rows[0].get_node("Actions/Open").pressed.emit()

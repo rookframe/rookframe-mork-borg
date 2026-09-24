@@ -174,8 +174,8 @@ func test_companion_rows_keep_owner_actions_at_touch_size(access: String, _test_
 	view.configure(actors)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	var row: Control = view.get_node("Items").get_child(0)
-	assert_str(row.get_node("Details").text).contains("4 / 10 HP")
+	var row: Control = view.get_node("Section/Content/Items").get_child(0)
+	assert_str(row.get_node("Info/Details").text).contains("4 / 10 HP")
 	var open: Button = row.get_node("Actions/Open")
 	var place: Button = row.get_node("Actions/Place")
 	assert_bool(place.disabled).is_equal(access != "Owner")
