@@ -446,6 +446,7 @@ func test_creature_targeting_selects_one_rolling_side_from_ordinary_access(owned
 
 func test_companion_defence_presentation_offers_flat_test_at_phone_dock_width() -> void:
 	var host := _combat_host()
+	host.actors.enemy.access_level = "Owner"
 	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
 	var sdk := SDK.new(host)
 	var result := await sdk.system_actions.submit("defence.start", {"id": "view", "source": "hero", "rook": "hero-rook", "attack": "bite"})
@@ -479,3 +480,28 @@ func test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence() ->
 	host.roll(host.last_request, [5])
 	await sdk.system_actions.submit("defence.advance", {"id": "skeleton"})
 	assert_int(host.actors.enemy.data.hit_points).is_equal(0)
+
+func test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice() -> void:
+	var view = load(ROOT + "ui/melee_attack.tscn").instantiate()
+	add_child(auto_free(view))
+	view.configure({"schema": "mork-borg-adversary/v1", "name": "Hound"}, {"name": "Bite", "damage": "d6", "range_feet": 5, "natural": true}, {"modifier": 0, "fumble": "break"}, "ready", "")
+	assert_bool(view.get_node("Rules/Lose").visible).is_false()
+
+func test_companion_defence_presentation_hides_when_owner_access_is_lost() -> void:
+	var host := _combat_host()
+	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
+	host.actors.enemy.access_level = "Owner"
+	var sdk := SDK.new(host)
+	var result := await sdk.system_actions.submit("defence.start", {"id": "private-view", "source": "hero", "rook": "hero-rook", "attack": "bite"})
+	host.participant = "defender"
+	host.session = "defender-session"
+	var view = load(ROOT + "ui/creature_defence_flow.tscn").instantiate()
+	add_child(auto_free(view))
+	view.present(sdk, result.value)
+	await get_tree().process_frame
+	host.actors.enemy.access_level = "None"
+	host.access_by_actor.enemy = []
+	host.WorldChanged.emit()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(view.visible).is_false()

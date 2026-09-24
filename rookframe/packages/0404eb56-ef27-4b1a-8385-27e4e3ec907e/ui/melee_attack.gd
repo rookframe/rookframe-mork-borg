@@ -33,6 +33,7 @@ func configure(character: Dictionary, item: Dictionary, options: Dictionary, sta
 	var difficulty: int = _options.get("difficulty", 0)
 	get_node(^"Rules/Difficulty/Editor").text = "" if difficulty == 0 else str(difficulty)
 	get_node(^"Rules/Modifier").value = str(_options.modifier)
+	get_node(^"Rules/Lose").visible = not item.get("natural", false)
 	get_node(^"Rules/Lose").button_pressed = str(_options.fumble) == "lose"
 	var piercing: bool = _options.get("piercing", false)
 	get_node(^"Rules/Piercing").button_pressed = piercing

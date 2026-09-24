@@ -40,6 +40,7 @@ func ready() -> void:
 	_creature_defence.changed.connect(_creature_defence_changed)
 	_creature_defence.resolved.connect(_creature_defence_resolved)
 	_creature_defence.decision_closed.connect(_creature_decision_closed)
+	_creature_defence.access_lost.connect(_refresh_world)
 	sdk.targeting.changed.connect(_creature_targets_changed)
 	get_node(^"Layout/Body/Content/CreatureAttack").targets_requested.connect(_choose_creature_targets)
 	_compact = not sdk.presentation_experience().is_desktop
@@ -166,9 +167,10 @@ func _reload_world() -> void:
 		_set_status(actors.message, true)
 		return
 	_actors = actors.items
-	if _selected_actor != null and _route in ["creature", "edit-creature", "creature-inventory", "creature-attack", "creature-catalogue", "creature-item", "creature-custom"]:
+	if _selected_actor != null and _route in ["creature", "edit-creature", "creature-inventory", "creature-attack", "creature-catalogue", "creature-item", "creature-custom", "creature-defence"]:
 		var latest := sdk.actors.read(_selected_actor.id)
-		if not latest.ok or latest.actor == null:
+		if not latest.ok or latest.actor == null or latest.actor.access_level == "None":
+			_close_creature_actions()
 			_selected_actor = null
 			_show_route("creatures")
 		elif _selected_actor.data != latest.actor.data or _selected_actor.access_level != latest.actor.access_level:
@@ -176,6 +178,7 @@ func _reload_world() -> void:
 			if _route in ["creature", "creature-inventory"]:
 				_render_actor()
 			elif latest.actor.access_level != "Owner":
+				_close_creature_actions()
 				_show_route("creature")
 			elif _route == "creature-item" and _creature_item_view != null:
 				_creature_item_refresh_pending = true
@@ -790,7 +793,7 @@ func _present_creature_attack(id: String) -> void:
 	view.visible = true
 	var combat_data := data.duplicate(true)
 	combat_data["inventory"] = CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
-	view.configure(combat_data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet, "ammunition": _creature_attack.get("ammunition", "")}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "ready", "")
+	view.configure(combat_data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet, "ammunition": _creature_attack.get("ammunition", ""), "natural": _creature_attack.get("natural", false)}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "ready", "")
 	view.get_node(^"Metrics/Strength").visible = true
 	view.get_node(^"Context").text = str(data.get("name", "Creature")) + " · Selected attack"
 	_creature_targets_pending = true
@@ -799,6 +802,8 @@ func _present_creature_attack(id: String) -> void:
 		source_rules = "Defence DR%s. %s" % [str(_creature_attack.defence_dr), source_rules]
 	if _creature_attack.has("attack_dr"):
 		source_rules = "Attack DR%s. %s" % [str(_creature_attack.attack_dr), source_rules]
+	if _creature_attack.get("natural", false):
+		source_rules += " Natural-weapon fumbles are adjudicated by the GM."
 	view.get_node(^"SourceRules").text = source_rules.strip_edges()
 	view.get_node(^"SourceRules").visible = not source_rules.is_empty()
 	get_node(^"Layout/SheetActions").visible = true

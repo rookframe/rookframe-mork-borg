@@ -8,6 +8,8 @@ const SHIELD = preload(ROOT + "ui/shield_dialog.gd")
 signal changed(state: String, can_roll: bool, automatic_hit: bool)
 signal resolved
 signal decision_closed
+signal access_lost
+var _sdk: SDK
 var _action: ACTION
 var _update_pending := false
 @onready var _view: VIEW = get_node(^"CompanionDefenceView")
@@ -19,6 +21,9 @@ func _ready() -> void:
 	_shield.cancelled.connect(close)
 
 func present(sdk: SDK, outcome: Dictionary) -> void:
+	_sdk = sdk
+	if not _sdk.world_changed.is_connected(_changed):
+		_sdk.world_changed.connect(_changed)
 	if _action != null:
 		if str(_action.snapshot.get("id", "")) == str(outcome.id):
 			return
@@ -37,6 +42,15 @@ func _process(_delta: float) -> void:
 		return
 	_update_pending = false
 	var action := _action
+	var target := _sdk.actors.read(SDK.ActorId.new(str(action.snapshot.target)))
+	if not target.ok or target.actor == null or target.actor.access_level != "Owner":
+		visible = false
+		_backdrop.visible = false
+		_shield.dismiss()
+		_action = null
+		action.retire()
+		access_lost.emit()
+		return
 	_view.configure(action.snapshot, action.state, action.message)
 	if action.state == "shield":
 		_backdrop.visible = true

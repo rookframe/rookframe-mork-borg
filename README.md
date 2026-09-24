@@ -310,13 +310,18 @@ Starting and summoned Creatures share the Character's Companions list. Open
 sheet and Place Rook address each individual Actor. Equipped Inventory attacks
 validate that Creature's own selected source Rook and authored reach. An owned
 Creature attacking a Character requests the defending Character's controlling
-Participant. Creature-versus-Creature combat remains unavailable pending the
-explicit source-rule decision tracked in RFG-291; this release does not invent
-a roll convention for that case.
+Participant. Granted Creatures also request their responsible Player’s flat defence. Attacks
+against unowned Creatures use the acting Creature’s flat d20, with DR12 plus
+independent printed difficulty adjustments. A single strike uses one hit test.
+This table ruling was approved in RFG-291 after research into printed rules and
+creator practice; the owner’s Character abilities never apply. Ordinary damage,
+armor, criticals and carried-weapon fumbles apply. Natural-weapon fumbles are GM
+adjudication and do not automatically disable teeth or claws. Situational DR
+and modifier choices remain available.
 
 Owner Players can add catalogue equipment or custom items, edit quantities and
 uses, equip or unequip, and remove items from each Creature's Inventory. Profile
 attacks keep their original source rules when first exposed as editable items;
 removed attacks do not return. Ranged equipment spends its ammunition once after
-the accepted defence Roll. Equipped shields reduce supported damage, and armor
+the accepted hit test. Equipped shields reduce supported damage, and armor
 lost to a critical remains damaged through subsequent inventory edits.
