@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.19.0` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.21.0` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9de97beeede7f9d803e6ea0abef67730cdc84692` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -113,8 +113,7 @@ Completed Characters support field-local corrections, including the played abili
 modifier, current resources, class text and live equipment quantities/uses. The
 core equipment catalogue creates independent carried items; custom live items
 expose their supported mechanics. Item identities remain stable after removal.
-Equip/unequip and Attack entries stay on their inventory item. Attack resolution
-belongs to the combat slices. Spending an Omen changes only its remaining count.
+Equip/unequip and Attack entries stay on their inventory item. Equipped 5 ft and 10 ft melee weapons resolve through the System on World Authority. Spending an Omen changes only its remaining count.
 
 Actor-default appearance and the selected linked Rook are separate choices from
 available published Miniatures. The SDK authorizes and persists all writes. Open
@@ -141,3 +140,33 @@ accepted sheet changes remain; late results never resume a cancelled action.
 There are no recovery, undo or GM takeover controls. The focused ability suite
 covers the System/public-SDK boundary; host lifetime, durable-save failure and
 replication checks live in rookframe-godot.
+
+## Melee attacks
+
+Select the Character’s linked Rook, open its equipped weapon in Inventory, and
+choose one Creature through tabletop targeting. Done restores the same managed
+window and keyboard focus. Difficulty defaults to the source Creature rule;
+the table can supply a difficulty or situational modifier and choose the printed
+break/loss fumble alternative. Piercing is an explicit attack choice for the
+skeleton’s printed DR. No Omen benefit or ongoing effect is automated.
+
+The World Authority snapshots the prescribed attack and protection, validates
+Owner access and the committed target set, and runs the human attack and damage
+Throws through the native Dice Tray. Natural 20 doubles damage before protection
+and lowers armor one tier after the hit; natural 1 applies the chosen equipment
+consequence. Source Creature DRs and the skeleton’s destruction threshold come
+from Bare Bones pages 58–62. Ordinary melee comes from pages 28–29. The Bevy
+weapon-attack-rules and weapon-attack-executor at 61ea4098 provide reuse evidence.
+
+One tabletop unit is one metre. Authored reach is explicit: 5 ft = 1.524 m and
+10 ft = 3.048 m. The SDK measures committed logical Rook centers, without line of
+sight. Every out-of-range target is reported as `target {public name} not in range`;
+an invalid set stops the entire action. Private Creature data remains on World
+Authority. Consequences do not grant the Player Actor access.
+
+Action identities belong to one live Participant session. Duplicate calls retain
+the existing result. Closure, cancellation, lost access or a required session
+ending prevents further interpretation. Completed raw Rolls and accepted HP,
+armor, equipment and public reports remain; reopening does not resume an action.
+The focused melee suite exercises this through generated public SDK actions,
+with only the external host boundary substituted.

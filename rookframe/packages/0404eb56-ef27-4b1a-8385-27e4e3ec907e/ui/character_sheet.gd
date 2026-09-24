@@ -9,6 +9,15 @@ signal sheet_changed
 signal workflow_changed(route: String, title: String, can_spend: bool, busy: bool)
 signal actor_unavailable
 const ABILITY_THROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/ability_throw.gd")
+const MELEE_ACTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_action.gd")
+const MELEE_VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.gd")
+const MELEE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.tscn")
+var _melee: MELEE_ACTION
+var _melee_view: MELEE_VIEW
+var _melee_options := {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}
+var _target_refresh_pending := false
+var _target_reading := false
+var _attack_item: Dictionary = {}
 var _ability_throw: ABILITY_THROW
 var _throw_refresh_pending := false
 var _refresh_pending := false
@@ -36,6 +45,7 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 	if _character_actor != null and _character_actor.id.value != actor.id.value:
 		close_action()
 		_ability_throw = null
+		_melee = null
 	if _ability_throw != null and not _ability_throw.pending:
 		_ability_throw = null
 	_character_actor = actor
@@ -46,6 +56,8 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 	sdk = facade
 	if not sdk.world_changed.is_connected(_world_changed):
 		sdk.world_changed.connect(_world_changed)
+	if not sdk.targeting.changed.is_connected(_targets_changed):
+		sdk.targeting.changed.connect(_targets_changed)
 	_render_pending = true
 
 
@@ -54,8 +66,13 @@ func _process(_delta: float) -> void:
 		_throw_refresh_pending = false
 		if _ability_throw != null:
 			_ability_throw.refresh()
+		if _melee != null:
+			_melee.refresh()
 	if not visible:
 		return
+	if _target_refresh_pending and not _target_reading:
+		_target_refresh_pending = false
+		_refresh_attack_targets()
 	if _refresh_pending and not _busy:
 		_refresh_pending = false
 		refresh_from_world()
@@ -75,12 +92,16 @@ func clear_character_sheet() -> void:
 		_content.remove_child(child)
 		child.queue_free()
 	_character_view = null
+	_melee_view = null
 	_status = get_node(^"Status") as Label
 
 
 func _render_character_sheet() -> void:
 	clear_character_sheet()
 	if _character_actor == null:
+		return
+	if _character_route == "attack":
+		_render_attack()
 		return
 	if _character_route == "companions":
 		_show_companions()
@@ -120,8 +141,12 @@ func _navigate(route: String, item_id: String) -> void:
 		_set_status("Owner access is required to change this Character.", true)
 		return
 	if route == "attack":
-		_set_status("Weapon attacks will be available with the combat actions.", true)
-		return
+		if (_ability_throw != null and _ability_throw.pending) or (_melee != null and _melee.pending):
+			_set_status("Finish the current Throw before starting another action.", true)
+			return
+		_selected_rook = sdk.rooks.selected()
+		_melee = null
+		_melee_options = {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}
 	_character_route = route
 	_item_id = item_id
 	if route in ["character", "inventory", "appearance"]:
@@ -262,6 +287,7 @@ func _perform(actions: ACTIONS, operation: String, arguments: Array) -> SDK.Acto
 func _world_changed() -> void:
 	_refresh_pending = true
 	_throw_refresh_pending = true
+	_target_refresh_pending = true
 
 func refresh_from_world() -> void:
 	if _character_actor == null or sdk == null:
@@ -312,6 +338,8 @@ func _sync_chrome() -> void:
 		title = "Edit Character"
 	elif _character_route in ["catalogue", "custom"]:
 		title = "Add Item"
+	elif _character_route == "attack":
+		title = str(_attack_item.get("name", "Weapon")) + " attack"
 	elif _character_route == "item":
 		title = "Inventory Item"
 		var items: Array = data.get("inventory", [])
@@ -321,10 +349,13 @@ func _sync_chrome() -> void:
 				title = str(item.get("name", "Inventory Item"))
 	var count: int = data.get("omens", 0)
 	var route: String = _character_tab if _character_route == "character" else _character_route
-	workflow_changed.emit(route, title, count > 0 and _character_actor.access_level == "Owner", _busy)
+	var can_act := count > 0 and _character_actor.access_level == "Owner"
+	if route == "attack":
+		can_act = _melee == null or _melee.state == "error"
+	workflow_changed.emit(route, title, can_act, _busy or (_melee != null and _melee.pending))
 
 func _roll_ability(ability: String) -> void:
-	if _busy or sdk == null or (_ability_throw != null and _ability_throw.pending):
+	if _busy or sdk == null or (_ability_throw != null and _ability_throw.pending) or (_melee != null and _melee.pending):
 		return
 	_ability_throw = ABILITY_THROW.new(sdk, _character_actor.id)
 	_ability_throw.changed.connect(_ability_changed)
@@ -334,8 +365,91 @@ func _ability_changed() -> void:
 	_render_pending = true
 
 func close_action() -> void:
+	if _melee != null:
+		_melee.cancel()
 	if _ability_throw != null:
 		_ability_throw.cancel()
 
 func _exit_tree() -> void:
 	close_action()
+
+func _render_attack() -> void:
+	var data: Dictionary = _character_actor.data
+	var items := ACTIONS.new(sdk, _character_actor.id).inventory(data)
+	_attack_item = {}
+	for raw in items:
+		var item: Dictionary = raw
+		if str(item.get("inventory_id", "")) == _item_id:
+			_attack_item = item
+	var view := MELEE_SCENE.instantiate()
+	_content.add_child(view)
+	_melee_view = view
+	view.targets_requested.connect(_choose_attack_targets)
+	view.configure(data, _attack_item, _melee_options, _melee.state if _melee != null else "ready", _melee.message if _melee != null else "")
+	_status.visible = false
+	_target_refresh_pending = true
+	_sync_chrome()
+
+func roll_attack() -> void:
+	if _busy or _melee_view == null or (_melee != null and _melee.pending):
+		return
+	var options := _melee_view.options()
+	if options.is_empty():
+		_set_status("Enter whole numbers for difficulty and modifier.", true)
+		return
+	if _selected_rook == null:
+		_set_status("Select this Character’s source Rook before opening its attack.", true)
+		return
+	_melee_options = options
+	var input := options.duplicate(true)
+	input["source"] = _character_actor.id.value
+	input["rook"] = _selected_rook.value
+	input["item"] = _item_id
+	_melee = MELEE_ACTION.new(sdk)
+	_melee.changed.connect(_melee_changed)
+	await _melee.start(input)
+
+func _melee_changed() -> void:
+	_render_pending = true
+	_refresh_pending = true
+
+func _targets_changed(_snapshot: SDK.TargetSnapshot) -> void:
+	_target_refresh_pending = true
+
+func _choose_attack_targets() -> void:
+	if _melee_view != null:
+		var options := _melee_view.options()
+		if not options.is_empty():
+			_melee_options = options
+	var result: SDK.OperationResult = sdk.targeting.choose()
+	if not result.ok:
+		_set_status(result.message, true)
+
+func _refresh_attack_targets() -> void:
+	if _melee_view == null or sdk == null:
+		return
+	var view := _melee_view
+	_target_reading = true
+	var targets: SDK.TargetSnapshotResult = await sdk.targeting.snapshot()
+	_target_reading = false
+	if _melee_view != view:
+		return
+	if not targets.ok:
+		view.set_targets(targets.message)
+		return
+	var lines: Array[String] = []
+	for rook in targets.snapshot.rooks:
+		var identity: SDK.PublicIdentityResult = sdk.public_identities.read(rook)
+		var label := identity.public_identity.label if identity.ok else "Creature"
+		var line: String = label
+		if _selected_rook != null:
+			var distance: SDK.DistanceResult = sdk.scenes.distance(_selected_rook, rook)
+			if distance.ok:
+				var feet := distance.distance / 0.3048
+				var reach: float = _attack_item.get("range_feet", 0)
+				line += " · %.1f ft · %s" % [feet, "In range" if feet <= reach + 0.00001 else "Out of range"]
+		lines.append(line)
+	var summary := ""
+	for line in lines:
+		summary += ("\n" if not summary.is_empty() else "") + line
+	view.set_targets(summary if not lines.is_empty() else "Choose one Creature target")

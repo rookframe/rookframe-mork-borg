@@ -264,6 +264,7 @@ func _setup_character_content() -> void:
 	_character_sheet.workflow_changed.connect(_on_sheet_workflow_changed)
 	get_node(^"Layout/SheetActions/Back").pressed.connect(_cancel_sheet_workflow)
 	get_node(^"Layout/SheetActions/Spend").pressed.connect(_spend_sheet_omen)
+	get_node(^"Layout/SheetActions/Attack").pressed.connect(_roll_sheet_attack)
 	_character_sheet.companion_selected.connect(_open_companion)
 
 
@@ -440,9 +441,14 @@ func _on_sheet_workflow_changed(route: String, title: String, can_spend: bool, b
 		get_node(^"Layout/Body").scroll_vertical = 0
 		_last_sheet_route = route
 	_character_tabs.visible = route in ["character", "inventory", "appearance"]
-	get_node(^"Layout/SheetActions").visible = route == "omens"
+	get_node(^"Layout/SheetActions").visible = route in ["omens", "attack"]
+	get_node(^"Layout/SheetActions/Spend").visible = route == "omens"
+	get_node(^"Layout/SheetActions/Attack").visible = route == "attack"
+	get_node(^"Layout/SheetActions/Attack").disabled = not can_spend or busy
+	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if busy else "Roll attack"
+	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route == "attack" and not can_spend and not busy else "Cancel"
 	get_node(^"Layout/SheetActions/Spend").disabled = not can_spend or busy
-	get_node(^"Layout/SheetActions/Back").disabled = busy
+	get_node(^"Layout/SheetActions/Back").disabled = busy and route != "attack"
 	_set_window_title(title)
 
 func _cancel_sheet_workflow() -> void:
@@ -457,3 +463,6 @@ func _window_closed() -> void:
 	if _character_creator != null and _character_creator.is_active():
 		_creation_was_closed = true
 		_character_creator.discard()
+
+func _roll_sheet_attack() -> void:
+	_character_sheet.roll_attack()

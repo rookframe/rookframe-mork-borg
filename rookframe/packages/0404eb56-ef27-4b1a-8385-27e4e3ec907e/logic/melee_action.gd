@@ -1,0 +1,77 @@
+extends RefCounted
+
+## Live presentation of an authority-owned action; never saved or restored.
+const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
+signal changed
+var state := "ready"
+var message := ""
+var pending := false
+var _sdk: SDK
+var _id := ""
+var _reading := false
+var _refresh_requested := false
+var _closed := false
+var _submitted := false
+
+func _init(facade: SDK) -> void:
+	_sdk = facade
+
+func start(input: Dictionary) -> void:
+	if state != "ready" or _closed:
+		return
+	_id = _sdk.dice.new_request_id()
+	input["id"] = _id
+	pending = true
+	state = "pending"
+	message = "Requesting the attack Throw…"
+	changed.emit()
+	_reading = true
+	var result: SDK.DataResult = await _sdk.system_actions.submit("melee.start", input)
+	_reading = false
+	_submitted = result.ok
+	if _closed:
+		if _submitted:
+			await _sdk.system_actions.submit("melee.cancel", {"id": _id})
+		return
+	_accept(result)
+	if _refresh_requested:
+		await refresh()
+
+func refresh() -> void:
+	if not pending or _closed:
+		return
+	_refresh_requested = true
+	if _reading:
+		return
+	while _refresh_requested and pending and not _closed:
+		_refresh_requested = false
+		_reading = true
+		var result: SDK.DataResult = await _sdk.system_actions.submit("melee.advance", {"id": _id})
+		_reading = false
+		if not _closed:
+			_accept(result)
+
+func cancel() -> void:
+	if _closed:
+		return
+	_closed = true
+	if not pending:
+		return
+	pending = false
+	state = "ended"
+	message = ENDED
+	changed.emit()
+	if _submitted:
+		await _sdk.system_actions.submit("melee.cancel", {"id": _id})
+
+func _accept(result: SDK.DataResult) -> void:
+	if not result.ok:
+		state = "ended"
+		message = ENDED + " " + result.message
+	else:
+		var outcome: Dictionary = result.value
+		state = str(outcome.get("state", "ended"))
+		message = str(outcome.get("message", ENDED))
+	pending = state == "pending"
+	changed.emit()

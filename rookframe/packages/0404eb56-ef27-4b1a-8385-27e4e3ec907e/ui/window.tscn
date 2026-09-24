@@ -688,6 +688,13 @@ custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframePrimaryButton"
 text = "Spend 1 Omen"
 
+[node name="Attack" type="Button" parent="Layout/SheetActions"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframePrimaryButton"
+text = "Roll attack"
+
 [node name="CharacterCreator" parent="Layout/Body/Content" instance=ExtResource("8_creator")]
 visible = false
 layout_mode = 2

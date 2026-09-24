@@ -12,6 +12,10 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	equipped = item.get("equipped", false)
 	get_node(^"Copy/Title").text = str(item.get("name", "Item"))
 	var details: Array[String] = []
+	var broken: bool = item.get("broken", false)
+	if broken:
+		details.append("Broken")
+		get_node(^"Actions/Attack").disabled = true
 	if item.has("damage"):
 		details.append(str(item.damage))
 	if item.has("range_feet"):
