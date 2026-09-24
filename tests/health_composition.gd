@@ -37,8 +37,43 @@ func test_recovery_panel_eligibility_focus_pending_and_result() -> void:
 	assert_str(panel.primary_text()).is_equal("Waiting…")
 	host.roll(host.last_request, [4])
 	await get_tree().create_timer(0.6).timeout
-	assert_str(panel.get_node("Outcome").text).contains("regained 4 HP")
+	assert_str(panel.get_node("Result/Content/Copy").text).contains("regained 4 HP")
+	assert_bool(panel.get_node("Columns").visible).is_false()
+	assert_bool(panel.get_node("Result").is_visible_in_tree()).is_true()
+	assert_bool(panel.get_node("Result/Content/Heading").has_focus()).is_true()
 	assert_str(panel.primary_text()).is_equal("Done")
 
 func after_test() -> void:
 	await get_tree().process_frame
+
+func test_specialty_corrections_refresh_live_fields_and_preserve_other_drafts() -> void:
+	var classes = load(ROOT + "logic/creation_classes.gd").new()
+	var data := {"class_id": "gutterborn-scum", "name": "Graveworm", "traits": [classes.feature("gutterborn-scum", 1)]}
+	var editor = auto_free(load(ROOT + "ui/character_sheet_edit.tscn").instantiate())
+	add_child(editor)
+	editor.configure(data, [])
+	var name_field = _field(editor, "name")
+	name_field.get_node("Field").value = "Unsaved name"
+	var first_trait = _field(editor, "trait:0:name")
+	first_trait.get_node("Field").value = "Unsaved first specialty"
+	data.traits.append(classes.feature("gutterborn-scum", 3))
+	editor.refresh_data(data)
+	assert_str(_field(editor, "trait:1:name").current_value()).is_equal("Abominable gob lobber")
+	assert_object(_field(editor, "trait:1:uses")).is_not_null()
+	assert_str(name_field.current_value()).is_equal("Unsaved name")
+	assert_str(_field(editor, "trait:0:name").current_value()).is_equal("Unsaved first specialty")
+	data.traits[1] = classes.feature("gutterborn-scum", 4)
+	editor.refresh_data(data)
+	assert_str(_field(editor, "trait:1:name").current_value()).is_equal("Escaping fate")
+	assert_object(_field(editor, "trait:1:uses")).is_null()
+	data.traits.remove_at(1)
+	editor.refresh_data(data)
+	assert_object(_field(editor, "trait:1:name")).is_null()
+	assert_str(name_field.current_value()).is_equal("Unsaved name")
+	assert_str(_field(editor, "trait:0:name").current_value()).is_equal("Unsaved first specialty")
+
+func _field(editor: Node, key: String) -> Node:
+	for field in editor.get_node("Fields").get_children():
+		if field.field == key:
+			return field
+	return null

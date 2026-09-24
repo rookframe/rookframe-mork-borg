@@ -1,5 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd"
 
+const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
 
 func correct(field: String, text: String) -> SDK.ActorResult:
@@ -8,7 +9,7 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 		return source
 	var current: Dictionary = source.actor.data
 	var data: Dictionary = current.duplicate(true)
-	if field in ABILITIES or field in ["hit_points", "maximum_hit_points", "silver", "omens", "power_uses"]:
+	if field in ABILITIES or field in ["hit_points", "maximum_hit_points", "silver", "omens", "power_uses", "improvements"]:
 		if not text.is_valid_int():
 			return _failure("Enter a whole number.")
 		var value := int(text)
@@ -33,6 +34,29 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 		for line in text.split("\n"):
 			lines.append(line)
 		data[field] = lines
+	elif field.begins_with("scum_specialty:"):
+		if str(data.get("class_id", "")) != "gutterborn-scum" or not field in ["scum_specialty:0", "scum_specialty:1"] or not text.is_valid_int():
+			return _failure("Choose a Gutterborn specialty number from 1 to 6.")
+		var slot := 0 if field == "scum_specialty:0" else 1
+		var face := int(text)
+		if face < (1 if slot == 0 else 0) or face > 6:
+			return _failure("Use 1–6 for a specialty, or 0 to leave the second slot empty.")
+		var traits: Array = data.get("traits", [])
+		if traits.size() < slot or traits.size() > 2:
+			return _failure("Correct the first specialty before the second.")
+		if face == 0:
+			if traits.size() == 2:
+				traits = [traits[0]]
+		else:
+			var feature := CLASSES.new().feature("gutterborn-scum", face)
+			feature.erase("item")
+			if slot < traits.size():
+				var existing: Dictionary = traits[slot]
+				if str(existing.get("id", "")) != str(feature.id):
+					traits = [feature] if traits.size() == 1 else ([feature, traits[1]] if slot == 0 else [traits[0], feature])
+			else:
+				traits = [feature] if traits.is_empty() else [traits[0], feature]
+		data["traits"] = traits
 	elif field.begins_with("trait:") or field.begins_with("companion:"):
 		var parts := field.split(":")
 		var key := "traits" if parts[0] == "trait" else "companion_sheets"

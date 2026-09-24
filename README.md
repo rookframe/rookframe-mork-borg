@@ -352,7 +352,9 @@ to Inventory. Abilities stay within −3…+6, including the special low-ability
 Gutterborn Scum gains a second rolled specialty on the first improvement and may
 keep or reroll either/both on later improvements. Starting-only equipment is not
 re-granted. Interrupted improvements retain accepted steps and the spent grant;
-finish unfinished steps with ordinary dice and sheet corrections.
+finish unfinished steps with ordinary dice and sheet corrections. The completed
+sheet exposes improvements begun and both Scum specialty slots (source d6 number;
+0 leaves the second slot empty) so manual completion does not strand later play.
 
 At zero HP, Broken requests d4 and the prescribed injury/recovery parameters.
 Unconsciousness, limb/eye loss, hemorrhage and death are reported. Delayed recovery

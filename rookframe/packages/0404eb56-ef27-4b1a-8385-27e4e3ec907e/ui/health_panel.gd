@@ -2,7 +2,7 @@ extends VBoxContainer
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ACTION = preload(ROOT + "logic/health_action.gd")
-const ROLL_ROW = preload(ROOT + "ui/character_creation_roll.gd")
+const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
@@ -14,6 +14,10 @@ var _action: ACTION
 var _update_pending := false
 var _scroll := ""
 var _scroll_family := ""
+var _terminal_shown := false
+@onready var _hp_row: ROLL_ROW = get_node(^"Columns/Task/Improvement/MoreHP")
+@onready var _debris_row: ROLL_ROW = get_node(^"Columns/Task/Improvement/Debris")
+@onready var _ability_row: ROLL_ROW = get_node(^"Columns/Task/Improvement/Abilities")
 
 func _ready() -> void:
 	resized.connect(_layout)
@@ -31,8 +35,13 @@ func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
 	var editing := state in ["ready", "error"]
+	var terminal := state in ["resolved", "ended"]
 	var improve := _route == "improve"
 	var title: String = {"rest": "Rest", "improve": "Getting better", "broken": "Broken & death"}.get(_route, "Recovery")
+	if terminal:
+		title = "Action ended" if state == "ended" else ("Improvement resolved" if improve else "Recovery resolved" if _route == "rest" else "Broken & death")
+	get_node(^"Columns").visible = not terminal
+	get_node(^"Result").visible = terminal
 	get_node(^"Columns/Task/Rest").visible = _route == "rest"
 	get_node(^"Columns/Task/Improvement").visible = improve
 	get_node(^"Columns/Task/Broken").visible = _route == "broken"
@@ -74,7 +83,12 @@ func _render() -> void:
 			(get_node(^"Specialties/Choices").get_child(index) as Button).text = "Reroll " + str(entry.get("name", "specialty"))
 	var outcome := _action.message if _action != null else ""
 	get_node(^"Outcome").text = outcome
-	get_node(^"Outcome").visible = not outcome.is_empty()
+	get_node(^"Outcome").visible = not outcome.is_empty() and not terminal
+	get_node(^"Result/Content/Heading").text = title.to_upper()
+	get_node(^"Result/Content/Copy").text = outcome
+	if terminal and not _terminal_shown:
+		get_node(^"Result/Content/Heading").grab_focus()
+	_terminal_shown = terminal
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if state == "error" else "RookframeMeta"
 	var can_submit := state in ["resolved", "ended", "scroll", "specialties"] or (editing and _actor.access_level == "Owner" and (not improve or authorized))
 	workflow_changed.emit(_route, title, can_submit, state == "pending")
@@ -87,11 +101,12 @@ func _layout() -> void:
 	var step := 0 if phase in ["more_hp", "hp_increase"] else (1 if phase in ["debris", "silver"] else 2)
 	var titles := ["More HP", "Debris", "Ability changes"]
 	var formulas := ["6d10 against maximum HP", "d6", "d6 against each ability"]
+	var rows: Array[ROLL_ROW] = [_hp_row, _debris_row, _ability_row]
 	for index in range(3):
 		var status := "complete" if index < step else ("current" if index == step else "locked")
 		if _action != null and _action.state == "pending" and index == step:
 			status = "pending"
-		var row := get_node(^"Columns/Task/Improvement").get_child(index) as ROLL_ROW
+		var row: ROLL_ROW = rows[index]
 		row.present_roll(titles[index], formulas[index], "—", status, index + 1, compact)
 
 func submit() -> void:
@@ -112,8 +127,9 @@ func submit() -> void:
 		if _action.pending:
 			return
 		_action.retire()
-	_action = ACTION.new(_sdk)
-	action_created.emit(_action)
+	var action := ACTION.new(_sdk)
+	action_created.emit(action)
+	_action = action
 	_action.changed.connect(_changed)
 	await _action.start({"source": _actor.id.value, "kind": _route, "eligible": _route == "improve" or get_node(^"Columns/Context/Content/Eligible").button_pressed, "rest": "sleep" if get_node(^"Columns/Task/Rest/Content/Sleep").button_pressed else "breath", "food_and_drink": get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed, "infected": get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed})
 

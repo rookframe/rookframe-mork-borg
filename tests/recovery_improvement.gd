@@ -268,3 +268,19 @@ func test_gm_routes_recovery_to_connected_player_and_cannot_replace_offline_owne
 	result = await sdk.system_actions.submit("health.start", input)
 	assert_str(result.value.state).is_equal("error")
 	assert_int(host.requests.size()).is_equal(1)
+
+func test_interrupted_scum_can_finish_with_ordinary_sheet_corrections() -> void:
+	var host := _host()
+	host.actors.hero.data.class_id = "gutterborn-scum"
+	host.actors.hero.data.traits = [{"id": "cowards-jab", "name": "Coward's jab"}]
+	var sdk := SDK.new(host)
+	await _begin_improvement(host)
+	await sdk.system_actions.submit("health.cancel", {"id": "health"})
+	var edits = load(ROOT + "logic/character_actions.gd").new(sdk, SDK.ActorId.new("hero"))
+	var result: SDK.ActorResult = await edits.correct("scum_specialty:1", "6")
+	assert_bool(result.ok).is_true()
+	if not result.ok:
+		return
+	assert_str(host.actors.hero.data.traits[1].id).is_equal("dodging-death")
+	var next := await _begin_improvement(host, "next")
+	assert_str(next.value.state).is_equal("pending")

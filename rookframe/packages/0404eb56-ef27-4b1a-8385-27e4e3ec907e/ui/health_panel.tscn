@@ -254,3 +254,20 @@ layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
 text = ""
+
+[node name="Result" type="PanelContainer" parent="."]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="Result"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="Result/Content"]
+layout_mode = 2
+focus_mode = 2
+theme_type_variation = &"RookframeSectionHeading"
+autowrap_mode = 2
+[node name="Copy" type="Label" parent="Result/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+autowrap_mode = 2

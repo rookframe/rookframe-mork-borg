@@ -1,6 +1,7 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 
 
+const ACTION_ROUTES := ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
 const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd")
 @onready var _creation_progress: CREATION_PROGRESS = get_node(^"Layout/CreationProgress")
 
@@ -427,7 +428,7 @@ func _update_character_density() -> void:
 	_compact = compact
 	_header.visible = not compact
 	_header_title.visible = not compact
-	_header_subtitle.visible = not compact and not _last_sheet_route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
+	_header_subtitle.visible = not compact and not _last_sheet_route in ACTION_ROUTES
 	_content.custom_minimum_size = Vector2(0, 0) if compact else Vector2(0, 520)
 	_layout.add_theme_constant_override("separation", 6 if compact else 10)
 	_character_creator.set_compact(compact)
@@ -463,20 +464,20 @@ func _on_character_unavailable() -> void:
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
 	_sheet_workflow_title = title
-	_header_title.theme_type_variation = "RookframeTitle" if route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"] else "RookframeHeading"
-	if route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]:
+	_header_title.theme_type_variation = "RookframeTitle" if route in ACTION_ROUTES else "RookframeHeading"
+	if route in ACTION_ROUTES:
 		_header_title.text = title.to_upper()
 	elif _character_actor != null:
 		var data: Dictionary = _character_actor.data
 		_header_title.text = str(data.get("name", "Unnamed Character")).to_upper()
-	_header_subtitle.visible = not _compact and not route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
+	_header_subtitle.visible = not _compact and not route in ACTION_ROUTES
 	if route != _last_sheet_route:
 		get_node(^"Layout/Body").scroll_vertical = 0
 		_last_sheet_route = route
 	_character_tabs.visible = route in ["character", "inventory", "appearance"]
-	get_node(^"Layout/SheetActions").visible = route in ["omens", "attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
+	get_node(^"Layout/SheetActions").visible = route == "omens" or route in ACTION_ROUTES
 	get_node(^"Layout/SheetActions/Spend").visible = route == "omens"
-	get_node(^"Layout/SheetActions/Attack").visible = route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
+	get_node(^"Layout/SheetActions/Attack").visible = route in ACTION_ROUTES
 	get_node(^"Layout/SheetActions/Attack").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if busy else (("Roll damage" if title == "Roll damage" else "Roll defence") if route == "defence" else "Roll attack")
 	if route in ["rest", "improve", "broken"] and not busy:
@@ -485,11 +486,11 @@ func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, 
 		get_node(^"Layout/SheetActions/Attack").text = _character_sheet.special_primary_text()
 	if route == "cast" and not busy:
 		get_node(^"Layout/SheetActions/Attack").text = _character_sheet.power_primary_text()
-	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"] and not can_submit and not busy else "Cancel"
+	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route in ACTION_ROUTES and not can_submit and not busy else "Cancel"
 	if route == "cast" and _character_sheet.power_primary_text() == "Done":
 		get_node(^"Layout/SheetActions/Back").text = "Character"
 	get_node(^"Layout/SheetActions/Spend").disabled = not can_submit or busy
-	get_node(^"Layout/SheetActions/Back").disabled = busy and not route in ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
+	get_node(^"Layout/SheetActions/Back").disabled = busy and not route in ACTION_ROUTES
 	_set_window_title(title)
 
 func _cancel_sheet_workflow() -> void:

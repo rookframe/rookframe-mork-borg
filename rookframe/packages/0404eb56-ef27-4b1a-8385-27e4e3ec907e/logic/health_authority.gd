@@ -128,7 +128,11 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 	if hp < 0:
 		return _end(context, action)
 	var data := current.duplicate(true)
-	var recovered := maxi(0, mini(roll.terms[0].results[0], maximum - hp))
+	var recovered: int = roll.terms[0].results[0]
+	if recovered > maximum - hp:
+		recovered = maximum - hp
+	if recovered < 0:
+		recovered = 0
 	data["hit_points"] = hp + recovered
 	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Recovery: regained %d HP; now %d / %d. Raw Roll #%d. Omens and timed consequences remain table-managed." % [recovered, hp + recovered, maximum, roll.sequence])
 
@@ -262,7 +266,11 @@ func _improve(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 			var increase := face >= before
 			if before <= 1:
 				increase = face != 1
-			var after := clampi(before + (1 if increase else -1), -3, 6)
+			var after := before + (1 if increase else -1)
+			if after < -3:
+				after = -3
+			elif after > 6:
+				after = 6
 			ability["modifier"] = after
 			text += "%s: d6 %d, %+d → %+d. " % [key, face, before, after]
 		text += suffix
@@ -351,9 +359,10 @@ func _specialty_result(context: SDK.SystemActionContext, action: Dictionary, cur
 		# 'Begin with lockpicks' is starting equipment, not an improvement grant.
 		feature.erase("item")
 		if action.first_improvement:
-			traits.append(feature)
+			traits = [traits[0], feature]
 		else:
-			traits[selected[index]] = feature
+			var slot: int = selected[index]
+			traits = [feature, traits[1]] if slot == 0 else [traits[0], feature]
 		text += "Specialty d6 %d: %s. " % [face, str(feature.name)]
 	data["traits"] = traits
 	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + "Raw Roll #%d. Omen benefits and delayed effects remain manual." % roll.sequence)
@@ -368,7 +377,7 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 	if phase == "broken":
 		if face == 4:
 			return _finish(context, action, [], "Dead. Resolve any applicable class exception with the table; no restored HP or automatic resurrection." + suffix)
-		var branch: String = {1: "Unconscious", 2: "Injury", 3: "Hemorrhage"}.get(face, "")
+		var branch := "Unconscious" if face == 1 else ("Injury" if face == 2 else "Hemorrhage")
 		if not _record(context, [], "Broken: " + branch + suffix):
 			return _end(context, action)
 		if face == 1:
