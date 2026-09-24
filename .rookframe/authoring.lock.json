@@ -1,6 +1,6 @@
 {
   "sdkEdition": "2029",
-  "sdkAuthoringKitVersion": "0.22.1",
+  "sdkAuthoringKitVersion": "0.22.2",
   "minimumRevision": 14,
   "uiKit": {
     "version": "v1.0.0-rc.1",

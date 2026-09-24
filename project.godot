@@ -14,3 +14,7 @@ report/godot/script_error=true
 settings/test/test_timeout_seconds=90
 settings/test/flaky_check_enable=false
 settings/common/update_notification_enabled=false
+
+[display]
+
+window/per_pixel_transparency/allowed=true

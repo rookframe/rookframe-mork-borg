@@ -11,6 +11,7 @@ const CHARACTER_CREATOR = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8
 var _character_creator: CHARACTER_CREATOR
 var _last_sheet_route := ""
 var _sheet_workflow_title := ""
+var _restore_shield_focus := false
 const CHARACTER_SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.gd")
 var _character_sheet: CHARACTER_SHEET
 var _character_transition_pending := false
@@ -36,6 +37,12 @@ var _character_miniature_choices: Array[Dictionary] = []
 
 
 func _process(_delta: float) -> void:
+	if _restore_shield_focus:
+		_restore_shield_focus = false
+		if _last_sheet_route == "defence":
+			get_node(^"Layout/SheetActions/Back").grab_focus()
+		else:
+			_character_tab_character.grab_focus()
 	if _pending_companion != null:
 		var companion := _pending_companion
 		_pending_companion = null
@@ -271,6 +278,7 @@ func _setup_character_content() -> void:
 	_character_sheet.sheet_changed.connect(_on_sheet_changed)
 	_character_sheet.actor_unavailable.connect(_on_character_unavailable)
 	_character_sheet.workflow_changed.connect(_on_sheet_workflow_changed)
+	_character_sheet.shield_decision_closed.connect(_on_shield_decision_closed)
 	get_node(^"Layout/SheetActions/Back").pressed.connect(_cancel_sheet_workflow)
 	get_node(^"Layout/SheetActions/Spend").pressed.connect(_spend_sheet_omen)
 	get_node(^"Layout/SheetActions/Attack").pressed.connect(_roll_sheet_attack)
@@ -484,3 +492,6 @@ func _window_closed() -> void:
 
 func _roll_sheet_attack() -> void:
 	_character_sheet.roll_attack()
+
+func _on_shield_decision_closed() -> void:
+	_restore_shield_focus = true

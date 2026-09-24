@@ -18,10 +18,15 @@ visible = false
 size = Vector2i(368, 224)
 unresizable = true
 borderless = true
+transparent = true
+transparent_bg = true
 transient = true
 exclusive = true
 theme = ExtResource("2")
 script = ExtResource("1")
+[node name="Ink" type="Polygon2D" parent="."]
+polygon = PackedVector2Array(0, 8, 8, 0, 360, 0, 368, 8, 368, 216, 360, 224, 8, 224, 0, 216)
+color = Color(0.00392157, 0.0470588, 0.0627451, 1)
 [node name="Shell" type="PanelContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
