@@ -1,26 +1,35 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=7 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_window.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/dice.svg" id="dice"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="fallback"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/action_bar.tscn" id="footer"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/feedback/task_state.tscn" id="state"]
+
 [node name="Encounter" type="Control"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme = ExtResource("theme")
 script = ExtResource("script")
+
 [node name="Layout" type="VBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 8.0
-offset_right = -8.0
+offset_left = 12.0
+offset_top = 8.0
+offset_right = -12.0
+offset_bottom = -8.0
 theme_override_constants/separation = 8
 
-[node name="Heading" type="Label" parent="Layout"]
+[node name="TaskState" parent="Layout" instance=ExtResource("state")]
 layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-text = "ENCOUNTER"
-autowrap_mode = 2
+custom_minimum_size = Vector2(0, 0)
+state = 0
+title = "Loading encounter"
 
 [node name="Body" type="ScrollContainer" parent="Layout"]
 layout_mode = 2
@@ -31,202 +40,171 @@ follow_focus = true
 [node name="Content" type="VBoxContainer" parent="Layout/Body"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
-
-[node name="Tools" type="HBoxContainer" parent="Layout/Body/Content"]
-layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Mode" type="OptionButton" parent="Layout/Body/Content/Tools"]
+[node name="Sides" type="HBoxContainer" parent="Layout/Body/Content"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Players" type="Button" parent="Layout/Body/Content/Sides"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-item_count = 2
-popup/item_0/text = "Group"
-popup/item_0/id = 0
-popup/item_1/text = "Individual"
-popup/item_1/id = 1
+theme_type_variation = &"RookframeTabButton"
+text = "Players"
+toggle_mode = true
 
-[node name="RollGroup" type="Button" parent="Layout/Body/Content/Tools"]
+[node name="Monsters" type="Button" parent="Layout/Body/Content/Sides"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeTabButton"
+text = "Monsters"
+toggle_mode = true
+
+[node name="Roll" type="Button" parent="Layout/Body/Content/Sides"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Roll d6"
+theme_type_variation = &"RookframeQuietButton"
+icon = ExtResource("dice")
+icon_alignment = 1
+theme_override_constants/icon_max_width = 24
+expand_icon = true
+tooltip_text = "Roll initiative"
+accessibility_name = "Roll initiative"
 
 [node name="Empty" type="Label" parent="Layout/Body/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
-text = "Add Actors to build the initiative order."
+text = "Select a Rook and tap swords to add it."
 autowrap_mode = 2
 
-[node name="Roster" type="VBoxContainer" parent="Layout/Body/Content"]
+[node name="Selected" type="HBoxContainer" parent="Layout/Body/Content"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 12
 
-[node name="Add" type="VBoxContainer" parent="Layout/Body/Content"]
+[node name="Preview" type="Control" parent="Layout/Body/Content/Selected"]
+custom_minimum_size = Vector2(52, 64)
 layout_mode = 2
-theme_override_constants/separation = 4
+size_flags_vertical = 4
+mouse_filter = 2
 
-[node name="Actor" type="OptionButton" parent="Layout/Body/Content/Add"]
+[node name="Fallback" type="TextureRect" parent="Layout/Body/Content/Selected/Preview"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("fallback")
+expand_mode = 1
+stretch_mode = 6
+mouse_filter = 2
+
+[node name="Identity" type="VBoxContainer" parent="Layout/Body/Content/Selected"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-fit_to_longest_item = false
+size_flags_vertical = 4
+theme_override_constants/separation = 2
 
-[node name="Row" type="HBoxContainer" parent="Layout/Body/Content/Add"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Side" type="OptionButton" parent="Layout/Body/Content/Add/Row"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-size_flags_horizontal = 3
-item_count = 2
-popup/item_0/text = "PC side"
-popup/item_0/id = 0
-popup/item_1/text = "Enemy side"
-popup/item_1/id = 1
-
-[node name="Add" type="Button" parent="Layout/Body/Content/Add/Row"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Add Actor"
-
-[node name="Selected" type="VBoxContainer" parent="Layout/Body/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Name" type="Label" parent="Layout/Body/Content/Selected"]
+[node name="Name" type="Label" parent="Layout/Body/Content/Selected/Identity"]
 layout_mode = 2
 theme_type_variation = &"RookframeIdentity"
-text = "SELECT AN ACTOR"
-autowrap_mode = 2
+text_overrun_behavior = 3
 
-[node name="Actions" type="HFlowContainer" parent="Layout/Body/Content/Selected"]
+[node name="Kind" type="Label" parent="Layout/Body/Content/Selected/Identity"]
 layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 4
+theme_type_variation = &"RookframeMeta"
+text_overrun_behavior = 3
 
-[node name="Individual" type="Button" parent="Layout/Body/Content/Selected/Actions"]
+[node name="Actions" type="VBoxContainer" parent="Layout/Body/Content/Selected"]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Initiative"
+custom_minimum_size = Vector2(92, 0)
+theme_override_constants/separation = 0
 
 [node name="Reaction" type="Button" parent="Layout/Body/Content/Selected/Actions"]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
+custom_minimum_size = Vector2(92, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Reaction"
 
 [node name="Morale" type="Button" parent="Layout/Body/Content/Selected/Actions"]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
+custom_minimum_size = Vector2(92, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Morale"
 
-[node name="Score" type="HBoxContainer" parent="Layout/Body/Content/Selected"]
+[node name="Outcome" type="Label" parent="Layout/Body/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeStatus"
+autowrap_mode = 2
+
+[node name="Options" type="VBoxContainer" parent="Layout/Body/Content"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 8
+
+[node name="Round" type="HBoxContainer" parent="Layout/Body/Content/Options"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Value" type="LineEdit" parent="Layout/Body/Content/Selected/Score"]
+[node name="Label" type="Label" parent="Layout/Body/Content/Options/Round"]
 layout_mode = 2
-custom_minimum_size = Vector2(60, 44)
 size_flags_horizontal = 3
-placeholder_text = "Initiative"
-virtual_keyboard_type = 2
-max_length = 3
+theme_type_variation = &"RookframeLabel"
+text = "Round"
 
-[node name="Save" type="Button" parent="Layout/Body/Content/Selected/Score"]
+[node name="Value" type="LineEdit" parent="Layout/Body/Content/Options/Round"]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Set score"
-
-[node name="Position" type="HBoxContainer" parent="Layout/Body/Content/Selected"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Up" type="Button" parent="Layout/Body/Content/Selected/Position"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Up"
-
-[node name="Down" type="Button" parent="Layout/Body/Content/Selected/Position"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Down"
-
-[node name="Remove" type="Button" parent="Layout/Body/Content/Selected/Position"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeDangerButton"
-text = "Remove"
-
-[node name="Round" type="HBoxContainer" parent="Layout/Body/Content/Selected"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Value" type="LineEdit" parent="Layout/Body/Content/Selected/Round"]
-layout_mode = 2
-custom_minimum_size = Vector2(60, 44)
-size_flags_horizontal = 3
-placeholder_text = "Round"
-virtual_keyboard_type = 2
+custom_minimum_size = Vector2(72, 44)
+accessibility_name = "Round"
 max_length = 4
 
-[node name="Set" type="Button" parent="Layout/Body/Content/Selected/Round"]
+[node name="Set" type="Button" parent="Layout/Body/Content/Options/Round"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
+theme_type_variation = &"RookframeQuietButton"
+text = "Set"
+
+[node name="End" type="Button" parent="Layout/Body/Content/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeDangerButton"
+text = "End encounter"
+
+[node name="Footer" parent="Layout" instance=ExtResource("footer")]
+layout_mode = 2
+
+[node name="LeadingSlot" parent="Layout/Footer" index=0]
+visible = false
+
+[node name="TrailingSlot" parent="Layout/Footer" index=1]
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Set current turn"
 
-[node name="Rules" type="Label" parent="Layout/Body/Content"]
+[node name="Navigation" type="Control" parent="Layout/Footer/TrailingSlot"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-text = "Morale: leader killed, half the group eliminated, or a lone enemy at ⅓ HP. Special morale stays with the table. Guidance never restricts actions."
-autowrap_mode = 2
-
-[node name="Outcome" type="Label" parent="Layout"]
-layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-text = ""
-autowrap_mode = 2
-
-[node name="Footer" type="HBoxContainer" parent="Layout"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Previous" type="Button" parent="Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
+custom_minimum_size = Vector2(272, 52)
 size_flags_horizontal = 3
+
+[node name="Previous" type="Button" parent="Layout/Footer/TrailingSlot/Navigation"]
+layout_mode = 1
+anchor_right = 0.5
+offset_right = -4.0
+anchor_bottom = 1.0
+custom_minimum_size = Vector2(0, 52)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Previous"
 
-[node name="Primary" type="Button" parent="Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
+[node name="Primary" type="Button" parent="Layout/Footer/TrailingSlot/Navigation"]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 1.0
+offset_left = 4.0
+anchor_bottom = 1.0
+custom_minimum_size = Vector2(0, 52)
 theme_type_variation = &"RookframePrimaryButton"
-text = "Begin"
+text = "Next"
 
-[node name="End" type="Button" parent="Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "End"
+
+[node name="Poll" type="Timer" parent="."]
+wait_time = 0.5
+autostart = true

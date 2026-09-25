@@ -18,3 +18,34 @@ func SystemIntentCommitWorldData(_token: String, value: Variant, report: Diction
 
 func ListActors() -> Dictionary:
 	return {"ok": true, "value": actors.values().duplicate(true)}
+
+var previews: Array[String] = []
+func ListRooks() -> Dictionary:
+	var items: Array = []
+	for id in rooks:
+		items.append(SystemIntentReadRook("", id).value)
+	return {"ok": true, "value": items}
+
+func CurrentScene() -> Dictionary:
+	return {"ok": true, "value": {"id": "main", "name": "Tabletop"}}
+
+func PreviewRook(id: String, _target: Control) -> Dictionary:
+	previews.append(id)
+	return {"ok": true}
+
+var selected_rook := "hero-rook"
+var opened_surfaces: Array = []
+func SelectedRookContext() -> Dictionary:
+	return {"id": selected_rook}
+
+func PresentationDevice() -> int:
+	return 2
+
+func ReadRook(id: String) -> Dictionary:
+	return SystemIntentReadRook("", id)
+
+func OpenWindowWithPresentation(scene: PackedScene, _options: Dictionary) -> void:
+	opened_surfaces.append(scene.resource_path)
+
+func CloseWindow(_scene: PackedScene) -> Dictionary:
+	return {"ok": true}

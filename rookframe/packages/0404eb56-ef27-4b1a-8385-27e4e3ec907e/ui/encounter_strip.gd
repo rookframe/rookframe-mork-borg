@@ -1,13 +1,18 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
-const VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_view.gd")
-const CARD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_entry.tscn")
-const SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
-var _current := ""
+const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const VIEW = preload(ROOT + "ui/encounter_view.gd")
+const CARD = preload(ROOT + "ui/encounter_entry.tscn")
+const GROUP = preload(ROOT + "ui/encounter_group.tscn")
+const LOCAL = preload(ROOT + "ui/encounter_local.tres")
+var _rows: Array = []
 
 func ready() -> void:
 	resized.connect(_layout)
-	if sdk != null:
-		sdk.world_changed.connect(refresh)
+	if sdk == null:
+		return
+	sdk.world_changed.connect(refresh)
+	LOCAL.updated.connect(refresh)
+	get_node(^"Panel/Layout/Round").pressed.connect(_options)
 	refresh()
 
 func refresh() -> void:
@@ -15,44 +20,75 @@ func refresh() -> void:
 		return
 	var state: Dictionary = VIEW.new().snapshot(sdk)
 	get_node(^"Panel").visible = not state.has("error") and bool(state.get("active", false))
-	if get_node(^"Panel").visible == false:
+	if not get_node(^"Panel").visible:
+		_rows = []
 		return
-	get_node(^"Panel/Layout/Round").text = "ROUND %d · %s" % [int(state.round), "GROUP INITIATIVE" if state.mode == "group" else "INITIATIVE"]
-	for child in get_node(^"Panel/Layout/Scroll/Entries").get_children():
-		get_node(^"Panel/Layout/Scroll/Entries").remove_child(child)
-		child.queue_free()
-	var current: Control
+	var round_button: Button = get_node(^"Panel/Layout/Round")
+	round_button.text = str(state.round)
+	round_button.disabled = not state.is_gm
+	round_button.tooltip_text = "Round %d" % int(state.round)
+	round_button.accessibility_name = "Encounter options, round %d" % int(state.round) if state.is_gm else round_button.tooltip_text
+	var entries := get_node(^"Panel/Layout/Scroll/Groups")
 	var rows: Array = state.rows
-	for raw_row in rows:
-		var row: Dictionary = raw_row
-		var preview: Texture2D = row.preview
-		var label: String = row.label
-		var card: Button = CARD.instantiate()
-		get_node(^"Panel/Layout/Scroll/Entries").add_child(card)
-		(card.get_node("Layout/Image") as TextureRect).texture = preview
-		(card.get_node("Layout/Name") as Label).text = label
-		(card.get_node("Layout/Turn") as Label).text = "CURRENT" if row.active else ("PC" if row.side == "pc" else "ENEMY")
-		card.set_pressed_no_signal(bool(row.active))
-		card.tooltip_text = label + (" · current turn" if row.active else "")
-		card.accessibility_name = card.tooltip_text
-		card.pressed.connect(_open.bind(str(row.actor), bool(row.can_open)))
-		if row.active:
-			current = card
+	if rows != _rows:
+		_rows = rows.duplicate(true)
+		for child in entries.get_children():
+			entries.remove_child(child)
+			child.queue_free()
+		var group: Control
+		var side := ""
+		for raw_row in rows:
+			var row: Dictionary = raw_row
+			if str(row.side) != side:
+				side = str(row.side)
+				group = GROUP.instantiate()
+				entries.add_child(group)
+				group.get_node("Side").text = "Players" if side == "pc" else "Monsters"
+			var card: Button = CARD.instantiate()
+			group.get_node("Entries").add_child(card)
+			card.name = str(row.rook)
+			card.custom_minimum_size = Vector2(72, 64) if sdk.presentation_experience().is_phone else Vector2(88, 80)
+			VIEW.new().show_preview(sdk, card.get_node("Image"), row)
+			card.tooltip_text = str(row.label)
+			card.accessibility_name = str(row.label) + (", active side" if row.active else "")
+			card.pressed.connect(_open.bind(str(row.rook)))
+	for group in entries.get_children():
+		for card in group.get_node("Entries").get_children():
+			for raw in rows:
+				var row: Dictionary = raw
+				if str(card.name) == str(row.rook):
+					card.set_pressed_no_signal(bool(row.active))
 	_layout()
-	if str(state.current) != _current and current != null:
-		_current = str(state.current)
-		await get_tree().process_frame
-		if is_instance_valid(current):
-			get_node(^"Panel/Layout/Scroll").ensure_control_visible(current)
 
 func _layout() -> void:
-	var available := maxf(144, size.x - 144)
-	var desired := 32 + 100 * get_node(^"Panel/Layout/Scroll/Entries").get_child_count()
-	var width := minf(maxf(260, desired), minf(720, available))
-	get_node(^"Panel").offset_left = -width / 2
-	get_node(^"Panel").offset_right = width / 2
+	if sdk == null:
+		return
+	var panel: Control = get_node(^"Panel")
+	var phone := sdk.presentation_experience().is_phone
+	var tablet := sdk.presentation_experience().is_tablet
+	var width := minf(720, 72 + _rows.size() * (76 if phone else 92))
+	var x := (size.x - width) / 2
+	if LOCAL.panel_visible and (phone or tablet):
+		var bounds := LOCAL.panel_rect
+		var origin := get_global_rect().position.x
+		var before := maxf(0, bounds.position.x - origin - 68)
+		var after := maxf(0, size.x - (bounds.end.x - origin) - 12)
+		width = minf(width, maxf(144, maxf(before, after)))
+		x = 68 if before >= after else bounds.end.x - origin + 8
+	else:
+		width = minf(width, maxf(144, size.x - 144))
+		x = (size.x - width) / 2
+	panel.position = Vector2(x, 52 if phone else 20)
+	panel.size = Vector2(width, panel.size.y)
 
-func _open(actor: String, allowed: bool) -> void:
+func _open(rook: String) -> void:
+	if sdk.context().is_gm:
+		LOCAL.select_rook(rook)
+		sdk.windows.open(VIEW.new().surface(sdk))
 	refresh()
-	if allowed:
-		sdk.windows.open_actor(SHEET.window, SDK.ActorId.new(actor))
+
+func _options() -> void:
+	if not sdk.context().is_gm:
+		return
+	LOCAL.show_options()
+	sdk.windows.open(VIEW.new().surface(sdk))

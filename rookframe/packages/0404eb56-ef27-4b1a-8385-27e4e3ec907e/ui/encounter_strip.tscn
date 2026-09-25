@@ -1,6 +1,7 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_strip.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/chevron.svg" id="chevron"]
 [node name="EncounterStrip" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -10,26 +11,26 @@ mouse_filter = 2
 theme = ExtResource("theme")
 script = ExtResource("script")
 [node name="Panel" type="PanelContainer" parent="."]
-layout_mode = 1
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -360.0
-offset_right = 360.0
-offset_top = 8.0
+layout_mode = 0
 theme_type_variation = &"RookframeSection"
-[node name="Layout" type="VBoxContainer" parent="Panel"]
+[node name="Layout" type="HBoxContainer" parent="Panel"]
 layout_mode = 2
-theme_override_constants/separation = 4
-[node name="Round" type="Label" parent="Panel/Layout"]
+theme_override_constants/separation = 8
+[node name="Round" type="Button" parent="Panel/Layout"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-horizontal_alignment = 1
-text = "ROUND 1"
+custom_minimum_size = Vector2(44, 44)
+size_flags_vertical = 4
+theme_type_variation = &"RookframeQuietButton"
+text = "1"
+icon = ExtResource("chevron")
+icon_alignment = 2
+expand_icon = true
+theme_override_constants/icon_max_width = 12
 [node name="Scroll" type="ScrollContainer" parent="Panel/Layout"]
-custom_minimum_size = Vector2(0, 128)
 layout_mode = 2
+size_flags_horizontal = 3
 vertical_scroll_mode = 0
 follow_focus = true
-[node name="Entries" type="HBoxContainer" parent="Panel/Layout/Scroll"]
+[node name="Groups" type="HBoxContainer" parent="Panel/Layout/Scroll"]
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_override_constants/separation = 8

@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.24.1` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.25.1` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `0c152a804332dd5571caa8a2c3dd161aa21fb7f7` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -374,19 +374,21 @@ transport, Prop, effect engine, resumption, Undo or GM takeover is introduced.
 
 ## Encounter guidance
 
-The GM's Encounter rail entry manages a roster, group or individual initiative,
-round/current turn, previous/next, score and order corrections. Every Participant
-sees a horizontal sequence of miniature previews while the encounter is active. Selecting an
-accessible entry opens that Actor's sheet. Encounter guidance never gates an
-action or processes effects or fictional time.
+Select a linked Rook on the tabletop and use its swords action to add or remove
+that Rook from combat. Rooks remain separate even when linked to the same Actor.
+The GM's Encounter window advances Players and Monsters, with equal Previous and
+Next buttons, a quiet initiative die beside the sides, and round correction / End
+behind the round numeral. Every Participant sees a horizontal Miniature sequence.
+Selecting an entry opens its GM encounter actions without changing initiative.
+Guidance never gates actions or processes effects or fictional time.
 
-Group initiative requests one physical d6 (1–3 enemies, 4–6 PCs). Individual
-initiative uses the played Agility modifier plus a physical d6; Actors without
-Agility use a table-entered score or group initiative. Wrat Wraith wins initiative.
-Ties retain the GM's current order. Reaction requests 2d6 and uses the five printed
-bands. Morale requests 2d6 against a numeric Creature Morale; only a strictly higher
-total requests the second physical d6 (1–3 flee, 4–6 surrender). Trigger timing and
-qualitative special Morale stay with the table. No Actor HP is changed by guidance.
+Group initiative requests one physical d6 (1–3 Monsters, 4–6 Players). Wrat Wraith
+acts first, before the ordinary side phases. The optional individual initiative
+procedure is outside this compact two-side surface; there are no score or bonus
+editors. Reaction requests 2d6 and uses the five printed bands. Morale requests
+2d6 against numeric Creature Morale; only a strictly higher total requests the
+separate physical d6 (1–3 flee, 4–6 surrender). Trigger timing and qualitative
+special Morale stay with the table. No Actor HP is changed by guidance.
 
 Current guidance is stored under `encounter` in Package-owned World data. All
 Participants receive the complete state; access only controls local presentation.

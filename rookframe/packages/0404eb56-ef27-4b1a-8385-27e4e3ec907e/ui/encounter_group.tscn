@@ -1,0 +1,11 @@
+[gd_scene format=3]
+[node name="Side" type="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Side" type="Label" parent="."]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+text = "Players"
+[node name="Entries" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4

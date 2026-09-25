@@ -6,7 +6,11 @@ const DESKTOP_WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/package
 const ENCOUNTER_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button.tres")
 const ENCOUNTER_STRIP = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_strip.tscn")
 
+const ENCOUNTER_LOCAL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_local.tres")
+const ENCOUNTER_ROOK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_rook.tscn")
+
 func compose() -> void:
+	ENCOUNTER_LOCAL.activate(sdk.context().session_id)
 	var timer := Timer.new()
 	timer.wait_time = 0.5
 	timer.autostart = true
@@ -16,7 +20,13 @@ func compose() -> void:
 	var rail: SDK.Rail = sdk.rails.left
 	rail.push(DESKTOP_WINDOW_BUTTON if experience.is_desktop else WINDOW_BUTTON)
 	if sdk.context().is_gm:
-		rail.push(ENCOUNTER_BUTTON)
+		var combat_button := SDK.WindowButton.new()
+		combat_button.button_scene = ENCOUNTER_BUTTON.button_scene
+		combat_button.window = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_view.gd").new().surface(sdk)
+		rail.push(combat_button)
+		var contextual := SDK.Contribution.new()
+		contextual.scene = ENCOUNTER_ROOK
+		sdk.slots.selected_rook.push(contextual)
 	var order := SDK.Contribution.new()
 	order.scene = ENCOUNTER_STRIP
 	sdk.ui_root.push(order)

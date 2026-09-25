@@ -15,26 +15,33 @@ func _host() -> BOUNDARY:
 	host.actors.enemy.data.morale = {"kind": "fixed", "value": 7}
 	return host
 
-func test_gm_roster_round_and_current_turn_are_saved_without_actor_changes() -> void:
+func test_rooks_share_actor_but_keep_membership_and_advance_as_sides() -> void:
 	var host := _host()
+	host.rooks["second-enemy-rook"] = "enemy"
 	var sdk := SDK.new(host)
-	var result := await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "actor": "hero", "side": "pc"})
+	var result := await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	assert_str(result.value.state).is_equal("resolved")
 	if result.value.state != "resolved":
 		return
-	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "actor": "enemy", "side": "enemy"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "rook": "enemy-rook"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 2, "kind": "add", "rook": "second-enemy-rook"})
+	assert_int(host.world_data.encounter.entries.size()).is_equal(3)
 	var actors := host.actors.duplicate(true)
-	await sdk.system_actions.submit("encounter.edit", {"revision": 2, "kind": "begin"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 3, "kind": "begin"})
 	assert_int(host.world_data.encounter.round).is_equal(1)
-	assert_str(host.world_data.encounter.current).is_equal("hero")
-	await sdk.system_actions.submit("encounter.edit", {"revision": 3, "kind": "next"})
-	assert_str(host.world_data.encounter.current).is_equal("enemy")
+	assert_str(host.world_data.encounter.current).is_equal("pc")
 	await sdk.system_actions.submit("encounter.edit", {"revision": 4, "kind": "next"})
+	assert_str(host.world_data.encounter.current).is_equal("enemy")
+	await sdk.system_actions.submit("encounter.edit", {"revision": 5, "kind": "next"})
 	assert_int(host.world_data.encounter.round).is_equal(2)
+	assert_str(host.world_data.encounter.current).is_equal("pc")
+	await sdk.system_actions.submit("encounter.edit", {"revision": 6, "kind": "remove", "rook": "enemy-rook"})
+	assert_int(host.world_data.encounter.entries.size()).is_equal(2)
+	assert_str(host.world_data.encounter.entries[1].rook).is_equal("second-enemy-rook")
 	assert_dict(host.actors).is_equal(actors)
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	result = await sdk.system_actions.submit("encounter.edit", {"revision": 5, "kind": "correct", "round": 7, "current": "enemy"})
+	result = await sdk.system_actions.submit("encounter.edit", {"revision": 7, "kind": "correct", "round": 7, "current": "enemy"})
 	assert_str(result.value.state).is_equal("resolved")
 	assert_int(host.world_data.encounter.round).is_equal(7)
 	assert_str(host.world_data.encounter.current).is_equal("enemy")
@@ -43,8 +50,8 @@ func test_gm_roster_round_and_current_turn_are_saved_without_actor_changes() -> 
 func test_group_initiative_requests_gm_d6_and_sorts_sides() -> void:
 	var host := _host()
 	var sdk := SDK.new(host)
-	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "actor": "hero", "side": "pc"})
-	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "actor": "enemy", "side": "enemy"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "rook": "enemy-rook"})
 	var result := await sdk.system_actions.submit("encounter.roll", {"revision": 2, "id": "initiative", "kind": "group"})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -55,7 +62,7 @@ func test_group_initiative_requests_gm_d6_and_sorts_sides() -> void:
 	result = await sdk.system_actions.submit("encounter.advance", {"id": "initiative"})
 	assert_str(result.value.state).is_equal("resolved")
 	assert_str(host.world_data.encounter.entries[0].actor).is_equal("enemy")
-	assert_str(str(host.reports)).contains("Enemies go first").contains("Raw Roll #1")
+	assert_str(str(host.reports)).contains("Monsters go first").contains("Raw Roll #1")
 	await sdk.system_actions.submit("encounter.advance", {"id": "initiative"})
 	assert_int(host.world_data.encounter.revision).is_equal(3)
 
@@ -91,31 +98,27 @@ func test_morale_equality_holds_and_failure_requests_flee_or_surrender(total: in
 	assert_str(str(host.reports)).not_contains("Seth").not_contains("7")
 	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
 
-func test_individual_initiative_uses_agility_and_wraith_always_wins() -> void:
+func test_wraith_acts_first_without_giving_every_monster_an_extra_turn() -> void:
 	var host := _host()
 	host.actors.enemy.data.definition_id = "wrat-wraith"
 	var sdk := SDK.new(host)
-	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "actor": "hero", "side": "pc"})
-	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "actor": "enemy", "side": "enemy"})
-	await sdk.system_actions.submit("encounter.edit", {"revision": 2, "kind": "mode", "mode": "individual"})
-	var result := await sdk.system_actions.submit("encounter.roll", {"revision": 3, "id": "individual", "kind": "individual", "actor": "hero"})
-	assert_str(result.value.state).is_equal("pending")
-	if result.value.state != "pending":
-		return
-	host.roll("individual", [6])
-	await sdk.system_actions.submit("encounter.advance", {"id": "individual"})
-	assert_str(host.world_data.encounter.entries[0].actor).is_equal("enemy")
-	assert_int(host.world_data.encounter.entries[1].initiative).is_equal(8)
+	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "rook": "enemy-rook"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 2, "kind": "begin"})
+	assert_str(host.world_data.encounter.current).is_equal("first")
+	assert_str(host.world_data.encounter.entries[0].rook).is_equal("enemy-rook")
+	await sdk.system_actions.submit("encounter.edit", {"revision": 3, "kind": "next"})
+	assert_str(host.world_data.encounter.current).is_equal("pc")
 
 func test_unauthorized_stale_failed_and_interrupted_changes_leave_guidance_intact() -> void:
 	var host := _host()
 	var sdk := SDK.new(host)
 	host.game_master = false
-	var result := await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "actor": "hero", "side": "pc"})
+	var result := await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	assert_str(result.value.state).is_equal("error")
 	assert_bool(host.world_data.has("encounter")).is_false()
 	host.game_master = true
-	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "actor": "hero", "side": "pc"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	result = await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "begin"})
 	assert_str(result.value.state).is_equal("error")
 	host.fail_commit = true

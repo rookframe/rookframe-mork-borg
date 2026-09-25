@@ -1,0 +1,33 @@
+[gd_scene load_steps=5 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_rook.gd" id="script"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/swords.svg" id="swords"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/check.svg" id="check"]
+[node name="CombatRookAction" type="Control"]
+custom_minimum_size = Vector2(48, 48)
+layout_mode = 2
+mouse_filter = 2
+theme = ExtResource("theme")
+script = ExtResource("script")
+[node name="Toggle" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_minimum_size = Vector2(48, 48)
+theme_type_variation = &"RookframeCircularAction"
+icon = ExtResource("swords")
+icon_alignment = 1
+expand_icon = true
+theme_override_constants/icon_max_width = 24
+toggle_mode = true
+[node name="Check" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 32.0
+offset_top = 32.0
+offset_right = 48.0
+offset_bottom = 48.0
+mouse_filter = 2
+texture = ExtResource("check")
+expand_mode = 1
+stretch_mode = 5
