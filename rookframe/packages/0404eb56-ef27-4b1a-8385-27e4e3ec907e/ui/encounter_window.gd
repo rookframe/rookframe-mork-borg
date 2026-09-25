@@ -250,7 +250,7 @@ func _show_selection() -> void:
 
 func _show_outcome(message: String, state: String) -> void:
 	_outcome.text = message
-	_outcome.theme_type_variation = "RookframeError" if state == "error" else "RookframePending" if state == "pending" else "RookframeSuccess"
+	_outcome.theme_type_variation = "RookframeError" if state == "error" else "RookframePending" if state == "pending" else "RookframeSuccess" if state == "resolved" else "RookframeStatus"
 
 func _show_result(result: SDK.DataResult) -> void:
 	if result.ok:
