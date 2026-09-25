@@ -1,7 +1,19 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=6 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_strip.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/chevron.svg" id="chevron"]
+[sub_resource type="StyleBoxFlat" id="StripFrame"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.003922, 0.047059, 0.062745, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+[sub_resource type="StyleBoxEmpty" id="RoundInset"]
 [node name="EncounterStrip" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -12,7 +24,8 @@ theme = ExtResource("theme")
 script = ExtResource("script")
 [node name="Panel" type="PanelContainer" parent="."]
 layout_mode = 0
-theme_type_variation = &"RookframeSection"
+theme_type_variation = &"RookframeSubtleFrame"
+theme_override_styles/panel = SubResource("StripFrame")
 [node name="Layout" type="HBoxContainer" parent="Panel"]
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -21,12 +34,30 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 size_flags_vertical = 4
 theme_type_variation = &"RookframeQuietButton"
+theme_override_styles/normal = SubResource("RoundInset")
+theme_override_styles/hover = SubResource("RoundInset")
+theme_override_styles/pressed = SubResource("RoundInset")
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_hover_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_focus_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
 text = "1"
 theme_override_font_sizes/font_size = 28
 icon = ExtResource("chevron")
 icon_alignment = 2
 expand_icon = true
 theme_override_constants/icon_max_width = 12
+[node name="RoundLabel" type="Label" parent="Panel/Layout"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_font_sizes/font_size = 28
+text = "1"
+horizontal_alignment = 1
+vertical_alignment = 1
 [node name="Scroll" type="ScrollContainer" parent="Panel/Layout"]
 layout_mode = 2
 size_flags_horizontal = 3

@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=8 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_window.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/dice.svg" id="dice"]
@@ -6,6 +6,15 @@
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/action_bar.tscn" id="footer"]
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/feedback/task_state.tscn" id="state"]
+
+[sub_resource type="StyleBoxFlat" id="ActiveSide"]
+content_margin_left = 8.0
+content_margin_top = 8.0
+content_margin_right = 8.0
+content_margin_bottom = 8.0
+bg_color = Color(0.070588, 0.290196, 0.282353, 1)
+border_width_bottom = 2
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="Encounter" type="Control"]
 layout_mode = 2
@@ -51,6 +60,8 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+theme_override_colors/font_pressed_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/pressed = SubResource("ActiveSide")
 text = "Players"
 toggle_mode = true
 
@@ -59,6 +70,8 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+theme_override_colors/font_pressed_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/pressed = SubResource("ActiveSide")
 text = "Monsters"
 toggle_mode = true
 
@@ -66,6 +79,7 @@ toggle_mode = true
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = &"RookframeQuietButton"
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("dice")
 icon_alignment = 1
 theme_override_constants/icon_max_width = 24

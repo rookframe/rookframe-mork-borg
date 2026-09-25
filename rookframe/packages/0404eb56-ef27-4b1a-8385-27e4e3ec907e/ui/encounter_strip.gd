@@ -31,8 +31,12 @@ func refresh() -> void:
 		return
 	var round_button: Button = get_node(^"Panel/Layout/Round")
 	round_button.text = str(state.round)
-	round_button.disabled = not state.is_gm
+	round_button.visible = bool(state.is_gm)
+	var round_label: Label = get_node(^"Panel/Layout/RoundLabel")
+	round_label.text = round_button.text
+	round_label.visible = not state.is_gm
 	round_button.tooltip_text = "Round %d" % int(state.round)
+	round_label.accessibility_name = round_button.tooltip_text
 	round_button.accessibility_name = "Encounter options, round %d" % int(state.round) if state.is_gm else round_button.tooltip_text
 	var entries := get_node(^"Panel/Layout/Scroll/Groups")
 	var rows: Array = state.rows
@@ -64,7 +68,6 @@ func refresh() -> void:
 			_cards.append(card)
 			group.get_node("Entries").add_child(card)
 			card.name = str(row.rook)
-			card.custom_minimum_size = Vector2(60, 64) if sdk.presentation_experience().is_phone else Vector2(88, 80)
 			VIEW.new().show_preview(sdk, card.get_node("Image") as Control, row)
 			card.tooltip_text = str(row.label)
 			card.accessibility_name = str(row.label) + (", active side" if row.active else "")
@@ -82,7 +85,11 @@ func _layout() -> void:
 	var panel: Control = get_node(^"Panel")
 	var phone := sdk.presentation_experience().is_phone
 	var tablet := sdk.presentation_experience().is_tablet
-	var round_width: float = get_node(^"Panel/Layout/Round").size.x
+	for entry in _cards:
+		var card := entry as Control
+		card.custom_minimum_size = Vector2(72, 64) if phone else Vector2(88, 80)
+	var round_node: Control = get_node(^"Panel/Layout/Round") if sdk.context().is_gm else get_node(^"Panel/Layout/RoundLabel")
+	var round_width: float = round_node.size.x
 	var width := minf(720, 104 + maxf(0, round_width - 44) + _rows.size() * (76 if phone else 92))
 	var x := (size.x - width) / 2
 	if _local.panel_visible and (phone or tablet):
@@ -96,7 +103,7 @@ func _layout() -> void:
 		width = minf(width, maxf(144, size.x - 144))
 		x = (size.x - width) / 2
 	panel.position = Vector2(x, 52 if phone else 20)
-	panel.size = Vector2(width, panel.size.y)
+	panel.size = Vector2(width, 0)
 
 func _open(rook: String) -> void:
 	if sdk.context().is_gm:
