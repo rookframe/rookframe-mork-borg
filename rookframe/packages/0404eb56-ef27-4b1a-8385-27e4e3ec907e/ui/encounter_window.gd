@@ -123,7 +123,7 @@ func _edit(input: Dictionary) -> void:
 	if not result.ok or str(result.value.get("state", "error")) == "error":
 		_show_outcome(result.message if not result.ok else str(result.value.message), "error")
 	else:
-		_outcome.hide()
+		_outcome.visible = false
 		if str(request.kind) == "end":
 			LOCAL.hide_options()
 	refresh()
