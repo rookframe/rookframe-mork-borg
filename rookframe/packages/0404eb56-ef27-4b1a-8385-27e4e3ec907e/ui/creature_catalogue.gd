@@ -6,7 +6,8 @@ const CORE := ["aland-wickhead", "arbint-troll", "belze-skeleton", "bent-scum", 
 signal selected(entry: SDK.ContentEntry)
 var _entries: Array[SDK.ContentEntry] = []
 var _selected_id := ""
-var _rows: Array[Button] = []
+const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/catalogue_choice.gd")
+var _rows: Array[ROW] = []
 
 func _ready() -> void:
 	resized.connect(_arrange)
@@ -30,22 +31,16 @@ func configure(entries: Array[SDK.ContentEntry], selected_id: String = "") -> vo
 		for entry in _entries:
 			var row := CHOICE.instantiate()
 			row.title = entry.title
-			row.variant = 1
-			row.description = ""
 			row.tooltip_text = entry.title
-			row.set_meta("definition_id", entry.reference.local_id)
-			row.set_meta("definition_title", entry.title)
 			row.theme_type_variation = "RookframeChoiceRow"
 			row.custom_minimum_size = Vector2(0, 52)
 			row.size_flags_horizontal = 3
 			row.alignment = 0
 			row.toggle_mode = true
-			row.gui_input.connect(_row_input.bind(row))
+			row.navigation.connect(_row_navigation.bind(_rows.size()))
 			row.pressed.connect(_select.bind(entry))
 			get_node("List/Content/DefinitionList").add_child(row)
 			_rows.append(row)
-			row.get_node("Content/Copy/Title").minimum_size_changed.connect(_fit_row.bind(row))
-			_fit_row(row)
 	var wanted := selected_id if not selected_id.is_empty() else (_selected_id if not _selected_id.is_empty() else "seth-goblin")
 	for entry in _entries:
 		if entry.reference.local_id == wanted:
@@ -62,10 +57,10 @@ func selection() -> SDK.ContentEntry:
 
 func _select(entry: SDK.ContentEntry, notify: bool = true) -> void:
 	_selected_id = entry.reference.local_id
-	for row in _rows:
-		var chosen := str(row.get_meta("definition_id")) == _selected_id
+	for index in range(_rows.size()):
+		var row := _rows[index]
+		var chosen := _entries[index].reference.local_id == _selected_id
 		row.set_selected(chosen)
-		row.get_node("Content/IndicatorLane/Indicator").modulate.a = 1.0 if chosen else 0.0
 		row.focus_mode = 2 if chosen else 1
 	_refresh_tab_stop()
 	var definition: Dictionary = CREATURES.CORE_DEFINITIONS[_selected_id]
@@ -84,43 +79,30 @@ func _select(entry: SDK.ContentEntry, notify: bool = true) -> void:
 
 func filter(query: String) -> void:
 	query = query.strip_edges().to_lower()
-	for row in _rows:
-		row.visible = query.is_empty() or str(row.get_meta("definition_title")).to_lower().contains(query)
+	for index in range(_rows.size()):
+		_rows[index].visible = query.is_empty() or _entries[index].title.to_lower().contains(query)
 	_refresh_tab_stop()
 
 func _arrange() -> void:
 	vertical = size.x < 640
 
-func _fit_row(row: Button) -> void:
-	row.custom_minimum_size.y = maxf(52, row.get_node("Content/Copy/Title").get_minimum_size().y + 24)
-
-func _row_input(event: InputEvent, row: Button) -> void:
-	if not event is InputEventKey or not event.pressed:
-		return
-	var available: Array[Button] = []
-	for candidate in _rows:
-		if candidate.visible and not candidate.disabled:
-			available.append(candidate)
+func _row_navigation(direction: int, boundary: bool, current: int) -> void:
+	var available: Array[int] = []
+	var position := 0
+	for index in range(_rows.size()):
+		if _rows[index].visible and not _rows[index].disabled:
+			if index == current:
+				position = available.size()
+			available.append(index)
 	if available.is_empty():
 		return
-	var index := available.find(row)
-	if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_right"):
-		index = (index + 1) % available.size()
-	elif event.is_action_pressed("ui_up") or event.is_action_pressed("ui_left"):
-		index = (index - 1 + available.size()) % available.size()
-	elif event.keycode == KEY_HOME:
-		index = 0
-	elif event.keycode == KEY_END:
-		index = available.size() - 1
+	if boundary:
+		position = 0 if direction == 0 else available.size() - 1
 	else:
-		return
-	var next := available[index]
-	for entry in _entries:
-		if entry.reference.local_id == str(next.get_meta("definition_id")):
-			_select(entry)
-			next.grab_focus()
-			row.accept_event()
-			return
+		position = (position + direction + available.size()) % available.size()
+	var next := available[position]
+	_select(_entries[next])
+	_rows[next].grab_focus()
 
 func _refresh_tab_stop() -> void:
 	var tab_stop: Button

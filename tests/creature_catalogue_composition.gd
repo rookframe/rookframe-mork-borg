@@ -28,8 +28,10 @@ func test_catalogue_has_core_choices_and_responsive_definition_preview() -> void
 	assert_str(catalogue.get_node("Preview/Identity/Content/Title").text).is_equal("SETH, GOBLIN")
 	assert_str(catalogue.get_node("Preview/Stats/HitPoints/Content/Value").text).is_equal("6")
 	assert_str(catalogue.get_node("Preview/Stats/Morale/Content/Value").text).is_equal("7")
-	var chosen = rows.filter(func(row): return row.get_meta("definition_id") == "seth-goblin")[0]
+	var chosen = rows.filter(func(row): return row.title == "Seth, Goblin")[0]
 	assert_bool(chosen.button_pressed).is_true()
+	assert_bool(chosen.get_node("Content/IndicatorLane/Indicator").visible).is_true()
+	assert_bool(rows[0].get_node("Content/IndicatorLane/Indicator").visible).is_false()
 	assert_bool(chosen.size.y >= 44).is_true()
 	var selections: Array = []
 	catalogue.selected.connect(func(entry): selections.append(entry))
@@ -43,11 +45,11 @@ func test_catalogue_has_core_choices_and_responsive_definition_preview() -> void
 	var key := InputEventKey.new()
 	key.pressed = true
 	key.keycode = KEY_END
-	catalogue._row_input(key, chosen)
+	chosen._gui_input(key)
 	assert_str(catalogue.selection().reference.local_id).is_equal("zukuma-berserker")
 	assert_bool(rows[-1].has_focus()).is_true()
 	key.keycode = KEY_HOME
-	catalogue._row_input(key, rows[-1])
+	rows[-1]._gui_input(key)
 	assert_str(catalogue.selection().reference.local_id).is_equal("aland-wickhead")
 	assert_bool(rows[0].has_focus()).is_true()
 	catalogue.filter("troll")
