@@ -164,5 +164,48 @@ func test_desktop_order_shows_three_complete_miniatures() -> void:
 			assert_bool(card.button_pressed).is_equal(card == selected)
 			assert_bool(card.get_global_rect().end.x <= scroll.get_global_rect().end.x).is_true()
 
+func test_desktop_round_correction_stays_visible_after_error() -> void:
+	var host := BOUNDARY.new()
+	host.device = 0
+	host.game_master = true
+	host.participant = "gm"
+	host.session = "gm-session"
+	host.handler = auto_free(SYSTEM.new())
+	add_child(host.handler)
+	var sdk := SDK.new(host)
+	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "enemy-rook"})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "correct", "round": 1, "current": "enemy"})
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(400, 292)
+	add_child(viewport)
+	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
+	strip.sdk = sdk
+	viewport.add_child(strip)
+	var slot := VBoxContainer.new()
+	viewport.add_child(slot)
+	slot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	slot.offset_top = 56
+	var window = auto_free(load(ROOT + "ui/encounter_window.tscn").instantiate())
+	window.sdk = sdk
+	slot.add_child(window)
+	for frame in range(4):
+		await get_tree().process_frame
+	strip.encounter_view_state().show_options()
+	for frame in range(4):
+		await get_tree().process_frame
+	var body: Control = window.get_node("Layout/Body")
+	var value: LineEdit = window.get_node("Layout/Body/Content/Options/Round/Value")
+	assert_bool(value.has_focus()).is_true()
+	assert_bool(body.get_global_rect().encloses(value.get_global_rect())).is_true()
+	value.text = "no"
+	window.get_node("Layout/Body/Content/Options/Round/Set").pressed.emit()
+	for frame in range(4):
+		await get_tree().process_frame
+	assert_bool(value.has_focus()).is_true()
+	assert_bool(body.get_global_rect().encloses(value.get_global_rect())).is_true()
+	var outcome: Label = window.get_node("Layout/Body/Content/Outcome")
+	assert_str(outcome.text).is_equal("Enter a round number.")
+	assert_bool(body.get_global_rect().encloses(outcome.get_global_rect())).is_true()
+
 func after_test() -> void:
 	await get_tree().process_frame

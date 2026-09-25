@@ -88,7 +88,7 @@ func refresh() -> void:
 	if not round_value.has_focus():
 		round_value.text = str(maxi(1, int(_state.round)))
 	if opening and options.visible:
-		round_value.grab_focus()
+		_focus_round()
 	get_node(^"Layout/Footer").visible = bool(_state.is_gm)
 	_primary_button.text = "Next" if _state.active else "Begin"
 	_primary_button.disabled = pending or rows.is_empty()
@@ -109,8 +109,20 @@ func _correct() -> void:
 	var value := str((get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit).text)
 	if not value.is_valid_int():
 		_show_outcome("Enter a round number.", "error")
+		_focus_round()
 		return
 	await _edit({"kind": "correct", "round": int(value), "current": str(_state.current)})
+	if _outcome.visible:
+		_focus_round()
+
+func _focus_round() -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if _closed or not _local.options or not is_visible_in_tree():
+		return
+	var value := get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit
+	value.grab_focus()
+	(get_node(^"Layout/Body") as ScrollContainer).ensure_control_visible(value)
 
 func _edit(input: Dictionary) -> void:
 	if _busy or _closed or not _roll_id.is_empty():
