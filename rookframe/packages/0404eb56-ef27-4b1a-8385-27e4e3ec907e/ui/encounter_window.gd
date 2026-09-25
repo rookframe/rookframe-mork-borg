@@ -86,7 +86,7 @@ func refresh() -> void:
 		round_value.text = str(maxi(1, int(_state.round)))
 	if opening and options.visible:
 		round_value.grab_focus()
-	get_node(^"Layout/Footer").visible = _state.is_gm
+	get_node(^"Layout/Footer").visible = bool(_state.is_gm)
 	_primary_button.text = "Next" if _state.active else "Begin"
 	_primary_button.disabled = pending or rows.is_empty()
 	_previous_button.disabled = pending or not _state.active or (_state.round == 1 and _state.current == RULES.new().phases(_state)[0])
