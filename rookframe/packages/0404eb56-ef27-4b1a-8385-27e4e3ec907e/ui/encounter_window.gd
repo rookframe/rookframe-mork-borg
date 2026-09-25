@@ -59,7 +59,7 @@ func refresh() -> void:
 	empty_label.visible = rows.is_empty()
 	(get_node(^"Layout/Body/Content/Sides") as Control).visible = not rows.is_empty()
 	(get_node(^"Layout/Body/Content/Sides/Players") as Button).set_pressed_no_signal(_state.active and _state.current == "pc")
-	(get_node(^"Layout/Body/Content/Sides/Monsters") as Button).set_pressed_no_signal(_state.active and _state.current in ["enemy", "first"])
+	(get_node(^"Layout/Body/Content/Sides/Monsters") as Button).set_pressed_no_signal(_state.active and str(_state.current) in ["enemy", "first"])
 	for name in ["Players", "Monsters", "Roll"]:
 		(get_node("Layout/Body/Content/Sides/" + name) as Button).disabled = pending or not _state.is_gm
 	_selected = {}
