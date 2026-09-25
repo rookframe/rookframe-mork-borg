@@ -39,8 +39,9 @@ var closed_surfaces := 0
 func SelectedRookContext() -> Dictionary:
 	return {"id": selected_rook}
 
+var device := 2
 func PresentationDevice() -> int:
-	return 2
+	return device
 
 func ReadRook(id: String) -> Dictionary:
 	return SystemIntentReadRook("", id)
@@ -50,4 +51,7 @@ func OpenWindowWithPresentation(scene: PackedScene, _options: Dictionary) -> voi
 
 func CloseWindow(_scene: PackedScene) -> Dictionary:
 	closed_surfaces += 1
+	return {"ok": true}
+
+func SetWindowTitle(_title: String) -> Dictionary:
 	return {"ok": true}

@@ -73,7 +73,8 @@ func _layout() -> void:
 	var panel: Control = get_node(^"Panel")
 	var phone := sdk.presentation_experience().is_phone
 	var tablet := sdk.presentation_experience().is_tablet
-	var width := minf(720, 72 + _rows.size() * (76 if phone else 92))
+	var round_width: float = get_node(^"Panel/Layout/Round").size.x
+	var width := minf(720, 104 + maxf(0, round_width - 44) + _rows.size() * (76 if phone else 92))
 	var x := (size.x - width) / 2
 	if LOCAL.panel_visible and (phone or tablet):
 		var bounds := LOCAL.panel_rect

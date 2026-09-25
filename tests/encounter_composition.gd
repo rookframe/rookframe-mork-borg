@@ -129,5 +129,33 @@ func test_swords_action_targets_currently_selected_rook_with_shared_actor() -> v
 	await get_tree().process_frame
 	assert_int(host.world_data.encounter.entries.size()).is_equal(0)
 
+func test_desktop_order_shows_three_complete_miniatures() -> void:
+	LOCAL.reset()
+	var host := BOUNDARY.new()
+	host.device = 0
+	host.game_master = true
+	host.participant = "gm"
+	host.session = "gm-session"
+	host.rooks["second-enemy"] = "enemy"
+	host.handler = auto_free(SYSTEM.new())
+	add_child(host.handler)
+	var sdk := SDK.new(host)
+	for rook in ["hero-rook", "enemy-rook", "second-enemy"]:
+		var revision := int(host.world_data.get("encounter", {}).get("revision", 0))
+		await sdk.system_actions.submit("encounter.edit", {"revision": revision, "kind": "add", "rook": rook})
+	await sdk.system_actions.submit("encounter.edit", {"revision": 3, "kind": "correct", "round": 1, "current": "pc"})
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(1920, 1080)
+	add_child(viewport)
+	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
+	strip.sdk = sdk
+	viewport.add_child(strip)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var scroll: ScrollContainer = strip.get_node("Panel/Layout/Scroll")
+	for group in scroll.get_node("Groups").get_children():
+		for card in group.get_node("Entries").get_children():
+			assert_bool(card.get_global_rect().end.x <= scroll.get_global_rect().end.x).is_true()
+
 func after_test() -> void:
 	await get_tree().process_frame

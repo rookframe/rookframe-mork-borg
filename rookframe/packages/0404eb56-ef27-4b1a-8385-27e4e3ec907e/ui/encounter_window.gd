@@ -17,6 +17,7 @@ var _closed := false
 func ready() -> void:
 	if sdk == null:
 		return
+	sdk.windows.set_title("Encounter")
 	closed.connect(_on_closed)
 	visibility_changed.connect(_visibility_changed)
 	sdk.world_changed.connect(refresh)
@@ -176,6 +177,7 @@ func _cancel() -> void:
 func _visibility_changed() -> void:
 	LOCAL.panel_changed(is_visible_in_tree())
 	if is_visible_in_tree():
+		sdk.windows.set_title("Encounter")
 		_closed = false
 		refresh()
 
