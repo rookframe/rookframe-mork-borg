@@ -35,6 +35,7 @@ func PreviewRook(id: String, _target: Control) -> Dictionary:
 
 var selected_rook := "hero-rook"
 var opened_surfaces: Array = []
+var closed_surfaces := 0
 func SelectedRookContext() -> Dictionary:
 	return {"id": selected_rook}
 
@@ -48,4 +49,5 @@ func OpenWindowWithPresentation(scene: PackedScene, _options: Dictionary) -> voi
 	opened_surfaces.append(scene.resource_path)
 
 func CloseWindow(_scene: PackedScene) -> Dictionary:
+	closed_surfaces += 1
 	return {"ok": true}

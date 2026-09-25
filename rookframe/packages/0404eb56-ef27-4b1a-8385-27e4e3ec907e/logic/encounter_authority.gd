@@ -79,7 +79,7 @@ func _edit(context: SDK.SystemActionContext, world: Dictionary, encounter: Dicti
 		if not encounter.active or entries.is_empty():
 			return error("Begin combat first.")
 		var order := phases(encounter)
-		var current := 0
+		var current := -1
 		for i in range(order.size()):
 			if order[i] == str(encounter.current):
 				current = i

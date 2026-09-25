@@ -107,6 +107,7 @@ func test_wraith_acts_first_without_giving_every_monster_an_extra_turn() -> void
 	await sdk.system_actions.submit("encounter.edit", {"revision": 2, "kind": "begin"})
 	assert_str(host.world_data.encounter.current).is_equal("first")
 	assert_str(host.world_data.encounter.entries[0].rook).is_equal("enemy-rook")
+	host.rooks.erase("enemy-rook")
 	await sdk.system_actions.submit("encounter.edit", {"revision": 3, "kind": "next"})
 	assert_str(host.world_data.encounter.current).is_equal("pc")
 

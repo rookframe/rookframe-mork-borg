@@ -22,6 +22,7 @@ custom_minimum_size = Vector2(44, 44)
 size_flags_vertical = 4
 theme_type_variation = &"RookframeQuietButton"
 text = "1"
+theme_override_font_sizes/font_size = 28
 icon = ExtResource("chevron")
 icon_alignment = 2
 expand_icon = true

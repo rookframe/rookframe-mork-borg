@@ -55,6 +55,8 @@ func test_phone_gm_can_act_without_scrolling_and_participant_sees_active_side() 
 	await get_tree().process_frame
 	assert_str(host.world_data.encounter.current).is_equal("enemy")
 	assert_bool(primary.has_focus()).is_true()
+	host.SelectedRookContextChanged.emit({"id": host.selected_rook})
+	assert_int(host.closed_surfaces).is_equal(0)
 	window.hide()
 	window.closed.emit()
 	window.show()

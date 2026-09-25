@@ -7,6 +7,7 @@ var _state: Dictionary = {}
 var _selected: Dictionary = {}
 var _roll_id := ""
 var _pending_rook := ""
+var _tabletop_rook := ""
 var _busy := false
 var _closed := false
 @onready var _content: VBoxContainer = get_node(^"Layout/Body/Content")
@@ -20,6 +21,8 @@ func ready() -> void:
 	closed.connect(_on_closed)
 	visibility_changed.connect(_visibility_changed)
 	sdk.world_changed.connect(refresh)
+	var current := sdk.rooks.selected()
+	_tabletop_rook = "" if current == null else current.value
 	sdk.rooks.selection_changed.connect(_tabletop_selection)
 	LOCAL.updated.connect(refresh)
 	item_rect_changed.connect(_bounds_changed)
@@ -177,7 +180,11 @@ func _visibility_changed() -> void:
 		refresh()
 
 func _tabletop_selection() -> void:
-	if is_visible_in_tree() and sdk.rooks.selected() != null:
+	var current := sdk.rooks.selected()
+	var id := "" if current == null else current.value
+	var changed := id != _tabletop_rook
+	_tabletop_rook = id
+	if changed and not id.is_empty() and is_visible_in_tree():
 		sdk.windows.close(VIEW.new().surface(sdk))
 
 func _show_outcome(message: String, state: String) -> void:
@@ -187,6 +194,7 @@ func _show_outcome(message: String, state: String) -> void:
 
 func _options_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
+		_content.get_node(^"Options/Round/Value").accept_event()
 		LOCAL.hide_options()
 		refresh()
 		_primary_button.grab_focus()

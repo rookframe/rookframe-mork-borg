@@ -43,11 +43,13 @@ func refresh() -> void:
 				side = str(row.side)
 				group = GROUP.instantiate()
 				entries.add_child(group)
-				group.get_node("Side").text = "Players" if side == "pc" else "Monsters"
+				var label := group.get_node("Side") as Label
+				label.text = "Players" if side == "pc" else "Monsters"
+				label.theme_type_variation = "RookframeStatus" if row.active else "RookframeMeta"
 			var card: Button = CARD.instantiate()
 			group.get_node("Entries").add_child(card)
 			card.name = str(row.rook)
-			card.custom_minimum_size = Vector2(72, 64) if sdk.presentation_experience().is_phone else Vector2(88, 80)
+			card.custom_minimum_size = Vector2(60, 64) if sdk.presentation_experience().is_phone else Vector2(88, 80)
 			VIEW.new().show_preview(sdk, card.get_node("Image"), row)
 			card.tooltip_text = str(row.label)
 			card.accessibility_name = str(row.label) + (", active side" if row.active else "")
