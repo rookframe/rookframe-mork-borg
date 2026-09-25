@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.23.1` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.24.1` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `0c152a804332dd5571caa8a2c3dd161aa21fb7f7` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -371,3 +371,40 @@ remain manual. The approved September 22 docked `rest` and `improve` routes guid
 composition. Existing public SDK System intents own authorization, persistence,
 complete World replication, raw Throws and Action Log commits. No new host API,
 transport, Prop, effect engine, resumption, Undo or GM takeover is introduced.
+
+## Encounter guidance
+
+The GM's Encounter rail entry manages a roster, group or individual initiative,
+round/current turn, previous/next, score and order corrections. Every Participant
+sees a horizontal portrait sequence while the encounter is active. Selecting an
+accessible portrait opens that Actor's sheet. Encounter guidance never gates an
+action or processes effects or fictional time.
+
+Group initiative requests one physical d6 (1–3 enemies, 4–6 PCs). Individual
+initiative uses the played Agility modifier plus a physical d6; Actors without
+Agility use a table-entered score or group initiative. Wrat Wraith wins initiative.
+Ties retain the GM's current order. Reaction requests 2d6 and uses the five printed
+bands. Morale requests 2d6 against a numeric Creature Morale; only a strictly higher
+total requests the second physical d6 (1–3 flee, 4–6 surrender). Trigger timing and
+qualitative special Morale stay with the table. No Actor HP is changed by guidance.
+
+Current guidance is stored under `encounter` in Package-owned World data. All
+Participants receive the complete state; access only controls local presentation.
+GM actions use revision checks and atomic World-data publication. Closing a
+pending tracker cancels its current requested Throw; returning opens current
+guidance. Restarted sessions do not resume actions. Raw Rolls and public outcomes
+remain in the Action Log; corrections change current values without replay.
+
+The tracker can explicitly reveal existing Creature artwork to everyone, or use
+a portrait from the Participant's internal file library. Without a revealed
+portrait, inaccessible Creatures use the public name and a neutral silhouette.
+The twelve Creature portraits are unchanged copies from
+`bevy-vtt/fixtures/packages/mork-borg-system/static/adversaries` at revision
+`d00a3f49e7587223501812976e86b9da20e0f7af`; no Props were created.
+
+Rules source: Bare Bones, Violence/Initiative/Reactions/Morale and Wrat Wraith.
+Presentation follows the conventional roster/round/next-turn controls in
+[Foundry](https://foundryvtt.com/article/combat/) and
+[Roll20](https://help.roll20.net/hc/en-us/articles/360039178634-Turn-Tracker), with
+[Baldur's Gate 3's portrait turn order](https://www.baldursgate3.game/news/patch-2-now-live_89)
+as the shared presentation reference, following the user's RFG-294 instruction.

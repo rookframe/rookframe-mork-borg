@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_strip.gd" id="script"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
+[node name="EncounterStrip" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme = ExtResource("theme")
+script = ExtResource("script")
+[node name="Panel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -360.0
+offset_right = 360.0
+offset_top = 8.0
+theme_type_variation = &"RookframeSection"
+[node name="Layout" type="VBoxContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Round" type="Label" parent="Panel/Layout"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+horizontal_alignment = 1
+text = "ROUND 1"
+[node name="Scroll" type="ScrollContainer" parent="Panel/Layout"]
+custom_minimum_size = Vector2(0, 108)
+layout_mode = 2
+vertical_scroll_mode = 0
+follow_focus = true
+[node name="Portraits" type="HBoxContainer" parent="Panel/Layout/Scroll"]
+layout_mode = 2
+theme_override_constants/separation = 4
