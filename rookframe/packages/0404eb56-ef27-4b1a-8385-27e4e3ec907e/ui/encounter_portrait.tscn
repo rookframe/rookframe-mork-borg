@@ -1,7 +1,7 @@
 [gd_scene load_steps=2 format=3]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="portrait"]
 [node name="Portrait" type="Button"]
-custom_minimum_size = Vector2(72, 92)
+custom_minimum_size = Vector2(96, 112)
 layout_mode = 2
 theme_type_variation = &"RookframeSecondaryButton"
 toggle_mode = true
@@ -27,15 +27,13 @@ stretch_mode = 6
 [node name="Name" type="Label" parent="Layout"]
 layout_mode = 2
 mouse_filter = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 12
+theme_type_variation = &"RookframeIdentity"
 text = "Actor"
 horizontal_alignment = 1
 text_overrun_behavior = 3
 [node name="Turn" type="Label" parent="Layout"]
 layout_mode = 2
 mouse_filter = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 11
+theme_type_variation = &"RookframeStatus"
 text = "PC"
 horizontal_alignment = 1

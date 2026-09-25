@@ -173,7 +173,7 @@ text = "Down"
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
+theme_type_variation = &"RookframeDangerButton"
 text = "Remove"
 
 [node name="Round" type="HBoxContainer" parent="Layout/Body/Content/Selected"]

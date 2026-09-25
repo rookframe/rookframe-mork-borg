@@ -47,7 +47,7 @@ func refresh() -> void:
 		return
 	var snapshot: Dictionary = VIEW.new().snapshot(sdk)
 	if snapshot.has("error"):
-		_outcome.text = str(snapshot.error)
+		_show_outcome(str(snapshot.error), "error")
 		return
 	_state = snapshot
 	var gm: bool = _state.is_gm
@@ -126,14 +126,14 @@ func _add() -> void:
 func _score() -> void:
 	var value := str(get_node(^"Layout/Body/Content/Selected/Score/Value").text)
 	if not value.is_valid_int():
-		_outcome.text = "Enter a whole initiative score."
+		_show_outcome("Enter a whole initiative score.", "error")
 		return
 	await _edit({"kind": "initiative", "actor": _selected, "value": int(value)})
 
 func _correct() -> void:
 	var value := str(get_node(^"Layout/Body/Content/Selected/Round/Value").text)
 	if not value.is_valid_int():
-		_outcome.text = "Enter a round number."
+		_show_outcome("Enter a round number.", "error")
 		return
 	await _edit({"kind": "correct", "round": int(value), "current": _selected})
 
@@ -150,7 +150,7 @@ func _edit(input: Dictionary) -> void:
 	_busy = false
 	if _closed:
 		return
-	_outcome.text = str(result.value.get("message", "")) if result.ok else result.message
+	_show_result(result)
 	refresh()
 
 func _roll(kind: String) -> void:
@@ -176,13 +176,13 @@ func _poll() -> void:
 func _accept(result: SDK.DataResult) -> void:
 	if not result.ok:
 		if not _closed:
-			_outcome.text = result.message
+			_show_outcome(result.message, "error")
 		return
 	var value: Dictionary = result.value
 	if str(value.get("state", "error")) != "pending":
 		_roll_id = ""
 	if not _closed:
-		_outcome.text = str(value.get("message", ""))
+		_show_outcome(str(value.get("message", "")), str(value.get("state", "error")))
 		refresh()
 
 func _on_closed() -> void:
@@ -202,11 +202,11 @@ func _portrait() -> void:
 		return
 	var portrait := selected.file.read_portrait()
 	if not portrait.ok:
-		_outcome.text = portrait.message
+		_show_outcome(portrait.message, "error")
 		return
 	var result := await sdk.system_actions.submit("encounter.edit", {"revision": revision, "kind": "portrait", "actor": actor, "portrait": portrait.texture})
 	if not _closed:
-		_outcome.text = str(result.value.get("message", "")) if result.ok else result.message
+		_show_result(result)
 		refresh()
 
 func _mode(index: int) -> void:
@@ -247,3 +247,13 @@ func _show_selection() -> void:
 	get_node(^"Layout/Body/Content/Selected/RevealPortrait").visible = _suggested_portrait != null
 	if not selected.is_empty():
 		get_node(^"Layout/Body/Content/Selected/Name").text = str(selected.label)
+
+func _show_outcome(message: String, state: String) -> void:
+	_outcome.text = message
+	_outcome.theme_type_variation = "RookframeError" if state == "error" else "RookframePending" if state == "pending" else "RookframeSuccess"
+
+func _show_result(result: SDK.DataResult) -> void:
+	if result.ok:
+		_show_outcome(str(result.value.get("message", "")), str(result.value.get("state", "error")))
+	else:
+		_show_outcome(result.message, "error")

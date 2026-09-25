@@ -47,7 +47,7 @@ func refresh() -> void:
 
 func _layout() -> void:
 	var available := maxf(144, size.x - 144)
-	var desired := 32 + 76 * get_node(^"Panel/Layout/Scroll/Portraits").get_child_count()
+	var desired := 32 + 100 * get_node(^"Panel/Layout/Scroll/Portraits").get_child_count()
 	var width := minf(maxf(260, desired), minf(720, available))
 	get_node(^"Panel").offset_left = -width / 2
 	get_node(^"Panel").offset_right = width / 2
