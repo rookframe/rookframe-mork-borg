@@ -63,17 +63,17 @@ func _select(entry: SDK.ContentEntry, notify: bool = true) -> void:
 		row.set_selected(chosen)
 		row.focus_mode = 2 if chosen else 1
 	_refresh_tab_stop()
-	var definition: Dictionary = CREATURES.CORE_DEFINITIONS[_selected_id]
+	var definition: Dictionary = CREATURES.CORE_DEFINITIONS.get(_selected_id, {})
 	(get_node("Preview/Identity/Content/Title") as Label).text = entry.title.to_upper()
 	(get_node("Preview/Identity/Content/Portrait") as Control).visible = _selected_id == "seth-goblin"
-	(get_node("Preview/Stats/HitPoints/Content/Value") as Label).text = str(definition.hit_points)
-	var morale: Dictionary = definition.morale
-	(get_node("Preview/Stats/Morale/Content/Value") as Label).text = str(morale.value) if morale.kind == "fixed" else ("Special" if morale.kind == "special" else "—")
+	(get_node("Preview/Stats/HitPoints/Content/Value") as Label).text = str(definition.get("hit_points", 0))
+	var morale: Dictionary = definition.get("morale", {})
+	(get_node("Preview/Stats/Morale/Content/Value") as Label).text = str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else ("Special" if str(morale.get("kind", "")) == "special" else "—")
 	var attacks := ""
 	var attack_rows: Array = definition.get("attacks", [])
 	for raw in attack_rows:
 		var attack: Dictionary = raw
-		attacks += ("\n\n" if not attacks.is_empty() else "") + str(attack.name) + " · " + str(attack.dice)
+		attacks += ("\n\n" if not attacks.is_empty() else "") + str(attack.get("name", "")) + " · " + str(attack.get("dice", ""))
 	(get_node("Preview/Attacks/Content/Copy") as Label).text = attacks
 	if notify:
 		selected.emit(entry)
