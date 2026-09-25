@@ -59,8 +59,17 @@ func test_phone_tracker_advances_from_fixed_controls_and_player_strip_hides_priv
 	strip.sdk = sdk
 	viewport.add_child(strip)
 	await get_tree().process_frame
-	assert_int(strip.get_node("Panel/Layout/Scroll/Portraits").get_child_count()).is_equal(2)
-	assert_str(strip.get_node("Panel/Layout/Scroll/Portraits").get_child(1).get_node("Layout/Turn").text).is_equal("CURRENT")
+	assert_int(strip.get_node("Panel/Layout/Scroll/Entries").get_child_count()).is_equal(2)
+	assert_str(strip.get_node("Panel/Layout/Scroll/Entries").get_child(1).get_node("Layout/Turn").text).is_equal("CURRENT")
+
+	# Native BaseButton toggles before emitting pressed. Inspection must not
+	# replace the World-owned current-turn highlight with local button state.
+	var current_card: Button = strip.get_node("Panel/Layout/Scroll/Entries").get_child(1)
+	current_card.set_pressed_no_signal(false)
+	current_card.pressed.emit()
+	await get_tree().process_frame
+	assert_bool(strip.get_node("Panel/Layout/Scroll/Entries").get_child(1).button_pressed).is_true()
+	assert_str(host.world_data.encounter.current).is_equal("enemy")
 
 func after_test() -> void:
 	await get_tree().process_frame

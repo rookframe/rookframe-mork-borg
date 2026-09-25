@@ -376,8 +376,8 @@ transport, Prop, effect engine, resumption, Undo or GM takeover is introduced.
 
 The GM's Encounter rail entry manages a roster, group or individual initiative,
 round/current turn, previous/next, score and order corrections. Every Participant
-sees a horizontal portrait sequence while the encounter is active. Selecting an
-accessible portrait opens that Actor's sheet. Encounter guidance never gates an
+sees a horizontal sequence of miniature previews while the encounter is active. Selecting an
+accessible entry opens that Actor's sheet. Encounter guidance never gates an
 action or processes effects or fictional time.
 
 Group initiative requests one physical d6 (1–3 enemies, 4–6 PCs). Individual
@@ -395,12 +395,8 @@ pending tracker cancels its current requested Throw; returning opens current
 guidance. Restarted sessions do not resume actions. Raw Rolls and public outcomes
 remain in the Action Log; corrections change current values without replay.
 
-The tracker can explicitly reveal existing Creature artwork to everyone, or use
-a portrait from the Participant's internal file library. Without a revealed
-portrait, inaccessible Creatures use the public name and a neutral silhouette.
-The twelve Creature portraits are unchanged copies from
-`bevy-vtt/fixtures/packages/mork-borg-system/static/adversaries` at revision
-`d00a3f49e7587223501812976e86b9da20e0f7af`; no Props were created.
+The initiative display uses miniature previews. There is no separate portrait
+selection, reveal workflow, or stored portrait value.
 
 Rules source: Bare Bones, Violence/Initiative/Reactions/Morale and Wrat Wraith.
 Presentation follows the conventional roster/round/next-turn controls in

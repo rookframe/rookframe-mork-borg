@@ -49,10 +49,6 @@ func _edit(context: SDK.SystemActionContext, world: Dictionary, encounter: Dicti
 		var found_data: Dictionary = found.actor.data
 		entries.append({"actor": actor, "side": str(input.side), "initiative": null, "always_first": str(found_data.get("definition_id", "")) == "wrat-wraith"})
 		_sort(encounter)
-	elif kind == "portrait":
-		if index < 0 or not input.get("portrait") is Texture2D:
-			return error("Choose an image for this Actor's public portrait.")
-		selected["portrait"] = input.portrait
 	elif kind == "remove":
 		if index < 0:
 			return error("Choose an Actor in this encounter.")

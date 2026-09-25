@@ -4,7 +4,6 @@ const VIEW = preload(ROOT + "ui/encounter_view.gd")
 const ROW = preload(ROOT + "ui/encounter_row.tscn")
 var _state: Dictionary = {}
 var _selected := ""
-var _suggested_portrait: Texture2D
 var _roll_id := ""
 var _busy := false
 var _closed := false
@@ -30,8 +29,6 @@ func ready() -> void:
 	get_node(^"Layout/Body/Content/Selected/Position/Up").pressed.connect(_move.bind(-1))
 	get_node(^"Layout/Body/Content/Selected/Position/Down").pressed.connect(_move.bind(1))
 	get_node(^"Layout/Body/Content/Selected/Position/Remove").pressed.connect(_remove)
-	get_node(^"Layout/Body/Content/Selected/Portrait").pressed.connect(_portrait)
-	get_node(^"Layout/Body/Content/Selected/RevealPortrait").pressed.connect(_reveal_portrait)
 	get_node(^"Layout/Footer/Previous").pressed.connect(_previous)
 	get_node(^"Layout/Footer/Primary").pressed.connect(_primary)
 	get_node(^"Layout/Footer/End").pressed.connect(_end)
@@ -66,11 +63,11 @@ func refresh() -> void:
 		child.queue_free()
 	for raw_row in rows:
 		var row: Dictionary = raw_row
-		var portrait: Texture2D = row.portrait
+		var preview: Texture2D = row.preview
 		var label: String = row.label
 		var button: Button = ROW.instantiate()
 		roster.add_child(button)
-		(button.get_node("Layout/Portrait") as TextureRect).texture = portrait
+		(button.get_node("Layout/Preview") as TextureRect).texture = preview
 		(button.get_node("Layout/Name") as Label).text = label
 		(button.get_node("Layout/Score") as Label).text = ("CURRENT · " if row.active else "") + ("—" if row.initiative == null else str(row.initiative))
 		button.name = str(row.actor)
@@ -194,21 +191,6 @@ func _cancel() -> void:
 		await sdk.system_actions.submit("encounter.cancel", {"id": _roll_id})
 		_roll_id = ""
 
-func _portrait() -> void:
-	var actor := _selected
-	var revision: int = _state.revision
-	var selected := await sdk.files.user.select_file()
-	if not selected.ok or _closed:
-		return
-	var portrait := selected.file.read_portrait()
-	if not portrait.ok:
-		_show_outcome(portrait.message, "error")
-		return
-	var result := await sdk.system_actions.submit("encounter.edit", {"revision": revision, "kind": "portrait", "actor": actor, "portrait": portrait.texture})
-	if not _closed:
-		_show_result(result)
-		refresh()
-
 func _mode(index: int) -> void:
 	await _edit({"kind": "mode", "mode": "group" if index == 0 else "individual"})
 
@@ -223,9 +205,6 @@ func _previous() -> void:
 
 func _end() -> void:
 	await _edit({"kind": "end"})
-
-func _reveal_portrait() -> void:
-	await _edit({"kind": "portrait", "actor": _selected, "portrait": _suggested_portrait})
 
 func _visibility_changed() -> void:
 	if is_visible_in_tree():
@@ -243,8 +222,6 @@ func _show_selection() -> void:
 		var button := child as Button
 		button.set_pressed_no_signal(str(button.name) == _selected)
 	_details.visible = bool(_state.get("is_gm", false)) and not selected.is_empty()
-	_suggested_portrait = selected.get("suggested_portrait")
-	get_node(^"Layout/Body/Content/Selected/RevealPortrait").visible = _suggested_portrait != null
 	if not selected.is_empty():
 		get_node(^"Layout/Body/Content/Selected/Name").text = str(selected.label)
 

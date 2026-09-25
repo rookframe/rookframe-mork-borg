@@ -1,6 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 const VIEW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_view.gd")
-const CARD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_portrait.tscn")
+const CARD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_entry.tscn")
 const SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
 var _current := ""
 
@@ -18,18 +18,18 @@ func refresh() -> void:
 	if get_node(^"Panel").visible == false:
 		return
 	get_node(^"Panel/Layout/Round").text = "ROUND %d · %s" % [int(state.round), "GROUP INITIATIVE" if state.mode == "group" else "INITIATIVE"]
-	for child in get_node(^"Panel/Layout/Scroll/Portraits").get_children():
-		get_node(^"Panel/Layout/Scroll/Portraits").remove_child(child)
+	for child in get_node(^"Panel/Layout/Scroll/Entries").get_children():
+		get_node(^"Panel/Layout/Scroll/Entries").remove_child(child)
 		child.queue_free()
 	var current: Control
 	var rows: Array = state.rows
 	for raw_row in rows:
 		var row: Dictionary = raw_row
-		var portrait: Texture2D = row.portrait
+		var preview: Texture2D = row.preview
 		var label: String = row.label
 		var card: Button = CARD.instantiate()
-		get_node(^"Panel/Layout/Scroll/Portraits").add_child(card)
-		(card.get_node("Layout/Image") as TextureRect).texture = portrait
+		get_node(^"Panel/Layout/Scroll/Entries").add_child(card)
+		(card.get_node("Layout/Image") as TextureRect).texture = preview
 		(card.get_node("Layout/Name") as Label).text = label
 		(card.get_node("Layout/Turn") as Label).text = "CURRENT" if row.active else ("PC" if row.side == "pc" else "ENEMY")
 		card.set_pressed_no_signal(bool(row.active))
@@ -47,11 +47,12 @@ func refresh() -> void:
 
 func _layout() -> void:
 	var available := maxf(144, size.x - 144)
-	var desired := 32 + 100 * get_node(^"Panel/Layout/Scroll/Portraits").get_child_count()
+	var desired := 32 + 100 * get_node(^"Panel/Layout/Scroll/Entries").get_child_count()
 	var width := minf(maxf(260, desired), minf(720, available))
 	get_node(^"Panel").offset_left = -width / 2
 	get_node(^"Panel").offset_right = width / 2
 
 func _open(actor: String, allowed: bool) -> void:
+	refresh()
 	if allowed:
 		sdk.windows.open_actor(SHEET.window, SDK.ActorId.new(actor))

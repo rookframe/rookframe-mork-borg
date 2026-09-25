@@ -194,20 +194,6 @@ size_flags_horizontal = 3
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Set current turn"
 
-[node name="RevealPortrait" type="Button" parent="Layout/Body/Content/Selected"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Reveal Creature portrait to everyone"
-
-[node name="Portrait" type="Button" parent="Layout/Body/Content/Selected"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Choose portrait from my files"
-
 [node name="Rules" type="Label" parent="Layout/Body/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

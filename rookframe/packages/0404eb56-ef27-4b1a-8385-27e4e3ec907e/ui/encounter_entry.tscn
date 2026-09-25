@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="portrait"]
-[node name="Portrait" type="Button"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="preview"]
+[node name="Preview" type="Button"]
 custom_minimum_size = Vector2(96, 112)
 layout_mode = 2
 theme_type_variation = &"RookframeSecondaryButton"
@@ -21,7 +21,7 @@ custom_minimum_size = Vector2(0, 52)
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
-texture = ExtResource("portrait")
+texture = ExtResource("preview")
 expand_mode = 1
 stretch_mode = 6
 [node name="Name" type="Label" parent="Layout"]
