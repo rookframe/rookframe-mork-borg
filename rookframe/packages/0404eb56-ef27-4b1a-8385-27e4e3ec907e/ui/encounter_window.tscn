@@ -2,10 +2,9 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_window.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="theme"]
 [node name="Encounter" type="Control"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 theme = ExtResource("theme")
 script = ExtResource("script")
 [node name="Layout" type="VBoxContainer" parent="."]

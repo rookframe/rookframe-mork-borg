@@ -20,9 +20,14 @@ func test_phone_tracker_advances_from_fixed_controls_and_player_strip_hides_priv
 	add_child(viewport)
 	var window = auto_free(load(ROOT + "ui/encounter_window.tscn").instantiate())
 	window.sdk = sdk
-	viewport.add_child(window)
+	var task_slot := VBoxContainer.new()
+	viewport.add_child(task_slot)
+	task_slot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	task_slot.add_child(window)
 	await get_tree().process_frame
 	var primary: Button = window.get_node("Layout/Footer/Primary")
+	assert_float(window.size.y).is_equal(369.0)
+	assert_bool(primary.get_global_rect().end.y <= window.get_global_rect().end.y).is_true()
 	assert_bool(primary.size.y >= 44).is_true()
 	assert_bool(primary.get_global_rect().end.y <= 369).is_true()
 	assert_bool(window.get_node("Layout/Body").size.y < window.get_node("Layout/Body/Content").size.y).is_true()
