@@ -1,0 +1,64 @@
+extends GdUnitTestSuite
+const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
+
+func test_catalogue_has_core_choices_and_responsive_definition_preview() -> void:
+	var window = auto_free(load(ROOT + "ui/window.tscn").instantiate())
+	assert_bool(window.has_node("Layout/Body/Content/Catalogue")).override_failure_message("The approved Creature catalogue requires its selectable list and definition preview.").is_true()
+	if not window.has_node("Layout/Body/Content/Catalogue"):
+		return
+	var catalogue = window.get_node("Layout/Body/Content/Catalogue")
+	catalogue.owner = null
+	catalogue.get_parent().remove_child(catalogue)
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(960, 944)
+	add_child(viewport)
+	viewport.add_child(auto_free(catalogue))
+	var entries: Array[SDK.ContentEntry] = []
+	for id in CREATURES.CORE_DEFINITIONS:
+		entries.append(SDK.ContentEntry.new({"packageId": "system", "localId": id, "displayName": CREATURES.CORE_DEFINITIONS[id].display_name, "type": "actor_definition", "available": true}))
+	catalogue.configure(entries, "seth-goblin")
+	catalogue.size = Vector2(912, 650)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var rows = catalogue.get_node("List/Content/DefinitionList").get_children()
+	assert_int(rows.size()).is_equal(12)
+	assert_bool(catalogue.vertical).is_false()
+	assert_str(catalogue.get_node("Preview/Identity/Content/Title").text).is_equal("SETH, GOBLIN")
+	assert_str(catalogue.get_node("Preview/Stats/HitPoints/Content/Value").text).is_equal("6")
+	assert_str(catalogue.get_node("Preview/Stats/Morale/Content/Value").text).is_equal("7")
+	var chosen = rows.filter(func(row): return row.get_meta("definition_id") == "seth-goblin")[0]
+	assert_bool(chosen.button_pressed).is_true()
+	assert_bool(chosen.size.y >= 44).is_true()
+	var selections: Array = []
+	catalogue.selected.connect(func(entry): selections.append(entry))
+	chosen.grab_focus()
+	catalogue.configure(entries, "seth-goblin")
+	assert_bool(chosen.has_focus()).is_true()
+	assert_int(selections.size()).is_equal(0)
+	chosen.pressed.emit()
+	assert_int(selections.size()).is_equal(1)
+	assert_str(chosen.get_node("Content/State").text).is_equal("Selected")
+	var key := InputEventKey.new()
+	key.pressed = true
+	key.keycode = KEY_END
+	catalogue._row_input(key, chosen)
+	assert_str(catalogue.selection().reference.local_id).is_equal("zukuma-berserker")
+	assert_bool(rows[-1].has_focus()).is_true()
+	key.keycode = KEY_HOME
+	catalogue._row_input(key, rows[-1])
+	assert_str(catalogue.selection().reference.local_id).is_equal("aland-wickhead")
+	assert_bool(rows[0].has_focus()).is_true()
+	catalogue.filter("troll")
+	assert_int(rows.filter(func(row): return row.visible).size()).is_equal(1)
+	assert_int(rows.filter(func(row): return row.visible and row.focus_mode == 2).size()).is_equal(1)
+	assert_str(catalogue.selection().reference.local_id).is_equal("aland-wickhead")
+	catalogue.filter("")
+	assert_int(rows[0].focus_mode).is_equal(2)
+	catalogue.size = Vector2(351, 260)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(catalogue.vertical).is_true()
+	assert_bool(catalogue.get_node("Preview").size.x <= 351).is_true()
+	assert_int(CREATURES.CORE_DEFINITIONS["seth-goblin"].hit_points).is_equal(6)

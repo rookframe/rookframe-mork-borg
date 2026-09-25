@@ -1,0 +1,94 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_catalogue.gd" id="1"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/portraits/seth-goblin.png" id="2"]
+[node name="Catalogue" type="BoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+script = ExtResource("1")
+[node name="List" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.3
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="List"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Heading" type="Label" parent="List/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+text = "CATALOGUE"
+[node name="DefinitionList" type="VBoxContainer" parent="List/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+[node name="Preview" type="VBoxContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+[node name="Identity" type="PanelContainer" parent="Preview"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="Preview/Identity"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Title" type="Label" parent="Preview/Identity/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+autowrap_mode = 2
+[node name="Portrait" type="TextureRect" parent="Preview/Identity/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 200)
+texture = ExtResource("2")
+expand_mode = 1
+stretch_mode = 6
+[node name="Stats" type="HBoxContainer" parent="Preview"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="HitPoints" type="PanelContainer" parent="Preview/Stats"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Preview/Stats/HitPoints"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Preview/Stats/HitPoints/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+text = "HP"
+[node name="Value" type="Label" parent="Preview/Stats/HitPoints/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+[node name="Morale" type="PanelContainer" parent="Preview/Stats"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeInsetSurface"
+[node name="Content" type="VBoxContainer" parent="Preview/Stats/Morale"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Label" type="Label" parent="Preview/Stats/Morale/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+text = "MORALE"
+[node name="Value" type="Label" parent="Preview/Stats/Morale/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeValue"
+[node name="Attacks" type="PanelContainer" parent="Preview"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+[node name="Content" type="VBoxContainer" parent="Preview/Attacks"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Heading" type="Label" parent="Preview/Attacks/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+text = "ATTACKS"
+[node name="Copy" type="Label" parent="Preview/Attacks/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+autowrap_mode = 2
+[node name="Help" type="Label" parent="Preview"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+text = "Create a private Creature sheet, then choose its public name."
+autowrap_mode = 2

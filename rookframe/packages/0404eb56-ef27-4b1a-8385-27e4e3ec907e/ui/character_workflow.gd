@@ -117,8 +117,7 @@ var _route_inventory: Button
 @onready var _body := get_node(^"Layout/Body") as ScrollContainer
 @onready var _content := get_node(^"Layout/Body/Content") as VBoxContainer
 @onready var _search = get_node(^"Layout/Body/Content/Search")
-@onready var _definition_heading := get_node(^"Layout/Body/Content/DefinitionHeading") as Label
-@onready var _definition_list := get_node(^"Layout/Body/Content/DefinitionList") as VBoxContainer
+@onready var _catalogue = get_node(^"Layout/Body/Content/Catalogue")
 @onready var _live_heading := get_node(^"Layout/Body/Content/LiveHeading") as Label
 @onready var _live_list := get_node(^"Layout/Body/Content/LiveList") as VBoxContainer
 @onready var _public_heading := get_node(^"Layout/Body/Content/PublicHeading") as Label
@@ -169,8 +168,7 @@ func character_setup() -> void:
 	_content = get_node(^"Layout/Body/Content") as VBoxContainer
 	_routes = get_node(^"Layout/Header/Routes") as Control
 	_search = get_node(^"Layout/Body/Content/Search")
-	_definition_heading = get_node(^"Layout/Body/Content/DefinitionHeading") as Label
-	_definition_list = get_node(^"Layout/Body/Content/DefinitionList") as VBoxContainer
+	_catalogue = get_node(^"Layout/Body/Content/Catalogue")
 	_live_heading = get_node(^"Layout/Body/Content/LiveHeading") as Label
 	_live_list = get_node(^"Layout/Body/Content/LiveList") as VBoxContainer
 	_public_heading = get_node(^"Layout/Body/Content/PublicHeading") as Label
@@ -335,8 +333,7 @@ func character_show_route(route: String) -> void:
 	_clear_character_content()
 	var creation := route.begins_with("create-")
 	_set_search_visible(false)
-	_definition_heading.visible = false
-	_definition_list.visible = false
+	_catalogue.visible = false
 	_live_heading.visible = false
 	_live_list.visible = false
 	_public_heading.visible = false

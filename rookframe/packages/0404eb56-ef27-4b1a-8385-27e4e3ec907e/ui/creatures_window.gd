@@ -85,6 +85,7 @@ func ready() -> void:
 		button.focus_mode = 2
 
 	_search.value_changed.connect(_filter_definitions)
+	_catalogue.selected.connect(_select_definition)
 	_route_creatures.pressed.connect(_on_creatures_route)
 	_route_creature.pressed.connect(_on_creature_route)
 	_route_edit.pressed.connect(_on_edit_route)
@@ -187,19 +188,11 @@ func _reload_world() -> void:
 
 
 func _render_definitions() -> void:
-	for child in _definition_list.get_children():
-		child.queue_free()
-	for entry in _definitions:
-		if ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character", "wretched-royalty-character", "heretical-priest-character", "occult-herbmaster-character"].has(entry.reference.local_id):
-			continue
-		var button := Button.new()
-		button.text = entry.title
-		button.custom_minimum_size = Vector2(0, 44)
-		button.focus_mode = 2
-		button.alignment = 0
-		button.theme_type_variation = "RookframeSecondaryButton"
-		button.pressed.connect(_select_definition.bind(entry))
-		_definition_list.add_child(button)
+	_catalogue.configure(_definitions, _selected_definition.reference.local_id if _selected_definition != null else "")
+	_selected_definition = _catalogue.selection()
+	_create_button.disabled = _selected_definition == null
+	_catalogue_create.disabled = _selected_definition == null
+	_filter_definitions(str(_search.get("value")))
 
 
 func _render_live_actors() -> void:
@@ -477,6 +470,10 @@ func _apply_route(route: String) -> void:
 	_preserve_error = false
 	_route = route
 	var catalogue := route == "creatures"
+	_layout.offset_left = (12.0 if _compact else 24.0) if catalogue else 6.0
+	_layout.offset_right = -_layout.offset_left
+	_layout.offset_top = 16.0 if catalogue and not _compact else 0.0
+	_header_title.theme_type_variation = "RookframeTitle" if catalogue else "RookframeHeading"
 	var sheet := route == "creature"
 	var edit := route == "edit-creature"
 	var inventory := route in ["creature-inventory", "creature-catalogue", "creature-item", "creature-custom"]
@@ -497,8 +494,7 @@ func _apply_route(route: String) -> void:
 	_catalogue_character.visible = catalogue and _character_definition != null
 	_detail.visible = sheet or edit or inventory
 	_set_search_visible(catalogue)
-	_definition_heading.visible = catalogue
-	_definition_list.visible = catalogue
+	_catalogue.visible = catalogue
 	_live_heading.visible = catalogue and not _actors.is_empty()
 	_live_list.visible = catalogue and not _actors.is_empty()
 	_public_heading.visible = false
@@ -522,7 +518,7 @@ func _apply_route(route: String) -> void:
 	_back_button.text = "Cancel"
 	if catalogue:
 		_header_title.text = "CREATURES"
-		_header_subtitle.text = "Immutable definitions · private Actors"
+		_header_subtitle.text = "MÖRK BORG · 12 definitions"
 		_set_window_title("CREATURES")
 		_header_title.visible = not _compact
 		_header_subtitle.visible = not _compact
@@ -545,12 +541,15 @@ func _apply_route(route: String) -> void:
 func _show_character_route(route: String) -> void:
 	if sdk == null:
 		return
+	_layout.offset_left = 6.0
+	_layout.offset_right = -6.0
+	_layout.offset_top = 0.0
+	_header_title.theme_type_variation = "RookframeHeading"
 	_route = route
 	_preserve_error = false
 	_routes.visible = false
 	_set_search_visible(false)
-	_definition_heading.visible = false
-	_definition_list.visible = false
+	_catalogue.visible = false
 	_live_heading.visible = false
 	_live_list.visible = false
 	_public_heading.visible = false
@@ -576,12 +575,8 @@ func _on_inventory_route() -> void:
 	_show_route("creature-inventory")
 
 
-func _filter_definitions(_query: String) -> void:
-	var query := str(_search.get("value")).strip_edges().to_lower()
-	for child in _definition_list.get_children():
-		var button := child as Button
-		if button != null:
-			button.visible = query.is_empty() or button.text.to_lower().contains(query)
+func _filter_definitions(query: String) -> void:
+	_catalogue.filter(query)
 
 
 func _create_creature() -> void:

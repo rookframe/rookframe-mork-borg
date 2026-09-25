@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creatures_window.gd" id="2_script"]
@@ -15,6 +15,8 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.tscn" id="10_attack"]
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_defence_flow.tscn" id="11_defence"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_catalogue.tscn" id="13_catalogue"]
 
 [sub_resource type="StyleBoxFlat" id="CharacterTabSelected"]
 content_margin_left = 12.0
@@ -232,15 +234,8 @@ label_text = "SEARCH CREATURES"
 show_label = false
 placeholder = "Search creatures…"
 
-[node name="DefinitionHeading" type="Label" parent="Layout/Body/Content"]
+[node name="Catalogue" parent="Layout/Body/Content" instance=ExtResource("13_catalogue")]
 layout_mode = 2
-theme_type_variation = &"RookframeSubtitle"
-text = "CATALOGUE"
-
-[node name="DefinitionList" type="VBoxContainer" parent="Layout/Body/Content"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
 
 [node name="LiveHeading" type="Label" parent="Layout/Body/Content"]
 layout_mode = 2
