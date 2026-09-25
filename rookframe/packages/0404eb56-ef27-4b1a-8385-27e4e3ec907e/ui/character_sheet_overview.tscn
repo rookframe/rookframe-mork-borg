@@ -74,6 +74,12 @@ theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit HP"
 
+[node name="Error" type="Label" parent="Resources/HitPoints/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
 [node name="Omens" type="PanelContainer" parent="Resources"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -119,6 +125,12 @@ theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit OMENS"
+
+[node name="Error" type="Label" parent="Resources/Omens/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
 
 [node name="Silver" type="PanelContainer" parent="Resources"]
 layout_mode = 2
@@ -166,9 +178,17 @@ theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit SILVER"
 
-[node name="Body" type="BoxContainer" parent="."]
+[node name="Error" type="Label" parent="Resources/Silver/Content"]
 layout_mode = 2
-theme_override_constants/separation = 16
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Body" type="GridContainer" parent="."]
+layout_mode = 2
+theme_override_constants/h_separation = 20
+theme_override_constants/v_separation = 20
+columns = 2
 
 [node name="Attributes" type="PanelContainer" parent="Body"]
 layout_mode = 2
@@ -252,6 +272,12 @@ theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Agility"
 
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
 [node name="Presence" type="PanelContainer" parent="Body/Attributes/Content/Abilities"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -311,6 +337,12 @@ theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Presence"
+
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
 
 [node name="Strength" type="PanelContainer" parent="Body/Attributes/Content/Abilities"]
 layout_mode = 2
@@ -372,6 +404,12 @@ theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Strength"
 
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
 [node name="Toughness" type="PanelContainer" parent="Body/Attributes/Content/Abilities"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -432,44 +470,48 @@ theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 icon = ExtResource("2")
 tooltip_text = "Edit Toughness"
 
-[node name="Context" type="VBoxContainer" parent="Body"]
+[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content"]
+layout_mode = 2
+visible = false
+theme_type_variation = &"RookframeError"
+autowrap_mode = 2
+
+[node name="Combat" type="PanelContainer" parent="Body"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
-
-[node name="Combat" type="PanelContainer" parent="Body/Context"]
-layout_mode = 2
+size_flags_vertical = 0
 theme_type_variation = &"RookframeSection"
 
-[node name="Content" type="VBoxContainer" parent="Body/Context/Combat"]
+[node name="Content" type="VBoxContainer" parent="Body/Combat"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="Title" type="Label" parent="Body/Context/Combat/Content"]
+[node name="Title" type="Label" parent="Body/Combat/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 theme_override_font_sizes/font_size = 14
 text = "COMBAT"
 
-[node name="Equipment" type="Label" parent="Body/Context/Combat/Content"]
+[node name="Equipment" type="Label" parent="Body/Combat/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
 
-[node name="Identity" type="PanelContainer" parent="Body/Context"]
+[node name="Identity" type="PanelContainer" parent="Body"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
 theme_type_variation = &"RookframeSection"
 
-[node name="Content" type="VBoxContainer" parent="Body/Context/Identity"]
+[node name="Content" type="VBoxContainer" parent="Body/Identity"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Header" type="HBoxContainer" parent="Body/Context/Identity/Content"]
+[node name="Header" type="HBoxContainer" parent="Body/Identity/Content"]
 layout_mode = 2
 
-
-[node name="Title" type="Label" parent="Body/Context/Identity/Content/Header"]
+[node name="Title" type="Label" parent="Body/Identity/Content/Header"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 theme_override_font_sizes/font_size = 16
@@ -477,7 +519,7 @@ text = "CHARACTER PROFILE"
 autowrap_mode = 2
 size_flags_horizontal = 3
 
-[node name="Edit" type="Button" parent="Body/Context/Identity/Content/Header"]
+[node name="Edit" type="Button" parent="Body/Identity/Content/Header"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeQuietButton"
@@ -486,107 +528,133 @@ theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 text = "Edit sheet"
 
-[node name="Description" type="Label" parent="Body/Context/Identity/Content"]
+[node name="Description" type="Label" parent="Body/Identity/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 16
 text = ""
 autowrap_mode = 2
 
-[node name="Origin" type="Label" parent="Body/Context/Identity/Content"]
+[node name="Origin" type="Label" parent="Body/Identity/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14
 text = "No Class"
 autowrap_mode = 2
 
-[node name="Companions" type="Button" parent="Body/Context"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "View companions"
-
-[node name="Traits" type="Label" parent="Body/Context/Identity/Content"]
+[node name="Traits" type="Label" parent="Body/Identity/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
 
-[node name="OmensAction" type="Button" parent="."]
+[node name="ClassActions" type="VBoxContainer" parent="Body/Identity/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Context" type="VBoxContainer" parent="Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+
+[node name="Powers" type="PanelContainer" parent="Body/Context"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+
+[node name="Content" type="VBoxContainer" parent="Body/Context/Powers"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Body/Context/Powers/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+theme_override_font_sizes/font_size = 14
+text = "POWERS & SCROLLS"
+
+[node name="Row" type="HBoxContainer" parent="Body/Context/Powers/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Summary" type="Label" parent="Body/Context/Powers/Content/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+
+[node name="PowersAction" type="Button" parent="Body/Context/Powers/Content/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "View"
+
+[node name="CompanionsSection" type="PanelContainer" parent="Body/Context"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+
+[node name="Content" type="VBoxContainer" parent="Body/Context/CompanionsSection"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Body/Context/CompanionsSection/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+theme_override_font_sizes/font_size = 14
+text = "COMPANIONS"
+
+[node name="Row" type="HBoxContainer" parent="Body/Context/CompanionsSection/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Summary" type="Label" parent="Body/Context/CompanionsSection/Content/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+
+[node name="Companions" type="Button" parent="Body/Context/CompanionsSection/Content/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframeSecondaryButton"
+text = "View"
+
+[node name="AtTable" type="PanelContainer" parent="Body/Context"]
+layout_mode = 2
+theme_type_variation = &"RookframeSection"
+
+[node name="Content" type="VBoxContainer" parent="Body/Context/AtTable"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Title" type="Label" parent="Body/Context/AtTable/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeHeading"
+theme_override_font_sizes/font_size = 14
+text = "AT THE TABLE"
+
+[node name="HealthActions" type="HFlowContainer" parent="Body/Context/AtTable/Content"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="OmensAction" type="Button" parent="Body/Context/AtTable/Content/HealthActions"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Spend Omen"
 
-[node name="Error" type="Label" parent="Resources/HitPoints/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="Error" type="Label" parent="Resources/Omens/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="Error" type="Label" parent="Resources/Silver/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Agility/Padding/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Presence/Padding/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Strength/Padding/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="Error" type="Label" parent="Body/Attributes/Content/Abilities/Toughness/Padding/Content"]
-layout_mode = 2
-visible = false
-theme_type_variation = &"RookframeError"
-autowrap_mode = 2
-
-[node name="PowersAction" type="Button" parent="."]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Powers & scrolls"
-
-[node name="ClassActions" type="VBoxContainer" parent="Body/Context/Identity/Content"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="HealthActions" type="VBoxContainer" parent="."]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="rest" type="Button" parent="HealthActions"]
+[node name="rest" type="Button" parent="Body/Context/AtTable/Content/HealthActions"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Rest"
 
-[node name="improve" type="Button" parent="HealthActions"]
+[node name="improve" type="Button" parent="Body/Context/AtTable/Content/HealthActions"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Getting better"
 
-[node name="broken" type="Button" parent="HealthActions"]
+[node name="broken" type="Button" parent="Body/Context/AtTable/Content/HealthActions"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"

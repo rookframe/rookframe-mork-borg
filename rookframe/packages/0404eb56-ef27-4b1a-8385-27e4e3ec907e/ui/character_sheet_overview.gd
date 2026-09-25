@@ -18,12 +18,12 @@ var _short_window := false
 
 func _ready() -> void:
 	for route in ["rest", "improve", "broken"]:
-		get_node("HealthActions/" + route).pressed.connect(_open_action.bind(route, ""))
-	get_node(^"Body/Context/Companions").pressed.connect(_open_companions)
+		get_node("Body/Context/AtTable/Content/HealthActions/" + route).pressed.connect(_open_action.bind(route, ""))
+	get_node(^"Body/Context/CompanionsSection/Content/Row/Companions").pressed.connect(_open_companions)
 	resized.connect(_layout)
-	get_node(^"OmensAction").pressed.connect(_open_omens)
-	get_node(^"PowersAction").pressed.connect(_open_powers)
-	get_node(^"Body/Context/Identity/Content/Header/Edit").pressed.connect(_edit)
+	get_node(^"Body/Context/AtTable/Content/HealthActions/OmensAction").pressed.connect(_open_omens)
+	get_node(^"Body/Context/Powers/Content/Row/PowersAction").pressed.connect(_open_powers)
+	get_node(^"Body/Identity/Content/Header/Edit").pressed.connect(_edit)
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
@@ -35,10 +35,10 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 	_short_window = short_window
 	_data = data
 	var read_only: bool = data.get("read_only", false)
-	for button in get_node(^"HealthActions").get_children():
+	for button in get_node(^"Body/Context/AtTable/Content/HealthActions").get_children():
 		(button as Button).disabled = read_only
-	get_node(^"Body/Context/Identity/Content/Header/Edit").disabled = read_only
-	get_node(^"OmensAction").disabled = read_only
+	get_node(^"Body/Identity/Content/Header/Edit").disabled = read_only
+	get_node(^"Body/Context/AtTable/Content/HealthActions/OmensAction").disabled = read_only
 	for resource in ["HitPoints", "Omens", "Silver"]:
 		get_node("Resources/" + resource + "/Content/Row/Edit").disabled = read_only
 	get_node(^"Resources/HitPoints/Content/Row/Value").text = "%s / %s" % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
@@ -56,13 +56,13 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 		button.disabled = read_only or not pending.is_empty()
 		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").disabled = read_only
 		button.accessibility_name = "Waiting for %s Throw" % ability if pending == ability else "Roll %s %s" % [ability, button.text]
-	get_node(^"Body/Context/Identity/Content/Description").text = str(data.get("description", ""))
-	get_node(^"Body/Context/Identity/Content/Origin").text = str(data.get("class_title", "No Class")) + "\n" + str(data.get("origin", ""))
+	get_node(^"Body/Identity/Content/Description").text = str(data.get("description", ""))
+	get_node(^"Body/Identity/Content/Origin").text = str(data.get("class_title", "No Class")) + "\n" + str(data.get("origin", ""))
 	var rules := ""
 	var class_rules: Array = data.get("class_rules", [])
 	for rule in class_rules:
 		rules += str(rule) + "\n"
-	var actions := get_node(^"Body/Context/Identity/Content/ClassActions")
+	var actions := get_node(^"Body/Identity/Content/ClassActions")
 	for child in actions.get_children():
 		actions.remove_child(child)
 		child.queue_free()
@@ -75,26 +75,30 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 		if not trait_data.has("item") and not RULES.new().definition(key).is_empty():
 			_action_row(actions, str(trait_data.get("name", key)), str(trait_data.get("rules", "")), "use-item", "feature:" + key, read_only)
 		rules += str(trait_data.get("name", "")) + "\n" + str(trait_data.get("rules", "")) + "\n"
-	get_node(^"Body/Context/Identity/Content/Traits").text = rules.strip_edges()
+	get_node(^"Body/Identity/Content/Traits").text = rules.strip_edges()
 	var companions: Array = data.get("starting_creature_grants", [])
-	get_node(^"Body/Context/Companions").visible = true
+	get_node(^"Body/Context/CompanionsSection/Content/Row/Companions").visible = true
 	var descriptions: Array = data.get("companion_sheets", [])
-	get_node(^"Body/Context/Companions").text = "View companions (%d)" % (companions.size() + descriptions.size())
+	get_node(^"Body/Context/CompanionsSection/Content/Row/Summary").text = "%d companions\nIndividual Creature sheets" % (companions.size() + descriptions.size())
 	var equipped := ""
 	var inventory: Array = data.get("inventory", [])
+	var scrolls := 0
 	for entry in inventory:
 		var item: Dictionary = entry
+		if str(item.get("kind", "")) == "Scroll":
+			scrolls += 1
 		var is_equipped: bool = item.get("equipped", false)
 		if is_equipped:
 			equipped += ("\n" if not equipped.is_empty() else "") + str(item.get("name", "Item"))
-	get_node(^"Body/Context/Combat/Content/Equipment").text = equipped if not equipped.is_empty() else "No equipment equipped."
+	get_node(^"Body/Combat/Content/Equipment").text = equipped if not equipped.is_empty() else "No equipment equipped."
+	get_node(^"Body/Context/Powers/Content/Row/Summary").text = "%d scrolls\n%d daily uses remain" % [scrolls, int(data.get("power_uses", 0))]
 	_layout()
 
 
 func _layout() -> void:
 	var compact := size.x < 600
 	var short := compact and _short_window
-	get_node(^"Body").vertical = compact
+	get_node(^"Body").columns = 1 if compact else 2
 	get_node(^"Body/Attributes").theme_type_variation = "RookframePackageInk" if short else "RookframeSection"
 	get_node(^"Body/Attributes/Content/Heading").visible = not short
 	get_node(^"Body/Attributes/Content/Abilities").columns = 2 if short else 1

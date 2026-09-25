@@ -177,3 +177,36 @@ func _check_live_refresh(host: RefCounted) -> void:
 
 func after_test() -> void:
 	await get_tree().process_frame
+
+
+func test_overview_groups_actions_in_responsive_sections() -> void:
+	var overview = auto_free(load(ROOT + "ui/character_sheet_overview.tscn").instantiate())
+	assert_bool(overview.has_node("Body/Context/AtTable/Content/HealthActions")).override_failure_message("Character actions belong to their approved sections, not full-width root buttons.").is_true()
+	if not overview.has_node("Body/Context/AtTable/Content/HealthActions"):
+		return
+	overview.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(960, 944)
+	add_child(viewport)
+	viewport.add_child(overview)
+	overview.configure({"class_title": "No Class", "power_uses": 3}, [])
+	overview.size = Vector2(912, 800)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var profile: Control = overview.get_node("Body/Identity")
+	var attributes: Control = overview.get_node("Body/Attributes")
+	assert_bool(profile.get_global_rect().position.y >= attributes.get_global_rect().end.y).is_true()
+	assert_bool(overview.get_node("Body/Context/Powers").get_global_rect().position.x > profile.get_global_rect().position.x).is_true()
+	var opened: Array = []
+	overview.navigate_requested.connect(func(route, item): opened.append(route))
+	overview.get_node("Body/Context/AtTable/Content/HealthActions/rest").pressed.emit()
+	assert_array(opened).is_equal(["rest"])
+	overview.size = Vector2(351, 800)
+	overview.configure({}, [], true)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_int(overview.get_node("Body").columns).is_equal(1)
+	var actions: Control = overview.get_node("Body/Context/AtTable/Content/HealthActions")
+	for button in actions.get_children():
+		assert_bool(button.size.y >= 44).is_true()
+		assert_bool(actions.get_global_rect().encloses(button.get_global_rect())).is_true()

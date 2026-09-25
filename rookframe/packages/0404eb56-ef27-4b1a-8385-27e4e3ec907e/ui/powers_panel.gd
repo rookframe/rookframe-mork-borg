@@ -197,5 +197,8 @@ func _status(text: String, error: bool = false) -> void:
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if error else "RookframeMeta"
 
 func _layout() -> void:
-	get_node(^"Metrics").columns = 2 if size.x < 480 or not get_node(^"Metrics/Difficulty").visible else 3
+	get_node(^"Metrics").columns = 2 if not get_node(^"Metrics/Difficulty").visible else 3
 	get_node(^"Cast/Columns").vertical = size.x < 600
+	for metric in ["Uses", "Presence", "Difficulty"]:
+		get_node("Metrics/" + metric + "/Content/Label").set("theme_override_font_sizes/font_size", 12 if size.x < 600 else 16)
+		get_node("Metrics/" + metric + "/Content/Value").set("theme_override_font_sizes/font_size", 24 if size.x < 600 else 28)

@@ -37,6 +37,7 @@ func ready() -> void:
 		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
 		return
 	character_setup()
+	resized.connect(_configure_surface_spacing)
 	_creature_defence.changed.connect(_creature_defence_changed)
 	_creature_defence.resolved.connect(_creature_defence_resolved)
 	_creature_defence.decision_closed.connect(_creature_decision_closed)
@@ -471,9 +472,7 @@ func _apply_route(route: String) -> void:
 	_preserve_error = false
 	_route = route
 	var catalogue := route == "creatures"
-	_layout.offset_left = (12.0 if _compact else 24.0) if catalogue else 6.0
-	_layout.offset_right = -_layout.offset_left
-	_layout.offset_top = 16.0 if catalogue and not _compact else 0.0
+	_configure_surface_spacing()
 	_header_title.theme_type_variation = "RookframeTitle" if catalogue else "RookframeHeading"
 	var sheet := route == "creature"
 	var edit := route == "edit-creature"
@@ -542,9 +541,7 @@ func _apply_route(route: String) -> void:
 func _show_character_route(route: String) -> void:
 	if sdk == null:
 		return
-	_layout.offset_left = 6.0
-	_layout.offset_right = -6.0
-	_layout.offset_top = 0.0
+	_configure_surface_spacing()
 	_header_title.theme_type_variation = "RookframeHeading"
 	_route = route
 	_preserve_error = false
@@ -1016,3 +1013,12 @@ func _creature_defence_resolved() -> void:
 
 func _creature_decision_closed() -> void:
 	get_node(^"Layout/SheetActions/Back").grab_focus()
+
+
+func _configure_surface_spacing() -> void:
+	var compact := size.x < 600
+	_layout.offset_left = 12.0 if compact else 24.0
+	_layout.offset_right = -_layout.offset_left
+	_layout.offset_top = 0.0 if compact else 16.0
+	_layout.offset_bottom = -6.0 if compact else -8.0
+	_layout.add_theme_constant_override("separation", 8 if compact else 20)

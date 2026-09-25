@@ -485,8 +485,8 @@ func test_companions_projection() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var overview = sheet.find_child("CharacterOverview", true, false)
-	_check(overview.get_node("Body/Context/Identity/Content/Traits").text.contains("Ancient gore-hound"), "The completed sheet projects the actual feature.")
-	overview.get_node("Body/Context/Companions").pressed.emit()
+	_check(overview.get_node("Body/Identity/Content/Traits").text.contains("Ancient gore-hound"), "The completed sheet projects the actual feature.")
+	overview.get_node("Body/Context/CompanionsSection/Content/Row/Companions").pressed.emit()
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var companion_view = sheet.find_child("Companions", true, false)
