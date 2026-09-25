@@ -1,7 +1,6 @@
 extends Resource
 ## Participant-local view state shared by this Package's authored controls.
 signal updated
-var session_id := ""
 var selected_rook := ""
 var options := false
 var panel_visible := false
@@ -33,8 +32,3 @@ func panel_bounds(value: Rect2) -> void:
 	if panel_rect != value:
 		panel_rect = value
 		updated.emit()
-
-func activate(session: String) -> void:
-	if session_id != session:
-		reset()
-		session_id = session

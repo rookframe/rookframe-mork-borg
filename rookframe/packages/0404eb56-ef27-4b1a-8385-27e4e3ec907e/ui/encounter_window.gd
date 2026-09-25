@@ -2,7 +2,8 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const RULES = preload(ROOT + "logic/encounter_authority.gd")
 const VIEW = preload(ROOT + "ui/encounter_view.gd")
-const LOCAL = preload(ROOT + "ui/encounter_local.tres")
+const LOCAL_STATE = preload(ROOT + "ui/encounter_local.gd")
+var _local: LOCAL_STATE
 var _state: Dictionary = {}
 var _selected: Dictionary = {}
 var _roll_id := ""
@@ -17,6 +18,7 @@ var _closed := false
 func ready() -> void:
 	if sdk == null:
 		return
+	_local = VIEW.new().local_state(self)
 	sdk.windows.set_title("Encounter")
 	closed.connect(_on_closed)
 	visibility_changed.connect(_visibility_changed)
@@ -24,9 +26,9 @@ func ready() -> void:
 	var current := sdk.rooks.selected()
 	_tabletop_rook = "" if current == null else current.value
 	sdk.rooks.selection_changed.connect(_tabletop_selection)
-	LOCAL.updated.connect(refresh)
+	_local.updated.connect(refresh)
 	item_rect_changed.connect(_bounds_changed)
-	LOCAL.panel_changed(is_visible_in_tree())
+	_local.panel_changed(is_visible_in_tree())
 	(get_node(^"Layout/Body/Content/Sides/Players") as Button).pressed.connect(_side.bind("pc"))
 	(get_node(^"Layout/Body/Content/Sides/Monsters") as Button).pressed.connect(_side.bind("enemy"))
 	(get_node(^"Layout/Body/Content/Sides/Roll") as Button).pressed.connect(_roll.bind("group"))
@@ -66,7 +68,7 @@ func refresh() -> void:
 	_selected = {}
 	for raw in rows:
 		var row: Dictionary = raw
-		if row.rook == (_pending_rook if not _roll_id.is_empty() else LOCAL.selected_rook):
+		if row.rook == (_pending_rook if not _roll_id.is_empty() else _local.selected_rook):
 			_selected = row
 	if _selected.is_empty() and not rows.is_empty():
 		_selected = rows[0]
@@ -80,8 +82,8 @@ func refresh() -> void:
 		for name in ["Reaction", "Morale"]:
 			(get_node("Layout/Body/Content/Selected/Actions/" + name) as Button).disabled = pending or not _selected.available
 	var options := get_node(^"Layout/Body/Content/Options") as Control
-	var opening := LOCAL.options and not options.visible
-	options.visible = LOCAL.options and _state.is_gm and _state.active
+	var opening := _local.options and not options.visible
+	options.visible = _local.options and _state.is_gm and _state.active
 	var round_value := get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit
 	if not round_value.has_focus():
 		round_value.text = str(maxi(1, int(_state.round)))
@@ -126,7 +128,7 @@ func _edit(input: Dictionary) -> void:
 	else:
 		_outcome.visible = false
 		if str(request.kind) == "end":
-			LOCAL.hide_options()
+			_local.hide_options()
 	refresh()
 
 func _roll(kind: String) -> void:
@@ -165,7 +167,7 @@ func _accept(result: SDK.DataResult) -> void:
 
 func _on_closed() -> void:
 	_closed = true
-	LOCAL.panel_changed(false)
+	_local.panel_changed(false)
 	await _cancel()
 
 func _cancel() -> void:
@@ -175,7 +177,7 @@ func _cancel() -> void:
 		_show_outcome("Throw ended.", "ended")
 
 func _visibility_changed() -> void:
-	LOCAL.panel_changed(is_visible_in_tree())
+	_local.panel_changed(is_visible_in_tree())
 	if is_visible_in_tree():
 		sdk.windows.set_title("Encounter")
 		_closed = false
@@ -197,7 +199,7 @@ func _show_outcome(message: String, state: String) -> void:
 func _options_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		(get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit).accept_event()
-		LOCAL.hide_options()
+		_local.hide_options()
 		refresh()
 		_primary_button.grab_focus()
 
@@ -207,4 +209,4 @@ func _process(_delta: float) -> void:
 
 func _bounds_changed() -> void:
 	if is_visible_in_tree():
-		LOCAL.panel_bounds(get_global_rect())
+		_local.panel_bounds(get_global_rect())

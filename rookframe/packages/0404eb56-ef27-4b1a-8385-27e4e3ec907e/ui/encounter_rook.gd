@@ -1,6 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const LOCAL = preload(ROOT + "ui/encounter_local.tres")
+const VIEW = preload(ROOT + "ui/encounter_view.gd")
 var _busy := false
 
 func ready() -> void:
@@ -59,5 +59,5 @@ func _toggle() -> void:
 		message.message = result.message if not result.ok else str(result.value.message)
 		sdk.feedback.error(message)
 	else:
-		LOCAL.select_rook(selected.value)
+		VIEW.new().local_state(self).select_rook(selected.value)
 	refresh()

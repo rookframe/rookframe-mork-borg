@@ -1,6 +1,7 @@
 extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const STRIP = preload(ROOT + "ui/encounter_strip_base.gd")
 const RULES = preload(ROOT + "logic/encounter_authority.gd")
 
 func snapshot(sdk: SDK) -> Dictionary:
@@ -54,3 +55,7 @@ func surface(sdk: SDK) -> SDK.ExtensionSurface:
 		result.initial_placement = "floating"
 		result.initial_floating_rect = Rect2(1456, 220, 400, 292)
 	return result
+
+func local_state(owner: Node):
+	var strip = owner.get_tree().get_first_node_in_group("mork-borg-0404eb56-encounter-view") as STRIP
+	return strip.encounter_view_state()

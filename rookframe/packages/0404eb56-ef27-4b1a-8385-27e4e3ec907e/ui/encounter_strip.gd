@@ -1,18 +1,23 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_strip_base.gd"
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const VIEW = preload(ROOT + "ui/encounter_view.gd")
 const CARD = preload(ROOT + "ui/encounter_entry.tscn")
 const GROUP = preload(ROOT + "ui/encounter_group.tscn")
-const LOCAL = preload(ROOT + "ui/encounter_local.tres")
+const STRIP = preload(ROOT + "ui/encounter_strip_base.gd")
+const LOCAL_GROUP := "mork-borg-0404eb56-encounter-view"
 var _rows: Array = []
 var _cards: Array = []
 
 func ready() -> void:
+	var previous = get_tree().get_first_node_in_group(LOCAL_GROUP) as STRIP
+	if previous != null:
+		_local = previous.encounter_view_state()
+	add_to_group(LOCAL_GROUP)
 	resized.connect(_layout)
 	if sdk == null:
 		return
 	sdk.world_changed.connect(refresh)
-	LOCAL.updated.connect(_local_changed)
+	_local.updated.connect(_local_changed)
 	get_node(^"Panel/Layout/Round").pressed.connect(_options)
 	refresh()
 
@@ -76,8 +81,8 @@ func _layout() -> void:
 	var round_width: float = get_node(^"Panel/Layout/Round").size.x
 	var width := minf(720, 104 + maxf(0, round_width - 44) + _rows.size() * (76 if phone else 92))
 	var x := (size.x - width) / 2
-	if LOCAL.panel_visible and (phone or tablet):
-		var bounds := LOCAL.panel_rect
+	if _local.panel_visible and (phone or tablet):
+		var bounds := _local.panel_rect
 		var origin := get_global_rect().position.x
 		var before := maxf(0, bounds.position.x - origin - 68)
 		var after := maxf(0, size.x - (bounds.end.x - origin) - 12)
@@ -91,12 +96,12 @@ func _layout() -> void:
 
 func _open(rook: String) -> void:
 	if sdk.context().is_gm:
-		LOCAL.select_rook(rook)
+		_local.select_rook(rook)
 		sdk.windows.open(VIEW.new().surface(sdk))
 	_local_changed()
 
 func _options() -> void:
 	if not sdk.context().is_gm:
 		return
-	LOCAL.show_options()
+	_local.show_options()
 	sdk.windows.open(VIEW.new().surface(sdk))
