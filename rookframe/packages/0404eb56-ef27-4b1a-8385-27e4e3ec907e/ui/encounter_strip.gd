@@ -5,6 +5,7 @@ const CARD = preload(ROOT + "ui/encounter_entry.tscn")
 const GROUP = preload(ROOT + "ui/encounter_group.tscn")
 const LOCAL = preload(ROOT + "ui/encounter_local.tres")
 var _rows: Array = []
+var _cards: Array = []
 
 func ready() -> void:
 	resized.connect(_layout)
@@ -32,6 +33,7 @@ func refresh() -> void:
 	var rows: Array = state.rows
 	if rows != _rows:
 		_rows = rows.duplicate(true)
+		_cards.clear()
 		for child in entries.get_children():
 			entries.remove_child(child)
 			child.queue_free()
@@ -47,23 +49,22 @@ func refresh() -> void:
 				label.text = "Players" if side == "pc" else "Monsters"
 				label.theme_type_variation = "RookframeStatus" if row.active else "RookframeMeta"
 			var card: Button = CARD.instantiate()
+			_cards.append(card)
 			group.get_node("Entries").add_child(card)
 			card.name = str(row.rook)
 			card.custom_minimum_size = Vector2(60, 64) if sdk.presentation_experience().is_phone else Vector2(88, 80)
-			VIEW.new().show_preview(sdk, card.get_node("Image"), row)
+			VIEW.new().show_preview(sdk, card.get_node("Image") as Control, row)
 			card.tooltip_text = str(row.label)
 			card.accessibility_name = str(row.label) + (", active side" if row.active else "")
 			card.pressed.connect(_open.bind(str(row.rook)))
 	_local_changed()
 
 func _local_changed() -> void:
-	var entries := get_node(^"Panel/Layout/Scroll/Groups")
-	for group in entries.get_children():
-		for card in group.get_node("Entries").get_children():
-			for raw in _rows:
-				var row: Dictionary = raw
-				if str(card.name) == str(row.rook):
-					(card as Button).set_pressed_no_signal(bool(row.active))
+	for card in _cards:
+		for raw in _rows:
+			var row: Dictionary = raw
+			if str(card.name) == str(row.rook):
+				card.set_pressed_no_signal(bool(row.active))
 	_layout()
 
 func _layout() -> void:

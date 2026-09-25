@@ -10,7 +10,6 @@ var _pending_rook := ""
 var _tabletop_rook := ""
 var _busy := false
 var _closed := false
-@onready var _content: VBoxContainer = get_node(^"Layout/Body/Content")
 @onready var _outcome: Label = get_node(^"Layout/Body/Content/Outcome")
 @onready var _primary_button: Button = get_node(^"Layout/Footer/TrailingSlot/Navigation/Primary")
 @onready var _previous_button: Button = get_node(^"Layout/Footer/TrailingSlot/Navigation/Previous")
@@ -27,14 +26,14 @@ func ready() -> void:
 	LOCAL.updated.connect(refresh)
 	item_rect_changed.connect(_bounds_changed)
 	LOCAL.panel_changed(is_visible_in_tree())
-	(_content.get_node(^"Sides/Players") as Button).pressed.connect(_side.bind("pc"))
-	(_content.get_node(^"Sides/Monsters") as Button).pressed.connect(_side.bind("enemy"))
-	(_content.get_node(^"Sides/Roll") as Button).pressed.connect(_roll.bind("group"))
-	(_content.get_node(^"Selected/Actions/Reaction") as Button).pressed.connect(_roll.bind("reaction"))
-	(_content.get_node(^"Selected/Actions/Morale") as Button).pressed.connect(_roll.bind("morale"))
-	(_content.get_node(^"Options/Round/Set") as Button).pressed.connect(_correct)
-	(_content.get_node(^"Options/Round/Value") as LineEdit).gui_input.connect(_options_input)
-	(_content.get_node(^"Options/End") as Button).pressed.connect(_edit.bind({"kind": "end"}))
+	(get_node(^"Layout/Body/Content/Sides/Players") as Button).pressed.connect(_side.bind("pc"))
+	(get_node(^"Layout/Body/Content/Sides/Monsters") as Button).pressed.connect(_side.bind("enemy"))
+	(get_node(^"Layout/Body/Content/Sides/Roll") as Button).pressed.connect(_roll.bind("group"))
+	(get_node(^"Layout/Body/Content/Selected/Actions/Reaction") as Button).pressed.connect(_roll.bind("reaction"))
+	(get_node(^"Layout/Body/Content/Selected/Actions/Morale") as Button).pressed.connect(_roll.bind("morale"))
+	(get_node(^"Layout/Body/Content/Options/Round/Set") as Button).pressed.connect(_correct)
+	(get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit).gui_input.connect(_options_input)
+	(get_node(^"Layout/Body/Content/Options/End") as Button).pressed.connect(_edit.bind({"kind": "end"}))
 	_previous_button.pressed.connect(_edit.bind({"kind": "previous"}))
 	_primary_button.pressed.connect(_primary)
 	get_node(^"Poll").timeout.connect(_poll)
@@ -56,13 +55,13 @@ func refresh() -> void:
 	_state = snapshot
 	var rows: Array = _state.rows
 	var pending := _busy or not _roll_id.is_empty()
-	var empty_label := _content.get_node(^"Empty") as Label
+	var empty_label := get_node(^"Layout/Body/Content/Empty") as Label
 	empty_label.visible = rows.is_empty()
-	(_content.get_node(^"Sides") as Control).visible = not rows.is_empty()
-	(_content.get_node(^"Sides/Players") as Button).set_pressed_no_signal(_state.active and _state.current == "pc")
-	(_content.get_node(^"Sides/Monsters") as Button).set_pressed_no_signal(_state.active and _state.current in ["enemy", "first"])
+	(get_node(^"Layout/Body/Content/Sides") as Control).visible = not rows.is_empty()
+	(get_node(^"Layout/Body/Content/Sides/Players") as Button).set_pressed_no_signal(_state.active and _state.current == "pc")
+	(get_node(^"Layout/Body/Content/Sides/Monsters") as Button).set_pressed_no_signal(_state.active and _state.current in ["enemy", "first"])
 	for name in ["Players", "Monsters", "Roll"]:
-		(_content.get_node("Sides/" + name) as Button).disabled = pending or not _state.is_gm
+		(get_node("Layout/Body/Content/Sides/" + name) as Button).disabled = pending or not _state.is_gm
 	_selected = {}
 	for raw in rows:
 		var row: Dictionary = raw
@@ -70,19 +69,19 @@ func refresh() -> void:
 			_selected = row
 	if _selected.is_empty() and not rows.is_empty():
 		_selected = rows[0]
-	(_content.get_node(^"Selected") as Control).visible = not _selected.is_empty()
+	(get_node(^"Layout/Body/Content/Selected") as Control).visible = not _selected.is_empty()
 	if not _selected.is_empty():
-		(_content.get_node(^"Selected/Identity/Name") as Label).text = str(_selected.label)
-		(_content.get_node(^"Selected/Identity/Kind") as Label).text = str(_selected.kind)
-		(_content.get_node(^"Selected/Identity/Kind") as Label).visible = not str(_selected.kind).is_empty()
-		VIEW.new().show_preview(sdk, _content.get_node(^"Selected/Preview"), _selected)
-		(_content.get_node(^"Selected/Actions") as Control).visible = _state.is_gm and _selected.side == "enemy"
+		(get_node(^"Layout/Body/Content/Selected/Identity/Name") as Label).text = str(_selected.label)
+		(get_node(^"Layout/Body/Content/Selected/Identity/Kind") as Label).text = str(_selected.kind)
+		(get_node(^"Layout/Body/Content/Selected/Identity/Kind") as Label).visible = not str(_selected.kind).is_empty()
+		VIEW.new().show_preview(sdk, get_node(^"Layout/Body/Content/Selected/Preview"), _selected)
+		(get_node(^"Layout/Body/Content/Selected/Actions") as Control).visible = _state.is_gm and _selected.side == "enemy"
 		for name in ["Reaction", "Morale"]:
-			(_content.get_node("Selected/Actions/" + name) as Button).disabled = pending or not _selected.available
-	var options := _content.get_node(^"Options") as Control
+			(get_node("Layout/Body/Content/Selected/Actions/" + name) as Button).disabled = pending or not _selected.available
+	var options := get_node(^"Layout/Body/Content/Options") as Control
 	var opening := LOCAL.options and not options.visible
 	options.visible = LOCAL.options and _state.is_gm and _state.active
-	var round_value := _content.get_node(^"Options/Round/Value") as LineEdit
+	var round_value := get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit
 	if not round_value.has_focus():
 		round_value.text = str(maxi(1, int(_state.round)))
 	if opening and options.visible:
@@ -91,8 +90,8 @@ func refresh() -> void:
 	_primary_button.text = "Next" if _state.active else "Begin"
 	_primary_button.disabled = pending or rows.is_empty()
 	_previous_button.disabled = pending or not _state.active or (_state.round == 1 and _state.current == RULES.new().phases(_state)[0])
-	(_content.get_node(^"Options/Round/Set") as Button).disabled = pending
-	(_content.get_node(^"Options/End") as Button).disabled = pending
+	(get_node(^"Layout/Body/Content/Options/Round/Set") as Button).disabled = pending
+	(get_node(^"Layout/Body/Content/Options/End") as Button).disabled = pending
 
 func _primary() -> void:
 	if _state.active:
@@ -104,7 +103,7 @@ func _side(side: String) -> void:
 	await _edit({"kind": "correct", "round": maxi(1, int(_state.round)), "current": side})
 
 func _correct() -> void:
-	var value := str((_content.get_node(^"Options/Round/Value") as LineEdit).text)
+	var value := str((get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit).text)
 	if not value.is_valid_int():
 		_show_outcome("Enter a round number.", "error")
 		return
@@ -195,7 +194,7 @@ func _show_outcome(message: String, state: String) -> void:
 
 func _options_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		(_content.get_node(^"Options/Round/Value") as LineEdit).accept_event()
+		(get_node(^"Layout/Body/Content/Options/Round/Value") as LineEdit).accept_event()
 		LOCAL.hide_options()
 		refresh()
 		_primary_button.grab_focus()
