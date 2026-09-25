@@ -2,6 +2,10 @@
 [node name="Side" type="VBoxContainer"]
 layout_mode = 2
 theme_override_constants/separation = 4
+[node name="Rule" type="ColorRect" parent="."]
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
 [node name="Side" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

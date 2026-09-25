@@ -84,12 +84,12 @@ func test_phone_gm_can_act_without_scrolling_and_participant_sees_active_side() 
 	strip.refresh()
 	await get_tree().process_frame
 	var card: Button = strip.get_node("Panel/Layout/Scroll/Groups").get_child(1).get_node("Entries").get_child(0)
-	assert_bool(card.button_pressed).is_true()
+	assert_bool(card.button_pressed).is_false()
 	assert_array(host.previews).contains(["hero-rook", "enemy-rook"])
 	card.set_pressed_no_signal(false)
 	card.pressed.emit()
 	await get_tree().process_frame
-	assert_bool(card.button_pressed).is_true()
+	assert_bool(card.button_pressed).is_false()
 	assert_str(host.world_data.encounter.current).is_equal("enemy")
 
 func test_swords_action_targets_currently_selected_rook_with_shared_actor() -> void:
@@ -154,8 +154,14 @@ func test_desktop_order_shows_three_complete_miniatures() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var scroll: ScrollContainer = strip.get_node("Panel/Layout/Scroll")
+	var selected: Button = scroll.get_node("Groups").get_child(1).get_node("Entries").get_child(0)
+	selected.pressed.emit()
+	await get_tree().process_frame
+	assert_bool(selected.button_pressed).is_true()
+	assert_str(host.world_data.encounter.current).is_equal("pc")
 	for group in scroll.get_node("Groups").get_children():
 		for card in group.get_node("Entries").get_children():
+			assert_bool(card.button_pressed).is_equal(card == selected)
 			assert_bool(card.get_global_rect().end.x <= scroll.get_global_rect().end.x).is_true()
 
 func after_test() -> void:

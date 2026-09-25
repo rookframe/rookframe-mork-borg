@@ -4,6 +4,7 @@ const VIEW = preload(ROOT + "ui/encounter_view.gd")
 const CARD = preload(ROOT + "ui/encounter_entry.tscn")
 const GROUP = preload(ROOT + "ui/encounter_group.tscn")
 const STRIP = preload(ROOT + "ui/encounter_strip_base.gd")
+const TOKENS = preload("res://rookframe/ui/tokens.gd")
 const LOCAL_GROUP := "mork-borg-0404eb56-encounter-view"
 var _rows: Array = []
 var _cards: Array = []
@@ -52,7 +53,8 @@ func refresh() -> void:
 				entries.add_child(group)
 				var label := group.get_node("Side") as Label
 				label.text = "Players" if side == "pc" else "Monsters"
-				label.theme_type_variation = "RookframeStatus" if row.active else "RookframeMeta"
+				label.add_theme_color_override("font_color", TOKENS.COLOR_ACCENT if row.active else TOKENS.COLOR_CONTENT_MUTED)
+				group.get_node("Rule").color = TOKENS.COLOR_ACCENT if row.active else TOKENS.COLOR_RULE
 			var card: Button = CARD.instantiate()
 			_cards.append(card)
 			group.get_node("Entries").add_child(card)
@@ -66,10 +68,7 @@ func refresh() -> void:
 
 func _local_changed() -> void:
 	for card in _cards:
-		for raw in _rows:
-			var row: Dictionary = raw
-			if str(card.name) == str(row.rook):
-				card.set_pressed_no_signal(bool(row.active))
+		card.set_pressed_no_signal(str(card.name) == _local.selected_rook)
 	_layout()
 
 func _layout() -> void:
