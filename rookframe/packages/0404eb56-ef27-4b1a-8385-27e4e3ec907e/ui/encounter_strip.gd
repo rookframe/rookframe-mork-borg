@@ -55,11 +55,11 @@ func refresh() -> void:
 				var active_label := group.get_node("ActiveSide") as Label
 				active_label.text = label.text
 				label.visible = not row.active
-				active_label.visible = row.active
+				active_label.visible = bool(row.active)
 				var rule := group.get_node("Rule") as Control
 				var active_rule := group.get_node("ActiveRule") as Control
 				rule.visible = not row.active
-				active_rule.visible = row.active
+				active_rule.visible = bool(row.active)
 			var card: Button = CARD.instantiate()
 			_cards.append(card)
 			group.get_node("Entries").add_child(card)
