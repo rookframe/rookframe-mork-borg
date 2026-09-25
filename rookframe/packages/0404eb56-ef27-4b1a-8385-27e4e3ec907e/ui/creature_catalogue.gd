@@ -70,7 +70,8 @@ func _select(entry: SDK.ContentEntry, notify: bool = true) -> void:
 	var morale: Dictionary = definition.morale
 	(get_node("Preview/Stats/Morale/Content/Value") as Label).text = str(morale.value) if morale.kind == "fixed" else ("Special" if morale.kind == "special" else "—")
 	var attacks := ""
-	for raw in definition.attacks:
+	var attack_rows: Array = definition.get("attacks", [])
+	for raw in attack_rows:
 		var attack: Dictionary = raw
 		attacks += ("\n\n" if not attacks.is_empty() else "") + str(attack.name) + " · " + str(attack.dice)
 	(get_node("Preview/Attacks/Content/Copy") as Label).text = attacks

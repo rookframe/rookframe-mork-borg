@@ -28,6 +28,10 @@ func test_catalogue_has_core_choices_and_responsive_definition_preview() -> void
 	assert_str(catalogue.get_node("Preview/Identity/Content/Title").text).is_equal("SETH, GOBLIN")
 	assert_str(catalogue.get_node("Preview/Stats/HitPoints/Content/Value").text).is_equal("6")
 	assert_str(catalogue.get_node("Preview/Stats/Morale/Content/Value").text).is_equal("7")
+	for row in rows:
+		row.pressed.emit()
+		assert_str(catalogue.get_node("Preview/Identity/Content/Title").text).is_equal(row.title.to_upper())
+	catalogue.configure(entries, "seth-goblin")
 	var chosen = rows.filter(func(row): return row.title == "Seth, Goblin")[0]
 	assert_bool(chosen.button_pressed).is_true()
 	assert_bool(chosen.get_node("Content/IndicatorLane/Indicator").visible).is_true()
