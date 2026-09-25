@@ -7,9 +7,21 @@ custom_minimum_size = Vector2(0, 2)
 layout_mode = 2
 mouse_filter = 2
 color = Color(0.133333, 0.196078, 0.215686, 1)
+[node name="ActiveRule" type="ColorRect" parent="."]
+visible = false
+custom_minimum_size = Vector2(0, 2)
+layout_mode = 2
+mouse_filter = 2
+color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="Side" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
+text = "Players"
+[node name="ActiveSide" type="Label" parent="."]
+visible = false
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 text = "Players"
 [node name="Entries" type="HBoxContainer" parent="."]
 layout_mode = 2

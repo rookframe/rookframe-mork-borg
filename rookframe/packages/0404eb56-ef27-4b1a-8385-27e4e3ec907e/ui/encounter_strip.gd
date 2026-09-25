@@ -52,10 +52,12 @@ func refresh() -> void:
 				entries.add_child(group)
 				var label := group.get_node("Side") as Label
 				label.text = "Players" if side == "pc" else "Monsters"
-				if row.active:
-					var accent := label.get_theme_color("font_color", "RookframeValue")
-					label.add_theme_color_override("font_color", accent)
-					group.get_node("Rule").color = accent
+				var active_label := group.get_node("ActiveSide") as Label
+				active_label.text = label.text
+				label.visible = not row.active
+				active_label.visible = row.active
+				group.get_node("Rule").visible = not row.active
+				group.get_node("ActiveRule").visible = row.active
 			var card: Button = CARD.instantiate()
 			_cards.append(card)
 			group.get_node("Entries").add_child(card)
