@@ -11,7 +11,7 @@ func ready() -> void:
 	if sdk == null:
 		return
 	sdk.world_changed.connect(refresh)
-	LOCAL.updated.connect(refresh)
+	LOCAL.updated.connect(_local_changed)
 	get_node(^"Panel/Layout/Round").pressed.connect(_options)
 	refresh()
 
@@ -54,12 +54,16 @@ func refresh() -> void:
 			card.tooltip_text = str(row.label)
 			card.accessibility_name = str(row.label) + (", active side" if row.active else "")
 			card.pressed.connect(_open.bind(str(row.rook)))
+	_local_changed()
+
+func _local_changed() -> void:
+	var entries := get_node(^"Panel/Layout/Scroll/Groups")
 	for group in entries.get_children():
 		for card in group.get_node("Entries").get_children():
-			for raw in rows:
+			for raw in _rows:
 				var row: Dictionary = raw
 				if str(card.name) == str(row.rook):
-					card.set_pressed_no_signal(bool(row.active))
+					(card as Button).set_pressed_no_signal(bool(row.active))
 	_layout()
 
 func _layout() -> void:
@@ -87,7 +91,7 @@ func _open(rook: String) -> void:
 	if sdk.context().is_gm:
 		LOCAL.select_rook(rook)
 		sdk.windows.open(VIEW.new().surface(sdk))
-	refresh()
+	_local_changed()
 
 func _options() -> void:
 	if not sdk.context().is_gm:

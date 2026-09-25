@@ -56,7 +56,7 @@ func refresh() -> void:
 	_state = snapshot
 	var rows: Array = _state.rows
 	var pending := _busy or not _roll_id.is_empty()
-	var empty_label: Label = _content.get_node(^"Empty")
+	var empty_label := _content.get_node(^"Empty") as Label
 	empty_label.visible = rows.is_empty()
 	(_content.get_node(^"Sides") as Control).visible = not rows.is_empty()
 	(_content.get_node(^"Sides/Players") as Button).set_pressed_no_signal(_state.active and _state.current == "pc")
@@ -79,10 +79,10 @@ func refresh() -> void:
 		(_content.get_node(^"Selected/Actions") as Control).visible = _state.is_gm and _selected.side == "enemy"
 		for name in ["Reaction", "Morale"]:
 			(_content.get_node("Selected/Actions/" + name) as Button).disabled = pending or not _selected.available
-	var options: Control = _content.get_node(^"Options")
+	var options := _content.get_node(^"Options") as Control
 	var opening := LOCAL.options and not options.visible
 	options.visible = LOCAL.options and _state.is_gm and _state.active
-	var round_value: LineEdit = _content.get_node(^"Options/Round/Value")
+	var round_value := _content.get_node(^"Options/Round/Value") as LineEdit
 	if not round_value.has_focus():
 		round_value.text = str(maxi(1, int(_state.round)))
 	if opening and options.visible:
