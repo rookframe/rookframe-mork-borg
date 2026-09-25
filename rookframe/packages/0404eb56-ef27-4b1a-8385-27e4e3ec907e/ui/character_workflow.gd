@@ -334,6 +334,7 @@ func character_show_route(route: String) -> void:
 	var creation := route.begins_with("create-")
 	_set_search_visible(false)
 	_catalogue.visible = false
+	get_node(^"Layout/Body/Content/CreateCharacter").visible = false
 	_live_heading.visible = false
 	_live_list.visible = false
 	_public_heading.visible = false

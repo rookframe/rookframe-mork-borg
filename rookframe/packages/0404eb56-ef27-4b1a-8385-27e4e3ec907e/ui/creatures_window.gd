@@ -95,6 +95,7 @@ func ready() -> void:
 	_create_button.pressed.connect(_create_creature)
 	_catalogue_create.pressed.connect(_create_creature)
 	_catalogue_character.pressed.connect(_character_primary_button_pressed)
+	get_node(^"Layout/Body/Content/CreateCharacter").pressed.connect(_character_primary_button_pressed)
 	_duplicate_button.pressed.connect(_duplicate_creature)
 	_save_button.pressed.connect(_save_creature)
 	_place_button.pressed.connect(_place_rook)
@@ -491,7 +492,8 @@ func _apply_route(route: String) -> void:
 	_header_title.visible = not _compact
 	_header_subtitle.visible = not _compact
 	_catalogue_bar.visible = catalogue
-	_catalogue_character.visible = catalogue and _character_definition != null
+	_catalogue_character.visible = false
+	get_node(^"Layout/Body/Content/CreateCharacter").visible = catalogue and _character_definition != null
 	_detail.visible = sheet or edit or inventory
 	_set_search_visible(catalogue)
 	_catalogue.visible = catalogue
@@ -713,6 +715,7 @@ func _set_busy(value: bool, message: String, error: bool = false) -> void:
 	_create_button.disabled = value or _selected_definition == null
 	_catalogue_create.disabled = value or _selected_definition == null
 	_catalogue_character.disabled = value or _character_definition == null
+	get_node(^"Layout/Body/Content/CreateCharacter").disabled = value or _character_definition == null
 	_duplicate_button.disabled = value
 	_save_button.disabled = value
 	_place_button.disabled = value

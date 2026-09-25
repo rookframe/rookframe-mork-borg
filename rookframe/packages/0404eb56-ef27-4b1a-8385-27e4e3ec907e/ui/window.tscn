@@ -237,6 +237,14 @@ placeholder = "Search creatures…"
 [node name="Catalogue" parent="Layout/Body/Content" instance=ExtResource("13_catalogue")]
 layout_mode = 2
 
+[node name="CreateCharacter" type="Button" parent="Layout/Body/Content"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 0
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Create Character"
+tooltip_text = "Start a new Character"
+
 [node name="LiveHeading" type="Label" parent="Layout/Body/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeSubtitle"
