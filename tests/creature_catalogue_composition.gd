@@ -68,3 +68,35 @@ func test_catalogue_has_core_choices_and_responsive_definition_preview() -> void
 	assert_bool(catalogue.vertical).is_true()
 	assert_bool(catalogue.get_node("Preview").size.x <= 351).is_true()
 	assert_int(CREATURES.CORE_DEFINITIONS["seth-goblin"].hit_points).is_equal(6)
+
+func test_catalogue_footer_recovers_after_character_navigation() -> void:
+	var window = auto_free(load(ROOT + "ui/window.tscn").instantiate())
+	assert_bool(window.has_method("_configure_catalogue_actions")).is_true()
+	if not window.has_method("_configure_catalogue_actions"):
+		return
+	var back: Button = window.get_node("Layout/CatalogueBar/LeadingSlot/Back")
+	var creation: Button = window.get_node("Layout/CatalogueBar/TrailingSlot/CreateCharacter")
+	back.visible = false
+	back.disabled = true
+	back.text = "Start over"
+	creation.visible = true
+	window._configure_catalogue_actions(true)
+	assert_bool(back.visible).is_true()
+	assert_bool(back.disabled).is_false()
+	assert_str(back.text).is_equal("Back")
+	assert_bool(creation.visible).is_false()
+	assert_bool(window.get_node("Layout/CatalogueBar").visible).is_true()
+	var footer: Control = window.get_node("Layout/CatalogueBar")
+	footer.theme = window.theme
+	footer.owner = null
+	footer.get_parent().remove_child(footer)
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(375, 369)
+	add_child(viewport)
+	viewport.add_child(auto_free(footer))
+	footer.size = Vector2(351, 44)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(footer.get_combined_minimum_size().x <= 351).is_true()
+	assert_bool(footer.get_rect().encloses(back.get_rect())).is_true()
+	assert_bool(back.size.y >= 44).is_true()

@@ -491,8 +491,7 @@ func _apply_route(route: String) -> void:
 	_route_inventory.button_pressed = inventory
 	_header_title.visible = not _compact
 	_header_subtitle.visible = not _compact
-	_catalogue_bar.visible = catalogue
-	_catalogue_character.visible = false
+	_configure_catalogue_actions(catalogue)
 	get_node(^"Layout/Body/Content/CreateCharacter").visible = catalogue and _character_definition != null
 	_detail.visible = sheet or edit or inventory
 	_set_search_visible(catalogue)
@@ -732,8 +731,22 @@ func _character_primary_button_pressed() -> void:
 	character_primary_button_pressed()
 
 
+func _configure_catalogue_actions(catalogue: bool) -> void:
+	var bar := get_node(^"Layout/CatalogueBar") as Control
+	var back := bar.get_node(^"LeadingSlot/Back") as Button
+	bar.visible = catalogue
+	back.visible = catalogue
+	back.disabled = false
+	back.text = "Back"
+	(bar.get_node(^"TrailingSlot/CreateCharacter") as Button).visible = false
+
 func _character_back_button_pressed() -> void:
-	character_back_button_pressed()
+	if _route == "creatures":
+		var surface := SDK.ExtensionSurface.new()
+		surface.scene = load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window.tscn")
+		sdk.windows.close(surface)
+	else:
+		character_back_button_pressed()
 
 
 func opened(actor_id: SDK.ActorId) -> void:
