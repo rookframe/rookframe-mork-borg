@@ -26,14 +26,15 @@ func ready() -> void:
 	sdk.rooks.selection_changed.connect(_tabletop_selection)
 	LOCAL.updated.connect(refresh)
 	item_rect_changed.connect(_bounds_changed)
-	_content.get_node(^"Sides/Players").pressed.connect(_side.bind("pc"))
-	_content.get_node(^"Sides/Monsters").pressed.connect(_side.bind("enemy"))
-	_content.get_node(^"Sides/Roll").pressed.connect(_roll.bind("group"))
-	_content.get_node(^"Selected/Actions/Reaction").pressed.connect(_roll.bind("reaction"))
-	_content.get_node(^"Selected/Actions/Morale").pressed.connect(_roll.bind("morale"))
-	_content.get_node(^"Options/Round/Set").pressed.connect(_correct)
-	_content.get_node(^"Options/Round/Value").gui_input.connect(_options_input)
-	_content.get_node(^"Options/End").pressed.connect(_edit.bind({"kind": "end"}))
+	LOCAL.panel_changed(is_visible_in_tree())
+	(_content.get_node(^"Sides/Players") as Button).pressed.connect(_side.bind("pc"))
+	(_content.get_node(^"Sides/Monsters") as Button).pressed.connect(_side.bind("enemy"))
+	(_content.get_node(^"Sides/Roll") as Button).pressed.connect(_roll.bind("group"))
+	(_content.get_node(^"Selected/Actions/Reaction") as Button).pressed.connect(_roll.bind("reaction"))
+	(_content.get_node(^"Selected/Actions/Morale") as Button).pressed.connect(_roll.bind("morale"))
+	(_content.get_node(^"Options/Round/Set") as Button).pressed.connect(_correct)
+	(_content.get_node(^"Options/Round/Value") as LineEdit).gui_input.connect(_options_input)
+	(_content.get_node(^"Options/End") as Button).pressed.connect(_edit.bind({"kind": "end"}))
 	_previous_button.pressed.connect(_edit.bind({"kind": "previous"}))
 	_primary_button.pressed.connect(_primary)
 	get_node(^"Poll").timeout.connect(_poll)
@@ -53,16 +54,15 @@ func refresh() -> void:
 		task_state.description = str(snapshot.error)
 		return
 	_state = snapshot
-	LOCAL.panel_changed(is_visible_in_tree())
 	var rows: Array = _state.rows
 	var pending := _busy or not _roll_id.is_empty()
 	var empty_label: Label = _content.get_node(^"Empty")
 	empty_label.visible = rows.is_empty()
-	_content.get_node(^"Sides").visible = not rows.is_empty()
-	_content.get_node(^"Sides/Players").set_pressed_no_signal(_state.active and _state.current == "pc")
-	_content.get_node(^"Sides/Monsters").set_pressed_no_signal(_state.active and _state.current in ["enemy", "first"])
+	(_content.get_node(^"Sides") as Control).visible = not rows.is_empty()
+	(_content.get_node(^"Sides/Players") as Button).set_pressed_no_signal(_state.active and _state.current == "pc")
+	(_content.get_node(^"Sides/Monsters") as Button).set_pressed_no_signal(_state.active and _state.current in ["enemy", "first"])
 	for name in ["Players", "Monsters", "Roll"]:
-		_content.get_node("Sides/" + name).disabled = pending or not _state.is_gm
+		(_content.get_node("Sides/" + name) as Button).disabled = pending or not _state.is_gm
 	_selected = {}
 	for raw in rows:
 		var row: Dictionary = raw
@@ -70,15 +70,15 @@ func refresh() -> void:
 			_selected = row
 	if _selected.is_empty() and not rows.is_empty():
 		_selected = rows[0]
-	_content.get_node(^"Selected").visible = not _selected.is_empty()
+	(_content.get_node(^"Selected") as Control).visible = not _selected.is_empty()
 	if not _selected.is_empty():
-		_content.get_node(^"Selected/Identity/Name").text = str(_selected.label)
-		_content.get_node(^"Selected/Identity/Kind").text = str(_selected.kind)
-		_content.get_node(^"Selected/Identity/Kind").visible = not str(_selected.kind).is_empty()
+		(_content.get_node(^"Selected/Identity/Name") as Label).text = str(_selected.label)
+		(_content.get_node(^"Selected/Identity/Kind") as Label).text = str(_selected.kind)
+		(_content.get_node(^"Selected/Identity/Kind") as Label).visible = not str(_selected.kind).is_empty()
 		VIEW.new().show_preview(sdk, _content.get_node(^"Selected/Preview"), _selected)
-		_content.get_node(^"Selected/Actions").visible = _state.is_gm and _selected.side == "enemy"
+		(_content.get_node(^"Selected/Actions") as Control).visible = _state.is_gm and _selected.side == "enemy"
 		for name in ["Reaction", "Morale"]:
-			_content.get_node("Selected/Actions/" + name).disabled = pending or not _selected.available
+			(_content.get_node("Selected/Actions/" + name) as Button).disabled = pending or not _selected.available
 	var options: Control = _content.get_node(^"Options")
 	var opening := LOCAL.options and not options.visible
 	options.visible = LOCAL.options and _state.is_gm and _state.active
@@ -91,8 +91,8 @@ func refresh() -> void:
 	_primary_button.text = "Next" if _state.active else "Begin"
 	_primary_button.disabled = pending or rows.is_empty()
 	_previous_button.disabled = pending or not _state.active or (_state.round == 1 and _state.current == RULES.new().phases(_state)[0])
-	_content.get_node(^"Options/Round/Set").disabled = pending
-	_content.get_node(^"Options/End").disabled = pending
+	(_content.get_node(^"Options/Round/Set") as Button).disabled = pending
+	(_content.get_node(^"Options/End") as Button).disabled = pending
 
 func _primary() -> void:
 	if _state.active:
@@ -104,7 +104,7 @@ func _side(side: String) -> void:
 	await _edit({"kind": "correct", "round": maxi(1, int(_state.round)), "current": side})
 
 func _correct() -> void:
-	var value := str(_content.get_node(^"Options/Round/Value").text)
+	var value := str((_content.get_node(^"Options/Round/Value") as LineEdit).text)
 	if not value.is_valid_int():
 		_show_outcome("Enter a round number.", "error")
 		return
@@ -175,6 +175,7 @@ func _cancel() -> void:
 		_show_outcome("Throw ended.", "ended")
 
 func _visibility_changed() -> void:
+	LOCAL.panel_changed(is_visible_in_tree())
 	if is_visible_in_tree():
 		_closed = false
 		refresh()
@@ -194,7 +195,7 @@ func _show_outcome(message: String, state: String) -> void:
 
 func _options_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
-		_content.get_node(^"Options/Round/Value").accept_event()
+		(_content.get_node(^"Options/Round/Value") as LineEdit).accept_event()
 		LOCAL.hide_options()
 		refresh()
 		_primary_button.grab_focus()
