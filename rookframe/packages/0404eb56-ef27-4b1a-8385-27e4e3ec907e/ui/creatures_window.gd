@@ -1,5 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_workflow.gd"
 const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_targets.gd")
+const LIVE_ACTOR_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/live_actor_row.tscn")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
 const CREATURE_KIND := "actor_definition"
@@ -203,13 +204,11 @@ func _render_live_actors() -> void:
 	for child in _live_list.get_children():
 		child.queue_free()
 	for actor in _actors:
-		var button := Button.new()
+		var button: Button = LIVE_ACTOR_ROW.instantiate()
 		var actor_data: Dictionary = actor.data
 		var private_name: String = actor_data.get("name", "Private Creature")
 		var public_name := actor.public_label if not actor.public_label.is_empty() else "Public name pending"
 		button.text = _t("%s  ·  Public: %s") % [private_name, public_name]
-		button.clip_text = true
-		button.text_overrun_behavior = 3
 		button.tooltip_text = button.text
 		button.accessibility_name = button.text
 		button.custom_minimum_size = Vector2(0, 44)
