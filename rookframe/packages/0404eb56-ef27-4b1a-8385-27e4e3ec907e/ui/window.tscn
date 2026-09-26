@@ -18,6 +18,8 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_catalogue.tscn" id="13_catalogue"]
 
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="14_miniatures"]
+
 [sub_resource type="StyleBoxFlat" id="CharacterTabSelected"]
 content_margin_left = 12.0
 content_margin_top = 10.0
@@ -669,5 +671,37 @@ visible = false
 layout_mode = 2
 
 [node name="CreatureDefence" parent="Layout/Body/Content" instance=ExtResource("11_defence")]
+visible = false
+layout_mode = 2
+
+[node name="Miniature" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Right/Miniature"]
+layout_mode = 2
+text = "Miniature"
+autowrap_mode = 2
+theme_type_variation = &"RookframeHeading"
+[node name="Current" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Right/Miniature"]
+layout_mode = 2
+autowrap_mode = 2
+theme_type_variation = &"RookframeBody"
+[node name="Help" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Right/Miniature"]
+layout_mode = 2
+text = "Used when placing new Rooks. Existing Rooks stay unchanged."
+autowrap_mode = 2
+theme_type_variation = &"RookframeMeta"
+[node name="Choose" type="Button" parent="Layout/Body/Content/Detail/SheetGrid/Right/Miniature"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Choose Miniature"
+theme_type_variation = &"RookframeSecondaryButton"
+[node name="ApplySelected" type="Button" parent="Layout/Body/Content/Detail/SheetGrid/Right/Miniature"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Change selected Rook"
+theme_type_variation = &"RookframeSecondaryButton"
+
+[node name="MiniatureWorkflow" parent="Layout" instance=ExtResource("14_miniatures")]
 visible = false
 layout_mode = 2

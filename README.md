@@ -17,8 +17,8 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.25.4` | `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `0c152a804332dd5571caa8a2c3dd161aa21fb7f7` (`v1.0.0-rc.1`) | `rookframe/ui/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.27.2` | `addons/rookframe_sdk/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `ad1a168e726640de8ca14687a72fc86aa06311bc` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.33)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.82)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
@@ -430,3 +430,24 @@ Both original and Russian names can be searched in the equipment/Creature catalo
 search, English fallback, untouched user input and drafts, format argument parity,
 and coverage of every authored class, equipment, Creature and scroll description.
 Keep English IDs and action-state comparisons separate from translated display copy.
+
+## Creature Miniatures
+
+The Game Master can choose a Miniature on a Creature library entry. This is a
+World-specific default: every new Creature made from that entry receives the
+current choice, while existing Actors keep theirs. Clearing the default affects
+only future Actors. Published library definitions are never edited.
+
+An Actor Owner can choose another Miniature in that Creature's sheet. The shared
+UI Kit browser searches all available Miniatures from enabled World Packages,
+shows their source Package and previews the selection. Back discards a draft;
+Use Miniature saves it. Missing content keeps its stable reference and asks for
+a replacement instead of silently picking another model.
+
+Place Rook uses this Actor's choice in the current Scene. Existing Rooks retain
+their appearance. Change selected Rook explicitly updates only the selected Rook
+linked to this Actor, preserving its identity, placement and hidden state.
+
+Both journeys and browser states are available in English and Russian. Miniature
+names use their owning Package's translations, falling back to its original name.
+Miniatures may live in separate Packages; this release does not relocate assets.

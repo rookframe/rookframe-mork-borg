@@ -44,7 +44,7 @@ func create_data(raw_choices: Variant) -> Variant:
 		data["creation_id"] = choices["creation_id"]
 	if choices.has("creation_roll_sequence"):
 		data["creation_roll_sequence"] = choices["creation_roll_sequence"]
-	for key in ["creature_inventory", "inventory_serial", "summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
+	for key in ["preferred_miniature", "creature_inventory", "inventory_serial", "summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
 		if choices.has(key):
 			data[key] = choices[key]
 	return data

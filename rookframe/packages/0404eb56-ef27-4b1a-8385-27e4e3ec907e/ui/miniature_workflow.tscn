@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.gd" id="1"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/content/miniature_browser.tscn" id="2"]
+[node name="MiniatureWorkflow" type="VBoxContainer"]
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 8
+script = ExtResource("1")
+[node name="Title" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 2
+theme_type_variation = &"RookframeHeading"
+[node name="Browser" parent="." instance=ExtResource("2")]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Status" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 2
+theme_type_variation = &"RookframeStatus"
+accessibility_live = 1
+[node name="Actions" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Back" type="Button" parent="Actions"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Back"
+[node name="Apply" type="Button" parent="Actions"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframePrimaryButton"
+text = "Use Miniature"

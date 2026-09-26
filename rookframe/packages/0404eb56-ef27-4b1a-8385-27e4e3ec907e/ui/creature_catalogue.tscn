@@ -92,3 +92,31 @@ layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 text = "Create a private Creature sheet, then choose its public name."
 autowrap_mode = 2
+
+[node name="Miniature" type="VBoxContainer" parent="Preview"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Heading" type="Label" parent="Preview/Miniature"]
+layout_mode = 2
+text = "Miniature for new Actors"
+autowrap_mode = 2
+theme_type_variation = &"RookframeHeading"
+[node name="Current" type="Label" parent="Preview/Miniature"]
+layout_mode = 2
+autowrap_mode = 2
+theme_type_variation = &"RookframeBody"
+[node name="Help" type="Label" parent="Preview/Miniature"]
+layout_mode = 2
+text = "Applies only to new Actors created from this entry."
+autowrap_mode = 2
+theme_type_variation = &"RookframeMeta"
+[node name="Choose" type="Button" parent="Preview/Miniature"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Choose Miniature"
+theme_type_variation = &"RookframeSecondaryButton"
+[node name="Clear" type="Button" parent="Preview/Miniature"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+text = "Clear default"
+theme_type_variation = &"RookframeSecondaryButton"

@@ -60,7 +60,7 @@ func SystemIntentContext(_token: String) -> Dictionary:
 func SystemIntentReadActor(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": actors[id].duplicate(true)} if actors.has(id) else {"ok": false, "message": "Actor unavailable"}
 func SystemIntentReadRook(_token: String, id: String) -> Dictionary:
- return {"ok": true, "value": {"id": id, "actor": rooks[id], "scene": "main", "position": Vector2.ZERO, "yaw": 0.0, "miniature": {"packageId": "", "localId": ""}}} if rooks.has(id) else {"ok": false}
+ return {"ok": true, "value": {"id": id, "actor": rooks[id], "scene": "main", "position": Vector2.ZERO, "yaw": 0.0, "hidden": false, "miniature": {"packageId": "", "localId": ""}}} if rooks.has(id) else {"ok": false}
 func SystemIntentActorAccess(_token: String, id: String) -> Dictionary:
  return {"ok": true, "value": access_by_actor.get(id, access_entries)}
 func SystemIntentDistance(_token: String, _from: String, _to: String) -> Dictionary:

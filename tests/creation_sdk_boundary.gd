@@ -92,6 +92,8 @@ func complete_update() -> void:
 	TabletopCommandCompleted.emit(result)
 
 func ReadRook(id: String) -> Dictionary:
+	if rooks.has(id):
+		rooks[id]["hidden"] = rooks[id].get("hidden", false)
 	return {"ok": true, "value": rooks[id].duplicate(true)} if rooks.has(id) else {"ok": false, "message": "Rook unavailable."}
 
 func SetRookMiniature(id: String, package: String, miniature: String) -> Dictionary:

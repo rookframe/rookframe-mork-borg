@@ -3,6 +3,8 @@ const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3
 const LIVE_ACTOR_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/live_actor_row.tscn")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
+const MINIATURE_ACTIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_actions.gd")
+
 const CREATURE_KIND := "actor_definition"
 var _pending_route := ""
 const CREATURE_ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_actions.gd")
@@ -40,6 +42,7 @@ func ready() -> void:
 		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
 		return
 	character_setup()
+	_setup_miniatures()
 	resized.connect(_configure_surface_spacing)
 	_creature_defence.changed.connect(_creature_defence_changed)
 	_creature_defence.resolved.connect(_creature_defence_resolved)
@@ -190,6 +193,7 @@ func _reload_world() -> void:
 				_creature_item_refresh_pending = true
 	_render_live_actors()
 	_render_public_names()
+	_render_miniatures()
 
 
 func _render_definitions() -> void:
@@ -238,6 +242,7 @@ func _render_public_names() -> void:
 
 func _select_definition(entry: SDK.ContentEntry) -> void:
 	_selected_definition = entry
+	_render_miniatures()
 	_create_button.disabled = false
 	_catalogue_create.disabled = false
 	_set_status(_t("Selected %s. Create a private Actor to edit its encounter sheet.") % entry.title)
@@ -300,7 +305,8 @@ func _render_actor() -> void:
 		_inventory_refresh_pending = true
 	_save_button.disabled = _selected_actor.access_level != "Owner"
 	_duplicate_button.disabled = not sdk.context().is_gm
-	_place_button.disabled = _selected_actor.access_level != "Owner"
+	_place_button.disabled = not sdk.context().is_gm
+	_render_miniatures()
 	_edit_button.disabled = _selected_actor.access_level != "Owner"
 	_inventory_button.disabled = false
 
@@ -471,6 +477,9 @@ func _process(delta: float) -> void:
 
 
 func _apply_route(route: String) -> void:
+	get_node(^"Layout/MiniatureWorkflow").visible = false
+	_header.visible = true
+	_body.visible = true
 	_creature_defence.visible = false
 	get_node(^"Layout/Body/Content/CreatureAttack").visible = false
 	get_node(^"Layout/SheetActions").visible = false
@@ -590,12 +599,15 @@ func _create_creature() -> void:
 	if _busy or _selected_definition == null or sdk == null:
 		return
 	_set_busy(true, "Creating private Creature sheet…")
-	var result: SDK.ActorResult = await sdk.actors.create(_selected_definition.reference, {})
-	_set_busy(false, result.message if not result.ok else "Creature created.", not result.ok)
-	if result.ok:
-		_selected_actor = result.actor
-		_render_live_actors()
-		_show_route("creature")
+	var result := await sdk.system_actions.submit("miniature.create", {"definition": _selected_definition.reference.local_id})
+	var succeeded: bool = result.ok and str(result.value.get("state", "error")) == "resolved"
+	_set_busy(false, "Creature created." if succeeded else (str(result.value.get("message", "")) if result.ok else result.message), not succeeded)
+	if succeeded:
+		var created := sdk.actors.read(SDK.ActorId.new(str(result.value.actor)))
+		if created.ok:
+			_selected_actor = created.actor
+			_render_live_actors()
+			_show_route("creature")
 
 
 func _duplicate_creature() -> void:
@@ -679,27 +691,13 @@ func _save_creature() -> void:
 func _place_rook() -> void:
 	if _busy or _selected_actor == null or sdk == null:
 		return
-	var miniatures: SDK.ContentEntryListResult = sdk.content.list(SDK.ContentKind.Value.MINIATURE)
-	if not miniatures.ok or miniatures.items.is_empty():
-		_set_status("Choose a published Miniature Package before placing this Rook.", true)
+	var actions := MINIATURE_ACTIONS.new(sdk)
+	if not actions.available(_actor_miniature()):
+		_open_miniature(false)
 		return
-	var label := _selected_actor.public_label.strip_edges()
 	_set_busy(true, "Placing Creature Rook…")
-	var created: SDK.RookResult = await sdk.rooks.create(miniatures.items[0].reference, SDK.SceneId.new("main"), Vector2(0, 0))
-	if not created.ok:
-		_set_busy(false, created.message, true)
-		return
-	var linked: SDK.OperationResult = await sdk.rooks.link(created.rook.id, _selected_actor.id)
-	if not linked.ok:
-		var deleted: SDK.OperationResult = await sdk.rooks.delete(created.rook.id)
-		var link_message := linked.message
-		if not deleted.ok:
-			link_message += _t(" Cleanup failed: %s") % deleted.message
-		_set_busy(false, link_message, true)
-		return
-	_selected_actor.public_label = label
-	_refresh_world()
-	_set_busy(false, "Creature Rook placed. Select it on the tabletop to act.")
+	var result := await actions.place(_selected_actor.id)
+	_set_busy(false, "Creature Rook placed. Select it on the tabletop to act." if result.ok else result.message, not result.ok)
 
 
 func _add_item() -> void:
@@ -1114,3 +1112,103 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Body/Content/CreatureAttack").localize(locale)
 	get_node(^"Layout/Body/Content/CreatureDefence").localize(locale)
 	get_node(^"Layout/CreationProgress").localize(locale)
+
+const MINIATURE_PANEL := "Layout/Body/Content/Detail/SheetGrid/Right/Miniature"
+
+func _setup_miniatures() -> void:
+	_catalogue.get_node(^"Preview/Miniature/Choose").pressed.connect(_open_miniature.bind(true))
+	_catalogue.get_node(^"Preview/Miniature/Clear").pressed.connect(_clear_library_miniature)
+	get_node(MINIATURE_PANEL + "/Choose").pressed.connect(_open_miniature.bind(false))
+	get_node(MINIATURE_PANEL + "/ApplySelected").pressed.connect(_apply_selected_miniature)
+	get_node(^"Layout/MiniatureWorkflow").closed.connect(_close_miniature)
+	sdk.rooks.selection_changed.connect(_render_miniatures)
+	for panel in [_catalogue.get_node(^"Preview/Miniature"), get_node(MINIATURE_PANEL)]:
+		for child in panel.get_children():
+			if child is Label:
+				var label := child as Label
+				label.text = _t(label.text)
+			elif child is Button:
+				var button := child as Button
+				button.text = _t(button.text)
+
+func _library_miniature() -> Dictionary:
+	if _selected_definition == null:
+		return {}
+	var value := sdk.world_data.read()
+	if not value.ok or typeof(value.value) != TYPE_DICTIONARY:
+		return {}
+	var world: Dictionary = value.value
+	var defaults: Dictionary = world.get("creature_miniatures", {})
+	return defaults.get(str(_selected_definition.reference.local_id), {})
+
+func _actor_miniature() -> Dictionary:
+	if _selected_actor == null:
+		return {}
+	var data: Dictionary = _selected_actor.data
+	return data.get("preferred_miniature", {})
+
+func _miniature_title(reference: Dictionary) -> String:
+	if reference.is_empty():
+		return _t("No Miniature selected")
+	var found := sdk.content.read(SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", ""))))
+	if not found.ok or not found.content_entry.available:
+		return _t("Saved Miniature unavailable. Choose a replacement.")
+	return found.content_entry.localized_title
+
+func _render_miniatures() -> void:
+	if sdk == null:
+		return
+	var panel := _catalogue.get_node(^"Preview/Miniature")
+	(panel.get_node(^"Current") as Label).text = _miniature_title(_library_miniature())
+	(panel.get_node(^"Choose") as Button).disabled = _busy or not sdk.context().is_gm or _selected_definition == null
+	(panel.get_node(^"Clear") as Button).disabled = _busy or not sdk.context().is_gm or _library_miniature().is_empty()
+	var actor_panel := get_node(MINIATURE_PANEL)
+	actor_panel.visible = _route == "creature" and _selected_actor != null
+	if _selected_actor != null:
+		var reference: Dictionary = _actor_miniature()
+		(actor_panel.get_node(^"Current") as Label).text = _miniature_title(reference)
+		(actor_panel.get_node(^"Choose") as Button).disabled = _busy or _selected_actor.access_level != "Owner"
+		var id := sdk.rooks.selected()
+		var linked := false
+		if id != null:
+			var selected := sdk.rooks.read(id)
+			linked = selected.ok and selected.rook.actor != null and selected.rook.actor.value == _selected_actor.id.value
+		(actor_panel.get_node(^"ApplySelected") as Button).disabled = _busy or not linked or _selected_actor.access_level != "Owner" or not MINIATURE_ACTIONS.new(sdk).available(reference)
+
+func _open_miniature(library: bool) -> void:
+	if _busy or (library and (_selected_definition == null or not sdk.context().is_gm)) or (not library and (_selected_actor == null or _selected_actor.access_level != "Owner")):
+		return
+	_body.visible = false
+	_routes.visible = false
+	_action_bar.visible = false
+	_catalogue_bar.visible = false
+	get_node(^"Layout/SheetActions").visible = false
+	_header.visible = false
+	get_node(^"Layout/MiniatureWorkflow").open(sdk, i18n, null if library else _selected_actor.id,
+		_selected_definition.reference.local_id if library else "",
+		_library_miniature() if library else _actor_miniature())
+
+func _close_miniature(saved: bool) -> void:
+	_header.visible = true
+	_reload_world()
+	_apply_route(_route)
+	if saved:
+		_set_status("Miniature saved.")
+	var target := _catalogue.get_node(^"Preview/Miniature/Choose") if _route == "creatures" else get_node(MINIATURE_PANEL + "/Choose")
+	target.grab_focus()
+
+func _clear_library_miniature() -> void:
+	if _busy or _selected_definition == null:
+		return
+	_set_busy(true, "Saving Miniature…")
+	var result := await sdk.system_actions.submit("miniature.default", {"definition": _selected_definition.reference.local_id, "package_id": "", "local_id": ""})
+	var succeeded: bool = result.ok and str(result.value.get("state", "error")) == "resolved"
+	_set_busy(false, "Library Miniature saved." if succeeded else (str(result.value.get("message", "")) if result.ok else result.message), not succeeded)
+	_render_miniatures()
+
+func _apply_selected_miniature() -> void:
+	if _busy or _selected_actor == null:
+		return
+	_set_busy(true, "Saving Miniature…")
+	var result := await MINIATURE_ACTIONS.new(sdk).apply_selected(_selected_actor.id)
+	_set_busy(false, "Miniature saved." if result.ok else result.message, not result.ok)
