@@ -55,6 +55,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
 [node name="Self" type="CheckBox" parent="Columns/Recipient/Content"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Self"
@@ -67,6 +68,7 @@ text = "Change recipient"
 [node name="Options" type="VBoxContainer" parent="."]
 layout_mode = 2
 [node name="Eligible" type="CheckBox" parent="Options"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Requirements confirmed with the table"
@@ -99,12 +101,14 @@ autowrap_mode = 2
 [node name="Choices" type="VBoxContainer" parent="Options/Ability"]
 layout_mode = 2
 [node name="NewFight" type="CheckBox" parent="Options"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "New fight confirmed: roll d2 spits"
 [node name="Morale" type="VBoxContainer" parent="Options"]
 layout_mode = 2
 [node name="Subtract" type="CheckBox" parent="Options/Morale"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Subtract Presence (otherwise add)"

@@ -132,3 +132,21 @@ func test_long_russian_live_names_fit_the_phone_content_width() -> void:
 	assert_str(row.tooltip_text).contains("Персонаж с очень длинным именем")
 	assert_str(row.tooltip_text).contains("Незнакомец с очень длинным именем")
 	assert_str(row.accessibility_name).is_equal(row.tooltip_text)
+
+func test_russian_cast_confirmation_wraps_inside_phone_width() -> void:
+	var panel = auto_free(load(ROOT + "ui/powers_panel.tscn").instantiate())
+	panel.localize(_locale("ru"))
+	var eligible: CheckBox = panel.get_node("Cast/Options/Eligible")
+	eligible.owner = null
+	eligible.get_parent().remove_child(eligible)
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(375, 369)
+	add_child(viewport)
+	viewport.add_child(auto_free(eligible))
+	eligible.size = Vector2(351, 44)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_bool(eligible.get_combined_minimum_size().x <= 351).is_true()
+	assert_bool(eligible.size.x <= 351).is_true()
+	assert_bool(eligible.size.y >= 44).is_true()
+	assert_str(eligible.text).is_equal(_locale("ru").text("Not dizzy; requirements met"))

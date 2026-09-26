@@ -128,6 +128,7 @@ theme_type_variation = &"RookframeSecondaryButton"
 text = "Authorize improvement"
 
 [node name="Eligible" type="CheckBox" parent="Columns/Context/Content"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Table confirms eligibility"
@@ -138,12 +139,14 @@ layout_mode = 2
 
 
 [node name="Food" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Had food and drink"
 button_pressed = true
 
 [node name="Infected" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Currently infected"
@@ -165,60 +168,70 @@ layout_mode = 2
 
 
 [node name="Scroll0" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll1" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll2" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll3" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll4" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll5" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll6" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll7" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll8" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Scroll9" type="CheckBox" parent="Scrolls/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
@@ -246,12 +259,14 @@ layout_mode = 2
 
 
 [node name="Specialty0" type="CheckBox" parent="Specialties/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""
 
 
 [node name="Specialty1" type="CheckBox" parent="Specialties/Choices"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = ""

@@ -167,6 +167,7 @@ layout_mode = 2
 label_text = "Situational modifier"
 value = "0"
 [node name="Eligible" type="CheckBox" parent="Cast/Options"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Not dizzy; requirements met"

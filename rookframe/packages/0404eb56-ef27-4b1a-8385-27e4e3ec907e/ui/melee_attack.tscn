@@ -132,21 +132,25 @@ layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="Jab" type="CheckBox" parent="Rules"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Coward’s Jab (surprise, light one-handed)"
 
 [node name="Eligible" type="CheckBox" parent="Rules"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Requirements confirmed"
 
 [node name="SmallMedium" type="CheckBox" parent="Rules"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Target is small or medium-sized"
 
 [node name="Faithless" type="CheckBox" parent="Rules"]
+autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 text = "Target is a faithless human (ordinary staff damage)"
