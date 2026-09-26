@@ -96,6 +96,9 @@ func test_catalog_covers_all_authored_rule_content_and_preserves_formats() -> vo
 		assert_array(translated_formats).is_equal(source_formats)
 	_assert_content(load(ROOT + "logic/creation_classes.gd").PROFILES, russian)
 	_assert_content(load(ROOT + "logic/starting_scrolls.gd").TABLES, russian)
+	var powers = load(ROOT + "logic/powers.gd").new()
+	for id in powers.HANDLING:
+		_assert_content(powers.definition(id), russian)
 	_assert_content(load(ROOT + "logic/creature_definition.gd").CORE_DEFINITIONS, russian)
 	_assert_content(load(ROOT + "logic/equipment.gd").new().entries(), russian)
 

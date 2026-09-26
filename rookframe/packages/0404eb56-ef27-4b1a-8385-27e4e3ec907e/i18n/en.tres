@@ -1161,5 +1161,7 @@ messages = {
 [&"", &" uses remaining · "]: [&" uses remaining · "],
 [&"", &" uses"]: [&" uses"],
 [&"", &" remaining uses"]: [&" remaining uses"],
-[&"", &" rules"]: [&" rules"]
+[&"", &" rules"]: [&" rules"],
+[&"", &"narrative"]: [&"narrative"],
+[&"", &"ongoing"]: [&"ongoing"]
 }
