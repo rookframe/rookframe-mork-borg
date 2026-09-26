@@ -779,7 +779,7 @@ func _cycle_preferred_miniature(miniature: Button) -> void:
 	if index == 0:
 		miniature.text = _t("Choose a published Miniature")
 	else:
-		miniature.text = str(_character_miniature_choices[index - 1].get("title", "Published Miniature"))
+		miniature.text = _t(str(_character_miniature_choices[index - 1].get("title", "Published Miniature")))
 	_preferred_miniature_index = index
 	_set_preferred_miniature(index, miniature)
 

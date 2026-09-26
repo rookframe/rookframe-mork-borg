@@ -29,7 +29,7 @@ func configure(data: Dictionary, _count: int, choices: Array[Dictionary]) -> voi
 				_default_rows.append(row)
 			else:
 				_selected_rows.append(row)
-			row.text = str(choice.get("title", "Miniature"))
+			row.text = _t(str(choice.get("title", "Miniature")))
 			row.pressed.connect(_select.bind(scope, index + 1))
 			if str(reference.get("package_id", "")) == str(choice.get("package_id", "")) and str(reference.get("local_id", "")) == str(choice.get("local_id", "")):
 				title = str(choice.get("title", "Miniature"))
@@ -37,7 +37,7 @@ func configure(data: Dictionary, _count: int, choices: Array[Dictionary]) -> voi
 				row.button_pressed = true
 		var rook_available: bool = data.get("selected_rook_available", false)
 		var available: bool = scope == "Default" or rook_available
-		get_node(scope + "/Content/Row/Details/Title").text = title if available else _t("Select this Character’s Rook")
+		get_node(scope + "/Content/Row/Details/Title").text = _t(title) if available else _t("Select this Character’s Rook")
 		get_node(scope + "/Content/Row/Details/Choose").disabled = choices.is_empty() or not available or read_only
 func _choose(scope: String) -> void:
 	get_node(scope + "/Content/Row/Details/Picker").visible = true

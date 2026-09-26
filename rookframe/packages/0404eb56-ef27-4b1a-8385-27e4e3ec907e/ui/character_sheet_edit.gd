@@ -35,13 +35,13 @@ func _add_entries(data: Dictionary, key: String, only_index: int = -1) -> void:
 			continue
 		var entry: Dictionary = entries[index]
 		var prefix := "trait" if key == "traits" else "companion"
-		_add("%s:%d:name" % [prefix, index], ("Trait" if key == "traits" else "Companion") + " name", str(entry.get("name", "")))
+		_add("%s:%d:name" % [prefix, index], _t("Trait" if key == "traits" else "Companion") + _t(" name"), str(entry.get("name", "")))
 		var rule := RULES.new().definition(str(entry.get("id", "")))
 		if key == "traits" and rule.has("uses") and not entry.has("item"):
 			var default_uses: int = rule.get("uses", 0)
 			var uses: int = entry.get("uses", default_uses)
-			_add("trait:%d:uses" % index, str(entry.get("name", "")) + " remaining uses", str(uses))
-		_add("%s:%d:rules" % [prefix, index], str(entry.get("name", "")) + " rules", str(entry.get("rules", "")))
+			_add("trait:%d:uses" % index, str(entry.get("name", "")) + _t(" remaining uses"), str(uses))
+		_add("%s:%d:rules" % [prefix, index], str(entry.get("name", "")) + _t(" rules"), str(entry.get("rules", "")))
 
 func _add(key: String, title: String, value: String) -> void:
 	var field = FIELD.instantiate()

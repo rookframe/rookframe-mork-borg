@@ -61,6 +61,23 @@ func test_editable_values_and_fallback() -> void:
 		view.refresh_value("Strength")
 		assert_str(view.current_value()).is_equal("Unsaved name")
 
+func test_edit_labels_translate_without_rewriting_named_content() -> void:
+	var view = auto_free(load(ROOT + "ui/character_sheet_edit.tscn").instantiate())
+	view.localize(_locale("ru"))
+	add_child(view)
+	var data := {"traits": [{"id": "custom", "name": "My trait", "rules": "My rules"}], "companion_sheets": [{"name": "My companion", "rules": "Their rules"}]}
+	view.configure(data, [])
+	var found := false
+	for field in view._fields:
+		if field.field == "trait:0:name":
+			assert_str(field.get_node("Field").label_text).is_equal("Черта: имя")
+			assert_str(field.current_value()).is_equal("My trait")
+		if field.field == "trait:0:rules":
+			assert_str(field.get_node("Multiline").label_text).is_equal("My trait: правила")
+			assert_str(field.current_value()).is_equal("My rules")
+			found = true
+	assert_bool(found).is_true()
+
 func test_catalog_covers_all_authored_rule_content_and_preserves_formats() -> void:
 	var english: Translation = load(ROOT + "i18n/en.tres")
 	var russian: Translation = load(ROOT + "i18n/ru.tres")
