@@ -208,6 +208,10 @@ func _render_live_actors() -> void:
 		var private_name: String = actor_data.get("name", "Private Creature")
 		var public_name := actor.public_label if not actor.public_label.is_empty() else "Public name pending"
 		button.text = _t("%s  ·  Public: %s") % [private_name, public_name]
+		button.clip_text = true
+		button.text_overrun_behavior = 3
+		button.tooltip_text = button.text
+		button.accessibility_name = button.text
 		button.custom_minimum_size = Vector2(0, 44)
 		button.focus_mode = 2
 		button.alignment = 0
@@ -524,7 +528,7 @@ func _apply_route(route: String) -> void:
 	if catalogue:
 		_header_title.text = _t("CREATURES")
 		_header_subtitle.text = _t("MÖRK BORG · 12 definitions")
-		_set_window_title("CREATURES")
+		_set_window_title(_t("CREATURES"))
 		_header_title.visible = not _compact
 		_header_subtitle.visible = not _compact
 		_set_status("Ready — immutable definitions are available to the GM.")
@@ -533,7 +537,7 @@ func _apply_route(route: String) -> void:
 	if edit:
 		_header_title.text = _t("EDIT CREATURE")
 		_header_subtitle.text = _t("Private values · public name")
-		_set_window_title("EDIT CREATURE")
+		_set_window_title(_t("EDIT CREATURE"))
 	elif inventory:
 		var selected_data: Dictionary = _selected_actor.data
 		var inventory_name: String = selected_data.get("name", "CREATURE")
@@ -993,7 +997,7 @@ func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
 	_routes.visible = false
 	_header_title.text = str(data.get("name", "Creature")).to_upper() + _t(" · DEFENCE")
 	_header_subtitle.visible = false
-	_set_window_title(str(data.get("name", "Creature")) + " · Defence")
+	_set_window_title(str(data.get("name", "Creature")) + _t(" · Defence"))
 	_creature_defence.visible = true
 	_creature_defence.present(sdk, outcome)
 	_body.scroll_vertical = 0

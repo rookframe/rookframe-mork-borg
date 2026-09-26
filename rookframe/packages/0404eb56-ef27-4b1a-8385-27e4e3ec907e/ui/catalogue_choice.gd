@@ -19,7 +19,7 @@ func set_selected(chosen: bool) -> void:
 	button_pressed = chosen
 	get_node("Content/State").text = _t("Selected") if chosen else _t("Select")
 	get_node("Content/IndicatorLane/Indicator").visible = chosen
-	accessibility_description = "Selected" if chosen else "Not selected"
+	accessibility_description = _t("Selected") if chosen else _t("Not selected")
 
 func _gui_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_down") or event.is_action_pressed("ui_right"):

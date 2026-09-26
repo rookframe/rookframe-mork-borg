@@ -409,7 +409,7 @@ as the shared presentation reference, following the user's RFG-294 instruction.
 
 ## Languages
 
-Version 1.0.79 adds Russian to the Package UI and authored class, Creature,
+Version 1.0.80 includes Russian to the Package UI and authored class, Creature,
 equipment, trait, origin and scroll descriptions. Choose **Русский** in
 Rookframe → Settings → Game settings → Language before opening the World.
 English remains the Package default for unsupported application languages.

@@ -108,3 +108,27 @@ func _assert_content(value: Variant, catalog: Translation, key: String = "") -> 
 			_assert_content(entry, catalog, key)
 	elif value is String and key in ["name", "title", "rules", "origins", "handling"] and not value.is_empty():
 		assert_str(str(catalog.get_message(value))).override_failure_message("Missing Russian content: " + value).is_not_empty()
+
+func test_long_russian_live_names_fit_the_phone_content_width() -> void:
+	var window = auto_free(load(ROOT + "ui/window.tscn").instantiate())
+	window.i18n = _locale("ru")
+	var list: VBoxContainer = window.get_node("Layout/Body/Content/LiveList")
+	window._live_list = list
+	window._actors.append(SDK.Actor.new({"id": "fixture", "data": {"name": "Персонаж с очень длинным именем"}, "access_level": "Owner", "public_label": "Незнакомец с очень длинным именем"}))
+	list.owner = null
+	list.get_parent().remove_child(list)
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(375, 369)
+	add_child(viewport)
+	viewport.add_child(auto_free(list))
+	window._render_live_actors()
+	list.size = Vector2(351, 100)
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var row: Button = list.get_child(0)
+	assert_bool(list.get_combined_minimum_size().x <= 351).is_true()
+	assert_bool(row.size.x <= 351).is_true()
+	assert_bool(row.size.y >= 44).is_true()
+	assert_str(row.tooltip_text).contains("Персонаж с очень длинным именем")
+	assert_str(row.tooltip_text).contains("Незнакомец с очень длинным именем")
+	assert_str(row.accessibility_name).is_equal(row.tooltip_text)
