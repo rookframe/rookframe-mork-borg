@@ -1,9 +1,6 @@
-[gd_scene format=3]
-
-[node name="LiveActorRow" type="Button"]
-custom_minimum_size = Vector2(0, 44)
-size_flags_horizontal = 3
+[gd_scene load_steps=2 format=3]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/catalogue_choice.tscn" id="1"]
+[node name="LiveActorRow" instance=ExtResource("1")]
 theme_type_variation = &"RookframeSecondaryButton"
-alignment = 0
-clip_text = true
-text_overrun_behavior = 3
+[node name="IndicatorLane" parent="Content" index=2]
+visible = false

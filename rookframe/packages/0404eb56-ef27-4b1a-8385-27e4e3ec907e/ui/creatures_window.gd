@@ -204,13 +204,14 @@ func _render_live_actors() -> void:
 	for child in _live_list.get_children():
 		child.queue_free()
 	for actor in _actors:
-		var button: Button = LIVE_ACTOR_ROW.instantiate()
+		var button = LIVE_ACTOR_ROW.instantiate()
+		button.localize(i18n)
 		var actor_data: Dictionary = actor.data
 		var private_name: String = actor_data.get("name", "Private Creature")
 		var public_name := actor.public_label if not actor.public_label.is_empty() else "Public name pending"
-		button.text = _t("%s  ·  Public: %s") % [private_name, public_name]
-		button.tooltip_text = button.text
-		button.accessibility_name = button.text
+		button.title = _t("%s  ·  Public: %s") % [private_name, public_name]
+		button.tooltip_text = button.title
+		button.accessibility_name = button.title
 		button.custom_minimum_size = Vector2(0, 44)
 		button.focus_mode = 2
 		button.alignment = 0
