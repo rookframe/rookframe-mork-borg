@@ -8,11 +8,11 @@ func describe(sdk: SDK, source: SDK.RookId, reach: float) -> String:
 	var summary := ""
 	for rook in targets.snapshot.rooks:
 		var identity: SDK.PublicIdentityResult = sdk.public_identities.read(rook)
-		var line := identity.public_identity.label if identity.ok else "Creature"
+		var line := identity.public_identity.label if identity.ok else sdk.translations.text("Creature")
 		if source != null:
 			var distance: SDK.DistanceResult = sdk.scenes.distance(source, rook)
 			if distance.ok:
 				var feet := distance.distance / 0.3048
-				line += "\n%.1f ft · %s" % [feet, "In range" if feet <= reach + 0.00001 else "Out of range"]
+				line += sdk.translations.text("\n%.1f ft · %s") % [feet, sdk.translations.text("In range") if feet <= reach + 0.00001 else sdk.translations.text("Out of range")]
 		summary += ("\n" if not summary.is_empty() else "") + line
-	return summary if not summary.is_empty() else "Choose one target"
+	return summary if not summary.is_empty() else sdk.translations.text("Choose one target")

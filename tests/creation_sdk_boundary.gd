@@ -132,3 +132,6 @@ func CancelHumanThrow(id: String) -> Dictionary:
 func PublishActionLog(report: Dictionary) -> Dictionary:
 	reports.append(report.duplicate(true))
 	return {"ok": true, "value": {"sequence": reports.size() + 42}}
+
+func Translate(message: String, _domain: String) -> String:
+	return message

@@ -1,5 +1,8 @@
 extends VBoxContainer
 
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
+
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 const SCROLLS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/starting_scrolls.gd")
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
@@ -52,6 +55,8 @@ func configure(definitions: Array[SDK.ContentEntry], character_definition: SDK.C
 	_character_miniature_choices = miniature_choices
 	_compact = compact
 	sdk = facade
+	i18n.bind(sdk)
+	localize(i18n)
 	_character_content = self
 
 
@@ -148,7 +153,7 @@ func _show_creation_route(route: String) -> void:
 	stage_changed.emit(_stage_index(route), title)
 	var primary := "Create character" if route == "create-review" else ("Review character" if route == "create-identity" else "Continue")
 	if bool(_character_draft.get("roll_pending", false)) or bool(_character_draft.get("equipment_roll_pending", false)):
-		primary = "Roll %s" % str(_character_draft.get("active_roll", "")) if _roll_ready else "Rolling…"
+		primary = _t("Roll %s") % _t(str(_character_draft.get("active_roll", ""))) if _roll_ready else "Rolling…"
 	if route == "create-equipment" and bool(_character_draft.get("pack_choice_pending", false)):
 		primary = "Choose a pack"
 	primary_changed.emit(primary, _route_blocked(route))
@@ -742,11 +747,11 @@ func _sync_identity_fields() -> void:
 func _cycle_pack(pack: Button, choices: Array) -> void:
 	var index := 0
 	for choice_index in range(choices.size()):
-		if pack.text == "Pack: %s" % choices[choice_index]:
+		if not bool(_character_draft.get("pack_choice_pending", false)) and str(_character_draft.get("pack", "")) == str(choices[choice_index]):
 			index = choice_index + 1
 	if index >= choices.size():
 		index = 0
-	pack.text = "Pack: %s" % choices[index]
+	pack.text = _t("Pack: %s") % _t(str(choices[index]))
 	_character_draft["pack"] = choices[index]
 	_replace_pack_inventory(str(choices[index]))
 
@@ -772,7 +777,7 @@ func _cycle_preferred_miniature(miniature: Button) -> void:
 	if index > available_count:
 		index = 0
 	if index == 0:
-		miniature.text = "Choose a published Miniature"
+		miniature.text = _t("Choose a published Miniature")
 	else:
 		miniature.text = str(_character_miniature_choices[index - 1].get("title", "Published Miniature"))
 	_preferred_miniature_index = index
@@ -870,3 +875,17 @@ func set_compact(compact: bool) -> void:
 	_compact = compact
 	if _creation_active:
 		_show_creation_route(_character_stage)
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"View").localize(locale)

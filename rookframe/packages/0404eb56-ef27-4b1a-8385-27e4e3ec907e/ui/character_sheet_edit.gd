@@ -1,4 +1,7 @@
 extends VBoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
@@ -42,6 +45,7 @@ func _add_entries(data: Dictionary, key: String, only_index: int = -1) -> void:
 
 func _add(key: String, title: String, value: String) -> void:
 	var field = FIELD.instantiate()
+	field.localize(i18n)
 	get_node(^"Fields").add_child(field)
 	field.configure(key, title, value)
 	_fields.append(field)
@@ -117,3 +121,18 @@ func _current_trait_ids(data: Dictionary) -> Array[String]:
 		var entry: Dictionary = raw
 		result.append(str(entry.get("id", "")))
 	return result
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Back").text = _t("Back to Character")
+	get_node(^"Heading").text = _t("CHARACTER DETAILS")

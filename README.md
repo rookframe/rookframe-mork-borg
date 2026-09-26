@@ -406,3 +406,27 @@ Presentation follows the conventional roster/round/next-turn controls in
 [Roll20](https://help.roll20.net/hc/en-us/articles/360039178634-Turn-Tracker), with
 [Baldur's Gate 3's portrait turn order](https://www.baldursgate3.game/news/patch-2-now-live_89)
 as the shared presentation reference, following the user's RFG-294 instruction.
+
+## Languages
+
+Version 1.0.79 adds Russian to the Package UI and authored class, Creature,
+equipment, trait, origin and scroll descriptions. Choose **Русский** in
+Rookframe → Settings → Game settings → Language before opening the World.
+English remains the Package default for unsupported application languages.
+
+The Manifest declares ordinary Godot `Translation` resources at `i18n/en.tres`
+and `i18n/ru.tres`. Authored views receive the generated SDK's translation
+capability through `localize()` and translate complete templates before formatting.
+The two rail entry scenes select their authored Russian copy through the same
+Package catalog; the rail API itself does not inject an SDK into Button scenes.
+There is no global catalog registration or host-node search.
+
+Names, custom item names, editable values, IDs, dice requests, gameplay data and
+recorded Action Log reports keep their original values. Language is local to each
+Participant; changing it does not rewrite the shared World or its history.
+Both original and Russian names can be searched in the equipment/Creature catalogues.
+
+`tests/localization.gd` covers Russian creation and inventory rendering, translated
+search, English fallback, untouched user input and drafts, format argument parity,
+and coverage of every authored class, equipment, Creature and scroll description.
+Keep English IDs and action-state comparisons separate from translated display copy.

@@ -1,4 +1,7 @@
 extends VBoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
@@ -32,11 +35,13 @@ func _rest_changed() -> void:
 	var sleep: Button = get_node(^"Columns/Task/Rest/Content/Sleep")
 	for choice in [breath, sleep]:
 		choice.icon = CHECK if choice.button_pressed else null
-		choice.accessibility_description = "Selected" if choice.button_pressed else "Not selected"
+		choice.accessibility_description = _t("Selected") if choice.button_pressed else _t("Not selected")
 
 func configure(actor: SDK.Actor, facade: SDK, route: String) -> void:
 	_actor = actor
 	_sdk = facade
+	i18n.bind(_sdk)
+	localize(i18n)
 	_route = route
 	if not _sdk.world_changed.is_connected(_changed):
 		_sdk.world_changed.connect(_changed)
@@ -56,17 +61,17 @@ func _render() -> void:
 	get_node(^"Columns/Task/Rest").visible = _route == "rest"
 	get_node(^"Columns/Task/Improvement").visible = improve
 	get_node(^"Columns/Task/Broken").visible = _route == "broken"
-	get_node(^"Columns/Context/Content/Heading").text = "WHEN THE GM DECIDES" if improve else "BEFORE ROLLING"
-	get_node(^"Columns/Context/Content/Copy").text = "Begin after the GM grants an improvement. Resolve each step in order." if improve else ("The table establishes that this rest has happened. Without food or drink, or while infected, resting restores no HP." if _route == "rest" else "At zero HP, roll Broken. Negative HP means dead. Delayed recovery and other timed consequences are handled by the table.")
-	get_node(^"Columns/Context/Content/Values").text = "Current hit points\n%s / %s" % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
+	get_node(^"Columns/Context/Content/Heading").text = _t("WHEN THE GM DECIDES") if improve else _t("BEFORE ROLLING")
+	get_node(^"Columns/Context/Content/Copy").text = _t("Begin after the GM grants an improvement. Resolve each step in order.") if improve else (_t("The table establishes that this rest has happened. Without food or drink, or while infected, resting restores no HP.") if _route == "rest" else _t("At zero HP, roll Broken. Negative HP means dead. Delayed recovery and other timed consequences are handled by the table."))
+	get_node(^"Columns/Context/Content/Values").text = _t("Current hit points\n%s / %s") % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	if improve:
 		var abilities: Dictionary = data.get("abilities", {})
 		var labels := ""
 		for key in ["Agility", "Presence", "Strength", "Toughness"]:
 			var ability: Dictionary = abilities.get(key, {})
 			var modifier: int = ability.get("modifier", 0)
-			labels += (" · " if not labels.is_empty() else "") + "%s %+d" % [key, modifier]
-		get_node(^"Columns/Context/Content/Values").text = "Maximum HP · %s\n%s" % [str(data.get("maximum_hit_points", 0)), labels]
+			labels += (" · " if not labels.is_empty() else "") + _t("%s %+d") % [_t(key), modifier]
+		get_node(^"Columns/Context/Content/Values").text = _t("Maximum HP · %s\n%s") % [str(data.get("maximum_hit_points", 0)), labels]
 	get_node(^"Columns/Context/Content/Eligible").visible = not improve and editing
 	get_node(^"Columns/Context/Content/Restrictions").visible = _route == "rest" and editing
 	get_node(^"Columns/Task/Rest/Content/Breath").disabled = not editing
@@ -74,7 +79,7 @@ func _render() -> void:
 	var authorized := not str(data.get("improvement_grant", "")).is_empty()
 	get_node(^"Columns/Context/Content/Authorize").visible = improve and editing and _sdk.context().is_gm and not authorized
 	get_node(^"Columns/Context/Content/Authorization").visible = improve and editing
-	get_node(^"Columns/Context/Content/Authorization").text = "GM authorization received." if authorized else "Waiting for the GM to authorize improvement."
+	get_node(^"Columns/Context/Content/Authorization").text = _t("GM authorization received.") if authorized else _t("Waiting for the GM to authorize improvement.")
 	get_node(^"Scrolls").visible = state == "scroll"
 	if state == "scroll":
 		var family := str(_action.snapshot.get("family", ""))
@@ -84,19 +89,19 @@ func _render() -> void:
 			for index in range(options.size()):
 				var entry: Dictionary = options[index]
 				var button := get_node(^"Scrolls/Choices").get_child(index) as Button
-				button.text = str(entry.name)
+				button.text = _t(str(entry.name))
 				button.pressed.connect(_choose_scroll.bind(str(entry.source_item_id)))
 	get_node(^"Specialties").visible = state == "specialties"
 	if state == "specialties":
 		var traits: Array = _action.snapshot.get("specialties", [])
 		for index in range(traits.size()):
 			var entry: Dictionary = traits[index]
-			(get_node(^"Specialties/Choices").get_child(index) as Button).text = "Reroll " + str(entry.get("name", "specialty"))
+			(get_node(^"Specialties/Choices").get_child(index) as Button).text = _t("Reroll ") + _t(str(entry.get("name", "specialty")))
 	var outcome := _action.message if _action != null else ""
-	get_node(^"Outcome").text = outcome
+	get_node(^"Outcome").text = _t(outcome)
 	get_node(^"Outcome").visible = not outcome.is_empty() and not terminal
-	get_node(^"Result/Content/Heading").text = title.to_upper()
-	get_node(^"Result/Content/Copy").text = outcome
+	get_node(^"Result/Content/Heading").text = _t(title).to_upper()
+	get_node(^"Result/Content/Copy").text = _t(outcome)
 	if terminal and not _terminal_shown:
 		get_node(^"Result/Content/Heading").grab_focus()
 	_terminal_shown = terminal
@@ -189,3 +194,32 @@ func close_action() -> void:
 		_action.cancel()
 func _exit_tree() -> void:
 	close_action()
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Columns/Context/Content/Authorize").text = _t("Authorize improvement")
+	get_node(^"Columns/Context/Content/Eligible").text = _t("Table confirms eligibility")
+	get_node(^"Columns/Context/Content/Heading").text = _t("BEFORE ROLLING")
+	get_node(^"Columns/Context/Content/Restrictions/Food").text = _t("Had food and drink")
+	get_node(^"Columns/Context/Content/Restrictions/Infected").text = _t("Currently infected")
+	get_node(^"Columns/Task/Broken/Content/Heading").text = _t("BROKEN · d4")
+	get_node(^"Columns/Task/Broken/Content/Rules").text = _t("1 · Unconscious\n2 · Broken limb or lost eye\n3 · Hemorrhage\n4 · Dead")
+	get_node(^"Columns/Task/Rest/Content/Breath").text = _t("Catch your breath · d4 HP")
+	get_node(^"Columns/Task/Rest/Content/Heading").text = _t("RECOVERY")
+	get_node(^"Columns/Task/Rest/Content/Sleep").text = _t("Full night’s sleep · d6 HP")
+	get_node(^"Scrolls/Heading").text = _t("CHOOSE THE FOUND SCROLL")
+	get_node(^"Specialties/Copy").text = _t("Leave both unchecked to keep them.")
+	get_node(^"Specialties/Heading").text = _t("GUTTERBORN SPECIALTIES")
+	get_node(^"Columns/Task/Improvement/Abilities").localize(locale)
+	get_node(^"Columns/Task/Improvement/Debris").localize(locale)
+	get_node(^"Columns/Task/Improvement/MoreHP").localize(locale)

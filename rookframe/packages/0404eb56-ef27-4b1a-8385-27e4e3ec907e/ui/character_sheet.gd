@@ -1,5 +1,8 @@
 extends VBoxContainer
 
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
+
 const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_targets.gd")
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 const COMPANIONS_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_companions.tscn")
@@ -86,6 +89,8 @@ func set_character(actor: SDK.Actor, tab: String, route: String, miniatures: Arr
 	_character_miniatures = miniatures
 	_character_miniature_choices = miniature_choices
 	sdk = facade
+	i18n.bind(sdk)
+	localize(i18n)
 	if not sdk.world_changed.is_connected(_world_changed):
 		sdk.world_changed.connect(_world_changed)
 	if not sdk.targeting.changed.is_connected(_targets_changed):
@@ -155,6 +160,7 @@ func _render_character_sheet() -> void:
 		if _health_panel == null:
 			clear_character_sheet()
 			var panel := HEALTH_SCENE.instantiate()
+			panel.localize(i18n)
 			_content.add_child(panel)
 			_health_panel = panel
 			_health_panel.navigate_requested.connect(_navigate)
@@ -167,6 +173,7 @@ func _render_character_sheet() -> void:
 		if _special_panel == null:
 			clear_character_sheet()
 			var panel := SPECIAL_SCENE.instantiate()
+			panel.localize(i18n)
 			_content.add_child(panel)
 			_special_panel = panel
 			_special_panel.navigate_requested.connect(_navigate)
@@ -179,6 +186,7 @@ func _render_character_sheet() -> void:
 		if _powers_panel == null:
 			clear_character_sheet()
 			var panel := POWERS_SCENE.instantiate()
+			panel.localize(i18n)
 			_content.add_child(panel)
 			_powers_panel = panel
 			_powers_panel.navigate_requested.connect(_navigate)
@@ -191,6 +199,7 @@ func _render_character_sheet() -> void:
 		if _defence_view == null:
 			clear_character_sheet()
 			var view := DEFENCE_SCENE.instantiate()
+			view.localize(i18n)
 			_content.add_child(view)
 			_defence_view = view
 		_defence_view.configure(_defence.snapshot, _defence.state, _defence.message)
@@ -207,6 +216,7 @@ func _render_character_sheet() -> void:
 		_show_companions()
 		return
 	var view = CHARACTER_SHEET_VIEW_SCENE.instantiate()
+	view.localize(i18n)
 	view.modifier_requested.connect(_roll_ability)
 	view.companions_requested.connect(_on_companions_requested)
 	view.mutation_requested.connect(_mutate)
@@ -325,8 +335,8 @@ func _set_status(message: String, error: bool = false) -> void:
 	if _status == null:
 		return
 	_status.theme_type_variation = "RookframeError" if error else "RookframeMeta"
-	_status.text = message
-	_status.tooltip_text = message
+	_status.text = _t(message)
+	_status.tooltip_text = _t(message)
 	_status.visible = not message.is_empty()
 
 
@@ -365,6 +375,7 @@ func _show_companions() -> void:
 		if str(data.get("schema", "")) == "mork-borg-adversary/v1" and (starting or summoned):
 			companions.append(actor)
 	var view = COMPANIONS_SCENE.instantiate()
+	view.localize(i18n)
 	view.back_requested.connect(_on_cancel_requested)
 	view.actor_requested.connect(_on_companion_selected)
 	view.placement_requested.connect(_on_companion_placement_requested)
@@ -456,7 +467,7 @@ func _sync_chrome() -> void:
 	elif _character_route in ["catalogue", "custom"]:
 		title = "Add Item"
 	elif _character_route == "attack":
-		title = str(_attack_item.get("name", "Weapon")) + " attack"
+		title = _t("%s attack") % (str(_attack_item.get("name", "Weapon")) if _attack_item.get("custom", false) else _t(str(_attack_item.get("name", "Weapon"))))
 	elif _character_route == "item":
 		title = "Inventory Item"
 		var items: Array = data.get("inventory", [])
@@ -518,6 +529,7 @@ func _render_attack() -> void:
 	if _item_id == "class:bite" and str(data.get("class_id", "")) == "fanged-deserter":
 		_attack_item = {"name": "Bite", "damage": "d6", "range_feet": 5, "attack_ability": "Strength", "natural": true}
 	var view := MELEE_SCENE.instantiate()
+	view.localize(i18n)
 	_content.add_child(view)
 	_melee_view = view
 	view.targets_requested.connect(_choose_attack_targets)
@@ -628,6 +640,7 @@ func _present_defence_update() -> void:
 		_shield_backdrop.visible = true
 		if _shield == null:
 			var dialog := SHIELD_SCENE.instantiate()
+			dialog.localize(i18n)
 			add_child(dialog)
 			_shield = dialog
 			_shield.choice_requested.connect(_choose_shield)
@@ -670,3 +683,16 @@ func health_primary_text() -> String:
 func _health_action_created(action: MELEE_ACTION) -> void:
 	_health_action = action
 	add_child(action)
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale

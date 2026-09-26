@@ -1,4 +1,7 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const RULES = preload(ROOT + "logic/encounter_authority.gd")
 const VIEW = preload(ROOT + "ui/encounter_view.gd")
@@ -16,6 +19,8 @@ var _closed := false
 @onready var _previous_button: Button = get_node(^"Layout/Footer/TrailingSlot/Navigation/Previous")
 
 func ready() -> void:
+	i18n.bind(sdk)
+	localize(i18n)
 	if sdk == null:
 		return
 	_local = VIEW.new().local_state(self)
@@ -52,7 +57,7 @@ func refresh() -> void:
 	get_node(^"Layout/Footer").visible = not snapshot.has("error")
 	if snapshot.has("error"):
 		task_state.state = 3
-		task_state.title = "Encounter unavailable"
+		task_state.title = _t("Encounter unavailable")
 		task_state.description = str(snapshot.error)
 		return
 	_state = snapshot
@@ -90,7 +95,7 @@ func refresh() -> void:
 	if opening and options.visible:
 		_focus_round()
 	get_node(^"Layout/Footer").visible = bool(_state.is_gm)
-	_primary_button.text = "Next" if _state.active else "Begin"
+	_primary_button.text = _t("Next") if _state.active else _t("Begin")
 	_primary_button.disabled = pending or rows.is_empty()
 	_previous_button.disabled = pending or not _state.active or (_state.round == 1 and _state.current == RULES.new().phases(_state)[0])
 	(get_node(^"Layout/Body/Content/Options/Round/Set") as Button).disabled = pending
@@ -204,7 +209,7 @@ func _tabletop_selection() -> void:
 		sdk.windows.close(VIEW.new().surface(sdk))
 
 func _show_outcome(message: String, state: String) -> void:
-	_outcome.text = message
+	_outcome.text = _t(message)
 	_outcome.visible = not message.is_empty()
 	_outcome.theme_type_variation = "RookframeError" if state == "error" else "RookframePending" if state == "pending" else "RookframeStatus"
 
@@ -222,3 +227,27 @@ func _process(_delta: float) -> void:
 func _bounds_changed() -> void:
 	if is_visible_in_tree():
 		_local.panel_bounds(get_global_rect())
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Layout/Body/Content/Empty").text = _t("Select a Rook and tap swords to add it.")
+	get_node(^"Layout/Body/Content/Options/End").text = _t("End encounter")
+	get_node(^"Layout/Body/Content/Options/Round/Label").text = _t("Round")
+	get_node(^"Layout/Body/Content/Options/Round/Set").text = _t("Set")
+	get_node(^"Layout/Body/Content/Options/Round/Value").accessibility_name = _t("Round")
+	get_node(^"Layout/Body/Content/Selected/Actions/Morale").text = _t("Morale")
+	get_node(^"Layout/Body/Content/Selected/Actions/Reaction").text = _t("Reaction")
+	get_node(^"Layout/Body/Content/Sides/Monsters").text = _t("Monsters")
+	get_node(^"Layout/Body/Content/Sides/Players").text = _t("Players")
+	get_node(^"Layout/Body/Content/Sides/Roll").accessibility_name = _t("Roll initiative")
+	get_node(^"Layout/Body/Content/Sides/Roll").tooltip_text = _t("Roll initiative")

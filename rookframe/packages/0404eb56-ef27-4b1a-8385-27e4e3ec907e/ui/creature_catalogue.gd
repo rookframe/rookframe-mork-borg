@@ -1,4 +1,7 @@
 extends BoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 const CHOICE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/catalogue_choice.tscn")
@@ -30,8 +33,9 @@ func configure(entries: Array[SDK.ContentEntry], selected_id: String = "") -> vo
 		_rows.clear()
 		for entry in _entries:
 			var row := CHOICE.instantiate()
-			row.title = entry.title
-			row.tooltip_text = entry.title
+			row.localize(i18n)
+			row.title = _t(entry.title)
+			row.tooltip_text = _t(entry.title)
 			row.theme_type_variation = "RookframeChoiceRow"
 			row.custom_minimum_size = Vector2(0, 52)
 			row.size_flags_horizontal = 3
@@ -64,16 +68,16 @@ func _select(entry: SDK.ContentEntry, notify: bool = true) -> void:
 		row.focus_mode = 2 if chosen else 1
 	_refresh_tab_stop()
 	var definition: Dictionary = CREATURES.CORE_DEFINITIONS.get(_selected_id, {})
-	(get_node("Preview/Identity/Content/Title") as Label).text = entry.title.to_upper()
+	(get_node("Preview/Identity/Content/Title") as Label).text = _t(entry.title).to_upper()
 	(get_node("Preview/Identity/Content/Portrait") as Control).visible = _selected_id == "seth-goblin"
 	(get_node("Preview/Stats/HitPoints/Content/Value") as Label).text = str(definition.get("hit_points", 0))
 	var morale: Dictionary = definition.get("morale", {})
-	(get_node("Preview/Stats/Morale/Content/Value") as Label).text = str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else ("Special" if str(morale.get("kind", "")) == "special" else "—")
+	(get_node("Preview/Stats/Morale/Content/Value") as Label).text = str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else (_t("Special") if str(morale.get("kind", "")) == "special" else "—")
 	var attacks := ""
 	var attack_rows: Array = definition.get("attacks", [])
 	for raw in attack_rows:
 		var attack: Dictionary = raw
-		attacks += ("\n\n" if not attacks.is_empty() else "") + str(attack.get("name", "")) + " · " + str(attack.get("dice", ""))
+		attacks += ("\n\n" if not attacks.is_empty() else "") + _t(str(attack.get("name", ""))) + " · " + str(attack.get("dice", ""))
 	(get_node("Preview/Attacks/Content/Copy") as Label).text = attacks
 	if notify:
 		selected.emit(entry)
@@ -81,7 +85,7 @@ func _select(entry: SDK.ContentEntry, notify: bool = true) -> void:
 func filter(query: String) -> void:
 	query = query.strip_edges().to_lower()
 	for index in range(_rows.size()):
-		_rows[index].visible = query.is_empty() or _entries[index].title.to_lower().contains(query)
+		_rows[index].visible = query.is_empty() or (_entries[index].title.to_lower().contains(query) or _t(_entries[index].title).to_lower().contains(query))
 	_refresh_tab_stop()
 
 func _arrange() -> void:
@@ -116,3 +120,21 @@ func _refresh_tab_stop() -> void:
 				break
 	for row in _rows:
 		row.focus_mode = 2 if row == tab_stop else 1
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"List/Content/Heading").text = _t("CATALOGUE")
+	get_node(^"Preview/Attacks/Content/Heading").text = _t("ATTACKS")
+	get_node(^"Preview/Help").text = _t("Create a private Creature sheet, then choose its public name.")
+	get_node(^"Preview/Stats/HitPoints/Content/Label").text = _t("HP")
+	get_node(^"Preview/Stats/Morale/Content/Label").text = _t("MORALE")

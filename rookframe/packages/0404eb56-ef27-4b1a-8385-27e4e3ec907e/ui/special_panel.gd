@@ -1,4 +1,7 @@
 extends VBoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")
@@ -39,6 +42,8 @@ func _ready() -> void:
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
 	_sdk = facade
+	i18n.bind(_sdk)
+	localize(i18n)
 	_item = item
 	_entry = RULES.new().owned(actor.data, item)
 	_rule = RULES.new().definition(str(_entry.get("source_item_id", "")))
@@ -59,9 +64,9 @@ func _render() -> void:
 	var editing := state in ["ready", "error"]
 	var title := str(_entry.get("name", "Use item"))
 	get_node(^"Columns/Item/Content/Name").visible = false
-	get_node(^"Columns/Item/Content/Rules").text = str(_entry.get("rules", ""))
+	get_node(^"Columns/Item/Content/Rules").text = _t(str(_entry.get("rules", "")))
 	if _rule.get("blade", false):
-		get_node(^"Columns/Item/Content/Rules").text += " Check treachery when the table confirms continual disappointment; choose the possible victim before rolling. The source leaves check frequency and victim selection to the table."
+		get_node(^"Columns/Item/Content/Rules").text += _t(" Check treachery when the table confirms continual disappointment; choose the possible victim before rolling. The source leaves check frequency and victim selection to the table.")
 	var default_uses: int = _rule.get("uses", -1)
 	var uses: int = _entry.get("uses", default_uses)
 	if _entry.has("dose_pool"):
@@ -72,20 +77,20 @@ func _render() -> void:
 			if str(item.get("source_item_id", "")) == str(_entry.dose_pool):
 				uses = item.get("uses", 0)
 	var reach: int = _rule.get("range_feet", 0)
-	get_node(^"Columns/Item/Content/Uses").text = (str(uses) + " uses remaining · " if _entry.has("uses") or _rule.has("uses") or _entry.has("dose_pool") else "") + ("Self" if reach == 0 else "%d ft" % reach)
+	get_node(^"Columns/Item/Content/Uses").text = (str(uses) + _t(" uses remaining · ") if _entry.has("uses") or _rule.has("uses") or _entry.has("dose_pool") else "") + (_t("Self") if reach == 0 else _t("%d ft") % reach)
 	get_node(^"Columns/Recipient/Content/Self").visible = reach > 0 and not _rule.get("book", false)
 	get_node(^"Columns/Recipient/Content/Self").disabled = not editing
 	get_node(^"Columns/Recipient/Content/Change").visible = reach > 0
 	get_node(^"Columns/Recipient/Content/Change").disabled = not editing
 	if reach == 0 or get_node(^"Columns/Recipient/Content/Self").button_pressed:
-		get_node(^"Columns/Recipient/Content/Copy").text = "%s\n%s / %s HP" % [str(data.get("name", "Character")), str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
+		get_node(^"Columns/Recipient/Content/Copy").text = _t("%s\n%s / %s HP") % [str(data.get("name", "Character")), str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	get_node(^"Options").visible = editing
 	get_node(^"Options/Ability").visible = _rule.get("ability_choice", false) or _rule.get("book", false)
 	get_node(^"Options/Adjustment").visible = _rule.has("ability") or _rule.get("book", false) or _rule.get("resistance", false)
 	get_node(^"Options/NewFight").visible = _rule.get("gob", false)
 	get_node(^"Options/Morale").visible = _rule.get("morale", false)
 	get_node(^"Columns/Recipient/Content/Change").disabled = not editing and state != "witnesses"
-	get_node(^"Columns/Recipient/Content/Change").text = "Choose witnesses" if state == "witnesses" else "Change recipient"
+	get_node(^"Columns/Recipient/Content/Change").text = _t("Choose witnesses") if state == "witnesses" else _t("Change recipient")
 	get_node(^"Columns/Recipient/Content/Self").visible = reach > 0 and not _rule.get("book", false) and state != "witnesses"
 	get_node(^"Scrolls").visible = state == "scrolls"
 	if state == "scrolls" and _scroll_options.is_empty():
@@ -95,7 +100,7 @@ func _render() -> void:
 			for number in range(_scroll_options.size()):
 				var scroll: Dictionary = _scroll_options[number]
 				var row := list.get_child(number) as Button
-				row.text = str(scroll.name)
+				row.text = _t(str(scroll.name))
 				row.pressed.connect(_choose_scroll.bind(index, str(scroll.source_item_id)))
 		var count: int = _action.snapshot.get("count", 0)
 		get_node(^"Scrolls/Second").visible = count == 2
@@ -105,6 +110,7 @@ func _render() -> void:
 			add_child(backdrop)
 			_backdrop = backdrop
 			var dialog := SHIELD_SCENE.instantiate()
+			dialog.localize(i18n)
 			add_child(dialog)
 			_shield = dialog
 			_shield.choice_requested.connect(_choose_shield)
@@ -115,7 +121,7 @@ func _render() -> void:
 		_shield.dismiss()
 		_backdrop.visible = false
 	var outcome := _action.message if _action != null else ""
-	get_node(^"Outcome").text = outcome
+	get_node(^"Outcome").text = _t(outcome)
 	get_node(^"Outcome").visible = not outcome.is_empty()
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if state == "error" else "RookframeMeta"
 	workflow_changed.emit("use-item", title, state in ["resolved", "ended", "scrolls", "witnesses"] or (editing and not _rule.is_empty() and _actor.access_level == "Owner"), state in ["pending", "shield"])
@@ -139,7 +145,7 @@ func submit() -> void:
 		return
 	var adjustment_text: String = get_node(^"Options/Adjustment").value
 	if not adjustment_text.is_valid_int():
-		get_node(^"Outcome").text = "Enter a whole-number DR adjustment agreed with the table."
+		get_node(^"Outcome").text = _t("Enter a whole-number DR adjustment agreed with the table.")
 		get_node(^"Outcome").visible = true
 		get_node(^"Outcome").theme_type_variation = "RookframeError"
 		return
@@ -195,7 +201,7 @@ func _choose_targets() -> void:
 	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
 	var result := _sdk.targeting.choose()
 	if not result.ok:
-		get_node(^"Outcome").text = result.message
+		get_node(^"Outcome").text = _t(result.message)
 		get_node(^"Outcome").visible = true
 
 func close_action() -> void:
@@ -222,3 +228,31 @@ func _choose_scroll(index: int, id: String) -> void:
 
 func _choose_shield(choice: String) -> void:
 	await _action.choose_shield(choice)
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Columns/Item/Content/Heading").text = _t("USE ITEM")
+	get_node(^"Columns/Recipient/Content/Change").text = _t("Change recipient")
+	get_node(^"Columns/Recipient/Content/Heading").text = _t("RECIPIENT")
+	get_node(^"Columns/Recipient/Content/Self").text = _t("Self")
+	get_node(^"Options/Ability/Choices/Agility").text = _t("Agility")
+	get_node(^"Options/Ability/Choices/Presence").text = _t("Presence")
+	get_node(^"Options/Ability/Choices/Strength").text = _t("Strength")
+	get_node(^"Options/Ability/Choices/Toughness").text = _t("Toughness")
+	get_node(^"Options/Ability/Label").text = _t("Choose ability with the table (source unspecified)")
+	get_node(^"Options/Adjustment").label_text = _t("Agreed DR adjustment (load / situation)")
+	get_node(^"Options/Eligible").text = _t("Requirements confirmed with the table")
+	get_node(^"Options/Morale/Subtract").text = _t("Subtract Presence (otherwise add)")
+	get_node(^"Options/Morale/Value").label_text = _t("Table-agreed Morale if none printed (2–12)")
+	get_node(^"Options/NewFight").text = _t("New fight confirmed: roll d2 spits")
+	get_node(^"Scrolls/Label").text = _t("Choose the scrolls with the table")

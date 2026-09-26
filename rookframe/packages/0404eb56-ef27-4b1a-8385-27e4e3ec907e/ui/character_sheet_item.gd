@@ -1,4 +1,7 @@
 extends VBoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 const FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_field.tscn")
@@ -14,8 +17,8 @@ func _ready() -> void:
 func configure(item: Dictionary, _miniatures: Array) -> void:
 	_new = item.is_empty()
 	_id = str(item.get("inventory_id", ""))
-	get_node(^"Title").text = "CUSTOM ITEM" if _new else str(item.get("name", "Item"))
-	get_node(^"Rules").text = str(item.get("rules", ""))
+	get_node(^"Title").text = _t("CUSTOM ITEM") if _new else (str(item.get("name", "Item")) if item.get("custom", false) else _t(str(item.get("name", "Item"))))
+	get_node(^"Rules").text = (str(item.get("rules", "")) if item.get("custom", false) else _t(str(item.get("rules", ""))))
 	get_node(^"Use").visible = not RULES.new().definition(str(item.get("source_item_id", ""))).is_empty()
 	get_node(^"Remove").visible = not _new
 	get_node(^"Create").visible = _new
@@ -29,6 +32,7 @@ func configure(item: Dictionary, _miniatures: Array) -> void:
 			_add(key, str(item.get(key, "Equipment" if key == "kind" else 0 if key in ["range_feet", "armor_tier"] else "")))
 func _add(key: String, value: String) -> void:
 	var field = FIELD.instantiate()
+	field.localize(i18n)
 	get_node(^"Fields").add_child(field)
 	field.configure(key, {"name": "Name", "quantity": "Quantity", "uses": "Uses", "kind": "Kind", "damage": "Damage", "range_feet": "Range (feet)", "armor_tier": "Armor tier", "reduction": "Reduction", "rules": "Rules"}.get(key, key), value)
 	field.save_requested.connect(_save_field)
@@ -57,8 +61,8 @@ func field_result(key: String, message: String, error: bool) -> void:
 
 func show_missing() -> void:
 	get_node(^"Use").visible = false
-	get_node(^"Title").text = "Item unavailable"
-	get_node(^"Rules").text = "This item was removed. Return to Inventory to see the current items."
+	get_node(^"Title").text = _t("Item unavailable")
+	get_node(^"Rules").text = _t("This item was removed. Return to Inventory to see the current items.")
 	get_node(^"Remove").visible = false
 	get_node(^"Create").visible = false
 
@@ -78,3 +82,21 @@ func refresh_data(data: Dictionary) -> void:
 
 func _use() -> void:
 	navigate_requested.emit("use-item", _id)
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Back").text = _t("Back to Inventory")
+	get_node(^"Create").text = _t("Add custom item")
+	get_node(^"Remove").text = _t("Remove item")
+	get_node(^"Title").text = _t("ITEM")
+	get_node(^"Use").text = _t("Use item")

@@ -1,5 +1,8 @@
 extends VBoxContainer
 
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
+
 const OVERVIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.tscn")
 const INVENTORY_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_inventory.tscn")
 const ITEM_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_item.tscn")
@@ -26,6 +29,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 	_short_window = short_window
 	if route in ["item", "custom"]:
 		var item_view = ITEM_SCENE.instantiate()
+		item_view.localize(i18n)
 		_item_editor = item_view
 		_connect_form(item_view)
 		var item: Dictionary = {}
@@ -41,32 +45,38 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		return
 	if route == "edit":
 		var edit = EDIT_SCENE.instantiate()
+		edit.localize(i18n)
 		_character_editor = edit
 		_connect_form(edit)
 		edit.configure(data, miniatures)
 		return
 	if route == "catalogue":
 		var catalogue = CATALOGUE.instantiate()
+		catalogue.localize(i18n)
 		_connect_form(catalogue)
 		catalogue.configure(data, miniatures)
 		return
 	if route == "omens":
 		var omens = OMENS.instantiate()
+		omens.localize(i18n)
 		_connect_form(omens)
 		omens.configure(data, miniatures)
 		return
 	if route == "appearance" or tab == "appearance":
 		var appearance = APPEARANCE_SCENE.instantiate()
+		appearance.localize(i18n)
 		appearance.appearance_save_requested.connect(_appearance)
 		get_node(^"Content").add_child(appearance)
 		appearance.configure(data, miniature_choices.size(), miniature_choices)
 		return
 	if route == "inventory" or tab == "inventory":
 		var inventory_view = INVENTORY_SCENE.instantiate()
+		inventory_view.localize(i18n)
 		_connect_form(inventory_view)
 		inventory_view.configure(data, miniatures)
 		return
 	var overview = OVERVIEW_SCENE.instantiate()
+	overview.localize(i18n)
 	_overview = overview
 	overview.modifier_requested.connect(_roll)
 	overview.companions_requested.connect(_companions)
@@ -125,3 +135,16 @@ func _roll(ability: String) -> void:
 
 func _powers() -> void:
 	navigate_requested.emit("powers", "")
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale

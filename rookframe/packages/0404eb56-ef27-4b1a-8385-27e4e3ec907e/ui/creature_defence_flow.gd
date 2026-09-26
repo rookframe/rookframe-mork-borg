@@ -1,5 +1,8 @@
 extends VBoxContainer
 
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ACTION = preload(ROOT + "logic/defence_action.gd")
@@ -83,3 +86,18 @@ func close() -> void:
 	_shield.dismiss()
 	if _action != null:
 		await _action.cancel()
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"CompanionDefenceView").localize(locale)
+	get_node(^"Shield").localize(locale)

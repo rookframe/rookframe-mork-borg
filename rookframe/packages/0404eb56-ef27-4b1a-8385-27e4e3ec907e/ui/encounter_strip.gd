@@ -9,6 +9,8 @@ var _rows: Array = []
 var _cards: Array = []
 
 func ready() -> void:
+	i18n.bind(sdk)
+	localize(i18n)
 	var previous = get_tree().get_first_node_in_group(LOCAL_GROUP) as STRIP
 	if previous != null:
 		_local = previous.encounter_view_state()
@@ -35,9 +37,9 @@ func refresh() -> void:
 	var round_label: Label = get_node(^"Panel/Layout/RoundLabel")
 	round_label.text = round_button.text
 	round_label.visible = not state.is_gm
-	round_button.tooltip_text = "Round %d" % int(state.round)
+	round_button.tooltip_text = _t("Round %d") % int(state.round)
 	round_label.accessibility_name = round_button.tooltip_text
-	round_button.accessibility_name = "Encounter options, round %d" % int(state.round) if state.is_gm else round_button.tooltip_text
+	round_button.accessibility_name = _t("Encounter options, round %d") % int(state.round) if state.is_gm else round_button.tooltip_text
 	var entries := get_node(^"Panel/Layout/Scroll/Groups")
 	var rows: Array = state.rows
 	if rows != _rows:
@@ -53,9 +55,10 @@ func refresh() -> void:
 			if str(row.side) != side:
 				side = str(row.side)
 				group = GROUP.instantiate()
+				i18n.encounter_group(group)
 				entries.add_child(group)
 				var label := group.get_node("Side") as Label
-				label.text = "Players" if side == "pc" else "Monsters"
+				label.text = _t("Players") if side == "pc" else _t("Monsters")
 				var active_label := group.get_node("ActiveSide") as Label
 				active_label.text = label.text
 				label.visible = not row.active
@@ -65,12 +68,13 @@ func refresh() -> void:
 				rule.visible = not row.active
 				active_rule.visible = bool(row.active)
 			var card: Button = CARD.instantiate()
+			i18n.encounter_entry(card)
 			_cards.append(card)
 			group.get_node("Entries").add_child(card)
 			card.name = str(row.rook)
 			VIEW.new().show_preview(sdk, card.get_node("Image") as Control, row)
 			card.tooltip_text = str(row.label)
-			card.accessibility_name = str(row.label) + (", active side" if row.active else "")
+			card.accessibility_name = str(row.label) + (_t(", active side") if row.active else "")
 			card.pressed.connect(_open.bind(str(row.rook)))
 	_local_changed()
 
@@ -116,3 +120,8 @@ func _options() -> void:
 		return
 	_local.show_options()
 	sdk.windows.open(VIEW.new().surface(sdk))
+
+
+func localize(locale: I18N) -> void:
+	i18n = locale
+	get_node(^"Panel/Layout/Round").tooltip_text = _t("Round")

@@ -1,4 +1,7 @@
 extends VBoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
@@ -11,11 +14,12 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 	get_node(^"Toolbar/Add").disabled = read_only
 	var inventory: Array = data.get("inventory", [])
 	var creature := str(data.get("schema", "")) == "mork-borg-adversary/v1"
-	get_node(^"Toolbar/Count").text = "Inventory · %d items" % inventory.size() if creature else "%d items · %s silver" % [inventory.size(), str(data.get("silver", 0))]
+	get_node(^"Toolbar/Count").text = _t("Inventory · %d items") % inventory.size() if creature else _t("%d items · %s silver") % [inventory.size(), str(data.get("silver", 0))]
 	get_node(^"Empty").visible = inventory.is_empty()
 	for raw in inventory:
 		var item: Dictionary = raw
 		var row = ROW.instantiate()
+		row.localize(i18n)
 		var equipped: bool = item.get("equipped", false)
 		var target: NodePath = ^"EquippedSection/Content/Items" if equipped else ^"CarriedSection/Content/Items"
 		if get_node(target).get_child_count() > 0:
@@ -41,3 +45,21 @@ func _layout() -> void:
 	var variant := "RookframePackageInk" if size.x < 600 else "RookframeSection"
 	get_node(^"EquippedSection").theme_type_variation = variant
 	get_node(^"CarriedSection").theme_type_variation = variant
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"CarriedSection/Content/Heading").text = _t("CARRIED")
+	get_node(^"Empty").text = _t("No items yet. Add equipment from the core catalogue or create a custom item.")
+	get_node(^"EquippedSection/Content/Heading").text = _t("EQUIPPED")
+	get_node(^"Toolbar/Add").text = _t("Add Item")
+	get_node(^"Toolbar/Count").text = _t("Inventory")

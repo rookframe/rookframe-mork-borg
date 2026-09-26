@@ -1,5 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
+
 
 const ACTION_ROUTES := ["attack", "defence", "cast", "use-item", "rest", "improve", "broken"]
 const CREATION_PROGRESS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_progress.gd")
@@ -249,8 +252,8 @@ func _exit_tree() -> void:
 
 
 func _set_status(message: String, error: bool = false) -> void:
-	_status.text = message
-	_status.tooltip_text = message
+	_status.text = _t(message)
+	_status.tooltip_text = _t(message)
 	_status.visible = error or _busy
 
 
@@ -288,7 +291,7 @@ func _setup_character_content() -> void:
 
 
 func _on_creation_stage_changed(step: int, title: String) -> void:
-	_header_subtitle.text = title
+	_header_subtitle.text = _t(title)
 	_creation_progress.present_progress(step, _compact)
 
 
@@ -303,7 +306,7 @@ func _on_creator_busy(value: bool) -> void:
 
 
 func _on_creator_primary(text: String, disabled: bool) -> void:
-	_catalogue_character.text = text
+	_catalogue_character.text = _t(text)
 	_catalogue_character.disabled = disabled or _busy or _character_definition == null
 
 
@@ -354,13 +357,13 @@ func character_show_route(route: String) -> void:
 		_character_creator.visible = true
 		_character_sheet.visible = false
 		_character_content = _character_creator
-		_catalogue_back.text = "Start over"
+		_catalogue_back.text = _t("Start over")
 		_catalogue_character.disabled = _busy or _character_definition == null
 		_header_title.visible = not _compact
 		_header_subtitle.visible = not _compact
-		_header_title.text = "CREATE CHARACTER"
+		_header_title.text = _t("CREATE CHARACTER")
 		_header_title.set("theme_override_font_sizes/font_size", 32)
-		_set_window_title("CREATE CHARACTER")
+		_set_window_title(_t("CREATE CHARACTER"))
 		_character_creator.show_creation_route(route)
 	else:
 		_character_creator.visible = false
@@ -383,7 +386,7 @@ func _build_character_sheet_route(route: String) -> void:
 	var data: Dictionary = _character_actor.data
 	var name: String = data.get("name", "Unnamed Character")
 	_header_title.text = name.to_upper()
-	_header_subtitle.text = str(data.get("class_title", "No Class")) + " Character · private sheet"
+	_header_subtitle.text = _t(str(data.get("class_title", "No Class"))) + _t(" Character · private sheet")
 	_set_window_title(name)
 	_character_tabs.visible = true
 	_character_tab_character.button_pressed = _character_tab == "character"
@@ -431,7 +434,7 @@ func _update_character_density() -> void:
 	_layout.add_theme_constant_override("separation", 8 if compact else 20)
 	_character_creator.set_compact(compact)
 	if _route.begins_with("create-"):
-		_set_window_title("CREATE CHARACTER")
+		_set_window_title(_t("CREATE CHARACTER"))
 	elif _character_actor != null:
 		var data: Dictionary = _character_actor.data
 		_set_window_title(_sheet_workflow_title if not _sheet_workflow_title.is_empty() else str(data.get("name", "Unnamed Character")))
@@ -455,16 +458,16 @@ func _on_scroll_choice_requested(_slot: String) -> void:
 func _on_character_unavailable() -> void:
 	get_node(^"Layout/SheetActions").visible = false
 	_character_actor = null
-	_header_title.text = "CHARACTER UNAVAILABLE"
+	_header_title.text = _t("CHARACTER UNAVAILABLE")
 	_header_subtitle.text = ""
-	_set_window_title("Character unavailable")
+	_set_window_title(_t("Character unavailable"))
 	_character_tabs.visible = false
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
 	_sheet_workflow_title = title
 	_header_title.theme_type_variation = "RookframeTitle" if route in ACTION_ROUTES else "RookframeHeading"
 	if route in ACTION_ROUTES:
-		_header_title.text = title.to_upper()
+		_header_title.text = _t(title).to_upper()
 	elif _character_actor != null:
 		var data: Dictionary = _character_actor.data
 		_header_title.text = str(data.get("name", "Unnamed Character")).to_upper()
@@ -477,19 +480,19 @@ func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, 
 	get_node(^"Layout/SheetActions/Spend").visible = route == "omens"
 	get_node(^"Layout/SheetActions/Attack").visible = route in ACTION_ROUTES
 	get_node(^"Layout/SheetActions/Attack").disabled = not can_submit or busy
-	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if busy else (("Roll damage" if title == "Roll damage" else "Roll defence") if route == "defence" else "Roll attack")
+	get_node(^"Layout/SheetActions/Attack").text = _t("Waiting…") if busy else ((_t("Roll damage") if title == "Roll damage" else _t("Roll defence")) if route == "defence" else _t("Roll attack"))
 	if route in ["rest", "improve", "broken"] and not busy:
-		get_node(^"Layout/SheetActions/Attack").text = _character_sheet.health_primary_text()
+		get_node(^"Layout/SheetActions/Attack").text = _t(_character_sheet.health_primary_text())
 	if route == "use-item" and not busy:
-		get_node(^"Layout/SheetActions/Attack").text = _character_sheet.special_primary_text()
+		get_node(^"Layout/SheetActions/Attack").text = _t(_character_sheet.special_primary_text())
 	if route == "cast" and not busy:
-		get_node(^"Layout/SheetActions/Attack").text = _character_sheet.power_primary_text()
-	get_node(^"Layout/SheetActions/Back").text = "Back to sheet" if route in ACTION_ROUTES and not can_submit and not busy else "Cancel"
+		get_node(^"Layout/SheetActions/Attack").text = _t(_character_sheet.power_primary_text())
+	get_node(^"Layout/SheetActions/Back").text = _t("Back to sheet") if route in ACTION_ROUTES and not can_submit and not busy else _t("Cancel")
 	if route == "cast" and _character_sheet.power_primary_text() == "Done":
-		get_node(^"Layout/SheetActions/Back").text = "Character"
+		get_node(^"Layout/SheetActions/Back").text = _t("Character")
 	get_node(^"Layout/SheetActions/Spend").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Back").disabled = busy and not route in ACTION_ROUTES
-	_set_window_title(title)
+	_set_window_title(_t(title) if route in ACTION_ROUTES else title)
 
 func _cancel_sheet_workflow() -> void:
 	_character_sheet.cancel_workflow()
@@ -509,3 +512,16 @@ func _roll_sheet_attack() -> void:
 
 func _on_shield_decision_closed() -> void:
 	_restore_shield_focus = true
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale

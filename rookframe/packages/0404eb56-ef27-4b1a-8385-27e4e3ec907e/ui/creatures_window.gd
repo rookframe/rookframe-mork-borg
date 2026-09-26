@@ -33,6 +33,8 @@ var _inventory_refresh_pending := false
 var _world_refresh_pending := false
 
 func ready() -> void:
+	i18n.bind(sdk)
+	localize(i18n)
 	if sdk == null:
 		_set_status("Install the published MÖRK BORG System to load Creature definitions.", true)
 		return
@@ -131,7 +133,7 @@ func _apply_density() -> void:
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Description").visible = false
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Description").visible = false
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
-		_protection_label.text = "ARMOR"
+		_protection_label.text = _t("ARMOR")
 
 
 func _refresh_world() -> void:
@@ -205,7 +207,7 @@ func _render_live_actors() -> void:
 		var actor_data: Dictionary = actor.data
 		var private_name: String = actor_data.get("name", "Private Creature")
 		var public_name := actor.public_label if not actor.public_label.is_empty() else "Public name pending"
-		button.text = "%s  ·  Public: %s" % [private_name, public_name]
+		button.text = _t("%s  ·  Public: %s") % [private_name, public_name]
 		button.custom_minimum_size = Vector2(0, 44)
 		button.focus_mode = 2
 		button.alignment = 0
@@ -234,7 +236,7 @@ func _select_definition(entry: SDK.ContentEntry) -> void:
 	_selected_definition = entry
 	_create_button.disabled = false
 	_catalogue_create.disabled = false
-	_set_status("Selected %s. Create a private Actor to edit its encounter sheet." % entry.title)
+	_set_status(_t("Selected %s. Create a private Actor to edit its encounter sheet.") % entry.title)
 	_show_route("creatures")
 
 
@@ -269,20 +271,20 @@ func _render_actor() -> void:
 	var attacks: Array = CREATURES.new().attack_options(actor_data)
 
 	_header_title.text = private_name.to_upper()
-	_header_subtitle.text = "Creature sheet · " + _selected_actor.access_level
+	_header_subtitle.text = _t("Creature sheet · ") + _t(_selected_actor.access_level)
 	_set_window_title(private_name)
 	if _compact:
 		_header_subtitle.visible = false
 	_detail_title_if_present(private_name)
-	_public_identity.text = _selected_actor.public_label if not _selected_actor.public_label.is_empty() else "Public name pending"
+	_public_identity.text = _selected_actor.public_label if not _selected_actor.public_label.is_empty() else _t("Public name pending")
 	_hit_points_metric.text = "%d / %d" % [hit_points, maximum_hit_points]
-	_morale_metric.text = morale_value
-	_protection_label.text = armor_name.to_upper()
+	_morale_metric.text = _t(morale_value)
+	_protection_label.text = _t(armor_name).to_upper()
 	_protection_metric.text = armor_reduction if not armor_reduction.is_empty() else "—"
-	_rules.text = str(actor_data.get("rules", ""))
+	_rules.text = _t(str(actor_data.get("rules", "")))
 	if actor_data.has("defence_dr"):
 		var defence_dr: int = actor_data["defence_dr"]
-		_rules.text = "Defence DR%d. %s" % [defence_dr, str(actor_data.get("rules", ""))]
+		_rules.text = _t("Defence DR%d. %s") % [defence_dr, _t(str(actor_data.get("rules", "")))]
 	_private_name.set("value", private_name)
 	_public_label.set("value", _selected_actor.public_label)
 	_public_label.visible = sdk.context().is_gm
@@ -303,7 +305,7 @@ func _detail_title_if_present(private_name: String) -> void:
 	var title := get_node(^"Layout/Body/Content/Detail/Title") as Label
 	var summary := get_node(^"Layout/Body/Content/Detail/Summary") as Label
 	title.text = private_name.to_upper()
-	summary.text = "Private Creature sheet · GM"
+	summary.text = _t("Private Creature sheet · GM")
 	# The host/header already owns the route title. Keep the sheet body focused
 	# on its stats and sections at every profile, including desktop.
 	title.visible = false
@@ -316,7 +318,7 @@ func _render_equipment(attacks: Array) -> void:
 		child.queue_free()
 	if attacks.is_empty():
 		var empty := Label.new()
-		empty.text = "No private attacks recorded."
+		empty.text = _t("No private attacks recorded.")
 		empty.theme_type_variation = "RookframeMeta"
 		_equipment_list.add_child(empty)
 		return
@@ -326,12 +328,12 @@ func _render_equipment(attacks: Array) -> void:
 		row.custom_minimum_size = Vector2(0, 54)
 		row.autowrap_mode = 2
 		row.theme_type_variation = "RookframeBody"
-		var attack_name: String = attack.get("name", "Attack")
+		var attack_name: String = _t(str(attack.get("name", "Attack")))
 		var attack_dice: String = attack.get("dice", "—")
-		var detail: String = "%s · %s ft" % [attack_dice, str(attack.get("range_feet", "—"))]
+		var detail: String = _t("%s · %s ft") % [attack_dice, str(attack.get("range_feet", "—"))]
 		if attack.has("attack_dr"):
 			var attack_dr: int = attack["attack_dr"]
-			detail += " · Attack DR%d" % attack_dr
+			detail += _t(" · Attack DR%d") % attack_dr
 		row.text = "%s\n%s" % [attack_name, detail]
 		_equipment_list.add_child(row)
 
@@ -347,6 +349,7 @@ func _render_inventory() -> void:
 	data["read_only"] = _selected_actor.access_level != "Owner"
 	if _route in ["creature-item", "creature-custom"]:
 		var item_view = ITEM_VIEW.instantiate()
+		item_view.localize(i18n)
 		_creature_item_view = item_view
 		_connect_creature_inventory(item_view)
 		if _route == "creature-custom":
@@ -362,10 +365,12 @@ func _render_inventory() -> void:
 		return
 	if _route == "creature-catalogue":
 		var catalogue = CATALOGUE_VIEW.instantiate()
+		catalogue.localize(i18n)
 		_connect_creature_inventory(catalogue)
 		catalogue.configure(data, [])
 		return
 	var view = INVENTORY_VIEW.instantiate()
+	view.localize(i18n)
 	_connect_creature_inventory(view)
 	view.configure(data, [])
 
@@ -515,10 +520,10 @@ func _apply_route(route: String) -> void:
 	_save_button.visible = edit and _selected_actor != null and _selected_actor.access_level == "Owner"
 	_add_item_button.visible = false
 	_back_button.visible = edit
-	_back_button.text = "Cancel"
+	_back_button.text = _t("Cancel")
 	if catalogue:
-		_header_title.text = "CREATURES"
-		_header_subtitle.text = "MÖRK BORG · 12 definitions"
+		_header_title.text = _t("CREATURES")
+		_header_subtitle.text = _t("MÖRK BORG · 12 definitions")
 		_set_window_title("CREATURES")
 		_header_title.visible = not _compact
 		_header_subtitle.visible = not _compact
@@ -526,14 +531,14 @@ func _apply_route(route: String) -> void:
 	elif _selected_actor != null:
 		_render_actor()
 	if edit:
-		_header_title.text = "EDIT CREATURE"
-		_header_subtitle.text = "Private values · public name"
+		_header_title.text = _t("EDIT CREATURE")
+		_header_subtitle.text = _t("Private values · public name")
 		_set_window_title("EDIT CREATURE")
 	elif inventory:
 		var selected_data: Dictionary = _selected_actor.data
 		var inventory_name: String = selected_data.get("name", "CREATURE")
 		_header_title.text = inventory_name.to_upper()
-		_header_subtitle.text = "Creature inventory · " + _selected_actor.access_level
+		_header_subtitle.text = _t("Creature inventory · ") + _t(_selected_actor.access_level)
 		_set_window_title(inventory_name)
 	_set_status(_status.text)
 
@@ -653,9 +658,9 @@ func _save_creature() -> void:
 			if rollback.ok:
 				var restored_identity: SDK.OperationResult = await sdk.public_identities.assign(_selected_actor.id, original_label)
 				if not restored_identity.ok:
-					rollback_message = " Identity rollback failed: %s" % restored_identity.message
+					rollback_message = _t(" Identity rollback failed: %s") % restored_identity.message
 			else:
-				rollback_message = " Actor rollback failed: %s" % rollback.message
+				rollback_message = _t(" Actor rollback failed: %s") % rollback.message
 			updated.ok = false
 			updated.message = identity.message + rollback_message
 		else:
@@ -685,7 +690,7 @@ func _place_rook() -> void:
 		var deleted: SDK.OperationResult = await sdk.rooks.delete(created.rook.id)
 		var link_message := linked.message
 		if not deleted.ok:
-			link_message += " Cleanup failed: %s" % deleted.message
+			link_message += _t(" Cleanup failed: %s") % deleted.message
 		_set_busy(false, link_message, true)
 		return
 	_selected_actor.public_label = label
@@ -719,8 +724,8 @@ func _set_busy(value: bool, message: String, error: bool = false) -> void:
 
 
 func _set_status(message: String, error: bool = false) -> void:
-	_status.text = message
-	_status.tooltip_text = message
+	_status.text = _t(message)
+	_status.tooltip_text = _t(message)
 	_status.visible = error or _busy
 
 
@@ -734,7 +739,7 @@ func _configure_catalogue_actions(catalogue: bool) -> void:
 	bar.visible = catalogue
 	back.visible = catalogue
 	back.disabled = false
-	back.text = "Back"
+	back.text = _t("Back")
 	(bar.get_node(^"TrailingSlot/CreateCharacter") as Button).visible = false
 
 func _character_back_button_pressed() -> void:
@@ -792,7 +797,7 @@ func _present_creature_attack(id: String) -> void:
 	_creature_rook = sdk.rooks.selected()
 	_responsible_owner = ""
 	get_node(^"Layout/Body/Content/CreatureAttack/Owners").visible = false
-	var title := str(_creature_attack.get("name", "Attack")) + " attack"
+	var title := _t("%s attack") % _t(str(_creature_attack.get("name", "Attack")))
 	_header_title.text = title.to_upper()
 	_header_subtitle.visible = false
 	_set_window_title(title)
@@ -803,23 +808,23 @@ func _present_creature_attack(id: String) -> void:
 	combat_data["inventory"] = CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
 	view.configure(combat_data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet, "ammunition": _creature_attack.get("ammunition", ""), "natural": _creature_attack.get("natural", false)}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "ready", "")
 	view.get_node(^"Metrics/Strength").visible = true
-	view.get_node(^"Context").text = str(data.get("name", "Creature")) + " · Selected attack"
+	view.get_node(^"Context").text = str(data.get("name", "Creature")) + _t(" · Selected attack")
 	_creature_targets_pending = true
-	var source_rules := str(_creature_attack.get("rules", ""))
+	var source_rules := _t(str(_creature_attack.get("rules", "")))
 	if _creature_attack.has("defence_dr"):
-		source_rules = "Defence DR%s. %s" % [str(_creature_attack.defence_dr), source_rules]
+		source_rules = _t("Defence DR%s. %s") % [str(_creature_attack.defence_dr), source_rules]
 	if _creature_attack.has("attack_dr"):
-		source_rules = "Attack DR%s. %s" % [str(_creature_attack.attack_dr), source_rules]
+		source_rules = _t("Attack DR%s. %s") % [str(_creature_attack.attack_dr), source_rules]
 	if _creature_attack.get("natural", false):
-		source_rules += " Natural-weapon fumbles are adjudicated by the GM."
+		source_rules += _t(" Natural-weapon fumbles are adjudicated by the GM.")
 	view.get_node(^"SourceRules").text = source_rules.strip_edges()
 	view.get_node(^"SourceRules").visible = not source_rules.is_empty()
 	get_node(^"Layout/SheetActions").visible = true
 	get_node(^"Layout/SheetActions/Spend").visible = false
-	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory"
+	get_node(^"Layout/SheetActions/Back").text = _t("Back to Inventory")
 	get_node(^"Layout/SheetActions/Back").disabled = false
 	get_node(^"Layout/SheetActions/Attack").visible = true
-	get_node(^"Layout/SheetActions/Attack").text = "Use attack"
+	get_node(^"Layout/SheetActions/Attack").text = _t("Use attack")
 	get_node(^"Layout/SheetActions/Attack").disabled = false
 	_body.scroll_vertical = 0
 
@@ -886,7 +891,7 @@ func _roll_sheet_attack() -> void:
 func _creature_attack_error(message: String) -> void:
 	var outcome: Label = get_node(^"Layout/Body/Content/CreatureAttack/Outcome")
 	outcome.visible = true
-	outcome.text = message
+	outcome.text = _t(message)
 	outcome.theme_type_variation = "RookframeError"
 
 func _creature_melee_changed() -> void:
@@ -897,12 +902,12 @@ func _present_creature_melee() -> void:
 		return
 	var action := _creature_melee
 	get_node(^"Layout/SheetActions/Attack").disabled = action.pending or action.state in ["resolved", "ended"]
-	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if action.pending else "Roll attack"
+	get_node(^"Layout/SheetActions/Attack").text = _t("Waiting…") if action.pending else _t("Roll attack")
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
 	view.get_node(^"Target/Change").disabled = action.pending
 	view.get_node(^"Rules").visible = action.state == "error"
 	view.get_node(^"Outcome").visible = true
-	view.get_node(^"Outcome").text = action.message
+	view.get_node(^"Outcome").text = _t(action.message)
 	view.get_node(^"Outcome").theme_type_variation = "RookframeError" if action.state == "error" else "RookframeMeta"
 
 func _initiated_defence_changed() -> void:
@@ -918,11 +923,11 @@ func _present_initiated_defence() -> void:
 		return
 	var action := _initiated_defence
 	get_node(^"Layout/SheetActions/Attack").disabled = action.pending or action.state in ["resolved", "ended"]
-	get_node(^"Layout/SheetActions/Attack").text = "Waiting…" if action.pending else "Request defence"
+	get_node(^"Layout/SheetActions/Attack").text = _t("Waiting…") if action.pending else _t("Request defence")
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
 	view.get_node(^"Target/Change").disabled = action.pending
 	view.get_node(^"Outcome").visible = action.state != "resolved"
-	view.get_node(^"Outcome").text = "Waiting for the defending Player." if action.state in ["ready", "shield"] else action.message
+	view.get_node(^"Outcome").text = _t("Waiting for the defending Player.") if action.state in ["ready", "shield"] else action.message
 	view.get_node(^"Outcome").theme_type_variation = "RookframeError" if action.state == "error" else "RookframeMeta"
 	var choices: Array = action.snapshot.get("owners", [])
 	var owners: VBoxContainer = view.get_node(^"Owners")
@@ -986,7 +991,7 @@ func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
 	_selected_actor = actor
 	_apply_route("creature-defence")
 	_routes.visible = false
-	_header_title.text = str(data.get("name", "Creature")).to_upper() + " · DEFENCE"
+	_header_title.text = str(data.get("name", "Creature")).to_upper() + _t(" · DEFENCE")
 	_header_subtitle.visible = false
 	_set_window_title(str(data.get("name", "Creature")) + " · Defence")
 	_creature_defence.visible = true
@@ -994,7 +999,7 @@ func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
 	_body.scroll_vertical = 0
 	get_node(^"Layout/SheetActions").visible = true
 	get_node(^"Layout/SheetActions/Spend").visible = false
-	get_node(^"Layout/SheetActions/Back").text = "Cancel"
+	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
 	get_node(^"Layout/SheetActions/Back").disabled = false
 
 func _creature_defence_changed(state: String, can_roll: bool, automatic_hit: bool) -> void:
@@ -1003,8 +1008,8 @@ func _creature_defence_changed(state: String, can_roll: bool, automatic_hit: boo
 	var button: Button = get_node(^"Layout/SheetActions/Attack")
 	button.visible = true
 	button.disabled = not can_roll
-	button.text = ("Roll damage" if automatic_hit else "Roll defence") if state == "ready" else "Waiting…"
-	get_node(^"Layout/SheetActions/Back").text = "Back to Inventory" if state in ["ended", "resolved"] else "Cancel"
+	button.text = (_t("Roll damage") if automatic_hit else _t("Roll defence")) if state == "ready" else _t("Waiting…")
+	get_node(^"Layout/SheetActions/Back").text = _t("Back to Inventory") if state in ["ended", "resolved"] else _t("Cancel")
 
 func _creature_defence_resolved() -> void:
 	if _route == "creature-defence":
@@ -1022,3 +1027,86 @@ func _configure_surface_spacing() -> void:
 	_layout.offset_top = 0.0 if compact else 16.0
 	_layout.offset_bottom = -6.0 if compact else -8.0
 	_layout.add_theme_constant_override("separation", 8 if compact else 20)
+
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Layout/Body/Content/CharacterDescriptionField").label_text = _t("Field label")
+	get_node(^"Layout/Body/Content/CharacterHitPointsField").label_text = _t("Field label")
+	get_node(^"Layout/Body/Content/CharacterItemField").label_text = _t("Field label")
+	get_node(^"Layout/Body/Content/CharacterNameField").label_text = _t("Field label")
+	get_node(^"Layout/Body/Content/CharacterOmensField").label_text = _t("Field label")
+	get_node(^"Layout/Body/Content/CharacterSilverField").label_text = _t("Field label")
+	get_node(^"Layout/Body/Content/CreateCharacter").text = _t("Create Character")
+	get_node(^"Layout/Body/Content/CreateCharacter").tooltip_text = _t("Start a new Character")
+	get_node(^"Layout/Body/Content/Detail/EditFields/HitPoints").label_text = _t("HIT POINTS")
+	get_node(^"Layout/Body/Content/Detail/EditFields/HitPoints").placeholder = _t("Private hit points")
+	get_node(^"Layout/Body/Content/Detail/EditFields/IdentityHeading").text = _t("IDENTITY")
+	get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints").label_text = _t("MAXIMUM HIT POINTS")
+	get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints").placeholder = _t("Private maximum hit points")
+	get_node(^"Layout/Body/Content/Detail/EditFields/Morale").label_text = _t("MORALE")
+	get_node(^"Layout/Body/Content/Detail/EditFields/Morale").placeholder = _t("Private morale")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PrivateName").label_text = _t("PRIVATE NAME")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PrivateName").placeholder = _t("Private name")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").help_text = _t("Only the public name appears to Players.")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").label_text = _t("PUBLIC NAME")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").placeholder = _t("Public name shown to Players")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Description").text = _t("Private encounter equipment and attacks.")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Title").text = _t("EQUIPMENT")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PrivateNotice").text = _t("Shown on the tabletop and in public reports.")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PublicIdentity").text = _t("Hooded stranger")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PublicNameLabel").text = _t("PUBLIC NAME")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Description").text = _t("Players see the chosen public name on the tabletop.")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Title").text = _t("PUBLIC IDENTITY")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/BodySlot/Access").text = _t("Players see the public name, not this sheet.")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").text = _t("GM only")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Title").text = _t("ACCESS")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/AddItem").text = _t("Add item")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/Back").text = _t("Back")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/CreateCreature").text = _t("Create Creature")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/CreatureInventory").text = _t("Inventory")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/Duplicate").text = _t("Duplicate")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/EditCreature").text = _t("Edit values")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/PlaceRook").text = _t("Place Rook")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/SaveChanges").text = _t("Save changes")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/BodySlot/Rules").text = _t("Quick, attacks and defence are DR14.")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/Header/Title").text = _t("SPECIAL RULES")
+	get_node(^"Layout/Body/Content/Detail/Stats/HitPoints/Content/Label").text = _t("HP")
+	get_node(^"Layout/Body/Content/Detail/Stats/Morale/Content/Label").text = _t("MORALE")
+	get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Label").text = _t("PROTECTION")
+	get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Value").text = _t("−d2")
+	get_node(^"Layout/Body/Content/Detail/Summary").text = _t("Private Creature sheet · GM")
+	get_node(^"Layout/Body/Content/Detail/Title").text = _t("Seth, Goblin")
+	get_node(^"Layout/Body/Content/LiveHeading").text = _t("LIVE CREATURES")
+	get_node(^"Layout/Body/Content/PublicHeading").text = _t("PUBLIC NAMES")
+	get_node(^"Layout/Body/Content/Search").label_text = _t("SEARCH CREATURES")
+	get_node(^"Layout/Body/Content/Search").placeholder = _t("Search creatures…")
+	get_node(^"Layout/CatalogueBar/LeadingSlot/Back").text = _t("Back")
+	get_node(^"Layout/CatalogueBar/TrailingSlot/CreateCharacter").text = _t("Create Character")
+	get_node(^"Layout/CatalogueBar/TrailingSlot/CreateCreature").text = _t("Create Creature")
+	get_node(^"Layout/CharacterTabs/Appearance").text = _t("Appearance")
+	get_node(^"Layout/CharacterTabs/Character").text = _t("Character")
+	get_node(^"Layout/CharacterTabs/Inventory").text = _t("Inventory")
+	get_node(^"Layout/Header/Brand").text = _t("MÖRK BORG")
+	get_node(^"Layout/Header/Routes/Compact/Creature").text = _t("Creature")
+	get_node(^"Layout/Header/Routes/Compact/CreatureInventory").text = _t("Inventory")
+	get_node(^"Layout/Header/Routes/Compact/Creatures").text = _t("Creatures")
+	get_node(^"Layout/Header/Routes/Compact/EditCreature").text = _t("Edit")
+	get_node(^"Layout/Header/Routes/Desktop/Creature").text = _t("Creature")
+	get_node(^"Layout/Header/Routes/Desktop/CreatureInventory").text = _t("Inventory")
+	get_node(^"Layout/Header/Routes/Desktop/Creatures").text = _t("Creatures")
+	get_node(^"Layout/Header/Routes/Desktop/EditCreature").text = _t("Edit")
+	get_node(^"Layout/Header/Subtitle").text = _t("Immutable definitions · private Actors")
+	get_node(^"Layout/Header/Title").text = _t("CREATURES")
+	get_node(^"Layout/SheetActions/Attack").text = _t("Roll attack")
+	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
+	get_node(^"Layout/SheetActions/Spend").text = _t("Spend 1 Omen")
+	get_node(^"Layout/Body/Content/Catalogue").localize(locale)
+	get_node(^"Layout/Body/Content/CharacterCreator").localize(locale)
+	get_node(^"Layout/Body/Content/CharacterSheet").localize(locale)
+	get_node(^"Layout/Body/Content/CreatureAttack").localize(locale)
+	get_node(^"Layout/Body/Content/CreatureDefence").localize(locale)
+	get_node(^"Layout/CreationProgress").localize(locale)

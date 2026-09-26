@@ -1,5 +1,8 @@
 extends BoxContainer
 
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
+
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
 
@@ -46,32 +49,32 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	var selected: String = {"create-class": "Class", "create-abilities": "Abilities", "create-rolling": "Abilities", "create-origin": "Origin", "create-equipment": "Equipment", "create-identity": "Identity", "create-review": "Review"}.get(route, "Class")
 	for stage in stages:
 		get_node("Main/Content/" + stage).visible = stage == selected
-	get_node(^"Main/Content/Title").text = "ROLL ABILITIES" if selected == "Abilities" else ("STARTING EQUIPMENT" if selected == "Equipment" else selected.to_upper())
+	get_node(^"Main/Content/Title").text = _t("ROLL ABILITIES") if selected == "Abilities" else (_t("STARTING EQUIPMENT") if selected == "Equipment" else _t(selected).to_upper())
 	get_node(^"Main/Content/Title").visible = not (compact and selected in ["Abilities", "Class"])
 	get_node(^"Aside").visible = not (compact and selected == "Abilities")
 	get_node(^"Aside/Context/Content/Pack").visible = selected == "Equipment" and not equipment_pending
 	get_node(^"Aside/Context/Content/PreferredMiniature").visible = selected == "Identity"
-	get_node(^"Aside/Context/Content/Title").text = "PREFERRED MINIATURE" if selected == "Identity" else ("EQUIPMENT PACK" if selected == "Equipment" else class_title.to_upper())
+	get_node(^"Aside/Context/Content/Title").text = _t("PREFERRED MINIATURE") if selected == "Identity" else (_t("EQUIPMENT PACK") if selected == "Equipment" else _t(class_title).to_upper())
 	var hp_faces: int = profile.get("hp_faces", 8)
 	var silver_count: int = profile.get("silver_count", 2)
 	var omen_faces: int = profile.get("omen_faces", 2)
 	var description := _rules_text(draft)
-	var facts := "Hit points\nToughness + 1d%d\n\nSilver\n%dd6 × 10\n\nOmens\n1d%d" % [hp_faces, silver_count, omen_faces]
+	var facts := _t("Hit points\nToughness + 1d%d\n\nSilver\n%dd6 × 10\n\nOmens\n1d%d") % [hp_faces, silver_count, omen_faces]
 	var hint := "Your character is created after the final review."
 	if selected == "Abilities":
 		description = "Rolls resolve in order. Dice are rolled automatically on your behalf."
-		facts = "Hit points\n1d%d + Toughness (minimum 1)" % hp_faces
-		hint = "Rolling %s…" % str(draft.get("active_roll", "abilities")) if ability_pending and not roll_ready else "Continue with the next ability when ready."
+		facts = _t("Hit points\n1d%d + Toughness (minimum 1)") % hp_faces
+		hint = _t("Rolling %s…") % _t(str(draft.get("active_roll", "abilities"))) if ability_pending and not roll_ready else "Continue with the next ability when ready."
 		_present_abilities(draft, compact)
 	elif selected == "Origin":
-		description = str(draft.get("origin", ""))
+		description = _t(str(draft.get("origin", "")))
 		facts = _traits_text(draft)
 		_present_origin(draft, compact)
 	elif selected == "Equipment":
 		description = "Choose from the packs available for your roll."
 		facts = _inventory_text(draft.get("inventory", []))
-		hint = "Rolling %s…" % str(draft.get("active_roll", "equipment")) if equipment_pending and not roll_ready else "Continue with the next roll when ready."
-		get_node(^"Aside/Context/Content/Pack").text = "Pack: Choose" if pack_pending else "Pack: %s" % str(draft.get("pack", "Nothing"))
+		hint = _t("Rolling %s…") % _t(str(draft.get("active_roll", "equipment"))) if equipment_pending and not roll_ready else "Continue with the next roll when ready."
+		get_node(^"Aside/Context/Content/Pack").text = _t("Pack: Choose") if pack_pending else _t("Pack: %s") % _t(str(draft.get("pack", "Nothing")))
 		_present_equipment(draft, compact)
 	elif selected == "Identity":
 		description = "Preferred appearance for this Actor’s Rooks."
@@ -82,22 +85,22 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	elif selected == "Review":
 		description = _traits_text(draft)
 		var creatures: Array = draft.get("starting_creature_ids", [])
-		facts = "Starting creatures: %d" % creatures.size()
+		facts = _t("Starting creatures: %d") % creatures.size()
 		hint = "You can edit the sheet after creating the character."
 		get_node(^"Main/Content/Review/Name").text = str(draft.get("name", "Unnamed Character"))
-		get_node(^"Main/Content/Review/Resources").text = "HP %s     Omens %s     Silver %s" % [str(draft.get("hit_points", 0)), str(draft.get("omens", 0)), str(draft.get("silver", 0))]
+		get_node(^"Main/Content/Review/Resources").text = _t("HP %s     Omens %s     Silver %s") % [str(draft.get("hit_points", 0)), str(draft.get("omens", 0)), str(draft.get("silver", 0))]
 		var values: Array[String] = []
 		var abilities: Dictionary = draft.get("abilities", {})
 		for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 			var value: Dictionary = abilities.get(ability, {})
 			var modifier: int = value.get("modifier", 0)
-			values.append("%s  %s → %s" % [ability, str(value.get("score", "—")), _modifier(modifier)])
+			values.append("%s  %s → %s" % [_t(ability), str(value.get("score", "—")), _modifier(modifier)])
 		get_node(^"Main/Content/Review/Abilities").text = _lines(values)
-		get_node(^"Main/Content/Review/Description").text = class_title + "\n" + str(draft.get("origin", "")) + "\n" + str(draft.get("description", ""))
+		get_node(^"Main/Content/Review/Description").text = _t(class_title) + "\n" + _t(str(draft.get("origin", ""))) + "\n" + str(draft.get("description", ""))
 		get_node(^"Main/Content/Review/Inventory").text = _inventory_text(draft.get("inventory", []))
-	get_node(^"Aside/Context/Content/Description").text = description
-	get_node(^"Aside/Context/Content/Facts").text = facts
-	get_node(^"Aside/Hint").text = hint
+	get_node(^"Aside/Context/Content/Description").text = _t(description)
+	get_node(^"Aside/Context/Content/Facts").text = _t(facts)
+	get_node(^"Aside/Hint").text = _t(hint)
 
 
 func _present_abilities(draft: Dictionary, compact: bool) -> void:
@@ -149,7 +152,7 @@ func _ability_formula(title: String, draft: Dictionary) -> String:
 	var profile: Dictionary = draft.get("class_profile", {})
 	if title == "Hit points":
 		var hp_faces: int = profile.get("hp_faces", 8)
-		return "1d%d + Toughness" % hp_faces
+		return _t("1d%d + Toughness") % hp_faces
 	var offsets: Dictionary = profile.get("ability_offsets", {})
 	var offset: int = offsets.get(title, 0)
 	return "3d6" + ("%+d" % offset if offset != 0 else "")
@@ -159,7 +162,7 @@ func _equipment_formula(title: String, draft: Dictionary, fallback: String) -> S
 	var profile: Dictionary = draft.get("class_profile", {})
 	if title == "Silver":
 		var silver_count: int = profile.get("silver_count", 2)
-		return "%dd6 × 10" % silver_count
+		return _t("%dd6 × 10") % silver_count
 	if title == "Omens":
 		var omen_faces: int = profile.get("omen_faces", 2)
 		return "1d%d" % omen_faces
@@ -180,8 +183,8 @@ func _present_origin(draft: Dictionary, compact: bool) -> void:
 	var classless := class_id == "classless"
 	var royalty := class_id == "wretched-royalty"
 	var herbmaster := class_id == "occult-herbmaster"
-	get_node(^"Main/Content/Origin/Explanation").text = "No class origin or traits." if classless else str(draft.get("origin", ""))
-	get_node(^"Main/Content/Origin/Continue").text = "Continue to starting equipment." if classless else _traits_text(draft)
+	get_node(^"Main/Content/Origin/Explanation").text = _t("No class origin or traits.") if classless else _t(str(draft.get("origin", "")))
+	get_node(^"Main/Content/Origin/Continue").text = _t("Continue to starting equipment.") if classless else _traits_text(draft)
 	get_node(^"Main/Content/Origin/SecondFeatureRoll").visible = royalty or herbmaster
 	get_node(^"Main/Content/Origin/DoseRoll").visible = herbmaster
 	var entries := [["OriginRoll", "Origin", "origin_roll", 8 if herbmaster else 6]]
@@ -210,8 +213,8 @@ func _rules_text(draft: Dictionary) -> String:
 	var rules: Array = draft.get("class_rules", [])
 	var result := ""
 	for rule in rules:
-		result += ("\n" if not result.is_empty() else "") + str(rule)
-	return result if not result.is_empty() else "Normal ability rolls and starting equipment."
+		result += ("\n" if not result.is_empty() else "") + _t(str(rule))
+	return result if not result.is_empty() else _t("Normal ability rolls and starting equipment.")
 
 
 func _traits_text(draft: Dictionary) -> String:
@@ -221,10 +224,10 @@ func _traits_text(draft: Dictionary) -> String:
 		var trait_data: Dictionary = raw_trait
 		result += ("
 
-" if not result.is_empty() else "") + str(trait_data.get("name", "")) + "\n" + str(trait_data.get("rules", ""))
+" if not result.is_empty() else "") + _t(str(trait_data.get("name", ""))) + "\n" + _t(str(trait_data.get("rules", "")))
 	if draft.has("decoction_doses"):
 		var doses: int = draft.get("decoction_doses", 0)
-		result += "\n\nShared decoction doses: %d" % doses
+		result += _t("\n\nShared decoction doses: %d") % doses
 	return result
 
 
@@ -232,7 +235,7 @@ func _inventory_text(items: Array) -> String:
 	var names: Array[String] = []
 	for item in items:
 		var item_data: Dictionary = item
-		names.append(str(item_data.get("name", "Item")))
+		names.append(_t(str(item_data.get("name", "Item"))))
 	return _lines(names)
 
 
@@ -246,3 +249,55 @@ func _lines(values: Array[String]) -> String:
 		var line: String = value
 		text += ("\n" if not text.is_empty() else "") + line
 	return text
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Aside/Context/Content/Pack").text = _t("Pack: Nothing")
+	get_node(^"Aside/Context/Content/PreferredMiniature").text = _t("Choose Miniature")
+	get_node(^"Aside/Context/Content/Title").text = _t("NO CLASS")
+	get_node(^"Main/Content/Class/EsotericHermit").text = _t("ESOTERIC HERMIT")
+	get_node(^"Main/Content/Class/FangedDeserter").text = _t("FANGED DESERTER")
+	get_node(^"Main/Content/Class/GutterbornScum").text = _t("GUTTERBORN SCUM")
+	get_node(^"Main/Content/Class/HereticalPriest").text = _t("HERETICAL PRIEST")
+	get_node(^"Main/Content/Class/NoClass").text = _t("NO CLASS")
+	get_node(^"Main/Content/Class/OccultHerbmaster").text = _t("OCCULT HERBMASTER")
+	get_node(^"Main/Content/Class/WretchedRoyalty").text = _t("WRETCHED ROYALTY")
+	get_node(^"Main/Content/Equipment/ScrollChoice/Eat").text = _t("Eat it")
+	get_node(^"Main/Content/Equipment/ScrollChoice/Explanation").text = _t("You cannot read this scroll. Choose what to do with it.")
+	get_node(^"Main/Content/Equipment/ScrollChoice/Paper").text = _t("Use as toilet paper")
+	get_node(^"Main/Content/Equipment/ScrollChoice/Reroll").text = _t("Reroll equipment")
+	get_node(^"Main/Content/Identity/Description").label_text = _t("DESCRIPTION")
+	get_node(^"Main/Content/Identity/Description").placeholder = _t("Describe this Character")
+	get_node(^"Main/Content/Identity/Name").label_text = _t("NAME")
+	get_node(^"Main/Content/Identity/Name").placeholder = _t("Character name")
+	get_node(^"Main/Content/Origin/Continue").text = _t("Continue to starting equipment.")
+	get_node(^"Main/Content/Origin/Explanation").text = _t("No class origin or traits.")
+	get_node(^"Main/Content/Title").text = _t("CHOOSE A CLASS")
+	get_node(^"Main/Content/Abilities/Agility").localize(locale)
+	get_node(^"Main/Content/Abilities/HitPoints").localize(locale)
+	get_node(^"Main/Content/Abilities/Presence").localize(locale)
+	get_node(^"Main/Content/Abilities/Strength").localize(locale)
+	get_node(^"Main/Content/Abilities/Toughness").localize(locale)
+	get_node(^"Main/Content/Equipment/Armor").localize(locale)
+	get_node(^"Main/Content/Equipment/ExtraRoll").localize(locale)
+	get_node(^"Main/Content/Equipment/First").localize(locale)
+	get_node(^"Main/Content/Equipment/Food").localize(locale)
+	get_node(^"Main/Content/Equipment/Omens").localize(locale)
+	get_node(^"Main/Content/Equipment/Pack").localize(locale)
+	get_node(^"Main/Content/Equipment/Second").localize(locale)
+	get_node(^"Main/Content/Equipment/Silver").localize(locale)
+	get_node(^"Main/Content/Equipment/Weapon").localize(locale)
+	get_node(^"Main/Content/Origin/DoseRoll").localize(locale)
+	get_node(^"Main/Content/Origin/FeatureRoll").localize(locale)
+	get_node(^"Main/Content/Origin/OriginRoll").localize(locale)
+	get_node(^"Main/Content/Origin/SecondFeatureRoll").localize(locale)

@@ -1,9 +1,14 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const VIEW = preload(ROOT + "ui/encounter_view.gd")
 var _busy := false
 
 func ready() -> void:
+	i18n.bind(sdk)
+	localize(i18n)
 	if sdk == null:
 		return
 	sdk.world_changed.connect(refresh)
@@ -32,7 +37,7 @@ func refresh() -> void:
 	button.set_pressed_no_signal(included)
 	visible = included or rook.rook.actor != null
 	button.disabled = _busy or not result.ok
-	button.tooltip_text = "Remove from combat" if included else "Add to combat"
+	button.tooltip_text = _t("Remove from combat") if included else _t("Add to combat")
 	button.accessibility_name = button.tooltip_text
 	get_node(^"Check").visible = included
 
@@ -55,9 +60,22 @@ func _toggle() -> void:
 	_busy = false
 	if not result.ok or str(result.value.get("state", "error")) == "error":
 		var message := SDK.FeedbackMessage.new()
-		message.title = "Encounter"
+		message.title = _t("Encounter")
 		message.message = result.message if not result.ok else str(result.value.message)
 		sdk.feedback.error(message)
 	else:
 		VIEW.new().local_state(self).select_rook(selected.value)
 	refresh()
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale

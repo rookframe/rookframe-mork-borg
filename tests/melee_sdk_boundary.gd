@@ -134,3 +134,6 @@ func UpdateActor(id: String, data: Dictionary) -> Dictionary:
   return {"ok": false, "message": "Update rejected"}
  actors[id].data = data.duplicate(true)
  return ReadActor(id)
+
+func Translate(message: String, _domain: String) -> String:
+ return message

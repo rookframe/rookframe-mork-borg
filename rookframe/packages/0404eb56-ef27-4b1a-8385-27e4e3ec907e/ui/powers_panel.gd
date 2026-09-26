@@ -1,4 +1,7 @@
 extends VBoxContainer
+
+const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
@@ -28,6 +31,8 @@ func _ready() -> void:
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
 	_sdk = facade
+	i18n.bind(_sdk)
+	localize(i18n)
 	_item = item
 	if not _sdk.targeting.changed.is_connected(_targets_changed):
 		_sdk.targeting.changed.connect(_targets_changed)
@@ -59,10 +64,11 @@ func _list(items: Array) -> void:
 		if power.is_empty() or quantity < 1:
 			continue
 		var row := ROW.instantiate()
+		i18n.power_row(row)
 		list.add_child(row)
-		(row.get_node(^"Copy/Name") as Label).text = str(power.name)
-		(row.get_node(^"Copy/Rules") as Label).text = str(power.rules)
-		(row.get_node(^"Copy/Handling") as Label).text = str(power.handling) if power.playable else "Not playable yet · " + str(power.handling)
+		(row.get_node(^"Copy/Name") as Label).text = _t(str(power.name))
+		(row.get_node(^"Copy/Rules") as Label).text = _t(str(power.rules))
+		(row.get_node(^"Copy/Handling") as Label).text = _t(str(power.handling)) if power.playable else _t("Not playable yet · ") + _t(str(power.handling))
 		(row.get_node(^"Cast") as Button).disabled = _actor.access_level != "Owner" or not power.playable or (_action != null and _action.pending)
 		(row.get_node(^"Cast") as Button).pressed.connect(_open_cast.bind(str(item.inventory_id)))
 	get_node(^"Empty").visible = list.get_child_count() == 0
@@ -85,15 +91,15 @@ func _render() -> void:
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Presence", {})
 	var presence: int = ability.get("modifier", 0)
-	get_node(^"Metrics/Uses/Content/Label").text = "NATURAL ROLL" if terminal else "DAILY USES"
-	get_node(^"Metrics/Presence/Content/Label").text = "RESULT" if terminal else "PRESENCE"
+	get_node(^"Metrics/Uses/Content/Label").text = _t("NATURAL ROLL") if terminal else _t("DAILY USES")
+	get_node(^"Metrics/Presence/Content/Label").text = _t("RESULT") if terminal else _t("PRESENCE")
 	get_node(^"Metrics/Uses/Content/Value").text = str(_action.snapshot.get("natural_face", 0)) if terminal else str(data.get("power_uses", 0))
-	get_node(^"Metrics/Presence/Content/Value").text = ("Critical" if adjudication == "critical" else "Fumble") if terminal else "%+d" % presence
-	get_node(^"Metrics/Difficulty/Content/Value").text = "DR10" if str(data.get("class_id", "")) == "gutterborn-scum" else "DR12"
-	get_node(^"Cast/Columns/Power/Content/Copy").text = str(_power.get("rules", "This scroll is unavailable."))
+	get_node(^"Metrics/Presence/Content/Value").text = (_t("Critical") if adjudication == "critical" else _t("Fumble")) if terminal else "%+d" % presence
+	get_node(^"Metrics/Difficulty/Content/Value").text = _t("DR10") if str(data.get("class_id", "")) == "gutterborn-scum" else _t("DR12")
+	get_node(^"Cast/Columns/Power/Content/Copy").text = _t(str(_power.get("rules", "This scroll is unavailable.")))
 	var mode := str(_power.get("target_mode", ""))
 	var reach: int = _power.get("range_feet", 0)
-	get_node(^"Cast/Columns/Power/Content/Range").text = "Area · 30 ft" if mode == "area" else ("Self" if mode == "self" else "Range · %d ft" % reach)
+	get_node(^"Cast/Columns/Power/Content/Range").text = _t("Area · 30 ft") if mode == "area" else (_t("Self") if mode == "self" else _t("Range · %d ft") % reach)
 	get_node(^"Cast/Columns/Targets").visible = mode != "self"
 	get_node(^"Cast/Columns/Targets/Content/Change").disabled = state == "pending"
 	get_node(^"Cast/Options").visible = state in ["ready", "error"]
@@ -103,9 +109,9 @@ func _render() -> void:
 	if terminal:
 		title = "Action ended" if state == "ended" else ("Power " + adjudication if not adjudication.is_empty() else "Power resolved")
 		get_node(^"Outcome").visible = false
-		get_node(^"Result/Power").text = str(_power.get("name", "Power"))
-		get_node(^"Result/Section/Content/Heading").text = "The action was interrupted" if state == "ended" else ("GM determines the outcome" if not adjudication.is_empty() else str(_action.snapshot.get("outcome", "Manual outcome")))
-		get_node(^"Result/Section/Content/Copy").text = _action.message
+		get_node(^"Result/Power").text = _t(str(_power.get("name", "Power")))
+		get_node(^"Result/Section/Content/Heading").text = _t("The action was interrupted") if state == "ended" else (_t("GM determines the outcome") if not adjudication.is_empty() else _t(str(_action.snapshot.get("outcome", "Manual outcome"))))
+		get_node(^"Result/Section/Content/Copy").text = _t(_action.message)
 	workflow_changed.emit("cast" if casting else "powers", title, terminal or (casting and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and _power.get("playable", false)), state == "pending")
 	_layout()
 
@@ -192,7 +198,7 @@ func _exit_tree() -> void:
 	close_action()
 
 func _status(text: String, error: bool = false) -> void:
-	get_node(^"Outcome").text = text
+	get_node(^"Outcome").text = _t(text)
 	get_node(^"Outcome").visible = not text.is_empty()
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if error else "RookframeMeta"
 
@@ -202,3 +208,30 @@ func _layout() -> void:
 	for metric in ["Uses", "Presence", "Difficulty"]:
 		get_node("Metrics/" + metric + "/Content/Label").set("theme_override_font_sizes/font_size", 12 if size.x < 600 else 16)
 		get_node("Metrics/" + metric + "/Content/Value").set("theme_override_font_sizes/font_size", 24 if size.x < 600 else 28)
+
+
+func _t(source: String) -> String:
+	return i18n.text(source)
+
+
+var _localized := false
+
+func localize(locale: I18N) -> void:
+	if _localized:
+		return
+	_localized = true
+	i18n = locale
+	get_node(^"Browse/Back").text = _t("‹ Character")
+	get_node(^"Browse/Title").text = _t("POWERS & SCROLLS")
+	get_node(^"Cast/Columns/Power/Content/Heading").text = _t("POWER")
+	get_node(^"Cast/Columns/Targets/Content/Change").text = _t("Change targets")
+	get_node(^"Cast/Columns/Targets/Content/Heading").text = _t("TARGETS")
+	get_node(^"Cast/Options/Eligible").text = _t("Not dizzy; requirements met")
+	get_node(^"Cast/Options/Modifier").label_text = _t("Situational modifier")
+	get_node(^"Cast/Rules").text = _t("Confirm fictional requirements with the table, including a deceased target or death within a week where stated. Failure: lose d2 HP; dizziness is manual. Critical/fumble: GM decides. Armor and zweihand restrictions apply.")
+	get_node(^"Daily/Hint").text = _t("Every morning: Presence + d4 uses. Confirm the morning with the table before rolling. Current uses can also be corrected in Edit Character.")
+	get_node(^"Daily/Roll").text = _t("Morning: roll daily uses")
+	get_node(^"Empty").text = _t("No core scrolls carried. Add a scroll from the Inventory catalogue.")
+	get_node(^"Metrics/Difficulty/Content/Label").text = _t("DIFFICULTY")
+	get_node(^"Metrics/Presence/Content/Label").text = _t("PRESENCE")
+	get_node(^"Metrics/Uses/Content/Label").text = _t("DAILY USES")

@@ -1,5 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/presentation.gd"
 
+
 const WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
 const DESKTOP_WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_desktop.tres")
 
@@ -16,10 +17,14 @@ func compose() -> void:
 	add_child(timer)
 	var experience: SDK.DeviceExperience = sdk.presentation_experience()
 	var rail: SDK.Rail = sdk.rails.left
-	rail.push(DESKTOP_WINDOW_BUTTON if experience.is_desktop else WINDOW_BUTTON)
+	var entry := DESKTOP_WINDOW_BUTTON if experience.is_desktop else WINDOW_BUTTON
+	var navigation := SDK.WindowButton.new()
+	navigation.window = entry.window
+	navigation.button_scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_ru.tscn") if sdk.translations.text("en") == "ru" else entry.button_scene
+	rail.push(navigation)
 	if sdk.context().is_gm:
 		var combat_button := SDK.WindowButton.new()
-		combat_button.button_scene = ENCOUNTER_BUTTON.button_scene
+		combat_button.button_scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button_ru.tscn") if sdk.translations.text("en") == "ru" else ENCOUNTER_BUTTON.button_scene
 		combat_button.window = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_view.gd").new().surface(sdk)
 		rail.push(combat_button)
 		var contextual := SDK.Contribution.new()
@@ -32,7 +37,7 @@ func compose() -> void:
 
 func describe_actor(actor: SDK.Actor) -> SDK.ActorSummary:
 	var data: Dictionary = actor.data
-	var name: String = data.get("name", "Unnamed Actor")
+	var name: String = data.get("name", sdk.translations.text("Unnamed Actor"))
 	return SDK.ActorSummary.new(name)
 
 
