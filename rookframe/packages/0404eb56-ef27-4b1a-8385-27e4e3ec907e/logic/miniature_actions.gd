@@ -1,6 +1,7 @@
 extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 var sdk: SDK
 func _init(facade: SDK) -> void:
 	sdk = facade
@@ -26,7 +27,7 @@ func place(actor: SDK.ActorId) -> SDK.RookResult:
 	if not current.ok:
 		return SDK.RookResult.new({"ok": false, "message": current.message})
 	var data: Dictionary = current.actor.data
-	var reference: Dictionary = data.get("preferred_miniature", {})
+	var reference: Dictionary = CREATURES.new().effective_miniature(data)
 	if not available(reference):
 		return SDK.RookResult.new({"ok": false, "message": "Choose an available Miniature before placing this Creature."})
 	var scene := sdk.scenes.current()
@@ -50,7 +51,7 @@ func apply_selected(actor: SDK.ActorId) -> SDK.RookResult:
 	if not current.ok or not selected.ok or selected.rook.actor == null or selected.rook.actor.value != actor.value:
 		return SDK.RookResult.new({"ok": false, "message": "Select a Rook linked to this Creature."})
 	var data: Dictionary = current.actor.data
-	var reference: Dictionary = data.get("preferred_miniature", {})
+	var reference: Dictionary = CREATURES.new().effective_miniature(data)
 	if not available(reference):
 		return SDK.RookResult.new({"ok": false, "message": "This Miniature is unavailable. Choose another."})
 	return await sdk.rooks.set_miniature(selected.rook.id, _reference(reference))

@@ -46,6 +46,10 @@ func _load() -> void:
 			"title": entry.localized_title, "package": entry.package_title if not entry.package_title.is_empty() else entry.reference.package_id,
 			"package_id": entry.reference.package_id, "local_id": entry.reference.local_id, "available": entry.available})
 	var id := str(_saved.get("package_id", "")) + "/" + str(_saved.get("local_id", ""))
+	if not _saved.is_empty():
+		var current := sdk.content.read(SDK.ContentReference.new(str(_saved.get("package_id", "")), str(_saved.get("local_id", ""))))
+		if current.ok:
+			id = current.content_entry.reference.package_id + "/" + current.content_entry.reference.local_id
 	browser.configure(entries, id, {"search": _t("Search Miniatures"), "retry": _t("Try again"), "unavailable": _t("Unavailable"), "empty": _t("Add a Miniature Package to this World."), "no_match": _t("No matching Miniatures.")})
 	_selected(browser.selection())
 	if not _saved.is_empty() and browser.selection().is_empty():

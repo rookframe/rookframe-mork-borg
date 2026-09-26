@@ -1,16 +1,12 @@
-# Existing MÖRK BORG Miniatures
+# Rookframe Miniatures
 
-These are the existing Scum, Goblin v3 and Berserker meshes used in the approved
-RFG-294 mock. They were authored by this project in Blender, with no new modeling
-for encounter tracking. Godot GLTFDocument and ResourceSaver converted the
-unchanged game exports to native authored scenes; embedded base-color and normal
-maps were extracted losslessly. The root scale converts the 25 mm bases to
-0.8 tabletop units. No portrait or Prop content is added.
+MÖRK BORG 1.0.83 ships no Miniature scenes, meshes or textures. Rookframe provides
+its standard collection under Content source `fbf21a78-626e-4f35-b2ce-bd196083d9b7`.
+Bent (Scum) uses `bandit`, Seth uses `goblin`, and Zukuma uses `barbarian`. Other
+Creatures implicitly use `default-miniature`. Explicit Actor choices take
+precedence; World-specific library overrides are copied when creating an Actor.
+Clearing a library override restores the authored choice or application default.
+Missing explicit choices remain visibly unavailable, rather than silently replaced.
 
-Source game exports in the host repository's artifacts directory:
-- mork-borg-scum/scum-miniature.glb — 25,546 triangles.
-- mork-borg-goblin/goblin-miniature-v3.glb — 21,147 triangles.
-- mork-borg-berserker/berserker-miniature.glb — 26,173 triangles.
-
-The scene and texture files are the published runtime sources. Blender originals
-and authoring history remain in their existing artifact folders.
+The original authored Scum, Goblin v3 and Berserker runtime sources now live in
+the Rookframe application. Original source hashes remain in this directory.

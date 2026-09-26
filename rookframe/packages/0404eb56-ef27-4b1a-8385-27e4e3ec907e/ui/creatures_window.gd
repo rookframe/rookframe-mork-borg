@@ -1131,7 +1131,7 @@ func _setup_miniatures() -> void:
 				var button := child as Button
 				button.text = _t(button.text)
 
-func _library_miniature() -> Dictionary:
+func _library_override() -> Dictionary:
 	if _selected_definition == null:
 		return {}
 	var value := sdk.world_data.read()
@@ -1141,11 +1141,17 @@ func _library_miniature() -> Dictionary:
 	var defaults: Dictionary = world.get("creature_miniatures", {})
 	return defaults.get(str(_selected_definition.reference.local_id), {})
 
+func _library_miniature() -> Dictionary:
+	var override := _library_override()
+	if not override.is_empty() or _selected_definition == null:
+		return override
+	return CREATURES.new().effective_miniature({"definition_id": _selected_definition.reference.local_id})
+
 func _actor_miniature() -> Dictionary:
 	if _selected_actor == null:
 		return {}
 	var data: Dictionary = _selected_actor.data
-	return data.get("preferred_miniature", {})
+	return CREATURES.new().effective_miniature(data)
 
 func _miniature_title(reference: Dictionary) -> String:
 	if reference.is_empty():
@@ -1161,7 +1167,7 @@ func _render_miniatures() -> void:
 	var panel := _catalogue.get_node(^"Preview/Miniature")
 	(panel.get_node(^"Current") as Label).text = _miniature_title(_library_miniature())
 	(panel.get_node(^"Choose") as Button).disabled = _busy or not sdk.context().is_gm or _selected_definition == null
-	(panel.get_node(^"Clear") as Button).disabled = _busy or not sdk.context().is_gm or _library_miniature().is_empty()
+	(panel.get_node(^"Clear") as Button).disabled = _busy or not sdk.context().is_gm or _library_override().is_empty()
 	var actor_panel := get_node(MINIATURE_PANEL)
 	actor_panel.visible = _route == "creature" and _selected_actor != null
 	if _selected_actor != null:

@@ -22,6 +22,20 @@ const CORE_DEFINITIONS: Dictionary = {
 }
 
 
+const ROOKFRAME_CONTENT := "fbf21a78-626e-4f35-b2ce-bd196083d9b7"
+const AUTHORED_MINIATURES := {"bent-scum": "bandit", "seth-goblin": "goblin", "zukuma-berserker": "barbarian"}
+
+func default_miniature(definition: String) -> Dictionary:
+	var local_id := str(AUTHORED_MINIATURES.get(definition, ""))
+	return {} if local_id.is_empty() else {"package_id": ROOKFRAME_CONTENT, "local_id": local_id}
+
+func effective_miniature(data: Dictionary) -> Dictionary:
+	var preferred: Dictionary = data.get("preferred_miniature", {})
+	if not preferred.is_empty():
+		return preferred.duplicate(true)
+	var authored := default_miniature(str(data.get("definition_id", "")))
+	return authored if not authored.is_empty() else {"package_id": ROOKFRAME_CONTENT, "local_id": "default-miniature"}
+
 func create_data(raw_choices: Variant) -> Variant:
 	var choices: Dictionary = raw_choices
 	var definition: Dictionary = CORE_DEFINITIONS.get(resource_name, {}).duplicate(true)
@@ -47,6 +61,8 @@ func create_data(raw_choices: Variant) -> Variant:
 	for key in ["preferred_miniature", "creature_inventory", "inventory_serial", "summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
 		if choices.has(key):
 			data[key] = choices[key]
+	if not data.has("preferred_miniature"):
+		data["preferred_miniature"] = default_miniature(resource_name)
 	return data
 
 ## Older saved core Actors used one entry for paired attacks. Resolve those

@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.82)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.83)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
@@ -439,7 +439,7 @@ current choice, while existing Actors keep theirs. Clearing the default affects
 only future Actors. Published library definitions are never edited.
 
 An Actor Owner can choose another Miniature in that Creature's sheet. The shared
-UI Kit browser searches all available Miniatures from enabled World Packages,
+UI Kit browser searches Rookframe’s built-in Miniatures and available Miniatures from enabled World Packages,
 shows their source Package and previews the selection. Back discards a draft;
 Use Miniature saves it. Missing content keeps its stable reference and asks for
 a replacement instead of silently picking another model.
@@ -450,4 +450,7 @@ linked to this Actor, preserving its identity, placement and hidden state.
 
 Both journeys and browser states are available in English and Russian. Miniature
 names use their owning Package's translations, falling back to its original name.
-Miniatures may live in separate Packages; this release does not relocate assets.
+The System ships no Miniature models. Scum, Goblin and Berserker definitions use
+Rookframe’s Bandit, Goblin and Barbarian respectively. Other Creatures implicitly
+use Rookframe’s Default Miniature. Explicit Actor and library choices take priority.
+See [Miniature ownership and defaults](docs/miniatures.md).

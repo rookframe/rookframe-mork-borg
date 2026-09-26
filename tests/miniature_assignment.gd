@@ -35,7 +35,7 @@ func test_world_default_is_copied_only_to_new_creatures_and_survives_new_impleme
 	assert_str(sdk.world_data.read().value.unrelated).is_equal("retained")
 	await sdk.system_actions.submit("miniature.default", {"definition": "seth-goblin", "package_id": "", "local_id": ""})
 	var third := await sdk.system_actions.submit("miniature.create", {"definition": "seth-goblin"})
-	assert_dict(sdk.actors.read(SDK.ActorId.new(str(third.value.actor))).actor.data.preferred_miniature).is_empty()
+	assert_dict(sdk.actors.read(SDK.ActorId.new(str(third.value.actor))).actor.data.preferred_miniature).is_equal({"package_id": "fbf21a78-626e-4f35-b2ce-bd196083d9b7", "local_id": "goblin"})
 
 func test_refusals_preserve_world_defaults_and_actor_choice() -> void:
 	var host := _host()
@@ -109,3 +109,12 @@ func test_picker_russian_selection_cancel_and_failed_save_keep_actor_unchanged()
 	await get_tree().process_frame
 	assert_dict(sdk.actors.read(SDK.ActorId.new("enemy")).actor.data.preferred_miniature).is_equal(WARDEN)
 	assert_bool(view.visible).is_false()
+
+func test_application_defaults_and_explicit_choices() -> void:
+	var definitions = preload(ROOT + "logic/creature_definition.gd")
+	for entry in [["bent-scum", "bandit"], ["seth-goblin", "goblin"], ["zukuma-berserker", "barbarian"]]:
+		assert_str(definitions.new().effective_miniature({"definition_id": entry[0]}).local_id).is_equal(entry[1])
+	assert_str(definitions.new().effective_miniature({"definition_id": "arbint-troll"}).local_id).is_equal("default-miniature")
+	assert_str(definitions.new().effective_miniature({}).local_id).is_equal("default-miniature")
+	assert_dict(definitions.new().effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": WARDEN})).is_equal(WARDEN)
+	assert_dict(definitions.new().effective_miniature({"preferred_miniature": {"package_id": "missing", "local_id": "saved"}})).is_equal({"package_id": "missing", "local_id": "saved"})

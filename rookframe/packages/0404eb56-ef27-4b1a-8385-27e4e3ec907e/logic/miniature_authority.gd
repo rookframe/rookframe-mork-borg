@@ -37,7 +37,7 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 		return {"state": "resolved", "message": "Library Miniature saved."} if result.ok else _error(result.message)
 	if operation == "miniature.create":
 		# Snapshot the current World default on Authority, never a client's stale copy.
-		var preferred: Dictionary = defaults.get(definition, {}).duplicate(true)
+		var preferred: Dictionary = defaults.get(definition, CREATURES.new().default_miniature(definition)).duplicate(true)
 		var created := context.create_actors([{"package_id": sdk.package_id(), "local_id": definition, "choices": {"preferred_miniature": preferred}}], str(identity.get("participant_id", "")))
 		if not created.ok:
 			return _error(created.message)
