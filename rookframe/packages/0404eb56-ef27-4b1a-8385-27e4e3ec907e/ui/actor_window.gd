@@ -639,7 +639,6 @@ func _present_creature_attack(id: String) -> void:
 	view.get_node(^"SourceRules").text = source_rules.strip_edges()
 	view.get_node(^"SourceRules").visible = not source_rules.is_empty()
 	get_node(^"Layout/SheetActions").visible = true
-	get_node(^"Layout/SheetActions/Spend").visible = false
 	get_node(^"Layout/SheetActions/Back").text = _t("Back to Inventory")
 	get_node(^"Layout/SheetActions/Back").disabled = false
 	get_node(^"Layout/SheetActions/Attack").visible = true
@@ -817,7 +816,6 @@ func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
 	_creature_defence.present(sdk, outcome)
 	_body.scroll_vertical = 0
 	get_node(^"Layout/SheetActions").visible = true
-	get_node(^"Layout/SheetActions/Spend").visible = false
 	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
 	get_node(^"Layout/SheetActions/Back").disabled = false
 
@@ -908,7 +906,6 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Header/Title").text = _t("Creature")
 	get_node(^"Layout/SheetActions/Attack").text = _t("Roll attack")
 	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
-	get_node(^"Layout/SheetActions/Spend").text = _t("Spend 1 Omen")
 	get_node(^"Layout/Body/Content/CharacterCreator").localize(locale)
 	get_node(^"Layout/Body/Content/CharacterSheet").localize(locale)
 	get_node(^"Layout/Body/Content/CreatureAttack").localize(locale)

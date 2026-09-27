@@ -472,11 +472,6 @@ text = "Cancel"
 [node name="Spacer" type="Control" parent="Layout/SheetActions"]
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Spend" type="Button" parent="Layout/SheetActions"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframePrimaryButton"
-text = "Spend 1 Omen"
 
 [node name="Attack" type="Button" parent="Layout/SheetActions"]
 layout_mode = 2

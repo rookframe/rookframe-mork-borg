@@ -249,7 +249,7 @@ func _navigate(route: String, item_id: String) -> void:
 		return
 	if (_powers_panel != null or _special_panel != null or _health_panel != null) and (route != _character_route or item_id != _item_id):
 		clear_character_sheet()
-	if _character_actor.access_level != "Owner" and route in ["rest", "improve", "broken", "attack", "cast", "use-item", "edit", "item", "custom", "catalogue", "omens"]:
+	if _character_actor.access_level != "Owner" and route in ["rest", "improve", "broken", "attack", "cast", "use-item", "edit", "item", "custom", "catalogue"]:
 		_set_status("Owner access is required to change this Character.", true)
 		return
 	if route == "attack":
@@ -272,16 +272,21 @@ func _on_cancel_requested() -> void:
 
 func _mutate(operation: String, arguments: Array) -> void:
 	if _busy or sdk == null:
-		if _character_view != null and operation in ["correct", "item"]:
-			_character_view.field_result(str(arguments[0] if operation == "correct" else arguments[1]), "Wait for the current save, then retry.", true)
+		if _character_view != null and operation in ["correct", "item", "adjust_omens"]:
+			_character_view.field_result("omens" if operation == "adjust_omens" else str(arguments[0] if operation == "correct" else arguments[1]), "Wait for the current save, then retry.", true)
 		return
 	var actions = ACTIONS.new(sdk, _character_actor.id)
 	_set_busy(true, "Saving…")
 	var result: SDK.ActorResult = await _perform(actions, operation, arguments)
 	_set_busy(false, result.message if not result.ok else "Saved.", not result.ok)
-	if _character_view != null and operation in ["correct", "item"]:
-		_character_view.field_result(str(arguments[0] if operation == "correct" else arguments[1]), "Saved." if result.ok else result.message, not result.ok)
+	if _character_view != null and operation in ["correct", "item", "adjust_omens"]:
+		_character_view.field_result("omens" if operation == "adjust_omens" else str(arguments[0] if operation == "correct" else arguments[1]), "Saved." if result.ok else result.message, not result.ok)
+	if operation == "adjust_omens":
+		_status.visible = false
 	if not result.ok:
+		return
+	if operation == "adjust_omens":
+		_refresh_pending = true
 		return
 	_character_actor = result.actor
 	sheet_changed.emit()
@@ -393,8 +398,8 @@ func _on_companion_selected(actor: SDK.Actor) -> void:
 func _perform(actions: ACTIONS, operation: String, arguments: Array) -> SDK.ActorResult:
 	if operation == "correct":
 		return await actions.correct(str(arguments[0]), str(arguments[1]))
-	if operation == "omen":
-		return await actions.spend_omen()
+	if operation == "adjust_omens":
+		return await actions.adjust_omens(int(arguments[0]))
 	if operation == "add":
 		return await actions.add_equipment(str(arguments[0]))
 	if operation == "custom":
@@ -446,9 +451,6 @@ func cancel_workflow() -> void:
 	close_action()
 	_navigate("character", "")
 
-func spend_omen() -> void:
-	_mutate("omen", [])
-
 func _sync_chrome() -> void:
 	if _character_route in ["rest", "improve", "broken"] and _health_panel != null:
 		return
@@ -460,9 +462,7 @@ func _sync_chrome() -> void:
 		return
 	var data: Dictionary = _character_actor.data
 	var title := str(data.get("name", "Character"))
-	if _character_route == "omens":
-		title = "Spend an Omen"
-	elif _character_route == "edit":
+	if _character_route == "edit":
 		title = "Edit Character"
 	elif _character_route in ["catalogue", "custom"]:
 		title = "Add Item"

@@ -24,7 +24,6 @@ signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 signal appearance_save_requested(scope: String, index: int)
 const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/equipment_catalogue.tscn")
-const OMENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_omens.tscn")
 func configure(data: Dictionary, tab: String, route: String, miniatures: Array[SDK.ContentEntry], miniature_choices: Array[Dictionary], short_window: bool = false, item_id: String = "") -> void:
 	_short_window = short_window
 	if route in ["item", "custom"]:
@@ -56,12 +55,6 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		_connect_form(catalogue)
 		catalogue.configure(data, miniatures)
 		return
-	if route == "omens":
-		var omens = OMENS.instantiate()
-		omens.localize(i18n)
-		_connect_form(omens)
-		omens.configure(data, miniatures)
-		return
 	if route == "appearance" or tab == "appearance":
 		var appearance = APPEARANCE_SCENE.instantiate()
 		appearance.localize(i18n)
@@ -81,10 +74,9 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 	overview.modifier_requested.connect(_roll)
 	overview.companions_requested.connect(_companions)
 	overview.edit_requested.connect(_edit)
-	overview.omens_requested.connect(_omens)
+	overview.omen_adjust_requested.connect(_adjust_omens)
 	overview.powers_requested.connect(_powers)
 	overview.navigate_requested.connect(_navigate)
-	overview.value_save_requested.connect(_correct)
 	get_node(^"Content").add_child(overview)
 	overview.configure(data, miniatures, short_window)
 
@@ -102,11 +94,8 @@ func _companions() -> void:
 func _edit() -> void:
 	navigate_requested.emit("edit", "")
 
-func _omens() -> void:
-	navigate_requested.emit("omens", "")
-
-func _correct(key: String, value: String) -> void:
-	mutation_requested.emit("correct", [key, str(value)])
+func _adjust_omens(delta: int) -> void:
+	mutation_requested.emit("adjust_omens", [delta])
 
 func _mutation(operation: String, arguments: Array) -> void:
 	mutation_requested.emit(operation, arguments)

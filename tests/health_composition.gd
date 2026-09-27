@@ -4,7 +4,7 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const BOUNDARY = preload("res://tests/power_composition_boundary.gd")
 
-func test_recovery_panel_eligibility_focus_pending_and_result() -> void:
+func test_recovery_panel_direct_submit_focus_pending_and_result() -> void:
 	var path := ROOT + "ui/health_panel.tscn"
 	assert_bool(ResourceLoader.exists(path)).is_true()
 	if not ResourceLoader.exists(path):
@@ -34,15 +34,8 @@ func test_recovery_panel_eligibility_focus_pending_and_result() -> void:
 	breath.pressed.emit()
 	assert_bool(sleep.button_pressed).is_false()
 	assert_str(breath.accessibility_description).is_equal("Selected")
-	await panel.submit()
-	assert_int(host.requests.size()).is_equal(0)
-	await get_tree().process_frame
-	assert_str(panel.get_node("Outcome").text).contains("eligibility")
-	var eligible: Button = panel.get_node("Columns/Context/Content/Eligible")
-	assert_bool(eligible.size.y >= 44).is_true()
-	eligible.grab_focus()
-	assert_bool(eligible.has_focus()).is_true()
-	eligible.button_pressed = true
+	breath.grab_focus()
+	assert_bool(breath.has_focus()).is_true()
 	await panel.submit()
 	await get_tree().process_frame
 	assert_str(panel.primary_text()).is_equal("Waiting…")

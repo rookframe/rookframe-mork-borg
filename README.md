@@ -109,11 +109,11 @@ corrections; creation mechanics remain fixed until confirmation.
 
 ## Completed sheets
 
-Completed Characters support field-local corrections, including the played ability
+One Edit sheet button opens all Character values, including the played ability
 modifier, current resources, class text and live equipment quantities/uses. The
 core equipment catalogue creates independent carried items; custom live items
 expose their supported mechanics. Item identities remain stable after removal.
-Equip/unequip and Attack entries stay on their inventory item. Equipped 5 ft and 10 ft melee weapons resolve through the System on World Authority. Spending an Omen changes only its remaining count.
+Equip/unequip and Attack entries stay on their inventory item. Equipped 5 ft and 10 ft melee weapons resolve through the System on World Authority. The inline Omens −/+ counter changes only its remaining count. See [the compact Character sheet contract](docs/character-sheet-design.md).
 
 Actor-default appearance and the selected linked Rook are separate choices from
 available published Miniatures. The SDK authorizes and persists all writes. Open
@@ -336,14 +336,15 @@ and ongoing effects and all Omen benefits stay manual.
 
 ## Recovery, improvement and Broken (RFG-293)
 
-Rest, Getting better and Broken & death are Character-sheet actions. The table
-confirms rest eligibility, food/drink and infection. Recovery requests a human
+Rest, Level up and Broken & death are Character-sheet actions. The table
+determines when rest occurs; only food/drink and infection have sheet controls.
+Recovery requests a human
 d4 (catch breath) or d6 (full sleep), caps healing at maximum HP and never
 replenishes Omens. No food/drink or infection restores no HP; daily loss remains
 manual. Negative HP means dead and rest cannot resurrect the Character.
 
-The GM authorizes one improvement from Getting better. This durable authorization
-changes no Actor Access and is consumed when an Owner begins. Human Throws resolve
+When the GM calls for improvement, an Owner begins directly from Level up. There
+is no authorization button or stored grant. Human Throws resolve
 6d10 against maximum HP (equality qualifies), the conditional d6 maximum-HP increase,
 d6 debris, conditional 3d10 Silver, and one d6 per ability in order. Increasing
 maximum HP does not heal current HP. Found sacred/unclean scroll identity is chosen
@@ -351,7 +352,7 @@ with the table; the source supplies only its family. The ordinary scroll is adde
 to Inventory. Abilities stay within −3…+6, including the special low-ability rule.
 Gutterborn Scum gains a second rolled specialty on the first improvement and may
 keep or reroll either/both on later improvements. Starting-only equipment is not
-re-granted. Interrupted improvements retain accepted steps and the spent grant;
+re-granted. Interrupted improvements retain accepted steps;
 finish unfinished steps with ordinary dice and sheet corrections. The completed
 sheet exposes improvements begun and both Scum specialty slots (source d6 number;
 0 leaves the second slot empty) so manual completion does not strand later play.
@@ -367,8 +368,8 @@ Rules: Bare Bones OCR pp. 29, 31, 33 and 49, plus its quick-reference infection
 entry. The main Rest extraction omits daily starvation/infection damage clauses;
 they are not interpreted as absent or automated by this action. Eligibility,
 fictional time, conditions, daily loss, Omen benefits, and delayed HP application
-remain manual. The approved September 22 docked `rest` and `improve` routes guide
-composition. Existing public SDK System intents own authorization, persistence,
+remain manual. The September 27 compact Character correction supersedes the old docked health
+composition and removes confirmation checkboxes. Existing public SDK System intents own authorization, persistence,
 complete World replication, raw Throws and Action Log commits. No new host API,
 transport, Prop, effect engine, resumption, Undo or GM takeover is introduced.
 

@@ -22,13 +22,14 @@ size_flags_horizontal = 3
 
 [node name="Rest" type="PanelContainer" parent="Columns/Task"]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
+theme_type_variation = &"RookframePackageInk"
 
 [node name="Content" type="VBoxContainer" parent="Columns/Task/Rest"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="Heading" type="Label" parent="Columns/Task/Rest/Content"]
+visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
@@ -91,7 +92,8 @@ text = "1 · Unconscious\n2 · Broken limb or lost eye\n3 · Hemorrhage\n4 · De
 [node name="Context" type="PanelContainer" parent="Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSection"
+size_flags_vertical = 0
+theme_type_variation = &"RookframePackageInk"
 
 [node name="Content" type="VBoxContainer" parent="Columns/Context"]
 layout_mode = 2
@@ -101,7 +103,8 @@ theme_override_constants/separation = 8
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
-text = "BEFORE ROLLING"
+visible = false
+text = "CURRENT VALUES"
 
 [node name="Copy" type="Label" parent="Columns/Context/Content"]
 layout_mode = 2
@@ -115,26 +118,10 @@ theme_type_variation = &"RookframeBody"
 autowrap_mode = 2
 text = ""
 
-[node name="Authorization" type="Label" parent="Columns/Context/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-autowrap_mode = 2
-text = ""
-
-[node name="Authorize" type="Button" parent="Columns/Context/Content"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Authorize improvement"
-
-[node name="Eligible" type="CheckBox" parent="Columns/Context/Content"]
-autowrap_mode = 2
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = "Table confirms eligibility"
 
 
-[node name="Restrictions" type="VBoxContainer" parent="Columns/Context/Content"]
+
+[node name="Restrictions" type="HBoxContainer" parent="Columns/Context/Content"]
 layout_mode = 2
 
 
@@ -142,14 +129,16 @@ layout_mode = 2
 autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
-text = "Had food and drink"
+size_flags_horizontal = 3
+text = "Food & drink"
 button_pressed = true
 
 [node name="Infected" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
 autowrap_mode = 2
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
-text = "Currently infected"
+size_flags_horizontal = 3
+text = "Infected"
 
 
 [node name="Scrolls" type="VBoxContainer" parent="."]

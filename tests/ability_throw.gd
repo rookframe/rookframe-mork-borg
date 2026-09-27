@@ -54,18 +54,18 @@ func test_ability_throw() -> void:
 	sheet.set_character(sdk.actors.read(SDK.ActorId.new("character")).actor, "character", "character", miniatures, choices, sdk)
 	await get_tree().process_frame
 	await get_tree().process_frame
-	var button = sheet.find_child("Strength", true, false).get_node("Padding/Content/Row/Modifier")
+	var button = sheet.find_child("Strength", true, false).get_node("Modifier")
 	button.pressed.emit()
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_bool(host.human_requests.size() == 5).override_failure_message("The authored modifier directly originates its human Throw.").is_true()
-	button = sheet.find_child("Strength", true, false).get_node("Padding/Content/Row/Modifier")
+	button = sheet.find_child("Strength", true, false).get_node("Modifier")
 	assert_bool(button.disabled and button.icon != null).override_failure_message("Pending modifier is explicit and prevents duplicate actions.").is_true()
 	host.actors[0].data["silver"] = 23
 	host.WorldChanged.emit()
 	await get_tree().process_frame
 	await get_tree().process_frame
-	button = sheet.find_child("Strength", true, false).get_node("Padding/Content/Row/Modifier")
+	button = sheet.find_child("Strength", true, false).get_node("Modifier")
 	assert_bool(button.disabled and button.icon != null).override_failure_message("Actor changes retain the pending modifier state.").is_true()
 	sheet.close_action()
 	await get_tree().process_frame
