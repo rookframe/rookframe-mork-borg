@@ -8,6 +8,8 @@ const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3
 @export var class_id := "classless"
 const ABILITY_NAMES := ["Agility", "Presence", "Strength", "Toughness"]
 const PACK_CHOICES: Array[String] = ["Nothing", "Backpack", "Sack", "Small wagon", "Donkey"]
+const FIRST_EQUIPMENT_NAMES := ["Rope", "Torch", "Lantern with oil", "Magnesium strip", "Unclean scroll", "Sharp needle", "Medicine box", "Metal file", "Bear trap", "Bomb", "Red poison", "Silver crucifix"]
+const SECOND_EQUIPMENT_NAMES := ["Life elixir", "Sacred scroll", "Small but vicious dog", "Monkeys", "Exquisite perfume", "Toolbox", "Heavy chain", "Grappling hook", "Shield", "Crowbar", "Lard", "Tent"]
 const WEAPON_RESULTS := ["Femur", "Staff", "Shortsword", "Knife", "Warhammer", "Sword", "Bow", "Flail", "Crossbow", "Zweihander"]
 const ARMOR_RESULTS := ["No armor", "Light armor", "Medium armor", "Heavy armor"]
 ## Fixed grants are empty for the classless profile. Conditional starting

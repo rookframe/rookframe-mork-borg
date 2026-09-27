@@ -1195,5 +1195,18 @@ messages = {
 [&"", &"Could not save. Try again."]: [&"Не удалось сохранить. Повторите попытку."],
 [&"", &"Try again"]: [&"Повторить"],
 [&"", &"Unavailable"]: [&"Недоступно"],
+[&"", &"CARRIED EQUIPMENT"]: [&"СНАРЯЖЕНИЕ С СОБОЙ"],
+[&"", &"Your starting belongings."]: [&"Ваши начальные вещи."],
+[&"", &"Choose your pack above."]: [&"Выберите поклажу выше."],
+[&"", &"Starting equipment complete. Continue to Identity."]: [&"Начальное снаряжение готово. Перейдите к личности."],
+[&"", &"Change Miniature"]: [&"Сменить миниатюру"],
+[&"", &"Choose one pack:"]: [&"Выберите одну поклажу:"],
+[&"", &"Choose one pack below"]: [&"Выберите поклажу ниже"],
+[&"", &"No pack"]: [&"Без поклажи"],
+[&"", &"%d silver"]: [&"Серебро: %d"],
+[&"", &"1 omen"]: [&"1 знамение"],
+[&"", &"%d omens"]: [&"Знамения: %d"],
+[&"", &"1 day of dried food"]: [&"Сухой паёк на 1 день"],
+[&"", &"%d days of dried food"]: [&"Сухой паёк: дней — %d"],
 }
 locale = "ru"

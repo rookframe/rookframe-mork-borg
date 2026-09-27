@@ -24,42 +24,26 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.266667, 0.913725, 0.913725, 1)
 
-[node name="CreationRoll" type="Control"]
+[node name="CreationRoll" type="PanelContainer"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
 size_flags_horizontal = 3
-script = ExtResource("1")
-
-[node name="Background" type="PanelContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
 theme_override_styles/panel = SubResource("Frame")
+script = ExtResource("1")
 
 [node name="Highlight" type="PanelContainer" parent="."]
 visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+layout_mode = 2
 mouse_filter = 2
 theme_override_styles/panel = SubResource("CurrentFrame")
 
 [node name="Row" type="HBoxContainer" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 8.0
-offset_top = 4.0
-offset_right = -8.0
-offset_bottom = -4.0
+layout_mode = 2
 theme_override_constants/separation = 8
 
 [node name="State" type="TextureRect" parent="Row"]
 layout_mode = 2
+pivot_offset = Vector2(12, 12)
 custom_minimum_size = Vector2(24, 24)
 size_flags_vertical = 4
 expand_mode = 1
@@ -99,10 +83,16 @@ theme_override_font_sizes/font_size = 16
 text = "3d6"
 autowrap_mode = 2
 
+[node name="Meaning" type="Label" parent="Row/Identity"]
+visible = false
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 2
+
 [node name="Result" type="Label" parent="Row"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 18
 text = "—"
 autowrap_mode = 0
-

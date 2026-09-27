@@ -59,11 +59,6 @@ func _process(_delta: float) -> void:
 	_update_character_density()
 	if _character_sheet != null:
 		_character_sheet.set_available_height(size.y)
-	if _surface_is_hidden() and _character_creator != null and _character_creator.is_active():
-		# The managed host closes this surface by hiding it. Treat that boundary
-		# exactly like a scene exit so pending creation can never resume hidden.
-		_character_creator.discard()
-		_creation_was_closed = true
 	if _creation_was_closed and not _surface_is_hidden():
 		_creation_was_closed = false
 		character_show_route("create-class")
@@ -262,6 +257,7 @@ func _setup_character_content() -> void:
 	_character_creator.primary_changed.connect(_on_creator_primary)
 	_character_creator.character_created.connect(_on_creator_created)
 	_character_creator.scroll_choice_requested.connect(_on_scroll_choice_requested)
+	_character_creator.pack_choice_requested.connect(_on_pack_choice_requested)
 	_character_sheet.sheet_changed.connect(_on_sheet_changed)
 	_character_sheet.actor_unavailable.connect(_on_character_unavailable)
 	_character_sheet.workflow_changed.connect(_on_sheet_workflow_changed)
@@ -420,6 +416,16 @@ func _open_companion(actor: SDK.Actor) -> void:
 
 func _navigate_companion(_actor: SDK.Actor) -> void:
 	pass
+
+
+func _on_pack_choice_requested() -> void:
+	# Native container layout settles before revealing the inline choice.
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if _character_creator == null or not _character_creator.is_active():
+		return
+	var choices: Control = _character_creator.get_node(^"View/Main/Content/Equipment/PackChoices")
+	_body.scroll_vertical = int(choices.get_global_rect().position.y - _content.get_global_rect().position.y)
 
 
 func _on_scroll_choice_requested(_slot: String) -> void:

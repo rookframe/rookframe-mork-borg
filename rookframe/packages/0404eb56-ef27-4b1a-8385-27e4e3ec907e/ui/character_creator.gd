@@ -7,8 +7,8 @@ const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec90
 const SCROLLS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/starting_scrolls.gd")
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 const CHARACTER_DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
-const FIRST_EQUIPMENT_NAMES := ["Rope", "Torch", "Lantern with oil", "Magnesium strip", "Unclean scroll", "Sharp needle", "Medicine box", "Metal file", "Bear trap", "Bomb", "Red poison", "Silver crucifix"]
-const SECOND_EQUIPMENT_NAMES := ["Life elixir", "Sacred scroll", "Small but vicious dog", "Monkeys", "Exquisite perfume", "Toolbox", "Heavy chain", "Grappling hook", "Shield", "Crowbar", "Lard", "Tent"]
+const FIRST_EQUIPMENT_NAMES = CHARACTER_DEFINITION.FIRST_EQUIPMENT_NAMES
+const SECOND_EQUIPMENT_NAMES = CHARACTER_DEFINITION.SECOND_EQUIPMENT_NAMES
 const FIRST_EQUIPMENT_IDS := ["rope", "torch", "lantern-with-oil", "magnesium-strip", "unclean-scroll", "sharp-needle", "medicine-box", "metal-file", "bear-trap", "bomb", "poison-red", "crucifix-silver"]
 const SECOND_EQUIPMENT_IDS := ["life-elixir", "sacred-scroll", "dog-small-but-vicious", "monkeys", "exquisite-perfume", "toolbox", "heavy-chain", "grappling-hook", "shield", "crowbar", "lard", "tent"]
 const WEAPON_IDS := ["femur", "staff", "shortsword", "knife", "warhammer", "sword", "bow", "flail", "crossbow", "zweihander"]
@@ -16,6 +16,7 @@ const ARMOR_IDS := ["", "light-armor", "medium-armor", "heavy-armor"]
 const PACK_IDS := ["backpack", "sack", "small-wagon", "donkey"]
 
 signal scroll_choice_requested(slot: String)
+signal pack_choice_requested
 signal scroll_decided
 signal roll_requested
 signal stage_changed(step: int, title: String)
@@ -43,7 +44,6 @@ var _character_tab := "character"
 var _character_name_field
 var _character_description_field
 var _character_fields: Dictionary = {}
-var _preferred_miniature_index := 0
 var _source_definition
 @onready var _view := get_node(^"View")
 
@@ -118,8 +118,10 @@ func _ready() -> void:
 	_view.scroll_selected.connect(choose_scroll_disposition)
 	_character_content = self
 	_source_definition = CHARACTER_DEFINITION.new()
-	_view.get_node(^"Aside/Context/Content/Pack").pressed.connect(_on_pack_pressed)
-	_view.get_node(^"Aside/Context/Content/PreferredMiniature").pressed.connect(_cycle_preferred_miniature.bind(_view.get_node(^"Aside/Context/Content/PreferredMiniature")))
+	_view.pack_selected.connect(_on_pack_selected)
+	_view.get_node(^"Aside/Context/Content/PreferredMiniature").pressed.connect(_choose_preferred_miniature)
+	get_node(^"MiniaturePicker").selected.connect(_miniature_selected)
+	get_node(^"MiniaturePicker").closed.connect(_miniature_picker_closed)
 
 
 func _stage_index(stage: String) -> int:
@@ -159,11 +161,14 @@ func _show_creation_route(route: String) -> void:
 	primary_changed.emit(primary, _route_blocked(route))
 
 
-func _on_pack_pressed() -> void:
+func _on_pack_selected(pack: String) -> void:
+	if not _creation_active or _character_stage != "create-equipment":
+		return
 	var totals: Dictionary = _character_draft.get("equipment_rolls", {})
 	var choices: Array = _source_definition.pack_choices_for_roll(int(totals.get("Equipment pack", 0)))
-	if not choices.is_empty():
-		_cycle_pack(_view.get_node(^"Aside/Context/Content/Pack"), choices)
+	if choices.has(pack):
+		_character_draft["pack"] = pack
+		_replace_pack_inventory(pack)
 		_character_draft["pack_choice_pending"] = false
 		_show_creation_route(_character_stage)
 
@@ -232,7 +237,6 @@ func _discard_character_creation() -> void:
 	roll_requested.emit()
 	_character_draft = {}
 	_character_stage = "create-class"
-	_preferred_miniature_index = 0
 	if _busy:
 		_busy = false
 		busy_changed.emit(false)
@@ -240,6 +244,8 @@ func _discard_character_creation() -> void:
 
 func _on_character_primary_action() -> void:
 	if not _creation_active or _busy:
+		return
+	if _character_stage == "create-equipment" and bool(_character_draft.get("pack_choice_pending", false)):
 		return
 	if _roll_ready:
 		_roll_ready = false
@@ -413,6 +419,12 @@ func _roll_character_equipment(token: int) -> void:
 			_set_status(result.message, true)
 			return
 		totals[term[0]] = _roll_total(result, term[1])
+		if term[0] == "Equipment pack":
+			var pack_roll := int(totals.get("Equipment pack", 0))
+			_character_draft["pack_choice_pending"] = not _source_definition.pack_choices_for_roll(pack_roll).is_empty()
+			_character_draft["pack"] = "Backpack" if pack_roll == 3 else ("Sack" if pack_roll == 4 else "Nothing")
+			if bool(_character_draft["pack_choice_pending"]):
+				pack_choice_requested.emit()
 	var scrolls_resolved: bool = await _resolve_starting_scrolls(totals, token)
 	if not scrolls_resolved:
 		return
@@ -493,18 +505,6 @@ func _roll_character_equipment(token: int) -> void:
 	_character_draft["omens"] = int(totals.get("Omens", 0))
 	var weapon_name: String = _source_definition.resolve_equipment_name("Weapon", int(totals.get("Weapon", 1)))
 	var armor_name: String = _source_definition.resolve_equipment_name("Armor", int(totals.get("Armor", 1)))
-	var pack_roll := int(totals.get("Equipment pack", 0))
-	var pack_choices: Array = _source_definition.pack_choices_for_roll(pack_roll)
-	_character_draft["pack_choice_pending"] = not pack_choices.is_empty()
-	if pack_choices.is_empty():
-		if pack_roll == 3:
-			_character_draft["pack"] = "Backpack"
-		elif pack_roll == 4:
-			_character_draft["pack"] = "Sack"
-		else:
-			_character_draft["pack"] = "Nothing"
-	else:
-		_character_draft["pack"] = "Nothing"
 	var inventory: Array = [
 		{"name": "Waterskin", "source_item_id": "waterskin"},
 		{"name": "Dried food", "source_item_id": "dried-food", "quantity": int(totals.get("Food", 0))},
@@ -744,18 +744,6 @@ func _sync_identity_fields() -> void:
 		_character_draft["description"] = _character_description_field.get("value")
 
 
-func _cycle_pack(pack: Button, choices: Array) -> void:
-	var index := 0
-	for choice_index in range(choices.size()):
-		if not bool(_character_draft.get("pack_choice_pending", false)) and str(_character_draft.get("pack", "")) == str(choices[choice_index]):
-			index = choice_index + 1
-	if index >= choices.size():
-		index = 0
-	pack.text = _t("Pack: %s") % _t(str(choices[index]))
-	_character_draft["pack"] = choices[index]
-	_replace_pack_inventory(str(choices[index]))
-
-
 func _replace_pack_inventory(pack: String) -> void:
 	var current_inventory: Array = _character_draft.get("inventory", [])
 	var inventory: Array = []
@@ -769,30 +757,26 @@ func _replace_pack_inventory(pack: String) -> void:
 	_character_draft["inventory"] = inventory
 
 
-func _cycle_preferred_miniature(miniature: Button) -> void:
-	var index := _preferred_miniature_index + 1
-	var available_count := _character_miniature_choices.size()
-	if available_count > _character_miniatures.size():
-		available_count = _character_miniatures.size()
-	if index > available_count:
-		index = 0
-	if index == 0:
-		miniature.text = _t("Choose a published Miniature")
-	else:
-		miniature.text = _t(str(_character_miniature_choices[index - 1].get("title", "Published Miniature")))
-	_preferred_miniature_index = index
-	_set_preferred_miniature(index, miniature)
+func _choose_preferred_miniature() -> void:
+	if not _creation_active or _character_stage != "create-identity":
+		return
+	_sync_identity_fields()
+	var picker := get_node(^"MiniaturePicker")
+	var result := sdk.windows.push(self, picker, _t("Choose Miniature"))
+	if not result.ok:
+		_set_status(result.message, true)
+		return
+	picker.open(sdk, i18n, _character_draft.get("preferred_miniature", {}))
 
 
-func _set_preferred_miniature(index: int, miniature: Button) -> void:
-	if index <= 0 or index - 1 >= _character_miniatures.size():
-		_character_draft["preferred_miniature"] = {}
-		return
-	if index - 1 >= _character_miniature_choices.size():
-		_character_draft["preferred_miniature"] = {}
-		return
-	_character_draft["preferred_miniature"] = _character_miniature_choices[index - 1].duplicate(true)
-	_character_draft["preferred_miniature"]["choice_index"] = index
+func _miniature_selected(reference: Dictionary) -> void:
+	if _creation_active and _character_stage == "create-identity":
+		_character_draft["preferred_miniature"] = reference.duplicate(true)
+
+
+func _miniature_picker_closed() -> void:
+	if _creation_active and _character_stage == "create-identity":
+		_show_creation_route(_character_stage)
 
 
 func _commit_character() -> void:

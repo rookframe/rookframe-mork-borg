@@ -40,6 +40,8 @@ corner_radius_top_right = 4
 corner_radius_bottom_right = 4
 corner_radius_bottom_left = 4
 
+[sub_resource type="ButtonGroup" id="PackGroup"]
+
 [node name="CreationView" type="BoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -289,6 +291,66 @@ layout_mode = 2
 [node name="Pack" parent="Main/Content/Equipment" instance=ExtResource("2")]
 layout_mode = 2
 
+[node name="PackChoices" type="VBoxContainer" parent="Main/Content/Equipment"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Prompt" type="Label" parent="Main/Content/Equipment/PackChoices"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+autowrap_mode = 2
+
+[node name="Options" type="HFlowContainer" parent="Main/Content/Equipment/PackChoices"]
+layout_mode = 2
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
+
+[node name="Choice0" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("PackGroup")
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Nothing"
+
+[node name="Choice1" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("PackGroup")
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Backpack"
+
+[node name="Choice2" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("PackGroup")
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Sack"
+
+[node name="Choice3" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("PackGroup")
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Small wagon"
+
+[node name="Choice4" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+layout_mode = 2
+custom_minimum_size = Vector2(140, 44)
+size_flags_horizontal = 3
+toggle_mode = true
+button_group = SubResource("PackGroup")
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Donkey"
+
 [node name="First" parent="Main/Content/Equipment" instance=ExtResource("2")]
 layout_mode = 2
 
@@ -383,13 +445,6 @@ theme_type_variation = &"RookframeBody"
 theme_override_font_sizes/font_size = 16
 text = ""
 autowrap_mode = 2
-
-[node name="Pack" type="Button" parent="Aside/Context/Content"]
-layout_mode = 2
-visible = false
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Pack: Nothing"
 
 [node name="PreferredMiniature" type="Button" parent="Aside/Context/Content"]
 layout_mode = 2

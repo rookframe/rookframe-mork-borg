@@ -4,12 +4,14 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const ACTIONS = preload(ROOT + "logic/miniature_actions.gd")
 signal closed(saved: bool)
+signal chosen(reference: Dictionary)
 var sdk: SDK
 var i18n := I18N.new()
 var _actor: SDK.ActorId
 var _definition := ""
 var _busy := false
 var _saved: Dictionary = {}
+var _selection_only := false
 @onready var browser = get_node(^"Browser")
 
 func _ready() -> void:
@@ -19,7 +21,8 @@ func _ready() -> void:
 	get_node(^"Actions/Back").pressed.connect(_cancel)
 	get_node(^"Actions/Apply").pressed.connect(_apply)
 
-func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary) -> void:
+func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false) -> void:
+	_selection_only = selection_only
 	sdk = facade
 	i18n = locale
 	_actor = actor
@@ -31,6 +34,10 @@ func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, sav
 	get_node(^"Actions/Apply").text = _t("Use Miniature")
 	_load()
 	browser.focus_search()
+
+func open_choice(facade: SDK, locale: I18N, saved: Dictionary) -> void:
+	open(facade, locale, null, "", saved, true)
+	get_node(^"Title").text = _t("Choose Miniature")
 
 func _load() -> void:
 	browser.set_state("loading", _t("Loading Miniatures…"))
@@ -46,6 +53,11 @@ func _load() -> void:
 			"title": entry.localized_title, "package": entry.package_title if not entry.package_title.is_empty() else entry.reference.package_id,
 			"package_id": entry.reference.package_id, "local_id": entry.reference.local_id, "available": entry.available})
 	var id := str(_saved.get("package_id", "")) + "/" + str(_saved.get("local_id", ""))
+	if _selection_only and _saved.is_empty():
+		for entry in entries:
+			if entry.available:
+				id = str(entry.id)
+				break
 	if not _saved.is_empty():
 		var current := sdk.content.read(SDK.ContentReference.new(str(_saved.get("package_id", "")), str(_saved.get("local_id", ""))))
 		if current.ok:
@@ -68,6 +80,10 @@ func _apply() -> void:
 		return
 	var entry: Dictionary = browser.selection()
 	var reference := {"package_id": str(entry.package_id), "local_id": str(entry.local_id)}
+	if _selection_only:
+		reference["title"] = str(entry.title)
+		chosen.emit(reference)
+		return
 	_busy = true
 	get_node(^"Actions/Apply").disabled = true
 	get_node(^"Actions/Back").disabled = true

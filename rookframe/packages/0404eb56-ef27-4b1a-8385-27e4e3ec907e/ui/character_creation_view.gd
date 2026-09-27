@@ -5,14 +5,18 @@ var i18n := I18N.new()
 
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
+const DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
 
 signal class_selected(class_id: String)
 signal scroll_selected(slot: String, disposition: String)
+signal pack_selected(pack: String)
 
 var _scroll_slot := ""
 const CLASS_NODES: Dictionary = {"NoClass": "classless", "FangedDeserter": "fanged-deserter", "GutterbornScum": "gutterborn-scum", "EsotericHermit": "esoteric-hermit", "WretchedRoyalty": "wretched-royalty", "HereticalPriest": "heretical-priest", "OccultHerbmaster": "occult-herbmaster"}
 
 func _ready() -> void:
+	for name in ["Choice0", "Choice1", "Choice2", "Choice3", "Choice4"]:
+		get_node("Main/Content/Equipment/PackChoices/Options/" + name).pressed.connect(_select_pack.bind({"Choice0": "Nothing", "Choice1": "Backpack", "Choice2": "Sack", "Choice3": "Small wagon", "Choice4": "Donkey"}[name]))
 	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit", "WretchedRoyalty", "HereticalPriest", "OccultHerbmaster"]:
 		get_node("Main/Content/Class/" + node).pressed.connect(_select_class.bind(CLASS_NODES[node]))
 	for choice in ["Reroll", "Eat", "Paper"]:
@@ -23,6 +27,9 @@ func _select_class(class_id: String) -> void:
 
 func _select_scroll(disposition: String) -> void:
 	scroll_selected.emit(_scroll_slot, disposition)
+
+func _select_pack(pack: String) -> void:
+	pack_selected.emit(pack)
 
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness", "Hit points"]
 const EQUIPMENT := ["Silver", "Omens", "Food", "Equipment pack", "Equipment first", "Equipment second", "Weapon", "Armor"]
@@ -52,9 +59,8 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 	get_node(^"Main/Content/Title").text = _t("ROLL ABILITIES") if selected == "Abilities" else (_t("STARTING EQUIPMENT") if selected == "Equipment" else _t(selected).to_upper())
 	get_node(^"Main/Content/Title").visible = not (compact and selected in ["Abilities", "Class"])
 	get_node(^"Aside").visible = not (compact and selected == "Abilities")
-	get_node(^"Aside/Context/Content/Pack").visible = selected == "Equipment" and not equipment_pending
 	get_node(^"Aside/Context/Content/PreferredMiniature").visible = selected == "Identity"
-	get_node(^"Aside/Context/Content/Title").text = _t("PREFERRED MINIATURE") if selected == "Identity" else (_t("EQUIPMENT PACK") if selected == "Equipment" else _t(class_title).to_upper())
+	get_node(^"Aside/Context/Content/Title").text = _t("PREFERRED MINIATURE") if selected == "Identity" else (_t("CARRIED EQUIPMENT") if selected == "Equipment" else _t(class_title).to_upper())
 	var hp_faces: int = profile.get("hp_faces", 8)
 	var silver_count: int = profile.get("silver_count", 2)
 	var omen_faces: int = profile.get("omen_faces", 2)
@@ -71,14 +77,18 @@ func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
 		facts = _traits_text(draft)
 		_present_origin(draft, compact)
 	elif selected == "Equipment":
-		description = "Choose from the packs available for your roll."
+		description = "Your starting belongings."
 		facts = _inventory_text(draft.get("inventory", []))
+		get_node(^"Aside").visible = not facts.is_empty() and not equipment_pending
 		hint = _t("Rolling %s…") % _t(str(draft.get("active_roll", "equipment"))) if equipment_pending and not roll_ready else "Continue with the next roll when ready."
-		get_node(^"Aside/Context/Content/Pack").text = _t("Pack: Choose") if pack_pending else _t("Pack: %s") % _t(str(draft.get("pack", "Nothing")))
+		if not equipment_pending:
+			hint = "Choose your pack above." if pack_pending else "Starting equipment complete. Continue to Identity."
 		_present_equipment(draft, compact)
 	elif selected == "Identity":
+		var miniature: Dictionary = draft.get("preferred_miniature", {})
+		get_node(^"Aside/Context/Content/PreferredMiniature").text = _t("Choose Miniature") if miniature.is_empty() else _t("Change Miniature")
 		description = "Preferred appearance for this Actor’s Rooks."
-		facts = ""
+		facts = str(miniature.get("title", ""))
 		hint = "You can edit the completed sheet after creation."
 		get_node(^"Main/Content/Identity/Name").value = str(draft.get("name", ""))
 		get_node(^"Main/Content/Identity/Description").value = str(draft.get("description", ""))
@@ -138,7 +148,17 @@ func _present_equipment(draft: Dictionary, compact: bool) -> void:
 			var silver_roll: int = values[title]
 			result = str(silver_roll * 10)
 		var row: ROLL_ROW = rows[index]
-		row.present_roll(title, _equipment_formula(title, draft, EQUIPMENT_FORMULAS[index]), result, "complete" if complete else (("current" if ready else "pending") if current else "locked"), index + 1, compact)
+		row.present_roll(title, _equipment_formula(title, draft, EQUIPMENT_FORMULAS[index]), result, "complete" if complete else (("current" if ready else "pending") if current else "locked"), index + 1, compact, _equipment_meaning(title, draft) if complete else "")
+	var choices: Array[String] = DEFINITION.new().pack_choices_for_roll(int(values.get("Equipment pack", 0)))
+	get_node(^"Main/Content/Equipment/PackChoices").visible = not choices.is_empty()
+	get_node(^"Main/Content/Equipment/PackChoices/Prompt").text = _t("Choose one pack:")
+	var buttons := [get_node(^"Main/Content/Equipment/PackChoices/Options/Choice0"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice1"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice2"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice3"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice4")]
+	for index in range(DEFINITION.PACK_CHOICES.size()):
+		var name: String = DEFINITION.PACK_CHOICES[index]
+		var button := buttons[index] as Button
+		button.visible = choices.has(name)
+		button.text = _t("No pack" if name == "Nothing" else name)
+		button.set_pressed_no_signal(not bool(draft.get("pack_choice_pending", true)) and name == str(draft.get("pack", "")))
 
 	var extra: ROLL_ROW = get_node(^"Main/Content/Equipment/ExtraRoll")
 	var active: String = draft.get("active_roll", "")
@@ -146,6 +166,32 @@ func _present_equipment(draft: Dictionary, compact: bool) -> void:
 	extra.visible = not EQUIPMENT.has(active) and not active.is_empty() and pending
 	if extra.visible:
 		extra.present_roll(active, str(draft.get("active_roll_formula", "")), "Ready" if ready else "Rolling…", "current" if ready else "pending", 7, compact)
+
+
+func _equipment_meaning(title: String, draft: Dictionary) -> String:
+	var values: Dictionary = draft.get("equipment_rolls", {})
+	var value := int(values.get(title, 0))
+	if title == "Silver":
+		return _t("%d silver") % (value * 10)
+	if title == "Omens":
+		return _t("1 omen") if value == 1 else _t("%d omens") % value
+	if title == "Food":
+		return _t("1 day of dried food") if value == 1 else _t("%d days of dried food") % value
+	if title == "Equipment pack":
+		if value == 3:
+			return _t("Backpack")
+		if value == 4:
+			return _t("Sack")
+		if value <= 2:
+			return _t("No pack")
+		return _t("Choose one pack below") if bool(draft.get("pack_choice_pending", true)) else _t(str(draft.get("pack", "Nothing")))
+	if title == "Equipment first":
+		return _t(DEFINITION.FIRST_EQUIPMENT_NAMES[value - 1]) if value >= 1 and value <= 12 else ""
+	if title == "Equipment second":
+		return _t(DEFINITION.SECOND_EQUIPMENT_NAMES[value - 1]) if value >= 1 and value <= 12 else ""
+	if title == "Weapon" or title == "Armor":
+		return _t(DEFINITION.new().resolve_equipment_name(title, value))
+	return ""
 
 
 func _ability_formula(title: String, draft: Dictionary) -> String:
@@ -235,7 +281,9 @@ func _inventory_text(items: Array) -> String:
 	var names: Array[String] = []
 	for item in items:
 		var item_data: Dictionary = item
-		names.append(_t(str(item_data.get("name", "Item"))))
+		var name := _t(str(item_data.get("name", "Item")))
+		var quantity := int(item_data.get("quantity", 1))
+		names.append("%s × %d" % [name, quantity] if quantity != 1 else name)
 	return _lines(names)
 
 
@@ -262,7 +310,6 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Aside/Context/Content/Pack").text = _t("Pack: Nothing")
 	get_node(^"Aside/Context/Content/PreferredMiniature").text = _t("Choose Miniature")
 	get_node(^"Aside/Context/Content/Title").text = _t("NO CLASS")
 	get_node(^"Main/Content/Class/EsotericHermit").text = _t("ESOTERIC HERMIT")

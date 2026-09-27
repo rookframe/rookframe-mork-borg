@@ -18,14 +18,14 @@ func test_required_pack_choice() -> void:
 	var creator = _creator_for(host, "occult-herbmaster")
 	for iteration in range(180):
 		await get_tree().process_frame
-		if stage == 4 and not host.requests.is_empty() and str(host.requests[-1].name).begins_with("Armor"):
+		if stage == 4 and creator.get_node(^"View/Main/Content/Equipment/PackChoices").visible:
 			await get_tree().process_frame
 			break
 		if not disabled:
 			creator.primary()
 	creator.primary()
 	_check(stage == 4 and host.actors.is_empty(), "Equipment waits for the required source pack choice.")
-	creator.get_node(^"View/Aside/Context/Content/Pack").pressed.emit()
+	creator.get_node(^"View/Main/Content/Equipment/PackChoices/Options/Choice0").pressed.emit()
 	await _finish(creator)
 	_check(host.actors.size() == 1 and host.actors[0].data.pack == "Nothing", "Nothing is an explicit legal pack choice.")
 	creator.free()
@@ -513,7 +513,7 @@ func test_atomic_refusal() -> void:
 		if not disabled:
 			if stage == 5:
 				creator.get_node(^"View/Main/Content/Identity/Name").value = "Failed grant"
-				creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+				_choose_miniature(creator)
 			creator.primary()
 	creator.primary()
 	await get_tree().process_frame
@@ -593,7 +593,7 @@ func _finish(creator: Node) -> void:
 			continue
 		if stage == 5:
 			creator.get_node(^"View/Main/Content/Identity/Name").value = "Ashen Test"
-			creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+			_choose_miniature(creator)
 		creator.primary()
 	_check(false, "Creation did not finish through its public actions.")
 
@@ -621,3 +621,39 @@ func before_test() -> void:
 	stages.clear()
 	primary = ""
 	disabled = false
+
+func _choose_miniature(creator: Node) -> void:
+	creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+	var picker = creator.get_node(^"MiniaturePicker/Picker")
+	picker.browser.get_node(^"Results/Rows").get_child(0).pressed.emit()
+	picker.get_node(^"Actions/Apply").pressed.emit()
+
+func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
+	var host = _host_for("gutterborn-scum", 2)
+	var creator = _creator_for(host, "gutterborn-scum")
+	for iteration in range(180):
+		await get_tree().process_frame
+		if stage == 5:
+			break
+		if not disabled:
+			creator.primary()
+	var name_field = creator.get_node(^"View/Main/Content/Identity/Name")
+	name_field.value = "Varg"
+	creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+	var picker = creator.get_node(^"MiniaturePicker/Picker")
+	_check(picker.browser.get_node(^"Results/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
+	picker.get_node(^"Actions/Back").pressed.emit()
+	_check(name_field.value == "Varg" and stage == 5, "Back returns to the same identity draft.")
+	_check(host.actors.is_empty(), "Browsing never creates an Actor.")
+	_choose_miniature(creator)
+	_check(not creator.get_node(^"MiniaturePicker").visible, "Use Miniature returns to the wizard.")
+	_check(name_field.value == "Varg", "Selecting preserves the name.")
+	creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+	_check(picker.browser.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
+	picker.get_node(^"Actions/Back").pressed.emit()
+	creator.primary()
+	creator.primary()
+	await get_tree().process_frame
+	_check(host.actors.size() == 1 and host.actors[0].data.preferred_miniature.local_id == "creature-token", "Confirmation persists the chosen Miniature.")
+	_check(host.previews_requested > 0, "The browser asks the host for visual previews.")
+	creator.free()

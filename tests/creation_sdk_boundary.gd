@@ -137,3 +137,26 @@ func PublishActionLog(report: Dictionary) -> Dictionary:
 
 func Translate(message: String, _domain: String) -> String:
 	return message
+
+# Native workspace stacking and render ownership are covered by the host suite.
+var window_source: Control
+var previews_requested := 0
+func PushWindow(source: Control, child: Control, _title: String) -> Dictionary:
+	window_source = source
+	child.visible = true
+	return {"ok": true}
+
+func PopWindow(child: Control) -> Dictionary:
+	child.visible = false
+	child.closed.emit()
+	return {"ok": true}
+
+func ListContent(_kind: int) -> Dictionary:
+	return {"ok": true, "value": [ReadContent(PackageId(), "creature-token").value]}
+
+func ReadContent(package: String, id: String) -> Dictionary:
+	return {"ok": true, "value": {"packageId": package, "localId": id, "displayName": "Creature", "available": true, "type": "miniature"}}
+
+func PreviewMiniature(_package: String, _id: String, _target: Control) -> Dictionary:
+	previews_requested += 1
+	return {"ok": true}
