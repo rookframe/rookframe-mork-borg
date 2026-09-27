@@ -1,4 +1,4 @@
-[gd_scene load_steps=18 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/actor_window.gd" id="2_script"]
@@ -25,13 +25,15 @@
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_frame.tres" id="resource_frame"]
 
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="sheet_tab"]
+
 [sub_resource type="ButtonGroup" id="CreatureTabs"]
 
 [sub_resource type="StyleBoxFlat" id="CharacterTabSelected"]
-content_margin_left = 12.0
-content_margin_top = 10.0
-content_margin_right = 12.0
-content_margin_bottom = 8.0
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
 bg_color = Color(0, 0, 0, 0)
 border_width_bottom = 3
 border_color = Color(0.266667, 0.913725, 0.913725, 1)
@@ -84,8 +86,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Creature" type="Button" parent="Layout/Header/Routes"]
-custom_minimum_size = Vector2(0, 44)
+[node name="Creature" parent="Layout/Header/Routes" instance=ExtResource("sheet_tab")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
@@ -95,8 +96,7 @@ toggle_mode = true
 button_group = SubResource("CreatureTabs")
 text = "Creature"
 
-[node name="CreatureInventory" type="Button" parent="Layout/Header/Routes"]
-custom_minimum_size = Vector2(0, 44)
+[node name="CreatureInventory" parent="Layout/Header/Routes" instance=ExtResource("sheet_tab")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
@@ -106,8 +106,7 @@ toggle_mode = true
 button_group = SubResource("CreatureTabs")
 text = "Inventory"
 
-[node name="Appearance" type="Button" parent="Layout/Header/Routes"]
-custom_minimum_size = Vector2(0, 44)
+[node name="Appearance" parent="Layout/Header/Routes" instance=ExtResource("sheet_tab")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
@@ -133,8 +132,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Character" type="Button" parent="Layout/CharacterTabs"]
-custom_minimum_size = Vector2(0, 44)
+[node name="Character" parent="Layout/CharacterTabs" instance=ExtResource("sheet_tab")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
@@ -145,8 +143,7 @@ theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1
 toggle_mode = true
 text = "Character"
 
-[node name="Inventory" type="Button" parent="Layout/CharacterTabs"]
-custom_minimum_size = Vector2(0, 44)
+[node name="Inventory" parent="Layout/CharacterTabs" instance=ExtResource("sheet_tab")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
@@ -157,8 +154,7 @@ theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1
 toggle_mode = true
 text = "Inventory"
 
-[node name="Appearance" type="Button" parent="Layout/CharacterTabs"]
-custom_minimum_size = Vector2(0, 44)
+[node name="Appearance" parent="Layout/CharacterTabs" instance=ExtResource("sheet_tab")]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"

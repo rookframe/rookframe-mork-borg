@@ -367,6 +367,9 @@ func _select_character_tab(tab: String) -> void:
 
 
 func _on_sheet_changed() -> void:
+	# A retained Character can finish refreshing after a Creature becomes active.
+	if _character_sheet == null or not _character_sheet.visible:
+		return
 	if _character_actor == null:
 		return
 	var latest: SDK.ActorResult = sdk.actors.read(_character_actor.id)
@@ -425,6 +428,9 @@ func _on_scroll_choice_requested(_slot: String) -> void:
 	_body.scroll_vertical = 0
 
 func _on_character_unavailable() -> void:
+	# A retained Character can finish refreshing after a Creature becomes active.
+	if _character_sheet == null or not _character_sheet.visible:
+		return
 	get_node(^"Layout/SheetActions").visible = false
 	_character_actor = null
 	_header_title.text = _t("CHARACTER UNAVAILABLE")
@@ -433,6 +439,9 @@ func _on_character_unavailable() -> void:
 	_character_tabs.visible = false
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
+	# A retained Character can finish refreshing after a Creature becomes active.
+	if _character_sheet == null or not _character_sheet.visible:
+		return
 	_sheet_workflow_title = title
 	_header_title.theme_type_variation = "RookframeTitle" if route in ACTION_ROUTES else "RookframeHeading"
 	if route in ACTION_ROUTES:

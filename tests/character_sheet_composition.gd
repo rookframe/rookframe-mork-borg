@@ -33,7 +33,7 @@ func _settle() -> void:
 	for frame in range(10):
 		await get_tree().process_frame
 
-func test_sheet_at_constrained_sizes(width: int, height: int, language: String, _test_parameters := [[328, 313, "en"], [328, 313, "ru"], [375, 313, "en"], [375, 313, "ru"], [412, 712, "en"], [960, 888, "en"]]) -> void:
+func test_sheet_at_constrained_sizes(width: int, height: int, language: String, _test_parameters := [[326, 315, "en"], [326, 315, "ru"], [375, 313, "en"], [375, 313, "ru"], [412, 712, "en"], [960, 888, "en"]]) -> void:
 	var host := BOUNDARY.new()
 	host.language = language
 	host.game_master = true
@@ -56,6 +56,10 @@ func test_sheet_at_constrained_sizes(width: int, height: int, language: String, 
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sheet.opened(SDK.ActorId.new("hero"))
 	await _settle()
+	for tab: Button in sheet.get_node("Layout/CharacterTabs").get_children():
+		var font: Font = tab.get_theme_font("font")
+		var text_width := font.get_string_size(tab.text, HORIZONTAL_ALIGNMENT_LEFT, -1, tab.get_theme_font_size("font_size")).x
+		assert_bool(text_width + tab.get_theme_stylebox("normal").get_minimum_size().x <= tab.size.x).override_failure_message("Tab text must fit in full after safe-area and window-border deductions.").is_true()
 	var view: Control = sheet.find_child("CharacterOverview", true, false)
 	assert_object(view).is_not_null()
 	assert_bool(view.get_global_rect().position.x >= 12 and view.get_global_rect().end.x <= width - 12).is_true()

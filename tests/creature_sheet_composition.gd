@@ -127,3 +127,27 @@ func _capture(viewport: SubViewport, name: String) -> void:
 	RenderingServer.force_draw()
 	DirAccess.make_dir_recursive_absolute(directory)
 	assert_int(viewport.get_texture().get_image().save_png(directory.path_join(name + ".png"))).is_equal(OK)
+
+func test_hidden_character_workflow_cannot_replace_creature_chrome() -> void:
+	var host := BOUNDARY.new()
+	host.game_master = true
+	host.actors.enemy.access_level = "Owner"
+	host.actors.enemy.data = preload(ROOT + "content/zukuma-berserker.tres").create_data({})
+	host.handler = auto_free(SYSTEM.new())
+	host.handler.sdk = SDK.new(host)
+	add_child(host.handler)
+	var sheet = auto_free(load(ROOT + "ui/window.tscn").instantiate())
+	sheet.sdk = SDK.new(host)
+	add_child(sheet)
+	sheet.size = Vector2(326, 315)
+	sheet.opened(SDK.ActorId.new("hero"))
+	await _settle()
+	var character = sheet.find_child("CharacterSheet", true, false)
+	character._navigate("rest", "")
+	await _settle()
+	sheet.opened(SDK.ActorId.new("enemy"))
+	await _settle()
+	character.workflow_changed.emit("rest", "Action ended", false, false)
+	await _settle()
+	assert_bool(sheet.get_node("Layout/SheetActions").visible).is_false()
+	assert_str(sheet.get_node("Layout/Header/Title").text).is_equal(str(host.actors.enemy.data.name).to_upper())

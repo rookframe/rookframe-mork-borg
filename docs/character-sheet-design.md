@@ -40,7 +40,7 @@ their task; no extra approval UI is introduced.
 `tests/character_sheet_composition.gd` checks one edit entry, inline counter writes,
 zero/viewer states, minimum target sizes, reserved counter value width, intrinsic
 profile height, fixed action footers and absence of invented approval controls.
-Run it at 328x313 (including the phone safe-area deduction), 375x313 (the phone dock body below host chrome), 412x712 and 960x888,
+Run it at 326x315 (including the phone safe-area and window-border deductions), 375x313 (the phone dock body below host chrome), 412x712 and 960x888,
 including Russian. The full suite also checks dirty edits, persistence boundaries,
 recovery restrictions, direct Owner improvement, ordered rolls and interruption.
 
@@ -62,3 +62,7 @@ Actor presentation provides the preferred or default Miniature through SDK 0.31.
 Dragging an Owner Actor invokes placement at the dropped Scene position, creates
 one Rook and links it to that existing Actor. Placement rechecks access and reports
 errors through SDK feedback; no additional Actor is created.
+
+Shared tabs are 32px high with 8px horizontal padding, so their full names fit
+inside the safe-area body. Events from a retained hidden Character sheet cannot
+replace the active Creature title, tabs or footer.
