@@ -23,132 +23,142 @@ offset_right = -12.0
 offset_bottom = -12.0
 size_flags_vertical = 3
 theme_override_constants/separation = 12
-[node name="Body" type="ScrollContainer" parent="Layout"]
+[node name="Tabs" type="TabContainer" parent="Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Creature" type="ScrollContainer" parent="Layout/Tabs"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
-[node name="Preview" type="VBoxContainer" parent="Layout/Body"]
+[node name="Preview" type="VBoxContainer" parent="Layout/Tabs/Creature"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 16
-[node name="Identity" type="PanelContainer" parent="Layout/Body/Preview"]
+[node name="Identity" type="PanelContainer" parent="Layout/Tabs/Creature/Preview"]
 layout_mode = 2
 theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Preview/Identity"]
+[node name="Content" type="VBoxContainer" parent="Layout/Tabs/Creature/Preview/Identity"]
 layout_mode = 2
 theme_override_constants/separation = 12
-[node name="Title" type="Label" parent="Layout/Body/Preview/Identity/Content"]
+[node name="Title" type="Label" parent="Layout/Tabs/Creature/Preview/Identity/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
-[node name="Portrait" type="TextureRect" parent="Layout/Body/Preview/Identity/Content"]
+[node name="Portrait" type="TextureRect" parent="Layout/Tabs/Creature/Preview/Identity/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 200)
 texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 6
-[node name="Stats" type="HBoxContainer" parent="Layout/Body/Preview"]
+[node name="Stats" type="HBoxContainer" parent="Layout/Tabs/Creature/Preview"]
 layout_mode = 2
 theme_override_constants/separation = 0
-[node name="HitPoints" type="PanelContainer" parent="Layout/Body/Preview/Stats"]
+[node name="HitPoints" type="PanelContainer" parent="Layout/Tabs/Creature/Preview/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeInsetSurface"
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Preview/Stats/HitPoints"]
+[node name="Content" type="VBoxContainer" parent="Layout/Tabs/Creature/Preview/Stats/HitPoints"]
 layout_mode = 2
 theme_override_constants/separation = 4
-[node name="Label" type="Label" parent="Layout/Body/Preview/Stats/HitPoints/Content"]
+[node name="Label" type="Label" parent="Layout/Tabs/Creature/Preview/Stats/HitPoints/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "HP"
-[node name="Value" type="Label" parent="Layout/Body/Preview/Stats/HitPoints/Content"]
+[node name="Value" type="Label" parent="Layout/Tabs/Creature/Preview/Stats/HitPoints/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
-[node name="Morale" type="PanelContainer" parent="Layout/Body/Preview/Stats"]
+[node name="Morale" type="PanelContainer" parent="Layout/Tabs/Creature/Preview/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeInsetSurface"
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Preview/Stats/Morale"]
+[node name="Content" type="VBoxContainer" parent="Layout/Tabs/Creature/Preview/Stats/Morale"]
 layout_mode = 2
 theme_override_constants/separation = 4
-[node name="Label" type="Label" parent="Layout/Body/Preview/Stats/Morale/Content"]
+[node name="Label" type="Label" parent="Layout/Tabs/Creature/Preview/Stats/Morale/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "MORALE"
-[node name="Value" type="Label" parent="Layout/Body/Preview/Stats/Morale/Content"]
+[node name="Value" type="Label" parent="Layout/Tabs/Creature/Preview/Stats/Morale/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
-[node name="Protection" type="PanelContainer" parent="Layout/Body/Preview/Stats"]
+[node name="Protection" type="PanelContainer" parent="Layout/Tabs/Creature/Preview/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeInsetSurface"
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Preview/Stats/Protection"]
+[node name="Content" type="VBoxContainer" parent="Layout/Tabs/Creature/Preview/Stats/Protection"]
 layout_mode = 2
 theme_override_constants/separation = 4
-[node name="Label" type="Label" parent="Layout/Body/Preview/Stats/Protection/Content"]
+[node name="Label" type="Label" parent="Layout/Tabs/Creature/Preview/Stats/Protection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "PROTECTION"
-[node name="Value" type="Label" parent="Layout/Body/Preview/Stats/Protection/Content"]
+[node name="Value" type="Label" parent="Layout/Tabs/Creature/Preview/Stats/Protection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
-[node name="Attacks" type="PanelContainer" parent="Layout/Body/Preview"]
+[node name="Attacks" type="PanelContainer" parent="Layout/Tabs/Creature/Preview"]
 layout_mode = 2
 theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Preview/Attacks"]
+[node name="Content" type="VBoxContainer" parent="Layout/Tabs/Creature/Preview/Attacks"]
 layout_mode = 2
 theme_override_constants/separation = 12
-[node name="Heading" type="Label" parent="Layout/Body/Preview/Attacks/Content"]
+[node name="Heading" type="Label" parent="Layout/Tabs/Creature/Preview/Attacks/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "ATTACKS"
-[node name="Copy" type="Label" parent="Layout/Body/Preview/Attacks/Content"]
+[node name="Copy" type="Label" parent="Layout/Tabs/Creature/Preview/Attacks/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 autowrap_mode = 2
-[node name="Rules" type="PanelContainer" parent="Layout/Body/Preview"]
+[node name="Rules" type="PanelContainer" parent="Layout/Tabs/Creature/Preview"]
 layout_mode = 2
 theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="Layout/Body/Preview/Rules"]
+[node name="Content" type="VBoxContainer" parent="Layout/Tabs/Creature/Preview/Rules"]
 layout_mode = 2
 theme_override_constants/separation = 12
-[node name="Heading" type="Label" parent="Layout/Body/Preview/Rules/Content"]
+[node name="Heading" type="Label" parent="Layout/Tabs/Creature/Preview/Rules/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "SPECIAL RULES"
-[node name="Copy" type="Label" parent="Layout/Body/Preview/Rules/Content"]
+[node name="Copy" type="Label" parent="Layout/Tabs/Creature/Preview/Rules/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 autowrap_mode = 2
-[node name="Help" type="Label" parent="Layout/Body/Preview"]
+[node name="Help" type="Label" parent="Layout/Tabs/Creature/Preview"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 text = "Create a private Creature sheet, then choose its public name."
 autowrap_mode = 2
 
-[node name="Miniature" type="VBoxContainer" parent="Layout/Body/Preview"]
+[node name="Appearance" type="ScrollContainer" parent="Layout/Tabs"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+
+[node name="Miniature" type="VBoxContainer" parent="Layout/Tabs/Appearance"]
+size_flags_horizontal = 3
 layout_mode = 2
 theme_override_constants/separation = 8
-[node name="Heading" type="Label" parent="Layout/Body/Preview/Miniature"]
+[node name="Heading" type="Label" parent="Layout/Tabs/Appearance/Miniature"]
 layout_mode = 2
 text = "Miniature for new Actors"
 autowrap_mode = 2
 theme_type_variation = &"RookframeHeading"
-[node name="Current" type="Label" parent="Layout/Body/Preview/Miniature"]
+[node name="Current" type="Label" parent="Layout/Tabs/Appearance/Miniature"]
 layout_mode = 2
 autowrap_mode = 2
 theme_type_variation = &"RookframeBody"
-[node name="Help" type="Label" parent="Layout/Body/Preview/Miniature"]
+[node name="Help" type="Label" parent="Layout/Tabs/Appearance/Miniature"]
 layout_mode = 2
 text = "Applies only to new Actors created from this entry."
 autowrap_mode = 2
 theme_type_variation = &"RookframeMeta"
-[node name="Choose" type="Button" parent="Layout/Body/Preview/Miniature"]
+[node name="Choose" type="Button" parent="Layout/Tabs/Appearance/Miniature"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Choose Miniature"
 theme_type_variation = &"RookframeSecondaryButton"
-[node name="Clear" type="Button" parent="Layout/Body/Preview/Miniature"]
+[node name="Clear" type="Button" parent="Layout/Tabs/Appearance/Miniature"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 text = "Clear default"

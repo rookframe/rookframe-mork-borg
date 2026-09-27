@@ -120,7 +120,7 @@ func test_long_russian_definition_names_fit_phone_width() -> void:
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	sheet.size = Vector2(351, 325)
-	var title: Label = sheet.get_node("Layout/Body/Preview/Identity/Content/Title")
+	var title: Label = sheet.get_node("Layout/Tabs/Creature/Preview/Identity/Content/Title")
 	title.text = "Существо с очень длинным именем"
 	await get_tree().process_frame
 	await get_tree().process_frame

@@ -10,13 +10,18 @@ func ready() -> void:
 	if sdk == null:
 		return
 	i18n.bind(sdk)
+	get_node("Layout/Tabs").set_tab_title(0, i18n.text("Creature"))
+	get_node("Layout/Tabs").set_tab_title(1, i18n.text("Appearance"))
 	get_node("Layout/Create").text = i18n.text("Create Actor")
 	get_node("Layout/Create").pressed.connect(_create)
-	get_node("Layout/Body/Preview/Miniature/Choose").pressed.connect(_choose)
-	get_node("Layout/Body/Preview/Miniature/Clear").pressed.connect(_clear)
+	get_node("Layout/Tabs/Appearance/Miniature/Choose").pressed.connect(_choose)
+	get_node("Layout/Tabs/Appearance/Miniature/Clear").pressed.connect(_clear)
 	get_node("MiniatureWorkflow").closed.connect(_miniature_closed)
-	for path in ["Stats/HitPoints/Content/Label", "Stats/Morale/Content/Label", "Attacks/Content/Heading", "Rules/Content/Heading", "Stats/Protection/Content/Label", "Help", "Miniature/Heading", "Miniature/Help", "Miniature/Choose", "Miniature/Clear"]:
-		var control = get_node("Layout/Body/Preview/" + path)
+	for path in ["Stats/HitPoints/Content/Label", "Stats/Morale/Content/Label", "Attacks/Content/Heading", "Rules/Content/Heading", "Stats/Protection/Content/Label", "Help"]:
+		var control = get_node("Layout/Tabs/Creature/Preview/" + path)
+		control.text = i18n.text(control.text)
+	for path in ["Heading", "Help", "Choose", "Clear"]:
+		var control = get_node("Layout/Tabs/Appearance/Miniature/" + path)
 		control.text = i18n.text(control.text)
 
 func opened_definition(definition: SDK.ContentReference) -> void:
@@ -37,16 +42,16 @@ func _refresh() -> void:
 	var data: Dictionary = source.create_data({})
 	var title: String = found.content_entry.localized_title
 	sdk.windows.set_title(title)
-	get_node("Layout/Body/Preview/Identity/Content/Title").text = title.to_upper()
-	get_node("Layout/Body/Preview/Identity/Content/Portrait").visible = _definition.local_id == "seth-goblin"
-	get_node("Layout/Body/Preview/Stats/HitPoints/Content/Value").text = str(data.get("hit_points", 0))
+	get_node("Layout/Tabs/Creature/Preview/Identity/Content/Title").text = title.to_upper()
+	get_node("Layout/Tabs/Creature/Preview/Identity/Content/Portrait").visible = _definition.local_id == "seth-goblin"
+	get_node("Layout/Tabs/Creature/Preview/Stats/HitPoints/Content/Value").text = str(data.get("hit_points", 0))
 	var morale: Dictionary = data.get("morale", {})
-	get_node("Layout/Body/Preview/Stats/Morale/Content/Value").text = str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else (i18n.text("Special") if str(morale.get("kind", "")) == "special" else "—")
+	get_node("Layout/Tabs/Creature/Preview/Stats/Morale/Content/Value").text = str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else (i18n.text("Special") if str(morale.get("kind", "")) == "special" else "—")
 	var armor: Dictionary = data.get("armor", {})
 	var reduction := str(armor.get("reduction", ""))
-	get_node("Layout/Body/Preview/Stats/Protection/Content/Value").text = "—" if reduction.is_empty() else "−" + reduction
-	get_node("Layout/Body/Preview/Rules/Content/Copy").text = i18n.text(str(data.get("rules", "")))
-	get_node("Layout/Body/Preview/Rules").visible = not str(data.get("rules", "")).is_empty()
+	get_node("Layout/Tabs/Creature/Preview/Stats/Protection/Content/Value").text = "—" if reduction.is_empty() else "−" + reduction
+	get_node("Layout/Tabs/Creature/Preview/Rules/Content/Copy").text = i18n.text(str(data.get("rules", "")))
+	get_node("Layout/Tabs/Creature/Preview/Rules").visible = not str(data.get("rules", "")).is_empty()
 	var attacks: String = ""
 	var attack_definitions: Array = data.get("attacks", [])
 	for raw in attack_definitions:
@@ -54,13 +59,13 @@ func _refresh() -> void:
 		if not attacks.is_empty():
 			attacks += "\n\n"
 		attacks += i18n.text(str(attack.get("name", ""))) + " · " + str(attack.get("dice", "")) + ("\n" + i18n.text(str(attack.rules)) if attack.has("rules") else "")
-	get_node("Layout/Body/Preview/Attacks/Content/Copy").text = attacks
+	get_node("Layout/Tabs/Creature/Preview/Attacks/Content/Copy").text = attacks
 	get_node("Layout/Create").disabled = _busy or not sdk.context().is_gm or not found.content_entry.available
 	var miniature := _miniature()
 	var content := sdk.content.read(SDK.ContentReference.new(str(miniature.get("package_id", "")), str(miniature.get("local_id", ""))))
-	get_node("Layout/Body/Preview/Miniature/Current").text = content.content_entry.localized_title if content.ok and content.content_entry.available else i18n.text("Saved Miniature unavailable. Choose a replacement.")
-	get_node("Layout/Body/Preview/Miniature/Choose").disabled = _busy or not sdk.context().is_gm
-	get_node("Layout/Body/Preview/Miniature/Clear").disabled = _busy or not sdk.context().is_gm
+	get_node("Layout/Tabs/Appearance/Miniature/Current").text = content.content_entry.localized_title if content.ok and content.content_entry.available else i18n.text("Saved Miniature unavailable. Choose a replacement.")
+	get_node("Layout/Tabs/Appearance/Miniature/Choose").disabled = _busy or not sdk.context().is_gm
+	get_node("Layout/Tabs/Appearance/Miniature/Clear").disabled = _busy or not sdk.context().is_gm
 
 func _miniature() -> Dictionary:
 	var saved := sdk.world_data.read()
@@ -86,7 +91,7 @@ func _choose() -> void:
 func _miniature_closed(_saved: bool) -> void:
 	get_node("Layout").visible = true
 	_refresh()
-	get_node("Layout/Body/Preview/Miniature/Choose").grab_focus()
+	get_node("Layout/Tabs/Appearance/Miniature/Choose").grab_focus()
 
 func _clear() -> void:
 	if _busy:

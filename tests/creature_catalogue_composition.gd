@@ -44,9 +44,15 @@ func test_library_definition_opens_independent_sheet() -> void:
 	sheet.size = Vector2(351, 325)
 	sheet.opened_definition(SDK.ContentReference.new(host.PackageId(), "seth-goblin"))
 	await get_tree().process_frame
-	assert_str(sheet.get_node("Layout/Body/Preview/Identity/Content/Title").text).is_equal("SETH, GOBLIN")
-	assert_str(sheet.get_node("Layout/Body/Preview/Stats/HitPoints/Content/Value").text).is_equal("6")
+	assert_str(sheet.get_node("Layout/Tabs/Creature/Preview/Identity/Content/Title").text).is_equal("SETH, GOBLIN")
+	assert_str(sheet.get_node("Layout/Tabs/Creature/Preview/Stats/HitPoints/Content/Value").text).is_equal("6")
 	assert_bool(sheet.get_node("Layout/Create").disabled).is_false()
+	var appearance: Control = sheet.get_node("Layout/Tabs/Appearance/Miniature")
+	assert_bool(appearance.is_visible_in_tree()).is_false()
+	sheet.get_node("Layout/Tabs").current_tab = 1
+	assert_bool(appearance.is_visible_in_tree()).is_true()
+	assert_bool(sheet.get_node("Layout/Tabs/Creature").is_visible_in_tree()).is_false()
+	assert_str(appearance.get_node("Current").text).is_equal("Goblin")
 	assert_bool(sheet.find_child("DefinitionList", true, false) == null).is_true()
 	assert_bool(sheet.get_combined_minimum_size().x <= 351).is_true()
 	var actor = auto_free(load(ROOT + "ui/window.tscn").instantiate())
