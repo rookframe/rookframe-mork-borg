@@ -73,7 +73,7 @@ func describe_actor_definition(definition: SDK.ContentEntry) -> SDK.ActorDefinit
 	var surface := SDK.ExtensionSurface.new()
 	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_sheet.tscn")
 	surface.initial_placement = "left"
-	surface.initial_dock_width = 440
+	surface.initial_dock_width = 0 if sdk.presentation_experience().is_phone else 440
 	return SDK.ActorDefinitionView.new(sdk.translations.text("Creatures"), surface, sdk.context().is_gm)
 
 func create_actor_from_definition(definition: SDK.ContentEntry, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0)) -> void:
