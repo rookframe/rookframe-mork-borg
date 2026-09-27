@@ -51,7 +51,6 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_bool(creator.is_active()).is_true()
 		assert_bool(picker.get_combined_minimum_size().x <= viewport.size.x).is_true()
 		assert_bool(picker.get_node(^"Picker/Actions/Apply").get_global_rect().end.y <= viewport.size.y).is_true()
-		await _capture(viewport, str(profile[0]) + "-miniatures")
 		picker.get_node(^"Picker/Actions/Back").pressed.emit()
 		assert_str(field.value).is_equal("Varg")
 		assert_bool(creator.get_node(^"View/Main/Content/Identity").visible).is_true()

@@ -23,6 +23,7 @@ func _ready() -> void:
 
 func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false) -> void:
 	_selection_only = selection_only
+	get_node(^"Title").visible = not selection_only
 	sdk = facade
 	i18n = locale
 	_actor = actor
@@ -50,7 +51,7 @@ func _load() -> void:
 	var entries: Array[Dictionary] = []
 	for entry in result.items:
 		entries.append({"id": entry.reference.package_id + "/" + entry.reference.local_id,
-			"title": entry.localized_title, "package": entry.package_title if not entry.package_title.is_empty() else entry.reference.package_id,
+			"title": entry.localized_title, "package": entry.package_title,
 			"package_id": entry.reference.package_id, "local_id": entry.reference.local_id, "available": entry.available})
 	var id := str(_saved.get("package_id", "")) + "/" + str(_saved.get("local_id", ""))
 	if _selection_only and _saved.is_empty():
@@ -62,7 +63,7 @@ func _load() -> void:
 		var current := sdk.content.read(SDK.ContentReference.new(str(_saved.get("package_id", "")), str(_saved.get("local_id", ""))))
 		if current.ok:
 			id = current.content_entry.reference.package_id + "/" + current.content_entry.reference.local_id
-	browser.configure(entries, id, {"search": _t("Search Miniatures"), "retry": _t("Try again"), "unavailable": _t("Unavailable"), "empty": _t("Add a Miniature Package to this World."), "no_match": _t("No matching Miniatures.")})
+	browser.configure(entries, id, {"search": _t("Search Miniatures"), "retry": _t("Try again"), "unavailable": _t("Unavailable"), "empty": _t("Add a Miniature Package to this World."), "no_match": _t("No matching Miniatures."), "preview_unavailable": _t("Miniature preview unavailable."), "selected": _t("Selected")})
 	_selected(browser.selection())
 	if not _saved.is_empty() and browser.selection().is_empty():
 		get_node(^"Status").text = _t("Saved Miniature unavailable. Choose a replacement.")
