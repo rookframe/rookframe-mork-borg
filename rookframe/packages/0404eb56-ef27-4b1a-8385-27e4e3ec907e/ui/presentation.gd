@@ -15,13 +15,10 @@ func compose() -> void:
 	timer.autostart = true
 	timer.timeout.connect(_check_defences)
 	add_child(timer)
-	var experience: SDK.DeviceExperience = sdk.presentation_experience()
 	var rail: SDK.Rail = sdk.rails.left
-	var entry := DESKTOP_WINDOW_BUTTON if experience.is_desktop else WINDOW_BUTTON
-	var navigation := SDK.WindowButton.new()
-	navigation.window = entry.window
-	navigation.button_scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_ru.tscn") if sdk.translations.text("en") == "ru" else entry.button_scene
-	rail.push(navigation)
+	var creation := SDK.Contribution.new()
+	creation.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/actor_creation.tscn")
+	sdk.slots.actor_creation.push(creation)
 	if sdk.context().is_gm:
 		var combat_button := SDK.WindowButton.new()
 		combat_button.button_scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button_ru.tscn") if sdk.translations.text("en") == "ru" else ENCOUNTER_BUTTON.button_scene
@@ -66,3 +63,18 @@ func _check_defences() -> void:
 				continue
 			inspect_actor(SDK.ActorId.new(str(outcome.target)))
 			return
+
+const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
+const LIBRARY = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_library.gd")
+
+func describe_actor_definition(definition: SDK.ContentEntry) -> SDK.ActorDefinitionView:
+	if definition.reference.package_id != sdk.package_id() or not CREATURES.CORE_DEFINITIONS.has(definition.reference.local_id):
+		return SDK.ActorDefinitionView.new()
+	var surface := SDK.ExtensionSurface.new()
+	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_sheet.tscn")
+	surface.initial_placement = "left"
+	surface.initial_dock_width = 440
+	return SDK.ActorDefinitionView.new(sdk.translations.text("Creatures"), surface, sdk.context().is_gm)
+
+func create_actor_from_definition(definition: SDK.ContentEntry, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0)) -> void:
+	await LIBRARY.new(sdk).create(definition.reference, scene, position)

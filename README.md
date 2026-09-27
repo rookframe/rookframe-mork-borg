@@ -7,8 +7,8 @@ releases belong here. Rookframe application capabilities belong in
 capabilities belong in the SDK and reusable UI components in the UI Kit.
 
 The first playable slices provide No Class and all six optional classes, editable
-Character sheets, individual granted Creature Actors and the private Creature
-catalogue. Royalty receives two independent gifts, Priest receives its special
+Character sheets, individual granted Creature Actors and imported Creature
+definitions in the shared Library. Royalty receives two independent gifts, Priest receives its special
 equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 ## Dependencies
@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.27.2` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.29.1` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `ad1a168e726640de8ca14687a72fc86aa06311bc` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.83)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.84)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
@@ -454,3 +454,13 @@ The System ships no Miniature models. Scum, Goblin and Berserker definitions use
 Rookframe’s Bandit, Goblin and Barbarian respectively. Other Creatures implicitly
 use Rookframe’s Default Miniature. Explicit Actor and library choices take priority.
 See [Miniature ownership and defaults](docs/miniatures.md).
+
+## Library and Actor navigation
+
+Rookframe owns the right rail in the order Actors, Scenes, Library, Builder, Menu.
+MÖRK BORG adds no Creature catalogue window. Its imported Actor Definitions appear
+in Library under Creatures. Opening one shows a separate docked definition sheet;
+Create Actor is available both on its Library row and its sheet. Dragging a
+Creature onto the tabletop creates an Actor and a linked Rook at the drop position.
+Creation is a GM operation. Failed placement cleans up its partial Actor and Rook.
+Character creation is contributed to the shared Actors window.

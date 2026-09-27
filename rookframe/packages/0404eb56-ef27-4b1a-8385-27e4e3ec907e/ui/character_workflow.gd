@@ -30,11 +30,10 @@ var _character_tab_inventory: Button
 var _character_tab_appearance: Button
 
 
-var _route := "creatures"
+var _route := "creature"
 var _compact := false
 var _definitions: Array[SDK.ContentEntry] = []
 var _actors: Array[SDK.Actor] = []
-var _selected_definition: SDK.ContentEntry
 var _selected_actor: SDK.Actor
 var _busy := false
 var _preserve_error := false
@@ -113,18 +112,11 @@ func opened(actor_id: SDK.ActorId) -> void:
 @onready var _routes := get_node(^"Layout/Header/Routes") as Control
 @onready var _routes_desktop := get_node(^"Layout/Header/Routes/Desktop") as Control
 @onready var _routes_compact := get_node(^"Layout/Header/Routes/Compact") as Control
-var _route_creatures: Button
 var _route_creature: Button
 var _route_edit: Button
 var _route_inventory: Button
 @onready var _body := get_node(^"Layout/Body") as ScrollContainer
 @onready var _content := get_node(^"Layout/Body/Content") as VBoxContainer
-@onready var _search = get_node(^"Layout/Body/Content/Search")
-@onready var _catalogue = get_node(^"Layout/Body/Content/Catalogue")
-@onready var _live_heading := get_node(^"Layout/Body/Content/LiveHeading") as Label
-@onready var _live_list := get_node(^"Layout/Body/Content/LiveList") as VBoxContainer
-@onready var _public_heading := get_node(^"Layout/Body/Content/PublicHeading") as Label
-@onready var _public_list := get_node(^"Layout/Body/Content/PublicList") as VBoxContainer
 @onready var _detail := get_node(^"Layout/Body/Content/Detail") as VBoxContainer
 @onready var _stats := get_node(^"Layout/Body/Content/Detail/Stats") as Control
 @onready var _hit_points_metric := get_node(^"Layout/Body/Content/Detail/Stats/HitPoints/Content/Value") as Label
@@ -149,7 +141,6 @@ var _route_inventory: Button
 @onready var _action_bar := get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar") as Control
 @onready var _catalogue_bar := get_node(^"Layout/CatalogueBar") as Control
 @onready var _status := get_node(^"Layout/Status") as Label
-var _create_button: Button
 var _edit_button: Button
 var _inventory_button: Button
 var _duplicate_button: Button
@@ -157,7 +148,6 @@ var _place_button: Button
 var _save_button: Button
 var _add_item_button: Button
 var _back_button: Button
-var _catalogue_create: Button
 var _catalogue_character: Button
 var _catalogue_back: Button
 
@@ -170,12 +160,6 @@ func character_setup() -> void:
 	_header_subtitle = get_node(^"Layout/Header/Subtitle") as Label
 	_content = get_node(^"Layout/Body/Content") as VBoxContainer
 	_routes = get_node(^"Layout/Header/Routes") as Control
-	_search = get_node(^"Layout/Body/Content/Search")
-	_catalogue = get_node(^"Layout/Body/Content/Catalogue")
-	_live_heading = get_node(^"Layout/Body/Content/LiveHeading") as Label
-	_live_list = get_node(^"Layout/Body/Content/LiveList") as VBoxContainer
-	_public_heading = get_node(^"Layout/Body/Content/PublicHeading") as Label
-	_public_list = get_node(^"Layout/Body/Content/PublicList") as VBoxContainer
 	_detail = get_node(^"Layout/Body/Content/Detail") as VBoxContainer
 	_action_bar = get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar") as Control
 	_catalogue_bar = get_node(^"Layout/CatalogueBar") as Control
@@ -208,7 +192,6 @@ func character_select_actor(actor: SDK.Actor) -> void:
 func character_hide_surface() -> void:
 	_header.visible = true
 	_creation_progress.visible = false
-	_catalogue_create.visible = true
 	if _character_creator != null:
 		_character_creator.discard()
 		_character_creator.visible = false
@@ -324,30 +307,17 @@ func _clear_character_content() -> void:
 	_character_sheet.visible = false
 
 
-func _set_search_visible(value: bool) -> void:
-	var search_control: Control = _search as Control
-	search_control.visible = value
-
-
 func character_show_route(route: String) -> void:
 	if sdk == null:
 		return
 	_route = route
 	_clear_character_content()
 	var creation := route.begins_with("create-")
-	_set_search_visible(false)
-	_catalogue.visible = false
-	get_node(^"Layout/Body/Content/CreateCharacter").visible = false
-	_live_heading.visible = false
-	_live_list.visible = false
-	_public_heading.visible = false
-	_public_list.visible = false
 	_detail.visible = false
 	_action_bar.visible = false
 	_routes.visible = false
 	_character_tabs.visible = not creation
 	_catalogue_bar.visible = creation
-	_catalogue_create.visible = false
 	_creation_progress.visible = creation
 	_brand.visible = false
 	_header.visible = not _compact

@@ -23,6 +23,12 @@ func set_actor(actor: SDK.ActorId, reference: Dictionary) -> SDK.ActorResult:
 	return await sdk.actors.update(actor, data)
 
 func place(actor: SDK.ActorId) -> SDK.RookResult:
+	var scene := sdk.scenes.current()
+	if not scene.ok:
+		return SDK.RookResult.new({"ok": false, "message": scene.message})
+	return await place_at(actor, scene.scene.id, Vector2(0, 0))
+
+func place_at(actor: SDK.ActorId, scene_id: SDK.SceneId, position: Vector2) -> SDK.RookResult:
 	var current := sdk.actors.read(actor)
 	if not current.ok:
 		return SDK.RookResult.new({"ok": false, "message": current.message})
@@ -30,10 +36,7 @@ func place(actor: SDK.ActorId) -> SDK.RookResult:
 	var reference: Dictionary = CREATURES.new().effective_miniature(data)
 	if not available(reference):
 		return SDK.RookResult.new({"ok": false, "message": "Choose an available Miniature before placing this Creature."})
-	var scene := sdk.scenes.current()
-	if not scene.ok:
-		return SDK.RookResult.new({"ok": false, "message": scene.message})
-	var created := await sdk.rooks.create(_reference(reference), scene.scene.id, Vector2(0, 0))
+	var created := await sdk.rooks.create(_reference(reference), scene_id, position)
 	if not created.ok:
 		return created
 	var linked := await sdk.rooks.link(created.rook.id, actor)

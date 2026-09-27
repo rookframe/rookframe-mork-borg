@@ -2,6 +2,8 @@
 
 [resource]
 messages = {
+[&"", &"Create Actor"]: [&"Create Actor"],
+[&"", &"Could not create Actor"]: [&"Could not create Actor"],
 [&"", &"pack"]: [&"pack"],
 [&"", &"target"]: [&"target"],
 [&"", &"remove"]: [&"remove"],

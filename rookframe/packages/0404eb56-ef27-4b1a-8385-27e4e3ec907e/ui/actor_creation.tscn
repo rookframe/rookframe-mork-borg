@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/actor_creation.gd" id="1"]
+[node name="ActorCreation" type="VBoxContainer"]
+layout_mode = 2
+script = ExtResource("1")
+[node name="Create" type="Button" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_type_variation = &"RookframePrimaryButton"
+text = "Create Character"
