@@ -1227,4 +1227,6 @@ messages = {
 [&"", &"%d omens"]: [&"%d omens"],
 [&"", &"1 day of dried food"]: [&"1 day of dried food"],
 [&"", &"%d days of dried food"]: [&"%d days of dried food"],
+[&"", &"Placement failed"]: [&"Placement failed"],
+[&"", &"Owner access is required to place this Actor."]: [&"Owner access is required to place this Actor."],
 }

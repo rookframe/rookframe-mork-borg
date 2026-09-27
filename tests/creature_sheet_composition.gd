@@ -8,7 +8,7 @@ func _settle() -> void:
 	for frame in range(8):
 		await get_tree().process_frame
 
-func test_creature_tabs_editing_and_viewer_at_phone_width() -> void:
+func test_creature_tabs_editing_and_viewer_at_phone_width(width: int, _test_parameters := [[375], [328]]) -> void:
 	var host := BOUNDARY.new()
 	host.game_master = true
 	host.actors.enemy.access_level = "Owner"
@@ -17,14 +17,22 @@ func test_creature_tabs_editing_and_viewer_at_phone_width() -> void:
 	host.handler.sdk = SDK.new(host)
 	add_child(host.handler)
 	var viewport: SubViewport = auto_free(SubViewport.new())
-	viewport.size = Vector2i(375, 313)
+	viewport.size = Vector2i(width, 313)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(viewport)
+	var background: Panel = auto_free(Panel.new())
+	background.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
+	background.add_theme_stylebox_override("panel", background.theme.get_stylebox("panel", "RookframePackageInk"))
+	viewport.add_child(background)
+	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var sheet = auto_free(load(ROOT + "ui/window.tscn").instantiate())
 	sheet.sdk = SDK.new(host)
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sheet.opened(SDK.ActorId.new("enemy"))
 	await _settle()
+	var layout: Control = sheet.get_node("Layout")
+	assert_bool(layout.position.x >= 12 and layout.get_rect().end.x <= width - 12).override_failure_message("Shared Actor layout must retain both insets after the display safe area reduces the body width.").is_true()
 	var tabs: Control = sheet.get_node("Layout/Header/Routes")
 	var detail: Control = sheet.get_node("Layout/Body/Content/Detail")
 	assert_int(tabs.get_child_count()).is_equal(3)
@@ -35,8 +43,18 @@ func test_creature_tabs_editing_and_viewer_at_phone_width() -> void:
 	assert_bool(detail.find_child("CreatureInventory", true, false) == null).is_true()
 	var gear: Button = detail.get_node("Identity/EditCreature")
 	assert_str(gear.text).is_empty()
-	assert_bool(gear.icon != null and gear.size.x == 44 and gear.size.y == 44).is_true()
+	assert_bool(gear.icon != null and gear.size.x == 24 and gear.size.y == 24).is_true()
 	assert_bool(sheet.get_global_rect().encloses(gear.get_global_rect())).is_true()
+	var attack_rows: Node = detail.get_node("SheetGrid/Left/EquipmentSection/Content/BodySlot/EquipmentList")
+	assert_int(attack_rows.get_child_count()).is_equal(4)
+	var attack: Button = attack_rows.get_child(0).get_node("Actions/Attack")
+	assert_bool(attack.icon != null and not attack.disabled).is_true()
+	await _capture(viewport, "%d-creature" % width)
+	attack.pressed.emit()
+	await _settle()
+	assert_bool(sheet.get_node("Layout/Body/Content/CreatureAttack").visible).is_true()
+	sheet.get_node("Layout/SheetActions/Back").pressed.emit()
+	await _settle()
 	gear.pressed.emit()
 	await _settle()
 	assert_bool(detail.get_node("EditFields").is_visible_in_tree()).is_true()
@@ -50,10 +68,12 @@ func test_creature_tabs_editing_and_viewer_at_phone_width() -> void:
 	assert_bool(detail.get_node("Miniature").is_visible_in_tree()).is_true()
 	assert_bool(detail.get_node("Stats").is_visible_in_tree()).is_false()
 	assert_bool(detail.get_node("SheetGrid").is_visible_in_tree()).is_false()
+	await _capture(viewport, "%d-appearance" % width)
 	tabs.get_node("CreatureInventory").pressed.emit()
 	await _settle()
 	assert_bool(detail.get_node("Miniature").is_visible_in_tree()).is_false()
 	assert_bool(detail.get_node("Inventory").is_visible_in_tree()).is_true()
+	await _capture(viewport, "%d-inventory" % width)
 	host.actors.enemy.access_level = "Viewer"
 	host.WorldChanged.emit()
 	await _settle()
@@ -87,7 +107,7 @@ func test_inventory_names_keep_space_and_icons_keep_accessible_actions() -> void
 		assert_str(button.text).is_empty()
 		assert_bool(button.icon != null).is_true()
 		assert_str(button.accessibility_name).contains("Long flail")
-		assert_bool(button.size.x == 44 and button.size.y == 44).is_true()
+		assert_bool(button.size.x == 24 and button.size.y == 24).is_true()
 		assert_bool(inventory.get_global_rect().encloses(button.get_global_rect())).is_true()
 	assert_bool(row.get_node("Actions/Equip").button_pressed).is_true()
 	var edits: Array = []
@@ -98,4 +118,12 @@ func test_inventory_names_keep_space_and_icons_keep_accessible_actions() -> void
 	row.mutation_requested.connect(func(operation, arguments): mutations.append([operation, arguments]))
 	row.get_node("Actions/Equip").pressed.emit()
 	assert_array(mutations).is_equal([["item", ["1", "equipped", "false"]]])
-	assert_bool(rows.get_child(2).position.y - row.position.y >= 76).is_true()
+	assert_bool(rows.get_child(2).position.y - row.position.y <= 64).is_true()
+
+func _capture(viewport: SubViewport, name: String) -> void:
+	var directory := OS.get_environment("MORK_SHEET_CAPTURE_DIR")
+	if directory.is_empty() or DisplayServer.get_name() == "headless":
+		return
+	RenderingServer.force_draw()
+	DirAccess.make_dir_recursive_absolute(directory)
+	assert_int(viewport.get_texture().get_image().save_png(directory.path_join(name + ".png"))).is_equal(OK)

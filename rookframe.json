@@ -3,11 +3,11 @@
   "id": "0404eb56-ef27-4b1a-8385-27e4e3ec907e",
   "kind": "system-extension",
   "name": "M\u00d6RK BORG System",
-  "version": "1.0.92",
+  "version": "1.0.93",
   "summary": "M\u00d6RK BORG Character and Creature Actors with private sheets.",
   "sdk": {
     "edition": "2029",
-    "minimumRevision": 22
+    "minimumRevision": 23
   },
   "rookframeCompatibility": {
     "minimum": "0.1.0",
@@ -175,8 +175,8 @@
       "compatibleVersions": ">=1.0.0 <2.0.0"
     }
   ],
-  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.92/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.92.json",
-  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.92/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.92.rookpackage",
+  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.93/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.93.json",
+  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.93/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.93.rookpackage",
   "defaultLocale": "en",
   "translations": [
     {

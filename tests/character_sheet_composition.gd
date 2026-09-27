@@ -33,7 +33,7 @@ func _settle() -> void:
 	for frame in range(10):
 		await get_tree().process_frame
 
-func test_sheet_at_constrained_sizes(width: int, height: int, language: String, _test_parameters := [[375, 313, "en"], [375, 313, "ru"], [412, 712, "en"], [960, 888, "en"]]) -> void:
+func test_sheet_at_constrained_sizes(width: int, height: int, language: String, _test_parameters := [[328, 313, "en"], [328, 313, "ru"], [375, 313, "en"], [375, 313, "ru"], [412, 712, "en"], [960, 888, "en"]]) -> void:
 	var host := BOUNDARY.new()
 	host.language = language
 	host.game_master = true
@@ -58,15 +58,21 @@ func test_sheet_at_constrained_sizes(width: int, height: int, language: String, 
 	await _settle()
 	var view: Control = sheet.find_child("CharacterOverview", true, false)
 	assert_object(view).is_not_null()
-	assert_bool(view.get_global_rect().end.x <= width).is_true()
+	assert_bool(view.get_global_rect().position.x >= 12 and view.get_global_rect().end.x <= width - 12).is_true()
 	assert_bool(view.get_node("Body/Identity").size.y <= 30).override_failure_message("One line of profile must not turn into a giant card.").is_true()
 	for key in ["Edit", "DecreaseOmens", "IncreaseOmens"]:
 		var button: Button = view.find_child(key, true, false)
-		assert_bool(button.size.x >= 44 and button.size.y >= 44).is_true()
+		assert_bool(button.size.x == 24 and button.size.y == 24).is_true()
 		assert_bool(view.get_global_rect().encloses(button.get_global_rect())).is_true()
 		assert_str(button.accessibility_name).is_not_empty()
-	var omen_value: Control = view.get_node("Resources/Omens/Padding/Content/Row/Value")
+	var omen_value: Label = view.get_node("Resources/Omens/Padding/Content/Row/Value")
 	assert_bool(omen_value.size.x >= 28).is_true()
+	assert_int(omen_value.vertical_alignment).is_equal(VERTICAL_ALIGNMENT_CENTER)
+	for key in ["DecreaseOmens", "IncreaseOmens"]:
+		var button: Button = view.find_child(key, true, false)
+		assert_float(button.get_global_rect().get_center().y).is_equal(omen_value.get_global_rect().get_center().y)
+	assert_int(view.get_node("Header/Edit").icon_alignment).is_equal(HORIZONTAL_ALIGNMENT_CENTER)
+	assert_bool(view.get_node("Abilities").size.y <= 64).is_true()
 	assert_bool(view.get_node("Body/Combat/Title").get_global_rect().end.x <= view.get_node("Body/Combat/Equipment").get_global_rect().position.x).override_failure_message("Combat label and equipped item names must not overlap.").is_true()
 	var down: Button = view.find_child("DecreaseOmens", true, false)
 	var up: Button = view.find_child("IncreaseOmens", true, false)

@@ -35,7 +35,8 @@ func compose() -> void:
 func describe_actor(actor: SDK.Actor) -> SDK.ActorSummary:
 	var data: Dictionary = actor.data
 	var name: String = data.get("name", sdk.translations.text("Unnamed Actor"))
-	return SDK.ActorSummary.new(name)
+	var model: Dictionary = CREATURES.new().effective_miniature(data)
+	return SDK.ActorSummary.new(name, null, SDK.ContentReference.new(str(model.package_id), str(model.local_id)), true)
 
 
 func inspect_actor(actor: SDK.ActorId) -> void:
@@ -78,3 +79,12 @@ func describe_actor_definition(definition: SDK.ContentEntry) -> SDK.ActorDefinit
 
 func create_actor_from_definition(definition: SDK.ContentEntry, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0)) -> void:
 	await LIBRARY.new(sdk).create(definition.reference, scene, position)
+
+
+func place_actor(actor: SDK.ActorId, scene: SDK.SceneId, position: Vector2) -> void:
+	var result := await preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_actions.gd").new(sdk).place_at(actor, scene, position)
+	if not result.ok:
+		var feedback := SDK.FeedbackMessage.new()
+		feedback.title = sdk.translations.text("Placement failed")
+		feedback.message = sdk.translations.text(result.message)
+		sdk.feedback.error(feedback)

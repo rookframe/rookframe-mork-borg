@@ -1,9 +1,15 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=9 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.gd" id="script"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/edit.svg" id="edit"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/pack.svg" id="pack"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/sigil.svg" id="sigil"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="person"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_icon_button.tscn" id="compact_icon"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_text_button.tscn" id="compact_text"]
+
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_frame.tres" id="resource_frame"]
 
 [node name="CharacterOverview" type="VBoxContainer"]
 layout_mode = 2
@@ -23,13 +29,9 @@ text = "No Class"
 autowrap_mode = 2
 size_flags_horizontal = 3
 
-[node name="Edit" type="Button" parent="Header"]
+[node name="Edit" parent="Header" instance=ExtResource("compact_icon")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
 icon = ExtResource("edit")
-expand_icon = true
-theme_override_constants/icon_max_width = 24
 tooltip_text = "Edit sheet"
 accessibility_name = "Edit sheet"
 
@@ -43,12 +45,14 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
+theme_override_styles/panel = ExtResource("resource_frame")
+
 [node name="Padding" type="MarginContainer" parent="Resources/HitPoints"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 0
 
 [node name="Content" type="VBoxContainer" parent="Resources/HitPoints/Padding"]
 layout_mode = 2
@@ -65,7 +69,7 @@ theme_override_font_sizes/font_size = 12
 [node name="Row" type="HBoxContainer" parent="Resources/HitPoints/Padding/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 28)
 
 [node name="Value" type="Label" parent="Resources/HitPoints/Padding/Content/Row"]
 layout_mode = 2
@@ -75,18 +79,21 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Omens" type="PanelContainer" parent="Resources"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
+theme_override_styles/panel = ExtResource("resource_frame")
+
 [node name="Padding" type="MarginContainer" parent="Resources/Omens"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 0
 
 [node name="Content" type="VBoxContainer" parent="Resources/Omens/Padding"]
 layout_mode = 2
@@ -104,20 +111,16 @@ theme_override_font_sizes/font_size = 12
 alignment = 1
 layout_mode = 2
 theme_override_constants/separation = 0
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 28)
 
-[node name="DecreaseOmens" type="Button" parent="Resources/Omens/Padding/Content/Row"]
+[node name="DecreaseOmens" parent="Resources/Omens/Padding/Content/Row" instance=ExtResource("compact_icon")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
 text = "−"
-expand_icon = true
-theme_override_constants/icon_max_width = 24
 tooltip_text = "Decrease Omens"
 accessibility_name = "Decrease Omens"
 
 [node name="Value" type="Label" parent="Resources/Omens/Padding/Content/Row"]
-custom_minimum_size = Vector2(28, 44)
+custom_minimum_size = Vector2(28, 28)
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
 text = "0"
@@ -125,14 +128,11 @@ autowrap_mode = 2
 size_flags_horizontal = 0
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="IncreaseOmens" type="Button" parent="Resources/Omens/Padding/Content/Row"]
+[node name="IncreaseOmens" parent="Resources/Omens/Padding/Content/Row" instance=ExtResource("compact_icon")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
 text = "+"
-expand_icon = true
-theme_override_constants/icon_max_width = 24
 tooltip_text = "Increase Omens"
 accessibility_name = "Increase Omens"
 
@@ -141,12 +141,14 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSubtleFrame"
 
+theme_override_styles/panel = ExtResource("resource_frame")
+
 [node name="Padding" type="MarginContainer" parent="Resources/Silver"]
 layout_mode = 2
-theme_override_constants/margin_left = 8
-theme_override_constants/margin_right = 8
-theme_override_constants/margin_top = 4
-theme_override_constants/margin_bottom = 4
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 0
 
 [node name="Content" type="VBoxContainer" parent="Resources/Silver/Padding"]
 layout_mode = 2
@@ -163,7 +165,7 @@ theme_override_font_sizes/font_size = 12
 [node name="Row" type="HBoxContainer" parent="Resources/Silver/Padding/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 28)
 
 [node name="Value" type="Label" parent="Resources/Silver/Padding/Content/Row"]
 layout_mode = 2
@@ -173,6 +175,7 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 22
 horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="OmenStatus" type="Label" parent="."]
 layout_mode = 2
@@ -186,7 +189,7 @@ layout_mode = 2
 theme_override_constants/separation = 8
 columns = 2
 theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+theme_override_constants/v_separation = 4
 
 [node name="Agility" type="HBoxContainer" parent="Abilities"]
 layout_mode = 2
@@ -201,9 +204,9 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 
-[node name="Modifier" type="Button" parent="Abilities/Agility"]
+[node name="Modifier" parent="Abilities/Agility" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(40, 28)
 theme_type_variation = &"RookframeQuietButton"
 theme_override_font_sizes/font_size = 22
 text = "+0"
@@ -221,9 +224,9 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 
-[node name="Modifier" type="Button" parent="Abilities/Presence"]
+[node name="Modifier" parent="Abilities/Presence" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(40, 28)
 theme_type_variation = &"RookframeQuietButton"
 theme_override_font_sizes/font_size = 22
 text = "+0"
@@ -241,9 +244,9 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 
-[node name="Modifier" type="Button" parent="Abilities/Strength"]
+[node name="Modifier" parent="Abilities/Strength" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(40, 28)
 theme_type_variation = &"RookframeQuietButton"
 theme_override_font_sizes/font_size = 22
 text = "+0"
@@ -261,9 +264,9 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 
-[node name="Modifier" type="Button" parent="Abilities/Toughness"]
+[node name="Modifier" parent="Abilities/Toughness" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(52, 44)
+custom_minimum_size = Vector2(40, 28)
 theme_type_variation = &"RookframeQuietButton"
 theme_override_font_sizes/font_size = 22
 text = "+0"
@@ -274,21 +277,21 @@ theme_override_constants/separation = 4
 theme_override_constants/h_separation = 4
 theme_override_constants/v_separation = 4
 
-[node name="rest" type="Button" parent="HealthActions"]
+[node name="rest" parent="HealthActions" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 28)
 theme_type_variation = &"RookframeQuietButton"
 text = "Rest"
 
-[node name="improve" type="Button" parent="HealthActions"]
+[node name="improve" parent="HealthActions" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 28)
 theme_type_variation = &"RookframeQuietButton"
 text = "Level up"
 
-[node name="broken" type="Button" parent="HealthActions"]
+[node name="broken" parent="HealthActions" instance=ExtResource("compact_text")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+custom_minimum_size = Vector2(0, 28)
 theme_type_variation = &"RookframeQuietButton"
 text = "Broken / death"
 
@@ -347,13 +350,9 @@ text = ""
 autowrap_mode = 2
 size_flags_horizontal = 3
 
-[node name="Inventory" type="Button" parent="Body/Combat"]
+[node name="Inventory" parent="Body/Combat" instance=ExtResource("compact_icon")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
 icon = ExtResource("pack")
-expand_icon = true
-theme_override_constants/icon_max_width = 24
 tooltip_text = "Open Inventory"
 accessibility_name = "Open Inventory"
 
@@ -374,13 +373,9 @@ text = "Powers & scrolls"
 autowrap_mode = 2
 size_flags_horizontal = 3
 
-[node name="PowersAction" type="Button" parent="Body/Context/Powers"]
+[node name="PowersAction" parent="Body/Context/Powers" instance=ExtResource("compact_icon")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
 icon = ExtResource("sigil")
-expand_icon = true
-theme_override_constants/icon_max_width = 24
 tooltip_text = "Open Powers & scrolls"
 accessibility_name = "Open Powers & scrolls"
 
@@ -396,12 +391,8 @@ text = "Companions"
 autowrap_mode = 2
 size_flags_horizontal = 3
 
-[node name="Companions" type="Button" parent="Body/Context/CompanionsSection"]
+[node name="Companions" parent="Body/Context/CompanionsSection" instance=ExtResource("compact_icon")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
 icon = ExtResource("person")
-expand_icon = true
-theme_override_constants/icon_max_width = 24
 tooltip_text = "Open Companions"
 accessibility_name = "Open Companions"

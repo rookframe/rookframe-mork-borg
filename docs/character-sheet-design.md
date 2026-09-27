@@ -4,8 +4,8 @@ The September 27 user correction supersedes the old Character/Omen and health
 workflow compositions. Keep the unchanged Rookframe UI Kit and stock Godot
 containers, Buttons, Labels, CheckBoxes and ScrollContainer.
 
-Character starts with the class and one 44px Edit sheet icon. HP, Omens and Silver
-share a compact strip. Omens has named 44px decrease/increase controls and a
+Character starts with the class and one 24px Edit sheet icon. HP, Omens and Silver
+share a compact strip. Omens has named 24px decrease/increase controls and a
 reserved 28px value lane; zero disables decrease, a pending save disables both,
 and a failed save keeps the committed value with inline error text and retry.
 All four modifiers remain direct roll controls. The single editor includes every
@@ -29,7 +29,9 @@ Use Exo 2 hierarchy and Inter values/body from the existing kit; alternate font
 pairs and palette changes are outside this correction. Spacing uses 4/8/12/16px,
 12px resource captions, 14px attribute captions, 16px body and 22px stat values.
 Kit ink, gold, aqua, muted and error tokens retain their semantic roles. Controls
-keep native keyboard focus, accessibility names, disabled styles and 44px targets.
+keep native keyboard focus, accessibility names, disabled styles and compact 24px icon targets. Icon glyphs are 14px and explicitly centered.
+Counter values are vertically centered with their buttons. Ability rolls and the
+short health action row use 28px controls with compact theme padding.
 Existing loading, lost-access, save error and action-result states stay local to
 their task; no extra approval UI is introduced.
 
@@ -38,7 +40,7 @@ their task; no extra approval UI is introduced.
 `tests/character_sheet_composition.gd` checks one edit entry, inline counter writes,
 zero/viewer states, minimum target sizes, reserved counter value width, intrinsic
 profile height, fixed action footers and absence of invented approval controls.
-Run it at 375x313 (the phone dock body below host chrome), 412x712 and 960x888,
+Run it at 328x313 (including the phone safe-area deduction), 375x313 (the phone dock body below host chrome), 412x712 and 960x888,
 including Russian. The full suite also checks dirty edits, persistence boundaries,
 recovery restrictions, direct Owner improvement, ordered rolls and interruption.
 
@@ -49,3 +51,14 @@ Rest restrictions are visible with the primary action. Scroll Character to check
 profile, class actions and secondary links. Use the existing native published
 Manifest journey with `--health-only` for final application verification. No local
 archive import, copied Package store or new Prop is used.
+
+Creature sheets use the same Actor window insets, compact icon component and
+resource-frame style. Overview attacks call the existing attack workflow directly.
+Inventory row actions remain 24px with centered 14px icons, native focus and labels.
+Tab text cannot force the content wider than its viewport, including the 328px
+body left after the landscape phone safe-area deduction.
+
+Actor presentation provides the preferred or default Miniature through SDK 0.31.0.
+Dragging an Owner Actor invokes placement at the dropped Scene position, creates
+one Rook and links it to that existing Actor. Placement rechecks access and reports
+errors through SDK feedback; no additional Actor is created.

@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="1_theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/actor_window.gd" id="2_script"]
@@ -21,6 +21,10 @@
 
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/settings.svg" id="15_settings"]
 
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_icon_button.tscn" id="compact_icon"]
+
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_frame.tres" id="resource_frame"]
+
 [sub_resource type="ButtonGroup" id="CreatureTabs"]
 
 [sub_resource type="StyleBoxFlat" id="CharacterTabSelected"]
@@ -31,6 +35,7 @@ content_margin_bottom = 8.0
 bg_color = Color(0, 0, 0, 0)
 border_width_bottom = 3
 border_color = Color(0.266667, 0.913725, 0.913725, 1)
+
 
 [node name="CreatureSurface" type="Control"]
 layout_mode = 2
@@ -49,7 +54,7 @@ offset_left = 24.0
 offset_top = 0.0
 offset_right = -24.0
 offset_bottom = -8.0
-grow_horizontal = 2
+grow_horizontal = 1
 grow_vertical = 2
 theme_override_constants/separation = 8
 
@@ -84,6 +89,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
 toggle_mode = true
 button_group = SubResource("CreatureTabs")
 text = "Creature"
@@ -93,6 +100,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
 toggle_mode = true
 button_group = SubResource("CreatureTabs")
 text = "Inventory"
@@ -102,6 +111,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
 toggle_mode = true
 button_group = SubResource("CreatureTabs")
 text = "Appearance"
@@ -127,6 +138,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
 theme_override_styles/pressed = SubResource("CharacterTabSelected")
 theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
 toggle_mode = true
@@ -137,6 +150,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
 theme_override_styles/pressed = SubResource("CharacterTabSelected")
 theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
 toggle_mode = true
@@ -147,6 +162,8 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
 theme_override_styles/pressed = SubResource("CharacterTabSelected")
 theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
 toggle_mode = true
@@ -225,14 +242,10 @@ text = "PUBLIC NAME"
 layout_mode = 2
 theme_type_variation = &"RookframeIdentity"
 autowrap_mode = 2
-[node name="EditCreature" type="Button" parent="Layout/Body/Content/Detail/Identity"]
+[node name="EditCreature" parent="Layout/Body/Content/Detail/Identity" instance=ExtResource("compact_icon")]
 layout_mode = 2
 size_flags_vertical = 4
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeManagedControl"
-theme_override_constants/icon_max_width = 24
 icon = ExtResource("15_settings")
-expand_icon = true
 tooltip_text = "Edit values"
 accessibility_name = "Edit values"
 
@@ -246,57 +259,84 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeInsetSurface"
 
+theme_override_styles/panel = ExtResource("resource_frame")
+
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Stats/HitPoints"]
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 0
 
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Stats/HitPoints/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
 text = "HP"
 
+theme_override_font_sizes/font_size = 12
+
 [node name="Value" type="Label" parent="Layout/Body/Content/Detail/Stats/HitPoints/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
 text = "6 / 6"
+
+custom_minimum_size = Vector2(0, 28)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Morale" type="PanelContainer" parent="Layout/Body/Content/Detail/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeInsetSurface"
 
+theme_override_styles/panel = ExtResource("resource_frame")
+
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Stats/Morale"]
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 0
 
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Stats/Morale/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
 text = "MORALE"
 
+theme_override_font_sizes/font_size = 12
+
 [node name="Value" type="Label" parent="Layout/Body/Content/Detail/Stats/Morale/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
 text = "7"
+
+custom_minimum_size = Vector2(0, 28)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="Protection" type="PanelContainer" parent="Layout/Body/Content/Detail/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeInsetSurface"
 
+theme_override_styles/panel = ExtResource("resource_frame")
+
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Stats/Protection"]
 layout_mode = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 0
 
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Stats/Protection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
 text = "PROTECTION"
 
+theme_override_font_sizes/font_size = 12
+
 [node name="Value" type="Label" parent="Layout/Body/Content/Detail/Stats/Protection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
 text = "−d2"
+
+custom_minimum_size = Vector2(0, 28)
+theme_override_font_sizes/font_size = 22
+horizontal_alignment = 1
+vertical_alignment = 1
 
 [node name="SheetGrid" type="BoxContainer" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
