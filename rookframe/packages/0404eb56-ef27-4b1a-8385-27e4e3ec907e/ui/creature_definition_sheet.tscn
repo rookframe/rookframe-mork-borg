@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/portraits/seth-goblin.png" id="2"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="3"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="4"]
-[node name="CreatureDefinition" type="VBoxContainer"]
+[node name="CreatureDefinition" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +13,14 @@ size_flags_vertical = 3
 theme = ExtResource("4")
 script = ExtResource("1")
 [node name="Layout" type="VBoxContainer" parent="."]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
 size_flags_vertical = 3
 theme_override_constants/separation = 12
 [node name="Body" type="ScrollContainer" parent="Layout"]
@@ -158,6 +165,13 @@ custom_minimum_size = Vector2(0, 44)
 text = "Create Actor"
 theme_type_variation = &"RookframePrimaryButton"
 [node name="MiniatureWorkflow" parent="." instance=ExtResource("3")]
-layout_mode = 2
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_top = 12.0
+offset_right = -12.0
+offset_bottom = -12.0
 size_flags_vertical = 3
 visible = false

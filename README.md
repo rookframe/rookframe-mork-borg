@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.84)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.85)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
