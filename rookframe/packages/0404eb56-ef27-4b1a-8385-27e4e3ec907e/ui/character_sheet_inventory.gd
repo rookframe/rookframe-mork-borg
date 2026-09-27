@@ -8,7 +8,6 @@ const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec90
 const DIVIDER = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_divider.tscn")
 func _ready() -> void:
 	get_node(^"Toolbar/Add").pressed.connect(_add_item)
-	resized.connect(_layout)
 func configure(data: Dictionary, _miniatures: Array) -> void:
 	var read_only: bool = data.get("read_only", false)
 	get_node(^"Toolbar/Add").disabled = read_only
@@ -30,7 +29,6 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 		row.navigate_requested.connect(_navigate)
 	get_node(^"EquippedSection").visible = get_node(^"EquippedSection/Content/Items").get_child_count() > 0
 	get_node(^"CarriedSection").visible = get_node(^"CarriedSection/Content/Items").get_child_count() > 0
-	_layout()
 
 func _add_item() -> void:
 	navigate_requested.emit("catalogue", "")
@@ -40,12 +38,6 @@ func _mutation(operation: String, arguments: Array) -> void:
 
 func _navigate(route: String, id: String) -> void:
 	navigate_requested.emit(route, id)
-
-func _layout() -> void:
-	var variant := "RookframePackageInk" if size.x < 600 else "RookframeSection"
-	get_node(^"EquippedSection").theme_type_variation = variant
-	get_node(^"CarriedSection").theme_type_variation = variant
-
 
 func _t(source: String) -> String:
 	return i18n.text(source)
@@ -61,5 +53,6 @@ func localize(locale: I18N) -> void:
 	get_node(^"CarriedSection/Content/Heading").text = _t("CARRIED")
 	get_node(^"Empty").text = _t("No items yet. Add equipment from the core catalogue or create a custom item.")
 	get_node(^"EquippedSection/Content/Heading").text = _t("EQUIPPED")
-	get_node(^"Toolbar/Add").text = _t("Add Item")
+	get_node(^"Toolbar/Add").tooltip_text = _t("Add Item")
+	get_node(^"Toolbar/Add").accessibility_name = _t("Add Item")
 	get_node(^"Toolbar/Count").text = _t("Inventory")

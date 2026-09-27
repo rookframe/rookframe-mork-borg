@@ -8,8 +8,6 @@ const POWERS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3e
 const SPECIAL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 var equipped := false
 var item: Dictionary = {}
-func _ready() -> void:
-	resized.connect(_layout)
 func configure(value: Dictionary, catalogue: bool = false, read_only: bool = false, can_cast: bool = true) -> void:
 	for path in [^"Actions/Attack", ^"Actions/Edit", ^"Actions/Equip", ^"Actions/Add"]:
 		get_node(path).disabled = read_only
@@ -41,23 +39,29 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Actions/Add").visible = catalogue
 	get_node(^"Actions/Edit").visible = not catalogue
 	get_node(^"Actions/Equip").visible = not catalogue and (str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre")
-	get_node(^"Actions/Equip").text = _t("Unequip") if equipped else _t("Equip")
+	get_node(^"Actions/Equip").set_pressed_no_signal(equipped == true)
+	get_node(^"Actions/Equip").theme_type_variation = "RookframeManagedSelected" if equipped else "RookframeManagedControl"
+	_action_name("Equip", "Unequip" if equipped else "Equip")
+	_action_name("Attack", "Attack")
+	_action_name("Edit", "Edit")
+	_action_name("Add", "Add")
 	get_node(^"Actions/Attack").visible = not catalogue and equipped and str(item.get("kind", "")) == "Weapon"
 	var power := POWERS.new().definition(str(item.get("source_item_id", "")))
 	if not catalogue and can_cast and not power.is_empty():
 		get_node(^"Actions/Attack").visible = true
-		get_node(^"Actions/Attack").text = _t("Cast")
+		_action_name("Attack", "Cast")
+		get_node(^"Actions/Attack").icon = preload("res://rookframe/ui/icons/sigil.svg")
 		get_node(^"Actions/Attack").disabled = read_only or not power.playable or quantity < 1
 		get_node(^"Copy/Details").text += " · " + (_t(str(power.handling)) if power.playable else _t("Not playable yet"))
 	if not catalogue and can_cast and str(item.get("kind", "")) != "Weapon" and not SPECIAL.new().definition(str(item.get("source_item_id", ""))).is_empty():
 		get_node(^"Actions/Attack").visible = true
-		get_node(^"Actions/Attack").text = _t("Use")
+		_action_name("Attack", "Use")
+		get_node(^"Actions/Attack").icon = preload("res://rookframe/ui/icons/bolt.svg")
 		get_node(^"Actions/Attack").disabled = read_only or quantity < 1 or broken
 	get_node(^"Actions/Attack").pressed.connect(_attack)
 	get_node(^"Actions/Edit").pressed.connect(_edit)
 	get_node(^"Actions/Equip").pressed.connect(_equip)
 	get_node(^"Actions/Add").pressed.connect(_add)
-	_layout()
 
 func _attack() -> void:
 	if str(item.get("kind", "")) != "Weapon" and not SPECIAL.new().definition(str(item.get("source_item_id", ""))).is_empty():
@@ -74,9 +78,11 @@ func _equip() -> void:
 func _add() -> void:
 	mutation_requested.emit("add", [str(item.get("source_item_id", ""))])
 
-func _layout() -> void:
-	var title: String = item.get("name", "")
-	get_node(^"Actions").vertical = size.x < 480 and title.length() > 40
+func _action_name(control: String, action: String) -> void:
+	var button: Button = get_node("Actions/" + control)
+	button.text = ""
+	button.tooltip_text = _t(action) + " · " + get_node(^"Copy/Title").text
+	button.accessibility_name = button.tooltip_text
 
 
 func _t(source: String) -> String:
@@ -90,8 +96,4 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Actions/Add").text = _t("Add")
-	get_node(^"Actions/Attack").text = _t("Attack")
-	get_node(^"Actions/Edit").text = _t("Edit")
-	get_node(^"Actions/Equip").text = _t("Equip")
 	get_node(^"Copy/Title").text = _t("Item")

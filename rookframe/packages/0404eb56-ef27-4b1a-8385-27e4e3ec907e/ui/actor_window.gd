@@ -52,33 +52,21 @@ func ready() -> void:
 	sdk.targeting.changed.connect(_creature_targets_changed)
 	get_node(^"Layout/Body/Content/CreatureAttack").targets_requested.connect(_choose_creature_targets)
 	_compact = not sdk.presentation_experience().is_desktop
-	_routes_desktop.visible = not _compact
-	_routes_compact.visible = _compact
-	var route_group: Node = _routes_compact if _compact else _routes_desktop
-	_route_creature = route_group.get_node(^"Creature") as Button
-	_route_edit = route_group.get_node(^"EditCreature") as Button
-	_route_inventory = route_group.get_node(^"CreatureInventory") as Button
-
-	_edit_button = _action_bar.get_node(^"LeadingSlot/EditCreature") as Button
-	_inventory_button = _action_bar.get_node(^"LeadingSlot/CreatureInventory") as Button
-	_duplicate_button = _action_bar.get_node(^"LeadingSlot/Duplicate") as Button
-	_place_button = _action_bar.get_node(^"LeadingSlot/PlaceRook") as Button
+	_route_creature = _routes.get_node(^"Creature") as Button
+	_route_inventory = _routes.get_node(^"CreatureInventory") as Button
+	_route_appearance = _routes.get_node(^"Appearance") as Button
+	_edit_button = get_node(^"Layout/Body/Content/Detail/Identity/EditCreature") as Button
 	_save_button = _action_bar.get_node(^"LeadingSlot/SaveChanges") as Button
-	_add_item_button = _action_bar.get_node(^"LeadingSlot/AddItem") as Button
 	_back_button = _action_bar.get_node(^"LeadingSlot/Back") as Button
 	_catalogue_character = _catalogue_bar.get_node(^"TrailingSlot/CreateCharacter") as Button
 	_catalogue_back = _catalogue_bar.get_node(^"LeadingSlot/Back") as Button
 
 	for button in [
 		_route_creature,
-		_route_edit,
 		_route_inventory,
+		_route_appearance,
 		_edit_button,
-		_inventory_button,
-		_duplicate_button,
-		_place_button,
 		_save_button,
-		_add_item_button,
 		_back_button,
 		_catalogue_character,
 		_catalogue_back,
@@ -86,15 +74,11 @@ func ready() -> void:
 		button.focus_mode = 2
 
 	_route_creature.pressed.connect(_on_creature_route)
-	_route_edit.pressed.connect(_on_edit_route)
 	_route_inventory.pressed.connect(_on_inventory_route)
+	_route_appearance.pressed.connect(_on_appearance_route)
 	_edit_button.pressed.connect(_on_edit_route)
-	_inventory_button.pressed.connect(_on_inventory_route)
 	_catalogue_character.pressed.connect(_character_primary_button_pressed)
-	_duplicate_button.pressed.connect(_duplicate_creature)
 	_save_button.pressed.connect(_save_creature)
-	_place_button.pressed.connect(_place_rook)
-	_add_item_button.pressed.connect(_add_item)
 	_back_button.pressed.connect(_on_back)
 	_catalogue_back.pressed.connect(_character_back_button_pressed)
 	if sdk.world_changed.is_connected(_refresh_world) == false:
@@ -108,25 +92,23 @@ func ready() -> void:
 
 
 func _apply_density() -> void:
-	_layout.add_theme_constant_override("separation", 6 if _compact else 10)
+	_layout.add_theme_constant_override("separation", 12)
 	_header.add_theme_constant_override("separation", 2 if _compact else 4)
 	_content.add_theme_constant_override("separation", 8 if _compact else 12)
-	_detail.add_theme_constant_override("separation", 8 if _compact else 12)
+	_detail.add_theme_constant_override("separation", 16)
 	_sheet_grid.vertical = _compact
 	_sheet_grid.add_theme_constant_override("separation", 12 if _compact else 20)
-	_content.custom_minimum_size = Vector2(0, 0) if _compact else Vector2(0, 520)
+	_content.custom_minimum_size = Vector2(0, 0)
 	# The managed host chrome already identifies the Package. Keep the body
 	# focused on the active route so desktop does not repeat that identity above
 	# the actor title.
 	_brand.visible = false
-	_header_subtitle.visible = not _compact
+	_header_subtitle.visible = false
 	_header_title.visible = true
 	_status.visible = not _compact
 	_body.add_theme_constant_override("scrollbar_width", 8 if _compact else 12)
-	_stats.add_theme_constant_override("separation", 2 if _compact else 4)
+	_stats.add_theme_constant_override("separation", 8)
 	if _compact:
-		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Description").visible = false
-		get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Description").visible = false
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
 		_protection_label.text = _t("ARMOR")
 
@@ -166,7 +148,7 @@ func _reload_world() -> void:
 		_set_status(actors.message, true)
 		return
 	_actors = actors.items
-	if _selected_actor != null and _route in ["creature", "edit-creature", "creature-inventory", "creature-attack", "creature-catalogue", "creature-item", "creature-custom", "creature-defence"]:
+	if _selected_actor != null and _route in ["creature", "creature-appearance", "edit-creature", "creature-inventory", "creature-attack", "creature-catalogue", "creature-item", "creature-custom", "creature-defence"]:
 		var latest := sdk.actors.read(_selected_actor.id)
 		if not latest.ok or latest.actor == null or latest.actor.access_level == "None":
 			_close_creature_actions()
@@ -174,7 +156,7 @@ func _reload_world() -> void:
 			_close_window()
 		elif _selected_actor.data != latest.actor.data or _selected_actor.access_level != latest.actor.access_level:
 			_selected_actor = latest.actor
-			if _route in ["creature", "creature-inventory"]:
+			if _route in ["creature", "creature-appearance", "creature-inventory"]:
 				_render_actor()
 			elif latest.actor.access_level != "Owner":
 				_close_creature_actions()
@@ -223,8 +205,9 @@ func _render_actor() -> void:
 	_public_identity.text = _selected_actor.public_label if not _selected_actor.public_label.is_empty() else _t("Public name pending")
 	_hit_points_metric.text = "%d / %d" % [hit_points, maximum_hit_points]
 	_morale_metric.text = _t(morale_value)
-	_protection_label.text = _t(armor_name).to_upper()
-	_protection_metric.text = armor_reduction if not armor_reduction.is_empty() else "—"
+	_protection_label.text = _t("ARMOR")
+	_protection_metric.tooltip_text = _t(armor_name)
+	_protection_metric.text = "−" + armor_reduction if not armor_reduction.is_empty() else "—"
 	_rules.text = _t(str(actor_data.get("rules", "")))
 	if actor_data.has("defence_dr"):
 		var defence_dr: int = actor_data["defence_dr"]
@@ -239,11 +222,8 @@ func _render_actor() -> void:
 	if _route in ["creature-inventory", "creature-catalogue", "creature-item", "creature-custom"]:
 		_inventory_refresh_pending = true
 	_save_button.disabled = _selected_actor.access_level != "Owner"
-	_duplicate_button.disabled = not sdk.context().is_gm
-	_place_button.disabled = not sdk.context().is_gm
 	_render_miniatures()
 	_edit_button.disabled = _selected_actor.access_level != "Owner"
-	_inventory_button.disabled = false
 
 
 func _detail_title_if_present(private_name: String) -> void:
@@ -270,7 +250,7 @@ func _render_equipment(attacks: Array) -> void:
 	for index in range(attacks.size()):
 		var attack: Dictionary = attacks[index]
 		var row := Label.new()
-		row.custom_minimum_size = Vector2(0, 54)
+		row.custom_minimum_size = Vector2(0, 44)
 		row.autowrap_mode = 2
 		row.theme_type_variation = "RookframeBody"
 		var attack_name: String = _t(str(attack.get("name", "Attack")))
@@ -279,7 +259,7 @@ func _render_equipment(attacks: Array) -> void:
 		if attack.has("attack_dr"):
 			var attack_dr: int = attack["attack_dr"]
 			detail += _t(" · Attack DR%d") % attack_dr
-		row.text = "%s\n%s" % [attack_name, detail]
+		row.text = "%s · %s" % [attack_name, detail]
 		_equipment_list.add_child(row)
 
 
@@ -427,34 +407,32 @@ func _apply_route(route: String) -> void:
 	_configure_surface_spacing()
 	_header_title.theme_type_variation = "RookframeHeading"
 	var sheet := route == "creature"
+	var appearance := route == "creature-appearance"
+	_body.scroll_vertical = 0
 	var edit := route == "edit-creature"
 	var inventory := route in ["creature-inventory", "creature-catalogue", "creature-item", "creature-custom"]
-	_sheet_grid.vertical = _compact or edit
+	_sheet_grid.vertical = size.x < 720
+	_sheet_grid.visible = sheet
 	var inventory_edit := route in ["creature-catalogue", "creature-item", "creature-custom"]
 	_routes.visible = not edit and not inventory_edit
 	_route_creature.visible = true
-	_route_edit.visible = false
 	_route_inventory.visible = true
 	_route_creature.button_pressed = sheet
-	_route_edit.button_pressed = edit
 	_route_inventory.button_pressed = inventory
-	_header_title.visible = not _compact
-	_header_subtitle.visible = not _compact
-	_detail.visible = sheet or edit or inventory
+	_route_appearance.button_pressed = appearance
+	_header_title.visible = false
+	_header_subtitle.visible = false
+	_detail.visible = sheet or edit or inventory or appearance
 	_stats.visible = sheet
-	_identity_section.visible = sheet and sdk.context().is_gm
+	_identity_section.visible = sheet
 	_equipment_section.visible = sheet
-	_rules_section.visible = sheet
+	_rules_section.visible = sheet and not _rules.text.is_empty()
 	_access_section.visible = false
 	_edit_fields.visible = edit
 	_inventory.visible = inventory
-	_action_bar.visible = sheet or edit
+	_action_bar.visible = edit
 	_edit_button.visible = sheet and _selected_actor != null and _selected_actor.access_level == "Owner"
-	_inventory_button.visible = sheet
-	_duplicate_button.visible = sheet and sdk.context().is_gm
-	_place_button.visible = sheet and _selected_actor != null and _selected_actor.access_level == "Owner"
 	_save_button.visible = edit and _selected_actor != null and _selected_actor.access_level == "Owner"
-	_add_item_button.visible = false
 	_back_button.visible = edit
 	_back_button.text = _t("Cancel")
 	if _selected_actor != null:
@@ -493,40 +471,12 @@ func _on_edit_route() -> void:
 	_show_route("edit-creature")
 
 
+func _on_appearance_route() -> void:
+	_show_route("creature-appearance")
+
+
 func _on_inventory_route() -> void:
 	_show_route("creature-inventory")
-
-
-func _duplicate_creature() -> void:
-	if _busy or _selected_actor == null or sdk == null:
-		return
-	var source: SDK.ActorResult = sdk.actors.read(_selected_actor.id)
-	if not source.ok or source.actor == null:
-		_set_status(source.message if not source.ok else "Private Creature data is unavailable.", true)
-		return
-	var source_data: Dictionary = source.actor.data
-	var definition_id: String = source_data["definition_id"]
-	var definition: SDK.ContentEntry
-	for entry in _definitions:
-		if entry.reference.local_id == definition_id:
-			definition = entry
-			break
-	if definition == null:
-		_set_status("The saved Creature definition is unavailable; duplicate was not created.", true)
-		return
-	var data: Dictionary = source_data.duplicate(true)
-	# A separate duplicate is not another grant from the original creation.
-	data.erase("creation_id")
-	data.erase("creation_roll_sequence")
-	data.erase("summoner_actor")
-	data.erase("summon_action")
-	data.erase("grant_source")
-	_set_busy(true, "Duplicating private Creature sheet…")
-	var result: SDK.ActorResult = await sdk.actors.create(definition.reference, data)
-	_set_busy(false, result.message if not result.ok else "Creature duplicated.", not result.ok)
-	if result.ok:
-		_selected_actor = result.actor
-		_show_route("creature")
 
 
 func _save_creature() -> void:
@@ -585,10 +535,6 @@ func _place_rook() -> void:
 	_set_busy(false, "Creature Rook placed. Select it on the tabletop to act." if result.ok else result.message, not result.ok)
 
 
-func _add_item() -> void:
-	_navigate_creature_inventory("catalogue", "")
-
-
 func _on_back() -> void:
 	if _route == "creature-inventory":
 		_show_route("creature")
@@ -601,10 +547,8 @@ func _set_busy(value: bool, message: String, error: bool = false) -> void:
 	_preserve_error = not value and error
 	_set_status(message, error)
 	_catalogue_character.disabled = value or _character_definition == null
-	_duplicate_button.disabled = value
 	_save_button.disabled = value
-	_place_button.disabled = value
-	_add_item_button.disabled = value
+	_edit_button.disabled = value or _selected_actor == null or _selected_actor.access_level != "Owner"
 
 
 func _set_status(message: String, error: bool = false) -> void:
@@ -909,6 +853,19 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
+	get_node(^"Layout/Header/Routes/Creature").text = _t("Creature")
+	get_node(^"Layout/Header/Routes/CreatureInventory").text = _t("Inventory")
+	get_node(^"Layout/Header/Routes/Appearance").text = _t("Appearance")
+	get_node(^"Layout/Body/Content/Detail/Identity/Copy/Label").text = _t("PUBLIC NAME")
+	var settings: Button = get_node(^"Layout/Body/Content/Detail/Identity/EditCreature")
+	settings.tooltip_text = _t("Edit values")
+	settings.accessibility_name = settings.tooltip_text
+	for path in ["Heading", "Help"]:
+		var label: Label = get_node(MINIATURE_PANEL + "/" + path)
+		label.text = _t(label.text)
+	for path in ["Choose", "ApplySelected"]:
+		var button: Button = get_node(MINIATURE_PANEL + "/" + path)
+		button.text = _t(button.text)
 	get_node(^"Layout/Body/Content/CharacterDescriptionField").label_text = _t("Field label")
 	get_node(^"Layout/Body/Content/CharacterHitPointsField").label_text = _t("Field label")
 	get_node(^"Layout/Body/Content/CharacterItemField").label_text = _t("Field label")
@@ -927,23 +884,12 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").help_text = _t("Only the public name appears to Players.")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").label_text = _t("PUBLIC NAME")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").placeholder = _t("Public name shown to Players")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Description").text = _t("Private encounter equipment and attacks.")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Title").text = _t("EQUIPMENT")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PrivateNotice").text = _t("Shown on the tabletop and in public reports.")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PublicIdentity").text = _t("Hooded stranger")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PublicNameLabel").text = _t("PUBLIC NAME")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Description").text = _t("Players see the chosen public name on the tabletop.")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/Header/Title").text = _t("PUBLIC IDENTITY")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Title").text = _t("ATTACKS")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/BodySlot/Access").text = _t("Players see the public name, not this sheet.")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").text = _t("GM only")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Title").text = _t("ACCESS")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/AddItem").text = _t("Add item")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/Back").text = _t("Back")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/CreatureInventory").text = _t("Inventory")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/Duplicate").text = _t("Duplicate")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/EditCreature").text = _t("Edit values")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/PlaceRook").text = _t("Place Rook")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar/LeadingSlot/SaveChanges").text = _t("Save changes")
+	get_node(^"Layout/CreatureEditActions/LeadingSlot/Back").text = _t("Back")
+	get_node(^"Layout/CreatureEditActions/LeadingSlot/SaveChanges").text = _t("Save changes")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/BodySlot/Rules").text = _t("Quick, attacks and defence are DR14.")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/Header/Title").text = _t("SPECIAL RULES")
 	get_node(^"Layout/Body/Content/Detail/Stats/HitPoints/Content/Label").text = _t("HP")
@@ -958,12 +904,6 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/CharacterTabs/Character").text = _t("Character")
 	get_node(^"Layout/CharacterTabs/Inventory").text = _t("Inventory")
 	get_node(^"Layout/Header/Brand").text = _t("MÖRK BORG")
-	get_node(^"Layout/Header/Routes/Compact/Creature").text = _t("Creature")
-	get_node(^"Layout/Header/Routes/Compact/CreatureInventory").text = _t("Inventory")
-	get_node(^"Layout/Header/Routes/Compact/EditCreature").text = _t("Edit")
-	get_node(^"Layout/Header/Routes/Desktop/Creature").text = _t("Creature")
-	get_node(^"Layout/Header/Routes/Desktop/CreatureInventory").text = _t("Inventory")
-	get_node(^"Layout/Header/Routes/Desktop/EditCreature").text = _t("Edit")
 	get_node(^"Layout/Header/Subtitle").text = _t("Private Creature sheet · GM")
 	get_node(^"Layout/Header/Title").text = _t("Creature")
 	get_node(^"Layout/SheetActions/Attack").text = _t("Roll attack")
@@ -975,7 +915,7 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Body/Content/CreatureDefence").localize(locale)
 	get_node(^"Layout/CreationProgress").localize(locale)
 
-const MINIATURE_PANEL := "Layout/Body/Content/Detail/SheetGrid/Right/Miniature"
+const MINIATURE_PANEL := "Layout/Body/Content/Detail/Miniature"
 
 func _setup_miniatures() -> void:
 	get_node(MINIATURE_PANEL + "/Choose").pressed.connect(_open_miniature)
@@ -1001,7 +941,7 @@ func _render_miniatures() -> void:
 	if sdk == null:
 		return
 	var actor_panel := get_node(MINIATURE_PANEL)
-	actor_panel.visible = _route == "creature" and _selected_actor != null
+	actor_panel.visible = _route == "creature-appearance" and _selected_actor != null
 	if _selected_actor != null:
 		var reference: Dictionary = _actor_miniature()
 		(actor_panel.get_node(^"Current") as Label).text = _miniature_title(reference)

@@ -110,11 +110,9 @@ func opened(actor_id: SDK.ActorId) -> void:
 @onready var _header_title := get_node(^"Layout/Header/Title") as Label
 @onready var _header_subtitle := get_node(^"Layout/Header/Subtitle") as Label
 @onready var _routes := get_node(^"Layout/Header/Routes") as Control
-@onready var _routes_desktop := get_node(^"Layout/Header/Routes/Desktop") as Control
-@onready var _routes_compact := get_node(^"Layout/Header/Routes/Compact") as Control
 var _route_creature: Button
-var _route_edit: Button
 var _route_inventory: Button
+var _route_appearance: Button
 @onready var _body := get_node(^"Layout/Body") as ScrollContainer
 @onready var _content := get_node(^"Layout/Body/Content") as VBoxContainer
 @onready var _detail := get_node(^"Layout/Body/Content/Detail") as VBoxContainer
@@ -124,8 +122,8 @@ var _route_inventory: Button
 @onready var _protection_metric := get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Value") as Label
 @onready var _protection_label := get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Label") as Label
 @onready var _sheet_grid := get_node(^"Layout/Body/Content/Detail/SheetGrid") as BoxContainer
-@onready var _identity_section := get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection") as Control
-@onready var _public_identity := get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/IdentitySection/Content/BodySlot/PublicIdentity") as Label
+@onready var _identity_section := get_node(^"Layout/Body/Content/Detail/Identity") as Control
+@onready var _public_identity := get_node(^"Layout/Body/Content/Detail/Identity/Copy/PublicIdentity") as Label
 @onready var _equipment_section := get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection") as Control
 @onready var _equipment_list := get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/BodySlot/EquipmentList") as VBoxContainer
 @onready var _rules_section := get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection") as Control
@@ -138,15 +136,11 @@ var _route_inventory: Button
 @onready var _maximum_hit_points = get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints")
 @onready var _morale = get_node(^"Layout/Body/Content/Detail/EditFields/Morale")
 @onready var _inventory := get_node(^"Layout/Body/Content/Detail/Inventory") as Control
-@onready var _action_bar := get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar") as Control
+@onready var _action_bar := get_node(^"Layout/CreatureEditActions") as Control
 @onready var _catalogue_bar := get_node(^"Layout/CatalogueBar") as Control
 @onready var _status := get_node(^"Layout/Status") as Label
 var _edit_button: Button
-var _inventory_button: Button
-var _duplicate_button: Button
-var _place_button: Button
 var _save_button: Button
-var _add_item_button: Button
 var _back_button: Button
 var _catalogue_character: Button
 var _catalogue_back: Button
@@ -161,7 +155,7 @@ func character_setup() -> void:
 	_content = get_node(^"Layout/Body/Content") as VBoxContainer
 	_routes = get_node(^"Layout/Header/Routes") as Control
 	_detail = get_node(^"Layout/Body/Content/Detail") as VBoxContainer
-	_action_bar = get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/ActionBar") as Control
+	_action_bar = get_node(^"Layout/CreatureEditActions") as Control
 	_catalogue_bar = get_node(^"Layout/CatalogueBar") as Control
 	_status = get_node(^"Layout/Status") as Label
 	_character_tabs = get_node(^"Layout/CharacterTabs") as Control

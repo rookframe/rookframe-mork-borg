@@ -16,3 +16,7 @@ official MÖRK BORG artwork, logos, setting prose, or book layout.
 asset unchanged from commit `1230e73777ee0fa2f4e17ec8c804e0c4061465de`.
 SHA-256: `98fd8a2d3ae893019e2c9c3b2c56bc3453ab313bf7eb41d97255ceea2336937e`.
 This is the approved Rookframe portrait used by the host design-system specimen.
+
+## Inventory spanner icon
+
+Spanner by Lorc, [Game-icons.net](https://game-icons.net/1x1/lorc/spanner.html), licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/). White on transparent SVG used unchanged for item editing, as requested. Attribution is also shipped beside the SVG in `ui/icons/credits.json`.
