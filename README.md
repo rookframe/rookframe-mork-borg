@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.29.2` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.29.3` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `ad1a168e726640de8ca14687a72fc86aa06311bc` (`v1.0.0-rc.1`) | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.88)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.90)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
@@ -465,3 +465,9 @@ Library row and Create Actor on its sheet create Actors. Dragging a
 Creature onto the tabletop creates an Actor and a linked Rook at the drop position.
 Creation is a GM operation. Failed placement cleans up its partial Actor and Rook.
 Character creation is contributed to the shared Actors window.
+
+## Creature Actor sheet
+
+Creature, Inventory and Appearance share one set of native ButtonGroup tabs on desktop and touch. The Creature view keeps public identity, HP, morale, armor, attacks and rules; a 44px settings gear opens corrections with fixed Save/Cancel actions. Miniature choices belong only to Appearance. Actor placement stays in the Actors drag-and-drop flow.
+
+Inventory uses 44px accessible icon actions (add, attack, equip and item edit), 12px row gaps and 16px section padding. Equipped armor/shield controls retain a pressed state and context-specific accessible names. The shared inventory component also improves Character inventories and the equipment catalogue. See [the visual smoke contract](docs/creature-sheet-design.md).
