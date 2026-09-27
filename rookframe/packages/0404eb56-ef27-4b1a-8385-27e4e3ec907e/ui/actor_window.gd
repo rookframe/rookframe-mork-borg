@@ -420,7 +420,7 @@ func _apply_route(route: String) -> void:
 	_route_creature.button_pressed = sheet
 	_route_inventory.button_pressed = inventory
 	_route_appearance.button_pressed = appearance
-	_header_title.visible = false
+	_header_title.visible = not _compact
 	_header_subtitle.visible = false
 	_detail.visible = sheet or edit or inventory or appearance
 	_stats.visible = sheet
