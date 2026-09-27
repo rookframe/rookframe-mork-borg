@@ -25,9 +25,10 @@ var _terminal_shown := false
 
 func _ready() -> void:
 	resized.connect(_layout)
-	get_node(^"Columns/Context/Content/Authorize").pressed.connect(_authorize)
 	get_node(^"Columns/Task/Rest/Content/Breath").pressed.connect(_rest_changed)
 	get_node(^"Columns/Task/Rest/Content/Sleep").pressed.connect(_rest_changed)
+	get_node(^"Columns/Context/Content/Restrictions/Food").pressed.connect(_changed)
+	get_node(^"Columns/Context/Content/Restrictions/Infected").pressed.connect(_changed)
 	_rest_changed()
 
 func _rest_changed() -> void:
@@ -53,7 +54,7 @@ func _render() -> void:
 	var editing := state in ["ready", "error"]
 	var terminal := state in ["resolved", "ended"]
 	var improve := _route == "improve"
-	var title: String = {"rest": "Rest", "improve": "Getting better", "broken": "Broken & death"}.get(_route, "Recovery")
+	var title: String = {"rest": "Rest", "improve": "Level up", "broken": "Broken & death"}.get(_route, "Recovery")
 	if terminal:
 		title = "Action ended" if state == "ended" else ("Improvement resolved" if improve else "Recovery resolved" if _route == "rest" else "Broken & death")
 	get_node(^"Columns").visible = not terminal
@@ -61,9 +62,10 @@ func _render() -> void:
 	get_node(^"Columns/Task/Rest").visible = _route == "rest"
 	get_node(^"Columns/Task/Improvement").visible = improve
 	get_node(^"Columns/Task/Broken").visible = _route == "broken"
-	get_node(^"Columns/Context/Content/Heading").text = _t("WHEN THE GM DECIDES") if improve else _t("BEFORE ROLLING")
-	get_node(^"Columns/Context/Content/Copy").text = _t("Begin after the GM grants an improvement. Resolve each step in order.") if improve else (_t("The table establishes that this rest has happened. Without food or drink, or while infected, resting restores no HP.") if _route == "rest" else _t("At zero HP, roll Broken. Negative HP means dead. Delayed recovery and other timed consequences are handled by the table."))
-	get_node(^"Columns/Context/Content/Values").text = _t("Current hit points\n%s / %s") % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
+	get_node(^"Columns/Context/Content/Heading").text = _t("CURRENT VALUES")
+	get_node(^"Columns/Context/Content/Copy").text = _t("When the GM calls for improvement, roll each step in order.") if improve else (_t("Without food and drink, or while infected, rest restores no HP.") if _route == "rest" else _t("Roll at 0 HP. Below 0 HP means death."))
+	get_node(^"Columns/Context/Content/Copy").visible = _route != "rest" or not get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed or get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed
+	get_node(^"Columns/Context/Content/Values").text = _t("HP · %s / %s") % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	if improve:
 		var abilities: Dictionary = data.get("abilities", {})
 		var labels := ""
@@ -72,14 +74,9 @@ func _render() -> void:
 			var modifier: int = ability.get("modifier", 0)
 			labels += (" · " if not labels.is_empty() else "") + _t("%s %+d") % [_t(key), modifier]
 		get_node(^"Columns/Context/Content/Values").text = _t("Maximum HP · %s\n%s") % [str(data.get("maximum_hit_points", 0)), labels]
-	get_node(^"Columns/Context/Content/Eligible").visible = not improve and editing
 	get_node(^"Columns/Context/Content/Restrictions").visible = _route == "rest" and editing
 	get_node(^"Columns/Task/Rest/Content/Breath").disabled = not editing
 	get_node(^"Columns/Task/Rest/Content/Sleep").disabled = not editing
-	var authorized := not str(data.get("improvement_grant", "")).is_empty()
-	get_node(^"Columns/Context/Content/Authorize").visible = improve and editing and _sdk.context().is_gm and not authorized
-	get_node(^"Columns/Context/Content/Authorization").visible = improve and editing
-	get_node(^"Columns/Context/Content/Authorization").text = _t("GM authorization received.") if authorized else _t("Waiting for the GM to authorize improvement.")
 	get_node(^"Scrolls").visible = state == "scroll"
 	if state == "scroll":
 		var family := str(_action.snapshot.get("family", ""))
@@ -106,7 +103,7 @@ func _render() -> void:
 		get_node(^"Result/Content/Heading").grab_focus()
 	_terminal_shown = terminal
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if state == "error" else "RookframeMeta"
-	var can_submit := state in ["resolved", "ended", "scroll", "specialties"] or (editing and _actor.access_level == "Owner" and (not improve or authorized))
+	var can_submit := state in ["resolved", "ended", "scroll", "specialties"] or (editing and _actor.access_level == "Owner")
 	workflow_changed.emit(_route, title, can_submit, state == "pending")
 	_layout()
 
@@ -147,18 +144,7 @@ func submit() -> void:
 	action_created.emit(action)
 	_action = action
 	_action.changed.connect(_changed)
-	await _action.start({"source": _actor.id.value, "kind": _route, "eligible": _route == "improve" or get_node(^"Columns/Context/Content/Eligible").button_pressed, "rest": "sleep" if get_node(^"Columns/Task/Rest/Content/Sleep").button_pressed else "breath", "food_and_drink": get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed, "infected": get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed})
-
-func _authorize() -> void:
-	get_node(^"Columns/Context/Content/Authorize").disabled = true
-	var result := await _sdk.system_actions.submit("health.start", {"id": _sdk.dice.new_request_id(), "source": _actor.id.value, "kind": "authorize", "eligible": true})
-	get_node(^"Columns/Context/Content/Authorize").disabled = false
-	if not result.ok or str(result.value.get("state", "error")) != "resolved":
-		get_node(^"Outcome").text = result.message if not result.ok else str(result.value.message)
-		get_node(^"Outcome").visible = true
-		get_node(^"Outcome").theme_type_variation = "RookframeError"
-		return
-	_changed()
+	await _action.start({"source": _actor.id.value, "kind": _route, "rest": "sleep" if get_node(^"Columns/Task/Rest/Content/Sleep").button_pressed else "breath", "food_and_drink": get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed, "infected": get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed})
 
 func primary_text() -> String:
 	var state := _action.state if _action != null else "ready"
@@ -207,11 +193,9 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Columns/Context/Content/Authorize").text = _t("Authorize improvement")
-	get_node(^"Columns/Context/Content/Eligible").text = _t("Table confirms eligibility")
 	get_node(^"Columns/Context/Content/Heading").text = _t("BEFORE ROLLING")
-	get_node(^"Columns/Context/Content/Restrictions/Food").text = _t("Had food and drink")
-	get_node(^"Columns/Context/Content/Restrictions/Infected").text = _t("Currently infected")
+	get_node(^"Columns/Context/Content/Restrictions/Food").text = _t("Food & drink")
+	get_node(^"Columns/Context/Content/Restrictions/Infected").text = _t("Infected")
 	get_node(^"Columns/Task/Broken/Content/Heading").text = _t("BROKEN · d4")
 	get_node(^"Columns/Task/Broken/Content/Rules").text = _t("1 · Unconscious\n2 · Broken limb or lost eye\n3 · Hemorrhage\n4 · Dead")
 	get_node(^"Columns/Task/Rest/Content/Breath").text = _t("Catch your breath · d4 HP")

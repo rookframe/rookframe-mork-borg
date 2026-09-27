@@ -74,15 +74,20 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 	return await _sdk.actors.update(_id, data)
 
 func spend_omen() -> SDK.ActorResult:
+	return await adjust_omens(-1)
+
+func adjust_omens(delta: int) -> SDK.ActorResult:
+	if delta != -1 and delta != 1:
+		return _failure("Choose an Omen increase or decrease.")
 	var source := _read()
 	if not source.ok:
 		return source
 	var current: Dictionary = source.actor.data
 	var data: Dictionary = current.duplicate(true)
 	var omens: int = data.get("omens", 0)
-	if omens <= 0:
+	if delta < 0 and omens <= 0:
 		return _failure("No Omens remain.")
-	data["omens"] = omens - 1
+	data["omens"] = omens + delta
 	return await _sdk.actors.update(_id, data)
 
 func _read() -> SDK.ActorResult:

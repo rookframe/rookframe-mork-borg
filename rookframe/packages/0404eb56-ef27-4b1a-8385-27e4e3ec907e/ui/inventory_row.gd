@@ -40,7 +40,6 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Actions/Edit").visible = not catalogue
 	get_node(^"Actions/Equip").visible = not catalogue and (str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre")
 	get_node(^"Actions/Equip").set_pressed_no_signal(equipped == true)
-	get_node(^"Actions/Equip").theme_type_variation = "RookframeManagedSelected" if equipped else "RookframeManagedControl"
 	_action_name("Equip", "Unequip" if equipped else "Equip")
 	_action_name("Attack", "Attack")
 	_action_name("Edit", "Edit")

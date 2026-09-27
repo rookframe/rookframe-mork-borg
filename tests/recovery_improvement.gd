@@ -14,7 +14,7 @@ func _host() -> BOUNDARY:
 	return host
 
 func _options(kind: String = "rest") -> Dictionary:
-	return {"id": "health", "source": "hero", "kind": kind, "eligible": true, "rest": "breath", "food_and_drink": true, "infected": false}
+	return {"id": "health", "source": "hero", "kind": kind, "rest": "breath", "food_and_drink": true, "infected": false}
 
 func test_recovery_uses_human_throw_caps_hp_and_keeps_omens() -> void:
 	var host := _host()
@@ -41,19 +41,12 @@ func _gm(host: BOUNDARY, enabled: bool) -> void:
 	host.participant = "gm" if enabled else "player"
 	host.session = "gm-session" if enabled else "player-session"
 
-func test_improvement_requires_gm_grant_and_applies_ordered_steps() -> void:
+func test_owner_starts_improvement_directly_and_applies_ordered_steps() -> void:
 	var host := _host()
 	var sdk := SDK.new(host)
 	var input := _options("improve")
-	var result := await sdk.system_actions.submit("health.start", input)
-	assert_str(result.value.state).is_equal("error")
-	assert_int(host.requests.size()).is_equal(0)
-	_gm(host, true)
-	result = await sdk.system_actions.submit("health.start", {"id": "grant", "source": "hero", "kind": "authorize", "eligible": true})
-	assert_str(result.value.state).is_equal("resolved")
-	_gm(host, false)
 	input.id = "improvement"
-	result = await sdk.system_actions.submit("health.start", input)
+	var result := await sdk.system_actions.submit("health.start", input)
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
 		return
@@ -103,9 +96,6 @@ func test_broken_reports_delayed_recovery_without_healing(branch: int, values: A
 
 func _begin_improvement(host: BOUNDARY, id: String = "health") -> SDK.DataResult:
 	var sdk := SDK.new(host)
-	_gm(host, true)
-	await sdk.system_actions.submit("health.start", {"id": id + "-grant", "source": "hero", "kind": "authorize", "eligible": true})
-	_gm(host, false)
 	var input := _options("improve")
 	input.id = id
 	return await sdk.system_actions.submit("health.start", input)
@@ -185,15 +175,13 @@ func test_rest_restrictions_and_sleep(food: bool, infected: bool, hp: int, expec
 		if expected == "resolved":
 			assert_str(str(host.reports)).contains("No HP restored").contains("daily")
 
-func test_owner_eligibility_and_real_gm_identity_are_required(case: String, _test_parameters := [["viewer"], ["eligibility"], ["forged_grant"], ["malformed"]]) -> void:
+func test_owner_and_valid_options_are_required(case: String, _test_parameters := [["viewer"], ["obsolete_grant"], ["malformed"]]) -> void:
 	var host := _host()
 	var sdk := SDK.new(host)
 	var input := _options()
 	if case == "viewer":
 		host.actors.hero.access_level = "Viewer"
-	elif case == "eligibility":
-		input.eligible = false
-	elif case == "forged_grant":
+	elif case == "obsolete_grant":
 		input.kind = "authorize"
 		input["is_gm"] = true
 	else:
@@ -233,7 +221,7 @@ func test_interruption_rejects_late_changes_and_preserves_accepted_improvement(c
 	assert_int(host.actors.hero.data.maximum_hit_points).is_equal(14)
 	assert_int(host.actors.hero.data.silver).is_equal(10)
 	assert_str(host.requests[unfinished].result.status).is_equal("rolled")
-	assert_str(host.actors.hero.data.improvement_grant).is_empty()
+	assert_str(host.actors.hero.data.get("improvement_grant", "")).is_empty()
 	if cause == "cancel":
 		assert_str(host.reports[-1].result).is_equal("Ended")
 		assert_str(host.reports[-1].tone).is_equal("attention")

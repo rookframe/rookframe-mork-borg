@@ -247,20 +247,15 @@ func _render_equipment(attacks: Array) -> void:
 		empty.theme_type_variation = "RookframeMeta"
 		_equipment_list.add_child(empty)
 		return
-	for index in range(attacks.size()):
-		var attack: Dictionary = attacks[index]
-		var row := Label.new()
-		row.custom_minimum_size = Vector2(0, 44)
-		row.autowrap_mode = 2
-		row.theme_type_variation = "RookframeBody"
-		var attack_name: String = _t(str(attack.get("name", "Attack")))
-		var attack_dice: String = attack.get("dice", "—")
-		var detail: String = _t("%s · %s ft") % [attack_dice, str(attack.get("range_feet", "—"))]
-		if attack.has("attack_dr"):
-			var attack_dr: int = attack["attack_dr"]
-			detail += _t(" · Attack DR%d") % attack_dr
-		row.text = "%s · %s" % [attack_name, detail]
+	for raw in attacks:
+		var attack: Dictionary = raw
+		var row = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn").instantiate()
 		_equipment_list.add_child(row)
+		row.localize(i18n)
+		row.configure({"inventory_id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "kind": "Weapon", "equipped": true, "damage": str(attack.get("dice", "—")), "range_feet": attack.get("range_feet", 0)}, false, _selected_actor.access_level != "Owner", false)
+		(row.get_node(^"Actions/Equip") as Button).visible = false
+		(row.get_node(^"Actions/Edit") as Button).visible = false
+		row.navigate_requested.connect(_creature_attack_requested)
 
 
 func _render_inventory() -> void:
@@ -639,7 +634,6 @@ func _present_creature_attack(id: String) -> void:
 	view.get_node(^"SourceRules").text = source_rules.strip_edges()
 	view.get_node(^"SourceRules").visible = not source_rules.is_empty()
 	get_node(^"Layout/SheetActions").visible = true
-	get_node(^"Layout/SheetActions/Spend").visible = false
 	get_node(^"Layout/SheetActions/Back").text = _t("Back to Inventory")
 	get_node(^"Layout/SheetActions/Back").disabled = false
 	get_node(^"Layout/SheetActions/Attack").visible = true
@@ -817,7 +811,6 @@ func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
 	_creature_defence.present(sdk, outcome)
 	_body.scroll_vertical = 0
 	get_node(^"Layout/SheetActions").visible = true
-	get_node(^"Layout/SheetActions/Spend").visible = false
 	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
 	get_node(^"Layout/SheetActions/Back").disabled = false
 
@@ -841,6 +834,10 @@ func _creature_decision_closed() -> void:
 
 func _configure_surface_spacing() -> void:
 	var compact := size.x < 600
+	for tabs in [get_node(^"Layout/Header/Routes"), get_node(^"Layout/CharacterTabs")]:
+		for child in tabs.get_children():
+			var tab := child as Button
+			tab.add_theme_font_size_override("font_size", 12 if size.x < 360 else 14)
 	_layout.offset_left = 12.0 if compact else 24.0
 	_layout.offset_right = -_layout.offset_left
 	_layout.offset_top = 0.0 if compact else 16.0
@@ -908,7 +905,6 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Header/Title").text = _t("Creature")
 	get_node(^"Layout/SheetActions/Attack").text = _t("Roll attack")
 	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
-	get_node(^"Layout/SheetActions/Spend").text = _t("Spend 1 Omen")
 	get_node(^"Layout/Body/Content/CharacterCreator").localize(locale)
 	get_node(^"Layout/Body/Content/CharacterSheet").localize(locale)
 	get_node(^"Layout/Body/Content/CreatureAttack").localize(locale)

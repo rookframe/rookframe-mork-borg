@@ -13,8 +13,12 @@ const FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec
 func _ready() -> void:
 	get_node(^"Back").pressed.connect(_back)
 func configure(data: Dictionary, _miniatures: Array) -> void:
-	for entry in [["name", "Name"], ["description", "Description"], ["maximum_hit_points", "Maximum HP"], ["class_title", "Class"], ["origin", "Origin"], ["pack", "Pack"], ["power_uses", "Power uses remaining"]]:
+	for entry in [["name", "Name"], ["hit_points", "HP"], ["omens", "OMENS"], ["silver", "SILVER"], ["description", "Description"], ["maximum_hit_points", "Maximum HP"], ["class_title", "Class"], ["origin", "Origin"], ["pack", "Pack"], ["power_uses", "Power uses remaining"]]:
 		_add(entry[0], entry[1], str(data.get(entry[0], 0 if entry[0] == "power_uses" else "")))
+	var abilities: Dictionary = data.get("abilities", {})
+	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+		var value: Dictionary = abilities.get(ability, {})
+		_add(ability, ability, str(value.get("modifier", 0)))
 	_add("improvements", "Improvements begun", str(data.get("improvements", 0)))
 	if str(data.get("class_id", "")) == "gutterborn-scum":
 		_add("scum_specialty:0", "First specialty (1–6)", _specialty_value(data, 0))
@@ -87,7 +91,11 @@ func refresh_data(data: Dictionary) -> void:
 	for field in _fields:
 		var key: String = field.field
 		var value := str(data.get(key, ""))
-		if key.begins_with("scum_specialty:"):
+		if key in ["Agility", "Presence", "Strength", "Toughness"]:
+			var abilities: Dictionary = data.get("abilities", {})
+			var ability: Dictionary = abilities.get(key, {})
+			value = str(ability.get("modifier", 0))
+		elif key.begins_with("scum_specialty:"):
 			value = _specialty_value(data, 0 if key == "scum_specialty:0" else 1)
 		elif key == "class_rules":
 			value = ""

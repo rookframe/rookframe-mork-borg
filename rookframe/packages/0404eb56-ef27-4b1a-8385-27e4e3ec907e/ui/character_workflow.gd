@@ -257,7 +257,6 @@ func _setup_character_content() -> void:
 	_character_sheet.workflow_changed.connect(_on_sheet_workflow_changed)
 	_character_sheet.shield_decision_closed.connect(_on_shield_decision_closed)
 	get_node(^"Layout/SheetActions/Back").pressed.connect(_cancel_sheet_workflow)
-	get_node(^"Layout/SheetActions/Spend").pressed.connect(_spend_sheet_omen)
 	get_node(^"Layout/SheetActions/Attack").pressed.connect(_roll_sheet_attack)
 	_character_sheet.companion_selected.connect(_open_companion)
 	_character_sheet.companion_placement_requested.connect(_open_companion_for_placement)
@@ -368,6 +367,9 @@ func _select_character_tab(tab: String) -> void:
 
 
 func _on_sheet_changed() -> void:
+	# A retained Character can finish refreshing after a Creature becomes active.
+	if _character_sheet == null or not _character_sheet.visible:
+		return
 	if _character_actor == null:
 		return
 	var latest: SDK.ActorResult = sdk.actors.read(_character_actor.id)
@@ -426,6 +428,9 @@ func _on_scroll_choice_requested(_slot: String) -> void:
 	_body.scroll_vertical = 0
 
 func _on_character_unavailable() -> void:
+	# A retained Character can finish refreshing after a Creature becomes active.
+	if _character_sheet == null or not _character_sheet.visible:
+		return
 	get_node(^"Layout/SheetActions").visible = false
 	_character_actor = null
 	_header_title.text = _t("CHARACTER UNAVAILABLE")
@@ -434,6 +439,9 @@ func _on_character_unavailable() -> void:
 	_character_tabs.visible = false
 
 func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, busy: bool) -> void:
+	# A retained Character can finish refreshing after a Creature becomes active.
+	if _character_sheet == null or not _character_sheet.visible:
+		return
 	_sheet_workflow_title = title
 	_header_title.theme_type_variation = "RookframeTitle" if route in ACTION_ROUTES else "RookframeHeading"
 	if route in ACTION_ROUTES:
@@ -446,8 +454,7 @@ func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, 
 		get_node(^"Layout/Body").scroll_vertical = 0
 		_last_sheet_route = route
 	_character_tabs.visible = route in ["character", "inventory", "appearance"]
-	get_node(^"Layout/SheetActions").visible = route == "omens" or route in ACTION_ROUTES
-	get_node(^"Layout/SheetActions/Spend").visible = route == "omens"
+	get_node(^"Layout/SheetActions").visible = route in ACTION_ROUTES
 	get_node(^"Layout/SheetActions/Attack").visible = route in ACTION_ROUTES
 	get_node(^"Layout/SheetActions/Attack").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Attack").text = _t("Waiting…") if busy else ((_t("Roll damage") if title == "Roll damage" else _t("Roll defence")) if route == "defence" else _t("Roll attack"))
@@ -460,15 +467,11 @@ func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, 
 	get_node(^"Layout/SheetActions/Back").text = _t("Back to sheet") if route in ACTION_ROUTES and not can_submit and not busy else _t("Cancel")
 	if route == "cast" and _character_sheet.power_primary_text() == "Done":
 		get_node(^"Layout/SheetActions/Back").text = _t("Character")
-	get_node(^"Layout/SheetActions/Spend").disabled = not can_submit or busy
 	get_node(^"Layout/SheetActions/Back").disabled = busy and not route in ACTION_ROUTES
 	_set_window_title(_t(title) if route in ACTION_ROUTES else title)
 
 func _cancel_sheet_workflow() -> void:
 	_character_sheet.cancel_workflow()
-
-func _spend_sheet_omen() -> void:
-	_character_sheet.spend_omen()
 
 func _window_closed() -> void:
 	if _character_sheet != null:

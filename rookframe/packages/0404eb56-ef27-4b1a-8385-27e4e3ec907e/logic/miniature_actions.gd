@@ -32,6 +32,8 @@ func place_at(actor: SDK.ActorId, scene_id: SDK.SceneId, position: Vector2) -> S
 	var current := sdk.actors.read(actor)
 	if not current.ok:
 		return SDK.RookResult.new({"ok": false, "message": current.message})
+	if current.actor.access_level != "Owner":
+		return SDK.RookResult.new({"ok": false, "message": "Owner access is required to place this Actor."})
 	var data: Dictionary = current.actor.data
 	var reference: Dictionary = CREATURES.new().effective_miniature(data)
 	if not available(reference):

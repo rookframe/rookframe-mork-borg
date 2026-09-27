@@ -1,71 +1,61 @@
 extends VBoxContainer
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
-var i18n := I18N.new()
-
-signal navigate_requested(route: String, item_id: String)
 const RULES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/power_row.tscn")
+const SPINNER = preload("res://rookframe/ui/icons/spinner.svg")
+const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
+var i18n := I18N.new()
+signal navigate_requested(route: String, item_id: String)
 signal modifier_requested(ability: String)
 signal companions_requested
 signal edit_requested
 signal powers_requested
-signal omens_requested
-signal value_save_requested(key: String, value: String)
-
-const SPINNER = preload("res://rookframe/ui/icons/spinner.svg")
-const CHECK = preload("res://rookframe/ui/icons/check.svg")
+signal omen_adjust_requested(delta: int)
 var _data: Dictionary = {}
-var _editing := ""
-var _short_window := false
+var _omen_pending := false
 
 func _ready() -> void:
 	for route in ["rest", "improve", "broken"]:
-		get_node("Body/Context/AtTable/Content/HealthActions/" + route).pressed.connect(_open_action.bind(route, ""))
-	get_node(^"Body/Context/CompanionsSection/Content/Row/Companions").pressed.connect(_open_companions)
-	resized.connect(_layout)
-	get_node(^"Body/Context/AtTable/Content/HealthActions/OmensAction").pressed.connect(_open_omens)
-	get_node(^"Body/Context/Powers/Content/Row/PowersAction").pressed.connect(_open_powers)
-	get_node(^"Body/Identity/Content/Header/Edit").pressed.connect(_edit)
-	for resource in ["HitPoints", "Omens", "Silver"]:
-		get_node("Resources/" + resource + "/Content/Row/Edit").pressed.connect(_edit_value.bind(resource))
-	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Modifier").pressed.connect(_roll.bind(ability))
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").pressed.connect(_edit_value.bind(ability))
+		get_node("HealthActions/" + route).pressed.connect(_open_action.bind(route, ""))
+	get_node(^"Header/Edit").pressed.connect(_edit)
+	get_node(^"Body/Combat/Inventory").pressed.connect(_open_action.bind("inventory", ""))
+	get_node(^"Body/Context/CompanionsSection/Companions").pressed.connect(_companions)
+	get_node(^"Body/Context/Powers/PowersAction").pressed.connect(_powers)
+	_omen_button("DecreaseOmens").pressed.connect(_adjust_omens.bind(-1))
+	_omen_button("IncreaseOmens").pressed.connect(_adjust_omens.bind(1))
+	for ability in ABILITIES:
+		get_node("Abilities/" + ability + "/Modifier").pressed.connect(_roll.bind(ability))
 
-
-func configure(data: Dictionary, _miniatures: Array, short_window: bool = false) -> void:
-	_short_window = short_window
+func configure(data: Dictionary, _miniatures: Array, _short_window: bool = false) -> void:
 	_data = data
 	var read_only: bool = data.get("read_only", false)
-	for button in get_node(^"Body/Context/AtTable/Content/HealthActions").get_children():
+	for button in get_node(^"HealthActions").get_children():
 		(button as Button).disabled = read_only
-	get_node(^"Body/Identity/Content/Header/Edit").disabled = read_only
-	get_node(^"Body/Context/AtTable/Content/HealthActions/OmensAction").disabled = read_only
-	for resource in ["HitPoints", "Omens", "Silver"]:
-		get_node("Resources/" + resource + "/Content/Row/Edit").disabled = read_only
-	get_node(^"Resources/HitPoints/Content/Row/Value").text = "%s / %s" % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
-	get_node(^"Resources/Omens/Content/Row/Value").text = str(data.get("omens", 0))
-	get_node(^"Resources/Silver/Content/Row/Value").text = str(data.get("silver", 0))
+	get_node(^"Header/Edit").visible = not read_only
+	get_node(^"Header/Class").text = _t(str(data.get("class_title", "No Class")))
+	get_node(^"Resources/HitPoints/Padding/Content/Row/Value").text = "%s / %s" % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
+	get_node(^"Resources/Omens/Padding/Content/Row/Value").text = str(data.get("omens", 0))
+	get_node(^"Resources/Silver/Padding/Content/Row/Value").text = str(data.get("silver", 0))
+	_update_omen_buttons()
 	var abilities: Dictionary = data.get("abilities", {})
-	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+	for ability in ABILITIES:
 		var value: Dictionary = abilities.get(ability, {})
-		var button = get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Modifier")
-		var modifier: int = value.get("modifier", 0)
-		button.text = "%+d" % modifier
+		var button: Button = get_node("Abilities/" + ability + "/Modifier")
 		var pending: String = data.get("pending_ability", "")
+		button.text = "" if pending == ability else "%+d" % int(value.get("modifier", 0))
 		button.icon = SPINNER if pending == ability else null
-		button.text = "" if pending == ability else button.text
 		button.disabled = read_only or not pending.is_empty()
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Row/Edit").disabled = read_only
 		button.accessibility_name = _t("Waiting for %s Throw") % _t(ability) if pending == ability else _t("Roll %s %s") % [_t(ability), button.text]
-	get_node(^"Body/Identity/Content/Description").text = str(data.get("description", ""))
-	get_node(^"Body/Identity/Content/Origin").text = _t(str(data.get("class_title", "No Class"))) + "\n" + _t(str(data.get("origin", "")))
+		button.tooltip_text = button.accessibility_name
+	_copy("Description", str(data.get("description", "")))
+	_copy("Origin", _t(str(data.get("origin", ""))))
 	var rules := ""
 	var class_rules: Array = data.get("class_rules", [])
 	for rule in class_rules:
-		rules += _t(str(rule)) + "\n"
-	var actions := get_node(^"Body/Identity/Content/ClassActions")
+		if not str(rule).strip_edges().is_empty():
+			rules += ("\n" if not rules.is_empty() else "") + _t(str(rule))
+	var actions := get_node(^"Body/Identity/ClassActions")
 	for child in actions.get_children():
 		actions.remove_child(child)
 		child.queue_free()
@@ -76,86 +66,61 @@ func configure(data: Dictionary, _miniatures: Array, short_window: bool = false)
 		var trait_data: Dictionary = raw_trait
 		var key := str(trait_data.get("id", ""))
 		if not trait_data.has("item") and not RULES.new().definition(key).is_empty():
-			_action_row(actions, str(trait_data.get("name", key)), _t(str(trait_data.get("rules", ""))), "use-item", "feature:" + key, read_only)
-		rules += _t(str(trait_data.get("name", ""))) + "\n" + _t(str(trait_data.get("rules", ""))) + "\n"
-	get_node(^"Body/Identity/Content/Traits").text = rules.strip_edges()
+			_action_row(actions, str(trait_data.get("name", key)), str(trait_data.get("rules", "")), "use-item", "feature:" + key, read_only)
+		else:
+			rules += ("\n" if not rules.is_empty() else "") + _t(str(trait_data.get("name", ""))) + "\n" + _t(str(trait_data.get("rules", "")))
+	_copy("Traits", rules.strip_edges())
+	actions.visible = actions.get_child_count() > 0
+	var identity_visible := false
+	for child in get_node(^"Body/Identity").get_children():
+		identity_visible = identity_visible or (child as Control).visible
+	get_node(^"Body/Identity").visible = identity_visible
 	var companions: Array = data.get("starting_creature_grants", [])
-	get_node(^"Body/Context/CompanionsSection/Content/Row/Companions").visible = true
 	var descriptions: Array = data.get("companion_sheets", [])
-	get_node(^"Body/Context/CompanionsSection/Content/Row/Summary").text = _t("%d companions\nIndividual Creature sheets") % (companions.size() + descriptions.size())
+	get_node(^"Body/Context/CompanionsSection/Summary").text = _t("Companions · %d") % (companions.size() + descriptions.size())
 	var equipped := ""
-	var inventory: Array = data.get("inventory", [])
 	var scrolls := 0
+	var inventory: Array = data.get("inventory", [])
 	for entry in inventory:
 		var item: Dictionary = entry
 		if str(item.get("kind", "")) == "Scroll":
 			scrolls += 1
-		var is_equipped: bool = item.get("equipped", false)
-		if is_equipped:
-			equipped += ("\n" if not equipped.is_empty() else "") + (str(item.get("name", "Item")) if item.get("custom", false) else _t(str(item.get("name", "Item"))))
-	get_node(^"Body/Combat/Content/Equipment").text = equipped if not equipped.is_empty() else _t("No equipment equipped.")
-	get_node(^"Body/Context/Powers/Content/Row/Summary").text = _t("%d scrolls\n%d daily uses remain") % [scrolls, int(data.get("power_uses", 0))]
-	_layout()
+		if item.get("equipped", false):
+			equipped += (" · " if not equipped.is_empty() else "") + (str(item.get("name", "Item")) if item.get("custom", false) else _t(str(item.get("name", "Item"))))
+	get_node(^"Body/Combat/Equipment").text = equipped if not equipped.is_empty() else _t("Nothing equipped")
+	get_node(^"Body/Context/Powers/Summary").text = _t("Scrolls · %d   Uses · %d") % [scrolls, int(data.get("power_uses", 0))]
 
+func _copy(key: String, value: String) -> void:
+	var label: Label = get_node("Body/Identity/" + key)
+	label.text = value
+	label.visible = not value.strip_edges().is_empty()
 
-func _layout() -> void:
-	var compact := size.x < 600
-	var short := compact and _short_window
-	get_node(^"Body").columns = 1 if compact else 2
-	get_node(^"Body/Attributes").theme_type_variation = "RookframePackageInk" if short else "RookframeSection"
-	get_node(^"Body/Attributes/Content/Heading").visible = not short
-	get_node(^"Body/Attributes/Content/Abilities").columns = 2 if short else 1
-	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-		get_node("Body/Attributes/Content/Abilities/" + ability).theme_type_variation = "RookframeSubtleFrame" if short else "RookframePackageInk"
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content/Title").set("theme_override_font_sizes/font_size", 13 if short else 16)
-		get_node("Body/Attributes/Content/Abilities/" + ability + "/Padding/Content").vertical = short
+func _omen_button(key: String) -> Button:
+	return get_node("Resources/Omens/Padding/Content/Row/" + key)
 
+func _update_omen_buttons() -> void:
+	var locked: bool = _omen_pending or _data.get("read_only", false)
+	_omen_button("DecreaseOmens").disabled = locked or int(_data.get("omens", 0)) <= 0
+	_omen_button("IncreaseOmens").disabled = locked
 
-func _edit() -> void:
-	edit_requested.emit()
-
-
-func _edit_value(key: String) -> void:
-	var resource_key: String = {"HitPoints": "hit_points", "Omens": "omens", "Silver": "silver"}.get(key, "")
-	var row: Node = get_node("Resources/" + key + "/Content/Row") if not resource_key.is_empty() else get_node("Body/Attributes/Content/Abilities/" + key + "/Padding/Content/Row")
-	var input := row.get_node(^"Input") as LineEdit
-	if _editing == key:
-		value_save_requested.emit(resource_key if not resource_key.is_empty() else key, input.text)
+func _adjust_omens(delta: int) -> void:
+	if _omen_pending or _data.get("read_only", false) or (delta < 0 and int(_data.get("omens", 0)) <= 0):
 		return
-	if not _editing.is_empty():
-		return
-	_editing = key
-	var value: int = _data.get(resource_key, 0)
-	if resource_key.is_empty():
-		var abilities: Dictionary = _data.get("abilities", {})
-		var ability: Dictionary = abilities.get(key, {})
-		value = ability.get("modifier", 0)
-	input.text = str(value)
-	input.visible = true
-	var display := row.get_node(^"Value" if not resource_key.is_empty() else ^"Modifier") as Control
-	display.visible = false
-	var edit := row.get_node(^"Edit") as Button
-	edit.icon = CHECK
-
-
-func _open_companions() -> void:
-	companions_requested.emit()
-
-func _open_omens() -> void:
-	omens_requested.emit()
+	_omen_pending = true
+	get_node(^"OmenStatus").text = _t("Saving…")
+	get_node(^"OmenStatus").theme_type_variation = "RookframeMeta"
+	get_node(^"OmenStatus").visible = true
+	_update_omen_buttons()
+	omen_adjust_requested.emit(delta)
 
 func field_result(key: String, message: String, error: bool) -> void:
-	var paths: Dictionary = {"hit_points": ^"Resources/HitPoints/Content/Error", "omens": ^"Resources/Omens/Content/Error", "silver": ^"Resources/Silver/Content/Error", "Agility": ^"Body/Attributes/Content/Abilities/Agility/Padding/Content/Error", "Presence": ^"Body/Attributes/Content/Abilities/Presence/Padding/Content/Error", "Strength": ^"Body/Attributes/Content/Abilities/Strength/Padding/Content/Error", "Toughness": ^"Body/Attributes/Content/Abilities/Toughness/Padding/Content/Error"}
-	var path: NodePath = paths.get(key, ^"Resources/HitPoints/Content/Error")
-	var label := get_node(path) as Label
-	label.text = _t(message)
-	label.visible = error
-
-func _roll(ability: String) -> void:
-	modifier_requested.emit(ability)
-
-func _open_powers() -> void:
-	powers_requested.emit()
+	if key != "omens":
+		return
+	_omen_pending = false
+	get_node(^"OmenStatus").text = _t(message)
+	get_node(^"OmenStatus").theme_type_variation = "RookframeError"
+	get_node(^"OmenStatus").visible = error
+	_update_omen_buttons()
 
 func _action_row(parent: Node, title: String, rules: String, route: String, id: String, read_only: bool) -> void:
 	var row := ROW.instantiate()
@@ -171,50 +136,31 @@ func _action_row(parent: Node, title: String, rules: String, route: String, id: 
 func _open_action(route: String, id: String) -> void:
 	navigate_requested.emit(route, id)
 
-
 func _t(source: String) -> String:
 	return i18n.text(source)
 
-
-var _localized := false
-
 func localize(locale: I18N) -> void:
-	if _localized:
-		return
-	_localized = true
 	i18n = locale
-	get_node(^"Body/Attributes/Content/Abilities/Agility/Padding/Content/Row/Edit").tooltip_text = _t("Edit Agility")
-	get_node(^"Body/Attributes/Content/Abilities/Agility/Padding/Content/Row/Input").accessibility_name = _t("Edit Agility")
-	get_node(^"Body/Attributes/Content/Abilities/Agility/Padding/Content/Title").text = _t("Agility")
-	get_node(^"Body/Attributes/Content/Abilities/Presence/Padding/Content/Row/Edit").tooltip_text = _t("Edit Presence")
-	get_node(^"Body/Attributes/Content/Abilities/Presence/Padding/Content/Row/Input").accessibility_name = _t("Edit Presence")
-	get_node(^"Body/Attributes/Content/Abilities/Presence/Padding/Content/Title").text = _t("Presence")
-	get_node(^"Body/Attributes/Content/Abilities/Strength/Padding/Content/Row/Edit").tooltip_text = _t("Edit Strength")
-	get_node(^"Body/Attributes/Content/Abilities/Strength/Padding/Content/Row/Input").accessibility_name = _t("Edit Strength")
-	get_node(^"Body/Attributes/Content/Abilities/Strength/Padding/Content/Title").text = _t("Strength")
-	get_node(^"Body/Attributes/Content/Abilities/Toughness/Padding/Content/Row/Edit").tooltip_text = _t("Edit Toughness")
-	get_node(^"Body/Attributes/Content/Abilities/Toughness/Padding/Content/Row/Input").accessibility_name = _t("Edit Toughness")
-	get_node(^"Body/Attributes/Content/Abilities/Toughness/Padding/Content/Title").text = _t("Toughness")
-	get_node(^"Body/Attributes/Content/Heading").text = _t("ATTRIBUTES")
-	get_node(^"Body/Combat/Content/Title").text = _t("COMBAT")
-	get_node(^"Body/Context/AtTable/Content/HealthActions/OmensAction").text = _t("Spend Omen")
-	get_node(^"Body/Context/AtTable/Content/HealthActions/broken").text = _t("Broken & death")
-	get_node(^"Body/Context/AtTable/Content/HealthActions/improve").text = _t("Getting better")
-	get_node(^"Body/Context/AtTable/Content/HealthActions/rest").text = _t("Rest")
-	get_node(^"Body/Context/AtTable/Content/Title").text = _t("AT THE TABLE")
-	get_node(^"Body/Context/CompanionsSection/Content/Row/Companions").text = _t("View")
-	get_node(^"Body/Context/CompanionsSection/Content/Title").text = _t("COMPANIONS")
-	get_node(^"Body/Context/Powers/Content/Row/PowersAction").text = _t("View")
-	get_node(^"Body/Context/Powers/Content/Title").text = _t("POWERS & SCROLLS")
-	get_node(^"Body/Identity/Content/Header/Edit").text = _t("Edit sheet")
-	get_node(^"Body/Identity/Content/Header/Title").text = _t("CHARACTER PROFILE")
-	get_node(^"Body/Identity/Content/Origin").text = _t("No Class")
-	get_node(^"Resources/HitPoints/Content/Row/Edit").tooltip_text = _t("Edit HP")
-	get_node(^"Resources/HitPoints/Content/Row/Input").accessibility_name = _t("Edit HitPoints")
-	get_node(^"Resources/HitPoints/Content/Title").text = _t("HP")
-	get_node(^"Resources/Omens/Content/Row/Edit").tooltip_text = _t("Edit OMENS")
-	get_node(^"Resources/Omens/Content/Row/Input").accessibility_name = _t("Edit Omens")
-	get_node(^"Resources/Omens/Content/Title").text = _t("OMENS")
-	get_node(^"Resources/Silver/Content/Row/Edit").tooltip_text = _t("Edit SILVER")
-	get_node(^"Resources/Silver/Content/Row/Input").accessibility_name = _t("Edit Silver")
-	get_node(^"Resources/Silver/Content/Title").text = _t("SILVER")
+	for ability in ABILITIES:
+		get_node("Abilities/" + ability + "/Title").text = _t(ability)
+	for entry in [["Header/Edit", "Edit sheet"], ["Resources/Omens/Padding/Content/Row/DecreaseOmens", "Decrease Omens"], ["Resources/Omens/Padding/Content/Row/IncreaseOmens", "Increase Omens"], ["Body/Combat/Inventory", "Open Inventory"], ["Body/Context/Powers/PowersAction", "Open Powers & scrolls"], ["Body/Context/CompanionsSection/Companions", "Open Companions"]]:
+		var button: Button = get_node(entry[0])
+		button.tooltip_text = _t(entry[1])
+		button.accessibility_name = _t(entry[1])
+	for entry in [["HitPoints", "HP"], ["Omens", "OMENS"], ["Silver", "SILVER"]]:
+		get_node("Resources/" + entry[0] + "/Padding/Content/Title").text = _t(entry[1])
+	for entry in [["rest", "Rest"], ["improve", "Level up"], ["broken", "Broken / death"]]:
+		get_node("HealthActions/" + entry[0]).text = _t(entry[1])
+	get_node(^"Body/Combat/Title").text = _t("COMBAT")
+
+func _edit() -> void:
+	edit_requested.emit()
+
+func _companions() -> void:
+	companions_requested.emit()
+
+func _powers() -> void:
+	powers_requested.emit()
+
+func _roll(ability: String) -> void:
+	modifier_requested.emit(ability)

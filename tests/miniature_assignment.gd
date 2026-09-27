@@ -118,3 +118,26 @@ func test_application_defaults_and_explicit_choices() -> void:
 	assert_str(definitions.new().effective_miniature({}).local_id).is_equal("default-miniature")
 	assert_dict(definitions.new().effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": WARDEN})).is_equal(WARDEN)
 	assert_dict(definitions.new().effective_miniature({"preferred_miniature": {"package_id": "missing", "local_id": "saved"}})).is_equal({"package_id": "missing", "local_id": "saved"})
+
+func test_actor_summary_preview_and_drop_recheck_access() -> void:
+	var host := _host()
+	var presentation = auto_free(load(ROOT + "ui/presentation.gd").new())
+	presentation.sdk = SDK.new(host)
+	host.actors.enemy.data["definition_id"] = "zukuma-berserker"
+	var summary: Dictionary = presentation._rookframe_describe_actor("enemy")
+	assert_str(summary.miniature.localId).is_equal("barbarian")
+	assert_bool(summary.canPlace).is_false()
+	host.actors.enemy.access_level = "Owner"
+	host.actors.enemy.data["preferred_miniature"] = GOBLIN
+	summary = presentation._rookframe_describe_actor("enemy")
+	assert_str(summary.miniature.localId).is_equal("goblin")
+	assert_bool(summary.canPlace).is_true()
+	presentation._rookframe_place_actor("enemy", "chosen-scene", Vector2(3, 7))
+	await get_tree().process_frame
+	assert_int(host.placed.size()).is_equal(1)
+	assert_str(host.placed["placed-0"].actor).is_equal("enemy")
+	assert_vector(host.placed["placed-0"].position).is_equal(Vector2(3, 7))
+	host.actors.enemy.access_level = "Viewer"
+	presentation._rookframe_place_actor("enemy", "chosen-scene", Vector2(4, 8))
+	await get_tree().process_frame
+	assert_int(host.placed.size()).is_equal(1)

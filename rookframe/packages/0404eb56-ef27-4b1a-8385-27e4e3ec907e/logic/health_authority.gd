@@ -49,7 +49,7 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 	return _error("Unsupported health action.")
 
 func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Dictionary) -> Dictionary:
-	if typeof(input.get("source")) != TYPE_STRING or typeof(input.get("kind")) != TYPE_STRING or typeof(input.get("eligible")) != TYPE_BOOL:
+	if typeof(input.get("source")) != TYPE_STRING or typeof(input.get("kind")) != TYPE_STRING:
 		return _error("The health options are malformed.")
 	var source := context.read_actor(SDK.ActorId.new(str(input.source)))
 	if not source.ok or source.actor.access_level != "Owner":
@@ -57,21 +57,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if not _valid(source.actor.data):
 		return _error("Character data is malformed. Correct the sheet first.")
 	var data: Dictionary = source.actor.data
-	if not input.eligible:
-		return _error("Confirm eligibility with the table before rolling.")
 	for active in _actions:
 		if str(active.get("source", "")) == str(input.source) and str(active.state) in ["pending", "scroll", "specialties"]:
 			if PARTICIPANTS.new().alive(context, active):
 				return _error("Finish or cancel this Character's current recovery or improvement first.")
 			_end(context, active)
-	if str(input.kind) == "authorize":
-		if not caller.is_gm:
-			return _error("Only the GM can authorize improvement.")
-		if not str(data.get("improvement_grant", "")).is_empty():
-			return _error("This Character already has an unused improvement authorization.")
-		var granted := data.duplicate(true)
-		granted["improvement_grant"] = str(input.id)
-		return _finish(context, {"state": "ready", "message": ""}, [SDK.ActorChange.new(source.actor.id, granted)], "GM authorized one improvement. The Character's Owner may begin Getting better.", "Authorized")
 	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(str(owner.error))
@@ -86,18 +76,16 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if str(input.kind) == "improve":
 		if not _improvable(data):
 			return _error("Correct abilities, Silver and improvement history on the sheet first.")
-		if str(data.get("improvement_grant", "")).is_empty():
-			return _error("The GM must authorize this improvement first.")
 		var history: int = data.get("improvements", 0)
 		var traits: Array = data.get("traits", [])
 		if str(data.get("class_id", "")) == "gutterborn-scum" and traits.size() != (1 if history == 0 else 2):
 			return _error("Correct the Scum's specialty history before improving.")
 		var improved := data.duplicate(true)
-		improved["improvement_grant"] = ""
+		improved.erase("improvement_grant")
 		var count: int = data.get("improvements", 0)
 		improved["improvements"] = count + 1
 		action["first_improvement"] = count == 0
-		if not _record(context, [SDK.ActorChange.new(source.actor.id, improved)], "Improvement begun with GM authorization. Accepted changes remain if interrupted; resolve unfinished steps manually."):
+		if not _record(context, [SDK.ActorChange.new(source.actor.id, improved)], "Improvement begun. Accepted changes remain if interrupted; resolve unfinished steps manually."):
 			return _end(context, action)
 		return _request(context, action, "more_hp", [SDK.DiceTerm.new("More HP", 10, 6)], true)
 	if str(input.kind) != "rest":
@@ -143,8 +131,6 @@ func _valid(value: Variant) -> bool:
 	if str(data.get("schema", "")) != "mork-borg-character/v1":
 		return false
 	if typeof(data.get("hit_points")) != TYPE_INT or typeof(data.get("maximum_hit_points")) != TYPE_INT:
-		return false
-	if typeof(data.get("improvement_grant", "")) != TYPE_STRING:
 		return false
 	var maximum: int = data.maximum_hit_points
 	return maximum > 0
