@@ -16,6 +16,11 @@ func Translate(message: String, _domain: String) -> String:
 	return translated if not translated.is_empty() else message
 
 var window: Control
+var feedback_request: Dictionary = {}
+func ShowFeedback(title: String, message: String, severity: String, actions: Array) -> int:
+	feedback_request = {"title": title, "message": message, "severity": severity, "actions": actions}
+	return 71
+
 var return_parent: Node
 func PushWindow(_source: Control, child: Control, _title: String) -> Dictionary:
 	return_parent = child.get_parent()

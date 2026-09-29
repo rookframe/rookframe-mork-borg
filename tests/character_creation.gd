@@ -31,6 +31,80 @@ func test_required_pack_choice() -> void:
 	creator.free()
 
 
+func test_fresh_session_resumes_completed_rules_without_replaying_rolls() -> void:
+	for case in [["occult-herbmaster", "Second decoction"], ["fanged-deserter", "Armor"], ["wretched-royalty", "Second gift"]]:
+		var host = _host_for(case[0], 1)
+		host.pending_roll = case[1]
+		var creator = _creator_for(host, case[0])
+		for iteration in range(180):
+			await get_tree().process_frame
+			if not host.pending_result.is_empty():
+				break
+			if not disabled:
+				creator.primary()
+		assert_bool(not host.pending_result.is_empty()).is_true()
+		var state: Dictionary = creator.capture_reconnect_state()
+		creator.discard()
+		host.complete_pending()
+		await get_tree().process_frame
+		assert_bool(host.actors.is_empty()).is_true()
+		creator.free()
+		var fresh = _host_for(case[0], 1)
+		# Previously completed outcomes are no longer available at the new host.
+		fresh.outcomes = host.outcomes.duplicate(true)
+		fresh.outcomes[case[1]] = [[3]]
+		var restored = _creator_for(fresh, case[0])
+		restored.restore_reconnect_state(state)
+		await get_tree().process_frame
+		assert_bool(fresh.requests.is_empty()).is_true()
+		await _finish(restored)
+		assert_bool(fresh.errors.is_empty()).is_true()
+		assert_int(fresh.actors.size()).is_equal(1)
+		assert_str(fresh.actors[0].data.class_id).is_equal(case[0])
+		assert_str(fresh.actors[0].data.creation_id).is_equal(state.draft.creation_id)
+		restored.free()
+
+
+func test_identity_reconnect_finishes_once_after_lost_creation_acknowledgement() -> void:
+	var host = _host_for("heretical-priest", 4)
+	var creator = _creator_for(host, "heretical-priest")
+	for iteration in range(180):
+		await get_tree().process_frame
+		if stage == 5:
+			break
+		if not disabled:
+			creator.primary()
+	creator.get_node(^"View/Main/Content/Identity/Name").value = "Varg"
+	creator.get_node(^"View/Main/Content/Identity/Description").value = "Ash road"
+	_choose_miniature(creator)
+	var identity: Dictionary = creator.capture_reconnect_state()
+	creator.discard()
+	creator.free()
+	var fresh = _host_for("heretical-priest", 4)
+	fresh.outcomes = {}
+	var restored = _creator_for(fresh, "heretical-priest")
+	restored.restore_reconnect_state(identity)
+	assert_str(restored.get_node(^"View/Main/Content/Identity/Name").value).is_equal("Varg")
+	assert_str(restored.get_node(^"View/Main/Content/Identity/Description").value).is_equal("Ash road")
+	restored.primary()
+	var review: Dictionary = restored.capture_reconnect_state()
+	restored.primary()
+	await get_tree().process_frame
+	assert_int(fresh.actors.size()).is_equal(1)
+	assert_str(fresh.actors[0].data.name).is_equal("Varg")
+	assert_bool(fresh.requests.is_empty()).is_true()
+	restored.free()
+	# The retained Review state predates an acknowledgement lost on connection
+	# loss. The freshly shared Actor already contains the creation identity.
+	var retry = _creator_for(fresh, "heretical-priest")
+	retry.restore_reconnect_state(review)
+	retry.primary()
+	await get_tree().process_frame
+	assert_int(fresh.actors.size()).is_equal(1)
+	assert_bool(retry.is_active()).is_false()
+	retry.free()
+
+
 func test_remaining_class_lifetimes() -> void:
 	for case in [["wretched-royalty", "Second gift"], ["wretched-royalty", "Armor"], ["heretical-priest", "Class feature"], ["occult-herbmaster", "Second decoction"], ["occult-herbmaster", "Decoction doses"]]:
 		for restart in [false, true]:

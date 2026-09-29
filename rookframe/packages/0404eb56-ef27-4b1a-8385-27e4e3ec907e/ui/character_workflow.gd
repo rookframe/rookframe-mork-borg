@@ -22,7 +22,7 @@ var _requested_window_title := "MÖRK BORG"
 const CHARACTER_SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet.gd")
 var _character_sheet: CHARACTER_SHEET
 var _character_transition_pending := false
-var _creation_was_closed := false
+var _restart_requested := false
 var _character_tab := "character"
 var _character_tabs: Control
 var _character_tab_character: Button
@@ -59,10 +59,6 @@ func _process(_delta: float) -> void:
 	_update_character_density()
 	if _character_sheet != null:
 		_character_sheet.set_available_height(size.y)
-	if _creation_was_closed and not _surface_is_hidden():
-		_creation_was_closed = false
-		character_show_route("create-class")
-		_character_creator.begin()
 	if _character_transition_pending:
 		_character_transition_pending = false
 		character_show_route("character")
@@ -76,6 +72,17 @@ func _surface_is_hidden() -> bool:
 			return true
 		node = node.get_parent()
 	return false
+
+
+func capture_reconnect_state() -> Variant:
+	if _character_creator == null or not _character_creator.is_active():
+		return null
+	return _character_creator.capture_reconnect_state()
+
+
+func restore_reconnect_state(state: Dictionary) -> void:
+	character_show_route(str(state.get("stage", "create-class")))
+	_character_creator.restore_reconnect_state(state)
 
 
 func opened(actor_id: SDK.ActorId) -> void:
@@ -145,6 +152,7 @@ var _catalogue_back: Button
 
 func character_setup() -> void:
 	closed.connect(_window_closed)
+	sdk.feedback.action_selected.connect(_restart_answered)
 	_header_title = get_node(^"Layout/Header/Title") as Label
 	_header_subtitle = get_node(^"Layout/Header/Subtitle") as Label
 	_content = get_node(^"Layout/Body/Content") as VBoxContainer
@@ -200,10 +208,29 @@ func character_primary_button_pressed() -> void:
 
 func character_back_button_pressed() -> void:
 	if _character_creator.is_active():
-		_character_creator.start_over()
+		if _restart_requested or _busy:
+			return
+		_restart_requested = true
+		var message := SDK.FeedbackMessage.new()
+		message.title = _t("Start over")
+		message.message = _t("Discard this unfinished Character and start again?")
+		for option in [["restart-character", "Start over"], ["keep-character", "Cancel"]]:
+			var action := SDK.FeedbackAction.new()
+			action.id = option[0]
+			action.title = _t(option[1])
+			message.actions.append(action)
+		sdk.feedback.confirm(message)
 	else:
 		_character_actor = null
 		character_hide_surface()
+
+
+func _restart_answered(action: String) -> void:
+	if not _restart_requested or not action in ["restart-character", "keep-character"]:
+		return
+	_restart_requested = false
+	if action == "restart-character" and _character_creator.is_active():
+		_character_creator.start_over()
 
 
 func _on_tab_character() -> void:
@@ -474,11 +501,9 @@ func _cancel_sheet_workflow() -> void:
 	_character_sheet.cancel_workflow()
 
 func _window_closed() -> void:
+	_restart_requested = false
 	if _character_sheet != null:
 		_character_sheet.close_action()
-	if _character_creator != null and _character_creator.is_active():
-		_creation_was_closed = true
-		_character_creator.discard()
 
 func _roll_sheet_attack() -> void:
 	_character_sheet.roll_attack()

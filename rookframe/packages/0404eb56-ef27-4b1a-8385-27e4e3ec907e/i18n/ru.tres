@@ -2,6 +2,8 @@
 
 [resource]
 messages = {
+[&"", &"Discard this unfinished Character and start again?"]: [&"Отказаться от этого незавершённого персонажа и начать заново?"],
+[&"", &"The created Character is unavailable for editing."]: [&"Созданный персонаж недоступен для редактирования."],
 [&"", &"Food & drink"]: [&"Еда и питьё"],
 [&"", &"Infected"]: [&"Инфекция"],
 [&"", &"Decrease Omens"]: [&"Уменьшить знамения"],
