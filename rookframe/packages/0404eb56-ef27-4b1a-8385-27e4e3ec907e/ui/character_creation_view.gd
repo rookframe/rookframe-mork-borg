@@ -1,171 +1,351 @@
-extends BoxContainer
+extends "res://rookframe/ui/components/surfaces/fullscreen_wizard.gd"
 
-const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
-var i18n := I18N.new()
-
-const CHECK = preload("res://rookframe/ui/icons/check.svg")
-const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
-const DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
-
+const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const I18N = preload(ROOT + "ui/localization.gd")
+const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const CLASSES = preload(ROOT + "logic/creation_classes.gd")
+const DEFINITION = preload(ROOT + "logic/character_definition.gd")
+const CLASS_IDS := ["classless", "fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]
+const CLASS_ICONS := ["character", "sword", "dagger", "staff", "silver", "book", "herbs"]
+const ROUTES := ["create-class", "create-abilities", "create-origin", "create-equipment", "create-identity", "create-review"]
+const HEADINGS := ["Choose your class", "Discover your abilities", "Find your roots", "Gather your belongings", "Give them a name", "Review your character"]
+const SUBTITLES := ["A beginning, not a destiny.", "Your class is already included in each roll.", "Your origin and class traits.", "Roll your starting resources and gear.", "A name, a few words, a presence on the table.", "Everything is together. One last look before you begin."]
+const ABILITIES := ["Agility", "Presence", "Strength", "Toughness", "Hit points"]
+const ABILITY_DESCRIPTIONS := ["Defend, balance, swim and flee.", "Perceive, aim, charm and use Powers.", "Strike, grapple, lift and break.", "Resist poison, cold and heat.", "Roll your class Hit Points die and add Toughness. You start with at least 1 HP."]
+const EQUIPMENT := ["Silver", "Omens", "Food", "Equipment pack", "Equipment first", "Equipment second", "Weapon", "Armor"]
+const EQUIPMENT_FORMULAS := ["2d6 × 10", "1d2", "1d4 days", "1d6", "1d12", "1d12", "1d10", "1d4"]
+const PACK_BUTTONS := ["/PackChoices/Options/Choice0", "/PackChoices/Options/Choice1", "/PackChoices/Options/Choice2", "/PackChoices/Options/Choice3", "/PackChoices/Options/Choice4"]
+const STAGE := "Layout/Body/StageSlot/Stage"
+const CONTEXT := "Layout/Body/ContextSlot/Context"
+const LEFT := "Layout/Body/StageSlot/Stage/Content/Split/Left"
+const DETAIL := "Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"
 signal class_selected(class_id: String)
 signal scroll_selected(slot: String, disposition: String)
 signal pack_selected(pack: String)
-
-var _scroll_slot := ""
-const CLASS_NODES: Dictionary = {"NoClass": "classless", "FangedDeserter": "fanged-deserter", "GutterbornScum": "gutterborn-scum", "EsotericHermit": "esoteric-hermit", "WretchedRoyalty": "wretched-royalty", "HereticalPriest": "heretical-priest", "OccultHerbmaster": "occult-herbmaster"}
+signal miniature_requested
+var i18n := I18N.new()
+var facade: SDK
+var _draft: Dictionary = {}
+var _route := ""
+var _choice := ""
+var _active := ""
+var _records: Array[Dictionary] = []
+var _preview_key := ""
 
 func _ready() -> void:
-	for name in ["Choice0", "Choice1", "Choice2", "Choice3", "Choice4"]:
-		get_node("Main/Content/Equipment/PackChoices/Options/" + name).pressed.connect(_select_pack.bind({"Choice0": "Nothing", "Choice1": "Backpack", "Choice2": "Sack", "Choice3": "Small wagon", "Choice4": "Donkey"}[name]))
-	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit", "WretchedRoyalty", "HereticalPriest", "OccultHerbmaster"]:
-		get_node("Main/Content/Class/" + node).pressed.connect(_select_class.bind(CLASS_NODES[node]))
-	for choice in ["Reroll", "Eat", "Paper"]:
-		get_node("Main/Content/Equipment/ScrollChoice/" + choice).pressed.connect(_select_scroll.bind({"Reroll": "reroll", "Eat": "eat", "Paper": "toilet-paper"}[choice]))
-
-func _select_class(class_id: String) -> void:
-	class_selected.emit(class_id)
-
-func _select_scroll(disposition: String) -> void:
-	scroll_selected.emit(_scroll_slot, disposition)
-
-func _select_pack(pack: String) -> void:
-	pack_selected.emit(pack)
-
-const ABILITIES := ["Agility", "Presence", "Strength", "Toughness", "Hit points"]
-const EQUIPMENT := ["Silver", "Omens", "Food", "Equipment pack", "Equipment first", "Equipment second", "Weapon", "Armor"]
-const EQUIPMENT_FORMULAS := ["2d6 × 10", "1d2", "1d4 days", "1d6", "1d12", "1d12", "1d10", "1d4"]
-
-func present_creation(route: String, draft: Dictionary, compact: bool) -> void:
-	var profile: Dictionary = draft.get("class_profile", {})
-	var class_title: String = draft.get("class_title", "No Class")
-	_scroll_slot = str(draft.get("scroll_choice_slot", ""))
-	get_node(^"Main/Content/Class").columns = 2
-	for node in ["NoClass", "FangedDeserter", "GutterbornScum", "EsotericHermit", "WretchedRoyalty", "HereticalPriest", "OccultHerbmaster"]:
-		var choice := get_node("Main/Content/Class/" + node) as Button
-		choice.button_pressed = CLASS_NODES[node] == draft.get("class_id", "classless")
-		choice.icon = CHECK if choice.button_pressed else null
-	get_node(^"Main/Content/Equipment/ScrollChoice").visible = not _scroll_slot.is_empty()
-	var equipment_pending: bool = draft.get("equipment_roll_pending", false)
-	var pack_pending: bool = draft.get("pack_choice_pending", false)
-	var roll_ready: bool = draft.get("roll_ready", false)
-	var ability_pending: bool = draft.get("roll_pending", false)
-	vertical = compact
-	get_node(^"Main").theme_type_variation = "RookframePackageInk" if compact else "RookframeSection"
-	add_theme_constant_override("separation", 12 if compact else 20)
-	var stages := ["Class", "Abilities", "Origin", "Equipment", "Identity", "Review"]
-	var selected: String = {"create-class": "Class", "create-abilities": "Abilities", "create-rolling": "Abilities", "create-origin": "Origin", "create-equipment": "Equipment", "create-identity": "Identity", "create-review": "Review"}.get(route, "Class")
-	for stage in stages:
-		get_node("Main/Content/" + stage).visible = stage == selected
-	get_node(^"Main/Content/Title").text = _t("ROLL ABILITIES") if selected == "Abilities" else (_t("STARTING EQUIPMENT") if selected == "Equipment" else _t(selected).to_upper())
-	get_node(^"Main/Content/Title").visible = not (compact and selected in ["Abilities", "Class"])
-	get_node(^"Aside").visible = not (compact and selected == "Abilities")
-	get_node(^"Aside/Context/Content/PreferredMiniature").visible = selected == "Identity"
-	get_node(^"Aside/Context/Content/Title").text = _t("PREFERRED MINIATURE") if selected == "Identity" else (_t("CARRIED EQUIPMENT") if selected == "Equipment" else _t(class_title).to_upper())
-	var hp_faces: int = profile.get("hp_faces", 8)
-	var silver_count: int = profile.get("silver_count", 2)
-	var omen_faces: int = profile.get("omen_faces", 2)
-	var description := _rules_text(draft)
-	var facts := _t("Hit points\nToughness + 1d%d\n\nSilver\n%dd6 × 10\n\nOmens\n1d%d") % [hp_faces, silver_count, omen_faces]
-	var hint := "Your character is created after the final review."
-	if selected == "Abilities":
-		description = "Rolls resolve in order. Dice are rolled automatically on your behalf."
-		facts = _t("Hit points\n1d%d + Toughness (minimum 1)") % hp_faces
-		hint = _t("Rolling %s…") % _t(str(draft.get("active_roll", "abilities"))) if ability_pending and not roll_ready else "Continue with the next ability when ready."
-		_present_abilities(draft, compact)
-	elif selected == "Origin":
-		description = _t(str(draft.get("origin", "")))
-		facts = _traits_text(draft)
-		_present_origin(draft, compact)
-	elif selected == "Equipment":
-		description = "Your starting belongings."
-		facts = _inventory_text(draft.get("inventory", []))
-		get_node(^"Aside").visible = not facts.is_empty() and not equipment_pending
-		hint = _t("Rolling %s…") % _t(str(draft.get("active_roll", "equipment"))) if equipment_pending and not roll_ready else "Continue with the next roll when ready."
-		if not equipment_pending:
-			hint = "Choose your pack above." if pack_pending else "Starting equipment complete. Continue to Identity."
-		_present_equipment(draft, compact)
-	elif selected == "Identity":
-		var miniature: Dictionary = draft.get("preferred_miniature", {})
-		get_node(^"Aside/Context/Content/PreferredMiniature").text = _t("Choose Miniature") if miniature.is_empty() else _t("Change Miniature")
-		description = "Preferred appearance for this Actor’s Rooks."
-		facts = str(miniature.get("title", ""))
-		hint = "You can edit the completed sheet after creation."
-		get_node(^"Main/Content/Identity/Name").value = str(draft.get("name", ""))
-		get_node(^"Main/Content/Identity/Description").value = str(draft.get("description", ""))
-	elif selected == "Review":
-		description = _traits_text(draft)
-		var creatures: Array = draft.get("starting_creature_ids", [])
-		facts = _t("Starting creatures: %d") % creatures.size()
-		hint = "You can edit the sheet after creating the character."
-		get_node(^"Main/Content/Review/Name").text = str(draft.get("name", "Unnamed Character"))
-		get_node(^"Main/Content/Review/Resources").text = _t("HP %s     Omens %s     Silver %s") % [str(draft.get("hit_points", 0)), str(draft.get("omens", 0)), str(draft.get("silver", 0))]
-		var values: Array[String] = []
-		var abilities: Dictionary = draft.get("abilities", {})
-		for ability in ["Agility", "Presence", "Strength", "Toughness"]:
-			var value: Dictionary = abilities.get(ability, {})
-			var modifier: int = value.get("modifier", 0)
-			values.append("%s  %s → %s" % [_t(ability), str(value.get("score", "—")), _modifier(modifier)])
-		get_node(^"Main/Content/Review/Abilities").text = _lines(values)
-		get_node(^"Main/Content/Review/Description").text = _t(class_title) + "\n" + _t(str(draft.get("origin", ""))) + "\n" + str(draft.get("description", ""))
-		get_node(^"Main/Content/Review/Inventory").text = _inventory_text(draft.get("inventory", []))
-	get_node(^"Aside/Context/Content/Description").text = _t(description)
-	get_node(^"Aside/Context/Content/Facts").text = _t(facts)
-	get_node(^"Aside/Hint").text = _t(hint)
-
-
-func _present_abilities(draft: Dictionary, compact: bool) -> void:
-	var ready: bool = draft.get("roll_ready", false)
-	var values: Dictionary = draft.get("abilities", {})
-	var rows := [get_node(^"Main/Content/Abilities/Agility"), get_node(^"Main/Content/Abilities/Presence"), get_node(^"Main/Content/Abilities/Strength"), get_node(^"Main/Content/Abilities/Toughness"), get_node(^"Main/Content/Abilities/HitPoints")]
-	for index in range(5):
-		var title: String = ABILITIES[index]
-		var complete: bool = values.has(title) if index < 4 else draft.has("hit_points")
-		var current := title == str(draft.get("active_roll", ""))
-		var result := "—"
-		if complete:
-			if index < 4:
-				var ability: Dictionary = values[title]
-				var modifier: int = ability.get("modifier", 0)
-				result = "%s → %s" % [str(ability.get("score", 0)), _modifier(modifier)]
-			else:
-				result = str(draft.get("hit_points", 0))
-		elif current and not ready:
-			result = "Rolling…"
-		var row: ROLL_ROW = rows[index]
-		row.present_roll(title, _ability_formula(title, draft), result, "complete" if complete else (("current" if ready else "pending") if current else "locked"), index + 1, compact)
-
-
-func _present_equipment(draft: Dictionary, compact: bool) -> void:
-	var ready: bool = draft.get("roll_ready", false)
-	var values: Dictionary = draft.get("equipment_rolls", {})
-	var rows := [get_node(^"Main/Content/Equipment/Silver"), get_node(^"Main/Content/Equipment/Omens"), get_node(^"Main/Content/Equipment/Food"), get_node(^"Main/Content/Equipment/Pack"), get_node(^"Main/Content/Equipment/First"), get_node(^"Main/Content/Equipment/Second"), get_node(^"Main/Content/Equipment/Weapon"), get_node(^"Main/Content/Equipment/Armor")]
-	for index in range(EQUIPMENT.size()):
-		var title: String = EQUIPMENT[index]
-		var complete: bool = values.has(title)
-		var current := title == str(draft.get("active_roll", ""))
-		var result: String = str(values[title]) if complete else ("Rolling…" if current and not ready else "—")
-		if complete and title == "Silver":
-			var silver_roll: int = values[title]
-			result = str(silver_roll * 10)
-		var row: ROLL_ROW = rows[index]
-		row.present_roll(title, _equipment_formula(title, draft, EQUIPMENT_FORMULAS[index]), result, "complete" if complete else (("current" if ready else "pending") if current else "locked"), index + 1, compact, _equipment_meaning(title, draft) if complete else "")
-	var choices: Array[String] = DEFINITION.new().pack_choices_for_roll(int(values.get("Equipment pack", 0)))
-	get_node(^"Main/Content/Equipment/PackChoices").visible = not choices.is_empty()
-	get_node(^"Main/Content/Equipment/PackChoices/Prompt").text = _t("Choose one pack:")
-	var buttons := [get_node(^"Main/Content/Equipment/PackChoices/Options/Choice0"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice1"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice2"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice3"), get_node(^"Main/Content/Equipment/PackChoices/Options/Choice4")]
+	super._ready()
+	get_node(LEFT + "/Choices").selected.connect(_selected_row)
+	get_node(DETAIL + "/Appearance/Copy/PreferredMiniature").pressed.connect(_request_miniature)
 	for index in range(DEFINITION.PACK_CHOICES.size()):
-		var name: String = DEFINITION.PACK_CHOICES[index]
-		var button := buttons[index] as Button
-		button.visible = choices.has(name)
-		button.text = _t("No pack" if name == "Nothing" else name)
-		button.set_pressed_no_signal(not bool(draft.get("pack_choice_pending", true)) and name == str(draft.get("pack", "")))
+		get_node(DETAIL + PACK_BUTTONS[index]).pressed.connect(_request_pack.bind(DEFINITION.PACK_CHOICES[index]))
+	get_node(DETAIL + "/ScrollChoice/Reroll").pressed.connect(_request_scroll.bind("reroll"))
+	get_node(DETAIL + "/ScrollChoice/Eat").pressed.connect(_request_scroll.bind("eat"))
+	get_node(DETAIL + "/ScrollChoice/Paper").pressed.connect(_request_scroll.bind("toilet-paper"))
+	get_name_field().value_changed.connect(_name_changed)
+	localize(i18n)
 
-	var extra: ROLL_ROW = get_node(^"Main/Content/Equipment/ExtraRoll")
-	var active: String = draft.get("active_roll", "")
-	var pending: bool = draft.get("equipment_roll_pending", false)
-	extra.visible = not EQUIPMENT.has(active) and not active.is_empty() and pending
-	if extra.visible:
-		extra.present_roll(active, str(draft.get("active_roll_formula", "")), "Ready" if ready else "Rolling…", "current" if ready else "pending", 7, compact)
+func localize(locale: I18N) -> void:
+	i18n = locale
+	var titles: Array[String] = []
+	for title in ["Class", "Abilities", "Origin & Traits", "Equipment", "Identity", "Review"]:
+		titles.append(_t(title))
+	configure("MÖRK BORG", _t("Create a character"), titles, {"back": _t("Back"), "restart": _t("Start over"), "subtitle": _t("Character creation"), "close": _t("Close character creation")})
+	get_name_field().label_text = _t("Name")
+	get_name_field().help_text = _t("Required")
+	get_description_field().label_text = _t("Description")
+	get_description_field().help_text = _t("Optional · a few words to remember them by")
+
+func get_name_field() -> Control:
+	return get_node(LEFT + "/Identity/Name")
+
+func get_description_field() -> Control:
+	return get_node(LEFT + "/Identity/Description")
+
+func set_status(message: String, error: bool = false) -> void:
+	get_node(STAGE + "/Heading/Status").text = _t(message)
+	get_node(STAGE + "/Heading/Status").visible = error and not message.is_empty()
+	get_name_field().error_text = _t(message) if error and _route == "create-identity" else ""
+
+func present_creation(route: String, draft: Dictionary, _compact: bool) -> void:
+	var next_route := "create-abilities" if route == "create-rolling" else route
+	var changed := _route != next_route
+	_route = next_route
+	_draft = draft
+	var index := maxi(0, ROUTES.find(_route))
+	set_step(index)
+	get_node(STAGE + "/Heading/Kicker").text = _t("STEP %02d / 06") % (index + 1)
+	get_node(STAGE + "/Heading/Title").text = _t(HEADINGS[index])
+	get_node(STAGE + "/Heading/Subtitle").text = _t(SUBTITLES[index])
+	get_node(STAGE + "/Content/Split").visible = index != 5
+	get_node(STAGE + "/Content/Review").visible = index == 5
+	get_node(LEFT + "/Choices").visible = index < 4
+	get_node(LEFT + "/Identity").visible = index == 4
+	_present_context()
+	if index == 4:
+		get_name_field().value = str(draft.get("name", ""))
+		get_description_field().value = str(draft.get("description", ""))
+		_present_identity()
+	elif index == 5:
+		_present_review()
+	else:
+		_records = _class_rows() if index == 0 else _roll_rows(index)
+		var active := str(draft.get("active_roll", ""))
+		if index == 3 and bool(draft.get("pack_choice_pending", false)):
+			active = "Equipment pack"
+		if index == 0:
+			_choice = str(draft.get("class_id", "classless"))
+		elif changed or _active != active or _record(_choice).is_empty():
+			_choice = active if not _record(active).is_empty() else str(_records[0].id) if not _records.is_empty() else ""
+		_active = active
+		_present_choices()
+		_present_detail()
+
+func _selected_row(id: String) -> void:
+	if _route == "create-class":
+		class_selected.emit(id)
+	else:
+		_choice = id
+		_present_choices()
+		_present_detail()
+
+func _present_choices() -> void:
+	var completed := 0
+	for record in _records:
+		if bool(record.get("complete", false)):
+			completed += 1
+	get_node(LEFT + "/Choices").configure(_records, _choice, _t("CHOOSE A CLASS") if _route == "create-class" else _t("ALL RESULTS RECORDED" if completed == _records.size() else "ROLL IN ORDER"), _t("%d PATHS") % _records.size() if _route == "create-class" else "%d / %d" % [completed, _records.size()])
+
+func _class_rows() -> Array[Dictionary]:
+	var rows: Array[Dictionary] = []
+	for index in range(CLASS_IDS.size()):
+		var profile: Dictionary = CLASSES.new().profile(CLASS_IDS[index])
+		rows.append({"id": CLASS_IDS[index], "title": _t(str(profile.title)), "subtitle": "", "value": "◆" if _draft.get("class_id") == CLASS_IDS[index] else "", "icon": _icon(CLASS_ICONS[index])})
+	return rows
+
+func _roll_rows(index: int) -> Array[Dictionary]:
+	var profile: Dictionary = _draft.get("class_profile", {})
+	var rows: Array[Dictionary] = []
+	var active := str(_draft.get("active_roll", ""))
+	if index == 1:
+		var values: Dictionary = _draft.get("abilities", {})
+		for number in range(ABILITIES.size()):
+			var title: String = ABILITIES[number]
+			var ability: Dictionary = values.get(title, {})
+			var complete := values.has(title) if number < 4 else _draft.has("hit_points")
+			var result := _modifier(int(ability.get("modifier", 0))) if complete and number < 4 else str(_draft.get("hit_points", "—")) if complete else ""
+			var explanation := (_t("Score %d → modifier %s") % [int(ability.get("score", 0)), result]) if complete and number < 4 else _t("Starting and maximum Hit Points: %s") % result if complete else ""
+			rows.append(_roll_row(title, _ability_formula(title, _draft), result, complete, ["agility", "presence", "strength", "toughness", "heart"][number], _t(ABILITY_DESCRIPTIONS[number]), explanation))
+	elif index == 2:
+		var class_id := str(_draft.get("class_id", "classless"))
+		if class_id == "classless":
+			rows.append({"id": "none", "title": _t("No class origin or traits"), "subtitle": _t("Continue to starting equipment."), "value": "", "icon": _icon("character"), "complete": true})
+			return rows
+		var herb := class_id == "occult-herbmaster"
+		var royal := class_id == "wretched-royalty"
+		var terms := [["Origin", "origin_roll", int(profile.get("origin_faces", 6)), "character"], ["First decoction" if herb else "First gift" if royal else "Class feature", "first_decoction_roll" if herb else "feature_roll", 8 if herb else 6, "herbs"]]
+		if herb or royal:
+			terms.append(["Second decoction" if herb else "Second gift", "second_decoction_roll" if herb else "second_feature_roll", 8 if herb else 6, "elixir"])
+		if herb:
+			terms.append(["Decoction doses", "decoction_doses", 4, "elixir"])
+		for term in terms:
+			rows.append(_roll_row(term[0], "1d%d" % term[2], str(_draft.get(term[1], "")), _draft.has(term[1]), term[3], _t("Your class determines this starting roll."), str(_draft.get("origin", "")) if term[0] == "Origin" else _traits_text(_draft)))
+	else:
+		var values: Dictionary = _draft.get("equipment_rolls", {})
+		var icons := ["silver", "psychopomp", "food", "bag", "bag", "bag", "sword", "armor"]
+		for number in range(EQUIPMENT.size()):
+			var title: String = EQUIPMENT[number]
+			var value := _equipment_meaning(title, _draft) if values.has(title) else ""
+			rows.append(_roll_row(title, _equipment_formula(title, _draft, EQUIPMENT_FORMULAS[number]), value, values.has(title), icons[number], _t("Roll on the starting equipment table for your class."), value))
+		if not EQUIPMENT.has(active) and not active.is_empty() and bool(_draft.get("equipment_roll_pending", false)):
+			rows.append(_roll_row(active, str(_draft.get("active_roll_formula", "")), "", false, "dice", _t("Additional roll required by your starting equipment."), ""))
+	return rows
+
+func _roll_row(title: String, formula: String, value: String, complete: bool, icon_name: String, description: String, explanation: String) -> Dictionary:
+	var current := title == str(_draft.get("active_roll", ""))
+	var pending := bool(_draft.get("roll_pending", false)) or bool(_draft.get("equipment_roll_pending", false))
+	return {"id": title, "title": _t(title), "subtitle": formula, "formula": formula, "value": value if complete else _t("Next" if bool(_draft.get("roll_ready", false)) else "Rolling…") if current and pending else "—", "complete": complete, "pending": not complete, "icon": _icon(icon_name), "icon_name": icon_name, "description": description, "explanation": explanation}
+
+func _reset_detail() -> Control:
+	var detail := get_node(DETAIL) as Control
+	for name in ["Facts", "Formula", "Rules", "Result", "ResultCopy", "PackChoices", "ScrollChoice", "Appearance"]:
+		get_node(DETAIL + "/" + name).visible = false
+	get_node(DETAIL + "/Heading/Icon").visible = true
+	get_node(DETAIL + "/Flavor").text = ""
+	get_node(DETAIL + "/NoteRow/Note").text = _t("Results stay with you when you go back.")
+	return detail
+
+func _present_detail() -> void:
+	var detail := _reset_detail()
+	if _route == "create-class":
+		var profile: Dictionary = _draft.get("class_profile", {})
+		var herb := str(_draft.get("class_id", "")) == "occult-herbmaster"
+		get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("BORN OF THE MUSHROOM" if herb else "STARTING CLASS")
+		get_node(DETAIL + "/Heading/Copy/Title").text = _t(str(profile.get("title", "No Class")))
+		get_node(DETAIL + "/Heading/Icon").texture = _icon(CLASS_ICONS[maxi(0, CLASS_IDS.find(str(_draft.get("class_id", "classless"))))])
+		get_node(DETAIL + "/Flavor").text = _t("Raised in the glade. Your body is hardy; your remedies are stranger still." if herb else "Your class determines starting rolls, equipment and traits.")
+		get_node(DETAIL + "/Facts").visible = true
+		_set_fact("HitPoints", "Hit Points", "1d%d + TOU" % int(profile.get("hp_faces", 8)))
+		_set_fact("Silver", "Silver", "%dd6 × 10" % int(profile.get("silver_count", 2)))
+		_set_fact("Omens", "Omens", "1d%d" % int(profile.get("omen_faces", 2)))
+		get_node(DETAIL + "/Rules").visible = true
+		get_node(DETAIL + "/Rules").text = _class_rules_markup()
+		get_node(DETAIL + "/NoteRow/Note").text = _t("Next: roll your four abilities, then Hit Points. Your class modifies the rolls automatically.")
+		return
+	var row := _record(_choice)
+	if row.is_empty():
+		return
+	get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("RECORDED RESULT" if bool(row.get("complete", false)) else "STARTING ROLL")
+	get_node(DETAIL + "/Heading/Copy/Title").text = str(row.title)
+	get_node(DETAIL + "/Heading/Icon").texture = _icon(str(row.get("icon_name", "dice")))
+	get_node(DETAIL + "/Flavor").text = str(row.get("description", ""))
+	get_node(DETAIL + "/Formula").visible = row.has("formula")
+	get_node(DETAIL + "/Formula").text = str(row.get("formula", ""))
+	get_node(DETAIL + "/Result").visible = bool(row.get("complete", false))
+	get_node(DETAIL + "/Result/Content/Value").text = str(row.get("value", ""))
+	var rolls: Dictionary = _draft.get("roll_faces", {})
+	var raw: Array = rolls.get(_choice, [])
+	var faces: Array[String] = []
+	for value in raw:
+		faces.append(str(int(value)))
+	get_node(DETAIL + "/Result/Content/Raw").visible = not faces.is_empty()
+	get_node(DETAIL + "/Result/Content/Raw").text = _t("Rolled: %s") % _lines(faces, " + ")
+	get_node(DETAIL + "/ResultCopy").visible = not str(row.get("explanation", "")).is_empty()
+	get_node(DETAIL + "/ResultCopy").text = _t(str(row.get("explanation", "")))
+	var values: Dictionary = _draft.get("equipment_rolls", {})
+	var choices: Array[String] = DEFINITION.new().pack_choices_for_roll(int(values.get("Equipment pack", 0)))
+	get_node(DETAIL + "/PackChoices").visible = _route == "create-equipment" and _choice == "Equipment pack" and not choices.is_empty()
+	for index in range(DEFINITION.PACK_CHOICES.size()):
+		var pack: String = DEFINITION.PACK_CHOICES[index]
+		var choice := get_node(DETAIL + PACK_BUTTONS[index]) as Button
+		choice.visible = choices.has(pack)
+		choice.text = _t(pack)
+		choice.set_pressed_no_signal(not bool(_draft.get("pack_choice_pending", true)) and str(_draft.get("pack", "")) == pack)
+	get_node(DETAIL + "/ScrollChoice").visible = _route == "create-equipment" and not str(_draft.get("scroll_choice_slot", "")).is_empty()
+	if get_node(DETAIL + "/PackChoices").visible:
+		get_node(DETAIL + "/Flavor").text = _t("Choose your starting container or transport.")
+		get_node(DETAIL + "/Formula").visible = false
+		get_node(DETAIL + "/Result").visible = false
+		get_node(DETAIL + "/ResultCopy").visible = false
+		get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("1d6 · rolled %d") % int(values.get("Equipment pack", 0))
+		get_node(DETAIL + "/NoteRow/Note").text = _t("Choose one pack below") if bool(_draft.get("pack_choice_pending", true)) else _t("Selected: %s") % _t(str(_draft.get("pack", "Nothing")))
+
+func _class_rules_markup() -> String:
+	var profile: Dictionary = _draft.get("class_profile", {})
+	var rules: Array = _draft.get("class_rules", [])
+	var parts: Array[String] = []
+	if str(_draft.get("class_id", "")) == "occult-herbmaster":
+		var offsets: Dictionary = profile.get("ability_offsets", {})
+		for pair in [["Tough as wood", "Toughness"], ["Low in protein", "Strength"]]:
+			parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t(pair[0])), _bb(_t("%s is rolled with 3d6 %+d.") % [_t(pair[1]), int(offsets.get(pair[1], 0))])])
+		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Portable laboratory")), _bb(_t(str(rules[1])))])
+	else:
+		var offsets: Dictionary = profile.get("ability_offsets", {})
+		for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+			if not offsets.has(ability):
+				continue
+			parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t(str(ability))), _bb(_t("Starting roll: 3d6 %+d") % int(offsets[ability]))])
+		for rule in rules:
+			parts.append(_bb(_t(str(rule))))
+	if parts.is_empty():
+		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Starting abilities")), _bb(_t("Roll 3d6 for each ability."))])
+	return _lines(parts, "\n\n")
+
+func _bb(value: String) -> String:
+	return value.replace("[", "[lb]")
+
+func _present_identity() -> void:
+	var detail := _reset_detail()
+	get_node(DETAIL + "/Heading/Icon").visible = false
+	get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("ON THE TABLETOP")
+	get_node(DETAIL + "/Heading/Copy/Title").text = _t("Preferred miniature")
+	get_node(DETAIL + "/Appearance").visible = true
+	var miniature: Dictionary = _draft.get("preferred_miniature", {})
+	get_node(DETAIL + "/Appearance/Copy/Name").text = str(miniature.get("title", _t("None")))
+	get_node(DETAIL + "/Appearance/Copy/PreferredMiniature").text = _t("Choose miniature" if miniature.is_empty() else "Change miniature")
+	get_node(DETAIL + "/NoteRow/Note").text = _t("Your character portrait and tabletop miniature can be different.")
+	var key := str(miniature.get("package_id", "")) + "/" + str(miniature.get("local_id", ""))
+	get_node(DETAIL + "/Appearance/Preview").visible = not miniature.is_empty()
+	if key != _preview_key and facade != null:
+		_preview_key = key
+		if not miniature.is_empty():
+			facade.content.preview_miniature(SDK.ContentReference.new(str(miniature.package_id), str(miniature.local_id)), get_node(DETAIL + "/Appearance/Preview"))
+
+func _present_context() -> void:
+	var context := get_node(CONTEXT)
+	var name := str(_draft.get("name", "")).strip_edges()
+	get_node(CONTEXT + "/Name/Title").text = name if not name.is_empty() else _t("Unnamed soul")
+	get_node(CONTEXT + "/Name/Class").text = _t(str(_draft.get("class_title", "No Class")))
+	get_node(CONTEXT + "/PortraitVitals/Vitals/HitPoints/Row/Value").text = "%s / %s" % [int(_draft.hit_points), int(_draft.maximum_hit_points)] if _draft.has("hit_points") else "—"
+	var totals: Dictionary = _draft.get("equipment_rolls", {})
+	for key in ["Silver", "Omens"]:
+		get_node(CONTEXT + "/PortraitVitals/Vitals/" + key + "/Row/Value").text = str(int(totals[key]) * (10 if key == "Silver" else 1)) if totals.has(key) else "—"
+	var abilities: Dictionary = _draft.get("abilities", {})
+	for key in ["Agility", "Presence", "Strength", "Toughness"]:
+		var ability: Dictionary = abilities.get(key, {})
+		get_node(CONTEXT + "/Attributes/" + key + "/Row/Value").text = _modifier(int(ability.get("modifier", 0))) if abilities.has(key) else "—"
+	get_node(CONTEXT + "/History").text = _t(str(_draft.get("origin", ""))) if not str(_draft.get("origin", "")).is_empty() else _t("Your history, traits and belongings will appear as you create your character.")
+
+func _present_review() -> void:
+	var review := get_node(STAGE + "/Content/Review")
+	var miniature: Dictionary = _draft.get("preferred_miniature", {})
+	var identity: Array[Dictionary] = [_pair("Class", _t(str(_draft.get("class_title", "")))), _pair("Origin", _t(str(_draft.get("origin", ""))))]
+	get_node(STAGE + "/Content/Review" + "/Character/Identity").configure(_t("Character"), _icon("character"), identity, str(_draft.get("description", "")) if not str(_draft.get("description", "")).is_empty() else _t("No description added."))
+	var values: Array[Dictionary] = []
+	var abilities: Dictionary = _draft.get("abilities", {})
+	for ability in [["Agility", "AGI"], ["Presence", "PRE"], ["Strength", "STR"], ["Toughness", "TOU"]]:
+		var score: Dictionary = abilities.get(ability[0], {})
+		values.append(_pair(ability[1], _modifier(int(score.get("modifier", 0)))))
+	var vitals: Array[Dictionary] = [_pair("Hit Points", "%s / %s" % [int(_draft.get("hit_points", 1)), int(_draft.get("maximum_hit_points", 1))]), _pair("Preferred miniature", str(miniature.get("title", _t("None"))))]
+	get_node(STAGE + "/Content/Review" + "/Character/Abilities").configure(_t("Abilities"), _icon("strength"), vitals)
+	get_node(STAGE + "/Content/Review" + "/Character/Abilities").set_stats(values)
+	var inventory: Array = _draft.get("inventory", [])
+	var weapon: Array = []
+	var armor: Array = []
+	var carried: Array = []
+	for raw_item in inventory:
+		var item: Dictionary = raw_item
+		if item.get("kind", "") == "Weapon":
+			weapon.append(item)
+		elif item.get("kind", "") == "Armor":
+			armor.append(item)
+		else:
+			carried.append(item)
+	var equipment: Array[Dictionary] = [_pair("Weapon", _inventory_text(weapon)), _pair("Protection", _inventory_text(armor)), _pair("Carried", _inventory_text(carried).replace("\n", " · ")), _pair("Resources", _t("%s silver · %s Omens") % [int(_draft.get("silver", 0)), int(_draft.get("omens", 0))])]
+	get_node(STAGE + "/Content/Review" + "/Belongings/Equipment").configure(_t("Equipment"), _icon("bag"), equipment)
+	var traits: Array[Dictionary] = []
+	var traits_data: Array = _draft.get("traits", [])
+	for raw_trait in traits_data:
+		var trait_data: Dictionary = raw_trait
+		traits.append(_pair(_t(str(trait_data.get("name", ""))), _t(str(trait_data.get("rules", "")))))
+	if _draft.has("decoction_doses"):
+		traits.append(_pair("Portable laboratory", _t("%d doses / day") % int(_draft.decoction_doses)))
+	get_node(STAGE + "/Content/Review" + "/Belongings/Traits").configure(_t("Class traits"), _icon("herbs"), traits)
+
+func _pair(label: String, value: String) -> Dictionary:
+	return {"label": _t(label), "value": value if not value.is_empty() else "—"}
+
+func _icon(name: String) -> Texture2D:
+	var icons := {
+		"agility": preload("res://rookframe/ui/icons/character/agility.svg"),
+		"armor": preload("res://rookframe/ui/icons/character/armor.svg"),
+		"bag": preload("res://rookframe/ui/icons/character/bag.svg"),
+		"book": preload("res://rookframe/ui/icons/character/book.svg"),
+		"character": preload("res://rookframe/ui/icons/character/character.svg"),
+		"dagger": preload("res://rookframe/ui/icons/character/dagger.svg"),
+		"dice": preload("res://rookframe/ui/icons/character/dice.svg"),
+		"elixir": preload("res://rookframe/ui/icons/character/elixir.svg"),
+		"food": preload("res://rookframe/ui/icons/character/food.svg"),
+		"heart": preload("res://rookframe/ui/icons/character/heart.svg"),
+		"herbs": preload("res://rookframe/ui/icons/character/herbs.svg"),
+		"presence": preload("res://rookframe/ui/icons/character/presence.svg"),
+		"psychopomp": preload("res://rookframe/ui/icons/character/psychopomp.svg"),
+		"silver": preload("res://rookframe/ui/icons/character/silver.svg"),
+		"staff": preload("res://rookframe/ui/icons/character/staff.svg"),
+		"strength": preload("res://rookframe/ui/icons/character/strength.svg"),
+		"sword": preload("res://rookframe/ui/icons/character/sword.svg"),
+		"toughness": preload("res://rookframe/ui/icons/character/toughness.svg"),
+	}
+	return icons.get(name, icons["dice"])
 
 
 func _equipment_meaning(title: String, draft: Dictionary) -> String:
@@ -224,37 +404,6 @@ func _equipment_formula(title: String, draft: Dictionary, fallback: String) -> S
 	return fallback
 
 
-func _present_origin(draft: Dictionary, compact: bool) -> void:
-	var class_id: String = draft.get("class_id", "classless")
-	var classless := class_id == "classless"
-	var royalty := class_id == "wretched-royalty"
-	var herbmaster := class_id == "occult-herbmaster"
-	get_node(^"Main/Content/Origin/Explanation").text = _t("No class origin or traits.") if classless else _t(str(draft.get("origin", "")))
-	get_node(^"Main/Content/Origin/Continue").text = _t("Continue to starting equipment.") if classless else _traits_text(draft)
-	get_node(^"Main/Content/Origin/SecondFeatureRoll").visible = royalty or herbmaster
-	get_node(^"Main/Content/Origin/DoseRoll").visible = herbmaster
-	var entries := [["OriginRoll", "Origin", "origin_roll", 8 if herbmaster else 6]]
-	if herbmaster:
-		entries.append(["FeatureRoll", "First decoction", "first_decoction_roll", 8])
-		entries.append(["SecondFeatureRoll", "Second decoction", "second_decoction_roll", 8])
-		entries.append(["DoseRoll", "Decoction doses", "decoction_doses", 4])
-	else:
-		entries.append(["FeatureRoll", "First gift" if royalty else "Class feature", "feature_roll", 6])
-		if royalty:
-			entries.append(["SecondFeatureRoll", "Second gift", "second_feature_roll", 6])
-	var rows := [get_node(^"Main/Content/Origin/OriginRoll"), get_node(^"Main/Content/Origin/FeatureRoll"), get_node(^"Main/Content/Origin/SecondFeatureRoll"), get_node(^"Main/Content/Origin/DoseRoll")]
-	for index in range(entries.size()):
-		var entry: Array = entries[index]
-		var row: ROLL_ROW = rows[index]
-		row.visible = not classless
-		var complete := draft.has(entry[2])
-		var current: bool = str(draft.get("active_roll", "")) == entry[1]
-		var ready: bool = draft.get("roll_ready", false)
-		var value: int = draft.get(entry[2], 0)
-		var faces: int = entry[3]
-		row.present_roll(entry[1], "1d%d" % faces, str(value) if complete else ("Rolling…" if current and not ready else "—"), "complete" if complete else ("current" if current and ready else "pending" if current else "locked"), index + 1, compact)
-
-
 func _rules_text(draft: Dictionary) -> String:
 	var rules: Array = draft.get("class_rules", [])
 	var result := ""
@@ -291,11 +440,11 @@ func _modifier(value: int) -> String:
 	return "%+d" % value
 
 
-func _lines(values: Array[String]) -> String:
+func _lines(values: Array[String], separator: String = "\n") -> String:
 	var text := ""
 	for value in values:
 		var line: String = value
-		text += ("\n" if not text.is_empty() else "") + line
+		text += (separator if not text.is_empty() else "") + line
 	return text
 
 
@@ -303,48 +452,25 @@ func _t(source: String) -> String:
 	return i18n.text(source)
 
 
-var _localized := false
 
-func localize(locale: I18N) -> void:
-	if _localized:
-		return
-	_localized = true
-	i18n = locale
-	get_node(^"Aside/Context/Content/PreferredMiniature").text = _t("Choose Miniature")
-	get_node(^"Aside/Context/Content/Title").text = _t("NO CLASS")
-	get_node(^"Main/Content/Class/EsotericHermit").text = _t("ESOTERIC HERMIT")
-	get_node(^"Main/Content/Class/FangedDeserter").text = _t("FANGED DESERTER")
-	get_node(^"Main/Content/Class/GutterbornScum").text = _t("GUTTERBORN SCUM")
-	get_node(^"Main/Content/Class/HereticalPriest").text = _t("HERETICAL PRIEST")
-	get_node(^"Main/Content/Class/NoClass").text = _t("NO CLASS")
-	get_node(^"Main/Content/Class/OccultHerbmaster").text = _t("OCCULT HERBMASTER")
-	get_node(^"Main/Content/Class/WretchedRoyalty").text = _t("WRETCHED ROYALTY")
-	get_node(^"Main/Content/Equipment/ScrollChoice/Eat").text = _t("Eat it")
-	get_node(^"Main/Content/Equipment/ScrollChoice/Explanation").text = _t("You cannot read this scroll. Choose what to do with it.")
-	get_node(^"Main/Content/Equipment/ScrollChoice/Paper").text = _t("Use as toilet paper")
-	get_node(^"Main/Content/Equipment/ScrollChoice/Reroll").text = _t("Reroll equipment")
-	get_node(^"Main/Content/Identity/Description").label_text = _t("DESCRIPTION")
-	get_node(^"Main/Content/Identity/Description").placeholder = _t("Describe this Character")
-	get_node(^"Main/Content/Identity/Name").label_text = _t("NAME")
-	get_node(^"Main/Content/Identity/Name").placeholder = _t("Character name")
-	get_node(^"Main/Content/Origin/Continue").text = _t("Continue to starting equipment.")
-	get_node(^"Main/Content/Origin/Explanation").text = _t("No class origin or traits.")
-	get_node(^"Main/Content/Title").text = _t("CHOOSE A CLASS")
-	get_node(^"Main/Content/Abilities/Agility").localize(locale)
-	get_node(^"Main/Content/Abilities/HitPoints").localize(locale)
-	get_node(^"Main/Content/Abilities/Presence").localize(locale)
-	get_node(^"Main/Content/Abilities/Strength").localize(locale)
-	get_node(^"Main/Content/Abilities/Toughness").localize(locale)
-	get_node(^"Main/Content/Equipment/Armor").localize(locale)
-	get_node(^"Main/Content/Equipment/ExtraRoll").localize(locale)
-	get_node(^"Main/Content/Equipment/First").localize(locale)
-	get_node(^"Main/Content/Equipment/Food").localize(locale)
-	get_node(^"Main/Content/Equipment/Omens").localize(locale)
-	get_node(^"Main/Content/Equipment/Pack").localize(locale)
-	get_node(^"Main/Content/Equipment/Second").localize(locale)
-	get_node(^"Main/Content/Equipment/Silver").localize(locale)
-	get_node(^"Main/Content/Equipment/Weapon").localize(locale)
-	get_node(^"Main/Content/Origin/DoseRoll").localize(locale)
-	get_node(^"Main/Content/Origin/FeatureRoll").localize(locale)
-	get_node(^"Main/Content/Origin/OriginRoll").localize(locale)
-	get_node(^"Main/Content/Origin/SecondFeatureRoll").localize(locale)
+func _request_miniature() -> void:
+	miniature_requested.emit()
+
+func _request_pack(pack: String) -> void:
+	pack_selected.emit(pack)
+
+func _request_scroll(disposition: String) -> void:
+	scroll_selected.emit(str(_draft.get("scroll_choice_slot", "")), disposition)
+
+func _name_changed(value: String) -> void:
+	get_node(CONTEXT + "/Name/Title").text = value if not value.strip_edges().is_empty() else _t("Unnamed soul")
+
+func _record(id: String) -> Dictionary:
+	for record in _records:
+		if record.id == id:
+			return record
+	return {}
+
+func _set_fact(id: String, label: String, value: String) -> void:
+	get_node(DETAIL + "/Facts/Row/" + id + "/Label").text = _t(label)
+	get_node(DETAIL + "/Facts/Row/" + id + "/Value").text = value

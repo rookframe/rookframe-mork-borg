@@ -12,20 +12,111 @@ var stages: Array[int] = []
 var primary := ""
 var disabled := false
 
+func test_restart_cancels_the_abandoned_immediate_roll_before_late_completion() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	host.pending_roll = "Agility"
+	var creator = _creator_for(host, "occult-herbmaster")
+	creator.primary()
+	creator.primary()
+	for frame in 6:
+		await get_tree().process_frame
+	assert_bool(not host.pending_result.is_empty()).is_true()
+	creator.start_over()
+	assert_int(host.cancelled_rolls.size()).is_equal(1)
+	assert_int(stage).is_equal(1)
+	host.complete_pending()
+	await get_tree().process_frame
+	assert_bool(creator.capture_reconnect_state().draft.abilities.is_empty()).is_true()
+	assert_bool(host.actors.is_empty()).is_true()
+	creator.free()
+
+func test_changing_class_after_back_restarts_dependent_rolls_and_keeps_identity() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	var creator = _creator_for(host, "occult-herbmaster")
+	creator.primary()
+	creator.primary()
+	for frame in 6:
+		await get_tree().process_frame
+	creator.back()
+	var retained: Dictionary = creator.capture_reconnect_state()
+	retained.draft.name = "Varg"
+	retained.draft.description = "From the ash road"
+	retained.draft.preferred_miniature = {"package_id": host.PackageId(), "local_id": "creature-token"}
+	creator.restore_reconnect_state(retained)
+	await get_tree().process_frame
+	creator.select_class("gutterborn-scum")
+	var changed: Dictionary = creator.capture_reconnect_state().draft
+	assert_str(changed.class_id).is_equal("gutterborn-scum")
+	assert_bool(changed.abilities.is_empty()).is_true()
+	assert_str(changed.name).is_equal("Varg")
+	assert_str(changed.description).is_equal("From the ash road")
+	assert_that(changed.preferred_miniature).is_equal(retained.draft.preferred_miniature)
+	creator.primary()
+	assert_str(primary).is_equal("Roll Agility")
+	creator.discard()
+	creator.free()
+
+func test_back_between_rolls_resumes_only_on_the_roll_step() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	var creator = _creator_for(host, "occult-herbmaster")
+	creator.primary()
+	creator.primary()
+	for frame in 6:
+		await get_tree().process_frame
+	assert_int(host.requests.size()).is_equal(1)
+	var before: Dictionary = creator.capture_reconnect_state()
+	creator.back()
+	assert_int(stage).is_equal(1)
+	assert_str(primary).is_equal("Continue")
+	creator.primary()
+	assert_int(stage).is_equal(2)
+	assert_int(host.requests.size()).is_equal(1)
+	assert_that(creator.capture_reconnect_state().draft.abilities).is_equal(before.draft.abilities)
+	creator.primary()
+	for frame in 6:
+		await get_tree().process_frame
+	assert_int(host.requests.size()).is_equal(2)
+	creator.discard()
+	creator.free()
+
+func test_back_retains_completed_results_without_new_rolls() -> void:
+	var host = _host_for("gutterborn-scum", 2)
+	var creator = _creator_for(host, "gutterborn-scum")
+	for iteration in range(180):
+		await get_tree().process_frame
+		if stage == 5:
+			break
+		if not disabled:
+			creator.primary()
+	creator.get_node(^"View").get_name_field().value = "Varg"
+	var before: Dictionary = creator.capture_reconnect_state()
+	var roll_count: int = host.requests.size()
+	for expected in [4, 3, 2, 1]:
+		creator.back()
+		assert_int(stage).is_equal(expected)
+	for expected in [2, 3, 4, 5]:
+		creator.primary()
+		assert_int(stage).is_equal(expected)
+	assert_int(host.requests.size()).is_equal(roll_count)
+	var after: Dictionary = creator.capture_reconnect_state()
+	for key in ["abilities", "equipment_rolls", "inventory", "traits", "origin", "hit_points", "class_id", "name"]:
+		assert_that(after.draft[key]).is_equal(before.draft[key])
+	creator.free()
+
 func test_required_pack_choice() -> void:
 	var host = _host_for("occult-herbmaster", 1)
 	host.outcomes["Equipment pack"] = [[6]]
 	var creator = _creator_for(host, "occult-herbmaster")
 	for iteration in range(180):
 		await get_tree().process_frame
-		if stage == 4 and creator.get_node(^"View/Main/Content/Equipment/PackChoices").visible:
+		if stage == 4 and creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices").visible:
 			await get_tree().process_frame
 			break
 		if not disabled:
 			creator.primary()
 	creator.primary()
 	_check(stage == 4 and host.actors.is_empty(), "Equipment waits for the required source pack choice.")
-	creator.get_node(^"View/Main/Content/Equipment/PackChoices/Options/Choice0").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options/Choice0").pressed.emit()
 	await _finish(creator)
 	_check(host.actors.size() == 1 and host.actors[0].data.pack == "Nothing", "Nothing is an explicit legal pack choice.")
 	creator.free()
@@ -74,8 +165,8 @@ func test_identity_reconnect_finishes_once_after_lost_creation_acknowledgement()
 			break
 		if not disabled:
 			creator.primary()
-	creator.get_node(^"View/Main/Content/Identity/Name").value = "Varg"
-	creator.get_node(^"View/Main/Content/Identity/Description").value = "Ash road"
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name").value = "Varg"
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Description").value = "Ash road"
 	_choose_miniature(creator)
 	var identity: Dictionary = creator.capture_reconnect_state()
 	creator.discard()
@@ -84,8 +175,8 @@ func test_identity_reconnect_finishes_once_after_lost_creation_acknowledgement()
 	fresh.outcomes = {}
 	var restored = _creator_for(fresh, "heretical-priest")
 	restored.restore_reconnect_state(identity)
-	assert_str(restored.get_node(^"View/Main/Content/Identity/Name").value).is_equal("Varg")
-	assert_str(restored.get_node(^"View/Main/Content/Identity/Description").value).is_equal("Ash road")
+	assert_str(restored.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name").value).is_equal("Varg")
+	assert_str(restored.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Description").value).is_equal("Ash road")
 	restored.primary()
 	var review: Dictionary = restored.capture_reconnect_state()
 	restored.primary()
@@ -586,7 +677,7 @@ func test_atomic_refusal() -> void:
 			break
 		if not disabled:
 			if stage == 5:
-				creator.get_node(^"View/Main/Content/Identity/Name").value = "Failed grant"
+				creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name").value = "Failed grant"
 				_choose_miniature(creator)
 			creator.primary()
 	creator.primary()
@@ -652,9 +743,10 @@ func _creator_for(host, class_id: String):
 	creator.stage_changed.connect(_stage_changed)
 	creator.primary_changed.connect(_primary_changed)
 	creator.begin()
-	# Exercise the authored class button, not an implementation helper.
-	var node: String = {"fanged-deserter": "FangedDeserter", "gutterborn-scum": "GutterbornScum", "esoteric-hermit": "EsotericHermit", "wretched-royalty": "WretchedRoyalty", "heretical-priest": "HereticalPriest", "occult-herbmaster": "OccultHerbmaster"}[class_id]
-	creator.get_node("View/Main/Content/Class/" + node).pressed.emit()
+	# Exercise the native row action for every supported class.
+	var view = creator.get_node(^"View")
+	var index: int = view.CLASS_IDS.find(class_id)
+	view.get_node(view.LEFT).get_node(^"Choices/Area/Rows").get_child(index).pressed.emit()
 	return creator
 
 
@@ -666,7 +758,7 @@ func _finish(creator: Node) -> void:
 		if disabled:
 			continue
 		if stage == 5:
-			creator.get_node(^"View/Main/Content/Identity/Name").value = "Ashen Test"
+			creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name").value = "Ashen Test"
 			_choose_miniature(creator)
 		creator.primary()
 	_check(false, "Creation did not finish through its public actions.")
@@ -697,10 +789,10 @@ func before_test() -> void:
 	disabled = false
 
 func _choose_miniature(creator: Node) -> void:
-	creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 	var picker = creator.get_node(^"MiniaturePicker/Picker")
-	picker.browser.get_node(^"Results/Rows").get_child(0).pressed.emit()
-	picker.get_node(^"Actions/Apply").pressed.emit()
+	picker.get_node(^"Layout/Results/Content/GridArea/Rows").get_child(0).pressed.emit()
+	picker.get_node(^"Layout/Footer/Row/Choose").pressed.emit()
 
 func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 	var host = _host_for("gutterborn-scum", 2)
@@ -711,20 +803,20 @@ func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 			break
 		if not disabled:
 			creator.primary()
-	var name_field = creator.get_node(^"View/Main/Content/Identity/Name")
+	var name_field = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name")
 	name_field.value = "Varg"
-	creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 	var picker = creator.get_node(^"MiniaturePicker/Picker")
-	_check(picker.browser.get_node(^"Results/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
-	picker.get_node(^"Actions/Back").pressed.emit()
+	_check(picker.get_node(^"Layout/Results/Content/GridArea/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
+	picker.get_node(^"Layout/Footer/Row/Cancel").pressed.emit()
 	_check(name_field.value == "Varg" and stage == 5, "Back returns to the same identity draft.")
 	_check(host.actors.is_empty(), "Browsing never creates an Actor.")
 	_choose_miniature(creator)
 	_check(not creator.get_node(^"MiniaturePicker").visible, "Use Miniature returns to the wizard.")
 	_check(name_field.value == "Varg", "Selecting preserves the name.")
-	creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
-	_check(picker.browser.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
-	picker.get_node(^"Actions/Back").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	_check(picker.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
+	picker.get_node(^"Layout/Footer/Row/Cancel").pressed.emit()
 	creator.primary()
 	creator.primary()
 	await get_tree().process_frame

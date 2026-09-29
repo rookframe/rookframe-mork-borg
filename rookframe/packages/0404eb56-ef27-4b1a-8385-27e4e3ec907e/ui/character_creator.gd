@@ -36,6 +36,7 @@ var _status: Label
 var _character_draft: Dictionary = {}
 var _character_stage := "create-class"
 var _creation_generation := 0
+var _pending_roll_ids: Array[String] = []
 var _creation_active := false
 var _busy := false
 var _scroll_choice := ""
@@ -55,6 +56,7 @@ func configure(definitions: Array[SDK.ContentEntry], character_definition: SDK.C
 	_character_miniature_choices = miniature_choices
 	_compact = compact
 	sdk = facade
+	_view.facade = facade
 	i18n.bind(sdk)
 	localize(i18n)
 	_character_content = self
@@ -71,6 +73,14 @@ func select_class(class_id: String) -> void:
 	var definition := _find_definition(class_id + "-character")
 	if profile.is_empty() or definition == null:
 		return
+	if class_id != str(_character_draft.get("class_id", "classless")) and int(_character_draft.get("furthest_step", 1)) > 1:
+		_sync_identity_fields()
+		var identity := {}
+		for key in ["name", "description", "preferred_miniature"]:
+			identity[key] = _character_draft.get(key)
+		_begin_character_creation()
+		for key in ["name", "description", "preferred_miniature"]:
+			_character_draft[key] = identity[key]
 	_character_definition = definition
 	_character_draft["class_id"] = class_id
 	_character_draft["class_title"] = str(profile.get("title", ""))
@@ -91,6 +101,17 @@ func choose_scroll_disposition(slot: String, disposition: String) -> void:
 
 func primary() -> void:
 	_on_character_primary_action()
+
+func back() -> void:
+	if not can_go_back():
+		return
+	_sync_identity_fields()
+	var routes := ["create-class", "create-abilities", "create-origin", "create-equipment", "create-identity", "create-review"]
+	_show_creation_route(routes[_stage_index(_character_stage) - 2])
+
+func can_go_back() -> bool:
+	var pending := bool(_character_draft.get("roll_pending", false)) or bool(_character_draft.get("equipment_roll_pending", false))
+	return _creation_active and not _busy and _stage_index(_character_stage) > 1 and (not pending or _roll_ready or not str(_character_draft.get("scroll_choice_slot", "")).is_empty())
 
 
 func start_over() -> void:
@@ -133,7 +154,7 @@ func _resume_creation() -> void:
 	if bool(_character_draft.get("equipment_roll_pending", false)):
 		_roll_character_equipment(_creation_generation)
 	elif bool(_character_draft.get("roll_pending", false)):
-		if _character_stage == "create-origin":
+		if int(_character_draft.get("furthest_step", _stage_index(_character_stage))) == 3:
 			_roll_character_origin(_creation_generation)
 		else:
 			_roll_character_abilities(_creation_generation)
@@ -153,7 +174,7 @@ func _ready() -> void:
 	_character_content = self
 	_source_definition = CHARACTER_DEFINITION.new()
 	_view.pack_selected.connect(_on_pack_selected)
-	_view.get_node(^"Aside/Context/Content/PreferredMiniature").pressed.connect(_choose_preferred_miniature)
+	_view.miniature_requested.connect(_choose_preferred_miniature)
 	get_node(^"MiniaturePicker").selected.connect(_miniature_selected)
 	get_node(^"MiniaturePicker").closed.connect(_miniature_picker_closed)
 
@@ -173,6 +194,8 @@ func _stage_index(stage: String) -> int:
 
 
 func _route_blocked(route: String) -> bool:
+	if _stage_index(route) < int(_character_draft.get("furthest_step", 1)):
+		return false
 	if route == "create-equipment" and bool(_character_draft.get("pack_choice_pending", false)):
 		return true
 	if _roll_ready:
@@ -182,13 +205,15 @@ func _route_blocked(route: String) -> bool:
 
 func _show_creation_route(route: String) -> void:
 	_character_stage = route
+	_character_draft["furthest_step"] = maxi(_stage_index(route), int(_character_draft.get("furthest_step", 1)))
 	_view.present_creation(route, _character_draft, _compact)
-	_character_name_field = _view.get_node(^"Main/Content/Identity/Name") if route == "create-identity" else null
-	_character_description_field = _view.get_node(^"Main/Content/Identity/Description") if route == "create-identity" else null
+	_view.set_back_enabled(can_go_back())
+	_character_name_field = _view.get_name_field() if route == "create-identity" else null
+	_character_description_field = _view.get_description_field() if route == "create-identity" else null
 	var title: String = ["Choose a class", "Abilities", "Origin & Traits", "Equipment", "Identity", "Review character"][_stage_index(route) - 1]
 	stage_changed.emit(_stage_index(route), title)
 	var primary := "Create character" if route == "create-review" else ("Review character" if route == "create-identity" else "Continue")
-	if bool(_character_draft.get("roll_pending", false)) or bool(_character_draft.get("equipment_roll_pending", false)):
+	if _stage_index(route) == int(_character_draft.get("furthest_step", 1)) and (bool(_character_draft.get("roll_pending", false)) or bool(_character_draft.get("equipment_roll_pending", false))):
 		primary = _t("Roll %s") % _t(str(_character_draft.get("active_roll", ""))) if _roll_ready else "Rolling…"
 	if route == "create-equipment" and bool(_character_draft.get("pack_choice_pending", false)):
 		primary = "Choose a pack"
@@ -233,6 +258,7 @@ func _begin_character_creation() -> void:
 		"class_rules": [],
 		"abilities": {},
 		"equipment_rolls": {},
+		"roll_faces": {},
 		"inventory": [],
 		"pack": "Nothing",
 		"silver": 0,
@@ -266,6 +292,10 @@ func _discard_character_creation() -> void:
 		return
 	_creation_generation += 1
 	_creation_active = false
+	var abandoned := _pending_roll_ids.duplicate()
+	_pending_roll_ids.clear()
+	for request_id in abandoned:
+		sdk.dice.cancel_roll(request_id)
 	scroll_decided.emit()
 	_roll_ready = false
 	roll_requested.emit()
@@ -278,6 +308,11 @@ func _discard_character_creation() -> void:
 
 func _on_character_primary_action() -> void:
 	if not _creation_active or _busy:
+		return
+	if _stage_index(_character_stage) < mini(5, int(_character_draft.get("furthest_step", 1))):
+		var routes := ["create-class", "create-abilities", "create-origin", "create-equipment", "create-identity", "create-review"]
+		_sync_identity_fields()
+		_show_creation_route(routes[_stage_index(_character_stage)])
 		return
 	if _character_stage == "create-equipment" and bool(_character_draft.get("pack_choice_pending", false)):
 		return
@@ -774,7 +809,20 @@ func _automatic_roll(name: String, faces: int, count: int, token: int) -> SDK.Di
 	# Keep the physical result intact; apply the source die conversion when read.
 	var physical_faces := 4 if faces == 2 else faces
 	var roll_name := name + " (d2: d4 / 2, round up)" if faces == 2 else name
-	var result: SDK.DiceRollResult = await sdk.dice.roll(SDK.DiceRequest.new([SDK.DiceTerm.new(roll_name, physical_faces, count)]))
+	var request_id := sdk.dice.new_request_id()
+	_pending_roll_ids.append(request_id)
+	var result: SDK.DiceRollResult = await sdk.dice.roll(SDK.DiceRequest.new([SDK.DiceTerm.new(roll_name, physical_faces, count)], request_id))
+	var pending_index := _pending_roll_ids.find(request_id)
+	if pending_index >= 0:
+		_pending_roll_ids.remove_at(pending_index)
+	if token == _creation_generation and _creation_active and result.ok:
+		var values: Array[int] = []
+		for term in result.terms:
+			for value in term.results:
+				values.append(int(value))
+		var recorded: Dictionary = _character_draft.get("roll_faces", {})
+		recorded[name] = values
+		_character_draft["roll_faces"] = recorded
 	if token == _creation_generation and result.code == "session_ended":
 		# Leave accepted values and the unfinished phase available for capture.
 		# The suspended coroutine must not mark the retained draft as a rule failure.

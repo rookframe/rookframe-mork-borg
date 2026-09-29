@@ -9,7 +9,10 @@ func SetWindowTitle(_title: String) -> Dictionary:
 	return {"ok": true}
 func ListContent(kind: int) -> Dictionary:
 	if kind == 1:
-		return {"ok": true, "value": [{"packageId": PackageId(), "localId": "classless-character", "displayName": "No Class", "available": true, "type": "actor_definition"}]}
+		var entries: Array = []
+		for id in ["classless", "fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]:
+			entries.append({"packageId": PackageId(), "localId": id + "-character", "displayName": id, "available": true, "type": "actor_definition"})
+		return {"ok": true, "value": entries}
 	return super.ListContent(kind)
 func Translate(message: String, _domain: String) -> String:
 	var translated := str((RU if language == "ru" else EN).get_message(message))

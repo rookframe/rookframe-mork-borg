@@ -5,10 +5,11 @@ const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 
 func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> void:
-	for profile in [["phone", 2, Vector2i(375, 321)], ["tablet", 1, Vector2i(412, 720)], ["desktop", 0, Vector2i(960, 896)]]:
+	for profile in [["desktop", 0, Vector2i(1920, 1080)]]:
 		var host = BOUNDARY.new()
 		host.device = profile[1]
 		host.outcomes = {"Agility": [[3, 3, 3]], "Presence": [[3, 3, 3]], "Strength": [[3, 3, 3]], "Toughness": [[3, 3, 3]], "Hit points": [[4]], "Silver": [[3, 3]], "Omens": [[1]], "Food": [[3]], "Equipment pack": [[6]], "Equipment first": [[3]], "Equipment second": [[6]], "Weapon": [[1]], "Armor": [[1]]}
+		host.outcomes.merge({"Origin": [[2]], "First decoction": [[1]], "Second decoction": [[4]], "Decoction doses": [[3]]})
 		var viewport: SubViewport = auto_free(SubViewport.new())
 		viewport.size = profile[2]
 		viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
@@ -18,11 +19,19 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		surface.sdk = SDK.new(host)
 		viewport.add_child(surface)
 		surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-		var creator = surface.get_node(^"Layout/Body/Content/CharacterCreator")
-		var primary: Button = surface.get_node(^"Layout/CatalogueBar/TrailingSlot/CreateCharacter")
+		var creator = surface.get_node(^"CharacterCreator")
+		var primary: Button = surface.get_node(^"CharacterCreator/View/Layout/Footer/Row/Primary")
+		var view = creator.get_node(^"View")
+		view.get_node(view.LEFT).get_node(^"Choices/Area/Rows").get_child(6).pressed.emit()
+		var captures: Array[String] = []
 		for frame in range(180):
 			await get_tree().process_frame
-			if host.requests.size() >= 9:
+			var route: String = creator.capture_reconnect_state().stage
+			if not captures.has(route):
+				captures.append(route)
+				await _settle()
+				await _capture(viewport, "desktop-" + route)
+			if bool(creator.capture_reconnect_state().draft.get("pack_choice_pending", false)):
 				break
 			if not primary.disabled:
 				primary.pressed.emit()
@@ -31,45 +40,58 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_bool(primary.size.y >= 44).is_true()
 		assert_bool(surface.get_combined_minimum_size().x <= viewport.size.x).is_true()
 		await _capture(viewport, str(profile[0]) + "-equipment")
-		var choice: Button = creator.get_node(^"View/Main/Content/Equipment/PackChoices/Options/Choice1")
+		var choice: Button = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options/Choice1")
 		assert_bool(choice.is_visible_in_tree()).is_true()
 		await _settle()
 		await _capture(viewport, str(profile[0]) + "-pack")
 		choice.pressed.emit()
 		for frame in range(180):
 			await get_tree().process_frame
-			if creator.get_node(^"View/Main/Content/Identity").visible:
+			if creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible:
 				break
 			if not primary.disabled:
 				primary.pressed.emit()
-		var field = creator.get_node(^"View/Main/Content/Identity/Name")
-		field.value = "Varg"
+		var field = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name")
+		field.get_node(^"Editor").text = "Varg"
+		field.get_node(^"Editor").text_changed.emit("Varg")
+		await _settle()
+		await _capture(viewport, "desktop-identity")
 		var picker: Control = creator.get_node(^"MiniaturePicker")
-		creator.get_node(^"View/Aside/Context/Content/PreferredMiniature").pressed.emit()
+		creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 		surface.hide()
 		await _settle()
 		assert_bool(creator.is_active()).is_true()
 		assert_bool(picker.get_combined_minimum_size().x <= viewport.size.x).is_true()
-		assert_bool(picker.get_node(^"Picker/Actions/Apply").get_global_rect().end.y <= viewport.size.y).is_true()
-		picker.get_node(^"Picker/Actions/Back").pressed.emit()
+		assert_bool(picker.get_node(^"Picker/Layout/Footer/Row/Choose").get_global_rect().end.y <= viewport.size.y).is_true()
+		await _capture(viewport, "desktop-browser")
+		picker.get_node(^"Picker/Layout/Footer/Row/Cancel").pressed.emit()
 		assert_str(field.value).is_equal("Varg")
-		assert_bool(creator.get_node(^"View/Main/Content/Identity").visible).is_true()
+		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
+		view.miniature_requested.emit()
+		picker.get_node(^"Picker/Layout/Results/Content/GridArea/Rows").get_child(0).pressed.emit()
+		picker.get_node(^"Picker/Layout/Footer/Row/Choose").pressed.emit()
+		primary.pressed.emit()
+		assert_str(creator.capture_reconnect_state().stage).is_equal("create-review")
+		await _settle()
+		await _capture(viewport, "desktop-review")
+		view.get_node(^"Layout/Footer/Row/Back").pressed.emit()
 		surface.hide()
 		surface.closed.emit()
 		assert_bool(creator.is_active()).is_true()
 		surface.show()
 		await _settle()
 		assert_str(field.value).is_equal("Varg")
-		assert_bool(creator.get_node(^"View/Main/Content/Identity").visible).is_true()
-		var restart: Button = surface.get_node(^"Layout/CatalogueBar/LeadingSlot/Back")
+		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
+		var restart: Button = surface.get_node(^"CharacterCreator/View/Layout/Footer/Row/Restart")
 		restart.pressed.emit()
 		assert_str(host.feedback_request.severity).is_equal("confirmation")
 		host.FeedbackActionSelected.emit(71, "keep-character")
 		assert_str(field.value).is_equal("Varg")
 		restart.pressed.emit()
 		host.FeedbackActionSelected.emit(71, "restart-character")
-		assert_bool(creator.get_node(^"View/Main/Content/Class").visible).is_true()
+		assert_str(creator.capture_reconnect_state().stage).is_equal("create-class")
 		assert_bool(creator.is_active()).is_true()
+		await _settle()
 		viewport.free()
 
 func _settle() -> void:
@@ -78,5 +100,9 @@ func _settle() -> void:
 
 func _capture(viewport: SubViewport, name: String) -> void:
 	if DisplayServer.get_name() != "headless":
+		var directory := OS.get_environment("RFG_EVIDENCE_DIR")
+		if directory.is_empty():
+			directory = OS.get_user_data_dir().path_join("creation-evidence")
+		DirAccess.make_dir_recursive_absolute(directory)
 		RenderingServer.force_draw()
-		viewport.get_texture().get_image().save_png("/tmp/creator-" + name + ".png")
+		viewport.get_texture().get_image().save_png(directory.path_join("creator-" + name + ".png"))

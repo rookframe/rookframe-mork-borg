@@ -393,7 +393,7 @@ func _apply_route(route: String) -> void:
 	_creature_defence.visible = false
 	get_node(^"Layout/Body/Content/CreatureAttack").visible = false
 	get_node(^"Layout/SheetActions").visible = false
-	if route.begins_with("create-") or route in ["character", "edit", "appearance"]:
+	if route in ["character", "edit", "appearance"]:
 		_show_character_route(route)
 		return
 	character_hide_surface()
@@ -905,11 +905,9 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Header/Title").text = _t("Creature")
 	get_node(^"Layout/SheetActions/Attack").text = _t("Roll attack")
 	get_node(^"Layout/SheetActions/Back").text = _t("Cancel")
-	get_node(^"Layout/Body/Content/CharacterCreator").localize(locale)
 	get_node(^"Layout/Body/Content/CharacterSheet").localize(locale)
 	get_node(^"Layout/Body/Content/CreatureAttack").localize(locale)
 	get_node(^"Layout/Body/Content/CreatureDefence").localize(locale)
-	get_node(^"Layout/CreationProgress").localize(locale)
 
 const MINIATURE_PANEL := "Layout/Body/Content/Detail/Miniature"
 

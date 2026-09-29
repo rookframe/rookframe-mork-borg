@@ -20,6 +20,21 @@ var outcomes: Dictionary = {}
 var requests: Array[Dictionary] = []
 var actors: Array[Dictionary] = []
 var errors: Array[String] = []
+var immediate_ids: Dictionary = {}
+var cancelled_rolls: Array[String] = []
+
+func RollDiceWithId(terms: Array, identity: String) -> Dictionary:
+	var result := RollDice(terms)
+	if result.get("code", "") == "pending":
+		immediate_ids[identity] = int(result.requestId)
+	return result
+
+func CancelImmediateRoll(identity: String) -> Dictionary:
+	cancelled_rolls.append(identity)
+	if immediate_ids.has(identity):
+		TabletopCommandCompleted.emit({"ok": false, "code": "cancelled", "requestId": immediate_ids[identity]})
+		immediate_ids.erase(identity)
+	return {"ok": true}
 
 func PackageId() -> String:
 	return "0404eb56-ef27-4b1a-8385-27e4e3ec907e"

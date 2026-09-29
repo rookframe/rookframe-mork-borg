@@ -18,9 +18,12 @@ func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 		"equipment_roll_pending": true, "roll_ready": true, "active_roll": "Equipment first",
 		"equipment_rolls": {"Silver": 6, "Omens": 1, "Food": 3, "Equipment pack": 3}
 	}, true)
-	assert_str(_copy(view.get_node("Main/Content/Equipment/Omens"))).contains("1 omen")
-	assert_str(_copy(view.get_node("Main/Content/Equipment/Food"))).contains("3 days")
-	assert_str(_copy(view.get_node("Main/Content/Equipment/Pack"))).contains("Backpack")
+	var choices = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Left/Choices")
+	for result in [["Omens", "1 omen"], ["Food", "3 days"], ["Equipment pack", "Backpack"]]:
+		choices.selected.emit(result[0])
+		var detail = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result")
+		assert_bool(detail.is_visible_in_tree()).is_true()
+		assert_str(_copy(detail)).contains(result[1])
 
 func test_fixed_pack_does_not_offer_a_choice_button() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())

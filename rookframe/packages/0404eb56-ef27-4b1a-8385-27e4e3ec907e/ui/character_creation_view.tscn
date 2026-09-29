@@ -1,461 +1,901 @@
-[gd_scene load_steps=9 format=3]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_view.gd" id="1"]
-[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.tscn" id="2"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="3"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_area.tscn" id="4"]
+[gd_scene format=3]
 
-[sub_resource type="ButtonGroup" id="Classes"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
 
-[sub_resource type="StyleBoxFlat" id="CompactChoice"]
-content_margin_left = 4.0
-content_margin_right = 4.0
-content_margin_top = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.043137, 0.066667, 0.078431, 1)
-border_width_bottom = 1
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/fullscreen_wizard.tscn" id="frame"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_choices.tscn" id="choices"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_field.tscn" id="field"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_area.tscn" id="textarea"]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_view.gd" id="script"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="psychopomp"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/agility.svg" id="agility"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/strength.svg" id="strength"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/toughness.svg" id="toughness"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
+
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/summary_block.tscn" id="summary"]
+
+[sub_resource type="StyleBoxFlat" id="Attribute"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
 border_color = Color(0.133333, 0.196078, 0.215686, 1)
-
-[sub_resource type="StyleBoxFlat" id="CompactChoiceHover"]
-content_margin_left = 4.0
-content_margin_right = 4.0
-content_margin_top = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.070588, 0.164706, 0.168627, 0.65)
-border_width_bottom = 1
-border_color = Color(0.266667, 0.913725, 0.913725, 1)
-
-[sub_resource type="StyleBoxFlat" id="CompactChoiceSelected"]
-content_margin_left = 4.0
-content_margin_right = 4.0
-content_margin_top = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.070588, 0.290196, 0.282353, 1)
-border_width_bottom = 1
-border_color = Color(0.509804, 0.972549, 0.956863, 1)
-border_width_left = 1
 border_width_top = 1
+border_width_bottom = 1
+border_width_left = 1
 border_width_right = 1
-corner_radius_top_left = 4
-corner_radius_top_right = 4
-corner_radius_bottom_right = 4
-corner_radius_bottom_left = 4
+content_margin_left = 10.0
+content_margin_right = 10.0
+content_margin_top = 13.0
+content_margin_bottom = 13.0
 
-[sub_resource type="ButtonGroup" id="PackGroup"]
+[sub_resource type="StyleBoxFlat" id="Portrait"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.133333, 0.196078, 0.215686, 1)
+border_width_top = 1
+border_width_bottom = 1
+border_width_left = 1
+border_width_right = 1
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
 
-[node name="CreationView" type="BoxContainer"]
+[sub_resource type="StyleBoxFlat" id="Summary"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.133333, 0.196078, 0.215686, 1)
+border_width_top = 1
+border_width_bottom = 1
+border_width_left = 0
+border_width_right = 0
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxFlat" id="Facts"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.133333, 0.196078, 0.215686, 1)
+border_width_top = 1
+border_width_bottom = 1
+border_width_left = 0
+border_width_right = 0
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_top = 18.0
+content_margin_bottom = 18.0
+
+[sub_resource type="StyleBoxFlat" id="ResultBanner"]
+bg_color = Color(0.039216, 0.145098, 0.160784, 1)
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
+border_width_left = 2
+content_margin_left = 16.0
+content_margin_right = 16.0
+content_margin_top = 14.0
+content_margin_bottom = 14.0
+
+[sub_resource type="StyleBoxFlat" id="FormulaRule"]
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.133333, 0.196078, 0.215686, 1)
+border_width_bottom = 1
+content_margin_bottom = 20.0
+
+[node name="CharacterCreationView" instance=ExtResource("frame")]
+script = ExtResource("script")
+
+[node name="Context" type="VBoxContainer" parent="Layout/Body/ContextSlot"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="Heading" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Layout/Body/ContextSlot/Context/Heading"]
+layout_mode = 2
+text = "YOUR CHARACTER"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("display")
+
+[node name="State" type="Label" parent="Layout/Body/ContextSlot/Context/Heading"]
+layout_mode = 2
+text = "In the making"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="PortraitVitals" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+theme_override_constants/separation = 26
+
+
+[node name="PortraitFrame" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals"]
+layout_mode = 2
+custom_minimum_size = Vector2(180, 225)
+theme_override_styles/panel = SubResource("Portrait")
+
+[node name="Portrait" type="TextureRect" parent="Layout/Body/ContextSlot/Context/PortraitVitals/PortraitFrame"]
+layout_mode = 2
+custom_minimum_size = Vector2(180, 225)
+texture = ExtResource("character")
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+
+[node name="Vitals" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 20
-script = ExtResource("1")
+theme_override_constants/separation = 24
 
-[node name="Main" type="PanelContainer" parent="."]
+[node name="HitPoints" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals"]
 layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 0
-size_flags_stretch_ratio = 1.3
-theme_type_variation = &"RookframeSection"
+theme_override_constants/separation = 2
 
-[node name="Content" type="VBoxContainer" parent="Main"]
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/HitPoints"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Title" type="Label" parent="Main/Content"]
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/HitPoints/Row"]
 layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-theme_override_font_sizes/font_size = 16
-text = "CHOOSE A CLASS"
-autowrap_mode = 2
+custom_minimum_size = Vector2(20, 20)
+size_flags_vertical = 4
+texture = ExtResource("heart")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
 
-[node name="Class" type="GridContainer" parent="Main/Content"]
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/HitPoints/Row"]
 layout_mode = 2
-visible = false
+text = "—"
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.55, 0.83, 0.59, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/HitPoints"]
+layout_mode = 2
+text = "Hit Points"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Omens" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Omens"]
+layout_mode = 2
 theme_override_constants/separation = 8
-theme_override_constants/h_separation = 8
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Omens/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(20, 20)
+size_flags_vertical = 4
+texture = ExtResource("psychopomp")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Omens/Row"]
+layout_mode = 2
+text = "—"
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Omens"]
+layout_mode = 2
+text = "Omens"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Silver" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Silver"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Silver/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(20, 20)
+size_flags_vertical = 4
+texture = ExtResource("silver")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Silver/Row"]
+layout_mode = 2
+text = "—"
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Silver"]
+layout_mode = 2
+text = "Silver"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Name" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Title" type="Label" parent="Layout/Body/ContextSlot/Context/Name"]
+layout_mode = 2
+text = "Unnamed soul"
+theme_override_font_sizes/font_size = 27
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_fonts/font = ExtResource("display")
+text_overrun_behavior = 3
+
+[node name="Class" type="Label" parent="Layout/Body/ContextSlot/Context/Name"]
+layout_mode = 2
+text = "No Class"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="Attributes" type="GridContainer" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 0
 theme_override_constants/v_separation = 0
 
-[node name="Abilities" type="VBoxContainer" parent="Main/Content"]
+[node name="Agility" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
 layout_mode = 2
-visible = false
-theme_override_constants/separation = 8
-
-[node name="Origin" type="VBoxContainer" parent="Main/Content"]
-layout_mode = 2
-visible = false
-theme_override_constants/separation = 8
-
-[node name="Equipment" type="VBoxContainer" parent="Main/Content"]
-layout_mode = 2
-visible = false
-theme_override_constants/separation = 8
-
-[node name="Identity" type="VBoxContainer" parent="Main/Content"]
-layout_mode = 2
-visible = false
-theme_override_constants/separation = 8
-
-[node name="Review" type="VBoxContainer" parent="Main/Content"]
-layout_mode = 2
-visible = false
-theme_override_constants/separation = 8
-
-[node name="NoClass" type="Button" parent="Main/Content/Class"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "NO CLASS"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
+custom_minimum_size = Vector2(0, 48)
+theme_override_constants/separation = 7
 
-[node name="FangedDeserter" type="Button" parent="Main/Content/Class"]
+theme_override_styles/panel = SubResource("Attribute")
+
+
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Agility"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/Attributes/Agility/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(22, 22)
+size_flags_vertical = 4
+texture = ExtResource("agility")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Agility/Row"]
+layout_mode = 2
+text = "AGI"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "FANGED DESERTER"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
 
-[node name="GutterbornScum" type="Button" parent="Main/Content/Class"]
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Agility/Row"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+text = "—"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Presence" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
+layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "GUTTERBORN SCUM"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
+custom_minimum_size = Vector2(0, 48)
+theme_override_constants/separation = 7
 
-[node name="EsotericHermit" type="Button" parent="Main/Content/Class"]
+theme_override_styles/panel = SubResource("Attribute")
+
+
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Presence"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/Attributes/Presence/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(22, 22)
+size_flags_vertical = 4
+texture = ExtResource("presence")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Presence/Row"]
+layout_mode = 2
+text = "PRE"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "ESOTERIC HERMIT"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
 
-[node name="WretchedRoyalty" type="Button" parent="Main/Content/Class"]
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Presence/Row"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+text = "—"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Strength" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
+layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "WRETCHED ROYALTY"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
+custom_minimum_size = Vector2(0, 48)
+theme_override_constants/separation = 7
 
-[node name="HereticalPriest" type="Button" parent="Main/Content/Class"]
+theme_override_styles/panel = SubResource("Attribute")
+
+
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Strength"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/Attributes/Strength/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(22, 22)
+size_flags_vertical = 4
+texture = ExtResource("strength")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Strength/Row"]
+layout_mode = 2
+text = "STR"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "HERETICAL PRIEST"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
 
-[node name="OccultHerbmaster" type="Button" parent="Main/Content/Class"]
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Strength/Row"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
+text = "—"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Toughness" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
+layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeChoiceRow"
-theme_override_styles/normal = SubResource("CompactChoice")
-theme_override_styles/hover = SubResource("CompactChoiceHover")
-theme_override_styles/pressed = SubResource("CompactChoiceSelected")
-theme_override_constants/h_separation = 4
-theme_override_font_sizes/font_size = 13
-text = "OCCULT HERBMASTER"
-alignment = 0
-icon_alignment = 2
-toggle_mode = true
-button_group = SubResource("Classes")
+custom_minimum_size = Vector2(0, 48)
+theme_override_constants/separation = 7
 
-[node name="OriginRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
-layout_mode = 2
+theme_override_styles/panel = SubResource("Attribute")
 
-[node name="FeatureRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
-layout_mode = 2
 
-[node name="SecondFeatureRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness"]
 layout_mode = 2
+theme_override_constants/separation = 7
 
-[node name="DoseRoll" parent="Main/Content/Origin" instance=ExtResource("2")]
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness/Row"]
 layout_mode = 2
+custom_minimum_size = Vector2(22, 22)
+size_flags_vertical = 4
+texture = ExtResource("toughness")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
 
-[node name="Explanation" type="Label" parent="Main/Content/Origin"]
+[node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness/Row"]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
-theme_override_font_sizes/font_size = 16
-text = "No class origin or traits."
+text = "TOU"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+size_flags_horizontal = 3
+
+[node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness/Row"]
+layout_mode = 2
+text = "—"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="HistoryRule" type="ColorRect" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.133333, 0.196078, 0.215686, 1)
+mouse_filter = 2
+
+[node name="History" type="Label" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+text = "Your history, traits and belongings will appear as you create your character."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
-[node name="Continue" type="Label" parent="Main/Content/Origin"]
+[node name="Spacer" type="Control" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 16
-text = "Continue to starting equipment."
-autowrap_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
 
-[node name="Agility" parent="Main/Content/Abilities" instance=ExtResource("2")]
+
+[node name="HintRow" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
+theme_override_constants/separation = 12
 
-[node name="Presence" parent="Main/Content/Abilities" instance=ExtResource("2")]
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/HintRow"]
 layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+texture = ExtResource("dice")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
 
-[node name="Strength" parent="Main/Content/Abilities" instance=ExtResource("2")]
+[node name="Hint" type="Label" parent="Layout/Body/ContextSlot/Context/HintRow"]
 layout_mode = 2
+text = "One life. Let the dice decide."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-[node name="Toughness" parent="Main/Content/Abilities" instance=ExtResource("2")]
+size_flags_horizontal = 3
+size_flags_vertical = 4
+
+[node name="Stage" type="VBoxContainer" parent="Layout/Body/StageSlot"]
 layout_mode = 2
+theme_override_constants/separation = 30
 
-[node name="HitPoints" parent="Main/Content/Abilities" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="ScrollChoice" type="VBoxContainer" parent="Main/Content/Equipment"]
-layout_mode = 2
-visible = false
-
-[node name="Explanation" type="Label" parent="Main/Content/Equipment/ScrollChoice"]
-layout_mode = 2
-text = "You cannot read this scroll. Choose what to do with it."
-autowrap_mode = 2
-theme_type_variation = &"RookframeBody"
-
-[node name="Reroll" type="Button" parent="Main/Content/Equipment/ScrollChoice"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Reroll equipment"
-
-[node name="Eat" type="Button" parent="Main/Content/Equipment/ScrollChoice"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Eat it"
-
-[node name="Paper" type="Button" parent="Main/Content/Equipment/ScrollChoice"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Use as toilet paper"
-
-[node name="Silver" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="Omens" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="Food" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="Pack" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="PackChoices" type="VBoxContainer" parent="Main/Content/Equipment"]
-visible = false
+[node name="Heading" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Prompt" type="Label" parent="Main/Content/Equipment/PackChoices"]
+[node name="Kicker" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-autowrap_mode = 2
+text = "STEP 01 / 06"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
 
-[node name="Options" type="HFlowContainer" parent="Main/Content/Equipment/PackChoices"]
+[node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
 layout_mode = 2
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+text = "Choose your class"
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_fonts/font = ExtResource("display")
 
-[node name="Choice0" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+[node name="Subtitle" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
 layout_mode = 2
-custom_minimum_size = Vector2(140, 44)
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("PackGroup")
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Nothing"
+text = "A beginning, not a destiny."
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-[node name="Choice1" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
+[node name="Status" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
 layout_mode = 2
-custom_minimum_size = Vector2(140, 44)
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("PackGroup")
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Backpack"
-
-[node name="Choice2" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
-layout_mode = 2
-custom_minimum_size = Vector2(140, 44)
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("PackGroup")
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Sack"
-
-[node name="Choice3" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
-layout_mode = 2
-custom_minimum_size = Vector2(140, 44)
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("PackGroup")
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Small wagon"
-
-[node name="Choice4" type="Button" parent="Main/Content/Equipment/PackChoices/Options"]
-layout_mode = 2
-custom_minimum_size = Vector2(140, 44)
-size_flags_horizontal = 3
-toggle_mode = true
-button_group = SubResource("PackGroup")
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Donkey"
-
-[node name="First" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="Second" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="Weapon" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="Armor" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-
-[node name="ExtraRoll" parent="Main/Content/Equipment" instance=ExtResource("2")]
-layout_mode = 2
-visible = false
-
-[node name="Name" parent="Main/Content/Identity" instance=ExtResource("3")]
-layout_mode = 2
-label_text = "NAME"
-placeholder = "Character name"
-[node name="Description" parent="Main/Content/Identity" instance=ExtResource("4")]
-layout_mode = 2
-label_text = "DESCRIPTION"
-placeholder = "Describe this Character"
-
-[node name="Name" type="Label" parent="Main/Content/Review"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-theme_override_font_sizes/font_size = 24
 text = ""
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(1.0, 0.466667, 0.466667, 1)
+visible = false
 autowrap_mode = 2
 
-[node name="Resources" type="Label" parent="Main/Content/Review"]
+[node name="Content" type="Control" parent="Layout/Body/StageSlot/Stage"]
 layout_mode = 2
-theme_type_variation = &"RookframeValue"
+size_flags_vertical = 3
+clip_contents = true
+
+[node name="Split" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+
+[node name="Left" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+
+[node name="Choices" parent="Layout/Body/StageSlot/Stage/Content/Split/Left" instance=ExtResource("choices")]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Identity" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Left"]
+layout_mode = 2
+visible = false
+size_flags_vertical = 3
+theme_override_constants/separation = 26
+
+[node name="TopInset" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.133333, 0.196078, 0.215686, 1)
+mouse_filter = 2
+
+[node name="Name" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("field")]
+layout_mode = 2
+label_text = "Name"
+help_text = "Required"
+placeholder = ""
+
+[node name="Description" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("textarea")]
+layout_mode = 2
+label_text = "Description"
+help_text = "Optional · a few words to remember them by"
+
+[node name="Detail" type="Panel" parent="Layout/Body/StageSlot/Stage/Content/Split"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TaskDetailPanel"
+
+[node name="Content" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail"]
+layout_mode = 1
+theme_override_constants/separation = 26
+
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+
+[node name="Heading" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Heading"]
+layout_mode = 2
+custom_minimum_size = Vector2(80, 80)
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
+
+[node name="Copy" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Heading"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 5
+
+[node name="Kicker" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Heading/Copy"]
+layout_mode = 2
+text = "STARTING CLASS"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Heading/Copy"]
+layout_mode = 2
+text = "No Class"
+theme_override_font_sizes/font_size = 36
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_fonts/font = ExtResource("display")
+autowrap_mode = 2
+
+[node name="Formula" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 38
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+theme_override_styles/normal = SubResource("FormulaRule")
+
+[node name="Flavor" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+autowrap_mode = 2
+
+theme_override_constants/line_spacing = 10
+
+[node name="Facts" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+theme_override_styles/panel = SubResource("Facts")
+
+
+[node name="Row" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="HitPoints" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row/HitPoints"]
+layout_mode = 2
+text = "HitPoints"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row/HitPoints"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Silver" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row/Silver"]
+layout_mode = 2
+text = "Silver"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row/Silver"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Omens" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row/Omens"]
+layout_mode = 2
+text = "Omens"
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts/Row/Omens"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 23
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
+
+[node name="Rules" type="RichTextLabel" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+theme_override_font_sizes/normal_font_size = 14
+
+theme_override_colors/default_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_constants/line_separation = 6
+
+[node name="Result" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("ResultBanner")
+
+[node name="Content" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result/Content"]
+layout_mode = 2
+text = "RECORDED RESULT"
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result/Content"]
+layout_mode = 2
 theme_override_font_sizes/font_size = 22
-text = ""
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_fonts/font = ExtResource("display")
 autowrap_mode = 2
 
-[node name="Abilities" type="Label" parent="Main/Content/Review"]
+[node name="Raw" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
-theme_override_font_sizes/font_size = 16
-text = ""
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
-[node name="Description" type="Label" parent="Main/Content/Review"]
+[node name="ResultCopy" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
-theme_override_font_sizes/font_size = 16
 text = ""
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
-[node name="Inventory" type="Label" parent="Main/Content/Review"]
+[node name="PackChoices" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 16
-text = ""
-autowrap_mode = 2
+visible = false
+theme_override_constants/separation = 8
 
-[node name="Aside" type="VBoxContainer" parent="."]
+[node name="Prompt" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices"]
+layout_mode = 2
+text = "Choose one pack:"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="Options" type="GridContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 6
+theme_override_constants/v_separation = 6
+
+[node name="Choice0" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options"]
+layout_mode = 2
+text = "Nothing"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+size_flags_horizontal = 3
+
+[node name="Choice1" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options"]
+layout_mode = 2
+text = "Backpack"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+size_flags_horizontal = 3
+
+[node name="Choice2" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options"]
+layout_mode = 2
+text = "Sack"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+size_flags_horizontal = 3
+
+[node name="Choice3" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options"]
+layout_mode = 2
+text = "Small wagon"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+size_flags_horizontal = 3
+
+[node name="Choice4" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options"]
+layout_mode = 2
+text = "Donkey"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+size_flags_horizontal = 3
+
+[node name="ScrollChoice" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+visible = false
+
+[node name="Reroll" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/ScrollChoice"]
+layout_mode = 2
+text = "Reroll"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+
+[node name="Eat" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/ScrollChoice"]
+layout_mode = 2
+text = "Eat it"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+
+[node name="Paper" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/ScrollChoice"]
+layout_mode = 2
+text = "Use as toilet paper"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+
+[node name="Appearance" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 20
+
+[node name="Preview" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance"]
+layout_mode = 2
+custom_minimum_size = Vector2(110, 138)
+mouse_filter = 2
+
+[node name="Copy" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 0
 theme_override_constants/separation = 16
 
-[node name="Context" type="PanelContainer" parent="Aside"]
+[node name="Name" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy"]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
-
-[node name="Content" type="VBoxContainer" parent="Aside/Context"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-[node name="Title" type="Label" parent="Aside/Context/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-theme_override_font_sizes/font_size = 16
-text = "NO CLASS"
+text = "None"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
 autowrap_mode = 2
 
-[node name="Description" type="Label" parent="Aside/Context/Content"]
+[node name="Description" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 16
+text = "Preferred appearance for this character’s Rooks."
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+autowrap_mode = 2
+
+[node name="PreferredMiniature" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy"]
+layout_mode = 2
+text = "Choose miniature"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+
+[node name="Spacer" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+
+[node name="NoteRule" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.133333, 0.196078, 0.215686, 1)
+mouse_filter = 2
+
+[node name="NoteRow" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/NoteRow"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+texture = ExtResource("dice")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
+
+[node name="Note" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/NoteRow"]
+layout_mode = 2
 text = ""
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
-[node name="Facts" type="Label" parent="Aside/Context/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeBody"
-theme_override_font_sizes/font_size = 16
-text = ""
-autowrap_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
 
-[node name="PreferredMiniature" type="Button" parent="Aside/Context/Content"]
-layout_mode = 2
+[node name="Review" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 visible = false
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-text = "Choose Miniature"
+theme_override_constants/separation = 24
 
-[node name="Hint" type="Label" parent="Aside"]
+[node name="Character" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Review"]
 layout_mode = 2
-theme_type_variation = &"RookframeMeta"
-theme_override_font_sizes/font_size = 16
-text = ""
-autowrap_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 30
+
+[node name="Belongings" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Review"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 30
+
+[node name="Identity" parent="Layout/Body/StageSlot/Stage/Content/Review/Character" instance=ExtResource("summary")]
+layout_mode = 2
+
+[node name="Abilities" parent="Layout/Body/StageSlot/Stage/Content/Review/Character" instance=ExtResource("summary")]
+layout_mode = 2
+
+[node name="Equipment" parent="Layout/Body/StageSlot/Stage/Content/Review/Belongings" instance=ExtResource("summary")]
+layout_mode = 2
+
+[node name="Traits" parent="Layout/Body/StageSlot/Stage/Content/Review/Belongings" instance=ExtResource("summary")]
+layout_mode = 2
+
+[node name="TopRule" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail"]
+layout_mode = 1
+anchor_right = 1.0
+offset_bottom = 2.0
+color = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
