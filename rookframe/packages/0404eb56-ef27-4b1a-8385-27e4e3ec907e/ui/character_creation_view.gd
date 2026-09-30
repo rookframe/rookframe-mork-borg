@@ -320,7 +320,7 @@ func _present_context() -> void:
 	get_node(CONTEXT + "/PortraitVitals/Vitals/HitPoints/Row/Value").text = "%s / %s" % [int(_draft.hit_points), int(_draft.maximum_hit_points)] if _draft.has("hit_points") else "—"
 	var totals: Dictionary = _draft.get("equipment_rolls", {})
 	for key in ["Silver", "Omens"]:
-		var value := str(int(totals[key]) * (10 if key == "Silver" else 1)) if totals.has(key) else str(_draft.get(key.to_lower(), "—"))
+		var value := str(int(totals[key]) * (10 if key == "Silver" else 1)) if totals.has(key) else "—" if _draft.has("equipment_rolls") else str(_draft.get(key.to_lower(), "—"))
 		get_node(CONTEXT + "/PortraitVitals/Vitals/" + key + "/Row/Value").text = value
 	var abilities: Dictionary = _draft.get("abilities", {})
 	for key in ["Agility", "Presence", "Strength", "Toughness"]:

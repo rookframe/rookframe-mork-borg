@@ -22,6 +22,8 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		var creator = surface.get_node(^"CharacterCreator")
 		var primary: Button = surface.get_node(^"CharacterCreator/View/Layout/Footer/Row/Primary")
 		var view = creator.get_node(^"View")
+		for resource in ["Silver", "Omens"]:
+			assert_str(view.get_node(view.CONTEXT + "/PortraitVitals/Vitals/" + resource + "/Row/Value").text).is_equal("—")
 		view.get_node(view.LEFT).get_node(^"Choices/Area/Rows").get_child(6).pressed.emit()
 		var captures: Array[String] = []
 		for frame in range(180):
