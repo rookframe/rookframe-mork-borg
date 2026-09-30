@@ -622,6 +622,12 @@ label_text = "Name"
 help_text = "Required"
 placeholder = ""
 
+[node name="FieldGap" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 20)
+mouse_filter = 2
+
 [node name="Description" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("textarea")]
 layout_mode = 2
 label_text = "Description"
@@ -974,39 +980,42 @@ autowrap_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 
-[node name="ReviewPages" parent="Layout/Body/StageSlot/Stage/Content" instance=ExtResource("pages")]
+[node name="Review" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 visible = false
-
-[node name="Review" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
 theme_override_constants/separation = 24
 
-[node name="Character" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area/Review"]
+[node name="CharacterPages" parent="Layout/Body/StageSlot/Stage/Content/Review" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="BelongingsPages" parent="Layout/Body/StageSlot/Stage/Content/Review" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Character" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 30
 
-[node name="Belongings" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area/Review"]
+[node name="Belongings" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 30
 
-[node name="Identity" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area/Review/Character" instance=ExtResource("summary")]
+[node name="Identity" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character" instance=ExtResource("summary")]
 layout_mode = 2
 
-[node name="Abilities" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area/Review/Character" instance=ExtResource("summary")]
+[node name="Abilities" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character" instance=ExtResource("summary")]
 layout_mode = 2
 
-[node name="Equipment" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area/Review/Belongings" instance=ExtResource("summary")]
+[node name="Equipment" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area/Belongings" instance=ExtResource("summary")]
 layout_mode = 2
 
-[node name="Traits" parent="Layout/Body/StageSlot/Stage/Content/ReviewPages/Area/Review/Belongings" instance=ExtResource("summary")]
+[node name="Traits" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area/Belongings" instance=ExtResource("summary")]
 layout_mode = 2
 
 [node name="TopRule" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail"]
