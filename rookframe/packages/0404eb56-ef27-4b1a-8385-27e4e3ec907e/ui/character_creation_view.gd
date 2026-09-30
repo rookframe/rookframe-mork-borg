@@ -123,13 +123,15 @@ func _fit() -> void:
 	get_node(DETAIL + "/RollInfo/Flavor").add_theme_constant_override("line_spacing", 2 if phone else 10)
 	get_node(DETAIL + "/RollOutcome/ResultCopy").add_theme_font_size_override("font_size", 11 if phone else 15)
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").add_theme_font_size_override("font_size", 18 if phone else 22)
+	get_node(DETAIL + "/RollOutcome/Result/Content/Value").max_lines_visible = 2 if phone else -1
+	get_node(DETAIL + "/RollOutcome/Result/Content/Value").text_overrun_behavior = 3 if phone else 0
 	get_node(DETAIL + "/RollOutcome/Result/Content/Label").visible = not phone
 	get_node(DETAIL + "/RollOutcome/Result").theme_type_variation = "TaskResultCompact" if phone else "TaskResult"
 	get_node(DETAIL + "/RollInfo/Formula").theme_type_variation = "TaskFormulaCompact" if phone else "TaskFormula"
 	get_node(DETAIL + "/Rules").add_theme_font_size_override("normal_font_size", 11 if phone else 14)
 	get_node(DETAIL + "/Rules").add_theme_constant_override("line_separation", 2 if phone else 6)
 	get_node(DETAIL + "/Rules").fit_content = not phone
-	get_node(DETAIL + "/Rules").scroll_active = phone
+	get_node(DETAIL + "/Rules").scroll_active = false
 	get_node(DETAIL + "/Rules").size_flags_vertical = 3 if phone else 1
 	if _route == "create-class":
 		get_node(DETAIL + "/Rules").text = _class_rules_markup()
@@ -213,9 +215,17 @@ func present_primary(text: String, disabled: bool) -> void:
 	set_primary(text, disabled, _icon(symbol))
 
 func set_status(message: String, error: bool = false) -> void:
+	var name_error := error and _route == "create-identity" and message == "Enter a Character name before continuing."
 	get_node(STAGE + "/Heading/Copy/Status").text = _t(message)
-	get_node(STAGE + "/Heading/Copy/Status").visible = error and not message.is_empty() and (size.y > 560 or _route != "create-identity")
-	get_name_field().error_text = _t(message) if error and _route == "create-identity" else ""
+	get_node(STAGE + "/Heading/Copy/Status").visible = error and not message.is_empty() and not name_error
+	get_name_field().error_text = _t(message) if name_error else ""
+	if error and _route == "create-identity":
+		_details = not name_error
+		_sync_navigation()
+		if name_error:
+			get_node(LEFT + "/Identity/Name/Editor").grab_focus()
+		else:
+			get_node(DETAIL + "/Appearance/Copy/PreferredMiniature").grab_focus()
 
 func present_creation(route: String, draft: Dictionary, _compact: bool) -> void:
 	var next_route := "create-abilities" if route == "create-rolling" else route
@@ -441,21 +451,23 @@ func _class_rules_markup() -> String:
 		var offsets: Dictionary = profile.get("ability_offsets", {})
 		for pair in [["Tough as wood", "Toughness"], ["Low in protein", "Strength"]]:
 			parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t(pair[0])), _bb(_t("%s is rolled with 3d6 %+d.") % [_t(pair[1]), int(offsets.get(pair[1], 0))])])
-		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Portable laboratory")), _bb(_t(str(rules[1])))])
+		var laboratory := _t("Two random decoctions. d4 doses a day.") if size.y <= 560 else _t(str(rules[1]))
+		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Portable laboratory")), _bb(laboratory)])
 	else:
 		var offsets: Dictionary = profile.get("ability_offsets", {})
 		for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 			if not offsets.has(ability):
 				continue
 			parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t(str(ability))), _bb(_t("Starting roll: 3d6 %+d") % int(offsets[ability]))])
-		for rule in rules:
-			parts.append(_bb(_t(str(rule))))
+		if size.y > 560:
+			for rule in rules:
+				parts.append(_bb(_t(str(rule))))
 	if parts.is_empty():
 		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Starting abilities")), _bb(_t("Roll 3d6 for each ability."))])
 	if size.y <= 560:
 		var cells: Array[String] = []
 		for part in parts:
-			cells.append("[cell expand=1]" + part.replace("font_size=17", "font_size=14") + "[/cell]")
+			cells.append("[cell expand=1 shrink=false]" + part.replace("font_size=17", "font_size=15") + "[/cell]")
 		return "[table=3]" + _lines(cells, "") + "[/table]"
 	return _lines(parts, "\n\n")
 

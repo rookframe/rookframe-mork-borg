@@ -39,6 +39,9 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			_button(view, "Class details").pressed.emit()
 			await _settle()
 			await _capture(viewport, "phone-class-detail")
+			var rules: RichTextLabel = view.get_node(view.DETAIL + "/Rules")
+			assert_bool(rules.scroll_active).is_false()
+			assert_int(rules.get_content_height()).is_less_equal(int(rules.size.y))
 			_button(view, "Class list").pressed.emit()
 		var captures: Array[String] = []
 		for frame in range(180):
@@ -74,8 +77,22 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			if not primary.disabled:
 				primary.pressed.emit()
 		var field = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name")
+		if profile[0] == "phone":
+			_button(view, "Appearance").pressed.emit()
+			primary.pressed.emit()
+			await _settle()
+			assert_bool(field.is_visible_in_tree()).is_true()
+			assert_bool(field.get_node(^"Editor").has_focus()).is_true()
+			assert_str(field.error_text).contains("name")
 		field.get_node(^"Editor").text = "Varg"
 		field.get_node(^"Editor").text_changed.emit("Varg")
+		if profile[0] == "phone":
+			primary.pressed.emit()
+			await _settle()
+			assert_bool(view.get_node(view.STAGE + "/Heading/Copy/Status").is_visible_in_tree()).is_true()
+			assert_bool(view.get_node(view.DETAIL + "/Appearance/Copy/PreferredMiniature").has_focus()).is_true()
+			_button(view, "Identity").pressed.emit()
+			view.set_status("")
 		await _settle()
 		await _capture(viewport, str(profile[0]) + "-identity")
 		if profile[0] == "phone":
@@ -132,6 +149,28 @@ func _button(root: Node, text: String) -> Button:
 			return control
 	fail("Visible action missing: " + text)
 	return null
+
+func test_phone_long_origin_detail_stays_above_fixed_actions() -> void:
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(844, 390)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
+	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
+	viewport.add_child(view)
+	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("esoteric-hermit")
+	view.present_creation("create-origin", {"class_id": "esoteric-hermit", "class_profile": profile, "origin_roll": 6, "origin": profile.origins[5], "roll_faces": {"Origin": [6]}}, true)
+	view.get_node(view.LEFT + "/Choices").selected.emit("Origin")
+	await _settle()
+	var copy: Label = view.get_node(view.DETAIL + "/RollOutcome/ResultCopy")
+	assert_str(copy.text).is_equal(profile.origins[5])
+	for node in view.get_node(view.DETAIL).find_children("*", "Label", true, false):
+		if node.is_visible_in_tree():
+			assert_bool(view.get_node(view.STAGE + "/Content").get_global_rect().encloses(node.get_global_rect())).is_true()
+	if DisplayServer.get_name() != "headless":
+		RenderingServer.force_draw()
+		viewport.get_texture().get_image().save_png(OS.get_environment("RFG_EVIDENCE_DIR").path_join("creator-phone-long-origin.png"))
+	viewport.free()
 
 func _settle() -> void:
 	for frame in range(5):
