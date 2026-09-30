@@ -3,7 +3,9 @@ extends "res://rookframe/ui/components/surfaces/fullscreen_wizard.gd"
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const PLAN = preload(ROOT + "logic/creation_roll_plan.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
+var _roll_plan := PLAN.new()
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const DEFINITION = preload(ROOT + "logic/character_definition.gd")
 const CLASS_IDS := ["classless", "fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]
@@ -14,7 +16,6 @@ const SUBTITLES := ["A beginning, not a destiny.", "Your class is already includ
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness", "Hit points"]
 const ABILITY_DESCRIPTIONS := ["Defend, balance, swim and flee.", "Perceive, aim, charm and use Powers.", "Strike, grapple, lift and break.", "Resist poison, cold and heat.", "Roll your class Hit Points die and add Toughness. You start with at least 1 HP."]
 const EQUIPMENT := ["Silver", "Omens", "Food", "Equipment pack", "Equipment first", "Equipment second", "Weapon", "Armor"]
-const EQUIPMENT_FORMULAS := ["2d6 × 10", "1d2", "1d4 days", "1d6", "1d12", "1d12", "1d10", "1d4"]
 const PACK_BUTTONS := ["/PackChoices/Options/Choice0", "/PackChoices/Options/Choice1", "/PackChoices/Options/Choice2", "/PackChoices/Options/Choice3", "/PackChoices/Options/Choice4"]
 const STAGE := "Layout/Body/StageSlot/Stage"
 const CONTEXT := "Layout/Body/ContextSlot/Context"
@@ -131,7 +132,6 @@ func _class_rows() -> Array[Dictionary]:
 func _roll_rows(index: int) -> Array[Dictionary]:
 	var profile: Dictionary = _draft.get("class_profile", {})
 	var rows: Array[Dictionary] = []
-	var active := str(_draft.get("active_roll", ""))
 	if index == 1:
 		var values: Dictionary = _draft.get("abilities", {})
 		for number in range(ABILITIES.size()):
@@ -159,18 +159,21 @@ func _roll_rows(index: int) -> Array[Dictionary]:
 	else:
 		var values: Dictionary = _draft.get("equipment_rolls", {})
 		var icons := ["silver", "psychopomp", "food", "bag", "bag", "bag", "sword", "armor"]
-		for number in range(EQUIPMENT.size()):
-			var title: String = EQUIPMENT[number]
-			var value := _equipment_meaning(title, _draft) if values.has(title) else ""
-			rows.append(_roll_row(title, _equipment_formula(title, _draft, EQUIPMENT_FORMULAS[number]), value, values.has(title), icons[number], _t("Roll on the starting equipment table for your class."), value))
-		var formulas: Dictionary = _draft.get("roll_formulas", {})
-		for raw_title in values.keys():
-			var title := str(raw_title)
-			if not EQUIPMENT.has(title):
-				var resolved := _conditional_result(title)
-				rows.append(_roll_row(title, str(formulas.get(title, "")), str(resolved.value), true, "dice", _t("Additional roll required by your starting equipment."), str(resolved.detail)))
-		if not EQUIPMENT.has(active) and not values.has(active) and not active.is_empty() and bool(_draft.get("equipment_roll_pending", false)):
-			rows.append(_roll_row(active, str(_draft.get("active_roll_formula", "")), "", false, "dice", _t("Additional roll required by your starting equipment."), ""))
+		for term in _roll_plan.terms(_draft, 4):
+			var title := str(term.name)
+			var number := EQUIPMENT.find(title)
+			var formula := "%dd%d" % [int(term.count), int(term.faces)]
+			if title == "Silver":
+				formula += " × 10"
+			elif title == "Food":
+				formula = _t("1d4 days")
+			if number >= 0:
+				var value := _equipment_meaning(title, _draft) if values.has(title) else ""
+				rows.append(_roll_row(title, formula, value, values.has(title), icons[number], _t("Roll on the starting equipment table for your class."), value))
+			else:
+				var resolved := _conditional_result(title) if values.has(title) else {"value": "", "detail": ""}
+				rows.append(_roll_row(title, "%dd%d" % [int(term.count), int(term.faces)], str(resolved.value), values.has(title), "dice", _t("Additional roll required by your starting equipment."), str(resolved.detail)))
+
 	return rows
 
 func _origin_result(title: String, key: String) -> Dictionary:
@@ -203,9 +206,14 @@ func _conditional_result(title: String) -> Dictionary:
 	return {"value": str(value), "detail": ""}
 
 func _roll_row(title: String, formula: String, value: String, complete: bool, icon_name: String, description: String, explanation: String) -> Dictionary:
+	var rolling: Array = _draft.get("rolling", [])
+	var in_flight := false
+	for name in rolling:
+		if str(name) == title:
+			in_flight = true
 	var current := title == str(_draft.get("active_roll", ""))
 	var pending := bool(_draft.get("roll_pending", false)) or bool(_draft.get("equipment_roll_pending", false))
-	return {"id": title, "title": _t(title), "subtitle": formula, "formula": formula, "value": value if complete else _t("Next" if bool(_draft.get("roll_ready", false)) else "Rolling…") if current and pending else "—", "complete": complete, "pending": not complete, "icon": _icon(icon_name), "icon_name": icon_name, "description": description, "explanation": explanation}
+	return {"id": title, "title": _t(title), "subtitle": formula, "formula": formula, "value": value if complete else _t("Rolling…") if in_flight else _t("Next") if current and pending and bool(_draft.get("roll_ready", false)) else "—", "complete": complete, "pending": not complete, "icon": _icon(icon_name), "icon_name": icon_name, "description": description, "explanation": explanation}
 
 func _reset_detail() -> Control:
 	var detail := get_node(DETAIL) as Control
@@ -425,26 +433,6 @@ func _ability_formula(title: String, draft: Dictionary) -> String:
 	var offsets: Dictionary = profile.get("ability_offsets", {})
 	var offset: int = offsets.get(title, 0)
 	return "3d6" + ("%+d" % offset if offset != 0 else "")
-
-
-func _equipment_formula(title: String, draft: Dictionary, fallback: String) -> String:
-	var profile: Dictionary = draft.get("class_profile", {})
-	if title == "Silver":
-		var silver_count: int = profile.get("silver_count", 2)
-		return _t("%dd6 × 10") % silver_count
-	if title == "Omens":
-		var omen_faces: int = profile.get("omen_faces", 2)
-		return "1d%d" % omen_faces
-	if title == "Weapon" or title == "Armor":
-		var faces: int = profile.get("weapon_faces" if title == "Weapon" else "armor_faces", 10 if title == "Weapon" else 4)
-		var totals: Dictionary = draft.get("equipment_rolls", {})
-		var fixed_arms: bool = profile.get("fixed_arms", false)
-		if not fixed_arms and (totals.has("Unclean scroll") or totals.has("Sacred scroll")):
-			var limit := 6 if title == "Weapon" else 2
-			if faces > limit:
-				faces = limit
-		return "1d%d" % faces
-	return fallback
 
 
 func _rules_text(draft: Dictionary) -> String:

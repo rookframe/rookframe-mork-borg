@@ -12,6 +12,145 @@ var stages: Array[int] = []
 var primary := ""
 var disabled := false
 
+func test_empty_reconnect_state_leaves_creation_inactive() -> void:
+	var creator = _creator_for(_host_for("occult-herbmaster", 1), "occult-herbmaster")
+	creator.restore_reconnect_state({})
+	assert_bool(creator.is_active()).is_false()
+	assert_bool(creator.capture_reconnect_state().is_empty()).is_true()
+	creator.free()
+
+func test_overlapping_equipment_rolls_insert_dependencies_beside_their_parent() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	host.outcomes["Equipment first"] = [[11]]
+	host.outcomes["Red poison doses"] = [[3]]
+	host.outcomes["Equipment second"] = [[4]]
+	host.outcomes["Monkey count"] = [[2]]
+	host.outcomes["Monkey 1 hit points"] = [[1]]
+	host.outcomes["Monkey 2 hit points"] = [[4]]
+	host.deferred_rolls.assign(["Equipment second", "Weapon"])
+	var creator = _creator_for(host, "occult-herbmaster")
+	for iteration in 180:
+		await get_tree().process_frame
+		if primary == "Roll Equipment second":
+			break
+		if not disabled:
+			creator.primary()
+	assert_str(primary).is_equal("Roll Equipment second")
+	var rows: Node = creator.get_node(^"View").get_node(creator.get_node(^"View").LEFT + "/Choices/Area/Rows")
+	var titles: Array = rows.get_children().map(func(row): return row.get_node(^"Inset/Row/Copy/Title").text)
+	assert_int(titles.find("Red poison doses")).is_equal(titles.find("Equipment first") + 1)
+	creator.primary()
+	for frame in 3:
+		await get_tree().process_frame
+	assert_bool(host.pending_results.has("Equipment second")).is_true()
+	assert_str(primary).is_equal("Roll Weapon")
+	assert_bool(disabled).is_false()
+	creator.primary()
+	for frame in 3:
+		await get_tree().process_frame
+	assert_bool(host.pending_results.has("Weapon")).is_true()
+	assert_str(primary).is_equal("Roll Armor")
+	host.complete_roll("Equipment second")
+	await get_tree().process_frame
+	assert_str(primary).is_equal("Roll Monkey count")
+	titles = rows.get_children().map(func(row): return row.get_node(^"Inset/Row/Copy/Title").text)
+	assert_int(titles.find("Monkey count")).is_equal(titles.find("Equipment second") + 1)
+	var weapon_row = rows.get_children()[titles.find("Weapon")]
+	assert_str(weapon_row.get_node(^"Inset/Row/Value").text).is_equal("Rolling…")
+	host.complete_roll("Weapon")
+	assert_str(primary).is_equal("Roll Monkey count")
+	await _finish(creator)
+	assert_bool(host.errors.is_empty()).is_true()
+	assert_int(host.actors.size()).is_equal(3)
+	assert_int(host.actors[1].data.hit_points).is_equal(3)
+	assert_int(host.actors[2].data.hit_points).is_equal(6)
+	creator.free()
+
+func test_restart_cancels_all_overlapping_rolls_and_ignores_late_results() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	host.deferred_rolls.assign(["Agility", "Presence"])
+	var creator = _creator_for(host, "occult-herbmaster")
+	creator.primary()
+	creator.primary()
+	creator.primary()
+	for frame in 4:
+		await get_tree().process_frame
+	assert_int(host.pending_results.size()).is_equal(2)
+	creator.start_over()
+	assert_int(host.cancelled_rolls.size()).is_equal(2)
+	for name in host.pending_results.keys():
+		host.complete_roll(name)
+	assert_bool(creator.capture_reconnect_state().draft.abilities.is_empty()).is_true()
+	assert_int(stage).is_equal(1)
+	creator.free()
+
+func test_arms_wait_for_the_equipment_that_changes_their_dice() -> void:
+	var host = _host_for("classless", 1)
+	host.outcomes["Silver"] = [[2, 3]]
+	host.outcomes["Equipment second"] = [[2]]
+	host.outcomes["Sacred scroll"] = [[7]]
+	host.deferred_rolls.assign(["Equipment second", "Sacred scroll"])
+	var creator = _creator_for(host, "classless")
+	for iteration in 180:
+		await get_tree().process_frame
+		if host.pending_results.has("Equipment second"):
+			break
+		if not disabled:
+			creator.primary()
+	assert_bool(disabled).is_true()
+	creator.primary()
+	assert_bool(host.requests.any(func(term): return term.name == "Weapon" or term.name == "Armor")).is_false()
+	host.complete_roll("Equipment second")
+	assert_str(primary).is_equal("Roll Sacred scroll")
+	creator.primary()
+	for frame in 3:
+		await get_tree().process_frame
+	assert_str(primary).is_equal("Roll Weapon")
+	var view: Node = creator.get_node(^"View")
+	var rows: Array = view.get_node(view.LEFT + "/Choices/Area/Rows").get_children()
+	for pair in [["Weapon", "1d6"], ["Armor", "1d2"]]:
+		var row: Node = rows.filter(func(item): return item.get_node(^"Inset/Row/Copy/Title").text == pair[0])[0]
+		assert_str(row.get_node(^"Inset/Row/Copy/Subtitle").text).is_equal(pair[1])
+	host.complete_roll("Sacred scroll")
+	await _finish(creator)
+	assert_bool(host.errors.is_empty()).is_true()
+	assert_int(host.actors.size()).is_equal(1)
+	assert_int(host.requests.filter(func(term): return term.name == "Weapon")[0].faces).is_equal(6)
+	assert_int(host.requests.filter(func(term): return str(term.name).begins_with("Armor"))[0].faces).is_equal(4)
+	assert_bool(host.actors[0].data.inventory.any(func(item): return item.get("source_item_id") == "light-armor")).is_true()
+	creator.free()
+
+func test_hit_points_and_traits_keep_their_rules_when_results_arrive_out_of_order() -> void:
+	var host = _host_for("occult-herbmaster", 1)
+	host.outcomes["Second decoction"] = [[2]]
+	host.deferred_rolls.assign(["Toughness", "Origin", "First decoction"])
+	var creator = _creator_for(host, "occult-herbmaster")
+	for iteration in 60:
+		await get_tree().process_frame
+		if disabled:
+			break
+		creator.primary()
+	var draft: Dictionary = creator.capture_reconnect_state().draft
+	assert_bool(draft.has("hit_points_roll")).is_true()
+	assert_bool(draft.has("hit_points")).is_false()
+	host.complete_roll("Toughness")
+	draft = creator.capture_reconnect_state().draft
+	assert_int(draft.hit_points).is_equal(4 + int(draft.abilities.Toughness.modifier))
+	creator.primary()
+	for iteration in 60:
+		await get_tree().process_frame
+		if disabled:
+			break
+		creator.primary()
+	host.complete_roll("First decoction")
+	host.complete_roll("Origin")
+	await _finish(creator)
+	var classes = load(ROOT + "logic/creation_classes.gd").new()
+	assert_str(host.actors[0].data.traits[0].id).is_equal(classes.decoction(1).id)
+	assert_str(host.actors[0].data.traits[1].id).is_equal(classes.decoction(2).id)
+	assert_bool(host.errors.is_empty()).is_true()
+	creator.free()
+
 func test_restart_cancels_the_abandoned_immediate_roll_before_late_completion() -> void:
 	var host = _host_for("occult-herbmaster", 1)
 	host.pending_roll = "Agility"

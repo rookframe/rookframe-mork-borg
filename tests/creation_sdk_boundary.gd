@@ -15,6 +15,8 @@ var selected_rook := ""
 var rooks: Dictionary = {}
 var appearance_changes := 0
 var pending_roll := ""
+var deferred_rolls: Array[String] = []
+var pending_results: Dictionary = {}
 var pending_result: Dictionary = {}
 var outcomes: Dictionary = {}
 var requests: Array[Dictionary] = []
@@ -53,14 +55,19 @@ func RollDice(terms: Array) -> Dictionary:
 		if int(value) < 1 or int(value) > int(term.faces):
 			errors.append("Wrong die size for " + name)
 	var result := {"ok": true, "value": {"sequence": requests.size(), "terms": [{"name": term.name, "faces": term.faces, "results": values}]}}
-	if name == pending_roll:
+	if name == pending_roll or deferred_rolls.has(name):
 		pending_result = result
-		pending_result["requestId"] = 42
-		return {"ok": false, "code": "pending", "requestId": 42}
+		pending_result["requestId"] = 1000 + requests.size()
+		pending_results[name] = pending_result
+		return {"ok": false, "code": "pending", "requestId": pending_result.requestId}
 	return result
 
 func complete_pending() -> void:
 	TabletopCommandCompleted.emit(pending_result)
+
+func complete_roll(name: String) -> void:
+	TabletopCommandCompleted.emit(pending_results[name])
+	pending_results.erase(name)
 
 func CreateActorsAtomically(_package: String, definition: String, choices: Variant, children: Array) -> Dictionary:
 	if reject_creation:

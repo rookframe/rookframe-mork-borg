@@ -47,7 +47,7 @@ func _copy(root: Node) -> String:
 func test_completed_conditional_results_remain_selectable_with_raw_faces() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
 	add_child(view)
-	var draft := {"equipment_rolls": {"Hermit scroll family": 1, "Hermit scroll": 2, "Red poison doses": 3, "Dog hit points": 4}, "roll_faces": {"Hermit scroll": [2], "Red poison doses": [3], "Dog hit points": [4]}, "roll_formulas": {"Hermit scroll": "1d10", "Red poison doses": "1d4", "Dog hit points": "1d6"}}
+	var draft := {"class_id": "esoteric-hermit", "equipment_rolls": {"Equipment first": 11, "Equipment second": 3, "Hermit scroll family": 1, "Hermit scroll": 2, "Red poison doses": 3, "Dog hit points": 4}, "roll_faces": {"Hermit scroll": [2], "Red poison doses": [3], "Dog hit points": [4]}, "roll_formulas": {"Hermit scroll": "1d10", "Red poison doses": "1d4", "Dog hit points": "1d6"}}
 	view.present_creation("create-equipment", draft, false)
 	var choices = view.get_node(view.LEFT + "/Choices")
 	for result in [["Hermit scroll", "Grace for a sinner"], ["Red poison doses", "3"], ["Dog hit points", "6"]]:
