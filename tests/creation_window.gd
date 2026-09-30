@@ -86,6 +86,7 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			assert_str(field.error_text).contains("name")
 		field.get_node(^"Editor").text = "Varg"
 		field.get_node(^"Editor").text_changed.emit("Varg")
+		assert_str(field.error_text).is_empty()
 		if profile[0] == "phone":
 			primary.pressed.emit()
 			await _settle()

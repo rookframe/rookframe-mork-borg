@@ -694,6 +694,8 @@ func _request_scroll(disposition: String) -> void:
 
 func _name_changed(value: String) -> void:
 	get_node(CONTEXT + "/Name/Title").text = value if not value.strip_edges().is_empty() else _t("Unnamed soul")
+	if not value.strip_edges().is_empty():
+		get_name_field().error_text = ""
 
 func _record(id: String) -> Dictionary:
 	for record in _records:
