@@ -116,7 +116,7 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	first.window = surface
 	surface.sdk = SDK.new(first)
 	viewport.add_child(surface)
-	var actor := {"id": "already-created", "access_level": "Owner", "data": {"name": "Retained survivor", "class_title": "No Class", "inventory": []}}
+	var actor := {"id": "already-created", "access_level": "Owner", "data": {"name": "Retained survivor", "class_title": "No Class", "silver": 70, "omens": 2, "inventory": []}}
 	first.actors.append(actor)
 	surface.get_node("CharacterCreator").discard()
 	surface._created(SDK.Actor.new(actor))
@@ -131,7 +131,13 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	fresh.window = restored
 	restored.sdk = SDK.new(fresh)
 	viewport.add_child(restored)
+	fresh.restoring_private_draft = true
 	restored.restore_reconnect_state(retained)
+	fresh.restoring_private_draft = false
+	var view = restored.get_node("CharacterCreator/View")
+	assert_bool(view.get_node(view.STAGE + "/Content/Review").visible).is_true()
+	assert_str(view.get_node(view.CONTEXT + "/PortraitVitals/Vitals/Silver/Row/Value").text).is_equal("70")
+	assert_str(view.get_node(view.CONTEXT + "/PortraitVitals/Vitals/Omens/Row/Value").text).is_equal("2")
 	assert_bool(restored.get_node("CharacterCreator").is_active()).is_false()
 	restored.get_node("CharacterCreator/View/Layout/Footer/Row/Primary").pressed.emit()
 	assert_str(fresh.opened_actor).is_equal("already-created")

@@ -51,3 +51,9 @@ func CloseWindow(_scene: PackedScene) -> Dictionary:
 	window.hide()
 	window.closed.emit()
 	return {"ok": true}
+
+var restoring_private_draft := false
+func ReadActor(id: String) -> Dictionary:
+	if restoring_private_draft:
+		return {"ok": false, "code": "session_ended", "message": "World access is unavailable while restoring a private draft."}
+	return super.ReadActor(id)

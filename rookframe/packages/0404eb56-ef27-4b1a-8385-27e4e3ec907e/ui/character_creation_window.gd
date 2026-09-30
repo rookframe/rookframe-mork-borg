@@ -3,6 +3,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 var _restart_requested := false
 var _created_actor_id := ""
+var _created_actor_data: Dictionary = {}
 @onready var _creator := get_node(^"CharacterCreator")
 @onready var _view := get_node(^"CharacterCreator/View")
 
@@ -41,7 +42,7 @@ func _reopened() -> void:
 		_creator.begin()
 
 func capture_reconnect_state() -> Variant:
-	return {"created_actor_id": _created_actor_id} if not _created_actor_id.is_empty() else _creator.capture_reconnect_state()
+	return {"created_actor_id": _created_actor_id, "created_actor_data": _created_actor_data.duplicate(true)} if not _created_actor_id.is_empty() else _creator.capture_reconnect_state()
 
 func restore_reconnect_state(state: Dictionary) -> void:
 	_created_actor_id = str(state.get("created_actor_id", ""))
@@ -49,11 +50,10 @@ func restore_reconnect_state(state: Dictionary) -> void:
 		_creator.restore_reconnect_state(state)
 		return
 	_creator.discard()
-	var result := sdk.actors.read(SDK.ActorId.new(_created_actor_id))
-	if result.ok:
-		var data: Dictionary = result.actor.data
-		_view.present_creation("create-review", data, false)
-	_view.set_status(sdk.translations.text("Character created.") if result.ok else result.message, not result.ok)
+	var retained: Dictionary = state.get("created_actor_data", {})
+	_created_actor_data = retained.duplicate(true)
+	_view.present_creation("create-review", _created_actor_data, false)
+	_view.set_status(sdk.translations.text("Character created."))
 	_view.present_primary(sdk.translations.text("Open character"), false)
 	_view.set_back_enabled(false)
 
@@ -80,6 +80,7 @@ func _restart_answered(action: String) -> void:
 
 func _created(actor: SDK.Actor) -> void:
 	_created_actor_id = actor.id.value
+	_created_actor_data = actor.data.duplicate(true)
 	_open_created()
 
 func _open_created() -> void:
@@ -91,6 +92,7 @@ func _open_created() -> void:
 		return
 	_close()
 	_created_actor_id = ""
+	_created_actor_data = {}
 
 func _close() -> void:
 	var surface := SDK.ExtensionSurface.new()
