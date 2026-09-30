@@ -21,7 +21,7 @@ func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 	var choices = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Left/Choices")
 	for result in [["Omens", "1 omen"], ["Food", "3 days"], ["Equipment pack", "Backpack"]]:
 		choices.selected.emit(result[0])
-		var detail = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result")
+		var detail = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome/Result")
 		assert_bool(detail.is_visible_in_tree()).is_true()
 		assert_str(_copy(detail)).contains(result[1])
 
@@ -57,7 +57,7 @@ func test_completed_conditional_results_remain_selectable_with_raw_faces() -> vo
 				found = true
 				button.pressed.emit()
 		assert_bool(found).is_true()
-		assert_str(_copy(view.get_node(view.DETAIL + "/Result"))).contains(result[1]).contains("Rolled:")
+		assert_str(_copy(view.get_node(view.DETAIL + "/RollOutcome/Result"))).contains(result[1]).contains("Rolled:")
 	await get_tree().process_frame
 
 func test_origin_detail_contains_only_the_selected_resolved_trait() -> void:

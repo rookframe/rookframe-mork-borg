@@ -5,7 +5,7 @@ const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 
 func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> void:
-	for profile in [["desktop", 0, Vector2i(1920, 1080)]]:
+	for profile in [["desktop", 0, Vector2i(1920, 1080)], ["phone", 1, Vector2i(844, 390)]]:
 		var host = BOUNDARY.new()
 		host.device = profile[1]
 		host.outcomes = {"Agility": [[3, 3, 3]], "Presence": [[3, 3, 3]], "Strength": [[3, 3, 3]], "Toughness": [[3, 3, 3]], "Hit points": [[4]], "Silver": [[3, 3]], "Omens": [[1]], "Food": [[3]], "Equipment pack": [[6]], "Equipment first": [[3]], "Equipment second": [[6]], "Weapon": [[1]], "Armor": [[1]]}
@@ -22,9 +22,24 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		var creator = surface.get_node(^"CharacterCreator")
 		var primary: Button = surface.get_node(^"CharacterCreator/View/Layout/Footer/Row/Primary")
 		var view = creator.get_node(^"View")
+		await _settle()
+		if profile[0] == "phone":
+			await _capture(viewport, "phone-class")
+			var classes: Array[Node] = view.get_node(view.LEFT + "/Choices/Area/Rows").get_children()
+			assert_int(classes.size()).is_equal(7)
+			for row in classes:
+				assert_bool(row.is_visible_in_tree()).is_true()
+				assert_bool(row.get_global_rect().end.x <= viewport.size.x).is_true()
+				assert_bool(row.get_global_rect().end.y <= primary.global_position.y).is_true()
+			assert_bool(primary.get_global_rect().end.y <= viewport.size.y).is_true()
 		for resource in ["Silver", "Omens"]:
 			assert_str(view.get_node(view.CONTEXT + "/PortraitVitals/Vitals/" + resource + "/Row/Value").text).is_equal("—")
 		view.get_node(view.LEFT).get_node(^"Choices/Area/Rows").get_child(6).pressed.emit()
+		if profile[0] == "phone":
+			_button(view, "Class details").pressed.emit()
+			await _settle()
+			await _capture(viewport, "phone-class-detail")
+			_button(view, "Class list").pressed.emit()
 		var captures: Array[String] = []
 		for frame in range(180):
 			await get_tree().process_frame
@@ -32,7 +47,12 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			if not captures.has(route):
 				captures.append(route)
 				await _settle()
-				await _capture(viewport, "desktop-" + route)
+				await _capture(viewport, str(profile[0]) + "-" + route)
+				if profile[0] == "phone" and route in ["create-abilities", "create-origin"]:
+					_button(view, "Roll details").pressed.emit()
+					await _settle()
+					await _capture(viewport, "phone-" + route + "-detail")
+					_button(view, "Roll list").pressed.emit()
 			if bool(creator.capture_reconnect_state().draft.get("pack_choice_pending", false)):
 				break
 			if not primary.disabled:
@@ -57,15 +77,20 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		field.get_node(^"Editor").text = "Varg"
 		field.get_node(^"Editor").text_changed.emit("Varg")
 		await _settle()
-		await _capture(viewport, "desktop-identity")
+		await _capture(viewport, str(profile[0]) + "-identity")
+		if profile[0] == "phone":
+			_button(view, "Appearance").pressed.emit()
+			await _settle()
+			await _capture(viewport, "phone-appearance")
 		var picker: Control = creator.get_node(^"MiniaturePicker")
 		creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+		await _settle()
+		await _capture(viewport, str(profile[0]) + "-browser")
 		surface.hide()
 		await _settle()
 		assert_bool(creator.is_active()).is_true()
 		assert_bool(picker.get_combined_minimum_size().x <= viewport.size.x).is_true()
 		assert_bool(picker.get_node(^"Picker/Layout/Footer/Row/Choose").get_global_rect().end.y <= viewport.size.y).is_true()
-		await _capture(viewport, "desktop-browser")
 		picker.get_node(^"Picker/Layout/Footer/Row/Cancel").pressed.emit()
 		assert_str(field.value).is_equal("Varg")
 		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
@@ -75,7 +100,12 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		primary.pressed.emit()
 		assert_str(creator.capture_reconnect_state().stage).is_equal("create-review")
 		await _settle()
-		await _capture(viewport, "desktop-review")
+		await _capture(viewport, str(profile[0]) + "-review")
+		if profile[0] == "phone":
+			for section in ["Gear", "Traits", "Character"]:
+				_button(view, section).pressed.emit()
+				await _settle()
+				await _capture(viewport, "phone-review-" + section.to_lower())
 		view.get_node(^"Layout/Footer/Row/Back").pressed.emit()
 		surface.hide()
 		surface.closed.emit()
@@ -96,11 +126,28 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		await _settle()
 		viewport.free()
 
+func _button(root: Node, text: String) -> Button:
+	for control in root.find_children("*", "Button", true, false):
+		if control.is_visible_in_tree() and control.text == text:
+			return control
+	fail("Visible action missing: " + text)
+	return null
+
 func _settle() -> void:
 	for frame in range(5):
 		await get_tree().process_frame
 
 func _capture(viewport: SubViewport, name: String) -> void:
+	if name.begins_with("phone-") and not name.ends_with("-browser"):
+		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 842, 388)).is_true()
+		var bounds := Rect2(Vector2.ZERO, viewport.size)
+		for button in view.find_children("*", "Button", true, false):
+			if button.is_visible_in_tree():
+				assert_bool(button.size.y >= 44).is_true()
+				assert_bool(bounds.encloses(button.get_global_rect())).is_true()
+		var portrait = view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame")
+		assert_bool(portrait.size == Vector2(80, 100)).is_true()
 	if DisplayServer.get_name() != "headless":
 		var directory := OS.get_environment("RFG_EVIDENCE_DIR")
 		if directory.is_empty():

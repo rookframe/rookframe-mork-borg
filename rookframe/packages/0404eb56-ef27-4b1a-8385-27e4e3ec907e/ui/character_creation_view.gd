@@ -33,6 +33,9 @@ var _choice := ""
 var _active := ""
 var _records: Array[Dictionary] = []
 var _preview_key := ""
+var _details := false
+var _review_section := "Character"
+var _pending_choice := ""
 
 func _ready() -> void:
 	super._ready()
@@ -44,7 +47,148 @@ func _ready() -> void:
 	get_node(DETAIL + "/ScrollChoice/Eat").pressed.connect(_request_scroll.bind("eat"))
 	get_node(DETAIL + "/ScrollChoice/Paper").pressed.connect(_request_scroll.bind("toilet-paper"))
 	get_name_field().value_changed.connect(_name_changed)
+	get_node(STAGE + "/Heading/Details").pressed.connect(_toggle_details)
+	for section in ["Character", "Gear", "Traits"]:
+		get_node(STAGE + "/Heading/ReviewTabs/" + section).pressed.connect(_select_review.bind(section))
 	localize(i18n)
+	_fit()
+
+func _fit() -> void:
+	super._fit()
+	if not is_node_ready():
+		return
+	var phone := size.y <= 560
+	var context := get_node(CONTEXT)
+	context.add_theme_constant_override("separation", 8 if phone else 24)
+	for name in ["Heading", "HintRow", "History", "Spacer"]:
+		get_node(CONTEXT + "/" + name).visible = not phone
+	get_node(CONTEXT + "/PortraitVitals").add_theme_constant_override("separation", 12 if phone else 26)
+	for path in ["/PortraitVitals/PortraitFrame", "/PortraitVitals/PortraitFrame/Portrait"]:
+		get_node(CONTEXT + path).custom_minimum_size = Vector2(80, 100) if phone else Vector2(180, 225)
+	get_node(CONTEXT + "/PortraitVitals/Vitals").add_theme_constant_override("separation", 3 if phone else 24)
+	for vital in ["HitPoints", "Omens", "Silver"]:
+		var path: String = CONTEXT + "/PortraitVitals/Vitals/" + vital
+		get_node(path).add_theme_constant_override("separation", -2 if phone else 2)
+		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(14, 14) if phone else Vector2(20, 20)
+		get_node(path + "/Row/Value").add_theme_font_size_override("font_size", 19 if phone else 27)
+		get_node(path + "/Row/Value").add_theme_constant_override("line_spacing", 0 if phone else 4)
+		get_node(path + "/Label").add_theme_font_size_override("font_size", 8 if phone else 11)
+		get_node(path + "/Label").add_theme_constant_override("line_spacing", 0 if phone else 4)
+	get_node(CONTEXT + "/Name/Title").add_theme_font_size_override("font_size", 21 if phone else 27)
+	get_node(CONTEXT + "/Name/Class").add_theme_font_size_override("font_size", 11 if phone else 13)
+	get_node(CONTEXT + "/Name").add_theme_constant_override("separation", 2 if phone else 4)
+	get_node(CONTEXT + "/PhoneHistory").visible = phone
+	get_node(CONTEXT + "/Attributes").columns = 4 if phone else 2
+	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+		var path: String = CONTEXT + "/Attributes/" + ability
+		var node := get_node(path) as PanelContainer
+		node.custom_minimum_size = Vector2(0, 44 if phone else 48)
+		node.theme_type_variation = "TaskAttributeCompact" if phone else "TaskAttribute"
+		get_node(path + "/Row").vertical = phone
+		get_node(path + "/Row").add_theme_constant_override("separation", 1 if phone else 7)
+		get_node(path + "/Row/Icon").visible = not phone
+		get_node(path + "/Row/Label").add_theme_font_size_override("font_size", 8 if phone else 11)
+		get_node(path + "/Row/Value").add_theme_font_size_override("font_size", 17 if phone else 20)
+		get_node(path + "/Row/Label").horizontal_alignment = 1 if phone else 0
+		get_node(path + "/Row/Value").horizontal_alignment = 1 if phone else 0
+	get_node(STAGE).add_theme_constant_override("separation", 8 if phone else 30)
+	for name in ["Kicker", "Subtitle"]:
+		get_node(STAGE + "/Heading/Copy/" + name).visible = not phone
+	get_node(STAGE + "/Heading/Copy/Title").add_theme_font_size_override("font_size", (21 if _route == "create-review" else 23) if phone else 30)
+	get_node(STAGE + "/Heading/Copy/Title").text_overrun_behavior = 3
+	get_node(STAGE + "/Heading").custom_minimum_size = Vector2(0, 44 if phone else 0)
+	get_node(LEFT + "/Choices").columns = 2 if phone and _route == "create-class" else 1
+	get_node(LEFT + "/Identity").add_theme_constant_override("separation", 8 if phone else 26)
+	get_name_field().compact = phone
+	get_description_field().compact = phone
+	var detail := get_node(DETAIL)
+	for edge in ["left", "top", "right", "bottom"]:
+		detail.set("offset_" + edge, (14 if phone else 30) * (-1 if edge in ["right", "bottom"] else 1))
+	detail.add_theme_constant_override("separation", 8 if phone else 26)
+	get_node(DETAIL + "/Heading").add_theme_constant_override("separation", 12 if phone else 20)
+	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = Vector2(36, 36) if phone else Vector2(80, 80)
+	get_node(DETAIL + "/Heading/Copy").add_theme_constant_override("separation", 1 if phone else 5)
+	get_node(DETAIL + "/Heading/Copy/Title").add_theme_font_size_override("font_size", 21 if phone else 36)
+	get_node(DETAIL + "/Heading/Copy/Kicker").add_theme_font_size_override("font_size", 11 if phone else 12)
+	get_node(DETAIL + "/Heading/Copy/Kicker").add_theme_constant_override("line_spacing", 0 if phone else 4)
+	get_node(DETAIL + "/Heading/Copy/Title").add_theme_constant_override("line_spacing", 0 if phone else 4)
+	get_node(DETAIL + "/RollInfo").vertical = not phone or _route in ["create-class", "create-identity"]
+	get_node(DETAIL + "/RollOutcome").vertical = not phone
+	get_node(DETAIL + "/RollInfo").visible = _route != "create-identity"
+	get_node(DETAIL + "/RollOutcome").visible = get_node(DETAIL + "/RollOutcome/Result").visible or get_node(DETAIL + "/RollOutcome/ResultCopy").visible
+	for group in ["RollInfo", "RollOutcome"]:
+		get_node(DETAIL + "/" + group).add_theme_constant_override("separation", 20 if phone else 26)
+	get_node(DETAIL + "/RollInfo/Formula").add_theme_font_size_override("font_size", 25 if phone else 38)
+	get_node(DETAIL + "/RollInfo/Flavor").add_theme_font_size_override("font_size", 12 if phone else 16)
+	get_node(DETAIL + "/RollInfo/Flavor").add_theme_constant_override("line_spacing", 2 if phone else 10)
+	get_node(DETAIL + "/RollOutcome/ResultCopy").add_theme_font_size_override("font_size", 11 if phone else 15)
+	get_node(DETAIL + "/RollOutcome/Result/Content/Value").add_theme_font_size_override("font_size", 18 if phone else 22)
+	get_node(DETAIL + "/RollOutcome/Result/Content/Label").visible = not phone
+	get_node(DETAIL + "/RollOutcome/Result").theme_type_variation = "TaskResultCompact" if phone else "TaskResult"
+	get_node(DETAIL + "/RollInfo/Formula").theme_type_variation = "TaskFormulaCompact" if phone else "TaskFormula"
+	get_node(DETAIL + "/Rules").add_theme_font_size_override("normal_font_size", 11 if phone else 14)
+	get_node(DETAIL + "/Rules").add_theme_constant_override("line_separation", 2 if phone else 6)
+	get_node(DETAIL + "/Rules").fit_content = not phone
+	get_node(DETAIL + "/Rules").scroll_active = phone
+	get_node(DETAIL + "/Rules").size_flags_vertical = 3 if phone else 1
+	if _route == "create-class":
+		get_node(DETAIL + "/Rules").text = _class_rules_markup()
+	for fact in ["HitPoints", "Silver", "Omens"]:
+		get_node(DETAIL + "/Facts/Row/" + fact).add_theme_constant_override("separation", 2 if phone else 6)
+		get_node(DETAIL + "/Facts/Row/" + fact + "/Label").add_theme_font_size_override("font_size", 10 if phone else 12)
+		get_node(DETAIL + "/Facts/Row/" + fact + "/Value").add_theme_font_size_override("font_size", 17 if phone else 23)
+	get_node(DETAIL + "/Facts").theme_type_variation = "TaskFactsCompact" if phone else "TaskFacts"
+	for name in ["Spacer", "NoteRule", "NoteRow"]:
+		get_node(DETAIL + "/" + name).visible = not phone
+	get_node(DETAIL + "/Appearance/Preview").custom_minimum_size = Vector2(80, 100) if phone else Vector2(110, 138)
+	get_node(DETAIL + "/Appearance/Copy").add_theme_constant_override("separation", 8 if phone else 16)
+	get_node(DETAIL + "/Appearance/Copy/Description").add_theme_font_size_override("font_size", 11 if phone else 13)
+	get_node(DETAIL + "/PackChoices/Options").columns = 3 if phone else 2
+	get_node(DETAIL + "/PackChoices/Options").add_theme_constant_override("v_separation", 4 if phone else 8)
+	get_node(DETAIL + "/PackChoices/Prompt").visible = not phone
+	get_node(DETAIL + "/ScrollChoice").vertical = not phone
+	for group in [PACK_BUTTONS, ["/ScrollChoice/Reroll", "/ScrollChoice/Eat", "/ScrollChoice/Paper"]]:
+		for path in group:
+			get_node(DETAIL + path).add_theme_font_size_override("font_size", 11 if phone else 15)
+	_sync_navigation()
+
+func _toggle_details() -> void:
+	_details = not _details
+	_sync_navigation()
+
+func _select_review(section: String) -> void:
+	_review_section = section
+	_sync_navigation()
+
+func _sync_navigation() -> void:
+	var phone := size.y <= 560
+	var review := _route == "create-review"
+	get_node(STAGE + "/Heading/Details").visible = phone and not review
+	get_node(STAGE + "/Heading/Details").text = _t(("Class list" if _details else "Class details") if _route == "create-class" else ("Identity" if _details else "Appearance") if _route == "create-identity" else ("Roll list" if _details else "Roll details"))
+	get_node(STAGE + "/Heading/Details").set_pressed_no_signal(_details)
+	get_node(STAGE + "/Heading/ReviewTabs").visible = phone and review
+	get_node(LEFT).visible = not phone or not _details
+	(get_node(DETAIL).get_parent() as Control).visible = not phone or _details
+	get_node(STAGE + "/Content/Review/Character").visible = not phone or _review_section == "Character"
+	get_node(STAGE + "/Content/Review/Character/Abilities").visible = not phone
+	get_node(STAGE + "/Content/Review/Belongings").visible = not phone or _review_section != "Character"
+	get_node(STAGE + "/Content/Review/Belongings/Equipment").visible = not phone or _review_section == "Gear"
+	get_node(STAGE + "/Content/Review/Belongings/Traits").visible = not phone or _review_section == "Traits"
+	for section in ["Character", "Gear", "Traits"]:
+		get_node(STAGE + "/Heading/ReviewTabs/" + section).set_pressed_no_signal(_review_section == section)
+
+func capture_state() -> Dictionary:
+	return {"choice": _choice, "details": _details, "review": _review_section, "page": int(get_node(LEFT + "/Choices").capture_state().get("page", 0))}
+
+func restore_state(state: Dictionary) -> void:
+	_choice = str(state.get("choice", _choice))
+	_details = bool(state.get("details", false))
+	_review_section = str(state.get("review", "Character"))
+	if ROUTES.find(_route) < 4:
+		_present_choices()
+		_present_detail()
+	get_node(LEFT + "/Choices").restore_state({"page": int(state.get("page", 0))})
+	_sync_navigation()
 
 func localize(locale: I18N) -> void:
 	i18n = locale
@@ -69,20 +213,23 @@ func present_primary(text: String, disabled: bool) -> void:
 	set_primary(text, disabled, _icon(symbol))
 
 func set_status(message: String, error: bool = false) -> void:
-	get_node(STAGE + "/Heading/Status").text = _t(message)
-	get_node(STAGE + "/Heading/Status").visible = error and not message.is_empty()
+	get_node(STAGE + "/Heading/Copy/Status").text = _t(message)
+	get_node(STAGE + "/Heading/Copy/Status").visible = error and not message.is_empty() and (size.y > 560 or _route != "create-identity")
 	get_name_field().error_text = _t(message) if error and _route == "create-identity" else ""
 
 func present_creation(route: String, draft: Dictionary, _compact: bool) -> void:
 	var next_route := "create-abilities" if route == "create-rolling" else route
 	var changed := _route != next_route
+	if changed:
+		_details = false
+		_review_section = "Character"
 	_route = next_route
 	_draft = draft
 	var index := maxi(0, ROUTES.find(_route))
 	set_step(index)
-	get_node(STAGE + "/Heading/Kicker").text = _t("STEP %02d / 06") % (index + 1)
-	get_node(STAGE + "/Heading/Title").text = _t(HEADINGS[index])
-	get_node(STAGE + "/Heading/Subtitle").text = _t(SUBTITLES[index])
+	get_node(STAGE + "/Heading/Copy/Kicker").text = _t("STEP %02d / 06") % (index + 1)
+	get_node(STAGE + "/Heading/Copy/Title").text = _t(HEADINGS[index])
+	get_node(STAGE + "/Heading/Copy/Subtitle").text = _t(SUBTITLES[index])
 	get_node(STAGE + "/Content/Split").visible = index != 5
 	get_node(STAGE + "/Content/Review").visible = index == 5
 	get_node(LEFT + "/Choices").visible = index < 4
@@ -106,14 +253,21 @@ func present_creation(route: String, draft: Dictionary, _compact: bool) -> void:
 		_active = active
 		_present_choices()
 		_present_detail()
+	var pending_choice := "pack" if bool(draft.get("pack_choice_pending", false)) else str(draft.get("scroll_choice_slot", ""))
+	if size.y <= 560 and not pending_choice.is_empty() and pending_choice != _pending_choice:
+		_details = true
+	_pending_choice = pending_choice
+	_fit()
 
 func _selected_row(id: String) -> void:
 	if _route == "create-class":
 		class_selected.emit(id)
 	else:
 		_choice = id
+		_details = true
 		_present_choices()
 		_present_detail()
+		_fit()
 
 func _present_choices() -> void:
 	var completed := 0
@@ -217,10 +371,10 @@ func _roll_row(title: String, formula: String, value: String, complete: bool, ic
 
 func _reset_detail() -> Control:
 	var detail := get_node(DETAIL) as Control
-	for name in ["Facts", "Formula", "Rules", "Result", "ResultCopy", "PackChoices", "ScrollChoice", "Appearance"]:
+	for name in ["Facts", "RollInfo/Formula", "Rules", "RollOutcome/Result", "RollOutcome/ResultCopy", "PackChoices", "ScrollChoice", "Appearance"]:
 		get_node(DETAIL + "/" + name).visible = false
 	get_node(DETAIL + "/Heading/Icon").visible = true
-	get_node(DETAIL + "/Flavor").text = ""
+	get_node(DETAIL + "/RollInfo/Flavor").text = ""
 	get_node(DETAIL + "/NoteRow/Note").text = _t("Results stay with you when you go back.")
 	return detail
 
@@ -232,7 +386,7 @@ func _present_detail() -> void:
 		get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("BORN OF THE MUSHROOM" if herb else "STARTING CLASS")
 		get_node(DETAIL + "/Heading/Copy/Title").text = _t(str(profile.get("title", "No Class")))
 		get_node(DETAIL + "/Heading/Icon").texture = _icon(CLASS_ICONS[maxi(0, CLASS_IDS.find(str(_draft.get("class_id", "classless"))))])
-		get_node(DETAIL + "/Flavor").text = _t("Raised in the glade. Your body is hardy; your remedies are stranger still." if herb else "Your class determines starting rolls, equipment and traits.")
+		get_node(DETAIL + "/RollInfo/Flavor").text = _t("Raised in the glade. Your body is hardy; your remedies are stranger still." if herb else "Your class determines starting rolls, equipment and traits.")
 		get_node(DETAIL + "/Facts").visible = true
 		_set_fact("HitPoints", "Hit Points", "1d%d + TOU" % int(profile.get("hp_faces", 8)))
 		_set_fact("Silver", "Silver", "%dd6 × 10" % int(profile.get("silver_count", 2)))
@@ -247,20 +401,20 @@ func _present_detail() -> void:
 	get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("RECORDED RESULT" if bool(row.get("complete", false)) else "STARTING ROLL")
 	get_node(DETAIL + "/Heading/Copy/Title").text = str(row.title)
 	get_node(DETAIL + "/Heading/Icon").texture = _icon(str(row.get("icon_name", "dice")))
-	get_node(DETAIL + "/Flavor").text = str(row.get("description", ""))
-	get_node(DETAIL + "/Formula").visible = row.has("formula")
-	get_node(DETAIL + "/Formula").text = str(row.get("formula", ""))
-	get_node(DETAIL + "/Result").visible = bool(row.get("complete", false))
-	get_node(DETAIL + "/Result/Content/Value").text = str(row.get("value", ""))
+	get_node(DETAIL + "/RollInfo/Flavor").text = str(row.get("description", ""))
+	get_node(DETAIL + "/RollInfo/Formula").visible = row.has("formula")
+	get_node(DETAIL + "/RollInfo/Formula").text = str(row.get("formula", ""))
+	get_node(DETAIL + "/RollOutcome/Result").visible = bool(row.get("complete", false))
+	get_node(DETAIL + "/RollOutcome/Result/Content/Value").text = str(row.get("value", ""))
 	var rolls: Dictionary = _draft.get("roll_faces", {})
 	var raw: Array = rolls.get(_choice, [])
 	var faces: Array[String] = []
 	for value in raw:
 		faces.append(str(int(value)))
-	get_node(DETAIL + "/Result/Content/Raw").visible = not faces.is_empty()
-	get_node(DETAIL + "/Result/Content/Raw").text = _t("Rolled: %s") % _lines(faces, " + ")
-	get_node(DETAIL + "/ResultCopy").visible = not str(row.get("explanation", "")).is_empty()
-	get_node(DETAIL + "/ResultCopy").text = _t(str(row.get("explanation", "")))
+	get_node(DETAIL + "/RollOutcome/Result/Content/Raw").visible = not faces.is_empty()
+	get_node(DETAIL + "/RollOutcome/Result/Content/Raw").text = _t("Rolled: %s") % _lines(faces, " + ")
+	get_node(DETAIL + "/RollOutcome/ResultCopy").visible = not str(row.get("explanation", "")).is_empty()
+	get_node(DETAIL + "/RollOutcome/ResultCopy").text = _t(str(row.get("explanation", "")))
 	var values: Dictionary = _draft.get("equipment_rolls", {})
 	var choices: Array[String] = DEFINITION.new().pack_choices_for_roll(int(values.get("Equipment pack", 0)))
 	get_node(DETAIL + "/PackChoices").visible = _route == "create-equipment" and _choice == "Equipment pack" and not choices.is_empty()
@@ -272,10 +426,10 @@ func _present_detail() -> void:
 		choice.set_pressed_no_signal(not bool(_draft.get("pack_choice_pending", true)) and str(_draft.get("pack", "")) == pack)
 	get_node(DETAIL + "/ScrollChoice").visible = _route == "create-equipment" and not str(_draft.get("scroll_choice_slot", "")).is_empty()
 	if get_node(DETAIL + "/PackChoices").visible:
-		get_node(DETAIL + "/Flavor").text = _t("Choose your starting container or transport.")
-		get_node(DETAIL + "/Formula").visible = false
-		get_node(DETAIL + "/Result").visible = false
-		get_node(DETAIL + "/ResultCopy").visible = false
+		get_node(DETAIL + "/RollInfo/Flavor").text = _t("Choose your starting container or transport.")
+		get_node(DETAIL + "/RollInfo/Formula").visible = false
+		get_node(DETAIL + "/RollOutcome/Result").visible = false
+		get_node(DETAIL + "/RollOutcome/ResultCopy").visible = false
 		get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("1d6 · rolled %d") % int(values.get("Equipment pack", 0))
 		get_node(DETAIL + "/NoteRow/Note").text = _t("Choose one pack below") if bool(_draft.get("pack_choice_pending", true)) else _t("Selected: %s") % _t(str(_draft.get("pack", "Nothing")))
 
@@ -298,6 +452,11 @@ func _class_rules_markup() -> String:
 			parts.append(_bb(_t(str(rule))))
 	if parts.is_empty():
 		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Starting abilities")), _bb(_t("Roll 3d6 for each ability."))])
+	if size.y <= 560:
+		var cells: Array[String] = []
+		for part in parts:
+			cells.append("[cell expand=1]" + part.replace("font_size=17", "font_size=14") + "[/cell]")
+		return "[table=3]" + _lines(cells, "") + "[/table]"
 	return _lines(parts, "\n\n")
 
 func _bb(value: String) -> String:
@@ -335,6 +494,28 @@ func _present_context() -> void:
 		var ability: Dictionary = abilities.get(key, {})
 		get_node(CONTEXT + "/Attributes/" + key + "/Row/Value").text = _modifier(int(ability.get("modifier", 0))) if abilities.has(key) else "—"
 	get_node(CONTEXT + "/History").text = _t(str(_draft.get("origin", ""))) if not str(_draft.get("origin", "")).is_empty() else _t("Your history, traits and belongings will appear as you create your character.")
+	var history: Array[Dictionary] = []
+	if not str(_draft.get("origin", "")).is_empty():
+		history.append({"icon": "character", "text": _t(str(_draft.origin))})
+	if _draft.has("decoction_doses"):
+		history.append({"icon": "herbs", "text": _t("%d doses / day") % int(_draft.decoction_doses)})
+	var inventory: Array = _draft.get("inventory", [])
+	for kind in ["Weapon", "Armor"]:
+		var items: Array = []
+		for raw_item in inventory:
+			var item: Dictionary = raw_item
+			if item.get("kind", "") == kind:
+				items.append(item)
+		if not items.is_empty():
+			history.append({"icon": "sword" if kind == "Weapon" else "armor", "text": _inventory_text(items).replace("\n", " · ")})
+	for index in range(2):
+		var row := get_node(CONTEXT + ["/PhoneHistory/Line0", "/PhoneHistory/Line1"][index])
+		var entry := history.size() - mini(history.size(), 2) + index
+		row.visible = entry < history.size()
+		if row.visible:
+			(row.get_node(^"Icon") as TextureRect).texture = _icon(str(history[entry].icon))
+			(row.get_node(^"Text") as Label).text = str(history[entry].text)
+			(row.get_node(^"Text") as Label).tooltip_text = str(history[entry].text)
 
 func _present_review() -> void:
 	var review := get_node(STAGE + "/Content/Review")
@@ -370,7 +551,13 @@ func _present_review() -> void:
 		traits.append(_pair(_t(str(trait_data.get("name", ""))), _t(str(trait_data.get("rules", "")))))
 	if _draft.has("decoction_doses"):
 		traits.append(_pair("Portable laboratory", _t("%d doses / day") % int(_draft.decoction_doses)))
-	get_node(STAGE + "/Content/Review" + "/Belongings/Traits").configure(_t("Class traits"), _icon("herbs"), traits)
+	var modifiers: Array[String] = []
+	var profile: Dictionary = _draft.get("class_profile", {})
+	var offsets: Dictionary = profile.get("ability_offsets", {})
+	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+		if offsets.has(ability):
+			modifiers.append(_t("%s %+d to the starting roll.") % [_t(ability), int(offsets.get(ability, 0))])
+	get_node(STAGE + "/Content/Review" + "/Belongings/Traits").configure(_t("Class traits"), _icon("herbs"), traits, _lines(modifiers))
 
 func _pair(label: String, value: String) -> Dictionary:
 	return {"label": _t(label), "value": value if not value.is_empty() else "—"}

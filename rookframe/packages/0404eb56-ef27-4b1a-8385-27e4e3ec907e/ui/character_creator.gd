@@ -136,7 +136,7 @@ func capture_reconnect_state() -> Dictionary:
 	if not _creation_active:
 		return {}
 	_sync_identity_fields()
-	return {"draft": _character_draft.duplicate(true), "stage": _character_stage}
+	return {"draft": _character_draft.duplicate(true), "stage": _character_stage, "view": _view.capture_state()}
 
 
 func restore_reconnect_state(state: Dictionary) -> void:
@@ -155,6 +155,7 @@ func restore_reconnect_state(state: Dictionary) -> void:
 	_character_definition = _find_definition(str(_character_draft.get("class_id", "classless")) + "-character")
 	_character_stage = str(state.get("stage", "create-class"))
 	_show_creation_route(_character_stage)
+	_view.restore_state(state.get("view", {}))
 	# Restoration is plain data only. Fresh Rolls still require a button press;
 	# never reuse the old facade or resubmit its interrupted command.
 	_resume_creation.call_deferred()

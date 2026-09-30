@@ -35,17 +35,6 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/summary_block.tscn" id="summary"]
 
-[sub_resource type="StyleBoxFlat" id="Attribute"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
-border_color = Color(0.133333, 0.196078, 0.215686, 1)
-border_width_top = 1
-border_width_bottom = 1
-border_width_left = 1
-border_width_right = 1
-content_margin_left = 10.0
-content_margin_right = 10.0
-content_margin_top = 13.0
-content_margin_bottom = 13.0
 
 [sub_resource type="StyleBoxFlat" id="Portrait"]
 bg_color = Color(0.015686, 0.066667, 0.082353, 1)
@@ -71,32 +60,8 @@ content_margin_right = 0.0
 content_margin_top = 0.0
 content_margin_bottom = 0.0
 
-[sub_resource type="StyleBoxFlat" id="Facts"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
-border_color = Color(0.133333, 0.196078, 0.215686, 1)
-border_width_top = 1
-border_width_bottom = 1
-border_width_left = 0
-border_width_right = 0
-content_margin_left = 0.0
-content_margin_right = 0.0
-content_margin_top = 18.0
-content_margin_bottom = 18.0
 
-[sub_resource type="StyleBoxFlat" id="ResultBanner"]
-bg_color = Color(0.039216, 0.145098, 0.160784, 1)
-border_color = Color(0.266667, 0.913725, 0.913725, 1)
-border_width_left = 2
-content_margin_left = 16.0
-content_margin_right = 16.0
-content_margin_top = 14.0
-content_margin_bottom = 14.0
 
-[sub_resource type="StyleBoxFlat" id="FormulaRule"]
-bg_color = Color(0, 0, 0, 0)
-border_color = Color(0.133333, 0.196078, 0.215686, 1)
-border_width_bottom = 1
-content_margin_bottom = 20.0
 
 [node name="CharacterCreationView" instance=ExtResource("frame")]
 script = ExtResource("script")
@@ -128,6 +93,7 @@ theme_override_constants/separation = 26
 
 
 [node name="PortraitFrame" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals"]
+size_flags_vertical = 0
 layout_mode = 2
 custom_minimum_size = Vector2(180, 225)
 theme_override_styles/panel = SubResource("Portrait")
@@ -269,10 +235,10 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_override_styles/panel = SubResource("Attribute")
+theme_type_variation = &"TaskAttribute"
 
 
-[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Agility"]
+[node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Agility"]
 layout_mode = 2
 theme_override_constants/separation = 7
 
@@ -306,10 +272,10 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_override_styles/panel = SubResource("Attribute")
+theme_type_variation = &"TaskAttribute"
 
 
-[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Presence"]
+[node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Presence"]
 layout_mode = 2
 theme_override_constants/separation = 7
 
@@ -343,10 +309,10 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_override_styles/panel = SubResource("Attribute")
+theme_type_variation = &"TaskAttribute"
 
 
-[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Strength"]
+[node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Strength"]
 layout_mode = 2
 theme_override_constants/separation = 7
 
@@ -380,10 +346,10 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_override_styles/panel = SubResource("Attribute")
+theme_type_variation = &"TaskAttribute"
 
 
-[node name="Row" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness"]
+[node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness"]
 layout_mode = 2
 theme_override_constants/separation = 7
 
@@ -424,6 +390,49 @@ theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
+[node name="PhoneHistory" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 4
+
+[node name="Line0" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line0"]
+layout_mode = 2
+custom_minimum_size = Vector2(16, 16)
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line0"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+text_overrun_behavior = 3
+
+[node name="Line1" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
+layout_mode = 2
+theme_override_constants/separation = 7
+
+[node name="Icon" type="TextureRect" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line1"]
+layout_mode = 2
+custom_minimum_size = Vector2(16, 16)
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+mouse_filter = 2
+
+[node name="Text" type="Label" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line1"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+text_overrun_behavior = 3
+
 [node name="Spacer" type="Control" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -456,37 +465,81 @@ size_flags_vertical = 4
 layout_mode = 2
 theme_override_constants/separation = 30
 
-[node name="Heading" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage"]
+[node name="Heading" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage"]
 layout_mode = 2
 theme_override_constants/separation = 8
 
-[node name="Kicker" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
+[node name="Copy" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Heading"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="Kicker" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = "STEP 01 / 06"
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_fonts/font = ExtResource("display")
 
-[node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
+[node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = "Choose your class"
 theme_override_font_sizes/font_size = 30
 theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_fonts/font = ExtResource("display")
 
-[node name="Subtitle" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
+[node name="Subtitle" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = "A beginning, not a destiny."
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-[node name="Status" type="Label" parent="Layout/Body/StageSlot/Stage/Heading"]
+[node name="Status" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(1.0, 0.466667, 0.466667, 1)
 visible = false
 autowrap_mode = 2
+
+[node name="Details" type="Button" parent="Layout/Body/StageSlot/Stage/Heading"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 11
+toggle_mode = true
+text = "Class details"
+
+[node name="ReviewTabs" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Heading"]
+layout_mode = 2
+visible = false
+theme_override_constants/separation = 4
+
+[node name="Character" type="Button" parent="Layout/Body/StageSlot/Stage/Heading/ReviewTabs"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskSection"
+theme_override_font_sizes/font_size = 11
+toggle_mode = true
+text = "Character"
+
+[node name="Gear" type="Button" parent="Layout/Body/StageSlot/Stage/Heading/ReviewTabs"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskSection"
+theme_override_font_sizes/font_size = 11
+toggle_mode = true
+text = "Gear"
+
+[node name="Traits" type="Button" parent="Layout/Body/StageSlot/Stage/Heading/ReviewTabs"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskSection"
+theme_override_font_sizes/font_size = 11
+toggle_mode = true
+text = "Traits"
 
 [node name="Content" type="Control" parent="Layout/Body/StageSlot/Stage"]
 layout_mode = 2
@@ -585,16 +638,23 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_fonts/font = ExtResource("display")
 autowrap_mode = 2
 
-[node name="Formula" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+[node name="RollInfo" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
 layout_mode = 2
+vertical = true
+theme_override_constants/separation = 26
+
+[node name="Formula" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollInfo"]
+layout_mode = 2
+size_flags_horizontal = 3
 text = ""
 theme_override_font_sizes/font_size = 38
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_fonts/font = ExtResource("display")
-theme_override_styles/normal = SubResource("FormulaRule")
+theme_type_variation = &"TaskFormula"
 
-[node name="Flavor" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+[node name="Flavor" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollInfo"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = ""
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
@@ -606,7 +666,7 @@ theme_override_constants/line_spacing = 10
 layout_mode = 2
 theme_override_constants/separation = 12
 
-theme_override_styles/panel = SubResource("Facts")
+theme_type_variation = &"TaskFacts"
 
 
 [node name="Row" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Facts"]
@@ -677,35 +737,42 @@ theme_override_font_sizes/normal_font_size = 14
 theme_override_colors/default_color = Color(0.568627, 0.6, 0.603922, 1)
 theme_override_constants/line_separation = 6
 
-[node name="Result" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+[node name="RollOutcome" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
 layout_mode = 2
-theme_override_styles/panel = SubResource("ResultBanner")
+vertical = true
+theme_override_constants/separation = 26
 
-[node name="Content" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result"]
+[node name="Result" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"TaskResult"
+
+[node name="Content" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome/Result"]
 layout_mode = 2
 theme_override_constants/separation = 5
 
-[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result/Content"]
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome/Result/Content"]
 layout_mode = 2
 text = "RECORDED RESULT"
 theme_override_font_sizes/font_size = 11
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result/Content"]
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome/Result/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 theme_override_fonts/font = ExtResource("display")
 autowrap_mode = 2
 
-[node name="Raw" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Result/Content"]
+[node name="Raw" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome/Result/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
-[node name="ResultCopy" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+[node name="ResultCopy" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = ""
 theme_override_font_sizes/font_size = 15
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
@@ -768,7 +835,8 @@ theme_type_variation = "TaskButton"
 toggle_mode = true
 size_flags_horizontal = 3
 
-[node name="ScrollChoice" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+[node name="ScrollChoice" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"]
+vertical = true
 layout_mode = 2
 visible = false
 
@@ -821,6 +889,7 @@ theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
 [node name="PreferredMiniature" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy"]
+size_flags_horizontal = 0
 layout_mode = 2
 text = "Choose miniature"
 custom_minimum_size = Vector2(44, 44)
