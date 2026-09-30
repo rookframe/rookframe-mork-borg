@@ -5,7 +5,7 @@ const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 
 func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> void:
-	for profile in [["desktop", 0, Vector2i(1920, 1080)], ["phone", 1, Vector2i(844, 390)]]:
+	for profile in [["desktop", 0, Vector2i(1920, 1080)], ["tablet", 2, Vector2i(1024, 768)], ["phone", 1, Vector2i(844, 390)]]:
 		var host = BOUNDARY.new()
 		host.device = profile[1]
 		host.outcomes = {"Agility": [[3, 3, 3]], "Presence": [[3, 3, 3]], "Strength": [[3, 3, 3]], "Toughness": [[3, 3, 3]], "Hit points": [[4]], "Silver": [[3, 3]], "Omens": [[1]], "Food": [[3]], "Equipment pack": [[6]], "Equipment first": [[3]], "Equipment second": [[6]], "Weapon": [[1]], "Armor": [[1]]}
@@ -65,7 +65,7 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_bool(primary.size.y >= 44).is_true()
 		assert_bool(surface.get_combined_minimum_size().x <= viewport.size.x).is_true()
 		await _capture(viewport, str(profile[0]) + "-equipment")
-		var choice: Button = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options/Choice1")
+		var choice: Button = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/PackChoices/Options/Choice1")
 		assert_bool(choice.is_visible_in_tree()).is_true()
 		await _settle()
 		await _capture(viewport, str(profile[0]) + "-pack")
@@ -101,7 +101,7 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			await _settle()
 			await _capture(viewport, "phone-appearance")
 		var picker: Control = creator.get_node(^"MiniaturePicker")
-		creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+		creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 		await _settle()
 		await _capture(viewport, str(profile[0]) + "-browser")
 		surface.hide()
@@ -178,6 +178,24 @@ func _settle() -> void:
 		await get_tree().process_frame
 
 func _capture(viewport: SubViewport, name: String) -> void:
+	if name.begins_with("tablet-") and not name.ends_with("-browser"):
+		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 1022, 766)).is_true()
+		var bounds := Rect2(Vector2.ZERO, viewport.size)
+		for button in view.find_children("*", "Button", true, false):
+			if button.is_visible_in_tree():
+				assert_bool(button.size.y >= 44).is_true()
+				assert_bool(bounds.encloses(button.get_global_rect())).is_true()
+		assert_bool(view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame").size == Vector2(120, 150)).is_true()
+		if name == "tablet-review":
+			var pages = view.get_node(view.STAGE + "/Content/ReviewPages")
+			var last: Label = pages.get_node(^"Area/Review/Belongings/Traits/Content/Copy")
+			while not pages.get_node(^"Pager/Next").disabled:
+				pages.get_node(^"Pager/Next").pressed.emit()
+			await _settle()
+			assert_bool(pages.get_node(^"Area").get_global_rect().encloses(last.get_global_rect())).is_true()
+			pages.restore_state({})
+			await _settle()
 	if name.begins_with("phone-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
 		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 842, 388)).is_true()
@@ -224,7 +242,7 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	restored.restore_reconnect_state(retained)
 	fresh.restoring_private_draft = false
 	var view = restored.get_node("CharacterCreator/View")
-	assert_bool(view.get_node(view.STAGE + "/Content/Review").visible).is_true()
+	assert_bool(view.get_node(view.STAGE + "/Content/ReviewPages/Area/Review").visible).is_true()
 	assert_str(view.get_node(view.CONTEXT + "/PortraitVitals/Vitals/Silver/Row/Value").text).is_equal("70")
 	assert_str(view.get_node(view.CONTEXT + "/PortraitVitals/Vitals/Omens/Row/Value").text).is_equal("2")
 	assert_bool(restored.get_node("CharacterCreator").is_active()).is_false()
@@ -233,4 +251,38 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	assert_int(fresh.actors.size()).is_equal(1)
 	assert_bool(restored.visible).is_false()
 	await _settle()
+	viewport.free()
+
+func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> void:
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(1024, 768)
+	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	add_child(viewport)
+	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
+	viewport.add_child(view)
+	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	var classes = load(ROOT + "logic/creation_classes.gd").new()
+	for class_id in view.CLASS_IDS:
+		var profile: Dictionary = classes.profile(class_id)
+		view.present_creation("create-class", {"class_id": class_id, "class_profile": profile, "class_rules": profile.rules}, true)
+		await _settle()
+		var pages = view.get_node(view.STAGE + "/Content/Split/Detail/Pages")
+		while not pages.get_node(^"Pager/Next").disabled:
+			pages.get_node(^"Pager/Next").pressed.emit()
+			await _settle()
+		var note = view.get_node(view.DETAIL + "/NoteRow/Note")
+		assert_bool(pages.get_node(^"Area").get_global_rect().encloses(note.get_global_rect())).is_true()
+	var draft := {"name": "Varg", "description": "Every word of the character's long history remains available. ".repeat(60), "inventory": [{"name": "Carried item", "quantity": 15}], "traits": [{"name": "Long trait", "rules": "Retain these rules in full. ".repeat(60)}]}
+	var unchanged := draft.duplicate(true)
+	view.present_creation("create-review", draft, true)
+	await _settle()
+	var pages = view.get_node(view.STAGE + "/Content/ReviewPages")
+	assert_bool(pages.get_node(^"Pager").visible).is_true()
+	pages.get_node(^"Pager/Next").pressed.emit()
+	var retained: Dictionary = view.capture_state()
+	assert_int(retained.review_page.page).is_equal(1)
+	view.restore_state(retained)
+	await _settle()
+	assert_int(view.capture_state().review_page.page).is_equal(1)
+	assert_dict(draft).is_equal(unchanged)
 	viewport.free()
