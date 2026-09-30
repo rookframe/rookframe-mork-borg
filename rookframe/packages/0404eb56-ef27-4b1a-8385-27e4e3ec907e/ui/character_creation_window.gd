@@ -2,14 +2,14 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 var _restart_requested := false
-var _created_actor: SDK.Actor
+var _created_actor_id := ""
 @onready var _creator := get_node(^"CharacterCreator")
 @onready var _view := get_node(^"CharacterCreator/View")
 
 func ready() -> void:
 	if sdk == null:
 		return
-	_creator.primary_changed.connect(_view.set_primary)
+	_creator.primary_changed.connect(_view.present_primary)
 	_creator.status_changed.connect(_view.set_status)
 	_creator.character_created.connect(_created)
 	_view.primary_requested.connect(_primary)
@@ -31,20 +31,31 @@ func ready() -> void:
 	_creator.begin()
 
 func _primary() -> void:
-	if _created_actor != null:
+	if not _created_actor_id.is_empty():
 		_open_created()
 	else:
 		_creator.primary()
 
 func _reopened() -> void:
-	if is_visible_in_tree() and sdk != null and not _creator.is_active() and _created_actor == null:
+	if is_visible_in_tree() and sdk != null and not _creator.is_active() and _created_actor_id.is_empty():
 		_creator.begin()
 
 func capture_reconnect_state() -> Variant:
-	return _creator.capture_reconnect_state()
+	return {"created_actor_id": _created_actor_id} if not _created_actor_id.is_empty() else _creator.capture_reconnect_state()
 
 func restore_reconnect_state(state: Dictionary) -> void:
-	_creator.restore_reconnect_state(state)
+	_created_actor_id = str(state.get("created_actor_id", ""))
+	if _created_actor_id.is_empty():
+		_creator.restore_reconnect_state(state)
+		return
+	_creator.discard()
+	var result := sdk.actors.read(SDK.ActorId.new(_created_actor_id))
+	if result.ok:
+		var data: Dictionary = result.actor.data
+		_view.present_creation("create-review", data, false)
+	_view.set_status(sdk.translations.text("Character created.") if result.ok else result.message, not result.ok)
+	_view.present_primary(sdk.translations.text("Open character"), false)
+	_view.set_back_enabled(false)
 
 func _restart() -> void:
 	if _restart_requested or not _creator.is_active():
@@ -68,18 +79,18 @@ func _restart_answered(action: String) -> void:
 		_creator.start_over()
 
 func _created(actor: SDK.Actor) -> void:
-	_created_actor = actor
+	_created_actor_id = actor.id.value
 	_open_created()
 
 func _open_created() -> void:
 	var entry: SDK.WindowButton = load(ROOT + "ui/window_button_desktop.tres") if sdk.presentation_experience().is_desktop else load(ROOT + "ui/window_button.tres")
-	var result := sdk.windows.open_actor(entry.window, _created_actor.id)
+	var result := sdk.windows.open_actor(entry.window, SDK.ActorId.new(_created_actor_id))
 	if not result.ok:
 		_view.set_status(result.message, true)
-		_view.set_primary(sdk.translations.text("Open character"), false)
+		_view.present_primary(sdk.translations.text("Open character"), false)
 		return
 	_close()
-	_created_actor = null
+	_created_actor_id = ""
 
 func _close() -> void:
 	var surface := SDK.ExtensionSurface.new()

@@ -106,3 +106,36 @@ func _capture(viewport: SubViewport, name: String) -> void:
 		DirAccess.make_dir_recursive_absolute(directory)
 		RenderingServer.force_draw()
 		viewport.get_texture().get_image().save_png(directory.path_join("creator-" + name + ".png"))
+
+func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> void:
+	var first = BOUNDARY.new()
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(1920, 1080)
+	add_child(viewport)
+	var surface = load(ROOT + "ui/character_creation_window.tscn").instantiate()
+	first.window = surface
+	surface.sdk = SDK.new(first)
+	viewport.add_child(surface)
+	var actor := {"id": "already-created", "access_level": "Owner", "data": {"name": "Retained survivor", "class_title": "No Class", "inventory": []}}
+	first.actors.append(actor)
+	surface.get_node("CharacterCreator").discard()
+	surface._created(SDK.Actor.new(actor))
+	assert_str(surface.get_node("CharacterCreator/View/Layout/Footer/Row/Primary").text).is_equal("Open character")
+	var retained: Dictionary = surface.capture_reconnect_state()
+	assert_str(str(retained.get("created_actor_id", ""))).is_equal("already-created")
+	surface.free()
+	var fresh = BOUNDARY.new()
+	fresh.actors.append(actor.duplicate(true))
+	fresh.reject_sheet = false
+	var restored = load(ROOT + "ui/character_creation_window.tscn").instantiate()
+	fresh.window = restored
+	restored.sdk = SDK.new(fresh)
+	viewport.add_child(restored)
+	restored.restore_reconnect_state(retained)
+	assert_bool(restored.get_node("CharacterCreator").is_active()).is_false()
+	restored.get_node("CharacterCreator/View/Layout/Footer/Row/Primary").pressed.emit()
+	assert_str(fresh.opened_actor).is_equal("already-created")
+	assert_int(fresh.actors.size()).is_equal(1)
+	assert_bool(restored.visible).is_false()
+	await _settle()
+	viewport.free()

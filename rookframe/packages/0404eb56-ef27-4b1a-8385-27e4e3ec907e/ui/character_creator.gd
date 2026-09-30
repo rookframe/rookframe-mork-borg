@@ -792,6 +792,9 @@ func _starting_creature_ids_for_grants(grants: Array) -> Array:
 
 func _automatic_roll(name: String, faces: int, count: int, token: int) -> SDK.DiceRollResult:
 	_character_draft["active_roll_formula"] = "%dd%d" % [count, faces]
+	var formulas: Dictionary = _character_draft.get("roll_formulas", {})
+	formulas[name] = _character_draft["active_roll_formula"]
+	_character_draft["roll_formulas"] = formulas
 	_character_draft["active_roll"] = name
 	_character_draft["roll_ready"] = true
 	_roll_ready = true

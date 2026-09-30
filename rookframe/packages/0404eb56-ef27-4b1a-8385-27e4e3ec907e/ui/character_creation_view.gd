@@ -3,6 +3,7 @@ extends "res://rookframe/ui/components/surfaces/fullscreen_wizard.gd"
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const DEFINITION = preload(ROOT + "logic/character_definition.gd")
 const CLASS_IDS := ["classless", "fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]
@@ -60,6 +61,11 @@ func get_name_field() -> Control:
 
 func get_description_field() -> Control:
 	return get_node(LEFT + "/Identity/Description")
+
+func present_primary(text: String, disabled: bool) -> void:
+	var index := ROUTES.find(_route)
+	var symbol := "book" if index == 4 else "dice" if index in [1, 2, 3] else "character"
+	set_primary(text, disabled, _icon(symbol))
 
 func set_status(message: String, error: bool = false) -> void:
 	get_node(STAGE + "/Heading/Status").text = _t(message)
@@ -148,7 +154,8 @@ func _roll_rows(index: int) -> Array[Dictionary]:
 		if herb:
 			terms.append(["Decoction doses", "decoction_doses", 4, "elixir"])
 		for term in terms:
-			rows.append(_roll_row(term[0], "1d%d" % term[2], str(_draft.get(term[1], "")), _draft.has(term[1]), term[3], _t("Your class determines this starting roll."), str(_draft.get("origin", "")) if term[0] == "Origin" else _traits_text(_draft)))
+			var resolved := _origin_result(str(term[0]), str(term[1]))
+			rows.append(_roll_row(term[0], "1d%d" % term[2], str(resolved.value), _draft.has(term[1]), term[3], _t("Your class determines this starting roll."), str(resolved.detail)))
 	else:
 		var values: Dictionary = _draft.get("equipment_rolls", {})
 		var icons := ["silver", "psychopomp", "food", "bag", "bag", "bag", "sword", "armor"]
@@ -156,9 +163,44 @@ func _roll_rows(index: int) -> Array[Dictionary]:
 			var title: String = EQUIPMENT[number]
 			var value := _equipment_meaning(title, _draft) if values.has(title) else ""
 			rows.append(_roll_row(title, _equipment_formula(title, _draft, EQUIPMENT_FORMULAS[number]), value, values.has(title), icons[number], _t("Roll on the starting equipment table for your class."), value))
-		if not EQUIPMENT.has(active) and not active.is_empty() and bool(_draft.get("equipment_roll_pending", false)):
+		var formulas: Dictionary = _draft.get("roll_formulas", {})
+		for raw_title in values.keys():
+			var title := str(raw_title)
+			if not EQUIPMENT.has(title):
+				var resolved := _conditional_result(title)
+				rows.append(_roll_row(title, str(formulas.get(title, "")), str(resolved.value), true, "dice", _t("Additional roll required by your starting equipment."), str(resolved.detail)))
+		if not EQUIPMENT.has(active) and not values.has(active) and not active.is_empty() and bool(_draft.get("equipment_roll_pending", false)):
 			rows.append(_roll_row(active, str(_draft.get("active_roll_formula", "")), "", false, "dice", _t("Additional roll required by your starting equipment."), ""))
 	return rows
+
+func _origin_result(title: String, key: String) -> Dictionary:
+	if not _draft.has(key):
+		return {"value": "", "detail": ""}
+	var roll := int(_draft.get(key, 0))
+	if title == "Origin":
+		var origin := _t(str(_draft.get("origin", "")))
+		return {"value": origin, "detail": origin}
+	if title == "Decoction doses":
+		return {"value": _t("%d doses / day") % roll, "detail": _t("Shared decoction doses: %d") % roll}
+	var feature: Dictionary = CLASSES.new().decoction(roll) if title in ["First decoction", "Second decoction"] else CLASSES.new().feature(str(_draft.get("class_id", "")), roll)
+	return {"value": _t(str(feature.get("name", ""))), "detail": _t(str(feature.get("rules", "")))}
+
+func _conditional_result(title: String) -> Dictionary:
+	var values: Dictionary = _draft.get("equipment_rolls", {})
+	var value := int(values.get(title, 0))
+	if title == "Hermit scroll family":
+		return {"value": _t("Sacred scroll" if value == 1 else "Unclean scroll"), "detail": ""}
+	if title in ["Hermit scroll", "Sacred scroll", "Unclean scroll"]:
+		var sacred := title == "Sacred scroll" or (title == "Hermit scroll" and int(values.get("Hermit scroll family", 0)) == 1)
+		var item: Dictionary = SCROLLS.new().item("sacred" if sacred else "unclean", value)
+		return {"value": _t(str(item.get("name", ""))), "detail": _t(str(item.get("rules", "")))}
+	if title in ["Red poison doses", "Life elixir doses"]:
+		return {"value": _t("%d doses") % value, "detail": _t(title)}
+	if title == "Monkey count":
+		return {"value": str(value), "detail": _t("Monkey")}
+	if title == "Dog hit points" or (title.begins_with("Monkey ") and title.ends_with(" hit points")):
+		return {"value": "%d HP" % (value + 2), "detail": "%d + 2 = %d HP" % [value, value + 2]}
+	return {"value": str(value), "detail": ""}
 
 func _roll_row(title: String, formula: String, value: String, complete: bool, icon_name: String, description: String, explanation: String) -> Dictionary:
 	var current := title == str(_draft.get("active_roll", ""))

@@ -39,3 +39,15 @@ func PopWindow(child: Control) -> Dictionary:
 	window.show()
 	child.closed.emit()
 	return {"ok": true}
+
+var reject_sheet := true
+var opened_actor := ""
+func OpenActorWindowWithPresentation(_scene: PackedScene, id: String, _presentation: Dictionary) -> Dictionary:
+	if reject_sheet:
+		return {"ok": false, "message": "Sheet temporarily unavailable."}
+	opened_actor = id
+	return {"ok": true}
+func CloseWindow(_scene: PackedScene) -> Dictionary:
+	window.hide()
+	window.closed.emit()
+	return {"ok": true}
