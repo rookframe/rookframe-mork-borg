@@ -248,14 +248,14 @@ func test_required_pack_choice() -> void:
 	var creator = _creator_for(host, "occult-herbmaster")
 	for iteration in range(180):
 		await get_tree().process_frame
-		if stage == 4 and creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices").visible:
+		if stage == 4 and creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/PackChoices").visible:
 			await get_tree().process_frame
 			break
 		if not disabled:
 			creator.primary()
 	creator.primary()
 	_check(stage == 4 and host.actors.is_empty(), "Equipment waits for the required source pack choice.")
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/PackChoices/Options/Choice0").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/PackChoices/Options/Choice0").pressed.emit()
 	await _finish(creator)
 	_check(host.actors.size() == 1 and host.actors[0].data.pack == "Nothing", "Nothing is an explicit legal pack choice.")
 	creator.free()
@@ -928,7 +928,7 @@ func before_test() -> void:
 	disabled = false
 
 func _choose_miniature(creator: Node) -> void:
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 	var picker = creator.get_node(^"MiniaturePicker/Picker")
 	picker.get_node(^"Layout/Results/Content/GridArea/Rows").get_child(0).pressed.emit()
 	picker.get_node(^"Layout/Footer/Row/Choose").pressed.emit()
@@ -944,7 +944,7 @@ func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 			creator.primary()
 	var name_field = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name")
 	name_field.value = "Varg"
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 	var picker = creator.get_node(^"MiniaturePicker/Picker")
 	_check(picker.get_node(^"Layout/Results/Content/GridArea/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
 	picker.get_node(^"Layout/Footer/Row/Cancel").pressed.emit()
@@ -953,7 +953,7 @@ func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 	_choose_miniature(creator)
 	_check(not creator.get_node(^"MiniaturePicker").visible, "Use Miniature returns to the wizard.")
 	_check(name_field.value == "Varg", "Selecting preserves the name.")
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
 	_check(picker.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
 	picker.get_node(^"Layout/Footer/Row/Cancel").pressed.emit()
 	creator.primary()

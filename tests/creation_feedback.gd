@@ -21,7 +21,7 @@ func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 	var choices = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Left/Choices")
 	for result in [["Omens", "1 omen"], ["Food", "3 days"], ["Equipment pack", "Backpack"]]:
 		choices.selected.emit(result[0])
-		var detail = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/RollOutcome/Result")
+		var detail = view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome/Result")
 		assert_bool(detail.is_visible_in_tree()).is_true()
 		assert_str(_copy(detail)).contains(result[1])
 

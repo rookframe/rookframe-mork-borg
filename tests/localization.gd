@@ -19,11 +19,13 @@ func test_russian_creation_uses_display_labels_without_changing_draft() -> void:
 	var draft := {"class_id": "fanged-deserter", "class_title": profile.title, "class_profile": profile, "class_rules": profile.rules, "name": "Strength", "description": "My character", "origin": profile.origins[0], "inventory": []}
 	var before := draft.duplicate(true)
 	view.present_creation("create-abilities", draft, true)
-	assert_str(view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Content/Heading/Copy/Title").text).is_equal("Ловкость")
+	assert_str(view.get_node("Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Heading/Copy/Title").text).is_equal("Ловкость")
 	view.present_creation("create-review", draft, false)
 	assert_str(view.get_node("Layout/Body/ContextSlot/Context/Name/Title").text).is_equal("Strength")
-	assert_str(view.get_node("Layout/Body/StageSlot/Stage/Content/Review/Character/Identity/Content/Rows").get_child(0).get_node("Inset/Row/Value").text).is_equal("Клыкастый дезертир")
-	assert_str(view.get_node("Layout/Body/StageSlot/Stage/Content/Review/Character/Identity/Content/Copy").text).contains("My character")
+	assert_str(view.get_node("Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character/Identity/Content/Rows").get_child(0).get_node("Inset/Row/Value").text).is_equal("Клыкастый дезертир")
+	assert_str(view.get_node("Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character/Identity/Content/Copy").text).contains("My character")
+	assert_str(view.get_node(view.STAGE + "/Content/Review/BelongingsPages/Pager/Previous").text).is_equal("Назад")
+	assert_str(view.get_node(view.STAGE + "/Content/Review/BelongingsPages/Pager/Next").text).is_equal("Далее")
 	assert_dict(draft).is_equal(before)
 	await get_tree().process_frame
 	await get_tree().process_frame

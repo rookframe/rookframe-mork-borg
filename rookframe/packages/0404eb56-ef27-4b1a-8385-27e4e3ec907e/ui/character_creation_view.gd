@@ -17,10 +17,11 @@ const ABILITIES := ["Agility", "Presence", "Strength", "Toughness", "Hit points"
 const ABILITY_DESCRIPTIONS := ["Defend, balance, swim and flee.", "Perceive, aim, charm and use Powers.", "Strike, grapple, lift and break.", "Resist poison, cold and heat.", "Roll your class Hit Points die and add Toughness. You start with at least 1 HP."]
 const EQUIPMENT := ["Silver", "Omens", "Food", "Equipment pack", "Equipment first", "Equipment second", "Weapon", "Armor"]
 const PACK_BUTTONS := ["/PackChoices/Options/Choice0", "/PackChoices/Options/Choice1", "/PackChoices/Options/Choice2", "/PackChoices/Options/Choice3", "/PackChoices/Options/Choice4"]
+const TABLET_DETAIL_GAP := 12
 const STAGE := "Layout/Body/StageSlot/Stage"
 const CONTEXT := "Layout/Body/ContextSlot/Context"
 const LEFT := "Layout/Body/StageSlot/Stage/Content/Split/Left"
-const DETAIL := "Layout/Body/StageSlot/Stage/Content/Split/Detail/Content"
+const DETAIL := "Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"
 signal class_selected(class_id: String)
 signal scroll_selected(slot: String, disposition: String)
 signal pack_selected(pack: String)
@@ -36,6 +37,7 @@ var _preview_key := ""
 var _details := false
 var _review_section := "Character"
 var _pending_choice := ""
+var _detail_key := ""
 
 func _ready() -> void:
 	super._ready()
@@ -58,57 +60,68 @@ func _fit() -> void:
 	if not is_node_ready():
 		return
 	var phone := size.y <= 560
+	var tablet := size.x <= 1150 and not phone
 	var context := get_node(CONTEXT)
-	context.add_theme_constant_override("separation", 8 if phone else 24)
+	context.add_theme_constant_override("separation", 8 if phone else 18 if tablet else 24)
 	for name in ["Heading", "HintRow", "History", "Spacer"]:
 		get_node(CONTEXT + "/" + name).visible = not phone
-	get_node(CONTEXT + "/PortraitVitals").add_theme_constant_override("separation", 12 if phone else 26)
+	get_node(CONTEXT + "/PortraitVitals").add_theme_constant_override("separation", 12 if phone else 14 if tablet else 26)
 	for path in ["/PortraitVitals/PortraitFrame", "/PortraitVitals/PortraitFrame/Portrait"]:
-		get_node(CONTEXT + path).custom_minimum_size = Vector2(80, 100) if phone else Vector2(180, 225)
-	get_node(CONTEXT + "/PortraitVitals/Vitals").add_theme_constant_override("separation", 3 if phone else 24)
+		get_node(CONTEXT + path).custom_minimum_size = Vector2(80, 100) if phone else Vector2(120, 150) if tablet else Vector2(180, 225)
+	get_node(CONTEXT + "/PortraitVitals/Vitals").add_theme_constant_override("separation", 3 if phone else 9 if tablet else 24)
 	for vital in ["HitPoints", "Omens", "Silver"]:
 		var path: String = CONTEXT + "/PortraitVitals/Vitals/" + vital
 		get_node(path).add_theme_constant_override("separation", -2 if phone else 2)
-		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(14, 14) if phone else Vector2(20, 20)
-		get_node(path + "/Row/Value").add_theme_font_size_override("font_size", 19 if phone else 27)
+		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(14, 14) if phone else Vector2(17, 17) if tablet else Vector2(20, 20)
+		get_node(path + "/Row/Value").add_theme_font_size_override("font_size", 19 if phone else 23 if tablet else 27)
 		get_node(path + "/Row/Value").add_theme_constant_override("line_spacing", 0 if phone else 4)
-		get_node(path + "/Label").add_theme_font_size_override("font_size", 8 if phone else 11)
+		get_node(path + "/Label").add_theme_font_size_override("font_size", 8 if phone else 10 if tablet else 11)
 		get_node(path + "/Label").add_theme_constant_override("line_spacing", 0 if phone else 4)
-	get_node(CONTEXT + "/Name/Title").add_theme_font_size_override("font_size", 21 if phone else 27)
+	get_node(CONTEXT + "/Name/Title").add_theme_font_size_override("font_size", 21 if phone else 24 if tablet else 27)
 	get_node(CONTEXT + "/Name/Class").add_theme_font_size_override("font_size", 11 if phone else 13)
 	get_node(CONTEXT + "/Name").add_theme_constant_override("separation", 2 if phone else 4)
-	get_node(CONTEXT + "/PhoneHistory").visible = phone
+	get_node(CONTEXT + "/PhoneHistory").visible = phone or tablet and not str(_draft.get("origin", "")).is_empty()
+	get_node(CONTEXT + "/History").visible = not phone and not get_node(CONTEXT + "/PhoneHistory").visible
+	get_node(CONTEXT + "/PhoneHistory").add_theme_constant_override("separation", 8 if tablet else 4)
 	get_node(CONTEXT + "/Attributes").columns = 4 if phone else 2
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		var path: String = CONTEXT + "/Attributes/" + ability
 		var node := get_node(path) as PanelContainer
-		node.custom_minimum_size = Vector2(0, 44 if phone else 48)
-		node.theme_type_variation = "TaskAttributeCompact" if phone else "TaskAttribute"
+		node.custom_minimum_size = Vector2(0, 44 if phone else 41 if tablet else 48)
+		node.theme_type_variation = "TaskAttributeCompact" if phone else "TaskAttributeTablet" if tablet else "TaskAttribute"
 		get_node(path + "/Row").vertical = phone
-		get_node(path + "/Row").add_theme_constant_override("separation", 1 if phone else 7)
+		get_node(path + "/Row").add_theme_constant_override("separation", 1 if phone else 4 if tablet else 7)
 		get_node(path + "/Row/Icon").visible = not phone
-		get_node(path + "/Row/Label").add_theme_font_size_override("font_size", 8 if phone else 11)
-		get_node(path + "/Row/Value").add_theme_font_size_override("font_size", 17 if phone else 20)
+		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(18, 18) if tablet else Vector2(22, 22)
+		get_node(path + "/Row/Label").add_theme_font_size_override("font_size", 8 if phone else 10 if tablet else 11)
+		get_node(path + "/Row/Value").add_theme_font_size_override("font_size", 17 if phone else 18 if tablet else 20)
 		get_node(path + "/Row/Label").horizontal_alignment = 1 if phone else 0
 		get_node(path + "/Row/Value").horizontal_alignment = 1 if phone else 0
-	get_node(STAGE).add_theme_constant_override("separation", 8 if phone else 30)
+	get_node(STAGE).add_theme_constant_override("separation", 8 if phone else 22 if tablet else 30)
+	get_node(STAGE + "/Content/Split").add_theme_constant_override("separation", 20 if tablet else 40)
+	get_node(STAGE + "/Heading/Copy/Subtitle").add_theme_font_size_override("font_size", 12 if tablet else 14)
 	for name in ["Kicker", "Subtitle"]:
 		get_node(STAGE + "/Heading/Copy/" + name).visible = not phone
-	get_node(STAGE + "/Heading/Copy/Title").add_theme_font_size_override("font_size", (21 if _route == "create-review" else 23) if phone else 30)
+	get_node(STAGE + "/Heading/Copy/Title").add_theme_font_size_override("font_size", (21 if _route == "create-review" else 23) if phone else 28 if tablet else 30)
 	get_node(STAGE + "/Heading/Copy/Title").text_overrun_behavior = 3
 	get_node(STAGE + "/Heading").custom_minimum_size = Vector2(0, 44 if phone else 0)
 	get_node(LEFT + "/Choices").columns = 2 if phone and _route == "create-class" else 1
-	get_node(LEFT + "/Identity").add_theme_constant_override("separation", 8 if phone else 26)
+	get_node(LEFT + "/Identity").add_theme_constant_override("separation", 8 if phone else 22 if tablet else 26)
+	get_node(LEFT + "/Identity/FieldGap").visible = tablet
 	get_name_field().compact = phone
 	get_description_field().compact = phone
 	var detail := get_node(DETAIL)
+	var detail_pages := get_node(STAGE + "/Content/Split/Detail/Pages")
+	detail_pages.enabled = tablet
+	get_node(STAGE + "/Content/Review/CharacterPages").enabled = tablet
+	get_node(STAGE + "/Content/Review/BelongingsPages").enabled = tablet
 	for edge in ["left", "top", "right", "bottom"]:
-		detail.set("offset_" + edge, (14 if phone else 30) * (-1 if edge in ["right", "bottom"] else 1))
-	detail.add_theme_constant_override("separation", 8 if phone else 26)
-	get_node(DETAIL + "/Heading").add_theme_constant_override("separation", 12 if phone else 20)
-	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = Vector2(36, 36) if phone else Vector2(80, 80)
+		detail_pages.set("offset_" + edge, (14 if phone else 16 if tablet else 30) * (-1 if edge in ["right", "bottom"] else 1))
+	detail.add_theme_constant_override("separation", 8 if phone else TABLET_DETAIL_GAP if tablet else 26)
+	get_node(DETAIL + "/Heading").add_theme_constant_override("separation", 12 if phone or tablet else 20)
+	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = Vector2(36, 36) if phone else Vector2(42, 42) if tablet else Vector2(80, 80)
 	get_node(DETAIL + "/Heading/Copy").add_theme_constant_override("separation", 1 if phone else 5)
-	get_node(DETAIL + "/Heading/Copy/Title").add_theme_font_size_override("font_size", 21 if phone else 36)
+	get_node(DETAIL + "/Heading/Copy/Title").add_theme_font_size_override("font_size", 21 if phone else 24 if tablet else 36)
 	get_node(DETAIL + "/Heading/Copy/Kicker").add_theme_font_size_override("font_size", 11 if phone else 12)
 	get_node(DETAIL + "/Heading/Copy/Kicker").add_theme_constant_override("line_spacing", 0 if phone else 4)
 	get_node(DETAIL + "/Heading/Copy/Title").add_theme_constant_override("line_spacing", 0 if phone else 4)
@@ -117,19 +130,19 @@ func _fit() -> void:
 	get_node(DETAIL + "/RollInfo").visible = _route != "create-identity"
 	get_node(DETAIL + "/RollOutcome").visible = get_node(DETAIL + "/RollOutcome/Result").visible or get_node(DETAIL + "/RollOutcome/ResultCopy").visible
 	for group in ["RollInfo", "RollOutcome"]:
-		get_node(DETAIL + "/" + group).add_theme_constant_override("separation", 20 if phone else 26)
-	get_node(DETAIL + "/RollInfo/Formula").add_theme_font_size_override("font_size", 25 if phone else 38)
-	get_node(DETAIL + "/RollInfo/Flavor").add_theme_font_size_override("font_size", 12 if phone else 16)
-	get_node(DETAIL + "/RollInfo/Flavor").add_theme_constant_override("line_spacing", 2 if phone else 10)
-	get_node(DETAIL + "/RollOutcome/ResultCopy").add_theme_font_size_override("font_size", 11 if phone else 15)
+		get_node(DETAIL + "/" + group).add_theme_constant_override("separation", 20 if phone else 12 if tablet else 26)
+	get_node(DETAIL + "/RollInfo/Formula").add_theme_font_size_override("font_size", 25 if phone else 30 if tablet else 38)
+	get_node(DETAIL + "/RollInfo/Flavor").add_theme_font_size_override("font_size", 12 if phone else 13 if tablet else 16)
+	get_node(DETAIL + "/RollInfo/Flavor").add_theme_constant_override("line_spacing", 2 if phone else 4 if tablet else 10)
+	get_node(DETAIL + "/RollOutcome/ResultCopy").add_theme_font_size_override("font_size", 11 if phone else 13 if tablet else 15)
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").add_theme_font_size_override("font_size", 18 if phone else 22)
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").max_lines_visible = 2 if phone else -1
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").text_overrun_behavior = 3 if phone else 0
 	get_node(DETAIL + "/RollOutcome/Result/Content/Label").visible = not phone
 	get_node(DETAIL + "/RollOutcome/Result").theme_type_variation = "TaskResultCompact" if phone else "TaskResult"
 	get_node(DETAIL + "/RollInfo/Formula").theme_type_variation = "TaskFormulaCompact" if phone else "TaskFormula"
-	get_node(DETAIL + "/Rules").add_theme_font_size_override("normal_font_size", 11 if phone else 14)
-	get_node(DETAIL + "/Rules").add_theme_constant_override("line_separation", 2 if phone else 6)
+	get_node(DETAIL + "/Rules").add_theme_font_size_override("normal_font_size", 11 if phone else 12 if tablet else 14)
+	get_node(DETAIL + "/Rules").add_theme_constant_override("line_separation", 2 if phone or tablet else 6)
 	get_node(DETAIL + "/Rules").fit_content = not phone
 	get_node(DETAIL + "/Rules").scroll_active = false
 	get_node(DETAIL + "/Rules").size_flags_vertical = 3 if phone else 1
@@ -137,9 +150,10 @@ func _fit() -> void:
 		get_node(DETAIL + "/Rules").text = _class_rules_markup()
 	for fact in ["HitPoints", "Silver", "Omens"]:
 		get_node(DETAIL + "/Facts/Row/" + fact).add_theme_constant_override("separation", 2 if phone else 6)
-		get_node(DETAIL + "/Facts/Row/" + fact + "/Label").add_theme_font_size_override("font_size", 10 if phone else 12)
-		get_node(DETAIL + "/Facts/Row/" + fact + "/Value").add_theme_font_size_override("font_size", 17 if phone else 23)
-	get_node(DETAIL + "/Facts").theme_type_variation = "TaskFactsCompact" if phone else "TaskFacts"
+		get_node(DETAIL + "/Facts/Row/" + fact + "/Label").add_theme_font_size_override("font_size", 10 if phone or tablet else 12)
+		get_node(DETAIL + "/Facts/Row/" + fact + "/Value").add_theme_font_size_override("font_size", 17 if phone else 19 if tablet else 23)
+	get_node(DETAIL + "/Facts").theme_type_variation = "TaskFactsCompact" if phone else "TaskFactsTablet" if tablet else "TaskFacts"
+	get_node(DETAIL + "/NoteRow/Note").add_theme_font_size_override("font_size", 11 if tablet else 12)
 	for name in ["Spacer", "NoteRule", "NoteRow"]:
 		get_node(DETAIL + "/" + name).visible = not phone
 	get_node(DETAIL + "/Appearance/Preview").custom_minimum_size = Vector2(80, 100) if phone else Vector2(110, 138)
@@ -152,7 +166,20 @@ func _fit() -> void:
 	for group in [PACK_BUTTONS, ["/ScrollChoice/Reroll", "/ScrollChoice/Eat", "/ScrollChoice/Paper"]]:
 		for path in group:
 			get_node(DETAIL + path).add_theme_font_size_override("font_size", 11 if phone else 15)
+	get_node(STAGE + "/Content/Review").add_theme_constant_override("separation", 20 if tablet else 24)
+	for column in ["Character", "Belongings"]:
+		get_node(STAGE + "/Content/Review/" + column + "Pages/Area/" + column).add_theme_constant_override("separation", 18 if tablet else 28)
 	_sync_navigation()
+	_fit_detail_spacer.call_deferred()
+
+func _fit_detail_spacer() -> void:
+	if size.y <= 560 or size.x > 1150:
+		return
+	var content := get_node(DETAIL) as VBoxContainer
+	var spacer := get_node(DETAIL + "/Spacer") as Control
+	# After native layout, only Spacer absorbs the spare vertical space.
+	var minimum := content.size.y - spacer.size.y
+	spacer.visible = minimum <= get_node(STAGE + "/Content/Split/Detail/Pages").size.y
 
 func _toggle_details() -> void:
 	_details = not _details
@@ -170,17 +197,23 @@ func _sync_navigation() -> void:
 	get_node(STAGE + "/Heading/Details").set_pressed_no_signal(_details)
 	get_node(STAGE + "/Heading/ReviewTabs").visible = phone and review
 	get_node(LEFT).visible = not phone or not _details
-	(get_node(DETAIL).get_parent() as Control).visible = not phone or _details
-	get_node(STAGE + "/Content/Review/Character").visible = not phone or _review_section == "Character"
-	get_node(STAGE + "/Content/Review/Character/Abilities").visible = not phone
-	get_node(STAGE + "/Content/Review/Belongings").visible = not phone or _review_section != "Character"
-	get_node(STAGE + "/Content/Review/Belongings/Equipment").visible = not phone or _review_section == "Gear"
-	get_node(STAGE + "/Content/Review/Belongings/Traits").visible = not phone or _review_section == "Traits"
+	get_node(STAGE + "/Content/Split/Detail").visible = not phone or _details
+	get_node(STAGE + "/Content/Review/CharacterPages").visible = not phone or _review_section == "Character"
+	get_node(STAGE + "/Content/Review/CharacterPages/Area/Character/Abilities").visible = not phone
+	get_node(STAGE + "/Content/Review/BelongingsPages").visible = not phone or _review_section != "Character"
+	get_node(STAGE + "/Content/Review/BelongingsPages/Area/Belongings/Equipment").visible = not phone or _review_section == "Gear"
+	get_node(STAGE + "/Content/Review/BelongingsPages/Area/Belongings/Traits").visible = not phone or _review_section == "Traits"
 	for section in ["Character", "Gear", "Traits"]:
 		get_node(STAGE + "/Heading/ReviewTabs/" + section).set_pressed_no_signal(_review_section == section)
 
 func capture_state() -> Dictionary:
-	return {"choice": _choice, "details": _details, "review": _review_section, "page": int(get_node(LEFT + "/Choices").capture_state().get("page", 0))}
+	return {
+		"choice": _choice, "details": _details, "review": _review_section,
+		"page": int(get_node(LEFT + "/Choices").capture_state().get("page", 0)),
+		"detail_page": int(get_node(STAGE + "/Content/Split/Detail/Pages").capture_state().get("page", 0)),
+		"character_page": int(get_node(STAGE + "/Content/Review/CharacterPages").capture_state().get("page", 0)),
+		"belongings_page": int(get_node(STAGE + "/Content/Review/BelongingsPages").capture_state().get("page", 0)),
+	}
 
 func restore_state(state: Dictionary) -> void:
 	_choice = str(state.get("choice", _choice))
@@ -190,6 +223,9 @@ func restore_state(state: Dictionary) -> void:
 		_present_choices()
 		_present_detail()
 	get_node(LEFT + "/Choices").restore_state({"page": int(state.get("page", 0))})
+	get_node(STAGE + "/Content/Split/Detail/Pages").restore_state({"page": int(state.get("detail_page", 0))})
+	get_node(STAGE + "/Content/Review/CharacterPages").restore_state({"page": int(state.get("character_page", 0))})
+	get_node(STAGE + "/Content/Review/BelongingsPages").restore_state({"page": int(state.get("belongings_page", 0))})
 	_sync_navigation()
 
 func localize(locale: I18N) -> void:
@@ -202,6 +238,10 @@ func localize(locale: I18N) -> void:
 	get_name_field().help_text = _t("Required")
 	get_description_field().label_text = _t("Description")
 	get_description_field().help_text = _t("Optional · a few words to remember them by")
+	for path in ["/Content/Split/Detail/Pages", "/Content/Review/CharacterPages", "/Content/Review/BelongingsPages"]:
+		get_node(STAGE + path + "/Pager/Previous").text = _t("Previous")
+		get_node(STAGE + path + "/Pager/Next").text = _t("Next")
+
 
 func get_name_field() -> Control:
 	return get_node(LEFT + "/Identity/Name")
@@ -233,6 +273,8 @@ func present_creation(route: String, draft: Dictionary, _compact: bool) -> void:
 	if changed:
 		_details = false
 		_review_section = "Character"
+		get_node(STAGE + "/Content/Review/CharacterPages").restore_state({})
+		get_node(STAGE + "/Content/Review/BelongingsPages").restore_state({})
 	_route = next_route
 	_draft = draft
 	var index := maxi(0, ROUTES.find(_route))
@@ -389,6 +431,10 @@ func _reset_detail() -> Control:
 	return detail
 
 func _present_detail() -> void:
+	var key := _route + ":" + _choice
+	if key != _detail_key:
+		get_node(STAGE + "/Content/Split/Detail/Pages").restore_state({})
+	_detail_key = key
 	var detail := _reset_detail()
 	if _route == "create-class":
 		var profile: Dictionary = _draft.get("class_profile", {})
@@ -451,7 +497,7 @@ func _class_rules_markup() -> String:
 		var offsets: Dictionary = profile.get("ability_offsets", {})
 		for pair in [["Tough as wood", "Toughness"], ["Low in protein", "Strength"]]:
 			parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t(pair[0])), _bb(_t("%s is rolled with 3d6 %+d.") % [_t(pair[1]), int(offsets.get(pair[1], 0))])])
-		var laboratory := _t("Two random decoctions. d4 doses a day.") if size.y <= 560 else _t(str(rules[1]))
+		var laboratory := _t("Two random decoctions. d4 doses a day.") if size.y <= 560 or size.x <= 1150 else _t(str(rules[1]))
 		parts.append("[color=#f0bb32][font_size=17]%s[/font_size][/color]\n%s" % [_bb(_t("Portable laboratory")), _bb(laboratory)])
 	else:
 		var offsets: Dictionary = profile.get("ability_offsets", {})
@@ -469,7 +515,7 @@ func _class_rules_markup() -> String:
 		for part in parts:
 			cells.append("[cell expand=1 shrink=false]" + part.replace("font_size=17", "font_size=15") + "[/cell]")
 		return "[table=3]" + _lines(cells, "") + "[/table]"
-	return _lines(parts, "\n\n")
+	return _lines(parts, "\n\n").replace("font_size=17", "font_size=15") if size.x <= 1150 else _lines(parts, "\n\n")
 
 func _bb(value: String) -> String:
 	return value.replace("[", "[lb]")
@@ -520,10 +566,11 @@ func _present_context() -> void:
 				items.append(item)
 		if not items.is_empty():
 			history.append({"icon": "sword" if kind == "Weapon" else "armor", "text": _inventory_text(items).replace("\n", " · ")})
-	for index in range(2):
-		var row := get_node(CONTEXT + ["/PhoneHistory/Line0", "/PhoneHistory/Line1"][index])
-		var entry := history.size() - mini(history.size(), 2) + index
-		row.visible = entry < history.size()
+	var limit := 2 if size.y <= 560 else 4
+	for index in range(4):
+		var row := get_node(CONTEXT + ["/PhoneHistory/Line0", "/PhoneHistory/Line1", "/PhoneHistory/Line2", "/PhoneHistory/Line3"][index])
+		var entry := history.size() - mini(history.size(), limit) + index
+		row.visible = index < limit and entry < history.size()
 		if row.visible:
 			(row.get_node(^"Icon") as TextureRect).texture = _icon(str(history[entry].icon))
 			(row.get_node(^"Text") as Label).text = str(history[entry].text)
@@ -533,15 +580,15 @@ func _present_review() -> void:
 	var review := get_node(STAGE + "/Content/Review")
 	var miniature: Dictionary = _draft.get("preferred_miniature", {})
 	var identity: Array[Dictionary] = [_pair("Class", _t(str(_draft.get("class_title", "")))), _pair("Origin", _t(str(_draft.get("origin", ""))))]
-	get_node(STAGE + "/Content/Review" + "/Character/Identity").configure(_t("Character"), _icon("character"), identity, str(_draft.get("description", "")) if not str(_draft.get("description", "")).is_empty() else _t("No description added."))
+	get_node(STAGE + "/Content/Review/CharacterPages/Area/Character/Identity").configure(_t("Character"), _icon("character"), identity, str(_draft.get("description", "")) if not str(_draft.get("description", "")).is_empty() else _t("No description added."))
 	var values: Array[Dictionary] = []
 	var abilities: Dictionary = _draft.get("abilities", {})
 	for ability in [["Agility", "AGI"], ["Presence", "PRE"], ["Strength", "STR"], ["Toughness", "TOU"]]:
 		var score: Dictionary = abilities.get(ability[0], {})
 		values.append(_pair(ability[1], _modifier(int(score.get("modifier", 0)))))
 	var vitals: Array[Dictionary] = [_pair("Hit Points", "%s / %s" % [int(_draft.get("hit_points", 1)), int(_draft.get("maximum_hit_points", 1))]), _pair("Preferred miniature", str(miniature.get("title", _t("None"))))]
-	get_node(STAGE + "/Content/Review" + "/Character/Abilities").configure(_t("Abilities"), _icon("strength"), vitals)
-	get_node(STAGE + "/Content/Review" + "/Character/Abilities").set_stats(values)
+	get_node(STAGE + "/Content/Review/CharacterPages/Area/Character/Abilities").configure(_t("Abilities"), _icon("strength"), vitals)
+	get_node(STAGE + "/Content/Review/CharacterPages/Area/Character/Abilities").set_stats(values)
 	var inventory: Array = _draft.get("inventory", [])
 	var weapon: Array = []
 	var armor: Array = []
@@ -555,7 +602,7 @@ func _present_review() -> void:
 		else:
 			carried.append(item)
 	var equipment: Array[Dictionary] = [_pair("Weapon", _inventory_text(weapon)), _pair("Protection", _inventory_text(armor)), _pair("Carried", _inventory_text(carried).replace("\n", " · ")), _pair("Resources", _t("%s silver · %s Omens") % [int(_draft.get("silver", 0)), int(_draft.get("omens", 0))])]
-	get_node(STAGE + "/Content/Review" + "/Belongings/Equipment").configure(_t("Equipment"), _icon("bag"), equipment)
+	get_node(STAGE + "/Content/Review/BelongingsPages/Area/Belongings/Equipment").configure(_t("Equipment"), _icon("bag"), equipment)
 	var traits: Array[Dictionary] = []
 	var traits_data: Array = _draft.get("traits", [])
 	for raw_trait in traits_data:
@@ -569,7 +616,7 @@ func _present_review() -> void:
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		if offsets.has(ability):
 			modifiers.append(_t("%s %+d to the starting roll.") % [_t(ability), int(offsets.get(ability, 0))])
-	get_node(STAGE + "/Content/Review" + "/Belongings/Traits").configure(_t("Class traits"), _icon("herbs"), traits, _lines(modifiers))
+	get_node(STAGE + "/Content/Review/BelongingsPages/Area/Belongings/Traits").configure(_t("Class traits"), _icon("herbs"), traits, _lines(modifiers))
 
 func _pair(label: String, value: String) -> Dictionary:
 	return {"label": _t(label), "value": value if not value.is_empty() else "—"}
