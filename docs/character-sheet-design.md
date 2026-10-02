@@ -26,6 +26,8 @@ a running Roll, while abandoning its workflow cancels an unfinished Roll.
 
 Rest rolls d4 or d6 recovery capped at maximum HP, with eligibility at the table.
 Morning Power uses and laboratory brewing are independent Overview actions.
+Brewing starts Window Dice from the laboratory Overview in one activation;
+other item workflows retain any required preparation choices.
 Improvement follows the implemented ordered procedure; leaving unfinished ends
 it, retaining accepted changes and leaving remaining steps for manual resolution.
 

@@ -783,13 +783,7 @@ func _item_detail(item: Dictionary) -> void:
 			_option("Remove item", _remove_item)
 	else:
 		_text(str(item.get("rules", "")))
-		var facts: Array = [["Quantity", str(item.get("quantity", 0))], ["State", "Ready" if item.get("equipped", false) else "Carried"]]
-		for key in ["damage", "range_feet", "reduction", "armor_tier"]:
-			if item.has(str(key)):
-				facts.append([str(key).replace("_", " ").capitalize(), str(item.get(str(key)))])
-		if item.has("dose_pool"):
-			facts.append(["Shared laboratory doses", str(_projection.remaining_uses(_actor.data, item))])
-		_detail_ui.append_facts(facts)
+		_detail_ui.append_facts(_projection.item_facts(_actor.data, item))
 		var power := POWERS.new().definition(str(item.get("source_item_id", "")))
 		var rule := RULES.new().definition(str(item.get("source_item_id", "")))
 		if not power.is_empty():
@@ -1184,6 +1178,9 @@ func _primary_action() -> void:
 			await _start_workflow()
 		else:
 			_workflow("use", _detail.trim_prefix("item:"))
+			var rule := RULES.new().definition(str(item.get("source_item_id", "")))
+			if rule.get("brew", false):
+				await _start_workflow()
 	elif _detail == "custom":
 		_busy = true
 		var corrections := ACTIONS.new(sdk, _actor.id)

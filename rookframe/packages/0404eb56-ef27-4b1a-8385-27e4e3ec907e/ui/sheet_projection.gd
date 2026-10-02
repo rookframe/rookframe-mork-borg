@@ -146,6 +146,15 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 		resources.append(row("journal:notes", "Personal notes", "Local placeholder · Notes", "", BOOK))
 	return {"primary": primary, "resources": resources, "companions": companions, "heading": heading}
 
+func item_facts(data: Dictionary, item: Dictionary) -> Array:
+	var facts: Array = [["Quantity", str(item.get("quantity", 0))], ["State", "Ready" if item.get("equipped", false) else "Carried"]]
+	for key in ["damage", "range_feet", "reduction", "armor_tier"]:
+		if item.has(str(key)):
+			facts.append([str(key).replace("_", " ").capitalize(), str(item.get(str(key)))])
+	if item.has("dose_pool"):
+		facts.append(["Shared laboratory doses", str(remaining_uses(data, item))])
+	return facts
+
 func remaining_uses(data: Dictionary, item: Dictionary) -> int:
 	if not item.has("dose_pool"):
 		return int(item.get("uses", 0))
