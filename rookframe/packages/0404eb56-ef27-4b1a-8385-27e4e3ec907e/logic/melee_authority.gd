@@ -8,6 +8,7 @@ const CREATURE_ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385
 const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_actions.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 const TARGETING = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/attack_targeting.gd")
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Dictionary = {}
 
@@ -151,7 +152,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			report.text.append(SDK.ActionLogText.new(line))
 		report.result = "Stopped"
 		report.tone = "attention"
-		context.commit([], report)
+		BROKEN.new().commit(context, [], report)
 		var text := ""
 		for line in outside:
 			text += ("\n" if not text.is_empty() else "") + line
@@ -379,7 +380,7 @@ func _complete(context: SDK.SystemActionContext, action: Dictionary, changes: Ar
 	var report := SDK.ActionLogMessage.new("%s · %s attack" % [str(action.name), str(action.weapon)])
 	report.text = [SDK.ActionLogText.new(text)]
 	report.result = outcome
-	var saved := context.commit(changes, report)
+	var saved := BROKEN.new().commit(context, changes, report)
 	if not saved.ok:
 		return _end(context, action)
 	action.state = "resolved"
@@ -396,7 +397,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	report.text = [SDK.ActionLogText.new(ENDED)]
 	report.result = "ENDED"
 	report.tone = "attention"
-	context.commit([], report)
+	BROKEN.new().commit(context, [], report)
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
@@ -514,7 +515,7 @@ func _spend_ammunition(context: SDK.SystemActionContext, action: Dictionary, sou
 	var sequence: int = action.sequence
 	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.name), str(action.ammunition_kind), sequence])]
 	report.result = "1 spent"
-	var saved := context.commit([SDK.ActorChange.new(source.id, data)], report)
+	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report)
 	if not saved.ok:
 		return false
 	action.resource_spent = true
@@ -557,7 +558,7 @@ func _eurekia(context: SDK.SystemActionContext, action: Dictionary, source: SDK.
 	data["inventory"] = items
 	var report := SDK.ActionLogMessage.new("Eurekia")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit([SDK.ActorChange.new(source.id, data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report).ok:
 		return false
 	source.data = data
 	return true

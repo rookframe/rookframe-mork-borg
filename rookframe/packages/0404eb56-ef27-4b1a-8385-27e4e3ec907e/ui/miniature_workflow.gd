@@ -48,12 +48,14 @@ func _load() -> void:
 	if not result.ok:
 		browser.set_state("error", _t("Could not load Miniatures. Try again."))
 		return
-	var entries: Array[Dictionary] = []
+	var entries: Array[Dictionary] = [{"id": "none", "title": _t("None"), "package": "", "package_id": "", "local_id": "", "available": true}]
 	for entry in result.items:
 		entries.append({"id": entry.reference.package_id + "/" + entry.reference.local_id,
 			"title": entry.localized_title, "package": entry.package_title,
 			"package_id": entry.reference.package_id, "local_id": entry.reference.local_id, "available": entry.available})
 	var id := str(_saved.get("package_id", "")) + "/" + str(_saved.get("local_id", ""))
+	if _saved.is_empty():
+		id = "none"
 	if _selection_only and _saved.is_empty():
 		for entry in entries:
 			if entry.available:
@@ -69,6 +71,8 @@ func _load() -> void:
 		get_node(^"Status").text = _t("Saved Miniature unavailable. Choose a replacement.")
 
 func _preview(entry: Dictionary, target: Control) -> void:
+	if str(entry.get("id", "")) == "none":
+		return
 	var result := sdk.content.preview_miniature(SDK.ContentReference.new(str(entry.package_id), str(entry.local_id)), target)
 	if not result.ok:
 		get_node(^"Status").text = _t("Miniature preview unavailable.")
@@ -80,7 +84,7 @@ func _apply() -> void:
 	if _busy or browser.selection().is_empty():
 		return
 	var entry: Dictionary = browser.selection()
-	var reference := {"package_id": str(entry.package_id), "local_id": str(entry.local_id)}
+	var reference: Dictionary = {} if str(entry.id) == "none" else {"package_id": str(entry.package_id), "local_id": str(entry.local_id)}
 	if _selection_only:
 		reference["title"] = str(entry.title)
 		chosen.emit(reference)

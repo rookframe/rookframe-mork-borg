@@ -6,6 +6,7 @@ const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
 
@@ -92,7 +93,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var data: Dictionary = source.actor.data
 	if not _valid_character(data):
 		return _error("Character casting data is malformed.")
-	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
+	var owner := {"id": str(caller.participant_id), "session": str(caller.session_id)} if input.get("sheet", false) else PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(owner.error)
 	for previous in _actions:
@@ -102,7 +103,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			_end(context, previous)
 	var abilities: Dictionary = data.abilities
 	if daily:
-		if typeof(input.get("morning_confirmed", false)) != TYPE_BOOL or not input.get("morning_confirmed", false):
+		if not input.get("sheet", false) and (typeof(input.get("morning_confirmed", false)) != TYPE_BOOL or not input.get("morning_confirmed", false)):
 			return _error("Confirm with the table that this is the morning allowance roll.")
 		var ability: Dictionary = abilities.get("Presence", {})
 		var daily_presence: int = ability.get("modifier", 0)
@@ -120,22 +121,24 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("No daily Power uses remain. Establish today's allowance with the table.")
 	if not scroll.playable:
 		return _error("This Power's %s branch is not playable yet." % str(scroll.handling))
-	if typeof(input.get("eligible", false)) != TYPE_BOOL or not input.get("eligible", false):
+	if not input.get("sheet", false) and (typeof(input.get("eligible", false)) != TYPE_BOOL or not input.get("eligible", false)):
 		return _error("Confirm with the table that you are not dizzy and the Power's fictional requirements are met. While dizzy, Powers fail in the worst possible way; the GM handles that outcome.")
 	if typeof(input.get("modifier", 0)) != TYPE_INT:
 		return _error("Enter a whole-number situational modifier.")
 	var situation: int = input.get("modifier", 0)
 	if situation < -20 or situation > 20:
 		return _error("Enter a whole-number situational modifier from −20 to +20.")
+	if input.get("sheet", false) and not BROKEN.new().can_act(data):
+		return _error("This Character cannot cast. Rules references remain available.")
 	var restriction := _restriction(data)
 	if not restriction.is_empty():
 		return _error(restriction)
-	var targeting := _targets(context, caller, str(input.get("rook", "")), source.actor.id, scroll)
+	var targeting := {"state": "ready", "label": "Table outcome", "targets": []} if input.get("sheet", false) else _targets(context, caller, str(input.get("rook", "")), source.actor.id, scroll)
 	if targeting.state == "error":
 		return targeting
 	var presence: Dictionary = abilities.get("Presence", {})
 	var modifier: int = presence.get("modifier", 0)
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "owner": owner.id, "owner_session": owner.session, "item": str(input.item), "scroll": scroll, "presence": modifier, "phase": "casting", "sequence": 0, "modifier": modifier + situation, "difficulty": 10 if str(data.get("class_id", "")) == "gutterborn-scum" else 12, "label": targeting.label, "targets": targeting.get("targets", []), "rook": str(input.get("rook", "")), "request": str(input.id), "state": "pending", "message": "Waiting for the casting Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "owner": owner.id, "owner_session": owner.session, "item": str(input.item), "scroll": scroll, "sheet": input.get("sheet", false), "presence": modifier, "phase": "casting", "sequence": 0, "modifier": modifier + situation, "difficulty": 10 if str(data.get("class_id", "")) == "gutterborn-scum" else 12, "label": targeting.label, "targets": targeting.get("targets", []), "rook": str(input.get("rook", "")), "request": str(input.id), "state": "pending", "message": "Waiting for the casting Throw in the Dice Tray."}
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, action.owner, [SDK.DiceTerm.new("Casting", 20)]))
 	if not requested.ok:
 		return _error(requested.message)
@@ -167,6 +170,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		data = data.duplicate(true)
 		var usable: int = count if count > 0 else 0
 		data["power_uses"] = usable
+		data["power_uses_total"] = usable
 		return _complete(context, action, [SDK.ActorChange.new(source.actor.id, data)], "Daily allowance", "Morning allowance: Presence %+d + d4 %d = %d. %d usable Powers today. The table establishes the morning; no time or replenishment is automatic. Raw Roll #%d." % [presence, daily_face, count, usable, result.sequence])
 	if action["phase"] == "casting" and (_scroll(data, action.item).is_empty() or not _restriction(data).is_empty()):
 		return _end(context, action)
@@ -179,6 +183,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 				values.append(value)
 		if action["phase"] == "parameters" and str(power.source_item_id) == "foul-psychompomp":
 			return _summon(context, action, values, result.sequence)
+		if action.get("sheet", false) and str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate", "eyelid-blinds-the-mind"]:
+			return _manual_result(context, action, [], values, result.sequence)
 		if action["phase"] == "parameters" and str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate"]:
 			var d2: bool = str(power.source_item_id) != "roskoes-consuming-glare"
 			var count: int = int((values[0] + 1) / 2) if d2 else values[0]
@@ -233,7 +239,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var report := SDK.ActionLogMessage.new("Power activated")
 	report.result = "1 use spent"
 	report.text = [SDK.ActionLogText.new("%s activated. One daily use spent. Raw Roll #%d; stated parameters follow in the Dice Tray." % [str(power.name), result.sequence])]
-	if not context.commit([SDK.ActorChange.new(source.actor.id, data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report).ok:
 		return _end(context, action)
 	return _request(context, action, "parameters", terms, "Power activated. Throw its stated quantities in the Dice Tray.")
 
@@ -395,7 +401,7 @@ func _complete(context: SDK.SystemActionContext, action: Dictionary, changes: Ar
 	var report := SDK.ActionLogMessage.new("Power casting")
 	report.result = outcome
 	report.text = [SDK.ActionLogText.new(text)]
-	var saved := context.commit(changes, report)
+	var saved := BROKEN.new().commit(context, changes, report)
 	if not saved.ok:
 		return _end(context, action)
 	action["state"] = "resolved"
@@ -410,7 +416,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	var report := SDK.ActionLogMessage.new("Power action ended")
 	report.result = "ENDED"
 	report.text = [SDK.ActionLogText.new(ENDED)]
-	context.commit([], report)
+	BROKEN.new().commit(context, [], report)
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
@@ -555,7 +561,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 		report.result = "Stopped"
 		for line in outside.split("\n"):
 			report.text.append(SDK.ActionLogText.new(line))
-		context.commit([], report)
+		BROKEN.new().commit(context, [], report)
 		return _error(outside)
 	if not invalid.is_empty():
 		return _error(invalid)

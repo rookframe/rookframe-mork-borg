@@ -40,6 +40,11 @@ func describe_actor(actor: SDK.Actor) -> SDK.ActorSummary:
 
 
 func inspect_actor(actor: SDK.ActorId) -> void:
+	var source := sdk.actors.read(actor)
+	var data: Dictionary = source.actor.data if source.ok and typeof(source.actor.data) == TYPE_DICTIONARY else {}
+	if str(data.get("schema", "")) == "mork-borg-character/v1":
+		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), actor)
+		return
 	var entry: SDK.WindowButton = DESKTOP_WINDOW_BUTTON if sdk.presentation_experience().is_desktop else WINDOW_BUTTON
 	sdk.windows.open_actor(entry.window, actor)
 

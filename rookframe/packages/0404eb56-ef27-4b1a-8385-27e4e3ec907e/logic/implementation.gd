@@ -16,8 +16,12 @@ var _encounter := ENCOUNTER.new()
 
 const MINIATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_authority.gd")
 var _miniatures := MINIATURES.new()
+const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/sheet_combat.gd")
+var _sheet_combat := SHEET_COMBAT.new()
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("sheet-combat."):
+		return _sheet_combat.handle_system_intent(context, name.replace("sheet-combat.", "melee."), payload)
 	if name.begins_with("miniature."):
 		return _miniatures.handle(context, sdk, name, payload)
 	if name.begins_with("encounter."):

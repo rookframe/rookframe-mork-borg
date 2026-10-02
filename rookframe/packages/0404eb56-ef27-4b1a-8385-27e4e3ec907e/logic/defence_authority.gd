@@ -7,6 +7,7 @@ const TARGETING = preload(ROOT + "logic/attack_targeting.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const AMMUNITION = preload(ROOT + "logic/ammunition.gd")
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
 
@@ -90,7 +91,7 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 				if raw == 20:
 					text += " Natural 20: gain a free attack. Choose an equipped weapon in Inventory."
 				report.text = [SDK.ActionLogText.new(text)]
-				var saved := context.commit([], report)
+				var saved := BROKEN.new().commit(context, [], report)
 				if not saved.ok:
 					return _end(context, action)
 				action["state"] = "resolved"
@@ -246,7 +247,7 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 		var creature_report := SDK.ActionLogMessage.new("Defence fumble")
 		creature_report.result = "Armor damaged"
 		creature_report.text = [SDK.ActionLogText.new("Natural 1: double damage; armor reduced one tier. Existing penalties remain.")]
-		var creature_saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], creature_report)
+		var creature_saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], creature_report)
 		if creature_saved.ok:
 			action["armor_damaged"] = true
 		return creature_saved.ok
@@ -269,7 +270,7 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 		var report := SDK.ActionLogMessage.new("Defence fumble")
 		report.result = "Armor damaged"
 		report.text = [SDK.ActionLogText.new("Natural 1: double damage; armor reduced one tier. Strength and Agility penalties remain. Armor below tier 1 is ruined and cannot be repaired.")]
-		var saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], report)
+		var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], report)
 		if saved.ok:
 			action["armor_damaged"] = true
 		return saved.ok
@@ -329,7 +330,7 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 	if str(action.damage).ends_with("d2") or str(action.protection).ends_with("d2"):
 		text += " d2 uses each physical d4 halved, rounded up."
 	report.text = [SDK.ActionLogText.new(text)]
-	var saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], report)
+	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], report)
 	if not saved.ok:
 		return _end(context, action)
 	action["state"] = "resolved"
@@ -361,7 +362,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	report.result = "ENDED"
 	report.tone = "attention"
 	report.text = [SDK.ActionLogText.new(ENDED)]
-	context.commit([], report)
+	BROKEN.new().commit(context, [], report)
 	return _public(action)
 
 func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
@@ -452,7 +453,7 @@ func _spend_source_resource(context: SDK.SystemActionContext, action: Dictionary
 	var report := SDK.ActionLogMessage.new("Ammunition used")
 	report.result = "1 spent"
 	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.attacker), str(action.ammunition_kind), sequence])]
-	var saved := context.commit([SDK.ActorChange.new(source.actor.id, data)], report)
+	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report)
 	if not saved.ok:
 		return false
 	action["resource_spent"] = true

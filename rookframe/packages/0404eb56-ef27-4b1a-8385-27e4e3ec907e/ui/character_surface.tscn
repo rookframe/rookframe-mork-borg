@@ -1,0 +1,1503 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.gd" id="script"]
+
+[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
+
+[ext_resource type="Resource" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_navigation.tres" id="navigation"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_choices.tscn" id="choices"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="miniatures"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_area.tscn" id="textarea"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_field.tscn" id="textfield"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="psychopomp"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/strength.svg" id="strength"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/agility.svg" id="agility"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/toughness.svg" id="toughness"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/sword.svg" id="sword"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/armor.svg" id="armor"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
+
+[sub_resource type="StyleBoxFlat" id="Background"]
+
+bg_color = Color(0.003922, 0.047059, 0.062745, 1)
+
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+
+border_width_left = 1
+
+border_width_right = 1
+
+border_width_top = 1
+
+border_width_bottom = 1
+
+[node name="CharacterSurface" type="PanelContainer"]
+
+unique_name_in_owner = true
+
+script = ExtResource("script")
+
+theme = ExtResource("theme")
+
+navigation = ExtResource("navigation")
+
+theme_override_styles/panel = SubResource("Background")
+
+anchors_preset = 15
+
+anchor_right = 1.0
+
+anchor_bottom = 1.0
+
+grow_horizontal = 2
+
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/margin_left = 24
+
+theme_override_constants/margin_right = 24
+
+theme_override_constants/margin_top = 16
+
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 8
+
+[node name="Name" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Character"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("character")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+[node name="NameEdit" parent="Margin/Layout/Header" instance=ExtResource("textfield")]
+layout_mode = 2
+size_flags_horizontal = 3
+visible = false
+label_text = ""
+placeholder = "Character name"
+
+[node name="System" type="Label" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "MÖRK BORG"
+
+theme_override_font_sizes/font_size = 12
+
+autowrap_mode = 3
+
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Edit" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Edit sheet"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Rest" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Rest"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Improve" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Level up"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="SaveSheet" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Save sheet"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="CancelSheet" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Cancel"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="Close" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "×"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Body" type="HBoxContainer" parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 24
+
+[node name="Core" type="VBoxContainer" parent="Margin/Layout/Body"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(460, 0)
+
+theme_override_constants/separation = 12
+
+[node name="Class" type="Label" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Class"
+
+theme_override_font_sizes/font_size = 22
+
+autowrap_mode = 3
+
+horizontal_alignment = 1
+
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="Origin" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Origin"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Likeness" type="HBoxContainer" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 16
+
+[node name="Portrait" type="TextureRect" parent="Margin/Layout/Body/Core/Likeness"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(152, 190)
+
+size_flags_vertical = 0
+
+expand_mode = 1
+
+stretch_mode = 6
+
+[node name="Vitals" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+theme_override_constants/separation = 4
+
+[node name="HitPoints" type="Button" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Hit points"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("heart")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+clip_text = true
+
+[node name="HitPointsEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="HitPointsCurrent" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+placeholder = "Hit points"
+
+[node name="HitPointsMaximum" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+placeholder = "Max HP"
+
+[node name="PowerUses" type="Button" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Power uses"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("psychopomp")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+clip_text = true
+
+[node name="PowerUsesEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="PowerUsesCurrent" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+placeholder = "Power uses"
+
+[node name="Omens" type="Button" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Omens"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("dice")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+clip_text = true
+
+[node name="OmensEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="OmensCurrent" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+placeholder = "Omens"
+
+[node name="ConditionReminder" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Condition"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="Abilities" type="GridContainer" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+columns = 2
+
+theme_override_constants/h_separation = 12
+
+theme_override_constants/v_separation = 4
+
+[node name="StrengthRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Strength" type="Button" parent="Margin/Layout/Body/Core/Abilities/StrengthRow"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Strength"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("strength")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+[node name="StrengthEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+[node name="AgilityRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Agility" type="Button" parent="Margin/Layout/Body/Core/Abilities/AgilityRow"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Agility"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("agility")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+[node name="AgilityEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+[node name="PresenceRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Presence" type="Button" parent="Margin/Layout/Body/Core/Abilities/PresenceRow"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Presence"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("presence")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+[node name="PresenceEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+[node name="ToughnessRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Toughness" type="Button" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Toughness"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("toughness")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+[node name="ToughnessEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" instance=ExtResource("textfield")]
+label_text = ""
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+[node name="ReadyWeapon" type="Button" parent="Margin/Layout/Body/Core"]
+layout_mode = 2
+visible = false
+text = "Ready weapon ›"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+clip_text = true
+alignment = 0
+
+[node name="WeaponHeading" type="Label" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "READY WEAPON"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="Weapon" type="OptionButton" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(0, 44)
+
+[node name="WeaponActions" type="HBoxContainer" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="Attack" type="Button" parent="Margin/Layout/Body/Core/WeaponActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Attack"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("sword")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+[node name="Damage" type="Button" parent="Margin/Layout/Body/Core/WeaponActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Damage"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+[node name="ManageEquipment" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Manage equipment ›"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="ProtectionHeading" type="Label" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "PROTECTION"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="Protection" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Protection & reactions ›"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("armor")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+clip_text = true
+
+[node name="Dodge" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Dodge · d20 + Agility"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Chapter" type="VBoxContainer" parent="Margin/Layout/Body"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+
+[node name="Tabs" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 0
+
+[node name="TabCharacter" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Character"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabPowers" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Powers"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabInventory" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Inventory"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabJournal" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Journal"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabAppearance" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Appearance"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="Section" type="OptionButton" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(0, 44)
+
+[node name="Condition" type="VBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+theme_override_constants/separation = 4
+
+[node name="ConditionTitle" type="Label" parent="Margin/Layout/Body/Chapter/Condition"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "BROKEN"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="ConditionCopy" type="Label" parent="Margin/Layout/Body/Chapter/Condition"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = ""
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="ConditionActions" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Condition"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="Broken" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Roll Broken d4"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="NextRound" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Next round"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="UndoRound" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Undo round"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="Recover" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Awaken"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="AdvanceHour" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Advance 1 hour"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="UndoHour" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Undo hour"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="Treat" type="Button" parent="Margin/Layout/Body/Chapter/Condition/ConditionActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Record treatment"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+[node name="Collections" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+
+[node name="Primary" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+[node name="Secondary" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Collections"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+
+[node name="Resources" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+[node name="Companions" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+[node name="JournalPanel" type="VBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+size_flags_vertical = 3
+
+[node name="JournalTitle" type="Label" parent="Margin/Layout/Body/Chapter/JournalPanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "JOURNAL"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="JournalNotice" type="Label" parent="Margin/Layout/Body/Chapter/JournalPanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Notes are a local placeholder for this view."
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="JournalNotes" parent="Margin/Layout/Body/Chapter/JournalPanel" instance=ExtResource("textarea")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+label_text = "Notes · placeholder"
+
+placeholder = "Write a note…"
+
+[node name="AppearancePanel" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+
+[node name="PortraitPanel" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+[node name="PortraitHeading" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "PORTRAIT"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="PortraitPreview" type="TextureRect" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+size_flags_horizontal = 3
+
+expand_mode = 1
+
+stretch_mode = 6
+
+[node name="PortraitCaption" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "No portrait selected"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="PortraitButtons" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="ChangePortrait" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitButtons"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Change portrait"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+[node name="ClearPortrait" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitButtons"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Reset"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+[node name="MiniaturePanel" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+[node name="MiniatureHeading" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "MINIATURE"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="MiniaturePreview" type="Control" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+size_flags_horizontal = 3
+
+[node name="MiniatureCaption" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "No miniature selected"
+
+theme_override_font_sizes/font_size = 16
+
+autowrap_mode = 3
+
+[node name="MiniatureButtons" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="ChangeMiniature" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Change miniature"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+[node name="ClearMiniature" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Clear"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+[node name="QuickResources" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="QuickOmens" type="Button" parent="Margin/Layout/Body/Chapter/QuickResources"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Omens"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="QuickOmensEdit" parent="Margin/Layout/Body/Chapter/QuickResources" instance=ExtResource("textfield")]
+layout_mode = 2
+visible = false
+label_text = ""
+placeholder = "Omens"
+custom_minimum_size = Vector2(88, 44)
+
+[node name="QuickSilver" type="Button" parent="Margin/Layout/Body/Chapter/QuickResources"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Silver"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Detail" type="VBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 8
+
+[node name="DetailHeader" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="Back" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailHeader"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "‹ Back"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="DetailTitle" type="Label" parent="Margin/Layout/Body/Chapter/Detail/DetailHeader"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Details"
+
+theme_override_font_sizes/font_size = 22
+
+autowrap_mode = 3
+
+size_flags_horizontal = 3
+
+[node name="DetailTabs" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="Overview" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailTabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Overview"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+toggle_mode = true
+
+[node name="Details" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailTabs"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Details"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+toggle_mode = true
+
+[node name="DetailPages" instance=ExtResource("pages") parent="Margin/Layout/Body/Chapter/Detail"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="DetailContent" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Detail/DetailPages/Area"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 8
+
+[node name="DetailActions" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="PrimaryAction" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Roll"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskPrimary"
+
+visible = false
+
+size_flags_horizontal = 3
+
+[node name="SecondaryAction" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Details"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+size_flags_horizontal = 3
+
+[node name="Picker" instance=ExtResource("miniatures") parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+size_flags_vertical = 3
+
+[node name="Status" type="Label" parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = ""
+
+theme_override_font_sizes/font_size = 12
+
+autowrap_mode = 3
+
+visible = false
+

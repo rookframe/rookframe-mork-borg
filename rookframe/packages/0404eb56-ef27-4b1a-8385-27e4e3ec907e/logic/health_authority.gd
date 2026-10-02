@@ -8,6 +8,7 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
 
@@ -15,6 +16,8 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 	if typeof(payload) != TYPE_DICTIONARY:
 		return _error("The health action is malformed.")
 	var input: Dictionary = payload
+	if operation == "health.incident":
+		return _incident_event(context, input)
 	if typeof(input.get("id")) != TYPE_STRING or str(input.id).is_empty() or str(input.id).length() > 64:
 		return _error("Choose a new action identity.")
 	var caller_result := context.caller()
@@ -63,6 +66,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 				return _error("Finish or cancel this Character's current recovery or improvement first.")
 			_end(context, active)
 	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
+	if input.get("sheet", false):
+		owner = {"id": str(caller.participant_id), "session": str(caller.session_id)}
 	if owner.has("error"):
 		return _error(str(owner.error))
 	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "kind": str(input.kind), "request": str(input.id), "phase": "rest", "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
@@ -72,6 +77,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _error("Broken requires zero HP; negative HP means dead.")
 		if hp < 0:
 			return _finish(context, action, [], "Dead: negative HP. No Broken roll or restored HP. Resolve any applicable class exception with the table.", "Dead", "attention")
+		var incident: Dictionary = data.get("broken_incident", {})
+		if not incident.is_empty() and int(incident.get("outcome", 0)) != 0:
+			return _error("This Broken incident has already been rolled.")
+		action["incident_id"] = int(incident.get("id", int(data.get("broken_serial", 0)) + 1))
 		return _request(context, action, "broken", [SDK.DiceTerm.new("Broken", 4)], true)
 	if str(input.kind) == "improve":
 		if not _improvable(data):
@@ -90,13 +99,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _request(context, action, "more_hp", [SDK.DiceTerm.new("More HP", 10, 6)], true)
 	if str(input.kind) != "rest":
 		return _error("Choose a supported health action.")
-	if typeof(input.get("food_and_drink")) != TYPE_BOOL or typeof(input.get("infected")) != TYPE_BOOL or not str(input.get("rest", "")) in ["breath", "sleep"]:
-		return _error("Choose the rest and confirm food, drink and infection with the table.")
+	if not str(input.get("rest", "")) in ["breath", "sleep"]:
+		return _error("Choose breath + drink or a full night's rest.")
 	var hp: int = data.hit_points
 	if hp < 0:
 		return _error("Negative HP means dead. Rest does not resurrect a Character.")
-	if not input.food_and_drink or input.infected:
-		return _finish(context, action, [], "No HP restored: resting requires food and drink and does not heal an infected Character. Resolve daily starvation or infection HP loss manually; no time has been advanced.", "0 HP")
 	var faces := 4 if str(input.rest) == "breath" else 6
 	var request := context.request_throw(SDK.HumanThrowRequest.new(str(input.id), str(owner.id), [SDK.DiceTerm.new("Recovery", faces)]))
 	return action if request.ok else _error(request.message)
@@ -147,7 +154,7 @@ func _record(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], 
 	report.text = [SDK.ActionLogText.new(text)]
 	report.result = result
 	report.tone = tone
-	return context.commit(changes, report).ok
+	return BROKEN.new().commit(context, changes, report).ok
 
 func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	action["state"] = "ended"
@@ -362,11 +369,22 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 	var phase := str(action.phase)
 	var face: int = roll.terms[0].results[0]
 	var suffix := " Raw Roll #%d." % roll.sequence
+	var data := current.duplicate(true)
+	data = BROKEN.new().sync(current, data)
+	var incident: Dictionary = data.broken_incident
+	if int(incident.id) != int(action.incident_id):
+		return _end(context, action)
 	if phase == "broken":
+		if int(incident.outcome) != 0:
+			return _end(context, action)
+		incident["outcome"] = face
+		incident["broken_roll"] = face
+		incident["roll_sequence"] = roll.sequence
 		if face == 4:
-			return _finish(context, action, [], "Dead. Resolve any applicable class exception with the table; no restored HP or automatic resurrection." + suffix, "Dead", "attention")
+			incident["dead"] = true
+			return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Dead. Resolve any applicable class exception with the table; no restored HP or automatic resurrection." + suffix, "Dead", "attention")
 		var branch := "Unconscious" if face == 1 else ("Injury" if face == 2 else "Hemorrhage")
-		if not _record(context, [], "Broken: " + branch + suffix):
+		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Broken: " + branch + suffix):
 			return _end(context, action)
 		if face == 1:
 			return _request(context, action, "unconscious", [SDK.DiceTerm.new("Unconscious rounds", 4), SDK.DiceTerm.new("Awakening HP", 4)])
@@ -375,13 +393,48 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 		return _request(context, action, "hemorrhage", [SDK.DiceTerm.new("Death in hours (d2)", 4)])
 	var text := ""
 	if phase == "unconscious":
+		incident["duration"] = face
+		incident["recovery_hp"] = roll.terms[1].results[0]
 		text = "Unconscious: awaken with %d HP after %d rounds." % [roll.terms[1].results[0], face]
 	elif phase == "injury":
+		incident["injury_roll"] = face
+		incident["injury"] = "Lost eye" if face == 6 else "Broken or severed limb (table decides)"
+		incident["duration"] = roll.terms[1].results[0]
+		incident["recovery_hp"] = roll.terms[2].results[0]
+		var previous_injuries: Array = data.get("broken_injuries", [])
+		var injuries: Array = previous_injuries.duplicate(true)
+		injuries.append({"incident_id": incident.id, "name": incident.injury, "rules": "Recorded injury. Resolve its consequences with the table."})
+		data["broken_injuries"] = injuries
 		text = "%s. Cannot act for %d rounds, then become active with %d HP." % ["Lost eye" if face == 6 else "Broken or severed limb (table decides)", roll.terms[1].results[0], roll.terms[2].results[0]]
 	else:
 		var hours := int((face + 1) / 2)
+		incident["duration"] = hours
+		incident["deadline_roll"] = face
 		text = "Hemorrhage: death in %d hours unless treated. All tests DR16 the first hour, DR18 the last hour. Physical d4 %d → d2 %d." % [hours, face, hours]
-	return _finish(context, action, [], text + " Apply delayed recovery, restrictions and death manually; current HP is unchanged." + suffix, "Broken", "attention")
+	incident["followup_sequence"] = roll.sequence
+	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + " Record elapsed game time on the sheet; current HP is unchanged." + suffix, "Broken", "attention")
+
+func _incident_event(context: SDK.SystemActionContext, input: Dictionary) -> Dictionary:
+	var source := context.read_actor(SDK.ActorId.new(str(input.get("source", ""))))
+	if not source.ok or source.actor.access_level != "Owner" or not _valid(source.actor.data):
+		return _error("Owner access is required to record this Broken event.")
+	var current: Dictionary = source.actor.data
+	var data := current.duplicate(true)
+	var incident: Dictionary = data.get("broken_incident", {})
+	if int(input.get("incident", -1)) != int(incident.get("id", -2)) or int(input.get("elapsed", -1)) != int(incident.get("elapsed", 0)):
+		return _error("This incident changed. Review its current counter.")
+	var operation := str(input.get("event", ""))
+	var result := BROKEN.new().advance(data, operation)
+	if not str(result.message).is_empty():
+		return _error(str(result.message))
+	var prepared: Dictionary = result.get("data", {})
+	data = prepared
+	var prepared_incident: Dictionary = data.get("broken_incident", {})
+	incident = prepared_incident
+	var text := "Broken: %s recorded; elapsed %d / %d. HP %d." % [operation, int(incident.get("elapsed", 0)), int(incident.get("duration", 0)), int(data.hit_points)]
+	if not _record(context, [SDK.ActorChange.new(source.actor.id, data)], text):
+		return _error("The Broken event could not be saved.")
+	return {"state": "resolved", "message": text}
 
 func _valid_rerolls(selected: Array) -> bool:
 	for index in selected:

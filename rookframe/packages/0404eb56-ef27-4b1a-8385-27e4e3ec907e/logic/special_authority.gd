@@ -8,6 +8,7 @@ const RULES = preload(ROOT + "logic/special_rules.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
 const DAMAGE = preload(ROOT + "logic/special_damage.gd")
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
 
@@ -78,13 +79,15 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Choose a supported item in Inventory.")
 	if rule.get("brew", false) and str(data.get("class_id", "")) != "occult-herbmaster":
 		return _error("Only the Occult Herbmaster can brew daily decoctions.")
-	if not input.get("eligible", false):
+	if not input.get("sheet", false) and not input.get("eligible", false):
 		return _error("Confirm the item's fictional requirements with the table.")
 	if rule.get("ability_choice", false):
 		var chosen := str(input.get("ability", ""))
 		if not chosen in ["Agility", "Presence", "Strength", "Toughness"]:
 			return _error("The source leaves the ability unspecified. Choose it with the table.")
 		rule["ability"] = chosen
+	if input.get("sheet", false) and (rule.has("ability") or (rule.get("gob", false) and not input.get("new_fight", false))) and not BROKEN.new().can_act(data):
+		return _error("This Character cannot make a test while unable to act or dead.")
 	if str(item.source_item_id) == "stolen-mitre" and not item.get("equipped", false):
 		return _error("Wear the mitre and confirm that its ears are covered outside battle.")
 	var teeth := str(item.get("source_item_id", "")) == "wizard-teeth"
@@ -95,17 +98,27 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var uses: int = resource.get("uses", default_uses)
 	if consumes and uses < 1 and not (rule.get("gob", false) and input.get("new_fight", false)):
 		return _error("No uses remain. Correct remaining uses on the item when the table agrees.")
-	var target := _target(context, caller, input, source.actor.id, rule.range_feet)
+	var target := {"actor": source.actor.id.value, "label": str(data.get("name", "Character")), "rook": ""} if input.get("sheet", false) else _target(context, caller, input, source.actor.id, rule.range_feet)
 	if target.has("error"):
 		return _error(str(target.error))
 	var recipient := context.read_actor(SDK.ActorId.new(str(target.actor)))
 	if healing and (not recipient.ok or not _healable(recipient.actor.data)):
 		return _error("Healing requires a living target with valid maximum HP.")
-	var owner := PARTICIPANTS.new().owner(context, caller, source.actor.id)
+	var owner := {"id": str(caller.participant_id), "session": str(caller.session_id)} if input.get("sheet", false) else PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(str(owner.error))
-	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "item": str(input.item), "kind": str(item.source_item_id), "target": target, "rook": str(input.get("rook", "")), "resource": str(resource.get("inventory_id", "")), "rule": rule, "adjustment": input.get("adjustment", 0), "request": str(input.id), "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "item": str(input.item), "kind": str(item.source_item_id), "target": target, "sheet": input.get("sheet", false), "rook": str(input.get("rook", "")), "resource": str(resource.get("inventory_id", "")), "rule": rule, "adjustment": input.get("adjustment", 0), "request": str(input.id), "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
 	var terms: Array[SDK.DiceTerm] = []
+	if input.get("sheet", false) and (rule.get("poison", false) or rule.get("book", false) or rule.get("resistance", false) or rule.get("damage", false) or rule.get("morale", false)):
+		action["phase"] = "sheet-target"
+		if rule.get("morale", false):
+			terms = [SDK.DiceTerm.new("Morale", 6, 2)]
+		elif rule.has("die"):
+			terms = [SDK.DiceTerm.new("Printed outcome", int(rule.die))]
+		else:
+			return _sheet_target_result(context, action, [], 0)
+		var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, action.owner, terms))
+		return action if requested.ok else _error(requested.message)
 	if rule.get("poison", false) or rule.get("book", false) or rule.get("resistance", false):
 		if rule.get("book", false) and str(target.actor) == source.actor.id.value:
 			return _error("Choose an enemy to resist the Book.")
@@ -189,6 +202,9 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	if not source.ok or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
 		return _end(context, action)
 	var current: Dictionary = source.actor.data
+	var tested_rule: Dictionary = action.rule
+	if action.get("sheet", false) and action.get("phase", "") != "sheet-target" and (tested_rule.has("ability") or action.get("phase", "") == "spit") and not BROKEN.new().can_act(current):
+		return _end(context, action)
 	if not _valid(current) or RULES.new().owned(current, str(action.item)).is_empty():
 		return _end(context, action)
 	var roll := context.read_throw(str(action.request))
@@ -196,6 +212,13 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _end(context, action)
 	if roll.status == "pending":
 		return _public(action)
+	if action.get("phase", "") == "sheet-target":
+		var values: Array[int] = []
+		for term in roll.terms:
+			for value in term.results:
+				values.append(value)
+		return _sheet_target_result(context, action, values, roll.sequence)
+
 	var rule: Dictionary = action.rule
 	if rule.get("blade", false) or rule.get("damage", false):
 		return _damage_item(context, action, roll, current)
@@ -249,7 +272,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 			text += " One use spent."
 		var report := SDK.ActionLogMessage.new("Class ability")
 		report.text = [SDK.ActionLogText.new(text)]
-		if not context.commit(changes, report).ok:
+		if not BROKEN.new().commit(context, changes, report).ok:
 			return _end(context, action)
 		action["state"] = "resolved"
 		action["message"] = text
@@ -262,7 +285,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		var text := "Wizard teeth: %d attacks deal maximum damage. Apply and track these benefits manually. Raw Roll #%d." % [sixes, roll.sequence]
 		var report := SDK.ActionLogMessage.new("Wizard teeth")
 		report.text = [SDK.ActionLogText.new(text)]
-		if not context.commit([], report).ok:
+		if not BROKEN.new().commit(context, [], report).ok:
 			return _end(context, action)
 		action["state"] = "resolved"
 		action["message"] = text
@@ -300,7 +323,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var report := SDK.ActionLogMessage.new("Use item")
 	report.result = "Healing applied"
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit(changes, report).ok:
+	if not BROKEN.new().commit(context, changes, report).ok:
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
@@ -409,13 +432,15 @@ func _target(context: SDK.SystemActionContext, caller: Dictionary, input: Dictio
 	if not outside.is_empty():
 		var report := SDK.ActionLogMessage.new("Item out of range")
 		report.text = [SDK.ActionLogText.new(outside)]
-		context.commit([], report)
+		BROKEN.new().commit(context, [], report)
 		return {"error": outside}
 	if target_count != 1:
 		return {"error": "Choose exactly one recipient within %d ft, or choose Self." % reach}
 	return selected
 
 func _target_current(context: SDK.SystemActionContext, action: Dictionary) -> bool:
+	if action.get("sheet", false):
+		return true
 	var target: Dictionary = action.target
 	if str(target.rook).is_empty():
 		return true
@@ -499,7 +524,7 @@ func _manual(context: SDK.SystemActionContext, action: Dictionary, values: Array
 		text += " Raw Roll #%d." % sequence
 	var report := SDK.ActionLogMessage.new("Use item")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit([SDK.ActorChange.new(source.actor.id, data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report).ok:
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
@@ -592,7 +617,7 @@ func _poison(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.Hum
 			action["resisted"] = passed
 			var report := SDK.ActionLogMessage.new("Book opened" if rule.get("book", false) else "Poison applied")
 			report.text = [SDK.ActionLogText.new(description)]
-			if not context.commit(changes, report).ok:
+			if not BROKEN.new().commit(context, changes, report).ok:
 				return _end(context, action)
 			action["phase"] = "book-summons" if rule.get("book", false) else "duration" if rule.get("resistance", false) else "poison-hp"
 			action["request"] = context.new_request_id()
@@ -615,7 +640,7 @@ func _poison(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.Hum
 		description += "lost %d HP. %s Raw Roll #%d." % [loss, str(rule.text), roll.sequence]
 	var report := SDK.ActionLogMessage.new("Book resisted" if rule.get("book", false) else "Poison outcome")
 	report.text = [SDK.ActionLogText.new(description)]
-	if not context.commit(changes, report).ok:
+	if not BROKEN.new().commit(context, changes, report).ok:
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = description
@@ -678,7 +703,7 @@ func _brew(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.Human
 	var text := "Brewed %s; %d shared doses. Unused decoctions lose vitality after 24 hours; establish daily eligibility and track expiry manually. Raw Roll #%d." % [names, roll.terms[1].results[0], roll.sequence]
 	var report := SDK.ActionLogMessage.new("Daily decoctions")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit([SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], report).ok:
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
@@ -693,7 +718,7 @@ func _college(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.Hu
 	var text := "Invisible College: %d %s scrolls, each usable once. The source does not select their identities; choose them with the table. Unused scrolls turn to ash at sunrise; track expiry manually. One daily use spent. Raw Roll #%d." % [count, family, roll.sequence]
 	var report := SDK.ActionLogMessage.new("Invisible College")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit([SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], report).ok:
 		return _end(context, action)
 	action["count"] = count
 	action["family"] = family
@@ -745,7 +770,7 @@ func _choose_scrolls(context: SDK.SystemActionContext, action: Dictionary, input
 	var text := "%d single-use scrolls added to Inventory. Unused scrolls become ash at sunrise; remove them manually when the table agrees." % count
 	var report := SDK.ActionLogMessage.new("Scrolls summoned")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit([SDK.ActorChange.new(source.actor.id, data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report).ok:
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
@@ -754,7 +779,7 @@ func _choose_scrolls(context: SDK.SystemActionContext, action: Dictionary, input
 func _resolve(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], text: String) -> Dictionary:
 	var report := SDK.ActionLogMessage.new("Use item")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not context.commit(changes, report).ok:
+	if not BROKEN.new().commit(context, changes, report).ok:
 		return _end(context, action)
 	action["state"] = "resolved"
 	action["message"] = text
@@ -771,7 +796,7 @@ func _next_throw(context: SDK.SystemActionContext, action: Dictionary, phase: St
 func _record(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], text: String) -> bool:
 	var report := SDK.ActionLogMessage.new("Class ability")
 	report.text = [SDK.ActionLogText.new(text)]
-	return context.commit(changes, report).ok
+	return BROKEN.new().commit(context, changes, report).ok
 
 func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanThrowResult, current: Dictionary) -> Dictionary:
 	var phase := str(action.phase)
@@ -1065,3 +1090,14 @@ func _test_difficulty(data: Dictionary, ability: String, printed: int) -> int:
 		elif tier >= 3:
 			penalty = 4
 	return printed + penalty
+
+func _sheet_target_result(context: SDK.SystemActionContext, action: Dictionary, values: Array[int], sequence: int) -> Dictionary:
+	var source := context.read_actor(SDK.ActorId.new(str(action.source)))
+	if not source.ok or source.actor.access_level != "Owner":
+		return _end(context, action)
+	var current: Dictionary = source.actor.data
+	var data := current.duplicate(true)
+	if not _consume(data, action):
+		return _end(context, action)
+	var text := "%s: %s. Resolve the printed target outcome with the table. No target state changed. Raw Roll #%d." % [str(action.kind), str(values), sequence]
+	return _resolve(context, action, [SDK.ActorChange.new(source.actor.id, data)], text)

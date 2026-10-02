@@ -1,21 +1,54 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd"
 
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
 
 func correct(field: String, text: String) -> SDK.ActorResult:
+	var fields: Dictionary = {}
+	fields[field] = text
+	return await correct_many(fields)
+
+## Apply only edited Character fields to the latest shared Actor snapshot.
+## Inventory and Appearance are independent accepted operations.
+func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorResult:
 	var source := _read()
 	if not source.ok:
 		return source
 	var current: Dictionary = source.actor.data
-	var data: Dictionary = current.duplicate(true)
+	var data := current.duplicate(true)
+	for key in fields.keys():
+		var field := str(key)
+		if typeof(key) != TYPE_STRING or typeof(fields.get(field)) != TYPE_STRING:
+			return _failure("Character corrections must be text fields.")
+		if field.begins_with("trait:") or field.begins_with("companion:"):
+			var parts := field.split(":")
+			var collection := "traits" if parts[0] == "trait" else "companion_sheets"
+			var entries: Array = current.get(collection, [])
+			if parts.size() != 3 or not parts[1].is_valid_int():
+				return _failure("This Character entry is unavailable.")
+			var slot := int(parts[1])
+			if slot < 0 or slot >= entries.size():
+				return _failure("This Character entry is unavailable.")
+			var entry: Dictionary = entries[slot]
+			var identity := str(entry.get("id", "")) + "|" + str(entry.get("source_item_id", ""))
+			var prefix := parts[0] + ":" + parts[1]
+			if entry_ids.has(prefix) and str(entry_ids.get(prefix)) != identity:
+				return _failure("This Character entry was replaced. Review its current fields.")
+		var error := _correct(data, field, str(fields.get(field)))
+		if not error.is_empty():
+			return _failure(error)
+	data = BROKEN.new().sync(current, data)
+	return await _sdk.actors.update(_id, data)
+
+func _correct(data: Dictionary, field: String, text: String) -> String:
 	if field in ABILITIES or field in ["hit_points", "maximum_hit_points", "silver", "omens", "power_uses", "improvements"]:
 		if not text.is_valid_int():
-			return _failure("Enter a whole number.")
+			return ("Enter a whole number.")
 		var value := int(text)
 		if field in ABILITIES:
 			if value < -3 or value > 6:
-				return _failure("Ability modifiers range from −3 to +6.")
+				return ("Ability modifiers range from −3 to +6.")
 			var abilities: Dictionary = data.get("abilities", {})
 			var ability: Dictionary = abilities.get(field, {})
 			ability["modifier"] = value
@@ -23,11 +56,11 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 			data["abilities"] = abilities
 		else:
 			if field != "hit_points" and value < (1 if field == "maximum_hit_points" else 0):
-				return _failure("Enter a non-negative value (maximum HP must be at least 1).")
+				return ("Enter a non-negative value (maximum HP must be at least 1).")
 			data[field] = value
 	elif field in ["name", "description", "origin", "class_title", "pack"]:
 		if field == "name" and text.strip_edges().is_empty():
-			return _failure("Enter a Character name.")
+			return ("Enter a Character name.")
 		data[field] = text.strip_edges()
 	elif field == "class_rules":
 		var lines: Array[String] = []
@@ -36,14 +69,14 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 		data[field] = lines
 	elif field.begins_with("scum_specialty:"):
 		if str(data.get("class_id", "")) != "gutterborn-scum" or not field in ["scum_specialty:0", "scum_specialty:1"] or not text.is_valid_int():
-			return _failure("Choose a Gutterborn specialty number from 1 to 6.")
+			return ("Choose a Gutterborn specialty number from 1 to 6.")
 		var slot := 0 if field == "scum_specialty:0" else 1
 		var face := int(text)
 		if face < (1 if slot == 0 else 0) or face > 6:
-			return _failure("Use 1–6 for a specialty, or 0 to leave the second slot empty.")
+			return ("Use 1–6 for a specialty, or 0 to leave the second slot empty.")
 		var traits: Array = data.get("traits", [])
 		if traits.size() < slot or traits.size() > 2:
-			return _failure("Correct the first specialty before the second.")
+			return ("Correct the first specialty before the second.")
 		if face == 0:
 			if traits.size() == 2:
 				traits = [traits[0]]
@@ -63,15 +96,15 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 		var source_entries: Array = data.get(key, [])
 		var entries: Array = source_entries.duplicate(true)
 		if parts.size() != 3 or not parts[1].is_valid_int() or int(parts[1]) < 0 or int(parts[1]) >= entries.size() or not parts[2] in ["name", "rules", "uses"]:
-			return _failure("This Character field is unavailable. Reopen the sheet.")
+			return ("This Character field is unavailable. Reopen the sheet.")
 		var entry: Dictionary = entries[int(parts[1])]
 		if parts[2] == "uses" and (not text.is_valid_int() or int(text) < 0):
-			return _failure("Enter a non-negative whole number of remaining uses.")
+			return ("Enter a non-negative whole number of remaining uses.")
 		entry[parts[2]] = int(text) if parts[2] == "uses" else text
 		data[key] = entries
 	else:
-		return _failure("This Character field is not editable.")
-	return await _sdk.actors.update(_id, data)
+		return ("This Character field is not editable.")
+	return ""
 
 func spend_omen() -> SDK.ActorResult:
 	return await adjust_omens(-1)
@@ -102,3 +135,16 @@ func _read() -> SDK.ActorResult:
 	if result.actor.access_level != "Owner":
 		return _failure("Owner access is required to change this Character.")
 	return result
+
+## Appearance commits independently of the Character-field draft.
+func set_portrait(image: PackedByteArray) -> SDK.ActorResult:
+	var source := _read()
+	if not source.ok:
+		return source
+	var current: Dictionary = source.actor.data
+	var data := current.duplicate(true)
+	if image.is_empty():
+		data.erase("portrait")
+	else:
+		data["portrait"] = image
+	return await _sdk.actors.update(_id, data)
