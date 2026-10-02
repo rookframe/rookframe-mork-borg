@@ -402,6 +402,7 @@ func _show_route() -> void:
 	_chapter_ui.get_node(^"AppearanceIntro").visible = not obscured and chapter == 4 and not _phone
 	_chapter_ui.get_node(^"AppearanceStatus").visible = not obscured and chapter == 4
 	_detail_ui.visible = details and _detail != "workflow:rest"
+	_actions_ui.get_node(^"Utility/PagerSlot").visible = _detail_ui.visible
 	_condition_ui.visible = not obscured and chapter == 0 and not _condition_reference and not _projection.condition(_actor.data).is_empty()
 	_section.visible = _phone and not details and chapter in [0, 1, 2, 3]
 	_quick.visible = _phone and not details and chapter != 4 and not _condition_ui.visible
