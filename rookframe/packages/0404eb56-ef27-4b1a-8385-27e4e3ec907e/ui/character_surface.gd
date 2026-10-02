@@ -1093,7 +1093,8 @@ func _render_condition(data: Dictionary) -> void:
 	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").visible = combat and _phone
 	get_node(^"Margin/Layout/Body/Core/WeaponHeading").visible = combat and not _phone
 	get_node(^"Margin/Layout/Body/Core/Weapon").visible = combat and not _phone
-	get_node(^"Margin/Layout/Body/Core/WeaponActions").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/WeaponActions").visible = not combat or not _phone
+	get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack").visible = combat
 	get_node(^"Margin/Layout/Body/Core/ManageEquipment").visible = combat and not _phone
 	get_node(^"Margin/Layout/Body/Core/ProtectionHeading").visible = combat and not _phone
 	get_node(^"Margin/Layout/Body/Core/Protection").visible = combat
