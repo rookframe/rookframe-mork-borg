@@ -1,7 +1,7 @@
 extends Button
 ## The character core keeps the resource caption separate from its value.
 func configure(caption: String, current: int, suffix: String, maximum: int = 0, phone: bool = false, tablet: bool = false) -> void:
-	custom_minimum_size.y = 44 if phone or tablet else 62
+	custom_minimum_size = Vector2(44, 44 if phone or tablet else 62)
 	get_node(^"Inset/Copy/Caption").text = caption
 	get_node(^"Inset/Copy/Caption").add_theme_font_size_override("font_size", 10 if phone else 11 if tablet else 12)
 	get_node(^"Inset/Copy/Number/Value").text = str(current)
@@ -15,7 +15,7 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 	get_node(^"Health").visible = maximum > 0
 	get_node(^"Health").max_value = maxi(1, maximum)
 	get_node(^"Health").value = current
-	var color := Color("c97070") if maximum > 0 and current <= 0 else Color("7dd989") if maximum > 0 else Color("44e9e9")
+	var color := Color("ef5b54") if maximum > 0 and current <= 0 else Color("7dd989") if maximum > 0 else Color("44e9e9")
 	get_node(^"Inset/Copy/Number/Value").add_theme_color_override("font_color", color)
 	add_theme_color_override("icon_normal_color", color if maximum > 0 and current <= 0 else Color("44e9e9"))
 	accessibility_name = "%s. %d %s" % [caption, current, suffix]
