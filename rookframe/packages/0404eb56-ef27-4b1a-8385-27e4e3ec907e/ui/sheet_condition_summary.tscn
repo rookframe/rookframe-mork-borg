@@ -1,0 +1,63 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition_summary.gd" id="script"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="icon"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[sub_resource type="StyleBoxFlat" id="frame"]
+bg_color = Color(0.058824, 0.101961, 0.109804, 1)
+border_width_top = 2
+border_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="ConditionReminder" type="Button"]
+script = ExtResource("script")
+custom_minimum_size = Vector2(44, 100)
+theme_override_styles/normal = SubResource("frame")
+[node name="Inset" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+[node name="Content" type="VBoxContainer" parent="Inset"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 12
+[node name="Heading" type="HBoxContainer" parent="Inset/Content"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 10
+[node name="Icon" type="TextureRect" parent="Inset/Content/Heading"]
+layout_mode = 2
+mouse_filter = 2
+texture = ExtResource("icon")
+expand_mode = 1
+stretch_mode = 5
+custom_minimum_size = Vector2(22, 22)
+self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Title" type="Label" parent="Inset/Content/Heading"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 3
+text_overrun_behavior = 3
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Copy" type="Label" parent="Inset/Content"]
+layout_mode = 2
+mouse_filter = 2
+autowrap_mode = 3
+[node name="Link" type="HBoxContainer" parent="Inset/Content"]
+layout_mode = 2
+mouse_filter = 2
+[node name="Title" type="Label" parent="Inset/Content/Link"]
+size_flags_horizontal = 3
+layout_mode = 2
+mouse_filter = 2
+text = "Character"
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Arrow" type="Label" parent="Inset/Content/Link"]
+layout_mode = 2
+mouse_filter = 2
+text = "›"
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)

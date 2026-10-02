@@ -4,6 +4,8 @@ extends RefCounted
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 var _sdk: SDK
 var _id: SDK.ActorId
+## The rejected correction, for field-local feedback; empty for domain failures.
+var invalid_field := ""
 
 func _init(facade: SDK, actor_id: SDK.ActorId) -> void:
 	_sdk = facade
@@ -19,6 +21,10 @@ func _read() -> SDK.ActorResult:
 
 func _failure(message: String) -> SDK.ActorResult:
 	return SDK.ActorResult.new({"ok": false, "message": message})
+
+func _field_failure(field: String, message: String) -> SDK.ActorResult:
+	invalid_field = field
+	return _failure(message)
 
 func _save(data: Dictionary) -> SDK.ActorResult:
 	return await _sdk.actors.update(_id, data)
@@ -62,15 +68,16 @@ func add_equipment(source_id: String) -> SDK.ActorResult:
 	return await _add(item)
 
 func add_custom(fields: Dictionary) -> SDK.ActorResult:
+	invalid_field = ""
 	var item: Dictionary = {"custom": true, "name": "", "kind": "Equipment", "quantity": 1, "equipped": false}
 	for key in ["name", "kind", "quantity", "uses", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 		if not fields.has(key):
 			continue
 		var error := _edit_item(item, str(key), str(fields[key]))
 		if not error.is_empty():
-			return _failure(error)
+			return _field_failure(str(key), error)
 	if str(item.name).strip_edges().is_empty():
-		return _failure("Enter an item name.")
+		return _field_failure("name", "Enter an item name.")
 	return await _add(item)
 
 func _add(item: Dictionary) -> SDK.ActorResult:
@@ -94,6 +101,7 @@ func remove_item(id: String) -> SDK.ActorResult:
 	return await _change_item(id, "", "", true)
 
 func _change_item(id: String, field: String, text: String, remove: bool) -> SDK.ActorResult:
+	invalid_field = ""
 	var source := _read()
 	if not source.ok:
 		return source
@@ -114,7 +122,7 @@ func _change_item(id: String, field: String, text: String, remove: bool) -> SDK.
 		else:
 			var error := _edit_item(item, field, text)
 			if not error.is_empty():
-				return _failure(error)
+				return _field_failure(field, error)
 		data["inventory"] = items
 		return await _save(data)
 	return _failure("This item has been removed. Return to Inventory.")

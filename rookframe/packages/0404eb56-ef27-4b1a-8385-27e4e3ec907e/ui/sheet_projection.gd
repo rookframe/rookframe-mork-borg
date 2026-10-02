@@ -12,6 +12,7 @@ const BAG = preload("res://rookframe/ui/icons/character/bag.svg")
 const BOOK = preload("res://rookframe/ui/icons/character/book.svg")
 const SILVER = preload("res://rookframe/ui/icons/character/silver.svg")
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
+const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 
 func fields(data: Dictionary) -> Dictionary:
 	var values: Dictionary = {}
@@ -71,18 +72,18 @@ func condition(data: Dictionary) -> Dictionary:
 	var outcome := int(incident.get("outcome", 0))
 	var elapsed := int(incident.get("elapsed", 0))
 	var duration := int(incident.get("duration", 0))
-	if outcome in [1, 2, 3] and not incident.has("followup_sequence"):
-		return {"title": "BROKEN · FOLLOW-UP DICE", "copy": "Broken d4: %d is retained. Complete its duration, injury and recovery dice; the initial outcome is not rerolled." % outcome}
 	if hp < 0 or incident.get("dead", false):
 		return {"title": "DEAD", "copy": "Negative HP means death." if hp < 0 else ("Untreated hemorrhage reached its deadline." if outcome == 3 else "Broken d4: 4 · Dead.")}
+	if BROKEN.new().can_complete_followup(data):
+		return {"title": "Broken", "copy": "Broken d4: %d is retained. Complete its follow-up dice; the initial outcome is not rerolled." % outcome}
 	if outcome == 3 and not incident.get("treated", false):
-		return {"title": "HEMORRHAGE", "copy": "Broken d4: 3. Deadline d2: %d hours. Elapsed: %d / %d. %s. Treatment stops the deadline without restoring HP." % [duration, elapsed, duration, "DR18 · last hour" if elapsed >= duration - 1 else "DR16 · first hour"]}
+		return {"title": "Hemorrhage", "copy": "Treatment stops the hemorrhage. Every test is harder while it continues."}
 	if outcome in [1, 2] and not incident.get("recovered", false):
-		return {"title": "UNCONSCIOUS" if outcome == 1 else "INJURED · UNABLE TO ACT", "copy": "Broken d4: %d. %s Duration d4: %d rounds. Elapsed: %d / %d. Recovery d4: %d HP, held until recovery is due." % [outcome, ("Injury d6: %d · " % int(incident.get("injury_roll", 0)) if outcome == 2 else "") + str(incident.get("injury", "")), duration, elapsed, duration, int(incident.get("recovery_hp", 0))]}
+		return {"title": "Unconscious" if outcome == 1 else "Unable to act", "copy": "You cannot act until you awaken." if outcome == 1 else str(incident.get("injury", "Injured")) + ". You cannot act until recovery is due."}
 	if hp == 0 and outcome == 3 and incident.get("treated", false):
 		return {"title": "TREATED", "copy": "Bleeding stopped. 0 HP. Record HP when healing is resolved; treatment does not restore HP."}
 	if hp == 0 and outcome == 0:
-		return {"title": "BROKEN · 0 HP", "copy": "Roll Broken d4 once for this incident. Follow-up results are retained on the sheet."}
+		return {"title": "Broken", "copy": "Roll once to find out what happens to you."}
 	return {}
 
 func collections(data: Dictionary, items: Array, chapter: int, actor_id: String, facade: SDK, filter: int = 0, owner: bool = true) -> Dictionary:

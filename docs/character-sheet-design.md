@@ -37,5 +37,8 @@ Retained injuries add no invented modifiers.
 
 Portrait and preferred Miniature changes update immediately through SDK domain
 operations. Existing Rooks retain their Miniatures. Journal is a local placeholder
-with no durable data. Viewer access keeps references readable and disables writes.
+with disposable editor text only: leaving or rebuilding the editor discards it;
+no text is retained in navigation, Actor, World, reconnect state or files.
+Preferred Miniature selection uses the existing full-screen browser; the mockup's
+Miniature modal was superseded by the user on 2 October 2026. Viewer access keeps references readable and disables writes.
 QA uses public HTTPS Manifests and normal installation/World-join acquisition.

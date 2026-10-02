@@ -73,16 +73,16 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "kind": str(input.kind), "request": str(input.id), "phase": "rest", "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
 	if str(input.kind) == "broken":
 		var hp: int = data.hit_points
-		if hp > 0:
-			return _error("Broken requires zero HP; negative HP means dead.")
 		if hp < 0:
 			return _finish(context, action, [], "Dead: negative HP. No Broken roll or restored HP. Resolve any applicable class exception with the table.", "Dead", "attention")
 		var incident: Dictionary = data.get("broken_incident", {})
 		action["incident_id"] = int(incident.get("id", int(data.get("broken_serial", 0)) + 1))
 		if not incident.is_empty() and int(incident.get("outcome", 0)) != 0:
-			if int(incident.outcome) in [1, 2, 3] and not incident.has("followup_sequence") and not incident.get("dead", false):
+			if BROKEN.new().can_complete_followup(data):
 				return _broken_followup(context, action, int(incident.outcome), true)
 			return _error("This Broken incident has already been rolled.")
+		if hp > 0 or BROKEN.new().is_dead(data):
+			return _error("Broken requires zero HP; negative HP means dead.")
 		return _request(context, action, "broken", [SDK.DiceTerm.new("Broken", 4)], true)
 	if str(input.kind) == "improve":
 		if not _improvable(data):
@@ -365,16 +365,15 @@ func _specialty_result(context: SDK.SystemActionContext, action: Dictionary, cur
 	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + "Raw Roll #%d. Omen benefits and delayed effects remain manual." % roll.sequence)
 
 func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dictionary, roll: SDK.HumanThrowResult) -> Dictionary:
-	var hp: int = current.hit_points
-	if hp != 0:
-		return _end(context, action)
 	var phase := str(action.phase)
+	if BROKEN.new().is_dead(current) or (int(current.hit_points) != 0 if phase == "broken" else not BROKEN.new().can_complete_followup(current)):
+		return _end(context, action)
 	var face: int = roll.terms[0].results[0]
 	var suffix := " Raw Roll #%d." % roll.sequence
 	var data := current.duplicate(true)
 	data = BROKEN.new().sync(current, data)
-	var incident: Dictionary = data.broken_incident
-	if int(incident.id) != int(action.incident_id):
+	var incident: Dictionary = data.get("broken_incident", {})
+	if int(incident.get("id", -1)) != int(action.incident_id):
 		return _end(context, action)
 	if phase == "broken":
 		if int(incident.outcome) != 0:
@@ -390,6 +389,8 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 			return _end(context, action)
 		return _broken_followup(context, action, face)
 
+	if int(incident.get("outcome", 0)) != int({"unconscious": 1, "injury": 2, "hemorrhage": 3}.get(phase, -1)):
+		return _end(context, action)
 	var text := ""
 	if phase == "unconscious":
 		incident["duration"] = face

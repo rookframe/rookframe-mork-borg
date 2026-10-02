@@ -62,6 +62,11 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.tscn" id="workflow_scene"]
 
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="details_script"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition_summary.tscn" id="condition_summary"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_inline_field.gd" id="inline_field"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_validation.gd" id="validation"]
 [sub_resource type="StyleBoxFlat" id="PanelFrame"]
 bg_color = Color(0.015686, 0.066667, 0.082353, 1)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
@@ -156,6 +161,7 @@ theme_override_constants/margin_top = 16
 theme_override_constants/margin_bottom = 16
 
 [node name="Layout" type="VBoxContainer" parent="Margin"]
+script = ExtResource("validation")
 
 layout_mode = 2
 
@@ -206,7 +212,12 @@ theme_override_styles/pressed = SubResource("NamePlain")
 theme_override_fonts/font = ExtResource("display")
 theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
 
-[node name="NameEdit" type="LineEdit" parent="Margin/Layout/Header"]
+[node name="NameEditField" type="VBoxContainer" parent="Margin/Layout/Header"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Header/NameEditField"]
 layout_mode = 2
 size_flags_horizontal = 1
 visible = false
@@ -219,7 +230,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Header/NameEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Header/NameEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Header/NameEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -428,6 +445,9 @@ horizontal_alignment = 1
 
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 
+max_lines_visible = 1
+text_overrun_behavior = 3
+
 [node name="Origin" type="Button" parent="Margin/Layout/Body/Core"]
 
 layout_mode = 2
@@ -525,7 +545,12 @@ unique_name_in_owner = true
 
 visible = false
 
-[node name="HitPointsCurrent" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
+[node name="HitPointsCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField"]
 
 layout_mode = 2
 
@@ -542,7 +567,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -555,7 +586,12 @@ clip_text = true
 theme_override_font_sizes/font_size = 9
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-[node name="HitPointsMaximum" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
+[node name="HitPointsMaximumField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField"]
 
 layout_mode = 2
 
@@ -572,7 +608,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximum"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -598,7 +640,12 @@ unique_name_in_owner = true
 
 visible = false
 
-[node name="PowerUsesCurrent" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit"]
+[node name="PowerUsesCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField"]
 
 layout_mode = 2
 
@@ -615,7 +662,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrent"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -641,7 +694,12 @@ unique_name_in_owner = true
 
 visible = false
 
-[node name="OmensCurrent" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit"]
+[node name="OmensCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField"]
 
 layout_mode = 2
 
@@ -658,7 +716,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrent"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -697,7 +761,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("strength")
 
-[node name="StrengthEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow"]
+[node name="StrengthEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/StrengthRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField"]
 
 layout_mode = 2
 
@@ -715,7 +784,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -741,7 +816,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("agility")
 
-[node name="AgilityEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow"]
+[node name="AgilityEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/AgilityRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField"]
 
 layout_mode = 2
 
@@ -759,7 +839,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -785,7 +871,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("presence")
 
-[node name="PresenceEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow"]
+[node name="PresenceEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/PresenceRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField"]
 
 layout_mode = 2
 
@@ -803,7 +894,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -829,7 +926,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("toughness")
 
-[node name="ToughnessEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow"]
+[node name="ToughnessEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField"]
 
 layout_mode = 2
 
@@ -847,7 +949,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -860,18 +968,8 @@ clip_text = true
 theme_override_font_sizes/font_size = 9
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-[node name="ConditionReminder" type="Button" parent="Margin/Layout/Body/Core"]
-
+[node name="ConditionReminder" parent="Margin/Layout/Body/Core" instance=ExtResource("condition_summary")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Condition"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
 visible = false
 
 [node name="ReadyWeapon" parent="Margin/Layout/Body/Core" instance=ExtResource("readiness")]
@@ -1212,6 +1310,52 @@ custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 visible = false
 
+[node name="SilverEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/ChapterCaption/SilverEditField"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(120, 44)
+
+size_flags_horizontal = 1
+
+accessibility_name = "Silver"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/SilverEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/SilverEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Silver"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+
+[node name="Resource" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+text = "Silver"
+
 [node name="Collections" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
 
 layout_mode = 2
@@ -1256,6 +1400,7 @@ unique_name_in_owner = true
 size_flags_vertical = 3
 
 [node name="Companions" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+empty_text = "Travelling alone."
 framed_collection = true
 
 layout_mode = 2
@@ -1541,7 +1686,12 @@ custom_minimum_size = Vector2(86, 44)
 theme_type_variation = "TaskButton"
 theme_override_font_sizes/font_size = 13
 
-[node name="QuickOmensEdit" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources"]
+[node name="QuickOmensEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/QuickResources"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField"]
 layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(86, 44)
@@ -1554,7 +1704,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -1580,7 +1736,12 @@ custom_minimum_size = Vector2(86, 44)
 theme_type_variation = "TaskButton"
 theme_override_font_sizes/font_size = 13
 
-[node name="QuickSilverEdit" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources"]
+[node name="QuickSilverEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/QuickResources"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField"]
 layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(86, 44)
@@ -1593,7 +1754,13 @@ theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 
-[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEdit"]
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField/Editor"]
 layout_mode = 0
 anchor_right = 1.0
 offset_left = 5.0
@@ -1618,6 +1785,8 @@ visible = false
 size_flags_vertical = 3
 
 theme_override_constants/separation = 8
+
+script = ExtResource("details_script")
 
 [node name="DetailHeader" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
 
@@ -1650,6 +1819,9 @@ theme_override_font_sizes/font_size = 22
 autowrap_mode = 3
 
 size_flags_horizontal = 3
+
+max_lines_visible = 1
+text_overrun_behavior = 3
 
 [node name="DetailTabs" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
 
@@ -1699,6 +1871,10 @@ unique_name_in_owner = true
 
 theme_override_constants/separation = 8
 
+[node name="FullTitle" type="Label" parent="Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent"]
+layout_mode = 2
+autowrap_mode = 3
+
 [node name="DetailActions" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
 
 layout_mode = 2
@@ -1742,13 +1918,8 @@ layout_mode = 2
 visible = false
 
 [node name="Picker" instance=ExtResource("miniatures") parent="Margin/Layout"]
-
 layout_mode = 2
-
-unique_name_in_owner = true
-
 visible = false
-
 size_flags_vertical = 3
 
 [node name="Status" type="Label" parent="Margin/Layout"]

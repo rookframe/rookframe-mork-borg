@@ -1,7 +1,7 @@
 extends GdUnitTestSuite
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
-const SYSTEM = preload(ROOT + "logic/melee_authority.gd")
+const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const BOUNDARY = preload("res://tests/melee_sdk_boundary.gd")
 

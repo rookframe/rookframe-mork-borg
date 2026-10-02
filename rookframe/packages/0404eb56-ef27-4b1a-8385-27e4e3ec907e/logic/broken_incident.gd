@@ -21,6 +21,10 @@ func sync(previous: Dictionary, current: Dictionary) -> Dictionary:
 		incident["dead"] = true
 		incident["negative_hp"] = true
 	elif hp > 0 and not incident.is_empty():
+		if incident.get("dead", false):
+			if hp != old_hp:
+				data.erase("broken_incident")
+			return data
 		if int(incident.get("outcome", 0)) == 3:
 			# Recording external healing is distinct from recording treatment.
 			incident["negative_hp"] = false
@@ -46,6 +50,15 @@ func can_act(data: Dictionary) -> bool:
 		return false
 	var incident: Dictionary = data.get("broken_incident", {})
 	return not (int(incident.get("outcome", 0)) in [1, 2] and not incident.get("recovered", false))
+
+func can_complete_followup(data: Dictionary) -> bool:
+	var incident: Dictionary = data.get("broken_incident", {})
+	if is_dead(data) or incident.has("followup_sequence"):
+		return false
+	var outcome := int(incident.get("outcome", 0))
+	if outcome == 3:
+		return not incident.get("treated", false)
+	return outcome in [1, 2] and int(data.get("hit_points", 1)) == 0 and not incident.get("recovered", false)
 
 func commit(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], report: SDK.ActionLogMessage = null) -> SDK.OperationResult:
 	var prepared: Array[SDK.ActorChange] = []

@@ -7,106 +7,432 @@ bg_color = Color(0.015686, 0.066667, 0.082353, 1)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
 border_width_left = 1
 border_width_right = 1
+border_width_top = 1
 border_width_bottom = 1
-border_width_top = 3
-[node name="Condition" type="PanelContainer"]
+[sub_resource type="StyleBoxFlat" id="pip"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.937255, 0.356863, 0.329412, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="results"]
+bg_color = Color(0.058824, 0.101961, 0.109804, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[node name="Condition" type="VBoxContainer"]
 script = ExtResource("script")
+theme_override_constants/separation = 18
+[node name="Main" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("frame")
-[node name="Inset" type="MarginContainer" parent="."]
+[node name="Frame" type="VBoxContainer" parent="Main"]
 layout_mode = 2
-[node name="Content" type="VBoxContainer" parent="Inset"]
+theme_override_constants/separation = 0
+[node name="DangerEdge" type="ColorRect" parent="Main/Frame"]
 layout_mode = 2
-theme_override_constants/separation = 8
-[node name="ConditionTitle" type="Label" parent="Inset/Content"]
+custom_minimum_size = Vector2(0, 3)
+mouse_filter = 2
+color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Inset" type="MarginContainer" parent="Main/Frame"]
 layout_mode = 2
-autowrap_mode = 3
-theme_override_fonts/font = ExtResource("display")
+size_flags_vertical = 3
+[node name="Content" type="VBoxContainer" parent="Main/Frame/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 20
+[node name="Header" type="VBoxContainer" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Caption" type="Label" parent="Main/Frame/Inset/Content/Header"]
+layout_mode = 2
+text = "Broken · unresolved"
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Title" type="Label" parent="Main/Frame/Inset/Content/Header"]
+layout_mode = 2
+text = "Broken"
+theme_override_font_sizes/font_size = 48
 theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
-[node name="ConditionCopy" type="Label" parent="Inset/Content"]
-layout_mode = 2
-autowrap_mode = 3
-[node name="Metrics" type="HBoxContainer" parent="Inset/Content"]
-layout_mode = 2
-theme_override_constants/separation = 16
-[node name="Remaining" type="Label" parent="Inset/Content/Metrics"]
-layout_mode = 2
-size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-[node name="Future" type="Label" parent="Inset/Content/Metrics"]
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Header"]
+layout_mode = 2
+text = "Roll once to find out what happens to you."
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+[node name="Outcomes" type="GridContainer" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 20
+[node name="Outcome1" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
-autowrap_mode = 3
-[node name="Pips" type="HBoxContainer" parent="Inset/Content"]
+theme_override_constants/separation = 16
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome1"]
 layout_mode = 2
-theme_override_constants/separation = 6
-[node name="Rolls" type="Label" parent="Inset/Content"]
+text = "1"
+theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(44, 0)
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+[node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome1"]
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome1/Words"]
+layout_mode = 2
+text = "Unconscious"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome1/Words"]
+layout_mode = 2
+text = "d4 rounds → d4 HP"
+theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-[node name="DeathMark" type="TextureRect" parent="Inset/Content"]
+[node name="Outcome2" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
-texture = ExtResource("death")
-expand_mode = 1
-stretch_mode = 5
-visible = false
-self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
-[node name="ConditionActions" type="HBoxContainer" parent="Inset/Content"]
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome2"]
 layout_mode = 2
-theme_override_constants/separation = 6
-[node name="Broken" type="Button" parent="Inset/Content/ConditionActions"]
+text = "2"
+theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(44, 0)
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+[node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome2"]
 layout_mode = 2
-text = "Roll Broken d4"
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome2/Words"]
+layout_mode = 2
+text = "Injury"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome2/Words"]
+layout_mode = 2
+text = "d6 injury · d4 rounds → d4 HP"
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Outcome3" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome3"]
+layout_mode = 2
+text = "3"
+theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(44, 0)
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+[node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome3"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome3/Words"]
+layout_mode = 2
+text = "Hemorrhage"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome3/Words"]
+layout_mode = 2
+text = "Treat within d2 hours"
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Outcome4" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome4"]
+layout_mode = 2
+text = "4"
+theme_override_font_sizes/font_size = 40
+custom_minimum_size = Vector2(44, 0)
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+[node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome4"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome4/Words"]
+layout_mode = 2
+text = "Dead"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome4/Words"]
+layout_mode = 2
+text = "No further roll"
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="TopSpacer" type="Control" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+[node name="Counter" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 24
+[node name="Value" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+[node name="Amount" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Value"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Value/Amount"]
+layout_mode = 2
+text = "4"
+theme_override_font_sizes/font_size = 96
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+[node name="Hours" type="Label" parent="Main/Frame/Inset/Content/Counter/Value/Amount"]
+layout_mode = 2
+text = "h"
+vertical_alignment = 2
+theme_override_font_sizes/font_size = 40
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_fonts/font = ExtResource("display")
+[node name="Units" type="Label" parent="Main/Frame/Inset/Content/Counter/Value"]
+layout_mode = 2
+text = "rounds remaining"
+theme_override_font_sizes/font_size = 18
+[node name="Tracker" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+[node name="Pips" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Pip1" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 52)
+theme_override_styles/panel = SubResource("pip")
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
+layout_mode = 2
+text = "1"
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_fonts/font = ExtResource("display")
+[node name="Pip2" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 52)
+theme_override_styles/panel = SubResource("pip")
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
+layout_mode = 2
+text = "2"
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_fonts/font = ExtResource("display")
+[node name="Pip3" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 52)
+theme_override_styles/panel = SubResource("pip")
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
+layout_mode = 2
+text = "3"
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_fonts/font = ExtResource("display")
+[node name="Pip4" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
+layout_mode = 2
+custom_minimum_size = Vector2(52, 52)
+theme_override_styles/panel = SubResource("pip")
+[node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
+layout_mode = 2
+text = "4"
+theme_override_font_sizes/font_size = 24
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_fonts/font = ExtResource("display")
+[node name="Rules" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
+layout_mode = 2
+theme_override_constants/separation = 24
+[node name="First" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Caption" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/First"]
+layout_mode = 2
+text = "First hour"
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/First"]
+layout_mode = 2
+text = "All tests DR16"
+theme_override_font_sizes/font_size = 20
+[node name="Last" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Caption" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/Last"]
+layout_mode = 2
+text = "Last hour"
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/Last"]
+layout_mode = 2
+text = "All tests DR18"
+theme_override_font_sizes/font_size = 20
+[node name="Controls" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Undo" type="Button" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls"]
+layout_mode = 2
+text = "−"
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
-visible = false
-
-[node name="NextRound" type="Button" parent="Inset/Content/ConditionActions"]
+[node name="Next" type="Button" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls"]
 layout_mode = 2
 text = "Next round"
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
-visible = false
-
-[node name="UndoRound" type="Button" parent="Inset/Content/ConditionActions"]
+[node name="Death" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
-text = "Undo round"
+theme_override_constants/separation = 40
+[node name="Mark" type="TextureRect" parent="Main/Frame/Inset/Content/Death"]
+layout_mode = 2
+custom_minimum_size = Vector2(130, 150)
+texture = ExtResource("death")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Death"]
+layout_mode = 2
+text = "Your story ends here."
+theme_override_font_sizes/font_size = 18
+autowrap_mode = 3
+size_flags_horizontal = 3
+size_flags_vertical = 4
+[node name="Treated" type="VBoxContainer" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 18
+[node name="Title" type="Label" parent="Main/Frame/Inset/Content/Treated"]
+layout_mode = 2
+text = "Hemorrhage stopped"
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Treated"]
+layout_mode = 2
+text = "Keep the resolved treatment. Update HP when healing changes it."
+autowrap_mode = 3
+[node name="Spacer" type="Control" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+[node name="Divider" type="HSeparator" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+[node name="Footer" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+[node name="Note" type="Label" parent="Main/Frame/Inset/Content/Footer"]
+layout_mode = 2
+text = "At exactly 0 HP · Broken d4"
+theme_override_font_sizes/font_size = 16
+autowrap_mode = 3
+size_flags_horizontal = 3
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Broken" type="Button" parent="Main/Frame/Inset/Content/Footer"]
+layout_mode = 2
+text = "Roll Broken d4"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
-visible = false
-
-[node name="Recover" type="Button" parent="Inset/Content/ConditionActions"]
+theme_type_variation = "TaskPrimary"
+[node name="Recover" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Awaken"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
-visible = false
-
-[node name="AdvanceHour" type="Button" parent="Inset/Content/ConditionActions"]
-layout_mode = 2
-text = "Advance 1 hour"
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
-visible = false
-
-[node name="UndoHour" type="Button" parent="Inset/Content/ConditionActions"]
-layout_mode = 2
-text = "Undo hour"
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
-visible = false
-
-[node name="Treat" type="Button" parent="Inset/Content/ConditionActions"]
+theme_type_variation = "TaskPrimary"
+[node name="Treat" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Record treatment"
 custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskPrimary"
+[node name="EditHP" type="Button" parent="Main/Frame/Inset/Content/Footer"]
+layout_mode = 2
+text = "Edit HP"
+custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
-visible = false
-
-
-[node name="DangerEdge" type="ColorRect" parent="."]
-layout_mode = 0
-anchor_right = 1.0
-offset_bottom = 3.0
-mouse_filter = 2
-color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="UndoDeath" type="Button" parent="Main/Frame/Inset/Content/Footer"]
+layout_mode = 2
+text = "Undo last hour"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+[node name="Results" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("results")
+[node name="Inset" type="MarginContainer" parent="Results"]
+layout_mode = 2
+[node name="Values" type="HBoxContainer" parent="Results/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 24
+[node name="Broken" type="VBoxContainer" parent="Results/Inset/Values"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Caption" type="Label" parent="Results/Inset/Values/Broken"]
+layout_mode = 2
+text = "Broken"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Results/Inset/Values/Broken"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16
+[node name="Injury" type="VBoxContainer" parent="Results/Inset/Values"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Caption" type="Label" parent="Results/Inset/Values/Injury"]
+layout_mode = 2
+text = "Injury"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Results/Inset/Values/Injury"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16
+[node name="Duration" type="VBoxContainer" parent="Results/Inset/Values"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Caption" type="Label" parent="Results/Inset/Values/Duration"]
+layout_mode = 2
+text = "Duration"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Results/Inset/Values/Duration"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16
+[node name="Recovery" type="VBoxContainer" parent="Results/Inset/Values"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Caption" type="Label" parent="Results/Inset/Values/Recovery"]
+layout_mode = 2
+text = "Recovery"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Results/Inset/Values/Recovery"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16
+[node name="Elapsed" type="VBoxContainer" parent="Results/Inset/Values"]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Caption" type="Label" parent="Results/Inset/Values/Elapsed"]
+layout_mode = 2
+text = "Elapsed"
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Value" type="Label" parent="Results/Inset/Values/Elapsed"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 16

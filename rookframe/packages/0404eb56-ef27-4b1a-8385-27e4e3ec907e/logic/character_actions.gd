@@ -12,6 +12,7 @@ func correct(field: String, text: String) -> SDK.ActorResult:
 ## Apply only edited Character fields to the latest shared Actor snapshot.
 ## Inventory and Appearance are independent accepted operations.
 func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorResult:
+	invalid_field = ""
 	var source := _read()
 	if not source.ok:
 		return source
@@ -23,7 +24,7 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorRe
 				return _failure("Character corrections must be text fields.")
 			var error := _correct(data, str(specialty), str(fields.get(str(specialty))))
 			if not error.is_empty():
-				return _failure(error)
+				return _field_failure(str(specialty), error)
 	for key in fields.keys():
 		var field := str(key)
 		if typeof(key) != TYPE_STRING or typeof(fields.get(field)) != TYPE_STRING:
@@ -52,7 +53,7 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorRe
 				continue
 		var error := _correct(data, field, str(fields.get(field)))
 		if not error.is_empty():
-			return _failure(error)
+			return _field_failure(field, error)
 	data = BROKEN.new().sync(current, data)
 	return await _sdk.actors.update(_id, data)
 

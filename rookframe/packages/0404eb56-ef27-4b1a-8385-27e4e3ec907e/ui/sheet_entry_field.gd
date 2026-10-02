@@ -43,4 +43,17 @@ func refresh_value(value: String) -> void:
 
 func _typed(text: String) -> void:
 	if not _setting:
+		get_node(^"Value").error_text = ""
+		get_node(^"Text").error_text = ""
 		changed.emit(_field, text)
+
+func show_error(message: String) -> void:
+	get_node(^"Value").error_text = message
+	get_node(^"Text").error_text = message
+	_focus_editor.call_deferred()
+
+func _focus_editor() -> void:
+	if _multiline:
+		get_node(^"Text").focus_editor()
+	else:
+		get_node(^"Value").focus_editor()

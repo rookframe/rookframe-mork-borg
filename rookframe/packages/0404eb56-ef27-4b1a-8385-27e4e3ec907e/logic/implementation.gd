@@ -1,4 +1,7 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd"
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/implementation.gd"
+
+const MELEE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd")
+var _melee := MELEE.new()
 
 const DEFENCE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_authority.gd")
 var _defence := DEFENCE.new()
@@ -39,4 +42,4 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 		return inbox
 	if name.begins_with("defence."):
 		return _defence.handle(context, name, payload)
-	return super.handle_system_intent(context, name, payload)
+	return _melee.handle_system_intent(context, name, payload)
