@@ -309,7 +309,6 @@ func _core(data: Dictionary) -> void:
 	_header_name.visible = not _draft.active
 	_header_name_edit.visible = _draft.active
 	_header_name_edit.text = _draft.value("name") if _draft.active else str(data.get("name", ""))
-	_header.visible = not _phone or _draft.active
 	_header_name.text = str(data.get("name", "Character"))
 	_header_editing_status.visible = _draft.active
 	_header_spacer.visible = false
