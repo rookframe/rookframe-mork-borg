@@ -823,22 +823,23 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 		var face: int = roll.terms[0].results[0]
 		var success := face + modifier >= 8
 		var text := "Gob Lobber: d20 %d %+d vs DR8. %s One spit spent. Raw Roll #%d." % [face, modifier, "Hit." if success else "Miss.", roll.sequence]
+		if action.get("sheet", false) and not success:
+			return _resolve(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + " Witness Toughness tests and vomiting remain at the table.")
 		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text):
 			return _end(context, action)
 		if success:
 			return _next_throw(context, action, "gob-duration", str(action.owner), [SDK.DiceTerm.new("Blind and vomiting (rounds)", 4)], "Throw d4 rounds; ongoing consequences are manual.")
-		if action.get("sheet", false):
-			return _resolve(context, action, [], text + " Witness Toughness tests and vomiting remain at the table.")
 		action["state"] = "witnesses"
 		action["message"] = text + " Select all witnesses, friend and foe, then confirm. The table determines who witnessed this."
 		return _public(action)
 	if phase == "gob-duration":
 		var target: Dictionary = action.target
-		var text := "%s: blinded, retching and vomiting for %d rounds. Handle these consequences manually. Raw Roll #%d." % [str(target.label), roll.terms[0].results[0], roll.sequence]
-		if not _record(context, [], text):
-			return _end(context, action)
+		var label := "Table-chosen target" if action.get("sheet", false) else str(target.label)
+		var text := "%s: blinded, retching and vomiting for %d rounds. Handle these consequences manually. Raw Roll #%d." % [label, roll.terms[0].results[0], roll.sequence]
 		if action.get("sheet", false):
 			return _resolve(context, action, [], text + " Witness Toughness tests and vomiting remain at the table.")
+		if not _record(context, [], text):
+			return _end(context, action)
 		action["state"] = "witnesses"
 		action["message"] = text + " Select all witnesses, friend and foe, then confirm."
 		return _public(action)
