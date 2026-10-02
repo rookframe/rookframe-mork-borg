@@ -71,7 +71,10 @@ theme_override_styles/pressed = SubResource("selected")
 theme_override_styles/hover = SubResource("tab_normal")
 theme_override_styles/hover_pressed = SubResource("selected")
 theme_override_styles/disabled = SubResource("tab_normal")
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_hover_color = Color(0.568627, 0.6, 0.603922, 1)
 theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
 [node name="Details" type="Button" parent="TabsFrame/Inset/DetailTabs"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -84,7 +87,10 @@ theme_override_styles/pressed = SubResource("selected")
 theme_override_styles/hover = SubResource("tab_normal")
 theme_override_styles/hover_pressed = SubResource("selected")
 theme_override_styles/disabled = SubResource("tab_normal")
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_hover_color = Color(0.568627, 0.6, 0.603922, 1)
 theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
 [node name="Body" type="MarginContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
