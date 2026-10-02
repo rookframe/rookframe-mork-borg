@@ -312,7 +312,7 @@ func _core(data: Dictionary) -> void:
 	_header.visible = not _phone or _draft.active
 	_header_name.text = str(data.get("name", "Character"))
 	_header_editing_status.visible = _draft.active
-	_header_spacer.visible = _draft.active
+	_header_spacer.visible = false
 	_header_system.visible = not _phone and not _draft.active
 	get_node(^"Margin").add_theme_constant_override("margin_top", (4 if _draft.active else 10) if _phone else 16)
 	_quick_quick_omens_edit.visible = _phone and _draft.active

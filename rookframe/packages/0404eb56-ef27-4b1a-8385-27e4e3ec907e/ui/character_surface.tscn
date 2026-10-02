@@ -71,6 +71,18 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.tscn" id="details_scene"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.tscn" id="appearance_scene"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.tscn" id="resource_editors"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/shield.svg" id="shield"]
+
+[sub_resource type="StyleBoxFlat" id="CoreHeading"]
+bg_color = Color(0.062745, 0.105882, 0.117647, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+
 [sub_resource type="StyleBoxFlat" id="PanelFrame"]
 bg_color = Color(0.015686, 0.066667, 0.082353, 1)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
@@ -219,7 +231,7 @@ theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
 [node name="NameEditField" type="VBoxContainer" parent="Margin/Layout/Header"]
 layout_mode = 2
 script = ExtResource("inline_field")
-size_flags_horizontal = 1
+size_flags_horizontal = 3
 theme_override_constants/separation = 3
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Header/NameEditField"]
 layout_mode = 2
@@ -282,7 +294,8 @@ unique_name_in_owner = true
 
 text = "Edit sheet"
 icon = ExtResource("quill")
-expand_icon = true
+expand_icon = false
+size_flags_vertical = 4
 theme_override_constants/icon_max_width = 24
 
 custom_minimum_size = Vector2(44, 44)
@@ -300,7 +313,8 @@ unique_name_in_owner = true
 
 text = "Rest"
 icon = ExtResource("elixir")
-expand_icon = true
+expand_icon = false
+size_flags_vertical = 4
 theme_override_constants/icon_max_width = 24
 
 custom_minimum_size = Vector2(44, 44)
@@ -318,7 +332,8 @@ unique_name_in_owner = true
 
 text = "Level up"
 icon = ExtResource("strength")
-expand_icon = true
+expand_icon = false
+size_flags_vertical = 4
 theme_override_constants/icon_max_width = 24
 
 custom_minimum_size = Vector2(44, 44)
@@ -332,7 +347,8 @@ theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 layout_mode = 2
 text = "Editing sheet"
 theme_override_font_sizes/font_size = 14
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 visible = false
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 
@@ -351,6 +367,8 @@ theme_type_variation = "TaskButton"
 
 visible = false
 
+size_flags_vertical = 4
+
 [node name="SaveSheet" type="Button" parent="Margin/Layout/Header"]
 
 layout_mode = 2
@@ -364,6 +382,8 @@ custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskPrimary"
 
 visible = false
+
+size_flags_vertical = 4
 
 [node name="Close" type="Button" parent="Margin/Layout/Header"]
 
@@ -984,19 +1004,35 @@ theme_type_variation = "TaskButton"
 clip_text = true
 alignment = 0
 
-[node name="WeaponHeading" type="Label" parent="Margin/Layout/Body/Core"]
-
+[node name="WeaponHeading" type="PanelContainer" parent="Margin/Layout/Body/Core"]
 layout_mode = 2
-
-unique_name_in_owner = true
-
+custom_minimum_size = Vector2(0, 40)
+theme_override_styles/panel = SubResource("CoreHeading")
+mouse_filter = 2
+[node name="Center" type="CenterContainer" parent="Margin/Layout/Body/Core/WeaponHeading"]
+layout_mode = 2
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Center"]
+layout_mode = 2
+theme_override_constants/separation = 10
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/WeaponHeading/Center/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("sword")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Margin/Layout/Body/Core/WeaponHeading/Center/Row"]
+layout_mode = 2
 text = "READY WEAPON"
-
 theme_override_font_sizes/font_size = 16
-
-autowrap_mode = 3
-
+theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+vertical_alignment = 1
+mouse_filter = 2
 
 [node name="Weapon" type="OptionButton" parent="Margin/Layout/Body/Core"]
 
@@ -1066,19 +1102,35 @@ custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
 
-[node name="ProtectionHeading" type="Label" parent="Margin/Layout/Body/Core"]
-
+[node name="ProtectionHeading" type="PanelContainer" parent="Margin/Layout/Body/Core"]
 layout_mode = 2
-
-unique_name_in_owner = true
-
+custom_minimum_size = Vector2(0, 40)
+theme_override_styles/panel = SubResource("CoreHeading")
+mouse_filter = 2
+[node name="Center" type="CenterContainer" parent="Margin/Layout/Body/Core/ProtectionHeading"]
+layout_mode = 2
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/ProtectionHeading/Center"]
+layout_mode = 2
+theme_override_constants/separation = 10
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/ProtectionHeading/Center/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("shield")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Margin/Layout/Body/Core/ProtectionHeading/Center/Row"]
+layout_mode = 2
 text = "PROTECTION"
-
 theme_override_font_sizes/font_size = 16
-
-autowrap_mode = 3
-
+theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+vertical_alignment = 1
+mouse_filter = 2
 
 [node name="Protection" parent="Margin/Layout/Body/Core" instance=ExtResource("readiness")]
 
@@ -1254,7 +1306,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Personal notes"
 custom_minimum_size = Vector2(44, 44)
-clip_text = true
+clip_text = false
 theme_type_variation = "TaskButton"
 visible = false
 
@@ -1267,7 +1319,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "All belongings"
 custom_minimum_size = Vector2(44, 44)
-clip_text = true
+clip_text = false
 theme_type_variation = "TaskButton"
 toggle_mode = true
 theme_override_font_sizes/font_size = 13
@@ -1276,7 +1328,7 @@ theme_override_font_sizes/font_size = 13
 layout_mode = 2
 text = "Arms"
 custom_minimum_size = Vector2(44, 44)
-clip_text = true
+clip_text = false
 theme_type_variation = "TaskButton"
 toggle_mode = true
 theme_override_font_sizes/font_size = 13
@@ -1285,7 +1337,7 @@ theme_override_font_sizes/font_size = 13
 layout_mode = 2
 text = "Supplies"
 custom_minimum_size = Vector2(44, 44)
-clip_text = true
+clip_text = false
 theme_type_variation = "TaskButton"
 toggle_mode = true
 theme_override_font_sizes/font_size = 13
@@ -1294,7 +1346,7 @@ theme_override_font_sizes/font_size = 13
 layout_mode = 2
 text = "Ready"
 custom_minimum_size = Vector2(44, 44)
-clip_text = true
+clip_text = false
 theme_type_variation = "TaskButton"
 toggle_mode = true
 theme_override_font_sizes/font_size = 13

@@ -142,7 +142,7 @@ theme_override_constants/separation = 8
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Unsaved sheet changes"
-text_overrun_behavior = 3
+text_overrun_behavior = 0
 theme_override_font_sizes/font_size = 12
 [node name="Cancel" type="Button" parent="FooterFrame/FooterInset/DetailActions/Draft"]
 layout_mode = 2

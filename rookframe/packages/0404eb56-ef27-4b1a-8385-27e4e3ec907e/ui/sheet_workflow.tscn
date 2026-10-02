@@ -56,7 +56,8 @@ theme_override_fonts/font = ExtResource("display")
 [node name="HP" type="Label" parent="Header"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 16
 [node name="Body" type="HBoxContainer" parent="."]
 layout_mode = 2
@@ -101,13 +102,15 @@ size_flags_horizontal = 3
 [node name="Value" type="Label" parent="Body/Context/Inset/Content/HP"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 30
 theme_override_colors/font_color = Color(0.419608, 0.811765, 0.517647, 1)
 [node name="Maximum" type="Label" parent="Body/Context/Inset/Content/HP"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Abilities" type="VBoxContainer" parent="Body/Context/Inset/Content"]
@@ -124,7 +127,8 @@ size_flags_horizontal = 3
 [node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Strength"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="Agility" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
@@ -138,7 +142,8 @@ size_flags_horizontal = 3
 [node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Agility"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="Presence" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
@@ -152,7 +157,8 @@ size_flags_horizontal = 3
 [node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Presence"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="Toughness" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
@@ -166,7 +172,8 @@ size_flags_horizontal = 3
 [node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Toughness"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="Spacer" type="Control" parent="Body/Context/Inset/Content"]
@@ -337,7 +344,8 @@ theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Die" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row"]
 layout_mode = 2
 text = "d4 HP"
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 mouse_filter = 2
@@ -384,7 +392,8 @@ theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Die" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row"]
 layout_mode = 2
 text = "d6 HP"
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 24
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 mouse_filter = 2
@@ -445,13 +454,15 @@ layout_mode = 2
 [node name="Value" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result/HP"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 42
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="Maximum" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result/HP"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
+vertical_alignment = 1
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Copy" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result"]

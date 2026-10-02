@@ -7,7 +7,8 @@ func _ready() -> void:
 
 func present(active: bool, canvas: Vector2, presentation: String = "entry") -> void:
 	if not active:
-		hide()
+		if visible:
+			hide()
 		return
 	var height := 790 if presentation == "note" else 410 if presentation == "number" else 610
 	var extent := Vector2i(int(minf(640, canvas.x - 80)), int(minf(height, canvas.y - 70)))
