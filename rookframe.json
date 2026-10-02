@@ -3,7 +3,7 @@
   "id": "0404eb56-ef27-4b1a-8385-27e4e3ec907e",
   "kind": "system-extension",
   "name": "M\u00d6RK BORG System",
-  "version": "1.0.110-rc.2",
+  "version": "1.0.110-rc.3",
   "summary": "M\u00d6RK BORG Character and Creature Actors with private sheets.",
   "sdk": {
     "edition": "2029",
@@ -172,11 +172,11 @@
       ],
       "targetSystemPackageId": "0404eb56-ef27-4b1a-8385-27e4e3ec907e",
       "targetContractId": "mork-borg-adversary-v1",
-      "compatibleVersions": ">=1.0.110-rc.2 <2.0.0"
+      "compatibleVersions": ">=1.0.110-rc.3 <2.0.0"
     }
   ],
-  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.110-rc.2/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.110-rc.2.json",
-  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.110-rc.2/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.110-rc.2.rookpackage",
+  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.110-rc.3/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.110-rc.3.json",
+  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.110-rc.3/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.110-rc.3.rookpackage",
   "defaultLocale": "en",
   "translations": [
     {

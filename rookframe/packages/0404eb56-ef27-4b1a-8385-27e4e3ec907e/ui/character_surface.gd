@@ -363,7 +363,9 @@ func _collections(data: Dictionary) -> void:
 	_chapter_primary.configure(primary, "", heading, str(primary.size()))
 	_chapter_resources.configure(resources, "", "RESOURCES" if chapter == 0 else "DECOCTIONS & RESOURCES", str(resources.size()))
 	_chapter_companions.configure(companions, "", "COMPANIONS", str(companions.size()))
-	_chapter_ui.configure_journal(primary if chapter == 3 else [], resources if chapter == 3 else [])
+	var story: Array[Dictionary] = primary if chapter == 3 else []
+	var notes: Array[Dictionary] = resources if chapter == 3 else []
+	_chapter_ui.configure_journal(story, notes)
 	_rendered_chapter = chapter
 	_restore_pages()
 
