@@ -4,6 +4,12 @@
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
 
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/herbs.svg" id="herbs"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/bag.svg" id="bag"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/book.svg" id="book"]
+
 [ext_resource type="Resource" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_navigation.tres" id="navigation"]
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_choices.tscn" id="choices"]
@@ -112,6 +118,10 @@ text = "Character"
 
 custom_minimum_size = Vector2(44, 44)
 
+clip_text = true
+
+text_overrun_behavior = 3
+
 theme_type_variation = "TaskButton"
 
 icon = ExtResource("character")
@@ -126,6 +136,10 @@ size_flags_horizontal = 3
 
 alignment = 0
 
+flat = true
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
+
 [node name="NameEdit" parent="Margin/Layout/Header" instance=ExtResource("textfield")]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -139,11 +153,11 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "MÖRK BORG"
+text = "MÃ–RK BORG"
 
 theme_override_font_sizes/font_size = 12
 
-autowrap_mode = 3
+autowrap_mode = 0
 
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
@@ -159,6 +173,9 @@ custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
 
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
 [node name="Rest" type="Button" parent="Margin/Layout/Header"]
 
 layout_mode = 2
@@ -171,6 +188,9 @@ custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
 
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
 [node name="Improve" type="Button" parent="Margin/Layout/Header"]
 
 layout_mode = 2
@@ -182,6 +202,9 @@ text = "Level up"
 custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
+
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="SaveSheet" type="Button" parent="Margin/Layout/Header"]
 
@@ -217,7 +240,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "×"
+text = "Ã—"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -251,6 +274,8 @@ unique_name_in_owner = true
 
 text = "Class"
 
+theme_override_fonts/font = ExtResource("display")
+
 theme_override_font_sizes/font_size = 22
 
 autowrap_mode = 3
@@ -269,7 +294,9 @@ text = "Origin"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="Likeness" type="HBoxContainer" parent="Margin/Layout/Body/Core"]
 
@@ -313,7 +340,7 @@ text = "Hit points"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("heart")
 
@@ -328,6 +355,10 @@ size_flags_horizontal = 3
 alignment = 0
 
 clip_text = true
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+theme_override_colors/font_color = Color(0.490196, 0.850980, 0.537255, 1)
 
 [node name="HitPointsEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
 
@@ -373,7 +404,7 @@ text = "Power uses"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("psychopomp")
 
@@ -388,6 +419,8 @@ size_flags_horizontal = 3
 alignment = 0
 
 clip_text = true
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="PowerUsesEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
 
@@ -420,7 +453,7 @@ text = "Omens"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("dice")
 
@@ -435,6 +468,8 @@ size_flags_horizontal = 3
 alignment = 0
 
 clip_text = true
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="OmensEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
 
@@ -501,7 +536,7 @@ text = "Strength"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("strength")
 
@@ -514,6 +549,8 @@ theme_override_constants/icon_max_width = 24
 size_flags_horizontal = 3
 
 alignment = 0
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="StrengthEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -544,7 +581,7 @@ text = "Agility"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("agility")
 
@@ -557,6 +594,8 @@ theme_override_constants/icon_max_width = 24
 size_flags_horizontal = 3
 
 alignment = 0
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="AgilityEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -587,7 +626,7 @@ text = "Presence"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("presence")
 
@@ -600,6 +639,8 @@ theme_override_constants/icon_max_width = 24
 size_flags_horizontal = 3
 
 alignment = 0
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="PresenceEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -630,7 +671,7 @@ text = "Toughness"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("toughness")
 
@@ -643,6 +684,8 @@ theme_override_constants/icon_max_width = 24
 size_flags_horizontal = 3
 
 alignment = 0
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="ToughnessEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -658,7 +701,7 @@ custom_minimum_size = Vector2(56, 44)
 [node name="ReadyWeapon" type="Button" parent="Margin/Layout/Body/Core"]
 layout_mode = 2
 visible = false
-text = "Ready weapon ›"
+text = "Ready weapon â€º"
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
 clip_text = true
@@ -702,7 +745,7 @@ text = "Attack"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 icon = ExtResource("sword")
 
@@ -714,6 +757,8 @@ theme_override_constants/icon_max_width = 24
 
 size_flags_horizontal = 3
 
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
 [node name="Damage" type="Button" parent="Margin/Layout/Body/Core/WeaponActions"]
 
 layout_mode = 2
@@ -724,9 +769,11 @@ text = "Damage"
 
 custom_minimum_size = Vector2(44, 44)
 
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskChoice"
 
 size_flags_horizontal = 3
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
 
 [node name="ManageEquipment" type="Button" parent="Margin/Layout/Body/Core"]
 
@@ -734,7 +781,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Manage equipment ›"
+text = "Manage equipment â€º"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -760,7 +807,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Protection & reactions ›"
+text = "Protection & reactions â€º"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -786,7 +833,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Dodge · d20 + Agility"
+text = "Dodge Â· d20 + Agility"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -812,7 +859,7 @@ unique_name_in_owner = true
 
 theme_override_constants/separation = 0
 
-[node name="TabCharacter" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+[node name="TabCharacter" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
 
 layout_mode = 2
 
@@ -820,6 +867,10 @@ unique_name_in_owner = true
 
 text = "Character"
 
+icon = ExtResource("character")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
 custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
@@ -828,7 +879,7 @@ size_flags_horizontal = 3
 
 toggle_mode = true
 
-[node name="TabPowers" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+[node name="TabPowers" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
 
 layout_mode = 2
 
@@ -836,6 +887,10 @@ unique_name_in_owner = true
 
 text = "Powers"
 
+icon = ExtResource("psychopomp")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
 custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
@@ -844,7 +899,7 @@ size_flags_horizontal = 3
 
 toggle_mode = true
 
-[node name="TabInventory" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+[node name="TabInventory" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
 
 layout_mode = 2
 
@@ -852,6 +907,10 @@ unique_name_in_owner = true
 
 text = "Inventory"
 
+icon = ExtResource("bag")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
 custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
@@ -860,7 +919,7 @@ size_flags_horizontal = 3
 
 toggle_mode = true
 
-[node name="TabJournal" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+[node name="TabJournal" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
 
 layout_mode = 2
 
@@ -868,6 +927,10 @@ unique_name_in_owner = true
 
 text = "Journal"
 
+icon = ExtResource("book")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
 custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
@@ -876,13 +939,17 @@ size_flags_horizontal = 3
 
 toggle_mode = true
 
-[node name="TabAppearance" type="Button" parent="Margin/Layout/Body/Chapter/Tabs"]
+[node name="TabAppearance" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
 
 layout_mode = 2
 
 unique_name_in_owner = true
 
 text = "Appearance"
+
+icon = ExtResource("character")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -1132,9 +1199,9 @@ unique_name_in_owner = true
 
 size_flags_vertical = 3
 
-label_text = "Notes · placeholder"
+label_text = "Notes Â· placeholder"
 
-placeholder = "Write a note…"
+placeholder = "Write a noteâ€¦"
 
 [node name="AppearancePanel" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
 
@@ -1371,7 +1438,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "‹ Back"
+text = "â€¹ Back"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -1500,4 +1567,3 @@ theme_override_font_sizes/font_size = 12
 autowrap_mode = 3
 
 visible = false
-

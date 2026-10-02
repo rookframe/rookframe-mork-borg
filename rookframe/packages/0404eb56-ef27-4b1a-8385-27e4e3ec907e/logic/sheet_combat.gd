@@ -62,7 +62,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		if ammunition.is_empty():
 			return _error("Choose available ammunition.")
 	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(caller.participant_id), "owner_session": str(caller.session_id), "source": source.actor.id.value, "item": item_id, "weapon": _short_name(str(weapon.name), 16), "weapon_data": weapon.duplicate(true), "name": _short_name(str(data.get("name", "Character")), 12), "phase": part, "state": "pending", "request": str(input.id), "raw": 0, "sequence": 0, "modifier": int(ability.get("modifier", 0)) + modifier, "difficulty": difficulty, "damage": formula, "jab": jab, "natural": bite, "special": special, "fumble": str(input.get("fumble", "break")), "resource_spent": false, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "message": "Rolling " + part + "…", "attack_context": preceding.duplicate(true) if matching else {}}
-	var terms: Array[SDK.DiceTerm] = [SDK.DiceTerm.new("Attack", 20)] if part == "attack" else [damage]
+	var terms: Array[SDK.DiceTerm] = []
+	terms.append(SDK.DiceTerm.new("Attack", 20) if part == "attack" else damage)
 	if part == "attack" and (bite or special == "eurekia"):
 		terms.append(SDK.DiceTerm.new("Free attack chance" if bite else "Eurekia consequence", 6))
 	if part == "damage" and special in ["brown-scimitar-of-galgenbeck", "shoe-of-deaths-horse"]:

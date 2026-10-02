@@ -7,6 +7,10 @@ const POWERS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3e
 const HEART = preload("res://rookframe/ui/icons/character/heart.svg")
 const MAGIC = preload("res://rookframe/ui/icons/character/psychopomp.svg")
 const DICE = preload("res://rookframe/ui/icons/character/dice.svg")
+const HERBS = preload("res://rookframe/ui/icons/character/herbs.svg")
+const BAG = preload("res://rookframe/ui/icons/character/bag.svg")
+const BOOK = preload("res://rookframe/ui/icons/character/book.svg")
+const SILVER = preload("res://rookframe/ui/icons/character/silver.svg")
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 
 func fields(data: Dictionary) -> Dictionary:
@@ -57,6 +61,8 @@ func text(value: Variant) -> String:
 	return str(value)
 
 func row(id: String, title: String, subtitle: String = "", value: String = "", icon: Texture2D = null) -> Dictionary:
+	if icon == null:
+		icon = HERBS if id == "class" or id.begins_with("trait:") else BOOK if id.begins_with("injury:") else BAG
 	return {"id": id, "title": title, "subtitle": subtitle, "value": value, "icon": icon}
 
 func condition(data: Dictionary) -> Dictionary:
@@ -92,7 +98,7 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 			primary.append(row("injury:%d" % index, str(injury.get("name", "Injury")), "Retained injury"))
 		for key in ["hit_points", "omens", "power_uses", "silver"]:
 			var title: String = {"hit_points": "Hit points", "omens": "Omens", "power_uses": "Power uses", "silver": "Silver"}.get(str(key), "Resource")
-			resources.append(row("resource:" + str(key), title, "remaining", str(data.get(str(key), 0)), HEART if key == "hit_points" else MAGIC if key == "power_uses" else DICE))
+			resources.append(row("resource:" + str(key), title, "remaining", str(data.get(str(key), 0)), HEART if key == "hit_points" else MAGIC if key == "power_uses" else SILVER if key == "silver" else DICE))
 		var descriptions: Array = data.get("companion_sheets", [])
 		for index in range(descriptions.size()):
 			var companion: Dictionary = descriptions[index]
