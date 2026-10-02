@@ -153,7 +153,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "MÃ–RK BORG"
+text = "MÖRK BORG"
 
 theme_override_font_sizes/font_size = 12
 
@@ -240,7 +240,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Ã—"
+text = "×"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -701,7 +701,7 @@ custom_minimum_size = Vector2(56, 44)
 [node name="ReadyWeapon" type="Button" parent="Margin/Layout/Body/Core"]
 layout_mode = 2
 visible = false
-text = "Ready weapon â€º"
+text = "Ready weapon ›"
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
 clip_text = true
@@ -781,7 +781,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Manage equipment â€º"
+text = "Manage equipment ›"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -807,7 +807,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Protection & reactions â€º"
+text = "Protection & reactions ›"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -833,7 +833,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "Dodge Â· d20 + Agility"
+text = "Dodge · d20 + Agility"
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -1199,9 +1199,9 @@ unique_name_in_owner = true
 
 size_flags_vertical = 3
 
-label_text = "Notes Â· placeholder"
+label_text = "Notes · placeholder"
 
-placeholder = "Write a noteâ€¦"
+placeholder = "Write a note…"
 
 [node name="AppearancePanel" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
 
@@ -1438,7 +1438,7 @@ layout_mode = 2
 
 unique_name_in_owner = true
 
-text = "â€¹ Back"
+text = "‹ Back"
 
 custom_minimum_size = Vector2(44, 44)
 

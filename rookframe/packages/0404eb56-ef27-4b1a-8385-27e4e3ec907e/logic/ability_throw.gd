@@ -112,6 +112,7 @@ func _accept(result: SDK.HumanThrowResult) -> void:
 		_finish(result.message, true)
 		return
 	if result.status == "pending":
+		changed.emit()
 		return
 	if result.status == "cancelled":
 		_finish(ENDED_MESSAGE, false)
