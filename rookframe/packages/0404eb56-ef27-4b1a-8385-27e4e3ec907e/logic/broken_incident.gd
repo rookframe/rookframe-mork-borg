@@ -65,6 +65,8 @@ func advance(current: Dictionary, operation: String) -> Dictionary:
 	var incident: Dictionary = data.get("broken_incident", {})
 	if incident.is_empty() or int(incident.get("outcome", 0)) == 0:
 		return {"message": "Resolve this Broken incident first."}
+	if not incident.has("followup_sequence"):
+		return {"message": "Complete the retained Broken outcome’s follow-up dice first."}
 	var outcome := int(incident.outcome)
 	var elapsed := int(incident.get("elapsed", 0))
 	var duration := int(incident.get("duration", 0))

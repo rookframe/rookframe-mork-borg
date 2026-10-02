@@ -21,7 +21,7 @@ func _ready() -> void:
 	get_node(^"Actions/Back").pressed.connect(_cancel)
 	get_node(^"Actions/Apply").pressed.connect(_apply)
 
-func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false) -> void:
+func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false, subject: String = "Creature") -> void:
 	_selection_only = selection_only
 	get_node(^"Title").visible = not selection_only
 	sdk = facade
@@ -30,8 +30,8 @@ func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, sav
 	_definition = definition
 	_saved = saved.duplicate(true)
 	visible = true
-	get_node(^"Title").text = _t("Miniature for new Actors" if actor == null else "Miniature for this Creature")
-	get_node(^"Actions/Back").text = _t("Back")
+	get_node(^"Title").text = _t("Miniature for new Actors" if actor == null else "Miniature for this " + subject)
+	get_node(^"Actions/Back").text = _t("Cancel" if subject == "Character" else "Back")
 	get_node(^"Actions/Apply").text = _t("Use Miniature")
 	_load()
 	browser.focus_search()

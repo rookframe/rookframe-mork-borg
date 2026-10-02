@@ -71,19 +71,21 @@ func condition(data: Dictionary) -> Dictionary:
 	var outcome := int(incident.get("outcome", 0))
 	var elapsed := int(incident.get("elapsed", 0))
 	var duration := int(incident.get("duration", 0))
+	if outcome in [1, 2, 3] and not incident.has("followup_sequence"):
+		return {"title": "BROKEN · FOLLOW-UP DICE", "copy": "Broken d4: %d is retained. Complete its duration, injury and recovery dice; the initial outcome is not rerolled." % outcome}
 	if hp < 0 or incident.get("dead", false):
 		return {"title": "DEAD", "copy": "Negative HP means death." if hp < 0 else ("Untreated hemorrhage reached its deadline." if outcome == 3 else "Broken d4: 4 · Dead.")}
 	if outcome == 3 and not incident.get("treated", false):
 		return {"title": "HEMORRHAGE", "copy": "Broken d4: 3. Deadline d2: %d hours. Elapsed: %d / %d. %s. Treatment stops the deadline without restoring HP." % [duration, elapsed, duration, "DR18 · last hour" if elapsed >= duration - 1 else "DR16 · first hour"]}
 	if outcome in [1, 2] and not incident.get("recovered", false):
-		return {"title": "UNCONSCIOUS" if outcome == 1 else "INJURED · UNABLE TO ACT", "copy": "Broken d4: %d. %s Duration d4: %d rounds. Elapsed: %d / %d. Recovery d4: %d HP, held until recovery is due." % [outcome, str(incident.get("injury", "")), duration, elapsed, duration, int(incident.get("recovery_hp", 0))]}
+		return {"title": "UNCONSCIOUS" if outcome == 1 else "INJURED · UNABLE TO ACT", "copy": "Broken d4: %d. %s Duration d4: %d rounds. Elapsed: %d / %d. Recovery d4: %d HP, held until recovery is due." % [outcome, ("Injury d6: %d · " % int(incident.get("injury_roll", 0)) if outcome == 2 else "") + str(incident.get("injury", "")), duration, elapsed, duration, int(incident.get("recovery_hp", 0))]}
 	if hp == 0 and outcome == 3 and incident.get("treated", false):
 		return {"title": "TREATED", "copy": "Bleeding stopped. 0 HP. Record HP when healing is resolved; treatment does not restore HP."}
 	if hp == 0 and outcome == 0:
 		return {"title": "BROKEN · 0 HP", "copy": "Roll Broken d4 once for this incident. Follow-up results are retained on the sheet."}
 	return {}
 
-func collections(data: Dictionary, items: Array, chapter: int, actor_id: String, facade: SDK) -> Dictionary:
+func collections(data: Dictionary, items: Array, chapter: int, actor_id: String, facade: SDK, filter: int = 0, owner: bool = true) -> Dictionary:
 	var primary: Array[Dictionary] = []
 	var resources: Array[Dictionary] = []
 	var companions: Array[Dictionary] = []
@@ -126,15 +128,21 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 				resources.append(row("item:" + str(item.inventory_id), str(item.get("name", "Decoction")), "Shared laboratory doses" if item.has("dose_pool") else "Portable laboratory", str(remaining_uses(data, item))))
 	elif chapter == 2:
 		heading = "INVENTORY"
-		primary.append(row("catalogue", "Add equipment", "Browse the equipment catalogue"))
-		primary.append(row("custom", "Add custom item", "Current supported item fields"))
+		if owner:
+			primary.append(row("catalogue", "Add equipment", "Browse the equipment catalogue"))
+			primary.append(row("custom", "Add custom item", "Current supported item fields"))
 		for raw in items:
 			var item: Dictionary = raw
+			var arms := str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"]
+			if filter == 1 and not arms or filter == 2 and arms or filter == 3 and not item.get("equipped", false):
+				continue
 			primary.append(row("item:" + str(item.inventory_id), str(item.get("name", "Item")), "Broken" if item.get("broken", false) else "Ready" if item.get("equipped", false) else str(item.get("kind", "Equipment")), "×%d" % int(item.get("quantity", 0))))
 		resources.append(row("resource:silver", "Silver", "coins", str(data.get("silver", 0))))
 		resources.append(row("profile", "Pack & description", str(data.get("pack", ""))))
-	if primary.is_empty():
-		primary.append(row("empty", "Nothing here yet", "Entries appear when this Character gains them."))
+	elif chapter == 3:
+		heading = "STORY"
+		primary.append(row("journal:story", "The road ahead", "Local placeholder · Story", "", BOOK))
+		resources.append(row("journal:notes", "Personal notes", "Local placeholder · Notes", "", BOOK))
 	return {"primary": primary, "resources": resources, "companions": companions, "heading": heading}
 
 func remaining_uses(data: Dictionary, item: Dictionary) -> int:

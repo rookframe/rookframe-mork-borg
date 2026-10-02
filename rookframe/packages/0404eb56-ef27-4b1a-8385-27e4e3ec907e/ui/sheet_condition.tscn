@@ -1,0 +1,112 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition.gd" id="script"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="death"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[sub_resource type="StyleBoxFlat" id="frame"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_bottom = 1
+border_width_top = 3
+[node name="Condition" type="PanelContainer"]
+script = ExtResource("script")
+theme_override_styles/panel = SubResource("frame")
+[node name="Inset" type="MarginContainer" parent="."]
+layout_mode = 2
+[node name="Content" type="VBoxContainer" parent="Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="ConditionTitle" type="Label" parent="Inset/Content"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="ConditionCopy" type="Label" parent="Inset/Content"]
+layout_mode = 2
+autowrap_mode = 3
+[node name="Metrics" type="HBoxContainer" parent="Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 16
+[node name="Remaining" type="Label" parent="Inset/Content/Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+[node name="Future" type="Label" parent="Inset/Content/Metrics"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+[node name="Pips" type="HBoxContainer" parent="Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+[node name="Rolls" type="Label" parent="Inset/Content"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="DeathMark" type="TextureRect" parent="Inset/Content"]
+layout_mode = 2
+texture = ExtResource("death")
+expand_mode = 1
+stretch_mode = 5
+visible = false
+self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="ConditionActions" type="HBoxContainer" parent="Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 6
+[node name="Broken" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Roll Broken d4"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="NextRound" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Next round"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="UndoRound" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Undo round"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="Recover" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Awaken"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="AdvanceHour" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Advance 1 hour"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="UndoHour" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Undo hour"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="Treat" type="Button" parent="Inset/Content/ConditionActions"]
+layout_mode = 2
+text = "Record treatment"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+visible = false
+
+
+[node name="DangerEdge" type="ColorRect" parent="."]
+layout_mode = 0
+anchor_right = 1.0
+offset_bottom = 3.0
+mouse_filter = 2
+color = Color(0.937255, 0.356863, 0.329412, 1)

@@ -39,6 +39,12 @@ func value(field: String) -> String:
 func change(field: String, text: String) -> void:
 	_changes[field] = text
 
+func values() -> Dictionary:
+	var values := _values.duplicate(true)
+	for key in _changes.keys():
+		values[str(key)] = _changes.get(str(key))
+	return values
+
 func changes() -> Dictionary:
 	var changed: Dictionary = {}
 	for key in _changes.keys():

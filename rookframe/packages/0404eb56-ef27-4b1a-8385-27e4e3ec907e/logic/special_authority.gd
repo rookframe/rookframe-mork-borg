@@ -112,6 +112,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if input.get("sheet", false) and (rule.get("poison", false) or rule.get("book", false) or rule.get("resistance", false) or rule.get("damage", false) or rule.get("morale", false)):
 		action["phase"] = "sheet-target"
 		if rule.get("morale", false):
+			if typeof(input.get("presence_sign")) != TYPE_INT or input.presence_sign not in [-1, 1] or typeof(input.get("morale")) != TYPE_INT:
+				return _error("Choose Presence sign and the table-agreed Morale.")
+			action["presence_sign"] = input.presence_sign
+			action["morale"] = input.morale
 			terms = [SDK.DiceTerm.new("Morale", 6, 2)]
 		elif rule.has("die"):
 			terms = [SDK.DiceTerm.new("Printed outcome", int(rule.die))]
@@ -398,7 +402,7 @@ func _healable(value: Variant) -> bool:
 		return false
 	var hp: int = data.hit_points
 	var maximum: int = data.maximum_hit_points
-	return hp >= 0 and maximum > 0
+	return hp >= 0 and maximum > 0 and not BROKEN.new().is_dead(data)
 
 func _target(context: SDK.SystemActionContext, caller: Dictionary, input: Dictionary, source: SDK.ActorId, reach: int = 5) -> Dictionary:
 	if reach == 0 or input.get("self", false):
@@ -1113,4 +1117,12 @@ func _sheet_target_result(context: SDK.SystemActionContext, action: Dictionary, 
 	if not _consume(data, action):
 		return _end(context, action)
 	var text := "%s: %s. Resolve the printed target outcome with the table. No target state changed. Raw Roll #%d." % [str(action.kind), str(values), sequence]
+	var rule: Dictionary = action.rule
+	if rule.get("morale", false):
+		var abilities: Dictionary = current.get("abilities", {})
+		var presence: Dictionary = abilities.get("Presence", {})
+		var bonus := int(presence.get("modifier", 0)) * int(action.presence_sign)
+		var raw := values[0] + values[1]
+		var total := raw + bonus
+		text = "Morale %d %+d = %d vs %d. %s Resolve target movement with the table. Raw Roll #%d." % [raw, bonus, total, int(action.morale), "Bows and kindly removes itself." if total > int(action.morale) else "Does not bow or leave.", sequence]
 	return _resolve(context, action, [SDK.ActorChange.new(source.actor.id, data)], text)

@@ -78,9 +78,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		if hp < 0:
 			return _finish(context, action, [], "Dead: negative HP. No Broken roll or restored HP. Resolve any applicable class exception with the table.", "Dead", "attention")
 		var incident: Dictionary = data.get("broken_incident", {})
-		if not incident.is_empty() and int(incident.get("outcome", 0)) != 0:
-			return _error("This Broken incident has already been rolled.")
 		action["incident_id"] = int(incident.get("id", int(data.get("broken_serial", 0)) + 1))
+		if not incident.is_empty() and int(incident.get("outcome", 0)) != 0:
+			if int(incident.outcome) in [1, 2, 3] and not incident.has("followup_sequence") and not incident.get("dead", false):
+				return _broken_followup(context, action, int(incident.outcome), true)
+			return _error("This Broken incident has already been rolled.")
 		return _request(context, action, "broken", [SDK.DiceTerm.new("Broken", 4)], true)
 	if str(input.kind) == "improve":
 		if not _improvable(data):
@@ -386,11 +388,8 @@ func _broken(context: SDK.SystemActionContext, action: Dictionary, current: Dict
 		var branch := "Unconscious" if face == 1 else ("Injury" if face == 2 else "Hemorrhage")
 		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Broken: " + branch + suffix):
 			return _end(context, action)
-		if face == 1:
-			return _request(context, action, "unconscious", [SDK.DiceTerm.new("Unconscious rounds", 4), SDK.DiceTerm.new("Awakening HP", 4)])
-		if face == 2:
-			return _request(context, action, "injury", [SDK.DiceTerm.new("Injury", 6), SDK.DiceTerm.new("Unable to act rounds", 4), SDK.DiceTerm.new("Recovery HP", 4)])
-		return _request(context, action, "hemorrhage", [SDK.DiceTerm.new("Death in hours (d2)", 4)])
+		return _broken_followup(context, action, face)
+
 	var text := ""
 	if phase == "unconscious":
 		incident["duration"] = face
@@ -441,3 +440,10 @@ func _valid_rerolls(selected: Array) -> bool:
 		if typeof(index) != TYPE_INT or not index in [0, 1]:
 			return false
 	return true
+
+func _broken_followup(context: SDK.SystemActionContext, action: Dictionary, outcome: int, first: bool = false) -> Dictionary:
+	if outcome == 1:
+		return _request(context, action, "unconscious", [SDK.DiceTerm.new("Unconscious rounds", 4), SDK.DiceTerm.new("Awakening HP", 4)], first)
+	if outcome == 2:
+		return _request(context, action, "injury", [SDK.DiceTerm.new("Injury", 6), SDK.DiceTerm.new("Unable to act rounds", 4), SDK.DiceTerm.new("Recovery HP", 4)], first)
+	return _request(context, action, "hemorrhage", [SDK.DiceTerm.new("Death in hours (d2)", 4)], first)

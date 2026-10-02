@@ -18,14 +18,101 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
-const CHAPTERS := ["Character", "Powers", "Inventory", "Journal", "Appearance"]
-@onready var _detail_title = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle")
-@onready var _detail_content = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent")
+@onready var _quick_quick_omens = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens")
+@onready var _quick_quick_omens_edit = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit")
+@onready var _quick_quick_silver = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver")
+@onready var _quick_quick_silver_edit = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilverEdit")
+@onready var _core_agility = get_node(^"Margin/Layout/Body/Core/Abilities/AgilityRow/Agility")
+@onready var _core_presence = get_node(^"Margin/Layout/Body/Core/Abilities/PresenceRow/Presence")
+@onready var _core_strength = get_node(^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")
+@onready var _core_toughness = get_node(^"Margin/Layout/Body/Core/Abilities/ToughnessRow/Toughness")
+@onready var _core_condition_reminder = get_node(^"Margin/Layout/Body/Core/ConditionReminder")
+@onready var _core_dodge = get_node(^"Margin/Layout/Body/Core/Dodge")
+@onready var _core_portrait = get_node(^"Margin/Layout/Body/Core/Likeness/Portrait")
+@onready var _core_condition_badge = get_node(^"Margin/Layout/Body/Core/Likeness/Portrait/ConditionBadge")
+@onready var _core_condition_frame = get_node(^"Margin/Layout/Body/Core/Likeness/Portrait/ConditionFrame")
+@onready var _core_hit_points = get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints")
+@onready var _core_omens = get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens")
+@onready var _core_power_uses = get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses")
+@onready var _core_manage_equipment = get_node(^"Margin/Layout/Body/Core/ManageEquipment")
+@onready var _core_origin = get_node(^"Margin/Layout/Body/Core/Origin")
+@onready var _core_phone_edit = get_node(^"Margin/Layout/Body/Core/PhoneHeader/PhoneEdit")
+@onready var _core_phone_name = get_node(^"Margin/Layout/Body/Core/PhoneHeader/PhoneName")
+@onready var _core_protection = get_node(^"Margin/Layout/Body/Core/Protection")
+@onready var _core_protection_heading = get_node(^"Margin/Layout/Body/Core/ProtectionHeading")
+@onready var _core_ready_weapon = get_node(^"Margin/Layout/Body/Core/ReadyWeapon")
+@onready var _core_weapon = get_node(^"Margin/Layout/Body/Core/Weapon")
+@onready var _core_weapon_actions = get_node(^"Margin/Layout/Body/Core/WeaponActions")
+@onready var _core_attack = get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack")
+@onready var _core_damage = get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage")
+@onready var _core_weapon_heading = get_node(^"Margin/Layout/Body/Core/WeaponHeading")
+@onready var _chapter_chapter_caption = get_node(^"Margin/Layout/Body/Chapter/ChapterCaption")
+@onready var _chapter_personal_notes = get_node(^"Margin/Layout/Body/Chapter/ChapterCaption/PersonalNotes")
+@onready var _chapter_collections = get_node(^"Margin/Layout/Body/Chapter/Collections")
+@onready var _chapter_primary = get_node(^"Margin/Layout/Body/Chapter/Collections/Primary")
+@onready var _chapter_secondary = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary")
+@onready var _chapter_companions = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions")
+@onready var _chapter_resources = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources")
+@onready var _condition_ui = get_node(^"Margin/Layout/Body/Chapter/Condition")
+@onready var _chapter_journal_panel = get_node(^"Margin/Layout/Body/Chapter/JournalPanel")
+@onready var _chapter_notes = get_node(^"Margin/Layout/Body/Chapter/JournalPanel/Notes")
+@onready var _chapter_story = get_node(^"Margin/Layout/Body/Chapter/JournalPanel/Story")
+@onready var _section = get_node(^"Margin/Layout/Body/Chapter/Section")
+@onready var _chapter_tabs = get_node(^"Margin/Layout/Body/Chapter/Tabs")
+@onready var _chapter_tab_appearance = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabAppearance")
+@onready var _chapter_tab_character = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabCharacter")
+@onready var _chapter_tab_inventory = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabInventory")
+@onready var _chapter_tab_journal = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabJournal")
+@onready var _chapter_tab_powers = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabPowers")
+@onready var _actions_ui = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions")
 @onready var _primary_button = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction")
 @onready var _secondary_button = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction")
-@onready var _section = get_node(^"Margin/Layout/Body/Chapter/Section")
+@onready var _detail_back = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back")
+@onready var _detail_title = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle")
+@onready var _detail_detail_pages = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages")
+@onready var _detail_content = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent")
+@onready var _detail_detail_tabs = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs")
+@onready var _detail_details = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Details")
+@onready var _detail_overview = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Overview")
+@onready var _workflow_slot = get_node(^"Margin/Layout/Workflow/Body/Main/Procedure/Inset/Slot")
+@onready var _workflow_footer = get_node(^"Margin/Layout/Workflow/Footer")
+@onready var _header_cancel_sheet = get_node(^"Margin/Layout/Header/CancelSheet")
+@onready var _header_close = get_node(^"Margin/Layout/Header/Close")
+@onready var _header_edit = get_node(^"Margin/Layout/Header/Edit")
+@onready var _header_editing_status = get_node(^"Margin/Layout/Header/EditingStatus")
+@onready var _header_improve = get_node(^"Margin/Layout/Header/Improve")
+@onready var _header_name = get_node(^"Margin/Layout/Header/Name")
+@onready var _header_name_edit = get_node(^"Margin/Layout/Header/NameEdit")
+@onready var _header_name_edit__caption = get_node(^"Margin/Layout/Header/NameEdit/Caption")
+@onready var _header_rest = get_node(^"Margin/Layout/Header/Rest")
+@onready var _header_save_sheet = get_node(^"Margin/Layout/Header/SaveSheet")
+@onready var _header_spacer = get_node(^"Margin/Layout/Header/Spacer")
+@onready var _header_system = get_node(^"Margin/Layout/Header/System")
+@onready var _header = get_node(^"Margin/Layout/Header")
+@onready var _quick = get_node(^"Margin/Layout/Body/Chapter/QuickResources")
+@onready var _detail_ui = get_node(^"Margin/Layout/Body/Chapter/Detail")
+@onready var _appearance_change_miniature = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
+@onready var _appearance_clear_miniature = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons/ClearMiniature")
+@onready var _appearance_miniature_caption = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureCaption")
+@onready var _appearance_miniature_preview = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniaturePreview")
+@onready var _appearance_package_caption = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/PackageCaption")
+@onready var _appearance_change_portrait = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait")
+@onready var _appearance_clear_portrait = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons/ClearPortrait")
+@onready var _appearance_ui = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel")
+@onready var _core_ui = get_node(^"Margin/Layout/Body/Core")
+@onready var _chapter_ui = get_node(^"Margin/Layout/Body/Chapter")
+@onready var _quick_parent = _chapter_ui
+@onready var _workflow_ui = get_node(^"Margin/Layout/Workflow")
+@onready var _detail_parent = _chapter_ui
+@onready var _actions_parent = _detail_ui
+var _combat_options: Dictionary = {"difficulty": 0, "modifier": 0, "fumble": "break"}
+var _scroll_choices: Array[String] = []
+var _journal_note := ""
+var _portrait_texture: Texture2D
+const CHAPTERS := ["Character", "Powers", "Inventory", "Journal", "Appearance"]
+@onready var _detail_header = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader")
 @export var navigation: Resource
-@onready var _chapters = [get_node(^"Margin/Layout/Body/Chapter/Tabs/TabCharacter"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabPowers"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabInventory"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabJournal"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabAppearance")]
+@onready var _chapters = [_chapter_tab_character, _chapter_tab_powers, _chapter_tab_inventory, _chapter_tab_journal, _chapter_tab_appearance]
 const _ability_paths := {
 	"Strength": ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength",
 	"Agility": ^"Margin/Layout/Body/Core/Abilities/AgilityRow/Agility",
@@ -38,29 +125,11 @@ const _ability_edit_paths := {
 	"PresenceEdit": ^"Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEdit",
 	"ToughnessEdit": ^"Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEdit",
 }
-const _vital_paths := {
-	"HitPoints": ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints",
-	"PowerUses": ^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses",
-	"Omens": ^"Margin/Layout/Body/Core/Likeness/Vitals/Omens",
-}
-const _vital_group_paths := {
-	"HitPointsEdit": ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit",
-	"PowerUsesEdit": ^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit",
-	"OmensEdit": ^"Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit",
-}
 const _vital_edit_paths := {
 	"HitPointsCurrent": ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent",
 	"HitPointsMaximum": ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximum",
 	"PowerUsesCurrent": ^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrent",
 	"OmensCurrent": ^"Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrent",
-}
-const _incident_paths := {
-	"NextRound": ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/NextRound",
-	"UndoRound": ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/UndoRound",
-	"Recover": ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Recover",
-	"AdvanceHour": ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/AdvanceHour",
-	"UndoHour": ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/UndoHour",
-	"Treat": ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Treat",
 }
 var _projection := PROJECTION.new()
 var _draft := DRAFT.new()
@@ -73,7 +142,7 @@ var _detail_tab := 0
 var _item_edit := false
 var _fields: Array = []
 var _field_row
-var _field_names: Array[String] = []
+var _field_names: Array = []
 var _opener
 var _opened_entry := ""
 var _return_detail := ""
@@ -99,53 +168,63 @@ var _locale := I18N.new()
 
 func ready() -> void:
 	_locale.bind(sdk)
+	_workflow_ui.back_requested.connect(_back)
+	_workflow_ui.rest_selected.connect(_rest_selected)
 	for index in range(CHAPTERS.size()):
 		_chapters[index].pressed.connect(_chapter.bind(index))
-	get_node(^"Margin/Layout/Header/Edit").pressed.connect(_edit)
-	get_node(^"Margin/Layout/Header/SaveSheet").pressed.connect(_save_sheet)
-	get_node(^"Margin/Layout/Header/CancelSheet").pressed.connect(_cancel_edit)
-	get_node(^"Margin/Layout/Header/Close").pressed.connect(_close)
-	get_node(^"Margin/Layout/Header/Rest").pressed.connect(_workflow.bind("rest", ""))
-	get_node(^"Margin/Layout/Header/Improve").pressed.connect(_workflow.bind("improve", ""))
-	get_node(^"Margin/Layout/Header/Name").pressed.connect(_name_pressed)
-	get_node(^"Margin/Layout/Header/NameEdit").text_changed.connect(_core_typed.bind("name"))
-	get_node(^"Margin/Layout/Body/Core/Origin").pressed.connect(_open_detail.bind("profile"))
+	_header_edit.pressed.connect(_edit)
+	_core_phone_edit.pressed.connect(_edit)
+	_core_phone_name.pressed.connect(_name_pressed)
+	_quick_quick_silver_edit.text_changed.connect(_core_typed.bind("silver"))
+	_chapter_personal_notes.pressed.connect(_open_detail.bind("journal:notes"))
+	for index in range(4):
+		var path: NodePath = [^"ChapterCaption/InventoryFilters/All", ^"ChapterCaption/InventoryFilters/Arms", ^"ChapterCaption/InventoryFilters/Supplies", ^"ChapterCaption/InventoryFilters/Ready"][index]
+		_chapter_ui.get_node(path).pressed.connect(_inventory_filter.bind(index))
+	_header_save_sheet.pressed.connect(_save_sheet)
+	_header_cancel_sheet.pressed.connect(_cancel_edit)
+	_header_close.pressed.connect(_close)
+	_header_rest.pressed.connect(_workflow.bind("rest", ""))
+	_header_improve.pressed.connect(_workflow.bind("improve", ""))
+	_header_name.pressed.connect(_name_pressed)
+	_header_name_edit.text_changed.connect(_core_typed.bind("name"))
+	_core_origin.pressed.connect(_open_detail.bind("profile"))
 	for key in PROJECTION.ABILITIES:
 		get_node(_ability_paths.get(str(key), ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).pressed.connect(_open_detail.bind("ability:" + str(key)))
 		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).text_changed.connect(_core_typed.bind(str(key)))
 	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
 		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).text_changed.connect(_core_typed.bind(str(pair[1])))
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints").pressed.connect(_open_detail.bind("resource:hit_points"))
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses").pressed.connect(_open_detail.bind("resource:power_uses"))
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").pressed.connect(_open_detail.bind("resource:omens"))
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").text_changed.connect(_core_typed.bind("omens"))
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").pressed.connect(_open_detail.bind("resource:omens"))
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver").pressed.connect(_open_detail.bind("resource:silver"))
-	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").pressed.connect(_open_detail.bind("ready_weapon"))
-	get_node(^"Margin/Layout/Body/Core/Weapon").item_selected.connect(_weapon_selected)
-	get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack").pressed.connect(_roll_combat.bind("attack"))
-	get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage").pressed.connect(_roll_combat.bind("damage"))
-	get_node(^"Margin/Layout/Body/Core/ManageEquipment").pressed.connect(_chapter.bind(2))
-	get_node(^"Margin/Layout/Body/Core/Protection").pressed.connect(_open_detail.bind("protection"))
-	get_node(^"Margin/Layout/Body/Core/Dodge").pressed.connect(_workflow.bind("ability", "Agility"))
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").selected.connect(_open_detail)
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").selected.connect(_open_detail)
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").selected.connect(_open_detail)
+	_core_hit_points.pressed.connect(_open_detail.bind("resource:hit_points"))
+	_core_power_uses.pressed.connect(_open_detail.bind("resource:power_uses"))
+	_core_omens.pressed.connect(_open_detail.bind("resource:omens"))
+	_quick_quick_omens_edit.text_changed.connect(_core_typed.bind("omens"))
+	_quick_quick_omens.pressed.connect(_open_detail.bind("resource:omens"))
+	_quick_quick_silver.pressed.connect(_open_detail.bind("resource:silver"))
+	_core_ready_weapon.pressed.connect(_open_detail.bind("ready_weapon"))
+	_core_weapon.item_selected.connect(_weapon_selected)
+	_core_attack.pressed.connect(_roll_combat.bind("attack"))
+	_core_damage.pressed.connect(_roll_combat.bind("damage"))
+	_core_manage_equipment.pressed.connect(_chapter.bind(2))
+	_core_protection.pressed.connect(_open_detail.bind("protection"))
+	_core_dodge.pressed.connect(_workflow.bind("ability", "Agility"))
+	_chapter_primary.selected.connect(_open_detail)
+	_chapter_resources.selected.connect(_open_detail)
+	_chapter_companions.selected.connect(_open_detail)
 	_section.item_selected.connect(_section_selected)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back").pressed.connect(_back)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Overview").pressed.connect(_detail_tab_selected.bind(0))
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Details").pressed.connect(_detail_tab_selected.bind(1))
+	_chapter_story.selected.connect(_open_detail)
+	_chapter_notes.selected.connect(_open_detail)
+	_detail_back.pressed.connect(_back)
+	_detail_overview.pressed.connect(_detail_tab_selected.bind(0))
+	_detail_details.pressed.connect(_detail_tab_selected.bind(1))
 	_primary_button.pressed.connect(_primary_action)
 	_secondary_button.pressed.connect(_secondary_action)
-	get_node(^"Margin/Layout/Body/Core/ConditionReminder").pressed.connect(_chapter.bind(0))
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Broken").pressed.connect(_start_broken)
-	for pair in [["NextRound", "next"], ["UndoRound", "undo"], ["Recover", "recover"], ["AdvanceHour", "next"], ["UndoHour", "undo"], ["Treat", "treat"]]:
-		get_node(_incident_paths.get(str(pair[0]), ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/NextRound")).pressed.connect(_incident.bind(str(pair[1])))
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons/ChangeMiniature").pressed.connect(_choose_miniature)
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons/ClearMiniature").pressed.connect(_clear_miniature)
+	_core_condition_reminder.pressed.connect(_chapter.bind(0))
+	_condition_ui.broken_requested.connect(_start_broken)
+	_condition_ui.event_requested.connect(_incident)
+	_appearance_change_miniature.pressed.connect(_choose_miniature)
+	_appearance_clear_miniature.pressed.connect(_clear_miniature)
 	get_node(^"Margin/Layout/Picker").closed.connect(_picker_closed)
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitButtons/ChangePortrait").pressed.connect(_choose_portrait)
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitButtons/ClearPortrait").pressed.connect(_clear_portrait)
+	_appearance_change_portrait.pressed.connect(_choose_portrait)
+	_appearance_clear_portrait.pressed.connect(_clear_portrait)
 	closed.connect(_closed)
 	resized.connect(_density)
 	if sdk != null:
@@ -166,6 +245,8 @@ func opened(id: SDK.ActorId) -> void:
 	_actor = source.actor
 	_nav = navigation.read(sdk.context().session_id, id.value)
 	_detail = ""
+	get_node(^"Margin/Layout/Picker").visible = false
+	get_node(^"Margin/Layout/Body").visible = true
 	_refresh()
 
 func capture_reconnect_state() -> Dictionary:
@@ -224,6 +305,10 @@ func _refresh() -> void:
 	if _actor == null:
 		return
 	var data: Dictionary = _actor.data
+	if not _owner() and (_draft.active or _item_edit):
+		_draft.discard()
+		_item_edit = false
+		_request_detail()
 	_items = ACTIONS.new(sdk, _actor.id).inventory(data)
 	if _draft.active:
 		if _draft.refresh(_projection.fields(data), _projection.identities(data)):
@@ -237,85 +322,49 @@ func _refresh() -> void:
 	_remember()
 
 func _core(data: Dictionary) -> void:
-	var tablet := size.x <= 1150 and not _phone
 	_setting = true
-	get_node(^"Margin/Layout/Header/Name").visible = not _draft.active
-	get_node(^"Margin/Layout/Header/NameEdit").visible = _draft.active
-	get_node(^"Margin/Layout/Header/NameEdit").text = _draft.value("name") if _draft.active else str(data.get("name", ""))
-	get_node(^"Margin/Layout/Header/Name").text = str(data.get("name", "Character"))
-	get_node(^"Margin/Layout/Body/Core/Class").text = str(data.get("class_title", "Character"))
-	get_node(^"Margin/Layout/Body/Core/Origin").text = str(data.get("origin", "Origin"))
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints").configure("Hit points", int(data.get("hit_points", 0)), "/ %d" % int(data.get("maximum_hit_points", 1)), int(data.get("maximum_hit_points", 1)), _phone, tablet)
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses").configure("Power uses", int(data.get("power_uses", 0)), "/ %d" % int(data.get("power_uses_total", 0)) if data.has("power_uses_total") else "", 0, _phone, tablet)
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").configure("Omens", int(data.get("omens", 0)), "available", 0, _phone, tablet)
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").visible = _phone and _draft.active
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").text = _draft.value("omens") if _draft.active else str(data.get("omens", 0))
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").visible = not _draft.active
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").text = "%d Omens" % int(data.get("omens", 0))
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver").text = "%d Silver" % int(data.get("silver", 0))
-	var values := _projection.fields(data)
-	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
-		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).text = _draft.value(str(pair[1])) if _draft.active else str(values.get(str(pair[1]), ""))
-	for ability in PROJECTION.ABILITIES:
-		var key := str(ability)
-		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).configure({"Strength": "STR", "Agility": "AGI", "Presence": "PRE", "Toughness": "TOU"}.get(key, key) if _phone else key, int(values.get(key, 0)), _phone, tablet)
-		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).visible = not _draft.active
-		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).text = _draft.value(key) if _draft.active else str(values.get(key, "0"))
-		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).visible = _draft.active
-	for vital in ["HitPoints", "PowerUses", "Omens"]:
-		get_node(_vital_paths.get(str(vital), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints")).visible = not _draft.active and (not _phone or vital != "Omens")
-		get_node(_vital_group_paths.get(str(vital) + "Edit", ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit")).visible = _draft.active and (not _phone or vital != "Omens")
-	_weapons = []
-	get_node(^"Margin/Layout/Body/Core/Weapon").clear()
-	for raw in _items:
-		var item: Dictionary = raw
-		if str(item.get("kind", "")) == "Weapon" and item.get("equipped", false) and int(item.get("quantity", 0)) > 0 and not item.get("broken", false):
-			_weapons.append(item)
-	if str(data.get("class_id", "")) == "fanged-deserter":
-		_weapons.append({"inventory_id": "class:bite", "name": "Bite", "damage": "d6", "equipped": true, "quantity": 1})
-	var selected := 0
-	for index in range(_weapons.size()):
-		var item: Dictionary = _weapons[index]
-		get_node(^"Margin/Layout/Body/Core/Weapon").add_item(str(item.get("name", "Weapon")) + " · " + str(item.get("damage", "")))
-		if str(item.inventory_id) == str(_nav.get("weapon", "")):
-			selected = index
-	if _weapons.is_empty():
-		get_node(^"Margin/Layout/Body/Core/Weapon").add_item("No ready weapon")
-		_nav["weapon"] = ""
-	else:
-		_nav["weapon"] = str(_weapons[selected].inventory_id)
-	get_node(^"Margin/Layout/Body/Core/Weapon").select(selected)
-	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").text = "No ready weapon ›" if _weapons.is_empty() else str(_weapons[selected].get("name", "Weapon")) + " · " + str(_weapons[selected].get("damage", "")) + " ›"
-	var protection: Array[String] = []
-	for raw in _items:
-		var item: Dictionary = raw
-		if item.get("equipped", false) and str(item.get("kind", "")) in ["Armor", "Shield"]:
-			protection.append(str(item.get("name", "")) + " " + str(item.get("reduction", "")))
-	get_node(^"Margin/Layout/Body/Core/Protection").text = "Protection & reactions ›" if protection.is_empty() else _projection.text(protection) + " ›"
-	var playable := _owner() and not _draft.active and not _action_live() and BROKEN.new().can_act(data)
-	get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack").disabled = not playable or _weapons.is_empty()
-	get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage").disabled = not _owner() or _draft.active or _action_live() or _weapons.is_empty()
-	get_node(^"Margin/Layout/Body/Core/Dodge").disabled = not playable
-	get_node(^"Margin/Layout/Header/Edit").disabled = not _owner() or _action_live()
-	get_node(^"Margin/Layout/Header/Rest").disabled = not _owner() or _draft.active or _action_live() or BROKEN.new().is_dead(data)
-	get_node(^"Margin/Layout/Header/Improve").disabled = not _owner() or _draft.active or _action_live()
-	get_node(^"Margin/Layout/Header/Edit").visible = not _draft.active
-	get_node(^"Margin/Layout/Header/SaveSheet").visible = _draft.active
-	get_node(^"Margin/Layout/Header/CancelSheet").visible = _draft.active
+	_header_name.visible = not _draft.active
+	_header_name_edit.visible = _draft.active
+	_header_name_edit.text = _draft.value("name") if _draft.active else str(data.get("name", ""))
+	_header.visible = not _phone or _draft.active
+	_header_name.text = str(data.get("name", "Character"))
+	_header_editing_status.visible = _draft.active
+	_header_spacer.visible = _draft.active
+	_header_system.visible = not _phone and not _draft.active
+	get_node(^"Margin").add_theme_constant_override("margin_top", (4 if _draft.active else 10) if _phone else 16)
+	_quick_quick_omens_edit.visible = _phone and _draft.active
+	_quick_quick_omens_edit.text = _draft.value("omens") if _draft.active else str(data.get("omens", 0))
+	_quick_quick_omens.visible = not _draft.active
+	_quick_quick_omens.text = "%d Omens" % int(data.get("omens", 0))
+	_quick_quick_silver.text = "%d Silver" % int(data.get("silver", 0))
+	_quick_quick_silver.visible = not _draft.active
+	_quick_quick_silver_edit.visible = _draft.active
+	_quick_quick_silver_edit.text = _draft.value("silver") if _draft.active else str(data.get("silver", 0))
+	_header_edit.disabled = not _owner() or _action_live()
+	_header_rest.disabled = not _owner() or _draft.active or _action_live() or BROKEN.new().is_dead(data)
+	_header_improve.disabled = not _owner() or _draft.active or _action_live()
+	_header_edit.visible = not _draft.active
+	_header_save_sheet.visible = _draft.active
+	_header_cancel_sheet.visible = _draft.active
+	var state: Dictionary = _core_ui.configure(data, _projection.fields(data), _draft.values() if _draft.active else {}, _items, str(_nav.get("weapon", "")), _owner(), _action_live())
+	_weapons = state.weapons
+	_nav["weapon"] = state.weapon
 	_render_portrait(data)
 	_setting = false
 
 func _collections(data: Dictionary) -> void:
 	_capture_pages()
 	var chapter := int(_nav.get("chapter", 0))
-	var rows := _projection.collections(data, _items, chapter, _actor.id.value, sdk)
+	var rows := _projection.collections(data, _items, chapter, _actor.id.value, sdk, int(_nav.get("inventory_filter", 0)), _owner())
 	var primary: Array[Dictionary] = rows.primary
 	var resources: Array[Dictionary] = rows.resources
 	var companions: Array[Dictionary] = rows.companions
 	var heading := str(rows.heading)
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").configure(primary, "", heading, str(primary.size()))
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").configure(resources, "", "RESOURCES" if chapter == 0 else "DECOCTIONS & RESOURCES", str(resources.size()))
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").configure(companions, "", "COMPANIONS", str(companions.size()))
+	_chapter_primary.configure(primary, "", heading, str(primary.size()))
+	_chapter_resources.configure(resources, "", "RESOURCES" if chapter == 0 else "DECOCTIONS & RESOURCES", str(resources.size()))
+	_chapter_companions.configure(companions, "", "COMPANIONS", str(companions.size()))
+	_chapter_story.configure(primary if chapter == 3 else [], "", "STORY", "")
+	_chapter_notes.configure(resources if chapter == 3 else [], "", "NOTES", "")
 	_rendered_chapter = chapter
 	_restore_pages()
 
@@ -326,9 +375,9 @@ func _capture_pages() -> void:
 	var chapter := str(_rendered_chapter)
 	if _rendered_chapter < 0:
 		return
-	pages[chapter + ":primary"] = get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").capture_state()
-	pages[chapter + ":resources"] = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").capture_state()
-	pages[chapter + ":companions"] = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").capture_state()
+	pages[chapter + ":primary"] = _chapter_primary.capture_state()
+	pages[chapter + ":resources"] = _chapter_resources.capture_state()
+	pages[chapter + ":companions"] = _chapter_companions.capture_state()
 	_nav["pages"] = pages
 
 func _restore_pages() -> void:
@@ -337,35 +386,63 @@ func _restore_pages() -> void:
 	var primary: Dictionary = pages.get(chapter + ":primary", {})
 	var resources: Dictionary = pages.get(chapter + ":resources", {})
 	var companions: Dictionary = pages.get(chapter + ":companions", {})
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").restore_state(primary)
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").restore_state(resources)
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").restore_state(companions)
+	_chapter_primary.restore_state(primary)
+	_chapter_resources.restore_state(resources)
+	_chapter_companions.restore_state(companions)
 
 func _show_route() -> void:
 	var chapter := int(_nav.get("chapter", 0))
 	var details := not _detail.is_empty()
-	get_node(^"Margin/Layout/Header/Rest").visible = not _phone or _detail == "profile"
-	get_node(^"Margin/Layout/Header/Improve").visible = not _phone or _detail == "profile"
-	get_node(^"Margin/Layout/Body/Chapter/Tabs").visible = not details
-	get_node(^"Margin/Layout/Body/Core").visible = not (_phone and (details or chapter == 4))
-	get_node(^"Margin/Layout/Body/Chapter/Collections").visible = not details and chapter in [0, 1, 2]
-	get_node(^"Margin/Layout/Body/Chapter/JournalPanel").visible = not details and chapter == 3
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel").visible = not details and chapter == 4
-	get_node(^"Margin/Layout/Body/Chapter/Detail").visible = details
-	get_node(^"Margin/Layout/Body/Chapter/Condition").visible = not details and chapter == 0 and not _projection.condition(_actor.data).is_empty()
-	_section.visible = _phone and not details and chapter in [0, 1, 2]
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources").visible = _phone and not details and chapter != 4
+	var task := _detail in ["workflow:rest", "workflow:improve"]
+	var detail_parent = _workflow_slot if task else _chapter_ui
+	var actions_parent = _workflow_footer if task else _detail_ui
+	if _actions_parent != actions_parent:
+		_actions_parent.remove_child(_actions_ui)
+		actions_parent.add_child(_actions_ui)
+		_actions_parent = actions_parent
+	if _detail_parent != detail_parent:
+		_detail_parent.remove_child(_detail_ui)
+		detail_parent.add_child(_detail_ui)
+		_detail_parent = detail_parent
+	_workflow_ui.visible = task
+	get_node(^"Margin/Layout/Body").visible = not task and not get_node(^"Margin/Layout/Picker").visible
+	_header.visible = not task and (not _phone or _draft.active)
+	_detail_header.visible = not task
+	_header_rest.visible = not _phone and not _draft.active
+	_header_improve.visible = not _phone and not _draft.active
+	_chapter_tabs.visible = not details
+	_core_ui.visible = not (_phone and (details or chapter == 4))
+	_chapter_collections.visible = not details and chapter in [0, 1, 2]
+	_chapter_journal_panel.visible = not details and chapter == 3
+	_appearance_ui.visible = not details and chapter == 4
+	_detail_ui.visible = details and _detail != "workflow:rest"
+	_condition_ui.visible = not details and chapter == 0 and not _projection.condition(_actor.data).is_empty()
+	_section.visible = _phone and not details and chapter in [0, 1, 2, 3]
+	_quick.visible = _phone and not details and chapter != 4
 	_section.clear()
-	for title in (["Features & traits", "Resources", "Companions"] if chapter == 0 else ["Powers", "Decoctions & resources"] if chapter == 1 else ["Inventory", "Resources"]):
+	for title in (["Features & traits", "Resources", "Companions"] if chapter == 0 else ["Powers", "Decoctions & resources"] if chapter == 1 else ["All belongings", "Arms", "Supplies", "Ready"] if chapter == 2 else ["Story", "Notes"]):
 		_section.add_item(str(title))
-	_section.select(mini(int(_nav.get("section", 0)), _section.item_count - 1))
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").visible = not _phone or _section.selected == 0
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary").visible = not _phone or _section.selected != 0
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").visible = not _phone or _section.selected == 1
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").visible = chapter == 0 and (not _phone or _section.selected == 2)
-	if _phone and get_node(^"Margin/Layout/Body/Chapter/Condition").visible:
-		get_node(^"Margin/Layout/Body/Chapter/Collections").visible = false
+	_section.select(mini(int(_nav.get("inventory_filter", 0) if chapter == 2 else _nav.get("section", 0)), _section.item_count - 1))
+	_chapter_primary.visible = chapter == 2 or not _phone or _section.selected == 0
+	_chapter_secondary.visible = chapter == 0 and (not _phone or _section.selected != 0) or chapter == 1 and _phone and _section.selected == 1
+	_chapter_resources.visible = not _phone or _section.selected == 1
+	_chapter_companions.visible = chapter == 0 and _projection.condition(_actor.data).is_empty() and (not _phone or _section.selected == 2)
+	if _phone and _condition_ui.visible:
+		_chapter_collections.visible = false
 		_section.visible = false
+	_chapter_ui.configure_caption(chapter, _phone, int(_nav.get("inventory_filter", 0)), _actor.data)
+	_chapter_chapter_caption.visible = not details and not _phone and chapter in [1, 2, 3, 4]
+	_chapter_story.visible = not _phone or _section.selected == 0
+	_chapter_notes.visible = not _phone or _section.selected == 1
+	var footer = _chapter_ui
+	if _phone and not details and chapter in [0, 1, 2] and not _condition_ui.visible:
+		footer = _chapter_primary.get_footer_slot() if chapter == 2 or _section.selected == 0 else _chapter_resources.get_footer_slot() if _section.selected == 1 else _chapter_companions.get_footer_slot()
+	elif _phone and not details and chapter == 3:
+		footer = _chapter_story.get_footer_slot() if _section.selected == 0 else _chapter_notes.get_footer_slot()
+	if footer != _quick_parent:
+		_quick_parent.remove_child(_quick)
+		footer.add_child(_quick)
+		_quick_parent = footer
 	for index in range(CHAPTERS.size()):
 		_chapters[index].set_pressed_no_signal(index == chapter)
 	if chapter == 4:
@@ -383,7 +460,16 @@ func _chapter(index: int) -> void:
 	_chapters[index].grab_focus()
 
 func _section_selected(index: int) -> void:
+	if int(_nav.get("chapter", 0)) == 2:
+		_inventory_filter(index)
+		return
 	_nav["section"] = index
+	_show_route()
+	_remember()
+
+func _inventory_filter(index: int) -> void:
+	_nav["inventory_filter"] = index
+	_collections(_actor.data)
 	_show_route()
 	_remember()
 
@@ -404,25 +490,27 @@ func _edit() -> void:
 		return
 	_draft.begin(_projection.fields(_actor.data), _projection.identities(_actor.data))
 	_refresh()
+	_header_name_edit.grab_focus()
 
 func _core_typed(text: String, field: String) -> void:
 	if _draft.active and not _setting:
 		_draft.change(field, text)
 
 func _save_sheet() -> void:
-	if _busy or not _draft.active:
+	if _busy or not _draft.active or not _owner():
 		return
 	_busy = true
-	get_node(^"Margin/Layout/Header/SaveSheet").disabled = true
+	_header_save_sheet.disabled = true
 	var result := await ACTIONS.new(sdk, _actor.id).correct_many(_draft.changes(), _draft.identities())
 	_busy = false
-	get_node(^"Margin/Layout/Header/SaveSheet").disabled = false
+	_header_save_sheet.disabled = false
 	if result.ok:
 		_draft.discard()
 		_accept_actor(result.actor)
 		_refresh()
 		_request_detail()
 		_status("Sheet saved.")
+		_edit_focus()
 	else:
 		_status(result.message)
 
@@ -431,6 +519,13 @@ func _cancel_edit() -> void:
 	_refresh_pending = true
 	_refresh()
 	_request_detail()
+	_edit_focus()
+
+func _edit_focus() -> void:
+	if _phone:
+		_core_phone_edit.grab_focus()
+	else:
+		_header_edit.grab_focus()
 
 func _name_pressed() -> void:
 	_open_detail("profile")
@@ -447,7 +542,7 @@ func _open_detail(id: String) -> void:
 	_new_item = {}
 	_request_detail()
 	_show_route()
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back").grab_focus()
+	_detail_back.grab_focus()
 
 func _detail_tab_selected(index: int) -> void:
 	_detail_tab = index
@@ -462,10 +557,10 @@ func _clear_detail() -> void:
 		child.queue_free()
 	_primary_button.visible = false
 	_secondary_button.visible = false
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs").visible = not _detail.begins_with("workflow:") and _detail not in ["catalogue", "custom"]
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Overview").set_pressed_no_signal(_detail_tab == 0)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Details").set_pressed_no_signal(_detail_tab == 1)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages").restore_state({})
+	_detail_detail_tabs.visible = not _detail.begins_with("workflow:") and _detail not in ["catalogue", "custom"]
+	_detail_overview.set_pressed_no_signal(_detail_tab == 0)
+	_detail_details.set_pressed_no_signal(_detail_tab == 1)
+	_detail_detail_pages.restore_state({})
 
 func _render_detail() -> void:
 	if _detail.is_empty() or _actor == null:
@@ -474,7 +569,7 @@ func _render_detail() -> void:
 	var data: Dictionary = _actor.data
 	if _detail.begins_with("workflow:"):
 		_render_workflow()
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages").refresh()
+		_detail_detail_pages.refresh()
 		return
 	if _detail in ["profile", "class"]:
 		_detail_title.text = str(data.get("name", "Character")) if _detail == "profile" else str(data.get("class_title", "Class"))
@@ -491,6 +586,9 @@ func _render_detail() -> void:
 			if _detail == "class" and str(data.get("class_id", "")) == "gutterborn-scum":
 				_character_field("scum_specialty:0", "First specialty · 1–6")
 				_character_field("scum_specialty:1", "Second specialty · 0–6")
+		if _phone and _detail == "profile" and _detail_tab == 0:
+			_option("Rest", _workflow.bind("rest", ""), _owner() and not _draft.active and not _action_live() and not BROKEN.new().is_dead(data))
+			_option("Level up", _workflow.bind("improve", ""), _owner() and not _draft.active and not _action_live())
 		if str(data.get("class_id", "")) == "occult-herbmaster":
 			_secondary("Inspect laboratory")
 	elif _detail.begins_with("resource:"):
@@ -539,7 +637,7 @@ func _render_detail() -> void:
 			if entry.has("uses"):
 				_text("Uses: %d" % int(entry.uses))
 			if parts[0] == "trait" and not RULES.new().definition(str(entry.get("id", ""))).is_empty():
-				_primary("Use feature", not _draft.active and _owner())
+				_primary("Use feature", not _draft.active and _owner() and _use_allowed(RULES.new().definition(str(entry.get("id", "")))))
 	elif _detail.begins_with("actor:"):
 		var actor := sdk.actors.read(SDK.ActorId.new(_detail.trim_prefix("actor:")))
 		if actor.ok:
@@ -550,10 +648,22 @@ func _render_detail() -> void:
 			_secondary("Place Rook", actor.actor.access_level == "Owner")
 	elif _detail.begins_with("item:"):
 		_item_detail(_item(_detail.trim_prefix("item:")))
+	elif _detail.begins_with("journal:"):
+		_detail_title.text = "Personal notes" if _detail == "journal:notes" else "The road ahead"
+		_text("Local placeholder. This chapter does not save World data.")
+		if _detail == "journal:notes":
+			var notes = preload("res://rookframe/ui/components/forms/task_text_area.tscn").instantiate()
+			_detail_content.add_child(notes)
+			notes.label_text = "Personal notes · placeholder"
+			notes.compact = _phone
+			notes.value = _journal_note
+			notes.value_changed.connect(_note_changed)
+		else:
+			_text("The places and words you carry. Add your table's story here when Journal storage is supported.")
 	elif _detail == "catalogue":
 		_detail_title.text = "EQUIPMENT CATALOGUE"
 		for item in EQUIPMENT.new().entries():
-			_option(str(item.get("name", "Equipment")) + " · " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))))
+			_option(str(item.get("name", "Equipment")) + " · " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))), _owner())
 	elif _detail == "custom":
 		_detail_title.text = "CUSTOM ITEM"
 		_group_fields(["name", "quantity", "uses"] if _phone else ["name", "quantity"], [2, 1, 1] if _phone else [1, 1])
@@ -565,6 +675,9 @@ func _render_detail() -> void:
 		for index in range(_weapons.size()):
 			var weapon: Dictionary = _weapons[index]
 			_option(("Selected · " if str(weapon.inventory_id) == str(_nav.get("weapon", "")) else "") + str(weapon.get("name", "Weapon")) + " · " + str(weapon.get("damage", "")), _choose_ready_weapon.bind(index))
+		if _detail_tab == 0:
+			_action_input = _combat_options.duplicate(true)
+			_combat_preparation()
 		_primary("Attack", _can_act() and not _weapons.is_empty())
 		_secondary("Damage", _owner() and not _draft.active and not _weapons.is_empty())
 	elif _detail == "protection":
@@ -575,7 +688,10 @@ func _render_detail() -> void:
 				_option(str(item.get("name", "Protection")) + " · " + str(item.get("reduction", "")), _open_detail.bind("item:" + str(item.inventory_id)))
 		_text("Defence is d20 + Agility. Resolve incoming damage, protection and reactions with the existing combat workflow or at the table.")
 		_primary("Dodge · test Agility", _can_act())
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages").refresh()
+	_detail_detail_pages.refresh()
+
+func _note_changed(value: String) -> void:
+	_journal_note = value
 
 func _text(text: String) -> void:
 	if text.is_empty():
@@ -587,9 +703,12 @@ func _text(text: String) -> void:
 	label.add_theme_font_size_override("font_size", 14 if _phone else 18)
 	_detail_content.add_child(label)
 
-func _option(text: String, callback: Callable) -> void:
+func _option(text: String, callback: Callable, enabled: bool = true) -> void:
 	var button := Button.new()
 	button.text = _locale.text(text)
+	button.accessibility_name = button.text
+	button.clip_text = true
+	button.disabled = not enabled or _busy
 	button.custom_minimum_size = Vector2(0, 44)
 	button.theme_type_variation = "TaskButton"
 	button.text_overrun_behavior = 3 # TextServer.OVERRUN_TRIM_ELLIPSIS
@@ -668,7 +787,7 @@ func _item_detail(item: Dictionary) -> void:
 		if not power.is_empty():
 			_primary("Cast Power", _can_act() and int(item.get("quantity", 0)) > 0)
 		elif not rule.is_empty():
-			_primary("Brew decoctions" if rule.get("brew", false) else "Use item", not _draft.active and _owner())
+			_primary("Brew decoctions" if rule.get("brew", false) else "Use item", not _draft.active and _owner() and _use_allowed(rule))
 		if str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre":
 			_secondary("Carry" if item.get("equipped", false) else "Ready / equip", _owner())
 
@@ -682,6 +801,9 @@ func _refresh_detail() -> void:
 		else:
 			for field in _fields:
 				field.refresh_value(str(item.get(str(field._field), "")))
+	elif _detail == "custom":
+		for field in _fields:
+			field.refresh_value(str(_new_item.get(str(field._field), "Equipment" if field._field == "kind" else "1" if field._field == "quantity" else "0" if field._field in ["uses", "range_feet", "armor_tier"] else "")))
 	elif _draft.active and not _fields.is_empty():
 		for field in _fields:
 			field.refresh_value(_draft.value(str(field._field)))
@@ -713,11 +835,11 @@ func _back() -> void:
 	elif is_instance_valid(_opener) and _opener.is_visible_in_tree():
 		_opener.grab_focus()
 	else:
-		var focused: bool = get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").focus_entry(_opened_entry)
+		var focused: bool = _chapter_primary.focus_entry(_opened_entry)
 		if not focused:
-			focused = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").focus_entry(_opened_entry)
+			focused = _chapter_resources.focus_entry(_opened_entry)
 		if not focused:
-			focused = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").focus_entry(_opened_entry)
+			focused = _chapter_companions.focus_entry(_opened_entry)
 		if not focused:
 			_chapters[int(_nav.get("chapter", 0))].grab_focus()
 
@@ -727,13 +849,13 @@ func _remember_opener(id: String) -> void:
 	_opener = _core_opener()
 
 func _core_opener():
-	for button in [get_node(^"Margin/Layout/Body/Core/ReadyWeapon"), get_node(^"Margin/Layout/Header/Name"), get_node(^"Margin/Layout/Header/Rest"), get_node(^"Margin/Layout/Header/Improve"), get_node(^"Margin/Layout/Body/Core/Origin"), get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints"), get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses"), get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens"), get_node(^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength"), get_node(^"Margin/Layout/Body/Core/Abilities/AgilityRow/Agility"), get_node(^"Margin/Layout/Body/Core/Abilities/PresenceRow/Presence"), get_node(^"Margin/Layout/Body/Core/Abilities/ToughnessRow/Toughness"), get_node(^"Margin/Layout/Body/Core/Protection"), get_node(^"Margin/Layout/Body/Core/Dodge"), get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack"), get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage"), get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens"), get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver")]:
+	for button in [_core_phone_name, _core_ready_weapon, _header_name, _header_rest, _header_improve, _core_origin, _core_hit_points, _core_power_uses, _core_omens, _core_strength, _core_agility, _core_presence, _core_toughness, _core_protection, _core_dodge, _core_attack, _core_damage, _quick_quick_omens, _quick_quick_silver]:
 		if button.has_focus():
 			return button
 	return null
 
 func _catalogue_add(id: String) -> void:
-	if _busy:
+	if _busy or not _owner():
 		return
 	_busy = true
 	var result := await ACTIONS.new(sdk, _actor.id).add_equipment(id)
@@ -773,13 +895,15 @@ func _workflow(kind: String, entry: String) -> void:
 	_action_kind = kind
 	_action_input = {"source": _actor.id.value, "sheet": true}
 	_selection = ""
+	_scroll_choices.clear()
 	_rerolls = []
 	if kind in ["attack", "damage"]:
 		_action_input["item"] = str(_nav.get("weapon", ""))
 		_action_input["part"] = kind
 		_action_input["difficulty"] = 0
 		_action_input["modifier"] = 0
-		_action_input["fumble"] = "break"
+		for key in ["difficulty", "modifier", "fumble", "mode"]:
+			_action_input[key] = _combat_options.get(key, "" if key == "mode" else 0)
 	elif kind in ["cast", "use"]:
 		_action_input["item"] = entry
 		_action_input["adjustment"] = 0
@@ -796,9 +920,14 @@ func _workflow(kind: String, entry: String) -> void:
 	_end_action()
 	_request_detail()
 	_show_route()
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back").grab_focus()
+	_detail_back.grab_focus()
 
 func _render_workflow() -> void:
+	if _action_kind in ["rest", "improve"]:
+		_workflow_ui.configure(_data(), _action_kind, _rest, _action.snapshot if _action != null else {}, _portrait_texture)
+	if _action_kind == "rest":
+		_primary("Done" if _action != null and _action.state in ["resolved", "ended", "error"] else "Roll recovery", _owner() and not _busy and (_action == null or _action.state != "pending"))
+		return
 	_detail_title.text = "Getting better—or worse" if _action_kind == "improve" else {"improve": "Getting better—or worse", "rest": "Rest", "attack": "Attack", "damage": "Damage", "ability": "Ability test", "cast": "Cast Power", "use": "Use item"}.get(_action_kind, "Action")
 	if _action != null:
 		_text(_action.message)
@@ -817,7 +946,9 @@ func _render_workflow() -> void:
 			_primary("Confirm specialties", true)
 		elif _action.state == "scrolls":
 			_text("Choose the table-agreed scrolls within the supported families.")
-			for family in ["unclean", "sacred"]:
+			_text("Selected scrolls: " + str(_scroll_choices))
+			_option("Clear selected scrolls", _clear_scroll_choices)
+			for family in [str(_action.snapshot.get("family", "unclean"))]:
 				var entries: Array = SCROLLS.TABLES.get(str(family), [])
 				for raw in entries:
 					var entry: Dictionary = raw
@@ -883,7 +1014,21 @@ func _render_workflow() -> void:
 			_option("Presence sign: %+d" % int(_action_input.get("presence_sign", 1)), _morale_sign)
 		if rule.get("gob", false):
 			_option("New fight" + (" · selected" if _action_input.get("new_fight", false) else ""), _new_fight)
-		_primary("Brew decoctions" if rule.get("brew", false) else "Use item", _owner())
+		_primary("Brew decoctions" if rule.get("brew", false) else "Use item", _owner() and _use_allowed(rule))
+
+func _combat_preparation() -> void:
+	_group_fields(["difficulty", "modifier"], [1, 1])
+	_workflow_field("difficulty", "DR override · 0 uses weapon rules")
+	_workflow_field("modifier", "Situational modifier")
+	_option("Fumble: " + str(_combat_options.get("fumble", "break")), _fumble_choice, _can_act())
+	var traits: Array = _data().get("traits", [])
+	for raw in traits:
+		var combat_trait: Dictionary = raw
+		if str(combat_trait.get("id", "")) == "cowards-jab":
+			_option("Coward's jab" + (" · selected" if str(_combat_options.get("mode", "")) == "jab" else ""), _jab_choice, _can_act())
+
+func _use_allowed(rule: Dictionary) -> bool:
+	return BROKEN.new().can_act(_data()) or not (rule.has("ability") or rule.get("gob", false) or rule.get("blade", false))
 
 func _workflow_field(field: String, title: String) -> void:
 	var control = FIELD.instantiate()
@@ -893,17 +1038,21 @@ func _workflow_field(field: String, title: String) -> void:
 
 func _workflow_typed(field: String, value: String) -> void:
 	_action_input[field] = value
+	if field in ["difficulty", "modifier"]:
+		_combat_options[field] = value
 
 func _rest_selected(kind: String) -> void:
 	_rest = kind
 	_request_detail()
 
 func _fumble_choice() -> void:
-	_action_input["fumble"] = "lose" if str(_action_input.get("fumble", "break")) == "break" else "break"
+	_combat_options["fumble"] = "lose" if str(_combat_options.get("fumble", "break")) == "break" else "break"
+	_action_input["fumble"] = _combat_options["fumble"]
 	_request_detail()
 
 func _jab_choice() -> void:
-	_action_input["mode"] = "" if str(_action_input.get("mode", "")) == "jab" else "jab"
+	_combat_options["mode"] = "" if str(_combat_options.get("mode", "")) == "jab" else "jab"
+	_action_input["mode"] = _combat_options["mode"]
 	_request_detail()
 
 func _use_ability(ability: String) -> void:
@@ -1021,16 +1170,17 @@ func _reroll_specialty(index: int) -> void:
 
 func _special_scroll(id: String) -> void:
 	var count := int(_action.snapshot.get("count", 1))
-	var chosen: Array[String] = []
-	if not _selection.is_empty():
-		chosen.append(_selection)
-	chosen.append(id)
+	if _scroll_choices.size() >= count:
+		_scroll_choices.clear()
+	_scroll_choices.append(id)
 	var special := _action as SPECIAL
-	if chosen.size() >= count and special != null:
-		await special.choose_scrolls(chosen)
-	else:
-		_selection = id
-		_status("First scroll selected. Choose the second scroll.")
+	if _scroll_choices.size() >= count and special != null:
+		await special.choose_scrolls(_scroll_choices)
+	_request_detail()
+
+func _clear_scroll_choices() -> void:
+	_scroll_choices.clear()
+	_request_detail()
 
 func _shield_choice(choice: String) -> void:
 	var special := _action as SPECIAL
@@ -1090,37 +1240,19 @@ func _end_action() -> void:
 func _render_condition(data: Dictionary) -> void:
 	var condition := _projection.condition(data)
 	var combat := condition.is_empty()
-	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").visible = combat and _phone
-	get_node(^"Margin/Layout/Body/Core/WeaponHeading").visible = combat and not _phone
-	get_node(^"Margin/Layout/Body/Core/Weapon").visible = combat and not _phone
-	get_node(^"Margin/Layout/Body/Core/WeaponActions").visible = not combat or not _phone
-	get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack").visible = combat
-	get_node(^"Margin/Layout/Body/Core/ManageEquipment").visible = combat and not _phone
-	get_node(^"Margin/Layout/Body/Core/ProtectionHeading").visible = combat and not _phone
-	get_node(^"Margin/Layout/Body/Core/Protection").visible = combat
-	get_node(^"Margin/Layout/Body/Core/Dodge").visible = combat and not _phone
-	get_node(^"Margin/Layout/Body/Core/ConditionReminder").visible = not combat
-	get_node(^"Margin/Layout/Body/Core/ConditionReminder").text = str(condition.get("title", "")) + " › Character"
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionTitle").text = str(condition.get("title", ""))
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionCopy").text = str(condition.get("copy", ""))
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionCopy").add_theme_font_size_override("font_size", 12 if _phone else 16)
-	var incident: Dictionary = data.get("broken_incident", {})
-	var outcome := int(incident.get("outcome", 0))
-	var elapsed := int(incident.get("elapsed", 0))
-	var duration := int(incident.get("duration", 0))
-	var rounds: bool = outcome in [1, 2] and not incident.get("recovered", false) and not incident.get("dead", false)
-	var hemorrhage: bool = outcome == 3 and not incident.get("treated", false) and not incident.get("negative_hp", false)
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Broken").visible = int(data.get("hit_points", 0)) == 0 and outcome == 0
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/NextRound").visible = rounds and elapsed < duration
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/UndoRound").visible = rounds and elapsed > 0
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Recover").visible = rounds and duration > 0 and elapsed >= duration
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Recover").text = "Awaken" if outcome == 1 else "Recover"
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/AdvanceHour").visible = hemorrhage and elapsed < duration
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/UndoHour").visible = hemorrhage and elapsed > 0
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Treat").visible = hemorrhage and not incident.get("dead", false)
-	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Broken").disabled = not _owner() or _draft.active or _busy or _action_live()
-	for key in ["NextRound", "UndoRound", "Recover", "AdvanceHour", "UndoHour", "Treat"]:
-		get_node(_incident_paths.get(str(key), ^"Margin/Layout/Body/Chapter/Condition/ConditionActions/NextRound")).disabled = not _owner() or _draft.active or _busy or _action_live()
+	var can_attack := BROKEN.new().can_act(data)
+	_core_ready_weapon.visible = combat and _phone
+	_core_weapon_heading.visible = combat and not _phone
+	_core_weapon.visible = combat and not _phone
+	_core_weapon_actions.visible = not combat or not _phone
+	_core_attack.visible = can_attack
+	_core_manage_equipment.visible = combat and not _phone
+	_core_protection_heading.visible = combat and not _phone
+	_core_protection.visible = combat
+	_core_dodge.visible = combat and not _phone
+	_core_condition_reminder.visible = not combat
+	_core_condition_reminder.text = str(condition.get("title", "")) + " › Character"
+	_condition_ui.configure(data, condition, _owner() and not _draft.active and not _busy and not _action_live(), _phone)
 
 func _start_broken() -> void:
 	if not _owner() or _draft.active or _action_live():
@@ -1144,18 +1276,14 @@ func _incident(operation: String) -> void:
 	_refresh_pending = true
 
 func _appearance() -> void:
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons/ChangeMiniature").disabled = not _owner()
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons/ClearMiniature").disabled = not _owner()
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitButtons/ChangePortrait").disabled = not _owner()
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitButtons/ClearPortrait").disabled = not _owner()
 	var reference: Dictionary = _data().get("preferred_miniature", {})
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniaturePreview").visible = not reference.is_empty()
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureCaption").text = "No miniature selected"
+	_chapter_ui.configure_appearance(_owner(), reference)
 	if not reference.is_empty():
 		var entry := SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", "")))
 		var content := sdk.content.read(entry)
-		get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureCaption").text = content.content_entry.localized_title if content.ok else "Miniature unavailable"
-		var preview := sdk.content.preview_miniature(entry, get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniaturePreview"))
+		_appearance_miniature_caption.text = content.content_entry.localized_title if content.ok else "Miniature unavailable"
+		_appearance_package_caption.text = content.content_entry.package_title if content.ok else ""
+		var preview := sdk.content.preview_miniature(entry, _appearance_miniature_preview)
 		if not preview.ok:
 			_status(preview.message)
 	_render_portrait(_actor.data)
@@ -1163,13 +1291,13 @@ func _appearance() -> void:
 func _choose_miniature() -> void:
 	get_node(^"Margin/Layout/Body").visible = false
 	get_node(^"Margin/Layout/Picker").visible = true
-	get_node(^"Margin/Layout/Picker").open(sdk, _locale, _actor.id, "", _data().get("preferred_miniature", {}))
+	get_node(^"Margin/Layout/Picker").open(sdk, _locale, _actor.id, "", _data().get("preferred_miniature", {}), false, "Character")
 
 func _picker_closed(_saved: bool) -> void:
 	get_node(^"Margin/Layout/Picker").visible = false
 	get_node(^"Margin/Layout/Body").visible = true
 	_refresh_pending = true
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/MiniatureButtons/ChangeMiniature").grab_focus()
+	_appearance_change_miniature.grab_focus()
 
 func _clear_miniature() -> void:
 	_busy = true
@@ -1186,10 +1314,11 @@ func _render_portrait(data: Dictionary) -> void:
 			caption = "Character portrait"
 		else:
 			caption = decoded.message
-	get_node(^"Margin/Layout/Body/Core/Likeness/Portrait/ConditionFrame").visible = int(data.get("hit_points", 0)) <= 0
-	get_node(^"Margin/Layout/Body/Core/Likeness/Portrait").texture = texture
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitPreview").texture = texture
-	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitCaption").text = caption
+	_core_condition_frame.visible = not _projection.condition(data).is_empty()
+	_core_condition_badge.visible = not _projection.condition(data).is_empty()
+	_portrait_texture = texture
+	_core_portrait.texture = texture
+	_chapter_ui.configure_portrait(texture, caption)
 
 func _choose_portrait() -> void:
 	if _busy or not _owner():
@@ -1214,6 +1343,8 @@ func _clear_portrait() -> void:
 	_mutation_result(await ACTIONS.new(sdk, _actor.id).set_portrait(PackedByteArray()))
 
 func _closed() -> void:
+	get_node(^"Margin/Layout/Picker").visible = false
+	get_node(^"Margin/Layout/Body").visible = true
 	_end_after_roll = _action != null and _action.pending
 	_capture_pages()
 	_remember()
@@ -1236,36 +1367,20 @@ func _density() -> void:
 	var canvas := get_viewport_rect().size
 	_phone = canvas.y <= 560
 	var tablet := canvas.x <= 1150 and not _phone
-	get_node(^"Margin").add_theme_constant_override("margin_left", 10 if _phone else 16 if tablet else 44)
-	get_node(^"Margin").add_theme_constant_override("margin_right", 10 if _phone else 16 if tablet else 44)
-	get_node(^"Margin").add_theme_constant_override("margin_top", 8 if _phone else 16)
-	get_node(^"Margin").add_theme_constant_override("margin_bottom", 8 if _phone else 16)
+	for edge in ["left", "right"]:
+		get_node(^"Margin").add_theme_constant_override("margin_" + edge, 17 if _phone else 16 if tablet else 44)
+	get_node(^"Margin").add_theme_constant_override("margin_top", (4 if _draft.active else 10) if _phone else 16)
+	get_node(^"Margin").add_theme_constant_override("margin_bottom", 10 if _phone else 16)
 	get_node(^"Margin/Layout").add_theme_constant_override("separation", 8 if _phone else 16)
-	get_node(^"Margin/Layout/Body").add_theme_constant_override("separation", 16 if _phone else 24 if tablet else 44)
-	get_node(^"Margin/Layout/Body/Core").custom_minimum_size = Vector2(228 if _phone else 280 if tablet else 550, 0)
-	get_node(^"Margin/Layout/Body/Core").add_theme_constant_override("separation", 4 if _phone else 8 if tablet else 12)
-	get_node(^"Margin/Layout/Body/Core/Likeness/Portrait").custom_minimum_size = Vector2(72, 90) if _phone else Vector2(100, 125) if tablet else Vector2(152, 190)
-	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").visible = _phone
-	get_node(^"Margin/Layout/Body/Core/Weapon").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/WeaponActions").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/ManageEquipment").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/Dodge").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/Origin").visible = not _phone
-	get_node(^"Margin/Layout/Header/Edit").text = "" if _phone else "Edit sheet"
-	get_node(^"Margin/Layout/Header/Edit").icon = preload("res://rookframe/ui/icons/character/quill.svg")
-	get_node(^"Margin/Layout/Header/System").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/WeaponHeading").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/ProtectionHeading").visible = not _phone
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").visible = not _phone and not _draft.active
-	get_node(^"Margin/Layout/Body/Core/Class").add_theme_font_size_override("font_size", 11 if _phone else 18 if tablet else 22)
-	get_node(^"Margin/Layout/Body/Chapter").add_theme_constant_override("separation", 4 if _phone else 12)
-	for button in [get_node(^"Margin/Layout/Header/Name"), get_node(^"Margin/Layout/Header/Edit"), get_node(^"Margin/Layout/Header/Rest"), get_node(^"Margin/Layout/Header/Improve"), get_node(^"Margin/Layout/Header/SaveSheet"), get_node(^"Margin/Layout/Header/CancelSheet"), get_node(^"Margin/Layout/Header/Close")]:
+	get_node(^"Margin/Layout/Body").add_theme_constant_override("separation", 26 if _phone else 24 if tablet else 44)
+	_core_ui.configure_layout(_phone, tablet)
+	_chapter_ui.configure_layout(_phone, tablet)
+	_header_name_edit.custom_minimum_size = Vector2(220 if _phone else 230 if tablet else 320, 44)
+	_header_name_edit.add_theme_font_size_override("font_size", 18 if _phone or tablet else 20)
+	_header_name_edit__caption.add_theme_font_size_override("font_size", 9 if _phone or tablet else 11)
+	for button in [_header_name, _header_edit, _header_rest, _header_improve, _header_save_sheet, _header_cancel_sheet]:
 		button.add_theme_font_size_override("font_size", 12 if _phone else 16)
-	get_node(^"Margin/Layout/Header/Name").add_theme_font_size_override("font_size", 16 if _phone else 22 if tablet else 28)
-	for key in CHAPTERS:
-		_chapters[CHAPTERS.find(key)].add_theme_font_size_override("font_size", 11 if _phone else 14 if tablet else 18)
-	for key in PROJECTION.ABILITIES:
-		get_node(_ability_paths.get(str(key), ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).add_theme_font_size_override("font_size", 11 if _phone else 14 if tablet else 18)
+	_header_name.add_theme_font_size_override("font_size", 22 if tablet else 28)
 	if _actor != null:
 		_core(_actor.data)
 		_render_condition(_actor.data)
