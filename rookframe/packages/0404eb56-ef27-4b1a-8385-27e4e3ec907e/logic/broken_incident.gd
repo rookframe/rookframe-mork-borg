@@ -35,12 +35,16 @@ func sync(previous: Dictionary, current: Dictionary) -> Dictionary:
 
 	return data
 
-func can_act(data: Dictionary) -> bool:
+func is_dead(data: Dictionary) -> bool:
 	if int(data.get("hit_points", 1)) < 0:
+		return true
+	var incident: Dictionary = data.get("broken_incident", {})
+	return bool(incident.get("dead", false))
+
+func can_act(data: Dictionary) -> bool:
+	if is_dead(data):
 		return false
 	var incident: Dictionary = data.get("broken_incident", {})
-	if incident.get("dead", false):
-		return false
 	return not (int(incident.get("outcome", 0)) in [1, 2] and not incident.get("recovered", false))
 
 func commit(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], report: SDK.ActionLogMessage = null) -> SDK.OperationResult:

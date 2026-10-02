@@ -17,10 +17,19 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorRe
 		return source
 	var current: Dictionary = source.actor.data
 	var data := current.duplicate(true)
+	for specialty in ["scum_specialty:0", "scum_specialty:1"]:
+		if fields.has(str(specialty)):
+			if typeof(fields.get(str(specialty))) != TYPE_STRING:
+				return _failure("Character corrections must be text fields.")
+			var error := _correct(data, str(specialty), str(fields.get(str(specialty))))
+			if not error.is_empty():
+				return _failure(error)
 	for key in fields.keys():
 		var field := str(key)
 		if typeof(key) != TYPE_STRING or typeof(fields.get(field)) != TYPE_STRING:
 			return _failure("Character corrections must be text fields.")
+		if field.begins_with("scum_specialty:"):
+			continue
 		if field.begins_with("trait:") or field.begins_with("companion:"):
 			var parts := field.split(":")
 			var collection := "traits" if parts[0] == "trait" else "companion_sheets"
@@ -34,7 +43,13 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorRe
 			var identity := str(entry.get("id", "")) + "|" + str(entry.get("source_item_id", ""))
 			var prefix := parts[0] + ":" + parts[1]
 			if entry_ids.has(prefix) and str(entry_ids.get(prefix)) != identity:
-				return _failure("This Character entry was replaced. Review its current fields.")
+				continue
+			var resolved_entries: Array = data.get(collection, [])
+			if slot >= resolved_entries.size():
+				continue
+			var resolved: Dictionary = resolved_entries[slot]
+			if str(resolved.get("id", "")) + "|" + str(resolved.get("source_item_id", "")) != identity:
+				continue
 		var error := _correct(data, field, str(fields.get(field)))
 		if not error.is_empty():
 			return _failure(error)

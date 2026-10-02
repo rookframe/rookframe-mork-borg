@@ -280,7 +280,7 @@ func _core(data: Dictionary) -> void:
 	get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage").disabled = not _owner() or _draft.active or _weapons.is_empty()
 	get_node(^"Margin/Layout/Body/Core/Dodge").disabled = not playable
 	get_node(^"Margin/Layout/Header/Edit").disabled = not _owner() or _action_live()
-	get_node(^"Margin/Layout/Header/Rest").disabled = not _owner() or _draft.active or _action_live() or int(data.get("hit_points", 0)) < 0
+	get_node(^"Margin/Layout/Header/Rest").disabled = not _owner() or _draft.active or _action_live() or BROKEN.new().is_dead(data)
 	get_node(^"Margin/Layout/Header/Improve").disabled = not _owner() or _draft.active or _action_live()
 	get_node(^"Margin/Layout/Header/Edit").visible = not _draft.active
 	get_node(^"Margin/Layout/Header/SaveSheet").visible = _draft.active
@@ -327,6 +327,8 @@ func _restore_pages() -> void:
 func _show_route() -> void:
 	var chapter := int(_nav.get("chapter", 0))
 	var details := not _detail.is_empty()
+	get_node(^"Margin/Layout/Header/Rest").visible = not _phone or _detail == "profile"
+	get_node(^"Margin/Layout/Header/Improve").visible = not _phone or _detail == "profile"
 	get_node(^"Margin/Layout/Body/Chapter/Tabs").visible = not details
 	get_node(^"Margin/Layout/Body/Core").visible = not (_phone and (details or chapter == 4))
 	get_node(^"Margin/Layout/Body/Chapter/Collections").visible = not details and chapter in [0, 1, 2]
@@ -1188,8 +1190,6 @@ func _density() -> void:
 	get_node(^"Margin/Layout/Body/Core/ProtectionHeading").visible = not _phone
 	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").visible = not _phone and not _draft.active
 	get_node(^"Margin/Layout/Body/Core/Class").add_theme_font_size_override("font_size", 11 if _phone else 18 if tablet else 22)
-	get_node(^"Margin/Layout/Header/Rest").visible = not _phone or not _detail.is_empty()
-	get_node(^"Margin/Layout/Header/Improve").visible = not _phone or not _detail.is_empty()
 	get_node(^"Margin/Layout/Body/Chapter").add_theme_constant_override("separation", 4 if _phone else 12)
 	for button in [get_node(^"Margin/Layout/Header/Name"), get_node(^"Margin/Layout/Header/Edit"), get_node(^"Margin/Layout/Header/Rest"), get_node(^"Margin/Layout/Header/Improve"), get_node(^"Margin/Layout/Header/SaveSheet"), get_node(^"Margin/Layout/Header/CancelSheet"), get_node(^"Margin/Layout/Header/Close")]:
 		button.add_theme_font_size_override("font_size", 12 if _phone else 16)

@@ -203,7 +203,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _end(context, action)
 	var current: Dictionary = source.actor.data
 	var tested_rule: Dictionary = action.rule
-	if action.get("sheet", false) and action.get("phase", "") != "sheet-target" and (tested_rule.has("ability") or action.get("phase", "") == "spit") and not BROKEN.new().can_act(current):
+	if action.get("sheet", false) and action.get("phase", "") != "sheet-target" and (tested_rule.has("ability") or action.get("phase", "") in ["spit", "blade-attack"]) and not BROKEN.new().can_act(current):
 		return _end(context, action)
 	if not _valid(current) or RULES.new().owned(current, str(action.item)).is_empty():
 		return _end(context, action)
@@ -827,6 +827,8 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 			return _end(context, action)
 		if success:
 			return _next_throw(context, action, "gob-duration", str(action.owner), [SDK.DiceTerm.new("Blind and vomiting (rounds)", 4)], "Throw d4 rounds; ongoing consequences are manual.")
+		if action.get("sheet", false):
+			return _resolve(context, action, [], text + " Witness Toughness tests and vomiting remain at the table.")
 		action["state"] = "witnesses"
 		action["message"] = text + " Select all witnesses, friend and foe, then confirm. The table determines who witnessed this."
 		return _public(action)
@@ -835,6 +837,8 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 		var text := "%s: blinded, retching and vomiting for %d rounds. Handle these consequences manually. Raw Roll #%d." % [str(target.label), roll.terms[0].results[0], roll.sequence]
 		if not _record(context, [], text):
 			return _end(context, action)
+		if action.get("sheet", false):
+			return _resolve(context, action, [], text + " Witness Toughness tests and vomiting remain at the table.")
 		action["state"] = "witnesses"
 		action["message"] = text + " Select all witnesses, friend and foe, then confirm."
 		return _public(action)
@@ -935,6 +939,9 @@ func _damage_item(context: SDK.SystemActionContext, action: Dictionary, roll: SD
 			return _resolve(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "The treacherous blade fumbles and breaks. Raw Roll #%d." % roll.sequence)
 		if face != 20 and face + modifier < 10:
 			return _resolve(context, action, [], "The treacherous blade misses. Raw Roll #%d." % roll.sequence)
+		if action.get("sheet", false):
+			action["blade_critical"] = face == 20
+			return _next_throw(context, action, "blade-damage", str(action.owner), [SDK.DiceTerm.new("Blade damage", 6)], "Roll d6+1 damage; resolve the victim and protection manually.")
 		var plan := DAMAGE.new().plan(recipient.actor, 6, false)
 		if plan.has("error"):
 			return _end(context, action)
@@ -942,6 +949,11 @@ func _damage_item(context: SDK.SystemActionContext, action: Dictionary, roll: SD
 		plan["critical"] = face == 20
 		action["damage_plan"] = plan
 		return _next_throw(context, action, "blade-damage", str(action.owner), DAMAGE.new().terms(plan), "Throw d6+1 damage and protection.")
+	if action.get("sheet", false) and phase == "blade-damage":
+		var damage: int = roll.terms[0].results[0] + 1
+		if action.get("blade_critical", false):
+			damage *= 2
+		return _resolve(context, action, [], "Blade damage %d%s. Resolve the victim, protection and critical armor consequence manually. Raw Roll #%d." % [damage, " · critical" if action.get("blade_critical", false) else "", roll.sequence])
 	var plan: Dictionary = action.damage_plan
 	var outcome := DAMAGE.new().apply(recipient.actor, plan, roll)
 	if outcome.has("error"):

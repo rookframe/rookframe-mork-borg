@@ -102,8 +102,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if not str(input.get("rest", "")) in ["breath", "sleep"]:
 		return _error("Choose breath + drink or a full night's rest.")
 	var hp: int = data.hit_points
-	if hp < 0:
-		return _error("Negative HP means dead. Rest does not resurrect a Character.")
+	if BROKEN.new().is_dead(data):
+		return _error("Rest does not resurrect a dead Character.")
 	var faces := 4 if str(input.rest) == "breath" else 6
 	var request := context.request_throw(SDK.HumanThrowRequest.new(str(input.id), str(owner.id), [SDK.DiceTerm.new("Recovery", faces)]))
 	return action if request.ok else _error(request.message)
@@ -120,7 +120,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 		return _improve(context, action, current, roll)
 	var hp: int = current.hit_points
 	var maximum: int = current.maximum_hit_points
-	if hp < 0:
+	if BROKEN.new().is_dead(current):
 		return _end(context, action)
 	var data := current.duplicate(true)
 	var recovered: int = roll.terms[0].results[0]
