@@ -28,7 +28,10 @@ func ready() -> void:
 		if entry.reference.local_id == "classless-character":
 			default_definition = entry
 	var miniatures := sdk.content.list(SDK.ContentKind.Value.MINIATURE)
-	_creator.configure(definitions.items, default_definition, miniatures.items if miniatures.ok else [], false, sdk)
+	var available: Array[SDK.ContentEntry] = []
+	if miniatures.ok:
+		available = miniatures.items
+	_creator.configure(definitions.items, default_definition, available, false, sdk)
 	_creator.begin()
 
 func _primary() -> void:

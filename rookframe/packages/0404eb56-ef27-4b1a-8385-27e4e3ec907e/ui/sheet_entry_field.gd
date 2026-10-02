@@ -6,6 +6,8 @@ var _field := ""
 var _initial := ""
 var _multiline := false
 var _setting := false
+var _phone := false
+var _profile := false
 
 func _ready() -> void:
 	get_node(^"Value").value_changed.connect(_typed)
@@ -57,3 +59,18 @@ func _focus_editor() -> void:
 		get_node(^"Text").focus_editor()
 	else:
 		get_node(^"Value").focus_editor()
+
+func configure_layout(phone: bool, profile: bool = false) -> void:
+	_phone = phone
+	_profile = profile
+	for path in [^"Value", ^"Text"]:
+		get_node(path).add_theme_constant_override("label_font_size", 12 if phone else 15)
+		get_node(path).add_theme_constant_override("editor_font_size", 15 if phone else 16)
+		get_node(path).add_theme_constant_override("editor_minimum_height", (80 if profile else 124) if phone else 160)
+		get_node(path).compact = phone
+
+func has_editor_focus() -> bool:
+	return get_node(^"Text").is_editor_focused() if _multiline else get_node(^"Value").is_editor_focused()
+
+func restore_editor_focus() -> void:
+	_focus_editor()

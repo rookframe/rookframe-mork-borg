@@ -91,7 +91,7 @@ func advance(current: Dictionary, operation: String) -> Dictionary:
 		if outcome not in [1, 2] or elapsed < duration or incident.get("recovered", false) or incident.get("dead", false):
 			return {"message": "Recovery is not due."}
 		incident["recovered"] = true
-		data["hit_points"] = int(incident.recovery_hp)
+		data["hit_points"] = mini(int(data.maximum_hit_points), int(incident.recovery_hp))
 	elif operation in ["next", "undo"]:
 		if outcome not in [1, 2, 3] or incident.get("recovered", false) or incident.get("treated", false) or incident.get("negative_hp", false):
 			return {"message": "This incident has no running counter."}

@@ -2,396 +2,549 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.gd" id="script"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/elixir.svg" id="rest_icon"]
 [sub_resource type="StyleBoxFlat" id="frame"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+bg_color = Color(0.003922, 0.047059, 0.062745, 1)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="heading"]
+bg_color = Color(0.062745, 0.109804, 0.121569, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="result"]
+bg_color = Color(0.062745, 0.109804, 0.121569, 1)
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
+border_width_left = 3
+[sub_resource type="StyleBoxFlat" id="context"]
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_right = 1
 [node name="Workflow" type="VBoxContainer"]
 script = ExtResource("script")
 size_flags_vertical = 3
 theme_override_constants/separation = 24
 [node name="Header" type="HBoxContainer" parent="."]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 70)
+custom_minimum_size = Vector2(0, 80)
 theme_override_constants/separation = 24
-
 [node name="Back" type="Button" parent="Header"]
 layout_mode = 2
 text = "‹ Sheet"
-custom_minimum_size = Vector2(44, 44)
-clip_text = true
+custom_minimum_size = Vector2(44,44)
 theme_type_variation = "TaskButton"
 accessibility_name = "Back to character sheet"
-
 [node name="Titles" type="VBoxContainer" parent="Header"]
 layout_mode = 2
 size_flags_horizontal = 3
-
 [node name="Identity" type="Label" parent="Header/Titles"]
 layout_mode = 2
-text = "Character · MÖRK BORG"
-autowrap_mode = 0
+text = ""
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 12
-clip_text = true
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-
 [node name="Title" type="Label" parent="Header/Titles"]
 layout_mode = 2
 text = "Rest"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 30
-theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-
-[node name="HP" type="Label" parent="Header"]
-layout_mode = 2
-text = "HP"
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 16
-
-[node name="Body" type="HBoxContainer" parent="."]
-layout_mode = 2
-size_flags_vertical = 3
-theme_override_constants/separation = 44
-
-[node name="Context" type="VBoxContainer" parent="Body"]
-layout_mode = 2
-custom_minimum_size = Vector2(250, 0)
-theme_override_constants/separation = 14
-
-[node name="Portrait" type="TextureRect" parent="Body/Context"]
-layout_mode = 2
-custom_minimum_size = Vector2(250, 312)
-expand_mode = 1
-stretch_mode = 6
-
-[node name="Name" type="Label" parent="Body/Context"]
-max_lines_visible = 1
-text_overrun_behavior = 3
-layout_mode = 2
-text = "Character"
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 28
 theme_override_fonts/font = ExtResource("display")
-
-[node name="Class" type="Label" parent="Body/Context"]
-max_lines_visible = 1
-text_overrun_behavior = 3
-layout_mode = 2
-text = "Class"
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 16
-
-[node name="HP" type="Label" parent="Body/Context"]
-layout_mode = 2
-text = "Hit points"
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 22
-
-[node name="Abilities" type="Label" parent="Body/Context"]
+[node name="HP" type="Label" parent="Header"]
 layout_mode = 2
 text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-
-[node name="Spacer" type="Control" parent="Body/Context"]
+[node name="Body" type="HBoxContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-
-[node name="Note" type="Label" parent="Body/Context"]
+theme_override_constants/separation = 44
+[node name="Context" type="PanelContainer" parent="Body"]
 layout_mode = 2
-text = "Changes return to this character sheet."
+custom_minimum_size = Vector2(280,0)
+theme_override_styles/panel = SubResource("context")
+[node name="Inset" type="MarginContainer" parent="Body/Context"]
+layout_mode = 2
+theme_override_constants/margin_right = 28
+[node name="Content" type="VBoxContainer" parent="Body/Context/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 14
+[node name="Portrait" type="TextureRect" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(250,312)
+expand_mode = 1
+stretch_mode = 6
+[node name="Name" type="Label" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 28
+theme_override_fonts/font = ExtResource("display")
+[node name="Class" type="Label" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="HP" type="HBoxContainer" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,60)
+[node name="Label" type="Label" parent="Body/Context/Inset/Content/HP"]
+layout_mode = 2
+text = "Hit points"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Value" type="Label" parent="Body/Context/Inset/Content/HP"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 30
+theme_override_colors/font_color = Color(0.419608, 0.811765, 0.517647, 1)
+[node name="Maximum" type="Label" parent="Body/Context/Inset/Content/HP"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Abilities" type="VBoxContainer" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 9
+[node name="Strength" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
+layout_mode = 2
+[node name="Name" type="Label" parent="Body/Context/Inset/Content/Abilities/Strength"]
+layout_mode = 2
+text = "Strength"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Strength"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Agility" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
+layout_mode = 2
+[node name="Name" type="Label" parent="Body/Context/Inset/Content/Abilities/Agility"]
+layout_mode = 2
+text = "Agility"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Agility"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Presence" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
+layout_mode = 2
+[node name="Name" type="Label" parent="Body/Context/Inset/Content/Abilities/Presence"]
+layout_mode = 2
+text = "Presence"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Presence"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Toughness" type="HBoxContainer" parent="Body/Context/Inset/Content/Abilities"]
+layout_mode = 2
+[node name="Name" type="Label" parent="Body/Context/Inset/Content/Abilities/Toughness"]
+layout_mode = 2
+text = "Toughness"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Value" type="Label" parent="Body/Context/Inset/Content/Abilities/Toughness"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Spacer" type="Control" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Note" type="Label" parent="Body/Context/Inset/Content"]
+layout_mode = 2
+text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 14
-
-[node name="Main" type="VBoxContainer" parent="Body"]
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Main" type="MarginContainer" parent="Body"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 16
-
-[node name="Sections" type="HBoxContainer" parent="Body/Main"]
+[node name="Content" type="VBoxContainer" parent="Body/Main"]
+layout_mode = 2
+theme_override_constants/separation = 24
+[node name="Sections" type="HBoxContainer" parent="Body/Main/Content"]
 layout_mode = 2
 theme_override_constants/separation = 0
-
-[node name="Recovery" parent="Body/Main/Sections" instance=ExtResource("tab")]
+[node name="Recovery" parent="Body/Main/Content/Sections" instance=ExtResource("tab")]
 layout_mode = 2
 text = "Recovery"
 toggle_mode = true
-
-[node name="Daily" parent="Body/Main/Sections" instance=ExtResource("tab")]
+[node name="Daily" parent="Body/Main/Content/Sections" instance=ExtResource("tab")]
 layout_mode = 2
 text = "Daily resources"
 toggle_mode = true
-
-[node name="Progress" type="VBoxContainer" parent="Body/Main"]
+[node name="Progress" type="VBoxContainer" parent="Body/Main/Content"]
 layout_mode = 2
-theme_override_constants/separation = 4
-[node name="Summary" type="Label" parent="Body/Main/Progress"]
+[node name="Summary" type="Label" parent="Body/Main/Content/Progress"]
 layout_mode = 2
+text = ""
+autowrap_mode = 3
 theme_override_font_sizes/font_size = 11
-[node name="Steps" type="HBoxContainer" parent="Body/Main/Progress"]
+[node name="Steps" type="HBoxContainer" parent="Body/Main/Content/Progress"]
 layout_mode = 2
 theme_override_constants/separation = 0
-[node name="HP" type="VBoxContainer" parent="Body/Main/Progress/Steps"]
+[node name="HP" type="VBoxContainer" parent="Body/Main/Content/Progress/Steps"]
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Title" type="Label" parent="Body/Main/Progress/Steps/HP"]
+[node name="Title" type="Label" parent="Body/Main/Content/Progress/Steps/HP"]
 layout_mode = 2
-text = "Hit points"
-text_overrun_behavior = 3
-[node name="Current" type="ColorRect" parent="Body/Main/Progress/Steps/HP"]
+text = "More HP"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Current" type="ColorRect" parent="Body/Main/Content/Progress/Steps/HP"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 3)
+custom_minimum_size = Vector2(0,3)
 mouse_filter = 2
 color = Color(0.941176, 0.733333, 0.196078, 1)
-[node name="Debris" type="VBoxContainer" parent="Body/Main/Progress/Steps"]
+[node name="Debris" type="VBoxContainer" parent="Body/Main/Content/Progress/Steps"]
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Title" type="Label" parent="Body/Main/Progress/Steps/Debris"]
+[node name="Title" type="Label" parent="Body/Main/Content/Progress/Steps/Debris"]
 layout_mode = 2
 text = "Debris"
-text_overrun_behavior = 3
-[node name="Current" type="ColorRect" parent="Body/Main/Progress/Steps/Debris"]
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Current" type="ColorRect" parent="Body/Main/Content/Progress/Steps/Debris"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 3)
+custom_minimum_size = Vector2(0,3)
 mouse_filter = 2
 color = Color(0.941176, 0.733333, 0.196078, 1)
-[node name="Abilities" type="VBoxContainer" parent="Body/Main/Progress/Steps"]
+[node name="Abilities" type="VBoxContainer" parent="Body/Main/Content/Progress/Steps"]
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Title" type="Label" parent="Body/Main/Progress/Steps/Abilities"]
+[node name="Title" type="Label" parent="Body/Main/Content/Progress/Steps/Abilities"]
 layout_mode = 2
 text = "Abilities"
-text_overrun_behavior = 3
-[node name="Current" type="ColorRect" parent="Body/Main/Progress/Steps/Abilities"]
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Current" type="ColorRect" parent="Body/Main/Content/Progress/Steps/Abilities"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 3)
+custom_minimum_size = Vector2(0,3)
 mouse_filter = 2
 color = Color(0.941176, 0.733333, 0.196078, 1)
-[node name="Class" type="VBoxContainer" parent="Body/Main/Progress/Steps"]
+[node name="Class" type="VBoxContainer" parent="Body/Main/Content/Progress/Steps"]
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Title" type="Label" parent="Body/Main/Progress/Steps/Class"]
+[node name="Title" type="Label" parent="Body/Main/Content/Progress/Steps/Class"]
 layout_mode = 2
 text = "Class"
-text_overrun_behavior = 3
-[node name="Current" type="ColorRect" parent="Body/Main/Progress/Steps/Class"]
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Current" type="ColorRect" parent="Body/Main/Content/Progress/Steps/Class"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 3)
+custom_minimum_size = Vector2(0,3)
 mouse_filter = 2
 color = Color(0.941176, 0.733333, 0.196078, 1)
-
-[node name="RestContent" type="HBoxContainer" parent="Body/Main"]
+[node name="RestContent" type="HBoxContainer" parent="Body/Main/Content"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 28
-
-[node name="Choices" type="PanelContainer" parent="Body/Main/RestContent"]
+[node name="Choices" type="PanelContainer" parent="Body/Main/Content/RestContent"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("frame")
-
-[node name="Inset" type="MarginContainer" parent="Body/Main/RestContent/Choices"]
+[node name="Frame" type="VBoxContainer" parent="Body/Main/Content/RestContent/Choices"]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="Content" type="VBoxContainer" parent="Body/Main/RestContent/Choices/Inset"]
+theme_override_constants/separation = 0
+[node name="Heading" type="PanelContainer" parent="Body/Main/Content/RestContent/Choices/Frame"]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Heading" type="Label" parent="Body/Main/RestContent/Choices/Inset/Content"]
+theme_override_styles/panel = SubResource("heading")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Heading"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+[node name="Title" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Heading/Inset"]
 layout_mode = 2
 text = "CHOOSE A REST"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-
-[node name="Breath" type="Button" parent="Body/Main/RestContent/Choices/Inset/Content"]
-layout_mode = 2
-text = "Catch your breath
-Have a drink.                   d4 HP"
-custom_minimum_size = Vector2(44, 44)
-clip_text = true
-theme_type_variation = "TaskButton"
-toggle_mode = true
-
-[node name="Sleep" type="Button" parent="Body/Main/RestContent/Choices/Inset/Content"]
-layout_mode = 2
-text = "Full night's sleep
-Uninterrupted rest.          d6 HP"
-custom_minimum_size = Vector2(44, 44)
-clip_text = true
-theme_type_variation = "TaskButton"
-toggle_mode = true
-
-[node name="Recovery" type="PanelContainer" parent="Body/Main/RestContent"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("frame")
-
-[node name="Inset" type="MarginContainer" parent="Body/Main/RestContent/Recovery"]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="Scroll" type="ScrollContainer" parent="Body/Main/RestContent/Recovery/Inset"]
+theme_override_fonts/font = ExtResource("display")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame"]
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
-follow_focus = true
-
-[node name="Content" type="VBoxContainer" parent="Body/Main/RestContent/Recovery/Inset/Scroll"]
-size_flags_horizontal = 3
+[node name="Pages" parent="Body/Main/Content/RestContent/Choices/Frame/Inset" instance=ExtResource("pages")]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Heading" type="Label" parent="Body/Main/RestContent/Recovery/Inset/Scroll/Content"]
+[node name="Content" type="VBoxContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area"]
+layout_mode = 2
+theme_override_constants/separation = 20
+[node name="Breath" type="Button" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,92)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+accessibility_name = "Catch your breath. Have a drink. d4 HP"
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 16
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(28,28)
+texture = ExtResource("rest_icon")
+expand_mode = 1
+stretch_mode = 5
+size_flags_vertical = 4
+mouse_filter = 2
+self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Copy" type="VBoxContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+[node name="Title" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row/Copy"]
+layout_mode = 2
+text = "Catch your breath"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Help" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row/Copy"]
+layout_mode = 2
+text = "Have a drink."
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Die" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row"]
+layout_mode = 2
+text = "d4 HP"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+mouse_filter = 2
+[node name="Sleep" type="Button" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,92)
+theme_type_variation = "TaskButton"
+toggle_mode = true
+accessibility_name = "Full night’s sleep. A night of uninterrupted rest. d6 HP"
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 16
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(28,28)
+texture = ExtResource("rest_icon")
+expand_mode = 1
+stretch_mode = 5
+size_flags_vertical = 4
+mouse_filter = 2
+self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Copy" type="VBoxContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+mouse_filter = 2
+[node name="Title" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row/Copy"]
+layout_mode = 2
+text = "Full night’s sleep"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Help" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row/Copy"]
+layout_mode = 2
+text = "A night of uninterrupted rest."
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="Die" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row"]
+layout_mode = 2
+text = "d6 HP"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+mouse_filter = 2
+[node name="Recovery" type="PanelContainer" parent="Body/Main/Content/RestContent"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("frame")
+[node name="Frame" type="VBoxContainer" parent="Body/Main/Content/RestContent/Recovery"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Heading" type="PanelContainer" parent="Body/Main/Content/RestContent/Recovery/Frame"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("heading")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Recovery/Frame/Heading"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+[node name="Title" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Heading/Inset"]
 layout_mode = 2
 text = "RECOVERY"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-
-[node name="Caption" type="Label" parent="Body/Main/RestContent/Recovery/Inset/Scroll/Content"]
+theme_override_fonts/font = ExtResource("display")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Recovery/Frame"]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Pages" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset" instance=ExtResource("pages")]
+layout_mode = 2
+[node name="Content" type="VBoxContainer" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area"]
+layout_mode = 2
+theme_override_constants/separation = 20
+[node name="Caption" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content"]
 layout_mode = 2
 text = "Current hit points"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 14
-
-[node name="HP" type="Label" parent="Body/Main/RestContent/Recovery/Inset/Scroll/Content"]
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="ResultFrame" type="PanelContainer" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("result")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame"]
+layout_mode = 2
+[node name="Result" type="VBoxContainer" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Roll" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result"]
+layout_mode = 2
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="HP" type="HBoxContainer" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result"]
+layout_mode = 2
+[node name="Value" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result/HP"]
 layout_mode = 2
 text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 42
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
-
-[node name="Result" type="Label" parent="Body/Main/RestContent/Recovery/Inset/Scroll/Content"]
+[node name="Maximum" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result/HP"]
 layout_mode = 2
 text = ""
 autowrap_mode = 3
-theme_override_font_sizes/font_size = 16
-
-[node name="Restrictions" type="Label" parent="Body/Main/RestContent/Recovery/Inset/Scroll/Content"]
-layout_mode = 2
-autowrap_mode = 3
-text = "Without food or drink, or while infected, no recovery. After two days without food, lose d4 HP per day. Infection costs d6 HP per day. Resolve these restrictions at the table; Rest does not advance a day."
+theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-
-[node name="DailyContent" type="HBoxContainer" parent="Body/Main"]
-layout_mode = 2
-visible = false
-size_flags_vertical = 3
-theme_override_constants/separation = 28
-
-[node name="Power" type="PanelContainer" parent="Body/Main/DailyContent"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_styles/panel = SubResource("frame")
-
-[node name="Inset" type="MarginContainer" parent="Body/Main/DailyContent/Power"]
-layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="Content" type="VBoxContainer" parent="Body/Main/DailyContent/Power/Inset"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Heading" type="Label" parent="Body/Main/DailyContent/Power/Inset/Content"]
-layout_mode = 2
-text = "POWER USES"
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 16
-theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-
-[node name="Value" type="Label" parent="Body/Main/DailyContent/Power/Inset/Content"]
+[node name="Copy" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result"]
 layout_mode = 2
 text = ""
 autowrap_mode = 3
-theme_override_font_sizes/font_size = 32
-
-[node name="Rules" type="Label" parent="Body/Main/DailyContent/Power/Inset/Content"]
-layout_mode = 2
-text = "Roll d4 + Presence each morning. Sleep does not refill Power uses."
-autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-
-[node name="Omens" type="PanelContainer" parent="Body/Main/DailyContent"]
+[node name="Restrictions" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content"]
+layout_mode = 2
+text = "Without food or drink, or while infected, no recovery. After two days without food, lose d4 HP per day. Infection costs d6 HP per day. Resolve these restrictions at the table; Rest does not advance a day."
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+[node name="DailyContent" type="PanelContainer" parent="Body/Main/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 theme_override_styles/panel = SubResource("frame")
-
-[node name="Inset" type="MarginContainer" parent="Body/Main/DailyContent/Omens"]
+[node name="Frame" type="VBoxContainer" parent="Body/Main/Content/DailyContent"]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="Content" type="VBoxContainer" parent="Body/Main/DailyContent/Omens/Inset"]
+theme_override_constants/separation = 0
+[node name="Heading" type="PanelContainer" parent="Body/Main/Content/DailyContent/Frame"]
 layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="Heading" type="Label" parent="Body/Main/DailyContent/Omens/Inset/Content"]
+theme_override_styles/panel = SubResource("heading")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/DailyContent/Frame/Heading"]
 layout_mode = 2
-text = "OMENS"
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+[node name="Title" type="Label" parent="Body/Main/Content/DailyContent/Frame/Heading/Inset"]
+layout_mode = 2
+text = "DAILY RESOURCES"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-
-[node name="Value" type="Label" parent="Body/Main/DailyContent/Omens/Inset/Content"]
+theme_override_fonts/font = ExtResource("display")
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/DailyContent/Frame"]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Pages" parent="Body/Main/Content/DailyContent/Frame/Inset" instance=ExtResource("pages")]
+layout_mode = 2
+[node name="Content" type="VBoxContainer" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area"]
+layout_mode = 2
+theme_override_constants/separation = 20
+[node name="Omens" type="HBoxContainer" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content"]
+layout_mode = 2
+theme_override_constants/separation = 20
+[node name="Term" type="Label" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/Omens"]
+layout_mode = 2
+text = "Omens · optional rule"
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+custom_minimum_size = Vector2(180,0)
+[node name="Rules" type="Label" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/Omens"]
 layout_mode = 2
 text = ""
 autowrap_mode = 3
-theme_override_font_sizes/font_size = 32
-
-[node name="Rules" type="Label" parent="Body/Main/DailyContent/Omens/Inset/Content"]
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Power" type="HBoxContainer" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content"]
 layout_mode = 2
-text = "When depleted, at least six hours of rest permits the class die. Resolve it at the table and enter it with Edit sheet."
+theme_override_constants/separation = 20
+[node name="Term" type="Label" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/Power"]
+layout_mode = 2
+text = "Powers"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-
-[node name="Procedure" type="PanelContainer" parent="Body/Main"]
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+custom_minimum_size = Vector2(180,0)
+[node name="Rules" type="Label" parent="Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/Power"]
 layout_mode = 2
-visible = false
+text = ""
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+size_flags_horizontal = 3
+[node name="Procedure" type="PanelContainer" parent="Body/Main/Content"]
+layout_mode = 2
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("frame")
-
-[node name="Inset" type="MarginContainer" parent="Body/Main/Procedure"]
+[node name="Inset" type="MarginContainer" parent="Body/Main/Content/Procedure"]
 layout_mode = 2
-theme_override_constants/margin_left = 16
-theme_override_constants/margin_right = 16
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_bottom = 16
-
-[node name="Slot" type="VBoxContainer" parent="Body/Main/Procedure/Inset"]
+[node name="Slot" type="VBoxContainer" parent="Body/Main/Content/Procedure/Inset"]
 layout_mode = 2
 size_flags_vertical = 3
-
 [node name="Footer" type="HBoxContainer" parent="."]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 58)
+custom_minimum_size = Vector2(0,70)
 theme_override_constants/separation = 20
-
 [node name="Status" type="Label" parent="Footer"]
 layout_mode = 2
-text = "Other resources are unchanged."
+text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 14
 size_flags_horizontal = 3
-

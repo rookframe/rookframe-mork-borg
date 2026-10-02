@@ -61,8 +61,10 @@ func configure(data: Dictionary, condition: Dictionary, enabled: bool) -> void:
 	for index in range(4):
 		var pip = get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"][index])
 		pip.visible = index < duration
-		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).text = "×" if index < elapsed else str(index + 1)
+		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).text = str(index + 1)
 		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).add_theme_color_override("font_color", MUTED if index < elapsed else Color(1, 1, 1, 1))
+		pip.get_node(^"Elapsed").visible = index < elapsed
+		pip.get_node(^"Strike").visible = index < elapsed
 		pip.accessibility_name = "Round %d · %s" % [index + 1, "elapsed" if index < elapsed else "remaining"]
 	get_node(^"Main/Frame/Inset/Content/Death").visible = dead
 	get_node(^"Main/Frame/Inset/Content/Death/Copy").text = str(condition.get("copy", ""))
@@ -76,7 +78,7 @@ func configure(data: Dictionary, condition: Dictionary, enabled: bool) -> void:
 	get_node(^"Main/Frame/Inset/Content/Footer/Treat").disabled = not enabled
 	get_node(^"Main/Frame/Inset/Content/Footer/UndoDeath").visible = dead and outcome == 3 and complete and elapsed > 0 and not incident.get("negative_hp", false)
 	get_node(^"Main/Frame/Inset/Content/Footer/UndoDeath").disabled = not enabled
-	get_node(^"Main/Frame/Inset/Content/Footer/Note").text = "%d HP is restored when recovery is due." % int(incident.get("recovery_hp", 0)) if rounds else "Treatment stops the deadline; it does not add HP." if bleeding else "At exactly 0 HP · Broken d4" if initial else "No further Broken roll." if dead else "Accepted results remain on the sheet."
+	get_node(^"Main/Frame/Inset/Content/Footer/Note").text = "%d HP is restored when recovery is due." % mini(int(data.get("maximum_hit_points", 1)), int(incident.get("recovery_hp", 0))) if rounds else "Treatment stops the deadline; it does not add HP." if bleeding else "At exactly 0 HP · Broken d4" if initial else "No further Broken roll." if dead else "Accepted results remain on the sheet."
 	get_node(^"Results").visible = incident.has("roll_sequence")
 	_result("Broken", true, "Broken", "d4: %d" % outcome)
 	_result("Injury", complete and outcome == 2, "Injury", "d6: %d · %s" % [int(incident.get("injury_roll", 0)), str(incident.get("injury", ""))])
@@ -99,7 +101,7 @@ func _resize() -> void:
 	get_node(^"Main/Frame/Inset/Content/Header").add_theme_constant_override("separation", 3 if phone else 6 if tablet else 12)
 	for edge in ["left", "right", "top", "bottom"]:
 		get_node(^"Main/Frame/Inset").add_theme_constant_override("margin_" + edge, (12 if edge in ["left", "right"] else 10) if phone else 16 if tablet else 32)
-		get_node(^"Results/Inset").add_theme_constant_override("margin_" + edge, (8 if edge in ["left", "right"] else 5) if phone else 12 if tablet else 14)
+		get_node(^"Results/Inset").add_theme_constant_override("margin_" + edge, (8 if edge in ["left", "right"] else 5) if phone else 12 if tablet else (20 if edge in ["left", "right"] else 14))
 	get_node(^"Main/Frame/Inset/Content/Header/Caption").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 14)
 	get_node(^"Main/Frame/Inset/Content/Header/Title").add_theme_font_size_override("font_size", 25 if phone else 32 if tablet else 48)
 	get_node(^"Main/Frame/Inset/Content/Header/Copy").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 18)
@@ -157,6 +159,8 @@ func _resize() -> void:
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last/Value").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 20)
 	for path in [^"Main/Frame/Inset/Content/Counter/Tracker/Controls/Undo", ^"Main/Frame/Inset/Content/Counter/Tracker/Controls/Next", ^"Main/Frame/Inset/Content/Footer/Broken", ^"Main/Frame/Inset/Content/Footer/Recover", ^"Main/Frame/Inset/Content/Footer/Treat", ^"Main/Frame/Inset/Content/Footer/UndoDeath", ^"Main/Frame/Inset/Content/Footer/EditHP"]:
 		get_node(path).add_theme_font_size_override("font_size", 12 if phone else 14 if tablet else 16)
+	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules").add_theme_constant_override("separation", 12 if phone else 16 if tablet else 24)
+	get_node(^"Main/Frame/Inset/Content/Death").add_theme_constant_override("separation", 24 if phone else 40)
 	get_node(^"Results/Inset/Values").add_theme_constant_override("separation", 12 if phone or tablet else 24)
 	get_node(^"Results/Inset/Values/Broken").add_theme_constant_override("separation", 2 if phone else 4)
 	get_node(^"Results/Inset/Values/Broken/Caption").add_theme_font_size_override("font_size", 10 if phone else 13)

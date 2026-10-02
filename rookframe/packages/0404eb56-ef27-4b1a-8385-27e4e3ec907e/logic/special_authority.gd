@@ -379,7 +379,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
-	return {"state": action.state, "message": action.message, "request": action.get("request", ""), "count": action.get("count", 0), "family": action.get("family", "")}
+	return {"state": action.state, "message": str(action.message).replace("the Dice Tray", "Window Dice") if action.get("sheet", false) else action.message, "request": action.get("request", ""), "count": action.get("count", 0), "family": action.get("family", "")}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}

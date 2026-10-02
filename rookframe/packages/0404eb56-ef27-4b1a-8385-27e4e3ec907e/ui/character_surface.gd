@@ -17,114 +17,86 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
-@onready var _quick_quick_omens = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens")
-@onready var _quick_quick_omens_edit = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField/Editor")
-@onready var _quick_quick_silver = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver")
-@onready var _quick_quick_silver_edit = get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField/Editor")
-@onready var _core_agility = get_node(^"Margin/Layout/Body/Core/Abilities/AgilityRow/Agility")
-@onready var _core_presence = get_node(^"Margin/Layout/Body/Core/Abilities/PresenceRow/Presence")
-@onready var _core_strength = get_node(^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")
-@onready var _core_toughness = get_node(^"Margin/Layout/Body/Core/Abilities/ToughnessRow/Toughness")
-@onready var _core_condition_reminder = get_node(^"Margin/Layout/Body/Core/ConditionReminder")
-@onready var _core_dodge = get_node(^"Margin/Layout/Body/Core/Dodge")
-@onready var _core_portrait = get_node(^"Margin/Layout/Body/Core/Likeness/Portrait")
-@onready var _core_condition_badge = get_node(^"Margin/Layout/Body/Core/Likeness/Portrait/ConditionBadge")
-@onready var _core_condition_frame = get_node(^"Margin/Layout/Body/Core/Likeness/Portrait/ConditionFrame")
-@onready var _core_hit_points = get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints")
-@onready var _core_omens = get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens")
-@onready var _core_power_uses = get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses")
-@onready var _core_manage_equipment = get_node(^"Margin/Layout/Body/Core/ManageEquipment")
-@onready var _core_origin = get_node(^"Margin/Layout/Body/Core/Origin")
-@onready var _core_phone_edit = get_node(^"Margin/Layout/Body/Core/PhoneHeader/PhoneEdit")
-@onready var _core_phone_name = get_node(^"Margin/Layout/Body/Core/PhoneHeader/PhoneName")
-@onready var _core_protection = get_node(^"Margin/Layout/Body/Core/Protection")
-@onready var _core_ready_weapon = get_node(^"Margin/Layout/Body/Core/ReadyWeapon")
-@onready var _core_weapon = get_node(^"Margin/Layout/Body/Core/Weapon")
-@onready var _core_attack = get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack")
-@onready var _core_damage = get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage")
-@onready var _chapter_chapter_caption = get_node(^"Margin/Layout/Body/Chapter/ChapterCaption")
-@onready var _chapter_personal_notes = get_node(^"Margin/Layout/Body/Chapter/ChapterCaption/PersonalNotes")
-@onready var _chapter_collections = get_node(^"Margin/Layout/Body/Chapter/Collections")
-@onready var _chapter_primary = get_node(^"Margin/Layout/Body/Chapter/Collections/Primary")
-@onready var _chapter_secondary = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary")
-@onready var _chapter_companions = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions")
-@onready var _chapter_resources = get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources")
-@onready var _condition_ui = get_node(^"Margin/Layout/Body/Chapter/Condition")
-@onready var _chapter_journal_panel = get_node(^"Margin/Layout/Body/Chapter/JournalPanel")
-@onready var _chapter_notes = get_node(^"Margin/Layout/Body/Chapter/JournalPanel/Notes")
-@onready var _chapter_story = get_node(^"Margin/Layout/Body/Chapter/JournalPanel/Story")
-@onready var _section = get_node(^"Margin/Layout/Body/Chapter/Section")
-@onready var _chapter_tabs = get_node(^"Margin/Layout/Body/Chapter/Tabs")
-@onready var _chapter_tab_appearance = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabAppearance")
-@onready var _chapter_tab_character = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabCharacter")
-@onready var _chapter_tab_inventory = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabInventory")
-@onready var _chapter_tab_journal = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabJournal")
-@onready var _chapter_tab_powers = get_node(^"Margin/Layout/Body/Chapter/Tabs/TabPowers")
-@onready var _actions_ui = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions")
-@onready var _primary_button = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction")
-@onready var _secondary_button = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction")
-@onready var _detail_back = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back")
-@onready var _detail_title = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle")
-@onready var _detail_content = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent")
-@onready var _detail_detail_tabs = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs")
-@onready var _detail_details = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Details")
-@onready var _detail_overview = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Overview")
-@onready var _workflow_slot = get_node(^"Margin/Layout/Workflow/Body/Main/Procedure/Inset/Slot")
-@onready var _workflow_footer = get_node(^"Margin/Layout/Workflow/Footer")
-@onready var _header_cancel_sheet = get_node(^"Margin/Layout/Header/CancelSheet")
-@onready var _header_close = get_node(^"Margin/Layout/Header/Close")
-@onready var _header_edit = get_node(^"Margin/Layout/Header/Edit")
-@onready var _header_editing_status = get_node(^"Margin/Layout/Header/EditingStatus")
-@onready var _header_improve = get_node(^"Margin/Layout/Header/Improve")
-@onready var _header_name = get_node(^"Margin/Layout/Header/Name")
-@onready var _header_name_edit = get_node(^"Margin/Layout/Header/NameEditField/Editor")
-@onready var _header_name_edit__caption = get_node(^"Margin/Layout/Header/NameEditField/Editor/Caption")
-@onready var _header_rest = get_node(^"Margin/Layout/Header/Rest")
-@onready var _header_save_sheet = get_node(^"Margin/Layout/Header/SaveSheet")
-@onready var _header_spacer = get_node(^"Margin/Layout/Header/Spacer")
-@onready var _header_system = get_node(^"Margin/Layout/Header/System")
-@onready var _header = get_node(^"Margin/Layout/Header")
-@onready var _quick = get_node(^"Margin/Layout/Body/Chapter/QuickResources")
-@onready var _detail_ui = get_node(^"Margin/Layout/Body/Chapter/Detail")
-@onready var _appearance_change_miniature = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
-@onready var _appearance_clear_miniature = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons/ClearMiniature")
-@onready var _appearance_miniature_caption = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureCaption")
-@onready var _appearance_miniature_preview = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniaturePreview")
-@onready var _appearance_package_caption = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/PackageCaption")
-@onready var _appearance_change_portrait = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait")
-@onready var _appearance_clear_portrait = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons/ClearPortrait")
-@onready var _appearance_ui = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel")
 @onready var _core_ui = get_node(^"Margin/Layout/Body/Core")
 @onready var _chapter_ui = get_node(^"Margin/Layout/Body/Chapter")
+@onready var _detail_ui = get_node(^"Margin/Layout/Body/Chapter/Detail")
+@onready var _appearance_ui = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel")
+@onready var _header = get_node(^"Margin/Layout/Header")
+@onready var _quick_quick_omens = _chapter_ui.get_node(^"QuickResources/QuickOmens")
+@onready var _quick_quick_omens_edit = _chapter_ui.get_node(^"QuickResources/QuickOmensEditField/Editor")
+@onready var _quick_quick_silver = _chapter_ui.get_node(^"QuickResources/QuickSilver")
+@onready var _quick_quick_silver_edit = _chapter_ui.get_node(^"QuickResources/QuickSilverEditField/Editor")
+@onready var _core_condition_reminder = _core_ui.get_node(^"ConditionReminder")
+@onready var _core_dodge = _core_ui.get_node(^"Dodge")
+@onready var _core_portrait = _core_ui.get_node(^"Likeness/Portrait")
+@onready var _core_condition_badge = _core_ui.get_node(^"Likeness/Portrait/ConditionBadge")
+@onready var _core_condition_frame = _core_ui.get_node(^"Likeness/Portrait/ConditionFrame")
+@onready var _core_hit_points = _core_ui.get_node(^"Likeness/Vitals/HitPoints")
+@onready var _core_omens = _core_ui.get_node(^"Likeness/Vitals/Omens")
+@onready var _core_power_uses = _core_ui.get_node(^"Likeness/Vitals/PowerUses")
+@onready var _core_manage_equipment = _core_ui.get_node(^"ManageEquipment")
+@onready var _core_origin = _core_ui.get_node(^"Origin")
+@onready var _core_phone_edit = _core_ui.get_node(^"PhoneHeader/PhoneEdit")
+@onready var _core_phone_name = _core_ui.get_node(^"PhoneHeader/PhoneName")
+@onready var _core_protection = _core_ui.get_node(^"Protection")
+@onready var _core_ready_weapon = _core_ui.get_node(^"ReadyWeapon")
+@onready var _core_weapon = _core_ui.get_node(^"Weapon")
+@onready var _core_attack = _core_ui.get_node(^"WeaponActions/Attack")
+@onready var _core_damage = _core_ui.get_node(^"WeaponActions/Damage")
+@onready var _chapter_chapter_caption = _chapter_ui.get_node(^"ChapterCaption")
+@onready var _chapter_personal_notes = _chapter_ui.get_node(^"ChapterCaption/PersonalNotes")
+@onready var _chapter_collections = _chapter_ui.get_node(^"Collections")
+@onready var _chapter_primary = _chapter_ui.get_node(^"Collections/Primary")
+@onready var _chapter_secondary = _chapter_ui.get_node(^"Collections/Secondary")
+@onready var _chapter_companions = _chapter_ui.get_node(^"Collections/Secondary/Companions")
+@onready var _chapter_resources = _chapter_ui.get_node(^"Collections/Secondary/Resources")
+@onready var _condition_ui = _chapter_ui.get_node(^"Condition")
+@onready var _chapter_journal_panel = _chapter_ui.get_node(^"JournalPanel")
+@onready var _chapter_notes = _chapter_ui.get_node(^"JournalPanel/Notes")
+@onready var _chapter_story = _chapter_ui.get_node(^"JournalPanel/Story")
+@onready var _section = _chapter_ui.get_node(^"Section")
+@onready var _chapter_tabs = _chapter_ui.get_node(^"Tabs")
+@onready var _chapter_tab_appearance = _chapter_ui.get_node(^"Tabs/TabAppearance")
+@onready var _chapter_tab_character = _chapter_ui.get_node(^"Tabs/TabCharacter")
+@onready var _chapter_tab_inventory = _chapter_ui.get_node(^"Tabs/TabInventory")
+@onready var _chapter_tab_journal = _chapter_ui.get_node(^"Tabs/TabJournal")
+@onready var _chapter_tab_powers = _chapter_ui.get_node(^"Tabs/TabPowers")
+@onready var _actions_ui = _detail_ui.get_node(^"FooterInset/DetailActions")
+@onready var _primary_button = _detail_ui.get_node(^"FooterInset/DetailActions/PrimaryAction")
+@onready var _secondary_button = _detail_ui.get_node(^"FooterInset/DetailActions/Utility/SecondaryAction")
+@onready var _detail_back = _detail_ui.get_node(^"HeaderFrame/Inset/DetailHeader/Back")
+@onready var _detail_title = _detail_ui.get_node(^"HeaderFrame/Inset/DetailHeader/DetailTitle")
+@onready var _detail_content = _detail_ui.get_node(^"Body/DetailPages/Area/DetailContent")
+@onready var _detail_detail_tabs = _detail_ui.get_node(^"TabsFrame/Inset/DetailTabs")
+@onready var _detail_details = _detail_ui.get_node(^"TabsFrame/Inset/DetailTabs/Details")
+@onready var _detail_overview = _detail_ui.get_node(^"TabsFrame/Inset/DetailTabs/Overview")
+@onready var _workflow_slot = get_node(^"Margin/Layout/Workflow/Body/Main/Content/Procedure/Inset/Slot")
+@onready var _workflow_footer = get_node(^"Margin/Layout/Workflow/Footer")
+@onready var _header_cancel_sheet = _header.get_node(^"CancelSheet")
+@onready var _header_close = _header.get_node(^"Close")
+@onready var _header_edit = _header.get_node(^"Edit")
+@onready var _header_editing_status = _header.get_node(^"EditingStatus")
+@onready var _header_improve = _header.get_node(^"Improve")
+@onready var _header_name = _header.get_node(^"Name")
+@onready var _header_name_edit = _header.get_node(^"NameEditField/Editor")
+@onready var _header_name_edit__caption = _header.get_node(^"NameEditField/Editor/Caption")
+@onready var _header_rest = _header.get_node(^"Rest")
+@onready var _header_save_sheet = _header.get_node(^"SaveSheet")
+@onready var _header_spacer = _header.get_node(^"Spacer")
+@onready var _header_system = _header.get_node(^"System")
+@onready var _quick = _chapter_ui.get_node(^"QuickResources")
+@onready var _appearance_change_miniature = _appearance_ui.get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
 @onready var _quick_parent = _chapter_ui
 @onready var _workflow_ui = get_node(^"Margin/Layout/Workflow")
 @onready var _detail_parent = _chapter_ui
-@onready var _actions_parent = _detail_ui
+@onready var _actions_parent = _detail_ui.get_node(^"FooterInset")
 var _combat_options: Dictionary = {"difficulty": 0, "modifier": 0, "fumble": "break"}
 var _scroll_choices: Array[String] = []
 var _portrait_texture: Texture2D
 const CHAPTERS := ["Character", "Powers", "Inventory", "Journal", "Appearance"]
-@onready var _detail_header = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader")
+@onready var _detail_header = _detail_ui.get_node(^"HeaderFrame/Inset/DetailHeader")
 @export var navigation: Resource
 @onready var _chapters = [_chapter_tab_character, _chapter_tab_powers, _chapter_tab_inventory, _chapter_tab_journal, _chapter_tab_appearance]
-const _ability_paths := {
-	"Strength": ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength",
-	"Agility": ^"Margin/Layout/Body/Core/Abilities/AgilityRow/Agility",
-	"Presence": ^"Margin/Layout/Body/Core/Abilities/PresenceRow/Presence",
-	"Toughness": ^"Margin/Layout/Body/Core/Abilities/ToughnessRow/Toughness",
-}
-const _ability_edit_paths := {
-	"StrengthEdit": ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField/Editor",
-	"AgilityEdit": ^"Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField/Editor",
-	"PresenceEdit": ^"Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField/Editor",
-	"ToughnessEdit": ^"Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField/Editor",
-}
-const _vital_edit_paths := {
-	"HitPointsCurrent": ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor",
-	"HitPointsMaximum": ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor",
-	"PowerUsesCurrent": ^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor",
-	"OmensCurrent": ^"Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField/Editor",
-}
 var _projection := PROJECTION.new()
 var _draft := DRAFT.new()
 var _actor: SDK.Actor
@@ -139,6 +111,10 @@ var _validation_error: Dictionary = {}
 var _opener
 var _opened_entry := ""
 var _return_detail := ""
+var _history: Array[Dictionary] = []
+var _ending_improvement := false
+var _condition_reference := false
+var _cast_modifier := "0"
 var _focus_detail_action := false
 var _action: ACTION
 var _ability: ABILITY
@@ -161,6 +137,12 @@ var _locale := I18N.new()
 
 func ready() -> void:
 	_locale.bind(sdk)
+	get_node(^"EntryDialog").close_requested_by_user.connect(_dismiss_detail)
+	get_node(^"EntryDialog").escape_requested.connect(_escape)
+	_detail_ui.close_requested.connect(_dismiss_detail)
+	_detail_ui.save_requested.connect(_save_sheet)
+	_detail_ui.cancel_requested.connect(_cancel_edit)
+	_detail_ui.back_requested.connect(_back)
 	_workflow_ui.back_requested.connect(_back)
 	_workflow_ui.rest_selected.connect(_rest_selected)
 	_workflow_ui.section_changed.connect(_request_detail)
@@ -173,6 +155,8 @@ func ready() -> void:
 	_chapter_personal_notes.pressed.connect(_open_detail.bind("journal:notes"))
 	_chapter_ui.resource_requested.connect(_open_detail)
 	_chapter_ui.resource_changed.connect(_draft.change)
+	_chapter_ui.get_node(^"ReferenceBack").pressed.connect(_return_condition)
+	_chapter_ui.get_node(^"Collections/Secondary/ResourceEditors").changed.connect(_draft.change)
 	for index in range(4):
 		var path: NodePath = [^"ChapterCaption/InventoryFilters/All", ^"ChapterCaption/InventoryFilters/Arms", ^"ChapterCaption/InventoryFilters/Supplies", ^"ChapterCaption/InventoryFilters/Ready"][index]
 		_chapter_ui.get_node(path).pressed.connect(_inventory_filter.bind(index))
@@ -184,11 +168,8 @@ func ready() -> void:
 	_header_name.pressed.connect(_name_pressed)
 	_header_name_edit.text_changed.connect(_core_typed.bind("name"))
 	_core_origin.pressed.connect(_open_detail.bind("profile"))
-	for key in PROJECTION.ABILITIES:
-		get_node(_ability_paths.get(str(key), ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).pressed.connect(_open_detail.bind("ability:" + str(key)))
-		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField/Editor")).text_changed.connect(_core_typed.bind(str(key)))
-	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
-		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor")).text_changed.connect(_core_typed.bind(str(pair[1])))
+	_core_ui.entry_requested.connect(_open_detail)
+	_core_ui.field_changed.connect(_core_typed)
 	_core_hit_points.pressed.connect(_open_detail.bind("resource:hit_points"))
 	_core_power_uses.pressed.connect(_open_detail.bind("resource:power_uses"))
 	_core_omens.pressed.connect(_open_detail.bind("resource:omens"))
@@ -201,7 +182,7 @@ func ready() -> void:
 	_core_damage.pressed.connect(_roll_combat.bind("damage"))
 	_core_manage_equipment.pressed.connect(_chapter.bind(2))
 	_core_protection.pressed.connect(_open_detail.bind("protection"))
-	_core_dodge.pressed.connect(_workflow.bind("ability", "Agility"))
+	_core_dodge.pressed.connect(_direct_ability.bind("Agility"))
 	_chapter_primary.selected.connect(_open_detail)
 	_chapter_resources.selected.connect(_open_detail)
 	_chapter_companions.selected.connect(_open_detail)
@@ -217,11 +198,10 @@ func ready() -> void:
 	_condition_ui.broken_requested.connect(_start_broken)
 	_condition_ui.event_requested.connect(_incident)
 	_condition_ui.edit_hp_requested.connect(_edit_hit_points)
-	_appearance_change_miniature.pressed.connect(_choose_miniature)
-	_appearance_clear_miniature.pressed.connect(_clear_miniature)
 	get_node(^"Margin/Layout/Picker").closed.connect(_picker_closed)
-	_appearance_change_portrait.pressed.connect(_choose_portrait)
-	_appearance_clear_portrait.pressed.connect(_clear_portrait)
+	_appearance_ui.miniature_requested.connect(_choose_miniature)
+	_appearance_ui.changed.connect(_world_changed)
+	_appearance_ui.message.connect(_status)
 	closed.connect(_closed)
 	resized.connect(_density)
 	if sdk != null:
@@ -363,8 +343,11 @@ func _collections(data: Dictionary) -> void:
 	_chapter_primary.configure(primary, "", heading, str(primary.size()))
 	_chapter_resources.configure(resources, "", "RESOURCES" if chapter == 0 else "DECOCTIONS & RESOURCES", str(resources.size()))
 	_chapter_companions.configure(companions, "", "COMPANIONS", str(companions.size()))
-	var story: Array[Dictionary] = primary if chapter == 3 else []
-	var notes: Array[Dictionary] = resources if chapter == 3 else []
+	var story: Array[Dictionary] = []
+	var notes: Array[Dictionary] = []
+	if chapter == 3:
+		story = primary
+		notes = resources
 	_chapter_ui.configure_journal(story, notes)
 	_rendered_chapter = chapter
 	_restore_pages()
@@ -382,8 +365,9 @@ func _show_route() -> void:
 	var chapter := int(_nav.get("chapter", 0))
 	var details := not _detail.is_empty()
 	var task := _detail in ["workflow:rest", "workflow:improve"]
-	var detail_parent = _workflow_slot if task else _chapter_ui
-	var actions_parent = _workflow_footer if task else _detail_ui
+	var modal := details and not _phone and not task
+	var detail_parent = _workflow_slot if task else get_node(^"EntryDialog/Surface/Inset") if modal else _chapter_ui
+	var actions_parent = _workflow_footer if task else _detail_ui.get_node(^"FooterInset")
 	if _actions_parent != actions_parent:
 		_actions_parent.remove_child(_actions_ui)
 		actions_parent.add_child(_actions_ui)
@@ -394,22 +378,29 @@ func _show_route() -> void:
 		_detail_parent = detail_parent
 	_workflow_ui.visible = task
 	var tablet := get_viewport_rect().size.x <= 1150 and not _phone
+	_detail_ui.configure_layout(_phone, tablet, task, _draft.active, _detail_tab == 1)
 	for edge in ["left", "right"]:
 		get_node(^"Margin").add_theme_constant_override("margin_" + edge, (12 if _phone else 20 if tablet else 30) if task else (17 if _phone else 16 if tablet else 44))
 	get_node(^"Margin").add_theme_constant_override("margin_top", (4 if _phone else 12 if tablet else 20) if task else ((4 if _draft.active else 10) if _phone else 16))
 	get_node(^"Margin").add_theme_constant_override("margin_bottom", (6 if _phone else 12 if tablet else 20) if task else (10 if _phone else 16))
 	get_node(^"Margin/Layout/Body").visible = not task and not get_node(^"Margin/Layout/Picker").visible
-	_header.visible = not task and (not _phone or _draft.active)
+	_header.visible = not task and (not _phone or _draft.active or details)
 	_detail_header.visible = not task
+	if _phone and details and not _draft.active:
+		_header_name.add_theme_font_size_override("font_size", 18)
+		_header_name.custom_minimum_size = Vector2(140, _header_name.custom_minimum_size.y)
 	_header_rest.visible = not _phone and not _draft.active
 	_header_improve.visible = not _phone and not _draft.active
-	_chapter_tabs.visible = not details
+	var obscured := details and not modal
+	_chapter_tabs.visible = not obscured
 	_core_ui.visible = not (_phone and (details or chapter == 4))
-	_chapter_collections.visible = not details and chapter in [0, 1, 2]
-	_chapter_journal_panel.visible = not details and chapter == 3
-	_appearance_ui.visible = not details and chapter == 4
+	_chapter_collections.visible = not obscured and chapter in [0, 1, 2]
+	_chapter_journal_panel.visible = not obscured and chapter == 3
+	_appearance_ui.visible = not obscured and chapter == 4
+	_chapter_ui.get_node(^"AppearanceIntro").visible = not obscured and chapter == 4 and not _phone
+	_chapter_ui.get_node(^"AppearanceStatus").visible = not obscured and chapter == 4
 	_detail_ui.visible = details and _detail != "workflow:rest"
-	_condition_ui.visible = not details and chapter == 0 and not _projection.condition(_actor.data).is_empty()
+	_condition_ui.visible = not obscured and chapter == 0 and not _condition_reference and not _projection.condition(_actor.data).is_empty()
 	_section.visible = _phone and not details and chapter in [0, 1, 2, 3]
 	_quick.visible = _phone and not details and chapter != 4 and not _condition_ui.visible
 	_section.clear()
@@ -419,17 +410,22 @@ func _show_route() -> void:
 	_chapter_primary.visible = chapter == 2 or not _phone or _section.selected == 0
 	_chapter_secondary.visible = chapter == 0 and (not _phone or _section.selected != 0) or chapter == 1 and _phone and _section.selected == 1
 	_chapter_resources.visible = not _phone or _section.selected == 1
-	_chapter_companions.visible = chapter == 0 and _projection.condition(_actor.data).is_empty() and (not _phone or _section.selected == 2)
+	_chapter_companions.visible = chapter == 0 and (_condition_reference or _projection.condition(_actor.data).is_empty()) and (not _phone or _section.selected == 2)
 	if _phone and _condition_ui.visible:
 		_chapter_collections.visible = false
 		_section.visible = false
+	_chapter_ui.get_node(^"ReferenceBack").visible = _phone and _condition_reference and not details and chapter == 0
+	var resource_editor = _chapter_ui.get_node(^"Collections/Secondary/ResourceEditors")
+	resource_editor.visible = _draft.active and chapter == 0 and (not _phone or _section.selected == 1)
+	resource_editor.configure(_draft.values(), _phone, tablet)
+	_chapter_resources.visible = _chapter_resources.visible and not (chapter == 0 and _draft.active)
 	_chapter_ui.configure_caption(chapter, _phone, int(_nav.get("inventory_filter", 0)), _actor.data, _draft.values() if _draft.active else {}, int(_nav.get("section", 0)))
-	_chapter_chapter_caption.visible = not details and not _phone and chapter in [1, 2, 3, 4]
+	_chapter_chapter_caption.visible = not obscured and not _phone and chapter in [1, 2, 3]
 	_chapter_story.visible = not _phone or _section.selected < 2
 	_chapter_notes.visible = not _phone or _section.selected == 2
 	var footer = _chapter_ui
 	if _phone and not details and chapter in [0, 1, 2] and not _condition_ui.visible:
-		footer = _chapter_primary.get_footer_slot() if chapter == 2 or _section.selected == 0 else _chapter_resources.get_footer_slot() if _section.selected == 1 else _chapter_companions.get_footer_slot()
+		footer = _chapter_primary.get_footer_slot() if chapter == 2 or _section.selected == 0 else resource_editor.get_footer_slot() if _section.selected == 1 and chapter == 0 and _draft.active else _chapter_resources.get_footer_slot() if _section.selected == 1 else _chapter_companions.get_footer_slot()
 	elif _phone and not details and chapter == 3:
 		footer = _chapter_story.get_footer_slot() if _section.selected < 2 else _chapter_notes.get_footer_slot()
 	if footer != _quick_parent:
@@ -440,8 +436,11 @@ func _show_route() -> void:
 		_chapters[index].set_pressed_no_signal(index == chapter)
 	if chapter == 4:
 		_appearance()
+	get_node(^"EntryScrim").visible = modal
+	get_node(^"EntryDialog").present(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), get_viewport_rect().size, "note" if _detail == "journal:notes" else "entry")
 
 func _chapter(index: int) -> void:
+	_condition_reference = false
 	_capture_pages()
 	_leave_workflow()
 	_detail = ""
@@ -501,6 +500,8 @@ func _save_sheet() -> void:
 	_header_save_sheet.disabled = false
 	if result.ok:
 		_draft.discard()
+		_detail = ""
+		_history.clear()
 		_accept_actor(result.actor)
 		_refresh()
 		_request_detail()
@@ -517,6 +518,8 @@ func _save_sheet() -> void:
 			_request_detail()
 
 func _cancel_edit() -> void:
+	_detail = ""
+	_history.clear()
 	get_node(^"Margin/Layout").clear_errors()
 	_draft.discard()
 	_refresh_pending = true
@@ -525,10 +528,26 @@ func _cancel_edit() -> void:
 	_edit_focus()
 
 func _edit_focus() -> void:
-	if _phone:
+	if _core_phone_edit.is_visible_in_tree():
 		_core_phone_edit.grab_focus()
-	else:
+	elif _header_edit.is_visible_in_tree():
 		_header_edit.grab_focus()
+	else:
+		_chapters[int(_nav.get("chapter", 0))].grab_focus()
+
+func _reference_section(index: int) -> void:
+	_condition_reference = true
+	_nav["chapter"] = 0
+	_nav["section"] = index
+	_detail = ""
+	_history.clear()
+	_refresh()
+	_section.grab_focus()
+
+func _return_condition() -> void:
+	_condition_reference = false
+	_refresh()
+	_core_phone_name.grab_focus()
 
 func _name_pressed() -> void:
 	_open_detail("profile")
@@ -538,7 +557,11 @@ func _open_detail(id: String) -> void:
 		return
 	_leave_workflow()
 	_capture_pages()
-	_remember_opener(id)
+	if not _detail.is_empty() and not _detail.begins_with("workflow:"):
+		_history.append({"entry": _detail, "tab": _detail_tab, "page": _detail_ui.paging_state()})
+	else:
+		_history.clear()
+		_remember_opener(id)
 	_detail_ui.reset_navigation()
 	_detail = id
 	_detail_tab = 0
@@ -550,6 +573,7 @@ func _open_detail(id: String) -> void:
 
 func _detail_tab_selected(index: int) -> void:
 	_detail_tab = index
+	_show_route()
 	_request_detail()
 
 func _clear_detail() -> void:
@@ -576,7 +600,7 @@ func _render_detail() -> void:
 			_text(str(data.get("description", "")))
 			_text(str(data.get("origin", "")))
 			_text(_projection.text(data.get("class_rules", [])))
-			_text("Improvements: %d · %s" % [int(data.get("improvements", 0)), str(data.get("pack", ""))])
+			_detail_ui.append_facts([["Improvements", str(data.get("improvements", 0))], ["Pack", str(data.get("pack", ""))]])
 		else:
 			if _phone and _detail == "class":
 				_detail_ui.group_fields(["class_title", "class_rules"], [1, 2])
@@ -588,6 +612,9 @@ func _render_detail() -> void:
 		if _phone and _detail == "profile" and _detail_tab == 0:
 			_option("Rest", _workflow.bind("rest", ""), _owner() and not _draft.active and not _action_live() and not BROKEN.new().is_dead(data))
 			_option("Level up", _workflow.bind("improve", ""), _owner() and not _draft.active and not _action_live())
+		if _phone and _detail == "profile" and not _projection.condition(data).is_empty():
+			for index in range(3):
+				_option(["Features & traits", "Resources", "Companions"][index], _reference_section.bind(index))
 		if str(data.get("class_id", "")) == "occult-herbmaster":
 			_secondary("Inspect laboratory")
 	elif _detail.begins_with("resource:"):
@@ -598,7 +625,7 @@ func _render_detail() -> void:
 			if key == "hit_points":
 				_character_field("maximum_hit_points", "Maximum HP")
 		else:
-			_text("%s: %s" % [_detail_title.text, str(data.get(key, 0))])
+			_detail_ui.append_facts([[_detail_title.text, str(data.get(key, 0))], ["Maximum HP", str(data.get("maximum_hit_points", 1))]] if key == "hit_points" else [[_detail_title.text, str(data.get(key, 0))]])
 			if key == "hit_points":
 				_text("At 0 HP roll Broken; below 0 HP means death. Rest restores d4 or d6 HP, up to maximum HP. Table-resolved healing can be entered with Edit sheet.")
 			elif key == "power_uses":
@@ -613,7 +640,8 @@ func _render_detail() -> void:
 		if _detail_tab == 1:
 			_character_field(key, key + " modifier · −3…+6")
 		else:
-			_text("Roll d20 %+d. Compare with the difficulty agreed at the table." % int(_projection.fields(data).get(key, 0)))
+			_detail_ui.append_facts([["Roll", "d20"], ["Modifier", "%+d" % int(_projection.fields(data).get(key, 0))]])
+			_text("Compare with the difficulty agreed at the table.")
 			_primary("Test " + key, _can_act())
 	elif _detail.begins_with("trait:") or _detail.begins_with("companion:") or _detail.begins_with("injury:"):
 		var parts := _detail.split(":")
@@ -634,7 +662,7 @@ func _render_detail() -> void:
 		else:
 			_text(str(entry.get("rules", "")))
 			if entry.has("uses"):
-				_text("Uses: %d" % int(entry.uses))
+				_detail_ui.append_facts([["Uses", str(entry.uses)]])
 			if parts[0] == "trait" and not RULES.new().definition(str(entry.get("id", ""))).is_empty():
 				_primary("Use feature", not _draft.active and _owner() and _use_allowed(RULES.new().definition(str(entry.get("id", "")))))
 	elif _detail.begins_with("actor:"):
@@ -701,6 +729,8 @@ func _character_field(field: String, title: String) -> void:
 		return
 	var control = FIELD.instantiate()
 	_detail_ui.field_host(field).add_child(control)
+	control.configure_layout(_phone, _detail == "profile")
+	_detail_ui.register_field(control)
 	control.configure(field, title, _draft.value(field), field in ["description", "origin", "class_rules", "pack"] or field.ends_with(":rules"))
 	control.changed.connect(_draft.change)
 	_fields.append(control)
@@ -708,6 +738,8 @@ func _character_field(field: String, title: String) -> void:
 func _item_field(field: String, value: String, independent: bool) -> void:
 	var control = FIELD.instantiate()
 	_detail_ui.field_host(field).add_child(control)
+	control.configure_layout(_phone, _detail == "profile")
+	_detail_ui.register_field(control)
 	control.configure(field, field.replace("_", " ").capitalize(), value, field == "rules", independent)
 	control.submitted.connect(_item_field_saved)
 	control.changed.connect(_custom_typed)
@@ -745,15 +777,18 @@ func _item_detail(item: Dictionary) -> void:
 			_option("Remove item", _remove_item)
 	else:
 		_text(str(item.get("rules", "")))
-		_text("Quantity: %d · %s" % [int(item.get("quantity", 0)), "Ready" if item.get("equipped", false) else "Carried"])
+		var facts: Array = [["Quantity", str(item.get("quantity", 0))], ["State", "Ready" if item.get("equipped", false) else "Carried"]]
 		for key in ["damage", "range_feet", "reduction", "armor_tier"]:
 			if item.has(str(key)):
-				_text(str(key).replace("_", " ").capitalize() + ": " + str(item.get(str(key))))
+				facts.append([str(key).replace("_", " ").capitalize(), str(item.get(str(key)))])
 		if item.has("dose_pool"):
-			_text("Shared laboratory doses: %d" % _projection.remaining_uses(_actor.data, item))
+			facts.append(["Shared laboratory doses", str(_projection.remaining_uses(_actor.data, item))])
+		_detail_ui.append_facts(facts)
 		var power := POWERS.new().definition(str(item.get("source_item_id", "")))
 		var rule := RULES.new().definition(str(item.get("source_item_id", "")))
 		if not power.is_empty():
+			_action_input["modifier"] = _cast_modifier
+			_workflow_field("modifier", "Situational modifier")
 			_primary("Cast Power", _can_act() and int(item.get("quantity", 0)) > 0)
 		elif not rule.is_empty():
 			_primary("Brew decoctions" if rule.get("brew", false) else "Use item", not _draft.active and _owner() and _use_allowed(rule))
@@ -780,6 +815,8 @@ func _refresh_detail() -> void:
 		_request_detail()
 
 func _primary(text: String, enabled: bool) -> void:
+	if not enabled and text in ["Attack", "Test Strength", "Test Agility", "Test Presence", "Test Toughness", "Dodge · test Agility", "Cast Power", "Use feature", "Use item"] and not BROKEN.new().can_act(_data()):
+		text = "Dead — cannot act" if BROKEN.new().is_dead(_data()) else "Cannot act yet"
 	_primary_button.text = _locale.text(text)
 	_primary_button.visible = true
 	_primary_button.disabled = not enabled or _busy
@@ -793,6 +830,18 @@ func _can_act() -> bool:
 	return _owner() and not _draft.active and BROKEN.new().can_act(_actor.data)
 
 func _back() -> void:
+	if _detail == "workflow:improve" and _action_live() and not _ending_improvement:
+		_ending_improvement = true
+		_request_detail()
+		return
+	if not _history.is_empty() and not _detail.begins_with("workflow:"):
+		var previous: Dictionary = _history.pop_back()
+		_detail = str(previous.entry)
+		_detail_tab = int(previous.tab)
+		_render_detail()
+		_detail_ui.restore_paging(previous.page)
+		_show_route()
+		return
 	var parent := _return_detail if _detail.begins_with("workflow:") else ""
 	_leave_workflow()
 	_detail = parent
@@ -822,7 +871,10 @@ func _remember_opener(id: String) -> void:
 	_opener = _core_opener()
 
 func _core_opener():
-	for button in [get_node(^"Margin/Layout/Body/Chapter/ChapterCaption/Resource"), _chapter_personal_notes, _core_phone_name, _core_ready_weapon, _header_name, _header_rest, _header_improve, _core_origin, _core_hit_points, _core_power_uses, _core_omens, _core_strength, _core_agility, _core_presence, _core_toughness, _core_protection, _core_dodge, _core_attack, _core_damage, _quick_quick_omens, _quick_quick_silver]:
+	var ability = _core_ui.focused_entry()
+	if ability != null:
+		return ability
+	for button in [_chapter_ui.get_node(^"ChapterCaption/Resource"), _chapter_personal_notes, _core_phone_name, _core_ready_weapon, _header_name, _header_rest, _header_improve, _core_origin, _core_hit_points, _core_power_uses, _core_omens, _core_protection, _core_dodge, _core_attack, _core_damage, _quick_quick_omens, _quick_quick_silver]:
 		if button.has_focus():
 			return button
 	return null
@@ -890,6 +942,7 @@ func _workflow(kind: String, entry: String) -> void:
 		_action_input["ability"] = entry
 	else:
 		_action_input["kind"] = kind
+	_ending_improvement = false
 	_workflow_ui.begin()
 	_detail = "workflow:" + kind
 	_detail_tab = 0
@@ -908,8 +961,21 @@ func _render_workflow() -> void:
 		_primary("Edit resolved resources" if _workflow_ui.is_daily() else "Done" if _action != null and _action.state in ["resolved", "ended", "error"] else "Roll recovery", _owner() and not _busy and not _action_live())
 		return
 	_detail_title.text = "Getting better—or worse" if _action_kind == "improve" else {"improve": "Getting better—or worse", "rest": "Rest", "attack": "Attack", "damage": "Damage", "ability": "Ability test", "cast": "Cast Power", "use": "Use item"}.get(_action_kind, "Action")
+	if _action_kind == "improve":
+		var panel = preload(ROOT + "ui/sheet_improvement_panel.tscn").instantiate()
+		_detail_content.add_child(panel)
+		panel.configure(_data(), _action.snapshot if _action != null else {}, _phone, _workflow_ui.prepared, _ending_improvement)
+		if _ending_improvement:
+			_primary("End procedure", true)
+			_secondary("Continue procedure")
+			return
 	if _action != null:
-		_text(_action.message)
+		if _action_kind != "improve":
+			_text(_action.message)
+		if _action.state == "continue":
+			var next := str(_action.snapshot.get("next_phase", ""))
+			_primary({"hp_increase": "Roll d6 increase", "debris": "Continue to debris ›", "silver": "Roll 3d10 Silver", "abilities": "Continue to abilities ›", "class": "Continue to class ›", "specialty_roll": "Roll specialties", "finish": "Finish improvement"}.get(next, "Continue"), true)
+			return
 		if _action.state == "scroll":
 			var family := str(_action.snapshot.get("family", ""))
 			var entries: Array = SCROLLS.TABLES.get(family, [])
@@ -947,9 +1013,7 @@ func _render_workflow() -> void:
 		_primary("Rolling…" if _ability.pending else "Done", not _ability.pending)
 		return
 	if _action_kind == "improve":
-		_text("When the GM calls for improvement: 6d10 equal to or above maximum HP grants +d6 maximum HP. Current HP stays unchanged. Then roll debris, choose any awarded scroll, and resolve each ability and the current class's steps in order.")
-		_text("Accepted rolls cannot be rerolled. Leaving explicitly ends the procedure, keeps accepted changes, and leaves the remaining steps for manual resolution.")
-		_primary("Roll 6d10", true)
+		_primary("Roll 6d10" if _workflow_ui.prepared else "Begin improvement", true)
 	elif _action_kind in ["attack", "damage"]:
 		var item := _item(str(_action_input.get("item", "")))
 		_text(str(item.get("name", "Bite")) + " · " + str(item.get("damage", "d6")))
@@ -1006,11 +1070,17 @@ func _use_allowed(rule: Dictionary) -> bool:
 func _workflow_field(field: String, title: String) -> void:
 	var control = FIELD.instantiate()
 	_detail_ui.field_host(field).add_child(control)
+	control.configure_layout(_phone, _detail == "profile")
+	_detail_ui.register_field(control)
 	control.configure(field, title, str(_action_input.get(field, 0)))
 	control.changed.connect(_workflow_typed)
+	_fields.append(control)
 
 func _workflow_typed(field: String, value: String) -> void:
 	_action_input[field] = value
+	if _detail.begins_with("item:") and field == "modifier":
+		_cast_modifier = value
+		return
 	if field in ["difficulty", "modifier"]:
 		_combat_options[field] = value
 
@@ -1043,6 +1113,18 @@ func _new_fight() -> void:
 	_request_detail()
 
 func _primary_action() -> void:
+	if _detail == "workflow:improve":
+		if _ending_improvement:
+			_back()
+			_ending_improvement = false
+			return
+		if _action == null and not _workflow_ui.prepared:
+			_workflow_ui.prepared = true
+			_request_detail()
+			return
+		if _action != null and _action.state == "continue":
+			await (_action as HEALTH).choose({"continue": true})
+			return
 	if _busy:
 		return
 	if _detail == "workflow:rest" and _workflow_ui.is_daily():
@@ -1075,14 +1157,23 @@ func _primary_action() -> void:
 		_busy = true
 		_mutation_result(await ACTIONS.new(sdk, _actor.id).spend_omen())
 	elif _detail.begins_with("ability:") or _detail == "protection":
-		_workflow("ability", _detail.trim_prefix("ability:") if _detail.begins_with("ability:") else "Agility")
+		await _direct_ability(_detail.trim_prefix("ability:") if _detail.begins_with("ability:") else "Agility")
 	elif _detail.begins_with("trait:"):
 		var traits: Array = _data().get("traits", [])
 		var trait_entry: Dictionary = traits[int(_detail.split(":")[1])]
 		_workflow("use", "feature:" + str(trait_entry.get("id", "")))
 	elif _detail.begins_with("item:"):
 		var item := _item(_detail.trim_prefix("item:"))
-		_workflow("cast" if not POWERS.new().definition(str(item.get("source_item_id", ""))).is_empty() else "use", _detail.trim_prefix("item:"))
+		if not POWERS.new().definition(str(item.get("source_item_id", ""))).is_empty():
+			if not _cast_modifier.is_valid_int() or int(_cast_modifier) < -20 or int(_cast_modifier) > 20:
+				_field_error("modifier", "Enter a whole number from −20 to +20.")
+				return
+			var id := _detail.trim_prefix("item:")
+			_workflow("cast", id)
+			_action_input["modifier"] = int(_cast_modifier)
+			await _start_workflow()
+		else:
+			_workflow("use", _detail.trim_prefix("item:"))
 	elif _detail == "custom":
 		_busy = true
 		var corrections := ACTIONS.new(sdk, _actor.id)
@@ -1094,6 +1185,12 @@ func _primary_action() -> void:
 			_field_error(corrections.invalid_field, result.message)
 	elif _detail.begins_with("actor:"):
 		sdk.windows.open_actor(preload(ROOT + "ui/window_button.tres").window, SDK.ActorId.new(_detail.trim_prefix("actor:")))
+
+func _direct_ability(ability: String) -> void:
+	if not _can_act() or _action_live():
+		return
+	_workflow("ability", ability)
+	await _start_workflow()
 
 func _start_workflow() -> void:
 	if not _owner() or _draft.active or _action_live():
@@ -1174,6 +1271,10 @@ func _shield_choice(choice: String) -> void:
 		await special.choose_shield(choice)
 
 func _secondary_action() -> void:
+	if _detail == "workflow:improve" and _ending_improvement:
+		_ending_improvement = false
+		_request_detail()
+		return
 	if _detail == "ready_weapon":
 		await _roll_combat("damage")
 	elif _detail in ["class", "profile"]:
@@ -1256,16 +1357,7 @@ func _incident(operation: String) -> void:
 	_refresh_pending = true
 
 func _appearance() -> void:
-	var reference: Dictionary = _data().get("preferred_miniature", {})
-	_chapter_ui.configure_appearance(_owner(), reference)
-	if not reference.is_empty():
-		var entry := SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", "")))
-		var content := sdk.content.read(entry)
-		_appearance_miniature_caption.text = content.content_entry.localized_title if content.ok else "Miniature unavailable"
-		_appearance_package_caption.text = content.content_entry.package_title if content.ok else ""
-		var preview := sdk.content.preview_miniature(entry, _appearance_miniature_preview)
-		if not preview.ok:
-			_status(preview.message)
+	_appearance_ui.configure(sdk, _actor)
 	_render_portrait(_actor.data)
 
 func _choose_miniature() -> void:
@@ -1279,50 +1371,16 @@ func _picker_closed(_saved: bool) -> void:
 	_refresh_pending = true
 	_appearance_change_miniature.grab_focus()
 
-func _clear_miniature() -> void:
-	_busy = true
-	_mutation_result(await MINIATURES.new(sdk).set_actor(_actor.id, {}))
-
 func _render_portrait(data: Dictionary) -> void:
-	var texture: Texture2D = preload("res://rookframe/ui/icons/character/character.svg")
-	var caption := "No portrait selected"
-	if data.has("portrait"):
-		var image: PackedByteArray = data.get("portrait")
-		var decoded := sdk.portraits.decode(image)
-		if decoded.ok:
-			texture = decoded.texture
-			caption = "Character portrait"
-		else:
-			caption = decoded.message
+	_appearance_ui.configure(sdk, _actor)
+	_portrait_texture = _appearance_ui.portrait(data)
 	_core_condition_frame.visible = not _projection.condition(data).is_empty()
 	_core_condition_badge.visible = not _projection.condition(data).is_empty()
-	_portrait_texture = texture
-	_core_portrait.texture = texture
-	_chapter_ui.configure_portrait(texture, caption)
-
-func _choose_portrait() -> void:
-	if _busy or not _owner():
-		return
-	var actor_id := _actor.id
-	_busy = true
-	var selected := await sdk.portraits.choose()
-	if not selected.ok:
-		_busy = false
-		if selected.code != "cancelled":
-			_status(selected.message)
-		return
-	if _actor == null or _actor.id.value != actor_id.value:
-		_busy = false
-		return
-	_mutation_result(await ACTIONS.new(sdk, actor_id).set_portrait(selected.image))
-
-func _clear_portrait() -> void:
-	if _busy or not _owner():
-		return
-	_busy = true
-	_mutation_result(await ACTIONS.new(sdk, _actor.id).set_portrait(PackedByteArray()))
+	_core_portrait.texture = _portrait_texture
 
 func _closed() -> void:
+	get_node(^"EntryDialog").hide()
+	get_node(^"EntryScrim").visible = false
 	get_node(^"Margin/Layout/Picker").visible = false
 	get_node(^"Margin/Layout/Body").visible = true
 	_end_after_roll = _action != null and _action.pending
@@ -1341,7 +1399,11 @@ func _close() -> void:
 
 func _status(message: String) -> void:
 	get_node(^"Margin/Layout/Status").text = _locale.text(message)
+	if int(_nav.get("chapter", 0)) == 4:
+		_chapter_ui.get_node(^"AppearanceStatus").text = _locale.text(message)
 	get_node(^"Margin/Layout/Status").visible = not message.is_empty()
+	get_node(^"Margin/Layout/Status").tooltip_text = _locale.text(message)
+	get_node(^"Margin/Layout/Status").accessibility_description = _locale.text(message)
 
 func _density() -> void:
 	var canvas := get_viewport_rect().size
@@ -1366,14 +1428,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 	if not is_visible_in_tree():
 		return
 	if event.is_action_pressed("ui_cancel"):
-		if _draft.active:
-			_cancel_edit()
-		elif get_node(^"Margin/Layout/Picker").visible:
-			_picker_closed(false)
-		elif not _detail.is_empty():
-			_back()
-		else:
-			_close()
+		_escape()
 		accept_event()
 	elif _detail.is_empty():
 		var key := event as InputEventKey
@@ -1413,3 +1468,22 @@ func _field_error(field: String, message: String) -> void:
 			control.show_error(message)
 			_detail_ui.refresh_pages()
 			return
+
+func _escape() -> void:
+	if _draft.active:
+		_cancel_edit()
+	elif get_node(^"Margin/Layout/Picker").visible:
+		_picker_closed(false)
+	elif not _detail.is_empty():
+		_back()
+	else:
+		_close()
+
+func _dismiss_detail() -> void:
+	_history.clear()
+	if _draft.active:
+		_detail = ""
+		_show_route()
+		_edit_focus()
+	else:
+		_back()

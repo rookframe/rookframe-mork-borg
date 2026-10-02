@@ -3,9 +3,9 @@ var _elapsed := 0.0
 func _init(facade: SDK) -> void:
 	super(facade)
 	_operation = "health"
-	_active_states = ["pending", "scroll", "specialties"]
+	_active_states = ["pending", "scroll", "specialties", "continue"]
 func choose(options: Dictionary) -> void:
-	if not state in ["scroll", "specialties"] or _reading or _closed:
+	if not state in ["scroll", "specialties", "continue"] or _reading or _closed:
 		return
 	options["id"] = _id
 	_reading = true

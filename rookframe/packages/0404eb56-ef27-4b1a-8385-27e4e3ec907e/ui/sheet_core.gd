@@ -30,20 +30,36 @@ const _vital_edit_paths := {
 	"OmensCurrent": ^"Likeness/Vitals/OmensEdit/OmensCurrentField/Editor",
 }
 
+signal entry_requested(entry: String)
+signal field_changed(text: String, field: String)
+
+func _ready() -> void:
+	for key in PROJECTION.ABILITIES:
+		get_node(_ability_paths.get(str(key), ^"Abilities/StrengthRow/Strength")).pressed.connect(_ability_pressed.bind(str(key)))
+		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Abilities/StrengthRow/StrengthEditField/Editor")).text_changed.connect(_field_typed.bind(str(key)))
+	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
+		get_node(_vital_edit_paths.get(str(pair[0]), ^"Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor")).text_changed.connect(_field_typed.bind(str(pair[1])))
+
+func _ability_pressed(key: String) -> void:
+	entry_requested.emit("ability:" + key)
+
+func _field_typed(text: String, field: String) -> void:
+	field_changed.emit(text, field)
+
 func configure_layout(phone: bool, tablet: bool) -> void:
 	custom_minimum_size = Vector2(228 if phone else 280 if tablet else 550, 0)
-	add_theme_constant_override("separation", 4 if phone else 8 if tablet else 12)
+	add_theme_constant_override("separation", 4 if phone else 10 if tablet else 12)
 	get_node(^"Likeness").size_flags_vertical = 3 if phone else 1
-	get_node(^"Likeness/Vitals").add_theme_constant_override("separation", 0)
+	get_node(^"Likeness/Vitals").add_theme_constant_override("separation", 0 if phone or tablet else 4)
 	get_node(^"Likeness").add_theme_constant_override("separation", 12 if phone or tablet else 22)
 	get_node(^"Likeness/Portrait").custom_minimum_size = Vector2(76, 95) if phone else Vector2(100, 125) if tablet else Vector2(152, 190)
-	get_node(^"Abilities").add_theme_constant_override("v_separation", 0 if phone or tablet else 4)
+	get_node(^"Abilities").add_theme_constant_override("v_separation", 2 if phone else 0 if tablet else 4)
 	get_node(^"Abilities").add_theme_constant_override("h_separation", 8 if phone or tablet else 16)
 	for path in [^"Weapon", ^"ManageEquipment", ^"Dodge", ^"Origin", ^"WeaponHeading", ^"ProtectionHeading"]:
 		get_node(path).visible = not phone
 	get_node(^"ReadyWeapon").visible = phone
 	get_node(^"WeaponActions").visible = not phone
-	get_node(^"Class").add_theme_font_size_override("font_size", 18 if tablet else 22)
+	get_node(^"Class").add_theme_font_size_override("font_size", 16 if tablet else 22)
 	for path in [^"Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor", ^"Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor", ^"Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor", ^"Likeness/Vitals/OmensEdit/OmensCurrentField/Editor", ^"Abilities/StrengthRow/StrengthEditField/Editor", ^"Abilities/AgilityRow/AgilityEditField/Editor", ^"Abilities/PresenceRow/PresenceEditField/Editor", ^"Abilities/ToughnessRow/ToughnessEditField/Editor"]:
 		var field = get_node(path)
 		field.add_theme_font_size_override("font_size", 18 if phone or tablet else 20)
@@ -123,3 +139,9 @@ func configure_condition(data: Dictionary, condition: Dictionary, phone: bool) -
 	get_node(^"Dodge").visible = combat and not phone
 	get_node(^"ConditionReminder").visible = not combat
 	get_node(^"ConditionReminder").configure(data, condition, phone)
+
+func focused_entry() -> Control:
+	for path in [^"Abilities/StrengthRow/Strength", ^"Abilities/AgilityRow/Agility", ^"Abilities/PresenceRow/Presence", ^"Abilities/ToughnessRow/Toughness"]:
+		if get_node(path).has_focus():
+			return get_node(path)
+	return null

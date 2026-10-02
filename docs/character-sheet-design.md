@@ -42,3 +42,17 @@ no text is retained in navigation, Actor, World, reconnect state or files.
 Preferred Miniature selection uses the existing full-screen browser; the mockup's
 Miniature modal was superseded by the user on 2 October 2026. Viewer access keeps references readable and disables writes.
 QA uses public HTTPS Manifests and normal installation/World-join acquisition.
+
+
+In the full sheet, each accepted Improvement phase remains visible until Continue.
+The next Throw is requested only by that action. Completed HP, debris, Silver,
+scroll and ability results retain their individual faces and before/after values.
+Back offers Continue procedure or End procedure; End preserves accepted changes
+and does not create a resumable procedure. Existing compact recovery controls
+retain their prior automatic sequence. Due Broken recovery is capped at the
+current maximum HP; the incident keeps the original die result.
+
+Details use one bounded authored body and a public pager in their fixed footer.
+Nested references retain page history; native editor focus returns after World
+refresh. Escape cancels the shared sheet draft; Back retains it. Save validates
+through the same character correction boundary used by the inline resource rows.

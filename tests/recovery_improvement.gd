@@ -41,31 +41,32 @@ func _gm(host: BOUNDARY, enabled: bool) -> void:
 	host.participant = "gm" if enabled else "player"
 	host.session = "gm-session" if enabled else "player-session"
 
-func test_owner_starts_improvement_directly_and_applies_ordered_steps() -> void:
+func test_owner_starts_improvement_directly_and_applies_ordered_steps(sheet: bool, _test_parameters := [[false], [true]]) -> void:
 	var host := _host()
 	var sdk := SDK.new(host)
 	var input := _options("improve")
 	input.id = "improvement"
+	input["sheet"] = sheet
 	var result := await sdk.system_actions.submit("health.start", input)
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
 		return
 	assert_array(host.requests.improvement.terms).is_equal([{"name": "More HP", "faces": 10, "count": 6}])
 	host.roll("improvement", [1, 1, 1, 2, 2, 2])
-	await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+	await _advance_improvement(host, sheet)
 	assert_array(host.requests[host.last_request].terms).is_equal([{"name": "Maximum HP increase", "faces": 6, "count": 1}])
 	host.roll(host.last_request, [4])
-	await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+	await _advance_improvement(host, sheet)
 	assert_int(host.actors.hero.data.maximum_hit_points).is_equal(13)
 	assert_int(host.actors.hero.data.hit_points).is_equal(4)
 	host.roll(host.last_request, [4])
-	await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+	await _advance_improvement(host, sheet)
 	assert_array(host.requests[host.last_request].terms).is_equal([{"name": "Silver", "faces": 10, "count": 3}])
 	host.roll(host.last_request, [2, 3, 4])
-	await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+	await _advance_improvement(host, sheet)
 	assert_int(host.actors.hero.data.silver).is_equal(19)
 	host.roll(host.last_request, [1, 2, 2, 6])
-	result = await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+	result = await _advance_improvement(host, sheet)
 	assert_str(result.value.state).is_equal("resolved")
 	assert_int(host.actors.hero.data.abilities.Agility.modifier).is_equal(-3)
 	assert_int(host.actors.hero.data.abilities.Presence.modifier).is_equal(2)
@@ -103,6 +104,17 @@ func test_broken_reports_delayed_recovery_without_healing(branch: int, values: A
 	assert_str(result.value.message).contains(copy)
 	assert_int(host.actors.hero.data.hit_points).is_equal(3 if branch == 3 else 0)
 	assert_bool(host.actors.hero.data.has("conditions")).is_false()
+	if branch in [1, 2]:
+		host.actors.hero.data.maximum_hit_points = 2
+		var incident: Dictionary = host.actors.hero.data.broken_incident
+		var raw_recovery := int(incident.recovery_hp)
+		for elapsed in range(int(incident.duration)):
+			await sdk.system_actions.submit("health.incident", {"source": "hero", "incident": incident.id, "elapsed": elapsed, "event": "next"})
+		result = await sdk.system_actions.submit("health.incident", {"source": "hero", "incident": incident.id, "elapsed": incident.duration, "event": "recover"})
+		assert_str(result.value.state).is_equal("resolved")
+		assert_int(host.actors.hero.data.hit_points).is_equal(2)
+		assert_int(host.actors.hero.data.broken_incident.recovery_hp).is_equal(raw_recovery)
+
 	if branch == 3:
 		var incident: Dictionary = host.actors.hero.data.broken_incident
 		result = await sdk.system_actions.submit("health.incident", {"source": "hero", "incident": incident.id, "elapsed": 0, "event": "treat"})
@@ -289,3 +301,17 @@ func test_interrupted_scum_can_finish_with_ordinary_sheet_corrections() -> void:
 	assert_str(host.actors.hero.data.traits[1].id).is_equal("dodging-death")
 	var next := await _begin_improvement(host, "next")
 	assert_str(next.value.state).is_equal("pending")
+
+func _advance_improvement(host: BOUNDARY, sheet: bool) -> SDK.DataResult:
+	var sdk := SDK.new(host)
+	var requests: int = host.requests.size()
+	var result := await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+	if sheet:
+		assert_str(result.value.state).is_equal("continue")
+		assert_int(host.requests.size()).is_equal(requests)
+		assert_bool(result.value.results.is_empty()).is_false()
+		var reports: int = host.reports.size()
+		await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+		assert_int(host.reports.size()).is_equal(reports)
+		result = await sdk.system_actions.submit("health.choose", {"id": "improvement", "continue": true})
+	return result

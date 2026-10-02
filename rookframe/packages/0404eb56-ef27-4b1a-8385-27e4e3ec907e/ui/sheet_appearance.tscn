@@ -1,0 +1,180 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.gd" id="script"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="portrait"]
+[sub_resource type="StyleBoxFlat" id="wash"]
+bg_color = Color(0.266667, 0.913725, 0.913725, 0.035294)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[node name="AppearancePanel" type="HBoxContainer"]
+script = ExtResource("script")
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+[node name="PortraitPanel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("wash")
+[node name="Inset" type="MarginContainer" parent="PortraitPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+[node name="Content" type="VBoxContainer" parent="PortraitPanel/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="PortraitHeading" type="HBoxContainer" parent="PortraitPanel/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="Icon" type="TextureRect" parent="PortraitPanel/Inset/Content/PortraitHeading"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("portrait")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Title" type="Label" parent="PortraitPanel/Inset/Content/PortraitHeading"]
+layout_mode = 2
+text = "Portrait"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="PortraitPreview" type="Control" parent="PortraitPanel/Inset/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Image" type="TextureRect" parent="PortraitPanel/Inset/Content/PortraitPreview"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -12.0
+offset_top = 12.0
+offset_bottom = -12.0
+expand_mode = 1
+stretch_mode = 5
+[node name="PortraitCaption" type="Label" parent="PortraitPanel/Inset/Content"]
+layout_mode = 2
+text = "No portrait selected"
+theme_override_font_sizes/font_size = 16
+visible = false
+[node name="ControlsGap" type="Control" parent="PortraitPanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+[node name="PortraitButtons" type="HBoxContainer" parent="PortraitPanel/Inset/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+[node name="ChangePortrait" type="Button" parent="PortraitPanel/Inset/Content/PortraitButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Choose image"
+theme_type_variation = "TaskPrimary"
+theme_override_font_sizes/font_size = 13
+[node name="ClearPortrait" type="Button" parent="PortraitPanel/Inset/Content/PortraitButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Reset portrait"
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 13
+[node name="Explanation" type="Label" parent="PortraitPanel/Inset/Content"]
+layout_mode = 2
+text = "Portrait changes appear immediately."
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+[node name="MiniaturePanel" type="PanelContainer" parent="."]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("wash")
+[node name="Inset" type="MarginContainer" parent="MiniaturePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+[node name="Content" type="VBoxContainer" parent="MiniaturePanel/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="MiniatureHeading" type="HBoxContainer" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="Icon" type="TextureRect" parent="MiniaturePanel/Inset/Content/MiniatureHeading"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("character")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Title" type="Label" parent="MiniaturePanel/Inset/Content/MiniatureHeading"]
+layout_mode = 2
+text = "Tabletop miniature"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="MiniaturePreview" type="Control" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+visible = false
+[node name="EmptyPreview" type="CenterContainer" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Image" type="TextureRect" parent="MiniaturePanel/Inset/Content/EmptyPreview"]
+layout_mode = 2
+custom_minimum_size = Vector2(100, 100)
+texture = ExtResource("character")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.266667, 0.913725, 0.913725, 0.4)
+[node name="MiniatureCaption" type="Label" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+text = "No miniature selected"
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+max_lines_visible = 1
+text_overrun_behavior = 3
+[node name="PackageCaption" type="Label" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+max_lines_visible = 1
+text_overrun_behavior = 3
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+[node name="ControlsGap" type="Control" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+[node name="MiniatureButtons" type="HBoxContainer" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+[node name="ChangeMiniature" type="Button" parent="MiniaturePanel/Inset/Content/MiniatureButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Choose miniature"
+theme_type_variation = "TaskPrimary"
+theme_override_font_sizes/font_size = 13
+[node name="ClearMiniature" type="Button" parent="MiniaturePanel/Inset/Content/MiniatureButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Clear"
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 13
+[node name="Explanation" type="Label" parent="MiniaturePanel/Inset/Content"]
+layout_mode = 2
+text = "Existing Rooks keep their Miniature."
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)

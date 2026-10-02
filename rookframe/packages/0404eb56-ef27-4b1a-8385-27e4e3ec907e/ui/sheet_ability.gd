@@ -3,7 +3,7 @@ extends Button
 func configure(caption: String, modifier: int, phone: bool = false, tablet: bool = false) -> void:
 	custom_minimum_size = Vector2(44, 44 if phone or tablet else 52)
 	get_node(^"Inset/Row/Title").text = {"Strength": "STR", "Agility": "AGI", "Presence": "PRE", "Toughness": "TOU"}.get(caption, caption) if phone else caption
-	get_node(^"Inset/Row/Title").add_theme_font_size_override("font_size", 11 if phone else 13 if tablet else 16)
+	get_node(^"Inset/Row/Title").add_theme_font_size_override("font_size", 12 if phone else 13 if tablet else 16)
 	get_node(^"Inset/Row/Value").text = "%+d" % modifier
 	get_node(^"Inset/Row/Value").add_theme_font_size_override("font_size", 22 if phone else 18 if tablet else 24)
 	if caption == "Strength":

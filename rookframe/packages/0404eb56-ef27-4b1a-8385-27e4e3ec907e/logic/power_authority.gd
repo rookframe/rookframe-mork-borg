@@ -107,7 +107,9 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _error("Confirm with the table that this is the morning allowance roll.")
 		var ability: Dictionary = abilities.get("Presence", {})
 		var daily_presence: int = ability.get("modifier", 0)
-		var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": owner.id, "owner_session": owner.session, "source": source.actor.id.value, "phase": "daily", "presence": daily_presence, "request": str(input.id), "state": "pending", "message": "Throw today's Power allowance in the Dice Tray."}
+		var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": owner.id, "owner_session": owner.session, "source": source.actor.id.value, "phase": "daily", "sheet": input.get("sheet", false), "presence": daily_presence, "request": str(input.id), "state": "pending", "message": "Throw today's Power allowance in the Dice Tray."}
+		if action.get("sheet", false):
+			action["message"] = "Resolving morning Power uses in Window Dice…"
 		var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, action.owner, [SDK.DiceTerm.new("Daily uses + Presence", 4)]))
 		if not requested.ok:
 			return _error(requested.message)
@@ -139,6 +141,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var presence: Dictionary = abilities.get("Presence", {})
 	var modifier: int = presence.get("modifier", 0)
 	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "owner": owner.id, "owner_session": owner.session, "item": str(input.item), "scroll": scroll, "sheet": input.get("sheet", false), "presence": modifier, "phase": "casting", "sequence": 0, "modifier": modifier + situation, "difficulty": 10 if str(data.get("class_id", "")) == "gutterborn-scum" else 12, "label": targeting.label, "targets": targeting.get("targets", []), "rook": str(input.get("rook", "")), "request": str(input.id), "state": "pending", "message": "Waiting for the casting Throw in the Dice Tray."}
+	if action.get("sheet", false):
+		action["message"] = "Resolving casting in Window Dice…"
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, action.owner, [SDK.DiceTerm.new("Casting", 20)]))
 	if not requested.ok:
 		return _error(requested.message)
@@ -194,7 +198,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 			var message := "Choose exactly %d distinct creatures within 30 ft, then confirm targets." % count
 			if d2:
 				message += " d2 count used a physical d4 halved, rounded up."
-			action["message"] = message
+			action["message"] = message.replace("the Dice Tray", "Window Dice") if action.get("sheet", false) else message
 			return _public(action)
 		if action["phase"] == "parameters" and str(power.source_item_id) == "eyelid-blinds-the-mind":
 			action["count"] = values[0]
@@ -238,7 +242,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _manual_result(context, action, [SDK.ActorChange.new(source.actor.id, data)], [], result.sequence)
 	var report := SDK.ActionLogMessage.new("Power activated")
 	report.result = "1 use spent"
-	report.text = [SDK.ActionLogText.new("%s activated. One daily use spent. Raw Roll #%d; stated parameters follow in the Dice Tray." % [str(power.name), result.sequence])]
+	report.text = [SDK.ActionLogText.new("%s activated. One daily use spent. Raw Roll #%d; stated parameters follow in %s." % [str(power.name), result.sequence, "Window Dice" if action.get("sheet", false) else "the Dice Tray"])]
 	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report).ok:
 		return _end(context, action)
 	return _request(context, action, "parameters", terms, "Power activated. Throw its stated quantities in the Dice Tray.")
@@ -420,7 +424,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
-	return {"state": action.state, "message": action.message, "request": action.get("request", ""), "natural_face": action.get("natural_face", 0), "adjudication": action.get("adjudication", ""), "outcome": action.get("outcome", ""), "target_error": action.get("target_error", false)}
+	return {"state": action.state, "message": str(action.message).replace("the Dice Tray", "Window Dice") if action.get("sheet", false) else action.message, "request": action.get("request", ""), "natural_face": action.get("natural_face", 0), "adjudication": action.get("adjudication", ""), "outcome": action.get("outcome", ""), "target_error": action.get("target_error", false)}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}
@@ -472,7 +476,7 @@ func _request(context: SDK.SystemActionContext, action: Dictionary, phase: Strin
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.request, action.owner if receiver.is_empty() else receiver, terms))
 	if not requested.ok:
 		return _end(context, action)
-	action["message"] = message
+	action["message"] = message.replace("the Dice Tray", "Window Dice") if action.get("sheet", false) else message
 	return _public(action)
 
 func _restriction(data: Dictionary) -> String:

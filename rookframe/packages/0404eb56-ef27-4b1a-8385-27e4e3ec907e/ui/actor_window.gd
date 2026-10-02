@@ -134,7 +134,9 @@ func _reload_world() -> void:
 			if entry.reference.local_id == "classless-character":
 				_character_definition = entry
 	var miniatures: SDK.ContentEntryListResult = sdk.content.list(SDK.ContentKind.Value.MINIATURE)
-	_character_miniatures = miniatures.items if miniatures.ok else []
+	_character_miniatures = []
+	if miniatures.ok:
+		_character_miniatures = miniatures.items
 	var miniature_choices: Array[Dictionary] = []
 	for entry in _character_miniatures:
 		miniature_choices.append({

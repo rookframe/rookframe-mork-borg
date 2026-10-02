@@ -21,6 +21,6 @@ func configure(data: Dictionary, condition: Dictionary, phone: bool) -> void:
 	get_node(^"Inset/Content/Link/Title").add_theme_font_size_override("font_size", 12 if phone else 14)
 	get_node(^"Inset/Content").add_theme_constant_override("separation", 5 if phone else 12)
 	for edge in ["left", "right", "top", "bottom"]:
-		get_node(^"Inset").add_theme_constant_override("margin_" + edge, 8 if phone else 12)
+		get_node(^"Inset").add_theme_constant_override("margin_" + edge, 8 if phone else 12 if edge in ["left", "right"] else 18)
 	custom_minimum_size = Vector2(44, 100 if phone else 132)
 	accessibility_name = title + ": " + summary + ". Show condition on Character."

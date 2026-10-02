@@ -67,6 +67,10 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition_summary.tscn" id="condition_summary"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_inline_field.gd" id="inline_field"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_validation.gd" id="validation"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_dialog.gd" id="entry_dialog"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.tscn" id="details_scene"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.tscn" id="appearance_scene"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.tscn" id="resource_editors"]
 [sub_resource type="StyleBoxFlat" id="PanelFrame"]
 bg_color = Color(0.015686, 0.066667, 0.082353, 1)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
@@ -1296,6 +1300,12 @@ toggle_mode = true
 theme_override_font_sizes/font_size = 13
 
 
+[node name="ReferenceBack" type="Button" parent="Margin/Layout/Body/Chapter"]
+visible = false
+layout_mode = 2
+text = "‹ Back to condition"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
 [node name="Section" type="OptionButton" parent="Margin/Layout/Body/Chapter"]
 
 layout_mode = 2
@@ -1343,6 +1353,44 @@ offset_right = -5.0
 offset_bottom = 15.0
 mouse_filter = 2
 text = "Silver"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+
+[node name="PowerEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/ChapterCaption/PowerEditField"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(120, 44)
+
+size_flags_horizontal = 1
+
+accessibility_name = "Power uses"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/PowerEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/PowerEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Power uses"
 clip_text = true
 theme_override_font_sizes/font_size = 9
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
@@ -1399,6 +1447,10 @@ unique_name_in_owner = true
 
 size_flags_vertical = 3
 
+[node name="ResourceEditors" parent="Margin/Layout/Body/Chapter/Collections/Secondary" instance=ExtResource("resource_editors")]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
 [node name="Companions" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
 empty_text = "Travelling alone."
 framed_collection = true
@@ -1427,244 +1479,34 @@ framed_collection = true
 size_flags_horizontal = 3
 size_flags_vertical = 3
 
-[node name="AppearancePanel" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
+[node name="AppearanceIntro" type="VBoxContainer" parent="Margin/Layout/Body/Chapter"]
 visible = false
-
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Title" type="Label" parent="Margin/Layout/Body/Chapter/AppearanceIntro"]
+layout_mode = 2
+text = "Appearance"
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+[node name="Copy" type="Label" parent="Margin/Layout/Body/Chapter/AppearanceIntro"]
+layout_mode = 2
+text = "Portrait and preferred Miniature for this Character."
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+[node name="AppearancePanel" parent="Margin/Layout/Body/Chapter" instance=ExtResource("appearance_scene")]
+visible = false
+layout_mode = 2
 size_flags_vertical = 3
-
-theme_override_constants/separation = 16
-
-[node name="PortraitPanel" type="PanelContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel"]
-
+[node name="AppearanceStatus" type="Label" parent="Margin/Layout/Body/Chapter"]
+visible = false
 layout_mode = 2
-
-unique_name_in_owner = true
-
-size_flags_horizontal = 3
-
-size_flags_vertical = 3
-
-theme_override_styles/panel = SubResource("PanelFrame")
-
-[node name="Inset" type="MarginContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_bottom = 18
-
-[node name="Content" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-
-[node name="PortraitHeading" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "PORTRAIT"
-
-theme_override_font_sizes/font_size = 16
-
-autowrap_mode = 3
-
-[node name="PortraitPreview" type="TextureRect" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-size_flags_vertical = 3
-
-size_flags_horizontal = 3
-
-expand_mode = 1
-
-stretch_mode = 5
-
-[node name="PortraitCaption" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "No portrait selected"
-
-theme_override_font_sizes/font_size = 16
-
-autowrap_mode = 3
-
-[node name="PortraitButtons" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-[node name="Explanation" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content"]
-layout_mode = 2
-text = "Portrait changes appear immediately."
+custom_minimum_size = Vector2(0, 28)
+text = "Changes apply immediately. Existing Rooks keep their Miniature."
 theme_override_font_sizes/font_size = 12
-autowrap_mode = 3
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-
-
-[node name="ChangePortrait" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Change portrait"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskPrimary"
-
-size_flags_horizontal = 3
-clip_text = true
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+max_lines_visible = 1
 text_overrun_behavior = 3
-
-[node name="ClearPortrait" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Reset"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-size_flags_horizontal = 3
-clip_text = true
-
-[node name="MiniaturePanel" type="PanelContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-size_flags_horizontal = 3
-
-size_flags_vertical = 3
-
-theme_override_styles/panel = SubResource("PanelFrame")
-
-[node name="Inset" type="MarginContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel"]
-layout_mode = 2
-theme_override_constants/margin_left = 18
-theme_override_constants/margin_right = 18
-theme_override_constants/margin_top = 18
-theme_override_constants/margin_bottom = 18
-
-[node name="Content" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset"]
-layout_mode = 2
-theme_override_constants/separation = 8
-
-
-[node name="MiniatureHeading" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "MINIATURE"
-
-theme_override_font_sizes/font_size = 16
-
-autowrap_mode = 3
-
-[node name="MiniaturePreview" type="Control" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-size_flags_vertical = 3
-
-size_flags_horizontal = 3
-
-[node name="MiniatureCaption" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "No miniature selected"
-
-theme_override_font_sizes/font_size = 16
-
-autowrap_mode = 3
-
-[node name="PackageCaption" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-layout_mode = 2
-text = ""
-theme_override_font_sizes/font_size = 12
-autowrap_mode = 3
-
-[node name="EmptyPreview" type="TextureRect" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-layout_mode = 2
-texture = ExtResource("character")
-custom_minimum_size = Vector2(0, 60)
-size_flags_vertical = 3
-expand_mode = 1
-stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 0.4)
-
-
-[node name="MiniatureButtons" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-[node name="Explanation" type="Label" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content"]
-layout_mode = 2
-text = "Existing Rooks keep their Miniature."
-theme_override_font_sizes/font_size = 12
-autowrap_mode = 3
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-
-
-[node name="ChangeMiniature" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Change miniature"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskPrimary"
-
-size_flags_horizontal = 3
-clip_text = true
-text_overrun_behavior = 3
-
-[node name="ClearMiniature" type="Button" parent="Margin/Layout/Body/Chapter/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Clear"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-size_flags_horizontal = 3
-clip_text = true
-
 [node name="QuickResources" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
 
 layout_mode = 2
@@ -1774,144 +1616,9 @@ theme_override_font_sizes/font_size = 9
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 
-[node name="Detail" type="VBoxContainer" parent="Margin/Layout/Body/Chapter"]
-
+[node name="Detail" parent="Margin/Layout/Body/Chapter" instance=ExtResource("details_scene")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
 visible = false
-
-size_flags_vertical = 3
-
-theme_override_constants/separation = 8
-
-script = ExtResource("details_script")
-
-[node name="DetailHeader" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-[node name="Back" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailHeader"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "‹ Back"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-[node name="DetailTitle" type="Label" parent="Margin/Layout/Body/Chapter/Detail/DetailHeader"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Details"
-
-theme_override_font_sizes/font_size = 22
-
-autowrap_mode = 3
-
-size_flags_horizontal = 3
-
-max_lines_visible = 1
-text_overrun_behavior = 3
-
-[node name="DetailTabs" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-[node name="Overview" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailTabs"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Overview"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-toggle_mode = true
-
-[node name="Details" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailTabs"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Details"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-toggle_mode = true
-
-[node name="DetailPages" instance=ExtResource("pages") parent="Margin/Layout/Body/Chapter/Detail"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-[node name="DetailContent" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Detail/DetailPages/Area"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-theme_override_constants/separation = 8
-
-[node name="FullTitle" type="Label" parent="Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent"]
-layout_mode = 2
-autowrap_mode = 3
-
-[node name="DetailActions" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Detail"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-[node name="PrimaryAction" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailActions"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Roll"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskPrimary"
-
-visible = false
-
-size_flags_horizontal = 3
-
-[node name="SecondaryAction" type="Button" parent="Margin/Layout/Body/Chapter/Detail/DetailActions"]
-
-layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Details"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-visible = false
-
-size_flags_horizontal = 3
 
 [node name="Workflow" parent="Margin/Layout" instance=ExtResource("workflow_scene")]
 layout_mode = 2
@@ -1932,6 +1639,40 @@ text = ""
 
 theme_override_font_sizes/font_size = 12
 
-autowrap_mode = 3
+autowrap_mode = 0
+max_lines_visible = 1
+text_overrun_behavior = 3
 
 visible = false
+
+[node name="EntryScrim" type="ColorRect" parent="."]
+visible = false
+layout_mode = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.666667)
+
+[node name="EntryDialog" type="Window" parent="."]
+visible = false
+size = Vector2i(640, 610)
+borderless = true
+transient = true
+exclusive = true
+unresizable = true
+theme = ExtResource("theme")
+script = ExtResource("entry_dialog")
+accessibility_name = "Entry details"
+
+[node name="Surface" type="PanelContainer" parent="EntryDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelFrame")
+
+[node name="Inset" type="MarginContainer" parent="EntryDialog/Surface"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 0
