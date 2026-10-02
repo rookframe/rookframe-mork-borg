@@ -226,6 +226,7 @@ func _refresh() -> void:
 	_remember()
 
 func _core(data: Dictionary) -> void:
+	var tablet := size.x <= 1150 and not _phone
 	_setting = true
 	get_node(^"Margin/Layout/Header/Name").visible = not _draft.active
 	get_node(^"Margin/Layout/Header/NameEdit").visible = _draft.active
@@ -233,9 +234,9 @@ func _core(data: Dictionary) -> void:
 	get_node(^"Margin/Layout/Header/Name").text = str(data.get("name", "Character"))
 	get_node(^"Margin/Layout/Body/Core/Class").text = str(data.get("class_title", "Character"))
 	get_node(^"Margin/Layout/Body/Core/Origin").text = str(data.get("origin", "Origin"))
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints").configure("Hit points", int(data.get("hit_points", 0)), "/ %d" % int(data.get("maximum_hit_points", 1)), int(data.get("maximum_hit_points", 1)))
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses").configure("Power uses", int(data.get("power_uses", 0)), "/ %d" % int(data.get("power_uses_total", 0)) if data.has("power_uses_total") else "")
-	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").configure("Omens", int(data.get("omens", 0)), "available")
+	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints").configure("Hit points", int(data.get("hit_points", 0)), "/ %d" % int(data.get("maximum_hit_points", 1)), int(data.get("maximum_hit_points", 1)), _phone, tablet)
+	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses").configure("Power uses", int(data.get("power_uses", 0)), "/ %d" % int(data.get("power_uses_total", 0)) if data.has("power_uses_total") else "", 0, _phone, tablet)
+	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").configure("Omens", int(data.get("omens", 0)), "available", 0, _phone, tablet)
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").visible = _phone and _draft.active
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").value = _draft.value("omens") if _draft.active else str(data.get("omens", 0))
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").visible = not _draft.active
@@ -246,7 +247,7 @@ func _core(data: Dictionary) -> void:
 		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).value = _draft.value(str(pair[1])) if _draft.active else str(values.get(str(pair[1]), ""))
 	for ability in PROJECTION.ABILITIES:
 		var key := str(ability)
-		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).configure({"Strength": "STR", "Agility": "AGI", "Presence": "PRE", "Toughness": "TOU"}.get(key, key) if _phone else key, int(values.get(key, 0)))
+		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).configure({"Strength": "STR", "Agility": "AGI", "Presence": "PRE", "Toughness": "TOU"}.get(key, key) if _phone else key, int(values.get(key, 0)), _phone, tablet)
 		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).visible = not _draft.active
 		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).value = _draft.value(key) if _draft.active else str(values.get(key, "0"))
 		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).visible = _draft.active
@@ -1141,6 +1142,7 @@ func _render_portrait(data: Dictionary) -> void:
 			caption = "Character portrait"
 		else:
 			caption = decoded.message
+	get_node(^"Margin/Layout/Body/Core/Likeness/Portrait/ConditionFrame").visible = int(data.get("hit_points", 0)) <= 0
 	get_node(^"Margin/Layout/Body/Core/Likeness/Portrait").texture = texture
 	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitPreview").texture = texture
 	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel/PortraitPanel/PortraitCaption").text = caption

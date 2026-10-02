@@ -49,6 +49,14 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/elixir.svg" id="elixir"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
 
+[sub_resource type="StyleBoxFlat" id="ConditionPortrait"]
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.788235, 0.439216, 0.439216, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
 [sub_resource type="StyleBoxEmpty" id="NamePlain"]
 
 [sub_resource type="StyleBoxFlat" id="Background"]
@@ -340,6 +348,15 @@ size_flags_vertical = 0
 expand_mode = 1
 
 stretch_mode = 6
+
+[node name="ConditionFrame" type="Panel" parent="Margin/Layout/Body/Core/Likeness/Portrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+visible = false
+theme_override_styles/panel = SubResource("ConditionPortrait")
 
 [node name="Vitals" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness"]
 
