@@ -1189,8 +1189,9 @@ func _status(message: String) -> void:
 	get_node(^"Margin/Layout/Status").visible = not message.is_empty()
 
 func _density() -> void:
-	_phone = size.y <= 560
-	var tablet := size.x <= 1150 and not _phone
+	var canvas := get_viewport_rect().size
+	_phone = canvas.y <= 560
+	var tablet := canvas.x <= 1150 and not _phone
 	get_node(^"Margin").add_theme_constant_override("margin_left", 10 if _phone else 16 if tablet else 44)
 	get_node(^"Margin").add_theme_constant_override("margin_right", 10 if _phone else 16 if tablet else 44)
 	get_node(^"Margin").add_theme_constant_override("margin_top", 8 if _phone else 16)
