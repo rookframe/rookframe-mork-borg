@@ -18,9 +18,6 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
-const HEART = preload("res://rookframe/ui/icons/character/heart.svg")
-const MAGIC = preload("res://rookframe/ui/icons/character/palms.svg")
-const DICE = preload("res://rookframe/ui/icons/character/dice.svg")
 const CHAPTERS := ["Character", "Powers", "Inventory", "Journal", "Appearance"]
 @onready var _detail_title = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle")
 @onready var _detail_content = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent")
@@ -111,17 +108,17 @@ func ready() -> void:
 	get_node(^"Margin/Layout/Header/Rest").pressed.connect(_workflow.bind("rest", ""))
 	get_node(^"Margin/Layout/Header/Improve").pressed.connect(_workflow.bind("improve", ""))
 	get_node(^"Margin/Layout/Header/Name").pressed.connect(_name_pressed)
-	get_node(^"Margin/Layout/Header/NameEdit").value_changed.connect(_core_typed.bind("name"))
+	get_node(^"Margin/Layout/Header/NameEdit").text_changed.connect(_core_typed.bind("name"))
 	get_node(^"Margin/Layout/Body/Core/Origin").pressed.connect(_open_detail.bind("profile"))
 	for key in PROJECTION.ABILITIES:
 		get_node(_ability_paths.get(str(key), ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).pressed.connect(_open_detail.bind("ability:" + str(key)))
-		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).value_changed.connect(_core_typed.bind(str(key)))
+		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).text_changed.connect(_core_typed.bind(str(key)))
 	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
-		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).value_changed.connect(_core_typed.bind(str(pair[1])))
+		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).text_changed.connect(_core_typed.bind(str(pair[1])))
 	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints").pressed.connect(_open_detail.bind("resource:hit_points"))
 	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses").pressed.connect(_open_detail.bind("resource:power_uses"))
 	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").pressed.connect(_open_detail.bind("resource:omens"))
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").value_changed.connect(_core_typed.bind("omens"))
+	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").text_changed.connect(_core_typed.bind("omens"))
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").pressed.connect(_open_detail.bind("resource:omens"))
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver").pressed.connect(_open_detail.bind("resource:silver"))
 	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").pressed.connect(_open_detail.bind("ready_weapon"))
@@ -244,7 +241,7 @@ func _core(data: Dictionary) -> void:
 	_setting = true
 	get_node(^"Margin/Layout/Header/Name").visible = not _draft.active
 	get_node(^"Margin/Layout/Header/NameEdit").visible = _draft.active
-	get_node(^"Margin/Layout/Header/NameEdit").value = _draft.value("name") if _draft.active else str(data.get("name", ""))
+	get_node(^"Margin/Layout/Header/NameEdit").text = _draft.value("name") if _draft.active else str(data.get("name", ""))
 	get_node(^"Margin/Layout/Header/Name").text = str(data.get("name", "Character"))
 	get_node(^"Margin/Layout/Body/Core/Class").text = str(data.get("class_title", "Character"))
 	get_node(^"Margin/Layout/Body/Core/Origin").text = str(data.get("origin", "Origin"))
@@ -252,18 +249,18 @@ func _core(data: Dictionary) -> void:
 	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/PowerUses").configure("Power uses", int(data.get("power_uses", 0)), "/ %d" % int(data.get("power_uses_total", 0)) if data.has("power_uses_total") else "", 0, _phone, tablet)
 	get_node(^"Margin/Layout/Body/Core/Likeness/Vitals/Omens").configure("Omens", int(data.get("omens", 0)), "available", 0, _phone, tablet)
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").visible = _phone and _draft.active
-	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").value = _draft.value("omens") if _draft.active else str(data.get("omens", 0))
+	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit").text = _draft.value("omens") if _draft.active else str(data.get("omens", 0))
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").visible = not _draft.active
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickOmens").text = "%d Omens" % int(data.get("omens", 0))
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources/QuickSilver").text = "%d Silver" % int(data.get("silver", 0))
 	var values := _projection.fields(data)
 	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
-		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).value = _draft.value(str(pair[1])) if _draft.active else str(values.get(str(pair[1]), ""))
+		get_node(_vital_edit_paths.get(str(pair[0]), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent")).text = _draft.value(str(pair[1])) if _draft.active else str(values.get(str(pair[1]), ""))
 	for ability in PROJECTION.ABILITIES:
 		var key := str(ability)
 		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).configure({"Strength": "STR", "Agility": "AGI", "Presence": "PRE", "Toughness": "TOU"}.get(key, key) if _phone else key, int(values.get(key, 0)), _phone, tablet)
 		get_node(_ability_paths.get(key, ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).visible = not _draft.active
-		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).value = _draft.value(key) if _draft.active else str(values.get(key, "0"))
+		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).text = _draft.value(key) if _draft.active else str(values.get(key, "0"))
 		get_node(_ability_edit_paths.get(key + "Edit", ^"Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit")).visible = _draft.active
 	for vital in ["HitPoints", "PowerUses", "Omens"]:
 		get_node(_vital_paths.get(str(vital), ^"Margin/Layout/Body/Core/Likeness/Vitals/HitPoints")).visible = not _draft.active and (not _phone or vital != "Omens")
@@ -1092,7 +1089,16 @@ func _end_action() -> void:
 
 func _render_condition(data: Dictionary) -> void:
 	var condition := _projection.condition(data)
-	get_node(^"Margin/Layout/Body/Core/ConditionReminder").visible = not condition.is_empty()
+	var combat := condition.is_empty()
+	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").visible = combat and _phone
+	get_node(^"Margin/Layout/Body/Core/WeaponHeading").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/Weapon").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/WeaponActions").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/ManageEquipment").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/ProtectionHeading").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/Protection").visible = combat
+	get_node(^"Margin/Layout/Body/Core/Dodge").visible = combat and not _phone
+	get_node(^"Margin/Layout/Body/Core/ConditionReminder").visible = not combat
 	get_node(^"Margin/Layout/Body/Core/ConditionReminder").text = str(condition.get("title", "")) + " â€º Character"
 	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionTitle").text = str(condition.get("title", ""))
 	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionCopy").text = str(condition.get("copy", ""))
@@ -1261,6 +1267,7 @@ func _density() -> void:
 		get_node(_ability_paths.get(str(key), ^"Margin/Layout/Body/Core/Abilities/StrengthRow/Strength")).add_theme_font_size_override("font_size", 11 if _phone else 14 if tablet else 18)
 	if _actor != null:
 		_core(_actor.data)
+		_render_condition(_actor.data)
 		_show_route()
 
 func _unhandled_key_input(event: InputEvent) -> void:

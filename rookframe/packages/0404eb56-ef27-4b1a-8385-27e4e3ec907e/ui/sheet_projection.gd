@@ -16,7 +16,7 @@ const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3
 func fields(data: Dictionary) -> Dictionary:
 	var values: Dictionary = {}
 	for field in ["name", "description", "origin", "class_title", "pack", "hit_points", "maximum_hit_points", "omens", "power_uses", "silver", "improvements"]:
-		values[str(field)] = str(data.get(str(field), ""))
+		values[str(field)] = str(data.get(str(field), {"hit_points": 0, "maximum_hit_points": 1, "omens": 0, "power_uses": 0, "silver": 0, "improvements": 0}.get(str(field), "")))
 	values["class_rules"] = text(data.get("class_rules", []))
 	var abilities: Dictionary = data.get("abilities", {})
 	for field in ABILITIES:

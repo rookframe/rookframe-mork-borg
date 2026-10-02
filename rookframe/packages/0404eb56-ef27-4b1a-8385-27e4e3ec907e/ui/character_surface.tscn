@@ -18,7 +18,6 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="miniatures"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_area.tscn" id="textarea"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_field.tscn" id="textfield"]
 
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
 
@@ -56,6 +55,18 @@ border_width_left = 2
 border_width_top = 2
 border_width_right = 2
 border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id="InlineEditor"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.941176, 0.733333, 0.196078, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 5.0
+content_margin_right = 5.0
+content_margin_top = 17.0
+content_margin_bottom = 3.0
 
 [sub_resource type="StyleBoxEmpty" id="NamePlain"]
 
@@ -160,12 +171,32 @@ theme_override_styles/pressed = SubResource("NamePlain")
 theme_override_fonts/font = ExtResource("display")
 theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
 
-[node name="NameEdit" parent="Margin/Layout/Header" instance=ExtResource("textfield")]
+[node name="NameEdit" type="LineEdit" parent="Margin/Layout/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 visible = false
-label_text = ""
-placeholder = "Character name"
+
+custom_minimum_size = Vector2(56, 44)
+
+accessibility_name = "Character name"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+max_length = 80
+
+[node name="Caption" type="Label" parent="Margin/Layout/Header/NameEdit"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Name"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="System" type="Label" parent="Margin/Layout/Header"]
 
@@ -382,8 +413,7 @@ unique_name_in_owner = true
 
 visible = false
 
-[node name="HitPointsCurrent" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit" instance=ExtResource("textfield")]
-label_text = ""
+[node name="HitPointsCurrent" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
 
 layout_mode = 2
 
@@ -393,10 +423,27 @@ custom_minimum_size = Vector2(56, 44)
 
 size_flags_horizontal = 3
 
-placeholder = "Hit points"
 
-[node name="HitPointsMaximum" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit" instance=ExtResource("textfield")]
-label_text = ""
+accessibility_name = "Current hit points"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "HP"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="HitPointsMaximum" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
 
 layout_mode = 2
 
@@ -406,7 +453,25 @@ custom_minimum_size = Vector2(56, 44)
 
 size_flags_horizontal = 3
 
-placeholder = "Max HP"
+
+accessibility_name = "Maximum hit points"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximum"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Max HP"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="PowerUses" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
 layout_mode = 2
@@ -421,8 +486,7 @@ unique_name_in_owner = true
 
 visible = false
 
-[node name="PowerUsesCurrent" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit" instance=ExtResource("textfield")]
-label_text = ""
+[node name="PowerUsesCurrent" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit"]
 
 layout_mode = 2
 
@@ -432,7 +496,25 @@ custom_minimum_size = Vector2(56, 44)
 
 size_flags_horizontal = 3
 
-placeholder = "Power uses"
+
+accessibility_name = "Current Power uses"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrent"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Power uses"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="Omens" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
 layout_mode = 2
@@ -447,8 +529,7 @@ unique_name_in_owner = true
 
 visible = false
 
-[node name="OmensCurrent" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit" instance=ExtResource("textfield")]
-label_text = ""
+[node name="OmensCurrent" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit"]
 
 layout_mode = 2
 
@@ -458,21 +539,26 @@ custom_minimum_size = Vector2(56, 44)
 
 size_flags_horizontal = 3
 
-placeholder = "Omens"
 
-[node name="ConditionReminder" type="Button" parent="Margin/Layout/Body/Core"]
+accessibility_name = "Current Omens"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
 
-layout_mode = 2
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrent"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Omens"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
-unique_name_in_owner = true
-
-text = "Condition"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskButton"
-
-visible = false
 
 [node name="Abilities" type="GridContainer" parent="Margin/Layout/Body/Core"]
 
@@ -499,8 +585,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("strength")
 
-[node name="StrengthEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" instance=ExtResource("textfield")]
-label_text = ""
+[node name="StrengthEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow"]
 
 layout_mode = 2
 
@@ -509,6 +594,27 @@ unique_name_in_owner = true
 visible = false
 
 custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Strength modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Strength"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="AgilityRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
 
@@ -523,8 +629,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("agility")
 
-[node name="AgilityEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" instance=ExtResource("textfield")]
-label_text = ""
+[node name="AgilityEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow"]
 
 layout_mode = 2
 
@@ -533,6 +638,27 @@ unique_name_in_owner = true
 visible = false
 
 custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Agility modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEdit"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Agility"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="PresenceRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
 
@@ -547,8 +673,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("presence")
 
-[node name="PresenceEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" instance=ExtResource("textfield")]
-label_text = ""
+[node name="PresenceEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow"]
 
 layout_mode = 2
 
@@ -557,6 +682,27 @@ unique_name_in_owner = true
 visible = false
 
 custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Presence modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEdit"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Presence"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="ToughnessRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
 
@@ -571,8 +717,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 icon = ExtResource("toughness")
 
-[node name="ToughnessEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" instance=ExtResource("textfield")]
-label_text = ""
+[node name="ToughnessEdit" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow"]
 
 layout_mode = 2
 
@@ -581,6 +726,41 @@ unique_name_in_owner = true
 visible = false
 
 custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Toughness modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEdit"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Toughness"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="ConditionReminder" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Condition"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
 
 [node name="ReadyWeapon" type="Button" parent="Margin/Layout/Body/Core"]
 layout_mode = 2
@@ -1283,12 +1463,31 @@ custom_minimum_size = Vector2(44, 44)
 
 theme_type_variation = "TaskButton"
 
-[node name="QuickOmensEdit" parent="Margin/Layout/Body/Chapter/QuickResources" instance=ExtResource("textfield")]
+[node name="QuickOmensEdit" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources"]
 layout_mode = 2
 visible = false
-label_text = ""
-placeholder = "Omens"
 custom_minimum_size = Vector2(88, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Current Omens"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineEditor")
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Omens"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 
 [node name="QuickSilver" type="Button" parent="Margin/Layout/Body/Chapter/QuickResources"]
 
