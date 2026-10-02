@@ -42,6 +42,15 @@
 
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
 
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_vital.tscn" id="vital"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ability.tscn" id="ability"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="quill"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/elixir.svg" id="elixir"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
+
+[sub_resource type="StyleBoxEmpty" id="NamePlain"]
+
 [sub_resource type="StyleBoxFlat" id="Background"]
 
 bg_color = Color(0.003922, 0.047059, 0.062745, 1)
@@ -137,6 +146,9 @@ size_flags_horizontal = 3
 alignment = 0
 
 flat = true
+theme_override_styles/normal = SubResource("NamePlain")
+theme_override_styles/hover = SubResource("NamePlain")
+theme_override_styles/pressed = SubResource("NamePlain")
 theme_override_fonts/font = ExtResource("display")
 theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
 
@@ -168,6 +180,9 @@ layout_mode = 2
 unique_name_in_owner = true
 
 text = "Edit sheet"
+icon = ExtResource("quill")
+expand_icon = true
+theme_override_constants/icon_max_width = 24
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -183,6 +198,9 @@ layout_mode = 2
 unique_name_in_owner = true
 
 text = "Rest"
+icon = ExtResource("elixir")
+expand_icon = true
+theme_override_constants/icon_max_width = 24
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -198,6 +216,9 @@ layout_mode = 2
 unique_name_in_owner = true
 
 text = "Level up"
+icon = ExtResource("strength")
+expand_icon = true
+theme_override_constants/icon_max_width = 24
 
 custom_minimum_size = Vector2(44, 44)
 
@@ -330,35 +351,10 @@ size_flags_horizontal = 3
 
 theme_override_constants/separation = 4
 
-[node name="HitPoints" type="Button" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
-
+[node name="HitPoints" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Hit points"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("heart")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-clip_text = true
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
-
-theme_override_colors/font_color = Color(0.490196, 0.850980, 0.537255, 1)
+icon = ExtResource("heart")
 
 [node name="HitPointsEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
 
@@ -394,33 +390,10 @@ size_flags_horizontal = 3
 
 placeholder = "Max HP"
 
-[node name="PowerUses" type="Button" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
-
+[node name="PowerUses" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Power uses"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("psychopomp")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-clip_text = true
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+icon = ExtResource("palms")
 
 [node name="PowerUsesEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
 
@@ -443,33 +416,10 @@ size_flags_horizontal = 3
 
 placeholder = "Power uses"
 
-[node name="Omens" type="Button" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
-
+[node name="Omens" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Omens"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("dice")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-clip_text = true
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+icon = ExtResource("dice")
 
 [node name="OmensEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
 
@@ -526,31 +476,10 @@ unique_name_in_owner = true
 
 size_flags_horizontal = 3
 
-[node name="Strength" type="Button" parent="Margin/Layout/Body/Core/Abilities/StrengthRow"]
-
+[node name="Strength" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" instance=ExtResource("ability")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Strength"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("strength")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+icon = ExtResource("strength")
 
 [node name="StrengthEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -571,31 +500,10 @@ unique_name_in_owner = true
 
 size_flags_horizontal = 3
 
-[node name="Agility" type="Button" parent="Margin/Layout/Body/Core/Abilities/AgilityRow"]
-
+[node name="Agility" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" instance=ExtResource("ability")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Agility"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("agility")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+icon = ExtResource("agility")
 
 [node name="AgilityEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -616,31 +524,10 @@ unique_name_in_owner = true
 
 size_flags_horizontal = 3
 
-[node name="Presence" type="Button" parent="Margin/Layout/Body/Core/Abilities/PresenceRow"]
-
+[node name="Presence" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" instance=ExtResource("ability")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Presence"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("presence")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+icon = ExtResource("presence")
 
 [node name="PresenceEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -661,31 +548,10 @@ unique_name_in_owner = true
 
 size_flags_horizontal = 3
 
-[node name="Toughness" type="Button" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow"]
-
+[node name="Toughness" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" instance=ExtResource("ability")]
 layout_mode = 2
-
-unique_name_in_owner = true
-
-text = "Toughness"
-
-custom_minimum_size = Vector2(44, 44)
-
-theme_type_variation = "TaskChoice"
-
-icon = ExtResource("toughness")
-
-icon_alignment = 0
-
-expand_icon = true
-
-theme_override_constants/icon_max_width = 24
-
 size_flags_horizontal = 3
-
-alignment = 0
-
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+icon = ExtResource("toughness")
 
 [node name="ToughnessEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" instance=ExtResource("textfield")]
 label_text = ""
@@ -887,7 +753,7 @@ unique_name_in_owner = true
 
 text = "Powers"
 
-icon = ExtResource("psychopomp")
+icon = ExtResource("palms")
 expand_icon = true
 theme_override_constants/icon_max_width = 26
 
@@ -1120,6 +986,7 @@ size_flags_vertical = 3
 theme_override_constants/separation = 16
 
 [node name="Primary" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections"]
+framed_collection = true
 
 layout_mode = 2
 
@@ -1142,6 +1009,8 @@ size_flags_vertical = 3
 theme_override_constants/separation = 16
 
 [node name="Resources" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+framed_collection = true
+size_flags_stretch_ratio = 2.4
 
 layout_mode = 2
 
@@ -1150,6 +1019,7 @@ unique_name_in_owner = true
 size_flags_vertical = 3
 
 [node name="Companions" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+framed_collection = true
 
 layout_mode = 2
 
