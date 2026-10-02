@@ -43,6 +43,14 @@ func refresh_value(value: String) -> void:
 		_setting = false
 	_initial = value
 
+func sync_draft_value(value: String) -> void:
+	if current_value() != value:
+		_setting = true
+		get_node(^"Value").value = value
+		get_node(^"Text").value = value
+		_setting = false
+	_initial = value
+
 func _typed(text: String) -> void:
 	if not _setting:
 		get_node(^"Value").error_text = ""

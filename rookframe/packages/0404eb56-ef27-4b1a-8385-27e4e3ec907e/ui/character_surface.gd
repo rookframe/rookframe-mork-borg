@@ -154,9 +154,9 @@ func ready() -> void:
 	_quick_quick_silver_edit.text_changed.connect(_core_typed.bind("silver"))
 	_chapter_personal_notes.pressed.connect(_open_detail.bind("journal:notes"))
 	_chapter_ui.resource_requested.connect(_open_detail)
-	_chapter_ui.resource_changed.connect(_draft.change)
+	_chapter_ui.resource_changed.connect(_draft_typed)
 	_chapter_ui.get_node(^"ReferenceBack").pressed.connect(_return_condition)
-	_chapter_ui.get_node(^"Collections/Secondary/ResourceEditors").changed.connect(_draft.change)
+	_chapter_ui.get_node(^"Collections/Secondary/ResourceEditors").changed.connect(_draft_typed)
 	for index in range(4):
 		var path: NodePath = [^"ChapterCaption/InventoryFilters/All", ^"ChapterCaption/InventoryFilters/Arms", ^"ChapterCaption/InventoryFilters/Supplies", ^"ChapterCaption/InventoryFilters/Ready"][index]
 		_chapter_ui.get_node(path).pressed.connect(_inventory_filter.bind(index))
@@ -489,8 +489,15 @@ func _edit() -> void:
 	_header_name_edit.grab_focus()
 
 func _core_typed(text: String, field: String) -> void:
-	if _draft.active and not _setting:
-		_draft.change(field, text)
+	_draft_typed(field, text)
+
+func _draft_typed(field: String, text: String) -> void:
+	if not _draft.active or _setting:
+		return
+	_draft.change(field, text)
+	get_node(^"Margin/Layout").sync_draft_field(field, text)
+	if not _detail.begins_with("item:") and _detail != "custom":
+		_detail_ui.sync_draft_field(field, text)
 
 func _save_sheet() -> void:
 	if _busy or not _draft.active or not _owner():
@@ -730,12 +737,8 @@ func _character_field(field: String, title: String) -> void:
 	if not _draft.active:
 		_text(title + "\n" + str(_projection.fields(_actor.data).get(field, "")))
 		return
-	var control = FIELD.instantiate()
-	_detail_ui.field_host(field).add_child(control)
-	control.configure_layout(_phone, _detail == "profile")
-	_detail_ui.register_field(control)
-	control.configure(field, title, _draft.value(field), field in ["description", "origin", "class_rules", "pack"] or field.ends_with(":rules"))
-	control.changed.connect(_draft.change)
+	var control = _detail_ui.append_draft_field(field, title, _draft.value(field), _phone, _detail == "profile")
+	control.changed.connect(_draft_typed)
 	_fields.append(control)
 
 func _item_field(field: String, value: String, independent: bool) -> void:
