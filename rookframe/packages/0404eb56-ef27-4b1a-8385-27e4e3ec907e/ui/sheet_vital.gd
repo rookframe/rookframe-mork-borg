@@ -19,8 +19,10 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 	get_node(^"Inset/Copy/Number/Value").visible = maximum == 0
 	get_node(^"Inset/Copy/Number/HealthValue").visible = maximum > 0 and current > 0
 	get_node(^"Inset/Copy/Number/DeadValue").visible = maximum > 0 and current <= 0
+	if maximum > 0:
+		icon = null if current <= 0 else preload("res://rookframe/ui/icons/character/heart.svg")
 	get_node(^"DangerIcon").visible = maximum > 0 and current <= 0
 	get_node(^"DangerIcon").offset_top = -10 if phone else -13 if tablet else -16
 	get_node(^"DangerIcon").offset_bottom = 10 if phone else 13 if tablet else 16
-	get_node(^"DangerIcon").offset_right = 32 if phone else 38 if tablet else 44
+	get_node(^"DangerIcon").offset_right = 20 if phone else 26 if tablet else 32
 	accessibility_name = "%s. %d %s" % [caption, current, suffix]
