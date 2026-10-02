@@ -129,7 +129,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 	if recovered < 0:
 		recovered = 0
 	data["hit_points"] = hp + recovered
-	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Recovery: regained %d HP; now %d / %d. Raw Roll #%d. Omens and timed consequences remain table-managed." % [recovered, hp + recovered, maximum, roll.sequence], "+%d HP" % recovered, "success")
+	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Recovery: regained %d HP; %d → %d / %d. Raw Roll #%d. Omens and timed consequences remain table-managed." % [recovered, hp, hp + recovered, maximum, roll.sequence], "+%d HP" % recovered, "success")
 
 func _valid(value: Variant) -> bool:
 	if typeof(value) != TYPE_DICTIONARY:

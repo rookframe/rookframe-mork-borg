@@ -4,6 +4,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const ACTIONS = preload(ROOT + "logic/character_actions.gd")
 const PROJECTION = preload(ROOT + "ui/sheet_projection.gd")
 const DRAFT = preload(ROOT + "ui/sheet_draft.gd")
+const FIELD_ROW = preload(ROOT + "ui/sheet_field_row.tscn")
 const FIELD = preload(ROOT + "ui/sheet_entry_field.tscn")
 const BROKEN = preload(ROOT + "logic/broken_incident.gd")
 const ABILITY = preload(ROOT + "logic/ability_throw.gd")
@@ -21,6 +22,11 @@ const HEART = preload("res://rookframe/ui/icons/character/heart.svg")
 const MAGIC = preload("res://rookframe/ui/icons/character/palms.svg")
 const DICE = preload("res://rookframe/ui/icons/character/dice.svg")
 const CHAPTERS := ["Character", "Powers", "Inventory", "Journal", "Appearance"]
+@onready var _detail_title = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle")
+@onready var _detail_content = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent")
+@onready var _primary_button = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction")
+@onready var _secondary_button = get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction")
+@onready var _section = get_node(^"Margin/Layout/Body/Chapter/Section")
 @export var navigation: Resource
 @onready var _chapters = [get_node(^"Margin/Layout/Body/Chapter/Tabs/TabCharacter"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabPowers"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabInventory"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabJournal"), get_node(^"Margin/Layout/Body/Chapter/Tabs/TabAppearance")]
 const _ability_paths := {
@@ -69,6 +75,8 @@ var _detail := ""
 var _detail_tab := 0
 var _item_edit := false
 var _fields: Array = []
+var _field_row
+var _field_names: Array[String] = []
 var _opener
 var _opened_entry := ""
 var _return_detail := ""
@@ -126,12 +134,12 @@ func ready() -> void:
 	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").selected.connect(_open_detail)
 	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").selected.connect(_open_detail)
 	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").selected.connect(_open_detail)
-	get_node(^"Margin/Layout/Body/Chapter/Section").item_selected.connect(_section_selected)
+	_section.item_selected.connect(_section_selected)
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back").pressed.connect(_back)
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Overview").pressed.connect(_detail_tab_selected.bind(0))
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Details").pressed.connect(_detail_tab_selected.bind(1))
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction").pressed.connect(_primary_action)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction").pressed.connect(_secondary_action)
+	_primary_button.pressed.connect(_primary_action)
+	_secondary_button.pressed.connect(_secondary_action)
 	get_node(^"Margin/Layout/Body/Core/ConditionReminder").pressed.connect(_chapter.bind(0))
 	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionActions/Broken").pressed.connect(_start_broken)
 	for pair in [["NextRound", "next"], ["UndoRound", "undo"], ["Recover", "recover"], ["AdvanceHour", "next"], ["UndoHour", "undo"], ["Treat", "treat"]]:
@@ -163,6 +171,16 @@ func opened(id: SDK.ActorId) -> void:
 	_detail = ""
 	_refresh()
 
+func capture_reconnect_state() -> Dictionary:
+	_capture_pages()
+	return _nav.duplicate(true)
+
+func restore_reconnect_state(state: Dictionary) -> void:
+	_nav = state.duplicate(true)
+	_rendered_chapter = -1
+	_remember()
+	_refresh_pending = true
+
 func _world_changed() -> void:
 	_refresh_pending = true
 
@@ -178,11 +196,7 @@ func _process(delta: float) -> void:
 		_refresh_pending = false
 		var latest := sdk.actors.read(_actor.id)
 		if latest.ok:
-			var before := int(_data().get("hit_points", 0))
-			_actor = latest.actor
-			if before > 0 and int(_data().get("hit_points", 0)) <= 0:
-				_nav["chapter"] = 0
-				_detail = ""
+			_accept_actor(latest.actor)
 			_refresh()
 		else:
 			_draft.discard()
@@ -204,7 +218,7 @@ func _process(delta: float) -> void:
 		_render_detail()
 		if _focus_detail_action:
 			_focus_detail_action = false
-			get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction").grab_focus()
+			_primary_button.grab_focus()
 
 func _request_detail() -> void:
 	_detail_pending = true
@@ -281,9 +295,9 @@ func _core(data: Dictionary) -> void:
 		if item.get("equipped", false) and str(item.get("kind", "")) in ["Armor", "Shield"]:
 			protection.append(str(item.get("name", "")) + " " + str(item.get("reduction", "")))
 	get_node(^"Margin/Layout/Body/Core/Protection").text = "Protection & reactions ›" if protection.is_empty() else _projection.text(protection) + " ›"
-	var playable := _owner() and not _draft.active and BROKEN.new().can_act(data)
+	var playable := _owner() and not _draft.active and not _action_live() and BROKEN.new().can_act(data)
 	get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack").disabled = not playable or _weapons.is_empty()
-	get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage").disabled = not _owner() or _draft.active or _weapons.is_empty()
+	get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage").disabled = not _owner() or _draft.active or _action_live() or _weapons.is_empty()
 	get_node(^"Margin/Layout/Body/Core/Dodge").disabled = not playable
 	get_node(^"Margin/Layout/Header/Edit").disabled = not _owner() or _action_live()
 	get_node(^"Margin/Layout/Header/Rest").disabled = not _owner() or _draft.active or _action_live() or BROKEN.new().is_dead(data)
@@ -342,19 +356,19 @@ func _show_route() -> void:
 	get_node(^"Margin/Layout/Body/Chapter/AppearancePanel").visible = not details and chapter == 4
 	get_node(^"Margin/Layout/Body/Chapter/Detail").visible = details
 	get_node(^"Margin/Layout/Body/Chapter/Condition").visible = not details and chapter == 0 and not _projection.condition(_actor.data).is_empty()
-	get_node(^"Margin/Layout/Body/Chapter/Section").visible = _phone and not details and chapter in [0, 1, 2]
+	_section.visible = _phone and not details and chapter in [0, 1, 2]
 	get_node(^"Margin/Layout/Body/Chapter/QuickResources").visible = _phone and not details and chapter != 4
-	get_node(^"Margin/Layout/Body/Chapter/Section").clear()
+	_section.clear()
 	for title in (["Features & traits", "Resources", "Companions"] if chapter == 0 else ["Powers", "Decoctions & resources"] if chapter == 1 else ["Inventory", "Resources"]):
-		get_node(^"Margin/Layout/Body/Chapter/Section").add_item(str(title))
-	get_node(^"Margin/Layout/Body/Chapter/Section").select(mini(int(_nav.get("section", 0)), get_node(^"Margin/Layout/Body/Chapter/Section").item_count - 1))
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").visible = not _phone or get_node(^"Margin/Layout/Body/Chapter/Section").selected == 0
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary").visible = not _phone or get_node(^"Margin/Layout/Body/Chapter/Section").selected != 0
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").visible = not _phone or get_node(^"Margin/Layout/Body/Chapter/Section").selected == 1
-	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").visible = chapter == 0 and (not _phone or get_node(^"Margin/Layout/Body/Chapter/Section").selected == 2)
+		_section.add_item(str(title))
+	_section.select(mini(int(_nav.get("section", 0)), _section.item_count - 1))
+	get_node(^"Margin/Layout/Body/Chapter/Collections/Primary").visible = not _phone or _section.selected == 0
+	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary").visible = not _phone or _section.selected != 0
+	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Resources").visible = not _phone or _section.selected == 1
+	get_node(^"Margin/Layout/Body/Chapter/Collections/Secondary/Companions").visible = chapter == 0 and (not _phone or _section.selected == 2)
 	if _phone and get_node(^"Margin/Layout/Body/Chapter/Condition").visible:
 		get_node(^"Margin/Layout/Body/Chapter/Collections").visible = false
-		get_node(^"Margin/Layout/Body/Chapter/Section").visible = false
+		_section.visible = false
 	for index in range(CHAPTERS.size()):
 		_chapters[index].set_pressed_no_signal(index == chapter)
 	if chapter == 4:
@@ -408,7 +422,7 @@ func _save_sheet() -> void:
 	get_node(^"Margin/Layout/Header/SaveSheet").disabled = false
 	if result.ok:
 		_draft.discard()
-		_actor = result.actor
+		_accept_actor(result.actor)
 		_refresh()
 		_request_detail()
 		_status("Sheet saved.")
@@ -427,6 +441,7 @@ func _name_pressed() -> void:
 func _open_detail(id: String) -> void:
 	if id == "empty":
 		return
+	_leave_workflow()
 	_capture_pages()
 	_remember_opener(id)
 	_detail = id
@@ -443,11 +458,13 @@ func _detail_tab_selected(index: int) -> void:
 
 func _clear_detail() -> void:
 	_fields = []
-	for child in get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").get_children():
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").remove_child(child)
+	_field_row = null
+	_field_names = []
+	for child in _detail_content.get_children():
+		_detail_content.remove_child(child)
 		child.queue_free()
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction").visible = false
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction").visible = false
+	_primary_button.visible = false
+	_secondary_button.visible = false
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs").visible = not _detail.begins_with("workflow:") and _detail not in ["catalogue", "custom"]
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Overview").set_pressed_no_signal(_detail_tab == 0)
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailTabs/Details").set_pressed_no_signal(_detail_tab == 1)
@@ -463,13 +480,15 @@ func _render_detail() -> void:
 		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages").refresh()
 		return
 	if _detail in ["profile", "class"]:
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = str(data.get("name", "Character")) if _detail == "profile" else str(data.get("class_title", "Class"))
+		_detail_title.text = str(data.get("name", "Character")) if _detail == "profile" else str(data.get("class_title", "Class"))
 		if _detail_tab == 0:
 			_text(str(data.get("description", "")))
 			_text(str(data.get("origin", "")))
 			_text(_projection.text(data.get("class_rules", [])))
 			_text("Improvements: %d · %s" % [int(data.get("improvements", 0)), str(data.get("pack", ""))])
 		else:
+			if _phone and _detail == "class":
+				_group_fields(["class_title", "class_rules"], [1, 2])
 			for field in (["name", "description", "origin", "pack", "improvements"] if _detail == "profile" else ["class_title", "class_rules"]):
 				_character_field(str(field), str(field).replace("_", " ").capitalize())
 			if _detail == "class" and str(data.get("class_id", "")) == "gutterborn-scum":
@@ -479,13 +498,13 @@ func _render_detail() -> void:
 			_secondary("Inspect laboratory")
 	elif _detail.begins_with("resource:"):
 		var key := _detail.trim_prefix("resource:")
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = key.replace("_", " ").capitalize()
+		_detail_title.text = key.replace("_", " ").capitalize()
 		if _detail_tab == 1:
-			_character_field(key, get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text)
+			_character_field(key, _detail_title.text)
 			if key == "hit_points":
 				_character_field("maximum_hit_points", "Maximum HP")
 		else:
-			_text("%s: %s" % [get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text, str(data.get(key, 0))])
+			_text("%s: %s" % [_detail_title.text, str(data.get(key, 0))])
 			if key == "hit_points":
 				_text("At 0 HP roll Broken; below 0 HP means death. Rest restores d4 or d6 HP, up to maximum HP. Table-resolved healing can be entered with Edit sheet.")
 			elif key == "power_uses":
@@ -496,7 +515,7 @@ func _render_detail() -> void:
 				_primary("Spend Omen", not _draft.active and _owner() and int(data.get("omens", 0)) > 0)
 	elif _detail.begins_with("ability:"):
 		var key := _detail.trim_prefix("ability:")
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = key
+		_detail_title.text = key
 		if _detail_tab == 1:
 			_character_field(key, key + " modifier · −3…+6")
 		else:
@@ -510,8 +529,10 @@ func _render_detail() -> void:
 			_back()
 			return
 		var entry: Dictionary = entries[index]
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = str(entry.get("name", "Entry"))
+		_detail_title.text = str(entry.get("name", "Entry"))
 		if _detail_tab == 1 and parts[0] != "injury":
+			if _phone:
+				_group_fields([_detail + ":name", _detail + ":rules"], [1, 2])
 			for key in ["name", "rules", "uses"]:
 				if key == "uses" and not entry.has("uses"):
 					continue
@@ -526,30 +547,31 @@ func _render_detail() -> void:
 		var actor := sdk.actors.read(SDK.ActorId.new(_detail.trim_prefix("actor:")))
 		if actor.ok:
 			var companion_data: Dictionary = actor.actor.data
-			get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = str(companion_data.get("name", "Companion"))
+			_detail_title.text = str(companion_data.get("name", "Companion"))
 			_text("This companion has its own Actor sheet and inventory.")
 			_primary("Open companion", true)
 			_secondary("Place Rook", actor.actor.access_level == "Owner")
 	elif _detail.begins_with("item:"):
 		_item_detail(_item(_detail.trim_prefix("item:")))
 	elif _detail == "catalogue":
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = "EQUIPMENT CATALOGUE"
+		_detail_title.text = "EQUIPMENT CATALOGUE"
 		for item in EQUIPMENT.new().entries():
 			_option(str(item.get("name", "Equipment")) + " · " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))))
 	elif _detail == "custom":
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = "CUSTOM ITEM"
+		_detail_title.text = "CUSTOM ITEM"
+		_group_fields(["name", "quantity", "uses"] if _phone else ["name", "quantity"], [2, 1, 1] if _phone else [1, 1])
 		for key in ["name", "kind", "quantity", "uses", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 			_item_field(str(key), str(_new_item.get(str(key), "Equipment" if key == "kind" else "1" if key == "quantity" else "0" if key in ["uses", "range_feet", "armor_tier"] else "")), false)
 		_primary("Add custom item", _owner())
 	elif _detail == "ready_weapon":
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = "Ready weapon"
+		_detail_title.text = "Ready weapon"
 		for index in range(_weapons.size()):
 			var weapon: Dictionary = _weapons[index]
 			_option(("Selected · " if str(weapon.inventory_id) == str(_nav.get("weapon", "")) else "") + str(weapon.get("name", "Weapon")) + " · " + str(weapon.get("damage", "")), _choose_ready_weapon.bind(index))
 		_primary("Attack", _can_act() and not _weapons.is_empty())
 		_secondary("Damage", _owner() and not _draft.active and not _weapons.is_empty())
 	elif _detail == "protection":
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = "Protection & reactions"
+		_detail_title.text = "Protection & reactions"
 		for raw in _items:
 			var item: Dictionary = raw
 			if item.get("equipped", false) and str(item.get("kind", "")) in ["Armor", "Shield"]:
@@ -566,7 +588,7 @@ func _text(text: String) -> void:
 	label.autowrap_mode = 3 # TextServer.AUTOWRAP_WORD_SMART
 	label.size_flags_horizontal = 3 # Control.SIZE_EXPAND_FILL
 	label.add_theme_font_size_override("font_size", 14 if _phone else 18)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").add_child(label)
+	_detail_content.add_child(label)
 
 func _option(text: String, callback: Callable) -> void:
 	var button := Button.new()
@@ -575,21 +597,32 @@ func _option(text: String, callback: Callable) -> void:
 	button.theme_type_variation = "TaskButton"
 	button.text_overrun_behavior = 3 # TextServer.OVERRUN_TRIM_ELLIPSIS
 	button.pressed.connect(callback)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").add_child(button)
+	_detail_content.add_child(button)
+
+func _group_fields(fields: Array[String], weights: Array[int]) -> void:
+	_field_names = fields
+	var row = FIELD_ROW.instantiate()
+	_detail_content.add_child(row)
+	row.configure(weights, fields.size())
+	_field_row = row
+
+func _field_host(field: String) -> Control:
+	var index := _field_names.find(field)
+	return _detail_content if index < 0 else _field_row.slot(index)
 
 func _character_field(field: String, title: String) -> void:
 	if not _draft.active:
 		_text(title + "\n" + str(_projection.fields(_actor.data).get(field, "")))
 		return
 	var control = FIELD.instantiate()
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").add_child(control)
+	_field_host(field).add_child(control)
 	control.configure(field, title, _draft.value(field), field in ["description", "origin", "class_rules", "pack"] or field.ends_with(":rules"))
 	control.changed.connect(_draft.change)
 	_fields.append(control)
 
 func _item_field(field: String, value: String, independent: bool) -> void:
 	var control = FIELD.instantiate()
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").add_child(control)
+	_field_host(field).add_child(control)
 	control.configure(field, field.replace("_", " ").capitalize(), value, field == "rules", independent)
 	control.submitted.connect(_item_field_saved)
 	control.changed.connect(_custom_typed)
@@ -608,11 +641,13 @@ func _item(id: String) -> Dictionary:
 
 func _item_detail(item: Dictionary) -> void:
 	if item.is_empty():
-		get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = "Item unavailable"
+		_detail_title.text = "Item unavailable"
 		_text("This item was removed. Return to Inventory for the current items.")
 		return
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = str(item.get("name", "Item"))
+	_detail_title.text = str(item.get("name", "Item"))
 	if _detail_tab == 1:
+		if _item_edit and _owner():
+			_group_fields(["name", "quantity", "uses"] if _phone and not item.has("dose_pool") else ["name", "quantity"], [2, 1, 1] if _phone else [1, 1])
 		for key in ["name", "quantity", "uses", "kind", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 			if key == "uses" and item.has("dose_pool") or key not in ["name", "quantity", "uses"] and not item.get("custom", false):
 				continue
@@ -657,14 +692,14 @@ func _refresh_detail() -> void:
 		_request_detail()
 
 func _primary(text: String, enabled: bool) -> void:
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction").text = _locale.text(text)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction").visible = true
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/PrimaryAction").disabled = not enabled or _busy
+	_primary_button.text = _locale.text(text)
+	_primary_button.visible = true
+	_primary_button.disabled = not enabled or _busy
 
 func _secondary(text: String, enabled: bool = true) -> void:
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction").text = _locale.text(text)
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction").visible = true
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailActions/SecondaryAction").disabled = not enabled or _busy
+	_secondary_button.text = _locale.text(text)
+	_secondary_button.visible = true
+	_secondary_button.disabled = not enabled or _busy
 
 func _can_act() -> bool:
 	return _owner() and not _draft.active and BROKEN.new().can_act(_actor.data)
@@ -726,7 +761,7 @@ func _remove_item() -> void:
 func _mutation_result(result: SDK.ActorResult) -> void:
 	_busy = false
 	if result.ok:
-		_actor = result.actor
+		_accept_actor(result.actor)
 		_refresh()
 		_status("Saved.")
 	else:
@@ -767,7 +802,7 @@ func _workflow(kind: String, entry: String) -> void:
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back").grab_focus()
 
 func _render_workflow() -> void:
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/DetailTitle").text = "Getting better—or worse" if _action_kind == "improve" else {"improve": "Getting better—or worse", "rest": "Rest", "attack": "Attack", "damage": "Damage", "ability": "Ability test", "cast": "Cast Power", "use": "Use item"}.get(_action_kind, "Action")
+	_detail_title.text = "Getting better—or worse" if _action_kind == "improve" else {"improve": "Getting better—or worse", "rest": "Rest", "attack": "Attack", "damage": "Damage", "ability": "Ability test", "cast": "Cast Power", "use": "Use item"}.get(_action_kind, "Action")
 	if _action != null:
 		_text(_action.message)
 		if _action.state == "scroll":
@@ -855,7 +890,7 @@ func _render_workflow() -> void:
 
 func _workflow_field(field: String, title: String) -> void:
 	var control = FIELD.instantiate()
-	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages/Area/DetailContent").add_child(control)
+	_field_host(field).add_child(control)
 	control.configure(field, title, str(_action_input.get(field, 0)))
 	control.changed.connect(_workflow_typed)
 
@@ -929,6 +964,8 @@ func _primary_action() -> void:
 		sdk.windows.open_actor(preload(ROOT + "ui/window_button.tres").window, SDK.ActorId.new(_detail.trim_prefix("actor:")))
 
 func _start_workflow() -> void:
+	if not _owner() or _draft.active or _action_live():
+		return
 	var input: Dictionary = _action_input.duplicate(true)
 	for key in ["difficulty", "modifier", "adjustment", "morale", "presence_sign"]:
 		if input.has(str(key)):
@@ -1207,6 +1244,8 @@ func _density() -> void:
 	get_node(^"Margin/Layout/Body/Core/ManageEquipment").visible = not _phone
 	get_node(^"Margin/Layout/Body/Core/Dodge").visible = not _phone
 	get_node(^"Margin/Layout/Body/Core/Origin").visible = not _phone
+	get_node(^"Margin/Layout/Header/Edit").text = "" if _phone else "Edit sheet"
+	get_node(^"Margin/Layout/Header/Edit").icon = preload("res://rookframe/ui/icons/character/quill.svg")
 	get_node(^"Margin/Layout/Header/System").visible = not _phone
 	get_node(^"Margin/Layout/Body/Core/WeaponHeading").visible = not _phone
 	get_node(^"Margin/Layout/Body/Core/ProtectionHeading").visible = not _phone
@@ -1249,6 +1288,14 @@ func _roll_combat(part: String) -> void:
 	_workflow(part, "")
 	if _detail == "workflow:" + part:
 		await _start_workflow()
+
+func _accept_actor(actor: SDK.Actor) -> void:
+	var before := int(_data().get("hit_points", 0))
+	_actor = actor
+	if before > 0 and int(_data().get("hit_points", 0)) <= 0:
+		_leave_workflow()
+		_nav["chapter"] = 0
+		_detail = ""
 
 func _data() -> Dictionary:
 	if _actor == null:
