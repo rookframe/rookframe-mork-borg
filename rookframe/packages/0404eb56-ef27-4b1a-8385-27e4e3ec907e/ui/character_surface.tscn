@@ -68,6 +68,18 @@ content_margin_right = 5.0
 content_margin_top = 17.0
 content_margin_bottom = 3.0
 
+[sub_resource type="StyleBoxFlat" id="InlineFocus"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 5.0
+content_margin_right = 5.0
+content_margin_top = 17.0
+content_margin_bottom = 3.0
+
 [sub_resource type="StyleBoxEmpty" id="NamePlain"]
 
 [sub_resource type="StyleBoxFlat" id="Background"]
@@ -182,8 +194,7 @@ accessibility_name = "Character name"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
-max_length = 80
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Header/NameEdit"]
 layout_mode = 0
@@ -428,7 +439,7 @@ accessibility_name = "Current hit points"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrent"]
 layout_mode = 0
@@ -458,7 +469,7 @@ accessibility_name = "Maximum hit points"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximum"]
 layout_mode = 0
@@ -501,7 +512,7 @@ accessibility_name = "Current Power uses"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrent"]
 layout_mode = 0
@@ -544,7 +555,7 @@ accessibility_name = "Current Omens"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrent"]
 layout_mode = 0
@@ -601,7 +612,7 @@ accessibility_name = "Strength modifier"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEdit"]
 layout_mode = 0
@@ -645,7 +656,7 @@ accessibility_name = "Agility modifier"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEdit"]
 layout_mode = 0
@@ -689,7 +700,7 @@ accessibility_name = "Presence modifier"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEdit"]
 layout_mode = 0
@@ -733,7 +744,7 @@ accessibility_name = "Toughness modifier"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEdit"]
 layout_mode = 0
@@ -1474,7 +1485,7 @@ accessibility_name = "Current Omens"
 theme_override_font_sizes/font_size = 18
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEdit"]
 layout_mode = 0

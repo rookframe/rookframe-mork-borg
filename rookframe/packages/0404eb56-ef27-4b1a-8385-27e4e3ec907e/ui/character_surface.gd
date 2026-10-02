@@ -276,7 +276,7 @@ func _core(data: Dictionary) -> void:
 	var selected := 0
 	for index in range(_weapons.size()):
 		var item: Dictionary = _weapons[index]
-		get_node(^"Margin/Layout/Body/Core/Weapon").add_item(str(item.get("name", "Weapon")) + " Â· " + str(item.get("damage", "")))
+		get_node(^"Margin/Layout/Body/Core/Weapon").add_item(str(item.get("name", "Weapon")) + " · " + str(item.get("damage", "")))
 		if str(item.inventory_id) == str(_nav.get("weapon", "")):
 			selected = index
 	if _weapons.is_empty():
@@ -285,13 +285,13 @@ func _core(data: Dictionary) -> void:
 	else:
 		_nav["weapon"] = str(_weapons[selected].inventory_id)
 	get_node(^"Margin/Layout/Body/Core/Weapon").select(selected)
-	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").text = "No ready weapon â€º" if _weapons.is_empty() else str(_weapons[selected].get("name", "Weapon")) + " Â· " + str(_weapons[selected].get("damage", "")) + " â€º"
+	get_node(^"Margin/Layout/Body/Core/ReadyWeapon").text = "No ready weapon ›" if _weapons.is_empty() else str(_weapons[selected].get("name", "Weapon")) + " · " + str(_weapons[selected].get("damage", "")) + " ›"
 	var protection: Array[String] = []
 	for raw in _items:
 		var item: Dictionary = raw
 		if item.get("equipped", false) and str(item.get("kind", "")) in ["Armor", "Shield"]:
 			protection.append(str(item.get("name", "")) + " " + str(item.get("reduction", "")))
-	get_node(^"Margin/Layout/Body/Core/Protection").text = "Protection & reactions â€º" if protection.is_empty() else _projection.text(protection) + " â€º"
+	get_node(^"Margin/Layout/Body/Core/Protection").text = "Protection & reactions ›" if protection.is_empty() else _projection.text(protection) + " ›"
 	var playable := _owner() and not _draft.active and not _action_live() and BROKEN.new().can_act(data)
 	get_node(^"Margin/Layout/Body/Core/WeaponActions/Attack").disabled = not playable or _weapons.is_empty()
 	get_node(^"Margin/Layout/Body/Core/WeaponActions/Damage").disabled = not _owner() or _draft.active or _action_live() or _weapons.is_empty()
@@ -482,15 +482,15 @@ func _render_detail() -> void:
 			_text(str(data.get("description", "")))
 			_text(str(data.get("origin", "")))
 			_text(_projection.text(data.get("class_rules", [])))
-			_text("Improvements: %d Â· %s" % [int(data.get("improvements", 0)), str(data.get("pack", ""))])
+			_text("Improvements: %d · %s" % [int(data.get("improvements", 0)), str(data.get("pack", ""))])
 		else:
 			if _phone and _detail == "class":
 				_group_fields(["class_title", "class_rules"], [1, 2])
 			for field in (["name", "description", "origin", "pack", "improvements"] if _detail == "profile" else ["class_title", "class_rules"]):
 				_character_field(str(field), str(field).replace("_", " ").capitalize())
 			if _detail == "class" and str(data.get("class_id", "")) == "gutterborn-scum":
-				_character_field("scum_specialty:0", "First specialty Â· 1â€“6")
-				_character_field("scum_specialty:1", "Second specialty Â· 0â€“6")
+				_character_field("scum_specialty:0", "First specialty · 1–6")
+				_character_field("scum_specialty:1", "Second specialty · 0–6")
 		if str(data.get("class_id", "")) == "occult-herbmaster":
 			_secondary("Inspect laboratory")
 	elif _detail.begins_with("resource:"):
@@ -514,7 +514,7 @@ func _render_detail() -> void:
 		var key := _detail.trim_prefix("ability:")
 		_detail_title.text = key
 		if _detail_tab == 1:
-			_character_field(key, key + " modifier Â· âˆ’3â€¦+6")
+			_character_field(key, key + " modifier · −3…+6")
 		else:
 			_text("Roll d20 %+d. Compare with the difficulty agreed at the table." % int(_projection.fields(data).get(key, 0)))
 			_primary("Test " + key, _can_act())
@@ -553,7 +553,7 @@ func _render_detail() -> void:
 	elif _detail == "catalogue":
 		_detail_title.text = "EQUIPMENT CATALOGUE"
 		for item in EQUIPMENT.new().entries():
-			_option(str(item.get("name", "Equipment")) + " Â· " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))))
+			_option(str(item.get("name", "Equipment")) + " · " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))))
 	elif _detail == "custom":
 		_detail_title.text = "CUSTOM ITEM"
 		_group_fields(["name", "quantity", "uses"] if _phone else ["name", "quantity"], [2, 1, 1] if _phone else [1, 1])
@@ -564,7 +564,7 @@ func _render_detail() -> void:
 		_detail_title.text = "Ready weapon"
 		for index in range(_weapons.size()):
 			var weapon: Dictionary = _weapons[index]
-			_option(("Selected Â· " if str(weapon.inventory_id) == str(_nav.get("weapon", "")) else "") + str(weapon.get("name", "Weapon")) + " Â· " + str(weapon.get("damage", "")), _choose_ready_weapon.bind(index))
+			_option(("Selected · " if str(weapon.inventory_id) == str(_nav.get("weapon", "")) else "") + str(weapon.get("name", "Weapon")) + " · " + str(weapon.get("damage", "")), _choose_ready_weapon.bind(index))
 		_primary("Attack", _can_act() and not _weapons.is_empty())
 		_secondary("Damage", _owner() and not _draft.active and not _weapons.is_empty())
 	elif _detail == "protection":
@@ -572,9 +572,9 @@ func _render_detail() -> void:
 		for raw in _items:
 			var item: Dictionary = raw
 			if item.get("equipped", false) and str(item.get("kind", "")) in ["Armor", "Shield"]:
-				_option(str(item.get("name", "Protection")) + " Â· " + str(item.get("reduction", "")), _open_detail.bind("item:" + str(item.inventory_id)))
+				_option(str(item.get("name", "Protection")) + " · " + str(item.get("reduction", "")), _open_detail.bind("item:" + str(item.inventory_id)))
 		_text("Defence is d20 + Agility. Resolve incoming damage, protection and reactions with the existing combat workflow or at the table.")
-		_primary("Dodge Â· test Agility", _can_act())
+		_primary("Dodge · test Agility", _can_act())
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailPages").refresh()
 
 func _text(text: String) -> void:
@@ -657,7 +657,7 @@ func _item_detail(item: Dictionary) -> void:
 			_option("Remove item", _remove_item)
 	else:
 		_text(str(item.get("rules", "")))
-		_text("Quantity: %d Â· %s" % [int(item.get("quantity", 0)), "Ready" if item.get("equipped", false) else "Carried"])
+		_text("Quantity: %d · %s" % [int(item.get("quantity", 0)), "Ready" if item.get("equipped", false) else "Carried"])
 		for key in ["damage", "range_feet", "reduction", "armor_tier"]:
 			if item.has(str(key)):
 				_text(str(key).replace("_", " ").capitalize() + ": " + str(item.get(str(key))))
@@ -799,7 +799,7 @@ func _workflow(kind: String, entry: String) -> void:
 	get_node(^"Margin/Layout/Body/Chapter/Detail/DetailHeader/Back").grab_focus()
 
 func _render_workflow() -> void:
-	_detail_title.text = "Getting betterâ€”or worse" if _action_kind == "improve" else {"improve": "Getting betterâ€”or worse", "rest": "Rest", "attack": "Attack", "damage": "Damage", "ability": "Ability test", "cast": "Cast Power", "use": "Use item"}.get(_action_kind, "Action")
+	_detail_title.text = "Getting better—or worse" if _action_kind == "improve" else {"improve": "Getting better—or worse", "rest": "Rest", "attack": "Attack", "damage": "Damage", "ability": "Ability test", "cast": "Cast Power", "use": "Use item"}.get(_action_kind, "Action")
 	if _action != null:
 		_text(_action.message)
 		if _action.state == "scroll":
@@ -813,7 +813,7 @@ func _render_workflow() -> void:
 			var entries: Array = _action.snapshot.get("specialties", [])
 			for index in range(entries.size()):
 				var entry: Dictionary = entries[index]
-				_option(("Selected Â· " if index in _rerolls else "Reroll Â· ") + str(entry.get("name", "Specialty")), _reroll_specialty.bind(index))
+				_option(("Selected · " if index in _rerolls else "Reroll · ") + str(entry.get("name", "Specialty")), _reroll_specialty.bind(index))
 			_primary("Confirm specialties", true)
 		elif _action.state == "scrolls":
 			_text("Choose the table-agreed scrolls within the supported families.")
@@ -825,21 +825,21 @@ func _render_workflow() -> void:
 		elif _action.state == "witnesses":
 			_primary("Confirm witnesses", true)
 		elif _action.state == "shield":
-			_option("Take damage Â· keep shield", _shield_choice.bind("take"))
-			_option("Break shield Â· take no damage", _shield_choice.bind("break"))
+			_option("Take damage · keep shield", _shield_choice.bind("take"))
+			_option("Break shield · take no damage", _shield_choice.bind("break"))
 		elif _action.state in ["resolved", "ended", "error"]:
 			_primary("Done", true)
 		else:
-			_primary("Rollingâ€¦", false)
+			_primary("Rolling…", false)
 		return
 	if _ability != null:
 		_text(_ability.message)
-		_primary("Rollingâ€¦" if _ability.pending else "Done", not _ability.pending)
+		_primary("Rolling…" if _ability.pending else "Done", not _ability.pending)
 		return
 	if _action_kind == "rest":
 		_text("Current HP %d / %d. Recovery applies once, up to maximum HP. Power uses and Omens remain unchanged." % [int(_data().get("hit_points", 0)), int(_data().get("maximum_hit_points", 1))])
-		_option(("Selected Â· " if _rest == "breath" else "") + "Catch your breath + drink Â· d4 HP", _rest_selected.bind("breath"))
-		_option(("Selected Â· " if _rest == "sleep" else "") + "Full night's sleep Â· d6 HP", _rest_selected.bind("sleep"))
+		_option(("Selected · " if _rest == "breath" else "") + "Catch your breath + drink · d4 HP", _rest_selected.bind("breath"))
+		_option(("Selected · " if _rest == "sleep" else "") + "Full night's sleep · d6 HP", _rest_selected.bind("sleep"))
 		_text("Without food/drink or while infected, no recovery. After two days without food, lose d4 HP per day; infection costs d6 HP per day. Resolve these at the table; Rest does not advance a day. When Omens are depleted, at least six hours' rest allows the class die; enter the result with Edit sheet.")
 		_primary("Roll recovery", true)
 	elif _action_kind == "improve":
@@ -848,17 +848,17 @@ func _render_workflow() -> void:
 		_primary("Roll 6d10", true)
 	elif _action_kind in ["attack", "damage"]:
 		var item := _item(str(_action_input.get("item", "")))
-		_text(str(item.get("name", "Bite")) + " Â· " + str(item.get("damage", "d6")))
+		_text(str(item.get("name", "Bite")) + " · " + str(item.get("damage", "d6")))
 		_text("Damage is a separate roll. It uses the preceding matching Attack's critical context once. Resolve target protection and consequences at the table.")
 		if _action_kind == "attack":
-			_workflow_field("difficulty", "DR override Â· 0 uses the weapon's rules")
+			_workflow_field("difficulty", "DR override · 0 uses the weapon's rules")
 			_workflow_field("modifier", "Situational modifier")
 			_option("Fumble: break weapon" if str(_action_input.get("fumble", "break")) == "break" else "Fumble: lose weapon", _fumble_choice)
 			var traits: Array = _data().get("traits", [])
 			for raw in traits:
 				var trait_entry: Dictionary = raw
 				if str(trait_entry.get("id", "")) == "cowards-jab":
-					_option("Coward's jab" if str(_action_input.get("mode", "")) != "jab" else "Coward's jab selected Â· use ordinary attack", _jab_choice)
+					_option("Coward's jab" if str(_action_input.get("mode", "")) != "jab" else "Coward's jab selected · use ordinary attack", _jab_choice)
 		_primary("Roll " + _action_kind, _can_act() if _action_kind == "attack" else _owner())
 	elif _action_kind == "ability":
 		_text("Test " + str(_action_input.get("ability", "")) + " with the current modifier. Compare with the DR agreed at the table.")
@@ -875,14 +875,14 @@ func _render_workflow() -> void:
 		_text(str(item.get("name", "Item")) + "\n" + str(item.get("rules", "")))
 		if rule.get("ability_choice", false):
 			for ability in PROJECTION.ABILITIES:
-				_option(str(ability) + (" Â· selected" if str(_action_input.get("ability", "")) == str(ability) else ""), _use_ability.bind(str(ability)))
+				_option(str(ability) + (" · selected" if str(_action_input.get("ability", "")) == str(ability) else ""), _use_ability.bind(str(ability)))
 		if rule.has("ability"):
 			_workflow_field("adjustment", "DR adjustment")
 		if rule.get("morale", false):
 			_workflow_field("morale", "Morale")
 			_option("Presence sign: %+d" % int(_action_input.get("presence_sign", 1)), _morale_sign)
 		if rule.get("gob", false):
-			_option("New fight" + (" Â· selected" if _action_input.get("new_fight", false) else ""), _new_fight)
+			_option("New fight" + (" · selected" if _action_input.get("new_fight", false) else ""), _new_fight)
 		_primary("Brew decoctions" if rule.get("brew", false) else "Use item", _owner())
 
 func _workflow_field(field: String, title: String) -> void:
@@ -1099,7 +1099,7 @@ func _render_condition(data: Dictionary) -> void:
 	get_node(^"Margin/Layout/Body/Core/Protection").visible = combat
 	get_node(^"Margin/Layout/Body/Core/Dodge").visible = combat and not _phone
 	get_node(^"Margin/Layout/Body/Core/ConditionReminder").visible = not combat
-	get_node(^"Margin/Layout/Body/Core/ConditionReminder").text = str(condition.get("title", "")) + " â€º Character"
+	get_node(^"Margin/Layout/Body/Core/ConditionReminder").text = str(condition.get("title", "")) + " › Character"
 	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionTitle").text = str(condition.get("title", ""))
 	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionCopy").text = str(condition.get("copy", ""))
 	get_node(^"Margin/Layout/Body/Chapter/Condition/ConditionCopy").add_theme_font_size_override("font_size", 12 if _phone else 16)

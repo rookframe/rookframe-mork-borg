@@ -77,6 +77,8 @@ func condition(data: Dictionary) -> Dictionary:
 		return {"title": "HEMORRHAGE", "copy": "Broken d4: 3. Deadline d2: %d hours. Elapsed: %d / %d. %s. Treatment stops the deadline without restoring HP." % [duration, elapsed, duration, "DR18 · last hour" if elapsed >= duration - 1 else "DR16 · first hour"]}
 	if outcome in [1, 2] and not incident.get("recovered", false):
 		return {"title": "UNCONSCIOUS" if outcome == 1 else "INJURED · UNABLE TO ACT", "copy": "Broken d4: %d. %s Duration d4: %d rounds. Elapsed: %d / %d. Recovery d4: %d HP, held until recovery is due." % [outcome, str(incident.get("injury", "")), duration, elapsed, duration, int(incident.get("recovery_hp", 0))]}
+	if hp == 0 and outcome == 3 and incident.get("treated", false):
+		return {"title": "TREATED", "copy": "Bleeding stopped. 0 HP. Record HP when healing is resolved; treatment does not restore HP."}
 	if hp == 0 and outcome == 0:
 		return {"title": "BROKEN · 0 HP", "copy": "Roll Broken d4 once for this incident. Follow-up results are retained on the sheet."}
 	return {}
