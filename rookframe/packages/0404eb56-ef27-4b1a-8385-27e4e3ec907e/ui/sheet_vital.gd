@@ -4,8 +4,9 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 	custom_minimum_size = Vector2(44, 44 if phone or tablet else 62)
 	get_node(^"Inset/Copy/Caption").text = caption
 	get_node(^"Inset/Copy/Caption").add_theme_font_size_override("font_size", 10 if phone else 11 if tablet else 12)
-	get_node(^"Inset/Copy/Number/Value").text = str(current)
-	get_node(^"Inset/Copy/Number/Value").add_theme_font_size_override("font_size", 20 if phone else 22 if tablet else 28)
+	for path in [^"Inset/Copy/Number/Value", ^"Inset/Copy/Number/HealthValue", ^"Inset/Copy/Number/DeadValue"]:
+		get_node(path).text = str(current)
+		get_node(path).add_theme_font_size_override("font_size", 20 if phone else 22 if tablet else 28)
 	get_node(^"Inset/Copy/Number/Extra").text = suffix
 	get_node(^"Inset/Copy/Number/Extra").add_theme_font_size_override("font_size", 10 if phone else 11 if tablet else 14)
 	get_node(^"Inset").add_theme_constant_override("margin_left", 28 if phone else 36 if tablet else 44)
@@ -15,7 +16,11 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 	get_node(^"Health").visible = maximum > 0
 	get_node(^"Health").max_value = maxi(1, maximum)
 	get_node(^"Health").value = current
-	var color := Color("ef5b54") if maximum > 0 and current <= 0 else Color("7dd989") if maximum > 0 else Color("44e9e9")
-	get_node(^"Inset/Copy/Number/Value").add_theme_color_override("font_color", color)
-	add_theme_color_override("icon_normal_color", color if maximum > 0 and current <= 0 else Color("44e9e9"))
+	get_node(^"Inset/Copy/Number/Value").visible = maximum == 0
+	get_node(^"Inset/Copy/Number/HealthValue").visible = maximum > 0 and current > 0
+	get_node(^"Inset/Copy/Number/DeadValue").visible = maximum > 0 and current <= 0
+	get_node(^"DangerIcon").visible = maximum > 0 and current <= 0
+	get_node(^"DangerIcon").offset_top = -10 if phone else -13 if tablet else -16
+	get_node(^"DangerIcon").offset_bottom = 10 if phone else 13 if tablet else 16
+	get_node(^"DangerIcon").offset_right = 32 if phone else 38 if tablet else 44
 	accessibility_name = "%s. %d %s" % [caption, current, suffix]
