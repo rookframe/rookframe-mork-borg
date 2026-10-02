@@ -48,7 +48,7 @@ func _field_typed(text: String, field: String) -> void:
 
 func configure_layout(phone: bool, tablet: bool) -> void:
 	custom_minimum_size = Vector2(228 if phone else 280 if tablet else 550, 0)
-	add_theme_constant_override("separation", 4 if phone else 10 if tablet else 12)
+	add_theme_constant_override("separation", 4 if phone else 6 if tablet else 12)
 	get_node(^"Likeness").size_flags_vertical = 3 if phone else 1
 	get_node(^"Likeness/Vitals").add_theme_constant_override("separation", 0 if phone or tablet else 4)
 	get_node(^"Likeness").add_theme_constant_override("separation", 12 if phone or tablet else 22)
