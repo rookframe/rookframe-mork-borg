@@ -46,7 +46,6 @@ layout_mode = 2
 size_flags_vertical = 3
 [node name="Rows" type="VBoxContainer" parent="Pages/Area"]
 layout_mode = 0
-anchor_right = 1.0
 theme_override_constants/separation = 4
 [node name="HP" type="MarginContainer" parent="Pages/Area/Rows"]
 layout_mode = 2
