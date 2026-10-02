@@ -63,8 +63,8 @@ func configure(data: Dictionary, condition: Dictionary, enabled: bool) -> void:
 		pip.visible = index < duration
 		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).text = str(index + 1)
 		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).add_theme_color_override("font_color", MUTED if index < elapsed else Color(1, 1, 1, 1))
-		pip.get_node(^"Elapsed").visible = index < elapsed
-		pip.get_node(^"Strike").visible = index < elapsed
+		(get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Elapsed", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Elapsed", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Elapsed", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Elapsed"][index]) as Control).visible = index < elapsed
+		(get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Strike", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Strike", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Strike", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Strike"][index]) as Control).visible = index < elapsed
 		pip.accessibility_name = "Round %d · %s" % [index + 1, "elapsed" if index < elapsed else "remaining"]
 	get_node(^"Main/Frame/Inset/Content/Death").visible = dead
 	get_node(^"Main/Frame/Inset/Content/Death/Copy").text = str(condition.get("copy", ""))

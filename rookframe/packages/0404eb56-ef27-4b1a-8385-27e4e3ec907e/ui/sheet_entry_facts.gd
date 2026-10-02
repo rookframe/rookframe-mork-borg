@@ -1,7 +1,8 @@
 extends GridContainer
 
 func configure(facts: Array, phone: bool) -> void:
-	for fact in facts:
+	for raw in facts:
+		var fact: Array = raw
 		var lane := VBoxContainer.new()
 		lane.size_flags_horizontal = 3
 		lane.add_theme_constant_override("separation", 4)

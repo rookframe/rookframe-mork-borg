@@ -46,7 +46,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "×"
 theme_override_font_sizes/font_size = 30
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskGlyphButton"
 tooltip_text = "Close details"
 accessibility_name = "Close details"
 [node name="TabsFrame" type="PanelContainer" parent="."]
@@ -61,21 +61,29 @@ layout_mode = 2
 theme_override_constants/separation = 8
 [node name="Overview" type="Button" parent="TabsFrame/Inset/DetailTabs"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Overview"
 custom_minimum_size = Vector2(44, 48)
 toggle_mode = true
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskDetailTab"
 theme_override_styles/normal = SubResource("tab_normal")
 theme_override_styles/pressed = SubResource("selected")
+theme_override_styles/hover = SubResource("tab_normal")
+theme_override_styles/hover_pressed = SubResource("selected")
+theme_override_styles/disabled = SubResource("tab_normal")
 theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
 [node name="Details" type="Button" parent="TabsFrame/Inset/DetailTabs"]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Details"
 custom_minimum_size = Vector2(44, 48)
 toggle_mode = true
-theme_type_variation = "TaskButton"
+theme_type_variation = "TaskDetailTab"
 theme_override_styles/normal = SubResource("tab_normal")
 theme_override_styles/pressed = SubResource("selected")
+theme_override_styles/hover = SubResource("tab_normal")
+theme_override_styles/hover_pressed = SubResource("selected")
+theme_override_styles/disabled = SubResource("tab_normal")
 theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
 [node name="Body" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -88,51 +96,54 @@ theme_override_constants/separation = 16
 [node name="FullTitle" type="Label" parent="Body/DetailPages/Area/DetailContent"]
 layout_mode = 2
 autowrap_mode = 3
-[node name="FooterInset" type="MarginContainer" parent="."]
+[node name="FooterFrame" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = "TaskFooter"
+[node name="FooterInset" type="MarginContainer" parent="FooterFrame"]
 layout_mode = 2
 theme_override_constants/margin_left = 14
 theme_override_constants/margin_right = 14
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_bottom = 8
-[node name="DetailActions" type="BoxContainer" parent="FooterInset"]
+[node name="DetailActions" type="BoxContainer" parent="FooterFrame/FooterInset"]
 layout_mode = 2
 vertical = true
 theme_override_constants/separation = 7
-[node name="Utility" type="HBoxContainer" parent="FooterInset/DetailActions"]
+[node name="Utility" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 16
-[node name="SecondaryAction" type="Button" parent="FooterInset/DetailActions/Utility"]
+[node name="SecondaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions/Utility"]
 layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
-[node name="PagerSlot" type="HBoxContainer" parent="FooterInset/DetailActions/Utility"]
+[node name="PagerSlot" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions/Utility"]
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="PrimaryAction" type="Button" parent="FooterInset/DetailActions"]
+[node name="PrimaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions"]
 layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(44, 48)
 size_flags_horizontal = 3
 theme_type_variation = "TaskPrimary"
-[node name="Draft" type="HBoxContainer" parent="FooterInset/DetailActions"]
+[node name="Draft" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions"]
 layout_mode = 2
 visible = false
 size_flags_horizontal = 3
 theme_override_constants/separation = 8
-[node name="Status" type="Label" parent="FooterInset/DetailActions/Draft"]
+[node name="Status" type="Label" parent="FooterFrame/FooterInset/DetailActions/Draft"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Unsaved sheet changes"
 text_overrun_behavior = 3
 theme_override_font_sizes/font_size = 12
-[node name="Cancel" type="Button" parent="FooterInset/DetailActions/Draft"]
+[node name="Cancel" type="Button" parent="FooterFrame/FooterInset/DetailActions/Draft"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Cancel"
 theme_type_variation = "TaskButton"
-[node name="Save" type="Button" parent="FooterInset/DetailActions/Draft"]
+[node name="Save" type="Button" parent="FooterFrame/FooterInset/DetailActions/Draft"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Save sheet"

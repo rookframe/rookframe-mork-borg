@@ -2,6 +2,10 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_inline_field.gd" id="inline"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
 [sub_resource type="StyleBoxFlat" id="InlineEditor"]
 bg_color = Color(0.027451, 0.062745, 0.082353, 1)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
@@ -26,10 +30,6 @@ content_margin_right = 5.0
 content_margin_top = 17.0
 content_margin_bottom = 3.0
 
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
 [node name="ResourceEditors" type="VBoxContainer"]
 script = ExtResource("script")
 size_flags_vertical = 3

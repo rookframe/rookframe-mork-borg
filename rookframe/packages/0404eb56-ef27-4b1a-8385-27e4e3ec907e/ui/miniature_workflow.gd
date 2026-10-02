@@ -95,7 +95,7 @@ func _apply() -> void:
 	get_node(^"Status").text = _t("Saving Miniature…")
 	var message := ""
 	if _actor == null:
-		var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition, "package_id": reference.package_id, "local_id": reference.local_id})
+		var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition, "package_id": reference.get("package_id", ""), "local_id": reference.get("local_id", "")})
 		if not result.ok:
 			message = result.message
 		elif str(result.value.get("state", "error")) != "resolved":

@@ -40,13 +40,15 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		return _public(action)
 	if action.participant != caller.participant_id or action.session != caller.session_id:
 		return _error("This action belongs to another Participant session.")
-	if not str(action.state) in ["pending", "scroll", "specialties", "continue"]:
+	if not str(action.state) in ["pending", "scroll", "specialties", "continue", "ready"]:
 		return _public(action)
 	var source := context.read_actor(SDK.ActorId.new(str(action.source)))
 	if operation == "health.cancel" or not PARTICIPANTS.new().alive(context, action) or not source.ok or source.actor.access_level != "Owner" or not _valid(source.actor.data):
 		return _end(context, action)
 	if str(action.state) == "continue":
 		return _continue(context, action, source.actor.data) if operation == "health.choose" and input.get("continue", false) else _public(action)
+	if str(action.state) == "ready":
+		return _roll_phase(context, action, source.actor.data, str(action.phase)) if operation == "health.choose" and input.get("roll", false) else _public(action)
 	if str(action.state) in ["scroll", "specialties"]:
 		return _choose(context, action, input, source.actor.data) if operation == "health.choose" else _public(action)
 	if operation in ["health.advance", "health.start"]:
@@ -63,7 +65,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Character data is malformed. Correct the sheet first.")
 	var data: Dictionary = source.actor.data
 	for active in _actions:
-		if str(active.get("source", "")) == str(input.source) and str(active.state) in ["pending", "scroll", "specialties", "continue"]:
+		if str(active.get("source", "")) == str(input.source) and str(active.state) in ["pending", "scroll", "specialties", "continue", "ready"]:
 			if PARTICIPANTS.new().alive(context, active):
 				return _error("Finish or cancel this Character's current recovery or improvement first.")
 			_end(context, active)
@@ -140,7 +142,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 	data["hit_points"] = hp + recovered
 	var completed := _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Recovery: regained %d HP; %d → %d / %d. Raw Roll #%d. Omens and timed consequences remain table-managed." % [recovered, hp, hp + recovered, maximum, roll.sequence], "+%d HP" % recovered, "success")
 	if str(completed.state) == "resolved":
-		action.results["rest"] = {"roll": roll.terms[0].results[0], "before": hp, "after": hp + recovered, "maximum": maximum, "restored": recovered}
+		var results: Dictionary = action.results
+		results["rest"] = {"roll": roll.terms[0].results[0], "before": hp, "after": hp + recovered, "maximum": maximum, "restored": recovered}
 	return action if str(completed.state) == "resolved" else completed
 
 func _valid(value: Variant) -> bool:
@@ -215,7 +218,10 @@ func _improvable(data: Dictionary) -> bool:
 
 func _request(context: SDK.SystemActionContext, action: Dictionary, phase: String, terms: Array[SDK.DiceTerm], first: bool = false) -> Dictionary:
 	if action.get("sheet", false) and str(action.kind) == "improve" and not first and not action.get("continuing", false):
-		action["next_terms"] = terms
+		var plan: Array[Dictionary] = []
+		for term in terms:
+			plan.append(term.to_record())
+		action["next_terms"] = plan
 		return _pause(action, phase)
 	action.erase("continuing")
 	action.erase("next_phase")
@@ -237,6 +243,7 @@ func _improve(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 	var suffix := " Raw Roll #%d." % roll.sequence
 	var text := ""
 	var accepted: Dictionary = {}
+	var results: Dictionary = action.results
 	if phase == "more_hp":
 		var total := 0
 		for die in roll.terms[0].results:
@@ -245,7 +252,7 @@ func _improve(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 		accepted["more_hp"] = {"faces": roll.terms[0].results.duplicate(), "total": total, "maximum": maximum, "qualifies": total >= maximum}
 		if not _record(context, [], "More HP: 6d10 = %d against maximum HP %d.%s" % [total, maximum, suffix]):
 			return _end(context, action)
-		action.results.merge(accepted, true)
+		results[phase] = accepted.get(phase)
 		return _request(context, action, "hp_increase", [SDK.DiceTerm.new("Maximum HP increase", 6)]) if total >= maximum else _debris(context, action)
 	if phase == "hp_increase":
 		var maximum: int = current.maximum_hit_points
@@ -257,7 +264,7 @@ func _improve(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 		if value == 4:
 			if not _record(context, [], "Debris: roll 3d10 Silver." + suffix):
 				return _end(context, action)
-			action.results.merge(accepted, true)
+			results[phase] = accepted.get(phase)
 			return _request(context, action, "silver", [SDK.DiceTerm.new("Silver", 10, 3)])
 		if value in [5, 6]:
 			action["family"] = "unclean" if value == 5 else "sacred"
@@ -265,7 +272,7 @@ func _improve(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 			action["message"] = "Choose the found %s scroll with the table; its identity is not specified by the debris rule." % str(action.family)
 			if not _record(context, [], str(action.message) + suffix):
 				return _end(context, action)
-			action.results.merge(accepted, true)
+			results[phase] = accepted.get(phase)
 			return action
 		text = "Nothing found in the debris." + suffix
 	elif phase == "silver":
@@ -301,7 +308,7 @@ func _improve(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 		return _end(context, action)
 	if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text):
 		return _end(context, action)
-	action.results.merge(accepted, true)
+	results[phase] = accepted.get(phase)
 	action["message"] = text
 	if phase == "hp_increase":
 		return _debris(context, action)
@@ -340,13 +347,27 @@ func _continue(context: SDK.SystemActionContext, action: Dictionary, data: Dicti
 	var next_phase := str(action.get("next_phase", ""))
 	if next_phase == "finish":
 		return _public(_finish(context, action, [], "Improvement complete. Accepted changes remain on the sheet."))
+	if next_phase in ["debris", "abilities"]:
+		action["phase"] = next_phase
+		action["state"] = "ready"
+		action.erase("next_phase")
+		action["message"] = "Roll this step when ready. Accepted results remain on the sheet."
+		return _public(action)
 	action["continuing"] = true
 	if next_phase == "class":
 		return _public(_class_step(context, action, data))
+	return _roll_phase(context, action, data, next_phase)
+
+func _roll_phase(context: SDK.SystemActionContext, action: Dictionary, data: Dictionary, phase: String) -> Dictionary:
+	if not _improvable(data):
+		return _public(_end(context, action))
+	action["continuing"] = true
 	var terms: Array[SDK.DiceTerm] = []
-	for term in action.get("next_terms", []):
-		terms.append(term)
-	return _public(_request(context, action, next_phase, terms))
+	var queued: Array = action.get("next_terms", [])
+	for raw in queued:
+		var term: Dictionary = raw
+		terms.append(SDK.DiceTerm.new(str(term.name), int(term.faces), int(term.count)))
+	return _public(_request(context, action, phase, terms))
 
 func _debris(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	return _request(context, action, "debris", [SDK.DiceTerm.new("Debris", 6)])
@@ -368,7 +389,8 @@ func _choose(context: SDK.SystemActionContext, action: Dictionary, input: Dictio
 			return _public(action)
 		if selected.is_empty():
 			if action.get("sheet", false):
-				action.results["class"] = "Both specialties retained."
+				var results: Dictionary = action.get("results", {})
+				results["class"] = "Both specialties retained."
 				return _public(_pause(action, "finish"))
 			return _public(_finish(context, action, [], "Improvement complete. Both specialties retained."))
 		action["reroll"] = selected.duplicate()
@@ -398,7 +420,8 @@ func _choose(context: SDK.SystemActionContext, action: Dictionary, input: Dictio
 	data["inventory_serial"] = serial
 	if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "Debris: found " + str(addition.name) + ". Added to Inventory. Casting restrictions still apply."):
 		return _end(context, action)
-	action.results["scroll"] = str(addition.name)
+	var scroll_results: Dictionary = action.get("results", {})
+	scroll_results["scroll"] = str(addition.name)
 	return _public(_ability_roll(context, action))
 
 func _specialty_result(context: SDK.SystemActionContext, action: Dictionary, current: Dictionary, roll: SDK.HumanThrowResult) -> Dictionary:
@@ -423,7 +446,8 @@ func _specialty_result(context: SDK.SystemActionContext, action: Dictionary, cur
 	if action.get("sheet", false):
 		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + "Raw Roll #%d." % roll.sequence):
 			return _end(context, action)
-		action.results["class"] = text
+		var results: Dictionary = action.get("results", {})
+		results["class"] = text
 		return _pause(action, "finish")
 	return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + "Raw Roll #%d. Omen benefits and delayed effects remain manual." % roll.sequence)
 

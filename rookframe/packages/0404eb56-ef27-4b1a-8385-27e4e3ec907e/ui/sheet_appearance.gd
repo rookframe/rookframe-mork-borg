@@ -13,10 +13,10 @@ const PORTRAIT := ^"PortraitPanel/Inset/Content"
 const MINIATURE := ^"MiniaturePanel/Inset/Content"
 
 func _ready() -> void:
-	get_node(PORTRAIT).get_node(^"PortraitButtons/ChangePortrait").pressed.connect(_choose_portrait)
-	get_node(PORTRAIT).get_node(^"PortraitButtons/ClearPortrait").pressed.connect(_clear_portrait)
-	get_node(MINIATURE).get_node(^"MiniatureButtons/ChangeMiniature").pressed.connect(_choose_miniature)
-	get_node(MINIATURE).get_node(^"MiniatureButtons/ClearMiniature").pressed.connect(_clear_miniature)
+	(get_node(^"PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait") as Button).pressed.connect(_choose_portrait)
+	(get_node(^"PortraitPanel/Inset/Content/PortraitButtons/ClearPortrait") as Button).pressed.connect(_clear_portrait)
+	(get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature") as Button).pressed.connect(_choose_miniature)
+	(get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ClearMiniature") as Button).pressed.connect(_clear_miniature)
 
 func configure(facade: SDK, actor: SDK.Actor) -> void:
 	_sdk = facade
@@ -24,21 +24,22 @@ func configure(facade: SDK, actor: SDK.Actor) -> void:
 	var owner := actor.access_level == "Owner"
 	for path in [^"PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait", ^"PortraitPanel/Inset/Content/PortraitButtons/ClearPortrait", ^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature", ^"MiniaturePanel/Inset/Content/MiniatureButtons/ClearMiniature"]:
 		get_node(path).disabled = not owner or _busy
-	var reference: Dictionary = actor.data.get("preferred_miniature", {})
+	var data: Dictionary = actor.data
+	var reference: Dictionary = data.get("preferred_miniature", {})
 	var content = get_node(MINIATURE)
-	content.get_node(^"MiniaturePreview").visible = not reference.is_empty()
-	content.get_node(^"EmptyPreview").visible = reference.is_empty()
-	content.get_node(^"MiniatureButtons/ClearMiniature").visible = not reference.is_empty()
-	content.get_node(^"MiniatureButtons/ChangeMiniature").text = "Choose miniature" if reference.is_empty() else "Change miniature"
-	content.get_node(^"PackageCaption").text = ""
-	content.get_node(^"MiniatureCaption").text = "No miniature selected"
+	(get_node(^"MiniaturePanel/Inset/Content/MiniaturePreview") as Control).visible = not reference.is_empty()
+	(get_node(^"MiniaturePanel/Inset/Content/EmptyPreview") as Control).visible = reference.is_empty()
+	(get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ClearMiniature") as Control).visible = not reference.is_empty()
+	(get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature") as Button).text = "Choose miniature" if reference.is_empty() else "Change miniature"
+	(get_node(^"MiniaturePanel/Inset/Content/PackageCaption") as Label).text = ""
+	(get_node(^"MiniaturePanel/Inset/Content/MiniatureCaption") as Label).text = "No miniature selected"
 	if reference.is_empty() or not is_visible_in_tree():
 		return
 	var entry := SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", "")))
 	var found := _sdk.content.read(entry)
-	content.get_node(^"MiniatureCaption").text = found.content_entry.localized_title if found.ok else "Miniature unavailable"
-	content.get_node(^"PackageCaption").text = found.content_entry.package_title if found.ok else ""
-	var preview := _sdk.content.preview_miniature(entry, content.get_node(^"MiniaturePreview"))
+	(get_node(^"MiniaturePanel/Inset/Content/MiniatureCaption") as Label).text = found.content_entry.localized_title if found.ok else "Miniature unavailable"
+	(get_node(^"MiniaturePanel/Inset/Content/PackageCaption") as Label).text = found.content_entry.package_title if found.ok else ""
+	var preview := _sdk.content.preview_miniature(entry, get_node(^"MiniaturePanel/Inset/Content/MiniaturePreview"))
 	if not preview.ok:
 		message.emit(preview.message)
 
@@ -53,8 +54,8 @@ func portrait(data: Dictionary) -> Texture2D:
 			caption = "Character portrait"
 		else:
 			caption = decoded.message
-	get_node(PORTRAIT).get_node(^"PortraitPreview/Image").texture = texture
-	get_node(PORTRAIT).get_node(^"PortraitPreview").accessibility_description = caption
+	(get_node(^"PortraitPanel/Inset/Content/PortraitPreview/Image") as TextureRect).texture = texture
+	(get_node(^"PortraitPanel/Inset/Content/PortraitPreview") as Control).accessibility_description = caption
 	return texture
 
 func _choose_miniature() -> void:

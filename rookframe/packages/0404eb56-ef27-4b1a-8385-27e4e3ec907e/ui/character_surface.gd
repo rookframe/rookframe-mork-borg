@@ -61,9 +61,9 @@ const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _chapter_tab_inventory = _chapter_ui.get_node(^"Tabs/TabInventory")
 @onready var _chapter_tab_journal = _chapter_ui.get_node(^"Tabs/TabJournal")
 @onready var _chapter_tab_powers = _chapter_ui.get_node(^"Tabs/TabPowers")
-@onready var _actions_ui = _detail_ui.get_node(^"FooterInset/DetailActions")
-@onready var _primary_button = _detail_ui.get_node(^"FooterInset/DetailActions/PrimaryAction")
-@onready var _secondary_button = _detail_ui.get_node(^"FooterInset/DetailActions/Utility/SecondaryAction")
+@onready var _actions_ui = _detail_ui.get_node(^"FooterFrame/FooterInset/DetailActions")
+@onready var _primary_button = _detail_ui.get_node(^"FooterFrame/FooterInset/DetailActions/PrimaryAction")
+@onready var _secondary_button = _detail_ui.get_node(^"FooterFrame/FooterInset/DetailActions/Utility/SecondaryAction")
 @onready var _detail_back = _detail_ui.get_node(^"HeaderFrame/Inset/DetailHeader/Back")
 @onready var _detail_title = _detail_ui.get_node(^"HeaderFrame/Inset/DetailHeader/DetailTitle")
 @onready var _detail_content = _detail_ui.get_node(^"Body/DetailPages/Area/DetailContent")
@@ -72,24 +72,24 @@ const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _detail_overview = _detail_ui.get_node(^"TabsFrame/Inset/DetailTabs/Overview")
 @onready var _workflow_slot = get_node(^"Margin/Layout/Workflow/Body/Main/Content/Procedure/Inset/Slot")
 @onready var _workflow_footer = get_node(^"Margin/Layout/Workflow/Footer")
-@onready var _header_cancel_sheet = _header.get_node(^"CancelSheet")
-@onready var _header_close = _header.get_node(^"Close")
-@onready var _header_edit = _header.get_node(^"Edit")
-@onready var _header_editing_status = _header.get_node(^"EditingStatus")
-@onready var _header_improve = _header.get_node(^"Improve")
-@onready var _header_name = _header.get_node(^"Name")
-@onready var _header_name_edit = _header.get_node(^"NameEditField/Editor")
-@onready var _header_name_edit__caption = _header.get_node(^"NameEditField/Editor/Caption")
-@onready var _header_rest = _header.get_node(^"Rest")
-@onready var _header_save_sheet = _header.get_node(^"SaveSheet")
-@onready var _header_spacer = _header.get_node(^"Spacer")
-@onready var _header_system = _header.get_node(^"System")
+@onready var _header_cancel_sheet = get_node(^"Margin/Layout/Header/CancelSheet")
+@onready var _header_close = get_node(^"Margin/Layout/Header/Close")
+@onready var _header_edit = get_node(^"Margin/Layout/Header/Edit")
+@onready var _header_editing_status = get_node(^"Margin/Layout/Header/EditingStatus")
+@onready var _header_improve = get_node(^"Margin/Layout/Header/Improve")
+@onready var _header_name = get_node(^"Margin/Layout/Header/Name")
+@onready var _header_name_edit = get_node(^"Margin/Layout/Header/NameEditField/Editor")
+@onready var _header_name_edit__caption = get_node(^"Margin/Layout/Header/NameEditField/Editor/Caption")
+@onready var _header_rest = get_node(^"Margin/Layout/Header/Rest")
+@onready var _header_save_sheet = get_node(^"Margin/Layout/Header/SaveSheet")
+@onready var _header_spacer = get_node(^"Margin/Layout/Header/Spacer")
+@onready var _header_system = get_node(^"Margin/Layout/Header/System")
 @onready var _quick = _chapter_ui.get_node(^"QuickResources")
 @onready var _appearance_change_miniature = _appearance_ui.get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
 @onready var _quick_parent = _chapter_ui
 @onready var _workflow_ui = get_node(^"Margin/Layout/Workflow")
 @onready var _detail_parent = _chapter_ui
-@onready var _actions_parent = _detail_ui.get_node(^"FooterInset")
+@onready var _actions_parent = _detail_ui.get_node(^"FooterFrame/FooterInset")
 var _combat_options: Dictionary = {"difficulty": 0, "modifier": 0, "fumble": "break"}
 var _scroll_choices: Array[String] = []
 var _portrait_texture: Texture2D
@@ -128,6 +128,7 @@ var _busy := false
 var _refresh_pending := false
 var _action_pending := false
 var _detail_pending := false
+var _back_pending := false
 var _elapsed := 0.0
 var _phone := false
 var _setting := false
@@ -142,7 +143,6 @@ func ready() -> void:
 	_detail_ui.close_requested.connect(_dismiss_detail)
 	_detail_ui.save_requested.connect(_save_sheet)
 	_detail_ui.cancel_requested.connect(_cancel_edit)
-	_detail_ui.back_requested.connect(_back)
 	_workflow_ui.back_requested.connect(_back)
 	_workflow_ui.rest_selected.connect(_rest_selected)
 	_workflow_ui.section_changed.connect(_request_detail)
@@ -268,6 +268,9 @@ func _process(delta: float) -> void:
 		elif _action != null:
 			_status(_action.message)
 
+	if _back_pending:
+		_back_pending = false
+		_finish_back()
 	if _detail_pending:
 		_detail_pending = false
 		_render_detail()
@@ -367,7 +370,7 @@ func _show_route() -> void:
 	var task := _detail in ["workflow:rest", "workflow:improve"]
 	var modal := details and not _phone and not task
 	var detail_parent = _workflow_slot if task else get_node(^"EntryDialog/Surface/Inset") if modal else _chapter_ui
-	var actions_parent = _workflow_footer if task else _detail_ui.get_node(^"FooterInset")
+	var actions_parent = _workflow_footer if task else _detail_ui.get_node(^"FooterFrame/FooterInset")
 	if _actions_parent != actions_parent:
 		_actions_parent.remove_child(_actions_ui)
 		actions_parent.add_child(_actions_ui)
@@ -796,8 +799,6 @@ func _item_detail(item: Dictionary) -> void:
 			_secondary("Carry" if item.get("equipped", false) else "Ready / equip", _owner())
 
 func _refresh_detail() -> void:
-	# Accepted inventory changes refresh untouched independent item fields.
-	# Draft character fields remain in the shared draft, including across Back.
 	if _detail.begins_with("item:") and _item_edit:
 		var item := _item(_detail.trim_prefix("item:"))
 		if item.is_empty():
@@ -830,15 +831,22 @@ func _can_act() -> bool:
 	return _owner() and not _draft.active and BROKEN.new().can_act(_actor.data)
 
 func _back() -> void:
-	if _detail == "workflow:improve" and _action_live() and not _ending_improvement:
+	if _detail == "workflow:improve" and _action_live():
 		_ending_improvement = true
 		_request_detail()
 		return
+	_return_from_detail()
+
+func _return_from_detail() -> void:
+	_back_pending = true
+
+func _finish_back() -> void:
 	if not _history.is_empty() and not _detail.begins_with("workflow:"):
-		var previous: Dictionary = _history.pop_back()
+		var previous: Dictionary = _history[_history.size() - 1]
+		_history.remove_at(_history.size() - 1)
 		_detail = str(previous.entry)
 		_detail_tab = int(previous.tab)
-		_render_detail()
+		_request_detail()
 		_detail_ui.restore_paging(previous.page)
 		_show_route()
 		return
@@ -972,9 +980,8 @@ func _render_workflow() -> void:
 	if _action != null:
 		if _action_kind != "improve":
 			_text(_action.message)
-		if _action.state == "continue":
-			var next := str(_action.snapshot.get("next_phase", ""))
-			_primary({"hp_increase": "Roll d6 increase", "debris": "Continue to debris ›", "silver": "Roll 3d10 Silver", "abilities": "Continue to abilities ›", "class": "Continue to class ›", "specialty_roll": "Roll specialties", "finish": "Finish improvement"}.get(next, "Continue"), true)
+		if _action.state in ["continue", "ready"]:
+			_primary((_action as HEALTH).primary_label(), true)
 			return
 		if _action.state == "scroll":
 			var family := str(_action.snapshot.get("family", ""))
@@ -1115,15 +1122,15 @@ func _new_fight() -> void:
 func _primary_action() -> void:
 	if _detail == "workflow:improve":
 		if _ending_improvement:
-			_back()
+			_return_from_detail()
 			_ending_improvement = false
 			return
 		if _action == null and not _workflow_ui.prepared:
 			_workflow_ui.prepared = true
 			_request_detail()
 			return
-		if _action != null and _action.state == "continue":
-			await (_action as HEALTH).choose({"continue": true})
+		if _action != null and _action.state in ["continue", "ready"]:
+			await (_action as HEALTH).choose({"continue" if _action.state == "continue" else "roll": true})
 			return
 	if _busy:
 		return

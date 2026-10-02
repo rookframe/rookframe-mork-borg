@@ -314,4 +314,10 @@ func _advance_improvement(host: BOUNDARY, sheet: bool) -> SDK.DataResult:
 		await sdk.system_actions.submit("health.advance", {"id": "improvement"})
 		assert_int(host.reports.size()).is_equal(reports)
 		result = await sdk.system_actions.submit("health.choose", {"id": "improvement", "continue": true})
+		if str(result.value.state) == "ready":
+			assert_int(host.requests.size()).is_equal(requests)
+			await sdk.system_actions.submit("health.advance", {"id": "improvement"})
+			assert_int(host.requests.size()).is_equal(requests)
+			assert_int(host.reports.size()).is_equal(reports)
+			result = await sdk.system_actions.submit("health.choose", {"id": "improvement", "roll": true})
 	return result

@@ -44,8 +44,9 @@ Miniature modal was superseded by the user on 2 October 2026. Viewer access keep
 QA uses public HTTPS Manifests and normal installation/World-join acquisition.
 
 
-In the full sheet, each accepted Improvement phase remains visible until Continue.
-The next Throw is requested only by that action. Completed HP, debris, Silver,
+In the full sheet, accepted Improvement results remain visible until Continue.
+Continue opens the unrolled Debris or Abilities phase; its Roll action requests
+the next Throw. HP increases and Silver have their own Roll actions. Completed HP, debris, Silver,
 scroll and ability results retain their individual faces and before/after values.
 Back offers Continue procedure or End procedure; End preserves accepted changes
 and does not create a resumable procedure. Existing compact recovery controls
