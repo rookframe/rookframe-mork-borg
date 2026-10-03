@@ -61,6 +61,8 @@ Phone paged multiline editors use the approved compact height, including item
 Rules. Phone status copy stays in the chapter column so the persistent core and
 its actions retain their full touch area. Cancel clears the abandoned draft's
 validation, and both sheet and Details windows handle Escape before editors.
+Returning to a chapter restores the originating entry after native Container
+layout, so feedback that changes page capacity cannot move focus to another item.
 Nested references retain page history; native editor focus returns after World
 refresh. Escape cancels the shared sheet draft; Back retains it. Save validates
 through the same character correction boundary used by the inline resource rows.

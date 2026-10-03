@@ -110,3 +110,9 @@ func restore_pages(pages: Dictionary, chapter: int) -> void:
 func configure_journal(story: Array[Dictionary], notes: Array[Dictionary]) -> void:
 	_story = story
 	_notes = notes
+
+func focus_entry(id: String) -> bool:
+	for path in ["Collections/Primary", "Collections/Secondary/Resources", "Collections/Secondary/Companions", "JournalPanel/Story", "JournalPanel/Notes"]:
+		if get_node(path).focus_entry(id):
+			return true
+	return false

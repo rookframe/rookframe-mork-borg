@@ -116,6 +116,7 @@ var _ending_improvement := false
 var _condition_reference := false
 var _cast_modifier := "0"
 var _focus_detail_action := false
+var _focus_chapter_pending := false
 var _action: ACTION
 var _ability: ABILITY
 var _action_kind := ""
@@ -268,6 +269,10 @@ func _process(delta: float) -> void:
 		elif _action != null:
 			_status(_action.message)
 
+	if _focus_chapter_pending:
+		_focus_chapter_pending = false
+		if _detail.is_empty() and not _chapter_ui.focus_entry(_opened_entry):
+			_chapters[int(_nav.get("chapter", 0))].grab_focus()
 	if _back_pending:
 		_back_pending = false
 		_finish_back()
@@ -861,17 +866,8 @@ func _finish_back() -> void:
 	elif is_instance_valid(_opener) and _opener.is_visible_in_tree():
 		_opener.grab_focus()
 	else:
-		var focused: bool = _chapter_primary.focus_entry(_opened_entry)
-		if not focused:
-			focused = _chapter_resources.focus_entry(_opened_entry)
-		if not focused:
-			focused = _chapter_companions.focus_entry(_opened_entry)
-		if not focused:
-			focused = _chapter_story.focus_entry(_opened_entry)
-		if not focused:
-			focused = _chapter_notes.focus_entry(_opened_entry)
-		if not focused:
-			_chapters[int(_nav.get("chapter", 0))].grab_focus()
+		# Let the revealed chapter's Containers finish sizing before choosing a page.
+		_focus_chapter_pending = true
 
 func _remember_opener(id: String) -> void:
 	_opened_entry = id
