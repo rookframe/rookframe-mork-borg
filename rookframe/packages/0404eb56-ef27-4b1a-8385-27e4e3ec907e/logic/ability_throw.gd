@@ -37,28 +37,11 @@ func start(selected_ability: String, sheet: bool = false) -> void:
 	if str(data.get("schema", "")) != "mork-borg-character/v1" or not selected_ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		_finish("Choose a Character modifier.", true)
 		return
-	var context: SDK.WorldContext = _sdk.context()
-	if not context.ok:
-		_finish(context.message, true)
+	var responsibility: Dictionary = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/ability_throw_responsibility.gd").new().resolve(_sdk, _actor, sheet)
+	if not responsibility.get("ok", false):
+		_finish(str(responsibility.get("message", "")), true)
 		return
-	var participant := context.participant_id
-	if context.is_gm and not sheet:
-		var access: SDK.ActorAccessListResult = _sdk.actors.access(_actor)
-		if not access.ok:
-			_finish(access.message, true)
-			return
-		var owners: Array[SDK.ActorAccessEntry] = []
-		for entry in access.items:
-			if entry.access_level == "Owner":
-				owners.append(entry)
-		if owners.size() > 1:
-			_finish("Several Players own this Character. The responsible Player can roll from their sheet.", true)
-			return
-		if owners.size() == 1:
-			if not owners[0].is_connected:
-				_finish("This Character’s Player is not connected.", true)
-				return
-			participant = owners[0].participant_id
+	var participant := str(responsibility.get("participant_id", ""))
 	ability = selected_ability
 	var abilities: Dictionary = data.get("abilities", {})
 	var value: Dictionary = abilities.get(ability, {})

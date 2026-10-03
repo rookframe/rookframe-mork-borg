@@ -59,6 +59,7 @@ func ready() -> void:
 		get_node("Panel/More/" + category + "/Icon").texture = CATEGORY_ICONS.get(category)
 		get_node("Panel/More/" + category + "/Icon").modulate = GOLD
 	_launcher.bind(sdk)
+	_launcher.changed.connect(_action_changed)
 	sdk.character_hud.context_changed.connect(_refresh)
 	sdk.world_changed.connect(_refresh)
 	resized.connect(_layout)
@@ -121,6 +122,7 @@ func _refresh() -> void:
 	get_node("Bar/Identity/PortraitFrame/Portrait").texture = texture
 	var entries: Array[ENTRY] = []
 	var abilities: Dictionary = data.get("abilities", {})
+	var can_roll: bool = _launcher.can_roll(source.actor)
 	for index in range(ABILITIES.size()):
 		var entry := ENTRY.new()
 		entry.id = ABILITIES[index]
@@ -128,12 +130,24 @@ func _refresh() -> void:
 		var modifier := int(abilities.get(entry.id, {}).get("modifier", 0))
 		entry.value = ("+" if modifier >= 0 else "") + str(modifier)
 		entry.icon = ABILITY_ICONS[index]
-		entry.available = _launcher.can_roll(source.actor)
+		entry.available = can_roll
 		entries.append(entry)
 	_entries["Abilities"] = entries
 	visible = true
 	if not _category.is_empty() and not get_node("Panel/Detail").visible:
 		_render_panel()
+
+func _action_changed() -> void:
+	if _actor == null:
+		return
+	var source: SDK.ActorResult = sdk.actors.read(_actor)
+	var can_roll: bool = source.ok and _launcher.can_roll(source.actor)
+	var entries: Array[ENTRY] = _entries.get("Abilities", [])
+	for entry in entries:
+		entry.available = can_roll
+	if _category == "Abilities" and _panel.visible and not get_node("Panel/Detail").visible:
+		for index in range(_page_entries.size()):
+			_add_row(_rows[index], _page_entries[index], true)
 
 func _open_dice() -> void:
 	_close_panel()

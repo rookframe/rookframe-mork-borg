@@ -3,6 +3,7 @@ extends Node
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ABILITY = preload(ROOT + "logic/ability_throw.gd")
+const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
 const CONDITION = preload(ROOT + "logic/broken_incident.gd")
 signal changed
 var _sdk: SDK
@@ -18,19 +19,7 @@ func bind(facade: SDK) -> void:
 func can_roll(actor: SDK.Actor) -> bool:
 	if actor == null or actor.access_level != "Owner" or pending or not CONDITION.new().can_act(actor.data):
 		return false
-	var context := _sdk.context()
-	if not context.ok:
-		return false
-	if context.is_gm:
-		var access := _sdk.actors.access(actor.id)
-		if not access.ok:
-			return false
-		var owners: Array[SDK.ActorAccessEntry] = []
-		for entry in access.items:
-			if entry.access_level == "Owner":
-				owners.append(entry)
-		return owners.is_empty() or (owners.size() == 1 and owners[0].is_connected)
-	return true
+	return RESPONSIBILITY.new().resolve(_sdk, actor.id).get("ok", false)
 
 func roll_ability(actor: SDK.ActorId, ability: String) -> void:
 	if pending or _sdk == null:
