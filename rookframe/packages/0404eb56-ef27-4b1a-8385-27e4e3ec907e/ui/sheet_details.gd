@@ -52,6 +52,9 @@ func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, readin
 	_task = task
 	_draft = draft
 	_reading = reading
+	for editor in _editors:
+		if is_instance_valid(editor):
+			editor.configure_layout(phone)
 	get_node(^"HeaderFrame").visible = not task
 	get_node(^"HeaderFrame").custom_minimum_size = Vector2(0, 46 if phone else 63)
 	get_node(^"HeaderFrame/Inset/DetailHeader/Close").visible = not phone
