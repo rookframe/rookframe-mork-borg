@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_favorite.tscn" id="favorite"]
 [sub_resource type="StyleBoxFlat" id="line"]
 bg_color = Color(0, 0, 0, 0)
 border_color = Color(0.27451, 0.321569, 0.337255, 1)
@@ -41,6 +42,8 @@ theme_override_fonts/font = ExtResource("display")
 max_lines_visible = 1
 autowrap_mode = 3
 text_overrun_behavior = 3
+[node name="Favorite" parent="HeaderFrame/Inset/DetailHeader" instance=ExtResource("favorite")]
+layout_mode = 2
 [node name="Close" type="Button" parent="HeaderFrame/Inset/DetailHeader"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)

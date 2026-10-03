@@ -1,5 +1,7 @@
 [gd_scene format=3]
 
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_header.gd" id="header_script"]
+
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.gd" id="script"]
 
 [ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
@@ -186,6 +188,7 @@ unique_name_in_owner = true
 theme_override_constants/separation = 16
 
 [node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+script = ExtResource("header_script")
 
 layout_mode = 2
 
@@ -578,7 +581,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 custom_minimum_size = Vector2(56, 44)
 
@@ -619,7 +621,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 custom_minimum_size = Vector2(56, 44)
 
@@ -673,7 +674,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 custom_minimum_size = Vector2(56, 44)
 
@@ -727,7 +727,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 custom_minimum_size = Vector2(56, 44)
 
@@ -794,7 +793,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 visible = false
 
@@ -849,7 +847,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 visible = false
 
@@ -904,7 +901,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 visible = false
 
@@ -959,7 +955,6 @@ theme_override_constants/separation = 3
 
 layout_mode = 2
 
-unique_name_in_owner = true
 
 visible = false
 

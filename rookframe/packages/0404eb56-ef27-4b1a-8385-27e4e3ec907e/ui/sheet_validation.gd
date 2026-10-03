@@ -43,3 +43,8 @@ func show_status(message: String) -> void:
 	_status.visible = not message.is_empty()
 	_status.tooltip_text = message
 	_status.accessibility_description = message
+
+func configure_density(phone: bool, tablet: bool) -> void:
+	add_theme_constant_override("separation", 8 if phone else 16)
+	get_node(^"Body").add_theme_constant_override("separation", 26 if phone else 24 if tablet else 44)
+	get_node(^"Header").configure_layout(phone, tablet)

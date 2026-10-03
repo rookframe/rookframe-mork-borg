@@ -18,6 +18,8 @@ func set_actor(actor: SDK.ActorId, reference: Dictionary) -> SDK.ActorResult:
 		return SDK.ActorResult.new({"ok": false, "message": "Owner access is required to change this Creature’s Miniature."})
 	if not reference.is_empty() and not available(reference):
 		return SDK.ActorResult.new({"ok": false, "message": "This Miniature is unavailable. Choose another."})
+	if str(current.actor.data.get("schema", "")) == "mork-borg-character/v1":
+		return await preload(ROOT + "logic/character_actions.gd").new(sdk, actor).set_miniature(reference)
 	var current_data: Dictionary = current.actor.data
 	var data: Dictionary = current_data.duplicate(true)
 	data["preferred_miniature"] = reference.duplicate(true)
