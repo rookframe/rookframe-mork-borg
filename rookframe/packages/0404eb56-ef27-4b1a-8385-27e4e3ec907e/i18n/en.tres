@@ -2,6 +2,12 @@
 
 [resource]
 messages = {
+[&"", &"Character sheet"]: [&"Character sheet"],
+[&"", &"No entries"]: [&"No entries"],
+[&"", &"Show all"]: [&"Show all"],
+[&"", &"More"]: [&"More"],
+[&"", &"Features"]: [&"Features"],
+[&"", &"Items"]: [&"Items"],
 [&"", &"Discard this unfinished Character and start again?"]: [&"Discard this unfinished Character and start again?"],
 [&"", &"The created Character is unavailable for editing."]: [&"The created Character is unavailable for editing."],
 [&"", &"Food & drink"]: [&"Food & drink"],

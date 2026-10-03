@@ -2,6 +2,12 @@
 
 [resource]
 messages = {
+[&"", &"Character sheet"]: [&"Лист персонажа"],
+[&"", &"No entries"]: [&"Нет записей"],
+[&"", &"Show all"]: [&"Все"],
+[&"", &"More"]: [&"Ещё"],
+[&"", &"Features"]: [&"Особенности"],
+[&"", &"Items"]: [&"Предметы"],
 [&"", &"Discard this unfinished Character and start again?"]: [&"Отказаться от этого незавершённого персонажа и начать заново?"],
 [&"", &"The created Character is unavailable for editing."]: [&"Созданный персонаж недоступен для редактирования."],
 [&"", &"Food & drink"]: [&"Еда и питьё"],

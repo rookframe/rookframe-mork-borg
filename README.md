@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.20` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.21` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `b8aa5fa929f0f352096d63a53f01bf1e0af39b70` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -472,3 +472,18 @@ Character creation is contributed to the shared Actors window.
 Creature, Inventory and Appearance share one set of native ButtonGroup tabs on desktop and touch. The Creature view keeps public identity, HP, morale, armor, attacks and rules; a 44px settings gear opens corrections with fixed Save/Cancel actions. Miniature choices belong only to Appearance. Actor placement stays in the Actors drag-and-drop flow.
 
 Inventory uses 44px accessible icon actions (add, attack, equip and item edit), 12px row gaps and 16px section padding. Equipped armor/shield controls retain a pressed state and context-specific accessible names. The shared inventory component also improves Character inventories and the equipment catalogue. See [the visual smoke contract](docs/creature-sheet-design.md).
+
+## Character HUD
+
+SDK Edition 2029 revision 27 mounts the System-owned native Character HUD above
+floating windows and below docks and full-viewport tasks. Its Owner context uses
+an owned selected Rook or a Player's sole owned Actor; GM and multiple-Actor
+Players require selection, and available Prop controls take precedence.
+
+The approved revision-8 bar uses live portrait/HP, native Dice Tray and completed
+sheet entry points, and all four existing Ability Requested Throws. Starting a
+Throw retains its Actor across later HUD selection changes. Desktop, tablet and
+landscape phone share categories, anchored panels and bounded paging; phone uses
+More and the four-Ability grid. Other categories remain empty until their own
+RFG-338–342 slices supply real entries and domain handoffs. Favorites are not
+seeded or persisted by this presentation slice.

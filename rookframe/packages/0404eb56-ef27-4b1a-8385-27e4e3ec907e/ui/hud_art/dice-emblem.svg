@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+<defs>
+ <linearGradient id="gold" x1="12" y1="8" x2="52" y2="57" gradientUnits="userSpaceOnUse"><stop stop-color="#fff1bf"/><stop offset=".4" stop-color="#e6bf70"/><stop offset="1" stop-color="#906235"/></linearGradient>
+ <linearGradient id="face" x1="25" y1="23" x2="38" y2="44" gradientUnits="userSpaceOnUse"><stop stop-color="#503d26"/><stop offset="1" stop-color="#231f1b"/></linearGradient>
+</defs>
+<path d="M32 3 57 17v30L32 61 7 47V17Z" stroke="#b99053" stroke-opacity=".45"/>
+<path d="m32 8 21 12v24L32 56 11 44V20Z" fill="url(#gold)" stroke="#f4d798" stroke-width="1.2"/>
+<path d="m32 8-11 17-10-5Z" fill="#fff0bd"/><path d="m32 8 11 17 10-5Z" fill="#c9a467"/>
+<path d="m11 20 10 5-10 19Z" fill="#b78648"/><path d="m53 20-10 5 10 19Z" fill="#e7c27b"/>
+<path d="m11 44 21-2v14Z" fill="#d3a662"/><path d="m53 44-21-2v14Z" fill="#8c622f"/>
+<path d="m21 25 11-17 11 17-11 17Z" fill="#e9c780"/>
+<path d="m21 25 22 0-11 20Z" fill="url(#face)"/>
+<path d="m11 20 10 5 11-17 11 17 10-5M11 44l10-19h22l10 19-21 12Zm0 0 21-2 21 2M21 25l11 20 11-20M32 45v11" stroke="#624728" stroke-width=".8" stroke-linejoin="round"/>
+<text x="32" y="36" text-anchor="middle" fill="#ffe6a8" font-family="Georgia,serif" font-size="10" font-weight="bold">20</text>
+<path d="m11 20 10 5M21 25h22M32 8l-11 17" stroke="#fff2c9" stroke-width="1.1"/>
+</svg>
