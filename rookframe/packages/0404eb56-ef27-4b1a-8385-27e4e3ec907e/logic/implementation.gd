@@ -1,4 +1,7 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd"
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/implementation.gd"
+
+const MELEE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd")
+var _melee := MELEE.new()
 
 const DEFENCE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_authority.gd")
 var _defence := DEFENCE.new()
@@ -16,8 +19,12 @@ var _encounter := ENCOUNTER.new()
 
 const MINIATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_authority.gd")
 var _miniatures := MINIATURES.new()
+const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/sheet_combat.gd")
+var _sheet_combat := SHEET_COMBAT.new()
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("sheet-combat."):
+		return _sheet_combat.handle_system_intent(context, name.replace("sheet-combat.", "melee."), payload)
 	if name.begins_with("miniature."):
 		return _miniatures.handle(context, sdk, name, payload)
 	if name.begins_with("encounter."):
@@ -35,4 +42,4 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 		return inbox
 	if name.begins_with("defence."):
 		return _defence.handle(context, name, payload)
-	return super.handle_system_intent(context, name, payload)
+	return _melee.handle_system_intent(context, name, payload)

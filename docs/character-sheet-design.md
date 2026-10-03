@@ -1,68 +1,68 @@
-# Compact Character sheet
+# MÖRK BORG character sheet
 
-The September 27 user correction supersedes the old Character/Omen and health
-workflow compositions. Keep the unchanged Rookframe UI Kit and stock Godot
-containers, Buttons, Labels, CheckBoxes and ScrollContainer.
+RFG-336 supersedes the earlier compact sheet. The full-viewport Surface has
+Character, Powers, Inventory, Journal and Appearance chapters. Use the unchanged
+Rookframe design authority and public UI Kit with ordinary Godot Controls,
+Resources and signals.
 
-Character starts with the class and one 24px Edit sheet icon. HP, Omens and Silver
-share a compact strip. Omens has named 24px decrease/increase controls and a
-reserved 28px value lane; zero disables decrease, a pending save disables both,
-and a failed save keeps the committed value with inline error text and retry.
-All four modifiers remain direct roll controls. The single editor includes every
-resource and ability plus the existing profile fields; remote changes preserve
-dirty fields. Viewer access disables changes and hides the edit entry.
+The persistent core shows identity, a 4:5 portrait, HP, Power uses, Omens,
+four played modifiers, the ready weapon and protection. Phone landscape uses
+compact weapon/protection disclosures and a Section selector. Details and
+collection pages are bounded and measured, without page or collection scrolling.
+Q/E changes chapters; Back/Escape returns focus. Chapter, page and ready weapon
+are local per Actor for the running World Application, resetting on restart.
 
-Rest, Level up and Broken/death form one short wrapping action row. Combat and
-Powers/Companions use dense summary rows with accessible inventory, Power and companion icons. Profile
-copy uses intrinsic height; empty description, origin, traits and action groups
-are hidden. Actionable traits show their rules once, beside the action.
+Edit sheet retains one shared character-field draft across chapters and Details.
+Untouched fields refresh; changed fields retain their local text. Save writes
+changed fields only; Cancel presents latest Actor values. Removed/replaced entries
+invalidate obsolete fields. Inventory commits independently and survives Save
+and Cancel. Class text never changes class identity; curated mechanics stay read-only.
 
-Rest shows the two recovery choices, HP, Food & drink, and Infected. Those two
-booleans affect actual healing and remain; the redundant eligibility checkbox is
-removed. Level up starts directly for an Owner when the table calls for it; there
-is no persistent GM grant, authorization button or permission wait. Broken still
-requires 0 HP; negative HP still reports death. Authority validates access and
-actual mechanics. Human Throws, interruption and accepted changes retain their
-existing behavior. Omens never opens an explanatory window or applies a benefit.
+Sheet actions use local Window Dice, accepted Rolls and Action Log reports.
+Attack and Damage are separate. First accepted Damage consumes matching Attack
+context, retaining its weapon formula after ammunition consumption. Own costs
+and supported own effects remain; targets are handled manually. Closing preserves
+a running Roll, while abandoning its workflow cancels an unfinished Roll.
 
-Use Exo 2 hierarchy and Inter values/body from the existing kit; alternate font
-pairs and palette changes are outside this correction. Spacing uses 4/8/12/16px,
-12px resource captions, 14px attribute captions, 16px body and 22px stat values.
-Kit ink, gold, aqua, muted and error tokens retain their semantic roles. Controls
-keep native keyboard focus, accessibility names, disabled styles and compact 24px icon targets. Icon glyphs are 14px and explicitly centered.
-Counter values are vertically centered with their buttons. Ability rolls and the
-short health action row use 28px controls with compact theme padding.
-Existing loading, lost-access, save error and action-result states stay local to
-their task; no extra approval UI is introduced.
+Rest rolls d4 or d6 recovery capped at maximum HP, with eligibility at the table.
+Morning Power uses and laboratory brewing are independent Overview actions.
+Brewing starts Window Dice from the laboratory Overview in one activation;
+other item workflows retain any required preparation choices.
+Improvement follows the implemented ordered procedure; leaving unfinished ends
+it, retaining accepted changes and leaving remaining steps for manual resolution.
 
-## Regression and visual smoke
+Broken incidents belong to shared Actor data. A zero-HP incident rolls once and
+retains injury, duration and future recovery HP. Next round/hour and undo record
+game time. Recovery applies stored HP once when due; treatment stops hemorrhage
+without healing. Test, Attack and Cast are restricted while unable to act or dead.
+Retained injuries add no invented modifiers.
 
-`tests/character_sheet_composition.gd` checks one edit entry, inline counter writes,
-zero/viewer states, minimum target sizes, reserved counter value width, intrinsic
-profile height, fixed action footers and absence of invented approval controls.
-Run it at 326x315 (including the phone safe-area and window-border deductions), 375x313 (the phone dock body below host chrome), 412x712 and 960x888,
-including Russian. The full suite also checks dirty edits, persistence boundaries,
-recovery restrictions, direct Owner improvement, ordered rolls and interruption.
+Portrait and preferred Miniature changes update immediately through SDK domain
+operations. Existing Rooks retain their Miniatures. Journal is a local placeholder
+with disposable editor text only: leaving or rebuilding the editor discards it;
+no text is retained in navigation, Actor, World, reconnect state or files.
+Preferred Miniature selection uses the existing full-screen browser; the mockup's
+Miniature modal was superseded by the user on 2 October 2026. Viewer access keeps references readable and disables writes.
+QA uses public HTTPS Manifests and normal installation/World-join acquisition.
 
-For isolated graphical captures set `MORK_SHEET_CAPTURE_DIR` and run this suite
-without `--headless`. Review the pixels as well as the geometry: all four modifiers
-fit the initial phone sheet, Omens never collides with its buttons, and both real
-Rest restrictions are visible with the primary action. Scroll Character to check
-profile, class actions and secondary links. Use the existing native published
-Manifest journey with `--health-only` for final application verification. No local
-archive import, copied Package store or new Prop is used.
 
-Creature sheets use the same Actor window insets, compact icon component and
-resource-frame style. Overview attacks call the existing attack workflow directly.
-Inventory row actions remain 24px with centered 14px icons, native focus and labels.
-Tab text cannot force the content wider than its viewport, including the 328px
-body left after the landscape phone safe-area deduction.
+In the full sheet, accepted Improvement results remain visible until Continue.
+Continue opens the unrolled Debris or Abilities phase; its Roll action requests
+the next Throw. HP increases and Silver have their own Roll actions. Completed HP, debris, Silver,
+scroll and ability results retain their individual faces and before/after values.
+Back offers Continue procedure or End procedure; End preserves accepted changes
+and does not create a resumable procedure. Existing compact recovery controls
+retain their prior automatic sequence. Due Broken recovery is capped at the
+current maximum HP; the incident keeps the original die result.
 
-Actor presentation provides the preferred or default Miniature through SDK 0.31.0.
-Dragging an Owner Actor invokes placement at the dropped Scene position, creates
-one Rook and links it to that existing Actor. Placement rechecks access and reports
-errors through SDK feedback; no additional Actor is created.
-
-Shared tabs are 32px high with 8px horizontal padding, so their full names fit
-inside the safe-area body. Events from a retained hidden Character sheet cannot
-replace the active Creature title, tabs or footer.
+Details use one bounded authored body and a public pager in their fixed footer.
+Field labels, editors and validation copy remain together on one content page.
+Phone paged multiline editors use the approved compact height, including item
+Rules. Phone status copy stays in the chapter column so the persistent core and
+its actions retain their full touch area. Cancel clears the abandoned draft's
+validation, and both sheet and Details windows handle Escape before editors.
+Returning to a chapter restores the originating entry after native Container
+layout, so feedback that changes page capacity cannot move focus to another item.
+Nested references retain page history; native editor focus returns after World
+refresh. Escape cancels the shared sheet draft; Back retains it. Save validates
+through the same character correction boundary used by the inline resource rows.

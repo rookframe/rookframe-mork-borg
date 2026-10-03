@@ -1,0 +1,156 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="script"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[sub_resource type="StyleBoxFlat" id="line"]
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="selected"]
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.941176, 0.733333, 0.196078, 1)
+border_width_bottom = 2
+content_margin_left = 16.0
+content_margin_right = 16.0
+[sub_resource type="StyleBoxFlat" id="tab_normal"]
+bg_color = Color(0, 0, 0, 0)
+content_margin_left = 16.0
+content_margin_right = 16.0
+[node name="Detail" type="VBoxContainer"]
+script = ExtResource("script")
+size_flags_vertical = 3
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+[node name="HeaderFrame" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("line")
+[node name="Inset" type="MarginContainer" parent="HeaderFrame"]
+layout_mode = 2
+[node name="DetailHeader" type="HBoxContainer" parent="HeaderFrame/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Back" type="Button" parent="HeaderFrame/Inset/DetailHeader"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "‹ Back"
+theme_type_variation = "TaskButton"
+[node name="DetailTitle" type="Label" parent="HeaderFrame/Inset/DetailHeader"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("display")
+max_lines_visible = 1
+autowrap_mode = 3
+text_overrun_behavior = 3
+[node name="Close" type="Button" parent="HeaderFrame/Inset/DetailHeader"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "×"
+theme_override_font_sizes/font_size = 30
+theme_type_variation = "TaskGlyphButton"
+tooltip_text = "Close details"
+accessibility_name = "Close details"
+[node name="TabsFrame" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("line")
+[node name="Inset" type="MarginContainer" parent="TabsFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 17
+theme_override_constants/margin_right = 17
+[node name="DetailTabs" type="HBoxContainer" parent="TabsFrame/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Overview" type="Button" parent="TabsFrame/Inset/DetailTabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Overview"
+custom_minimum_size = Vector2(44, 48)
+toggle_mode = true
+theme_type_variation = "TaskDetailTab"
+theme_override_styles/normal = SubResource("tab_normal")
+theme_override_styles/pressed = SubResource("selected")
+theme_override_styles/hover = SubResource("tab_normal")
+theme_override_styles/hover_pressed = SubResource("selected")
+theme_override_styles/disabled = SubResource("tab_normal")
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_hover_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+[node name="Details" type="Button" parent="TabsFrame/Inset/DetailTabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Details"
+custom_minimum_size = Vector2(44, 48)
+toggle_mode = true
+theme_type_variation = "TaskDetailTab"
+theme_override_styles/normal = SubResource("tab_normal")
+theme_override_styles/pressed = SubResource("selected")
+theme_override_styles/hover = SubResource("tab_normal")
+theme_override_styles/hover_pressed = SubResource("selected")
+theme_override_styles/disabled = SubResource("tab_normal")
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_hover_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+[node name="Body" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="DetailPages" parent="Body" instance=ExtResource("pages")]
+layout_mode = 2
+[node name="DetailContent" type="VBoxContainer" parent="Body/DetailPages/Area"]
+layout_mode = 2
+theme_override_constants/separation = 16
+[node name="FullTitle" type="Label" parent="Body/DetailPages/Area/DetailContent"]
+layout_mode = 2
+autowrap_mode = 3
+[node name="FooterFrame" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = "TaskFooter"
+[node name="FooterInset" type="MarginContainer" parent="FooterFrame"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 8
+[node name="DetailActions" type="BoxContainer" parent="FooterFrame/FooterInset"]
+layout_mode = 2
+vertical = true
+theme_override_constants/separation = 7
+[node name="Utility" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 16
+[node name="SecondaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions/Utility"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+[node name="PagerSlot" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions/Utility"]
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="PrimaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(44, 48)
+size_flags_horizontal = 3
+theme_type_variation = "TaskPrimary"
+[node name="Draft" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions"]
+layout_mode = 2
+visible = false
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+[node name="Status" type="Label" parent="FooterFrame/FooterInset/DetailActions/Draft"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Unsaved sheet changes"
+text_overrun_behavior = 0
+theme_override_font_sizes/font_size = 12
+[node name="Cancel" type="Button" parent="FooterFrame/FooterInset/DetailActions/Draft"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Cancel"
+theme_type_variation = "TaskButton"
+[node name="Save" type="Button" parent="FooterFrame/FooterInset/DetailActions/Draft"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Save sheet"
+theme_type_variation = "TaskPrimary"

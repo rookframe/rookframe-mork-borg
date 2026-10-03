@@ -21,7 +21,7 @@ func _ready() -> void:
 	get_node(^"Actions/Back").pressed.connect(_cancel)
 	get_node(^"Actions/Apply").pressed.connect(_apply)
 
-func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false) -> void:
+func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false, subject: String = "Creature") -> void:
 	_selection_only = selection_only
 	get_node(^"Title").visible = not selection_only
 	sdk = facade
@@ -30,8 +30,8 @@ func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, sav
 	_definition = definition
 	_saved = saved.duplicate(true)
 	visible = true
-	get_node(^"Title").text = _t("Miniature for new Actors" if actor == null else "Miniature for this Creature")
-	get_node(^"Actions/Back").text = _t("Back")
+	get_node(^"Title").text = _t("Miniature for new Actors" if actor == null else "Miniature for this " + subject)
+	get_node(^"Actions/Back").text = _t("Cancel" if subject == "Character" else "Back")
 	get_node(^"Actions/Apply").text = _t("Use Miniature")
 	_load()
 	browser.focus_search()
@@ -48,12 +48,14 @@ func _load() -> void:
 	if not result.ok:
 		browser.set_state("error", _t("Could not load Miniatures. Try again."))
 		return
-	var entries: Array[Dictionary] = []
+	var entries: Array[Dictionary] = [{"id": "none", "title": _t("None"), "package": "", "package_id": "", "local_id": "", "available": true}]
 	for entry in result.items:
 		entries.append({"id": entry.reference.package_id + "/" + entry.reference.local_id,
 			"title": entry.localized_title, "package": entry.package_title,
 			"package_id": entry.reference.package_id, "local_id": entry.reference.local_id, "available": entry.available})
 	var id := str(_saved.get("package_id", "")) + "/" + str(_saved.get("local_id", ""))
+	if _saved.is_empty():
+		id = "none"
 	if _selection_only and _saved.is_empty():
 		for entry in entries:
 			if entry.available:
@@ -69,6 +71,8 @@ func _load() -> void:
 		get_node(^"Status").text = _t("Saved Miniature unavailable. Choose a replacement.")
 
 func _preview(entry: Dictionary, target: Control) -> void:
+	if str(entry.get("id", "")) == "none":
+		return
 	var result := sdk.content.preview_miniature(SDK.ContentReference.new(str(entry.package_id), str(entry.local_id)), target)
 	if not result.ok:
 		get_node(^"Status").text = _t("Miniature preview unavailable.")
@@ -80,7 +84,7 @@ func _apply() -> void:
 	if _busy or browser.selection().is_empty():
 		return
 	var entry: Dictionary = browser.selection()
-	var reference := {"package_id": str(entry.package_id), "local_id": str(entry.local_id)}
+	var reference: Dictionary = {} if str(entry.id) == "none" else {"package_id": str(entry.package_id), "local_id": str(entry.local_id)}
 	if _selection_only:
 		reference["title"] = str(entry.title)
 		chosen.emit(reference)
@@ -91,7 +95,7 @@ func _apply() -> void:
 	get_node(^"Status").text = _t("Saving Miniature…")
 	var message := ""
 	if _actor == null:
-		var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition, "package_id": reference.package_id, "local_id": reference.local_id})
+		var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition, "package_id": reference.get("package_id", ""), "local_id": reference.get("local_id", "")})
 		if not result.ok:
 			message = result.message
 		elif str(result.value.get("state", "error")) != "resolved":

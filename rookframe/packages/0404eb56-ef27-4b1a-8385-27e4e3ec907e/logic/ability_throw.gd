@@ -23,7 +23,7 @@ func _init(facade: SDK, actor: SDK.ActorId) -> void:
 	_sdk = facade
 	_actor = actor
 
-func start(selected_ability: String) -> void:
+func start(selected_ability: String, sheet: bool = false) -> void:
 	if pending or _ended:
 		return
 	var source: SDK.ActorResult = _sdk.actors.read(_actor)
@@ -31,6 +31,9 @@ func start(selected_ability: String) -> void:
 		_finish("Owner access is required to roll this Character.", true)
 		return
 	var data: Dictionary = source.actor.data
+	if sheet and not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd").new().can_act(data):
+		_finish("This Character cannot act. Rules references remain available.", true)
+		return
 	if str(data.get("schema", "")) != "mork-borg-character/v1" or not selected_ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		_finish("Choose a Character modifier.", true)
 		return
@@ -39,7 +42,7 @@ func start(selected_ability: String) -> void:
 		_finish(context.message, true)
 		return
 	var participant := context.participant_id
-	if context.is_gm:
+	if context.is_gm and not sheet:
 		var access: SDK.ActorAccessListResult = _sdk.actors.access(_actor)
 		if not access.ok:
 			_finish(access.message, true)
@@ -64,7 +67,7 @@ func start(selected_ability: String) -> void:
 	request_id = _sdk.dice.new_request_id()
 	_request = SDK.HumanThrowRequest.new(request_id, participant, [SDK.DiceTerm.new(ability, 20)])
 	pending = true
-	message = "Waiting for %s Throw in the Dice Tray." % ability
+	message = "Rolling %s…" % ability if sheet else "Waiting for %s Throw in the Dice Tray." % ability
 	changed.emit()
 	_reading = true
 	var result: SDK.HumanThrowResult = await _sdk.dice.request_session_throw(_request)
@@ -109,6 +112,7 @@ func _accept(result: SDK.HumanThrowResult) -> void:
 		_finish(result.message, true)
 		return
 	if result.status == "pending":
+		changed.emit()
 		return
 	if result.status == "cancelled":
 		_finish(ENDED_MESSAGE, false)

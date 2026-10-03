@@ -4,6 +4,41 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const BOUNDARY = preload("res://tests/melee_sdk_boundary.gd")
+const ACTION = preload(ROOT + "logic/special_action.gd")
+
+func test_scroll_selection_during_delayed_refresh_is_accepted_once(close_before_reply: bool, _test_parameters := [[false], [true]]) -> void:
+	var host := _host()
+	host.actors.hero.data.traits = [{"id": "initiate-of-the-invisible-college", "uses": 1}]
+	var action := ACTION.new(SDK.new(host))
+	add_child(auto_free(action))
+	var input := _use_input()
+	input.item = "feature:initiate-of-the-invisible-college"
+	await action.start(input)
+	host.roll(host.last_request, [4, 1])
+	await action.refresh()
+	assert_str(action.state).is_equal("scrolls")
+	host.defer_reply = true
+	action.refresh()
+	action.refresh()
+	await action.choose_scrolls(["enochian-syntax", "aegis-of-sorrow"])
+	action.refresh()
+	if close_before_reply:
+		await action.cancel()
+	else:
+		host.defer_reply = true
+	host.complete_reply()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	if not close_before_reply:
+		assert_int(host.submissions.get("special.scrolls", 0)).is_equal(1)
+		host.complete_reply()
+		await get_tree().process_frame
+	assert_str(action.state).is_equal("ended" if close_before_reply else "resolved")
+	assert_int(host.actors.hero.data.inventory.size()).is_equal(2 if close_before_reply else 4)
+	assert_int(host.actors.hero.data.traits[0].uses).is_equal(0)
+	assert_int(host.submissions.get("special.scrolls", 0)).is_equal(0 if close_before_reply else 1)
+	await action.refresh()
+	assert_int(host.reports.size()).is_equal(2)
 
 func _host(item_id: String = "medicine-box") -> BOUNDARY:
 	var host := BOUNDARY.new()

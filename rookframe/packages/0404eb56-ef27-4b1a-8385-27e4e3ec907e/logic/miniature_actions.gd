@@ -16,9 +16,10 @@ func set_actor(actor: SDK.ActorId, reference: Dictionary) -> SDK.ActorResult:
 	var current := sdk.actors.read(actor)
 	if not current.ok or current.actor.access_level != "Owner":
 		return SDK.ActorResult.new({"ok": false, "message": "Owner access is required to change this Creature’s Miniature."})
-	if not available(reference):
+	if not reference.is_empty() and not available(reference):
 		return SDK.ActorResult.new({"ok": false, "message": "This Miniature is unavailable. Choose another."})
-	var data: Dictionary = current.actor.data.duplicate(true)
+	var current_data: Dictionary = current.actor.data
+	var data: Dictionary = current_data.duplicate(true)
 	data["preferred_miniature"] = reference.duplicate(true)
 	return await sdk.actors.update(actor, data)
 

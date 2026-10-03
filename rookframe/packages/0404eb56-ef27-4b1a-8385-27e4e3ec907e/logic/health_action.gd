@@ -3,9 +3,9 @@ var _elapsed := 0.0
 func _init(facade: SDK) -> void:
 	super(facade)
 	_operation = "health"
-	_active_states = ["pending", "scroll", "specialties"]
+	_active_states = ["pending", "scroll", "specialties", "continue", "ready"]
 func choose(options: Dictionary) -> void:
-	if not state in ["scroll", "specialties"] or _reading or _closed:
+	if not state in ["scroll", "specialties", "continue", "ready"] or _reading or _closed:
 		return
 	options["id"] = _id
 	_reading = true
@@ -20,6 +20,12 @@ func _process(delta: float) -> void:
 	if _elapsed >= 0.5:
 		_elapsed = 0.0
 		refresh()
+
+func primary_label() -> String:
+	if state == "ready":
+		return "Roll d6 debris" if str(snapshot.get("phase", "")) == "debris" else "Roll four d6"
+	return {"hp_increase": "Roll d6 increase", "debris": "Continue to debris ›", "silver": "Roll 3d10 Silver", "abilities": "Continue to abilities ›", "class": "Continue to class ›", "specialty_roll": "Roll specialties", "finish": "Finish improvement"}.get(str(snapshot.get("next_phase", "")), "Continue")
+
 func _accept(result: SDK.DataResult) -> void:
 	if result.ok and result.value == snapshot:
 		return

@@ -1,0 +1,1742 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.gd" id="script"]
+
+[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
+
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/herbs.svg" id="herbs"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/bag.svg" id="bag"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/book.svg" id="book"]
+
+[ext_resource type="Resource" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_navigation.tres" id="navigation"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_choices.tscn" id="choices"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="miniatures"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_area.tscn" id="textarea"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="psychopomp"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/strength.svg" id="strength"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/agility.svg" id="agility"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/toughness.svg" id="toughness"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/sword.svg" id="sword"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/armor.svg" id="armor"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_vital.tscn" id="vital"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ability.tscn" id="ability"]
+
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="quill"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/elixir.svg" id="elixir"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_core.gd" id="core_layout"]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_chapter.gd" id="chapter_layout"]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition.gd" id="condition_layout"]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.gd" id="workflow_layout"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_readiness.tscn" id="readiness"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition.tscn" id="condition_scene"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.tscn" id="workflow_scene"]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="details_script"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition_summary.tscn" id="condition_summary"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_inline_field.gd" id="inline_field"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_validation.gd" id="validation"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_dialog.gd" id="entry_dialog"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.tscn" id="details_scene"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.tscn" id="appearance_scene"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.tscn" id="resource_editors"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/shield.svg" id="shield"]
+
+[sub_resource type="StyleBoxFlat" id="CoreHeading"]
+bg_color = Color(0.062745, 0.105882, 0.117647, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_top = 1
+border_width_bottom = 1
+content_margin_left = 14.0
+content_margin_right = 14.0
+content_margin_top = 4.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxFlat" id="PanelFrame"]
+bg_color = Color(0.015686, 0.066667, 0.082353, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+
+
+[sub_resource type="StyleBoxFlat" id="ConditionPortrait"]
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.937255, 0.356863, 0.329412, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+
+[sub_resource type="StyleBoxFlat" id="InlineEditor"]
+bg_color = Color(0.027451, 0.062745, 0.082353, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 5.0
+content_margin_right = 5.0
+content_margin_top = 17.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxFlat" id="InlineFocus"]
+bg_color = Color(0.027451, 0.062745, 0.082353, 1)
+border_color = Color(0.509804, 0.972549, 0.956863, 1)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+content_margin_left = 5.0
+content_margin_right = 5.0
+content_margin_top = 17.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxEmpty" id="NamePlain"]
+
+[sub_resource type="StyleBoxFlat" id="Background"]
+
+bg_color = Color(0.003922, 0.047059, 0.062745, 1)
+
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+
+border_width_left = 1
+
+border_width_right = 1
+
+border_width_top = 1
+
+border_width_bottom = 1
+
+[node name="CharacterSurface" type="PanelContainer"]
+
+unique_name_in_owner = true
+
+script = ExtResource("script")
+
+theme = ExtResource("theme")
+
+navigation = ExtResource("navigation")
+
+theme_override_styles/panel = SubResource("Background")
+
+anchors_preset = 15
+
+anchor_right = 1.0
+
+anchor_bottom = 1.0
+
+grow_horizontal = 2
+
+grow_vertical = 2
+
+[node name="Margin" type="MarginContainer" parent="."]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/margin_left = 24
+
+theme_override_constants/margin_right = 24
+
+theme_override_constants/margin_top = 16
+
+theme_override_constants/margin_bottom = 16
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+script = ExtResource("validation")
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 16
+
+[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 8
+
+[node name="Name" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Character"
+
+custom_minimum_size = Vector2(44, 44)
+
+clip_text = true
+
+text_overrun_behavior = 3
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("character")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+flat = true
+theme_override_styles/normal = SubResource("NamePlain")
+theme_override_styles/hover = SubResource("NamePlain")
+theme_override_styles/pressed = SubResource("NamePlain")
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/icon_normal_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+[node name="NameEditField" type="VBoxContainer" parent="Margin/Layout/Header"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Header/NameEditField"]
+layout_mode = 2
+size_flags_horizontal = 1
+visible = false
+
+custom_minimum_size = Vector2(320, 44)
+
+accessibility_name = "Character name"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Header/NameEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Header/NameEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Name"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Spacer" type="Control" parent="Margin/Layout/Header"]
+layout_mode = 2
+visible = false
+size_flags_horizontal = 3
+
+
+[node name="System" type="Label" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "MÖRK BORG"
+
+theme_override_font_sizes/font_size = 12
+
+autowrap_mode = 0
+
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Edit" type="Button" parent="Margin/Layout/Header"]
+accessibility_name = "Edit sheet"
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Edit sheet"
+icon = ExtResource("quill")
+expand_icon = false
+size_flags_vertical = 4
+theme_override_constants/icon_max_width = 24
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+[node name="Rest" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Rest"
+icon = ExtResource("elixir")
+expand_icon = false
+size_flags_vertical = 4
+theme_override_constants/icon_max_width = 24
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+[node name="Improve" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Level up"
+icon = ExtResource("strength")
+expand_icon = false
+size_flags_vertical = 4
+theme_override_constants/icon_max_width = 24
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+[node name="EditingStatus" type="Label" parent="Margin/Layout/Header"]
+layout_mode = 2
+text = "Editing sheet"
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 0
+vertical_alignment = 1
+visible = false
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+
+[node name="CancelSheet" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Cancel"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+visible = false
+
+size_flags_vertical = 4
+
+[node name="SaveSheet" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Save sheet"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskPrimary"
+
+visible = false
+
+size_flags_vertical = 4
+
+[node name="Close" type="Button" parent="Margin/Layout/Header"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "×"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+visible = false
+accessibility_name = "Close character sheet"
+
+[node name="Body" type="HBoxContainer" parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 24
+
+[node name="Core" type="VBoxContainer" parent="Margin/Layout/Body"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(460, 0)
+
+theme_override_constants/separation = 12
+script = ExtResource("core_layout")
+
+[node name="PhoneHeader" type="HBoxContainer" parent="Margin/Layout/Body/Core"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 44)
+theme_override_constants/separation = 4
+
+[node name="PhoneName" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader"]
+layout_mode = 2
+text = "Character"
+custom_minimum_size = Vector2(44, 44)
+clip_text = true
+theme_type_variation = "TaskButton"
+size_flags_horizontal = 3
+flat = true
+alignment = 0
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 20
+
+[node name="PhoneEdit" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader"]
+layout_mode = 2
+text = ""
+custom_minimum_size = Vector2(44, 44)
+clip_text = true
+theme_type_variation = "TaskButton"
+icon = ExtResource("quill")
+expand_icon = true
+accessibility_name = "Edit sheet"
+theme_override_constants/icon_max_width = 22
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+
+[node name="Class" type="Label" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Class"
+
+theme_override_fonts/font = ExtResource("display")
+
+theme_override_font_sizes/font_size = 22
+
+autowrap_mode = 3
+
+horizontal_alignment = 1
+
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+max_lines_visible = 1
+text_overrun_behavior = 3
+
+[node name="Origin" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Origin"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskChoice"
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="Likeness" type="HBoxContainer" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 16
+
+[node name="Portrait" type="TextureRect" parent="Margin/Layout/Body/Core/Likeness"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(152, 190)
+
+size_flags_vertical = 0
+
+expand_mode = 1
+
+stretch_mode = 6
+
+[node name="ConditionFrame" type="Panel" parent="Margin/Layout/Body/Core/Likeness/Portrait"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+visible = false
+theme_override_styles/panel = SubResource("ConditionPortrait")
+
+[node name="ConditionBadge" type="TextureRect" parent="Margin/Layout/Body/Core/Likeness/Portrait"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -24.0
+offset_top = -24.0
+texture = ExtResource("psychopomp")
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+visible = false
+self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+
+
+[node name="Vitals" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+theme_override_constants/separation = 4
+
+[node name="PhoneClass" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+layout_mode = 2
+text = "Class"
+theme_override_font_sizes/font_size = 10
+autowrap_mode = 0
+visible = false
+custom_minimum_size = Vector2(0, 20)
+clip_text = true
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+
+
+[node name="HitPoints" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("heart")
+
+[node name="HitPointsEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="HitPointsCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+
+accessibility_name = "Current hit points"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "HP"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="HitPointsMaximumField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+
+accessibility_name = "Maximum hit points"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Max HP"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="PowerUses" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("palms")
+
+[node name="PowerUsesEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="PowerUsesCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+
+accessibility_name = "Current Power uses"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Power uses"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="Omens" parent="Margin/Layout/Body/Core/Likeness/Vitals" instance=ExtResource("vital")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("dice")
+
+[node name="OmensEdit" type="HBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="OmensCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+
+accessibility_name = "Current Omens"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Omens"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+
+[node name="Abilities" type="GridContainer" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+columns = 2
+
+theme_override_constants/h_separation = 12
+
+theme_override_constants/v_separation = 4
+
+[node name="StrengthRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Strength" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" instance=ExtResource("ability")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("strength")
+
+[node name="StrengthEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/StrengthRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Strength modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Strength"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="AgilityRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Agility" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" instance=ExtResource("ability")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("agility")
+
+[node name="AgilityEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/AgilityRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Agility modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Agility"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="PresenceRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Presence" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" instance=ExtResource("ability")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("presence")
+
+[node name="PresenceEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/PresenceRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Presence modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Presence"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="ToughnessRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+[node name="Toughness" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" instance=ExtResource("ability")]
+layout_mode = 2
+size_flags_horizontal = 3
+icon = ExtResource("toughness")
+
+[node name="ToughnessEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 3
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(56, 44)
+
+size_flags_horizontal = 3
+
+accessibility_name = "Toughness modifier"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Toughness"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="ConditionReminder" parent="Margin/Layout/Body/Core" instance=ExtResource("condition_summary")]
+layout_mode = 2
+visible = false
+
+[node name="ReadyWeapon" parent="Margin/Layout/Body/Core" instance=ExtResource("readiness")]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+clip_text = true
+alignment = 0
+
+[node name="WeaponHeading" type="PanelContainer" parent="Margin/Layout/Body/Core"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+theme_override_styles/panel = SubResource("CoreHeading")
+mouse_filter = 2
+[node name="Actions" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading"]
+layout_mode = 2
+
+[node name="Center" type="CenterContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Actions"]
+size_flags_horizontal = 3
+layout_mode = 2
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center"]
+layout_mode = 2
+theme_override_constants/separation = 10
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("sword")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center/Row"]
+layout_mode = 2
+text = "READY WEAPON"
+theme_override_font_sizes/font_size = 16
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+vertical_alignment = 1
+mouse_filter = 2
+
+[node name="Options" type="Button" parent="Margin/Layout/Body/Core/WeaponHeading/Actions"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskQuiet"
+text = "Options"
+tooltip_text = "Weapon selection and attack options"
+accessibility_name = "Ready weapon options"
+
+[node name="Weapon" type="OptionButton" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+custom_minimum_size = Vector2(0, 44)
+clip_text = true
+text_overrun_behavior = 3
+
+[node name="WeaponActions" type="HBoxContainer" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+[node name="Attack" type="Button" parent="Margin/Layout/Body/Core/WeaponActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Attack"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskChoice"
+
+icon = ExtResource("sword")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+[node name="Damage" type="Button" parent="Margin/Layout/Body/Core/WeaponActions"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Damage"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskChoice"
+
+size_flags_horizontal = 3
+
+theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+
+[node name="ManageEquipment" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Manage equipment ›"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="ProtectionHeading" type="PanelContainer" parent="Margin/Layout/Body/Core"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 40)
+theme_override_styles/panel = SubResource("CoreHeading")
+mouse_filter = 2
+[node name="Center" type="CenterContainer" parent="Margin/Layout/Body/Core/ProtectionHeading"]
+layout_mode = 2
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/ProtectionHeading/Center"]
+layout_mode = 2
+theme_override_constants/separation = 10
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/ProtectionHeading/Center/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("shield")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Margin/Layout/Body/Core/ProtectionHeading/Center/Row"]
+layout_mode = 2
+text = "PROTECTION"
+theme_override_font_sizes/font_size = 16
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+vertical_alignment = 1
+mouse_filter = 2
+
+[node name="Protection" parent="Margin/Layout/Body/Core" instance=ExtResource("readiness")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+icon = ExtResource("armor")
+
+icon_alignment = 0
+
+expand_icon = true
+
+theme_override_constants/icon_max_width = 24
+
+size_flags_horizontal = 3
+
+alignment = 0
+
+clip_text = true
+
+[node name="Dodge" type="Button" parent="Margin/Layout/Body/Core"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Dodge · d20 + Agility"
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+[node name="Chapter" type="VBoxContainer" parent="Margin/Layout/Body"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+script = ExtResource("chapter_layout")
+
+[node name="Tabs" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+theme_override_constants/separation = 0
+
+[node name="TabCharacter" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Character"
+
+icon = ExtResource("character")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabPowers" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Powers"
+
+icon = ExtResource("palms")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabInventory" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Inventory"
+
+icon = ExtResource("bag")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabJournal" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Journal"
+
+icon = ExtResource("book")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="TabAppearance" parent="Margin/Layout/Body/Chapter/Tabs" instance=ExtResource("tab")]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Appearance"
+
+icon = ExtResource("character")
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+
+custom_minimum_size = Vector2(44, 44)
+
+theme_type_variation = "TaskButton"
+
+size_flags_horizontal = 3
+
+toggle_mode = true
+
+[node name="ChapterCaption" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(0, 44)
+
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+text = "Known Powers"
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
+size_flags_horizontal = 3
+
+[node name="PersonalNotes" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+text = "Personal notes"
+custom_minimum_size = Vector2(44, 44)
+clip_text = false
+theme_type_variation = "TaskButton"
+visible = false
+
+[node name="InventoryFilters" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+visible = false
+size_flags_horizontal = 3
+
+[node name="All" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption/InventoryFilters"]
+layout_mode = 2
+text = "All belongings"
+custom_minimum_size = Vector2(44, 44)
+clip_text = false
+theme_type_variation = "TaskButton"
+toggle_mode = true
+theme_override_font_sizes/font_size = 13
+
+[node name="Arms" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption/InventoryFilters"]
+layout_mode = 2
+text = "Arms"
+custom_minimum_size = Vector2(44, 44)
+clip_text = false
+theme_type_variation = "TaskButton"
+toggle_mode = true
+theme_override_font_sizes/font_size = 13
+
+[node name="Supplies" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption/InventoryFilters"]
+layout_mode = 2
+text = "Supplies"
+custom_minimum_size = Vector2(44, 44)
+clip_text = false
+theme_type_variation = "TaskButton"
+toggle_mode = true
+theme_override_font_sizes/font_size = 13
+
+[node name="Ready" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption/InventoryFilters"]
+layout_mode = 2
+text = "Ready"
+custom_minimum_size = Vector2(44, 44)
+clip_text = false
+theme_type_variation = "TaskButton"
+toggle_mode = true
+theme_override_font_sizes/font_size = 13
+
+
+[node name="ReferenceBack" type="Button" parent="Margin/Layout/Body/Chapter"]
+visible = false
+layout_mode = 2
+text = "‹ Back to condition"
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+[node name="Section" type="OptionButton" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+custom_minimum_size = Vector2(0, 44)
+
+[node name="Condition" parent="Margin/Layout/Body/Chapter" instance=ExtResource("condition_scene")]
+layout_mode = 2
+visible = false
+
+[node name="SilverEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/ChapterCaption/SilverEditField"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(120, 44)
+
+size_flags_horizontal = 1
+
+accessibility_name = "Silver"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/SilverEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/SilverEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Silver"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+
+[node name="PowerEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/ChapterCaption/PowerEditField"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(120, 44)
+
+size_flags_horizontal = 1
+
+accessibility_name = "Power uses"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/PowerEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/ChapterCaption/PowerEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Power uses"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+
+[node name="Resource" type="Button" parent="Margin/Layout/Body/Chapter/ChapterCaption"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+expand_icon = true
+theme_override_constants/icon_max_width = 26
+text = "Silver"
+
+[node name="Collections" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+
+[node name="Primary" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections"]
+framed_collection = true
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+[node name="Secondary" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Collections"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_horizontal = 3
+
+size_flags_vertical = 3
+
+theme_override_constants/separation = 16
+
+[node name="Resources" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+framed_collection = true
+size_flags_stretch_ratio = 2.4
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+[node name="ResourceEditors" parent="Margin/Layout/Body/Chapter/Collections/Secondary" instance=ExtResource("resource_editors")]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Companions" instance=ExtResource("choices") parent="Margin/Layout/Body/Chapter/Collections/Secondary"]
+empty_text = "Travelling alone."
+framed_collection = true
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+size_flags_vertical = 3
+
+[node name="JournalPanel" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+layout_mode = 2
+visible = false
+size_flags_vertical = 3
+theme_override_constants/separation = 16
+
+[node name="Story" parent="Margin/Layout/Body/Chapter/JournalPanel" instance=ExtResource("choices")]
+layout_mode = 2
+framed_collection = true
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="Notes" parent="Margin/Layout/Body/Chapter/JournalPanel" instance=ExtResource("choices")]
+layout_mode = 2
+framed_collection = true
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="AppearanceIntro" type="VBoxContainer" parent="Margin/Layout/Body/Chapter"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Title" type="Label" parent="Margin/Layout/Body/Chapter/AppearanceIntro"]
+layout_mode = 2
+text = "Appearance"
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+[node name="Copy" type="Label" parent="Margin/Layout/Body/Chapter/AppearanceIntro"]
+layout_mode = 2
+text = "Portrait and preferred Miniature for this Character."
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+[node name="AppearancePanel" parent="Margin/Layout/Body/Chapter" instance=ExtResource("appearance_scene")]
+visible = false
+layout_mode = 2
+size_flags_vertical = 3
+[node name="AppearanceStatus" type="Label" parent="Margin/Layout/Body/Chapter"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0, 28)
+text = "Changes apply immediately. Existing Rooks keep their Miniature."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+max_lines_visible = 1
+text_overrun_behavior = 3
+[node name="QuickResources" type="HBoxContainer" parent="Margin/Layout/Body/Chapter"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+visible = false
+
+[node name="QuickOmens" type="Button" parent="Margin/Layout/Body/Chapter/QuickResources"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Omens"
+
+custom_minimum_size = Vector2(86, 44)
+
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 13
+
+[node name="QuickOmensEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/QuickResources"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(86, 44)
+
+size_flags_horizontal = 1
+
+accessibility_name = "Current Omens"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickOmensEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Omens"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+[node name="QuickSilver" type="Button" parent="Margin/Layout/Body/Chapter/QuickResources"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = "Silver"
+
+custom_minimum_size = Vector2(86, 44)
+
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 13
+
+[node name="QuickSilverEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/QuickResources"]
+layout_mode = 2
+script = ExtResource("inline_field")
+size_flags_horizontal = 1
+theme_override_constants/separation = 3
+[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField"]
+layout_mode = 2
+visible = false
+custom_minimum_size = Vector2(86, 44)
+
+size_flags_horizontal = 1
+
+accessibility_name = "Silver"
+theme_override_font_sizes/font_size = 18
+theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_styles/normal = SubResource("InlineEditor")
+theme_override_styles/focus = SubResource("InlineFocus")
+
+[node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+[node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/QuickResources/QuickSilverEditField/Editor"]
+layout_mode = 0
+anchor_right = 1.0
+offset_left = 5.0
+offset_top = 3.0
+offset_right = -5.0
+offset_bottom = 15.0
+mouse_filter = 2
+text = "Silver"
+clip_text = true
+theme_override_font_sizes/font_size = 9
+theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+
+
+[node name="Detail" parent="Margin/Layout/Body/Chapter" instance=ExtResource("details_scene")]
+layout_mode = 2
+visible = false
+
+[node name="Workflow" parent="Margin/Layout" instance=ExtResource("workflow_scene")]
+layout_mode = 2
+visible = false
+
+[node name="Picker" instance=ExtResource("miniatures") parent="Margin/Layout"]
+layout_mode = 2
+visible = false
+size_flags_vertical = 3
+
+[node name="Status" type="Label" parent="Margin/Layout"]
+
+layout_mode = 2
+
+unique_name_in_owner = true
+
+text = ""
+
+theme_override_font_sizes/font_size = 12
+
+autowrap_mode = 0
+max_lines_visible = 1
+text_overrun_behavior = 3
+
+visible = false
+
+[node name="EntryScrim" type="ColorRect" parent="."]
+visible = false
+layout_mode = 2
+mouse_filter = 0
+color = Color(0, 0, 0, 0.666667)
+
+[node name="EntryDialog" type="Window" parent="."]
+visible = false
+size = Vector2i(640, 610)
+borderless = true
+transient = true
+exclusive = true
+unresizable = true
+theme = ExtResource("theme")
+script = ExtResource("entry_dialog")
+accessibility_name = "Entry details"
+
+[node name="Surface" type="PanelContainer" parent="EntryDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("PanelFrame")
+
+[node name="Inset" type="MarginContainer" parent="EntryDialog/Surface"]
+layout_mode = 2
+theme_override_constants/margin_left = 0
+theme_override_constants/margin_right = 0
+theme_override_constants/margin_top = 0
+theme_override_constants/margin_bottom = 0
