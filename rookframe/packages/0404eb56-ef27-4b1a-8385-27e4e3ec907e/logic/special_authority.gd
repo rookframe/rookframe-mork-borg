@@ -306,7 +306,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var recipient := context.read_actor(SDK.ActorId.new(str(target.actor)))
 	if not recipient.ok or not _healable(recipient.actor.data):
 		return _end(context, action)
-	var target_data: Dictionary = data if target.actor == action.source else recipient.actor.data.duplicate(true)
+	var recipient_data: Dictionary = recipient.actor.data
+	var target_data: Dictionary = data if target.actor == action.source else recipient_data.duplicate(true)
 	var hp: int = target_data.hit_points
 	var maximum: int = target_data.maximum_hit_points
 	var room := maximum - hp

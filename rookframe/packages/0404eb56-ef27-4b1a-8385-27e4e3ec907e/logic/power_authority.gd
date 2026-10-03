@@ -297,7 +297,8 @@ func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.
 		var current := context.read_actor(SDK.ActorId.new(target.actor))
 		if not current.ok or typeof(current.actor.data) != TYPE_DICTIONARY:
 			return _end(context, action)
-		var data: Dictionary = current.actor.data.duplicate(true)
+		var current_data: Dictionary = current.actor.data
+		var data: Dictionary = current_data.duplicate(true)
 		if typeof(data.get("hit_points")) != TYPE_INT or (healing and typeof(data.get("maximum_hit_points")) != TYPE_INT):
 			return _end(context, action)
 		var hp: int = data.hit_points

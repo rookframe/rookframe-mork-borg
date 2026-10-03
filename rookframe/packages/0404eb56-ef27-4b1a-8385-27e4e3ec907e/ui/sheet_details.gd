@@ -220,3 +220,11 @@ func append_facts(facts: Array) -> void:
 	var content = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_facts.tscn").instantiate()
 	get_node(^"Body/DetailPages/Area/DetailContent").add_child(content)
 	content.configure(facts, _phone)
+
+func append_item_field(field: String, value: String, phone: bool, independent: bool) -> ENTRY_FIELD:
+	var control = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_field.tscn").instantiate()
+	field_host(field).add_child(control)
+	control.configure_layout(phone)
+	register_field(control)
+	control.configure(field, field.replace("_", " ").capitalize(), value, field == "rules", independent)
+	return control

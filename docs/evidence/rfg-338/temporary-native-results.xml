@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="11" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="rfg338_favorites" package="tests" timestamp="2026-10-03T22:10:11" hostname="localhost" tests="11" failures="0" errors="0" skipped="0" flaky="0" time="9.217">
+		<testcase name="test_immediate_favorite_changes_preserve_current_actor_data" classname="rfg338_favorites" time="0.002">
+		</testcase>
+		<testcase name="test_duplicate_scrolls_removal_reacquisition_and_shared_exhaustion" classname="rfg338_favorites" time="0.004">
+		</testcase>
+		<testcase name="test_feature_identity_survives_rename_reorder_and_removed_sources_stay_unavailable" classname="rfg338_favorites" time="0.003">
+		</testcase>
+		<testcase name="test_authority_merges_concurrent_stars_field_and_inventory_changes" classname="rfg338_favorites" time="0.003">
+		</testcase>
+		<testcase name="test_viewer_failure_and_removed_companion_attacks" classname="rfg338_favorites" time="0.002">
+		</testcase>
+		<testcase name="test_native_sheet_stars_save_cancel_reopen_and_unavailable_sources:0 (1920, 1080)" classname="rfg338_favorites" time="3.250">
+		</testcase>
+		<testcase name="test_native_sheet_stars_save_cancel_reopen_and_unavailable_sources:1 (1024, 768)" classname="rfg338_favorites" time="2.962">
+		</testcase>
+		<testcase name="test_native_sheet_stars_save_cancel_reopen_and_unavailable_sources:2 (844, 390)" classname="rfg338_favorites" time="2.951">
+		</testcase>
+		<testcase name="test_unavailable_membership_restores_and_item_backed_traits_are_not_duplicate_actions" classname="rfg338_favorites" time="0.006">
+		</testcase>
+		<testcase name="test_legacy_companion_instances_keep_identity_through_reordering_and_replacement" classname="rfg338_favorites" time="0.005">
+		</testcase>
+		<testcase name="test_correction_validation_and_custom_inventory_use_authority_choices" classname="rfg338_favorites" time="0.003">
+		</testcase>
+	</testsuite>
+</testsuites>

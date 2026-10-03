@@ -1,5 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/implementation.gd"
 
+const SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/sheet_authority.gd")
+var _sheet := SHEET.new()
+
 const MELEE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd")
 var _melee := MELEE.new()
 
@@ -23,6 +26,8 @@ const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-2
 var _sheet_combat := SHEET_COMBAT.new()
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("sheet."):
+		return await _sheet.handle(context, sdk, name, payload)
 	if name.begins_with("sheet-combat."):
 		return _sheet_combat.handle_system_intent(context, name.replace("sheet-combat.", "melee."), payload)
 	if name.begins_with("miniature."):

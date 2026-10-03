@@ -110,6 +110,11 @@ func SelectedRookContext() -> Dictionary:
 
 func complete_update() -> void:
 	defer_update = false
+	if not pending_sheet_reply.is_empty():
+		pending_sheet_reply["requestId"] = 43
+		TabletopCommandCompleted.emit(pending_sheet_reply)
+		pending_sheet_reply = {}
+		return
 	var result: Dictionary = UpdateActor(pending_update.id, pending_update.data)
 	result["requestId"] = 43
 	TabletopCommandCompleted.emit(result)
@@ -182,4 +187,26 @@ func ReadContent(package: String, id: String) -> Dictionary:
 
 func PreviewMiniature(_package: String, _id: String, _target: Control) -> Dictionary:
 	previews_requested += 1
+	return {"ok": true}
+
+# Substitute only the host's authenticated, durable System-intent boundary.
+var pending_sheet_reply: Dictionary = {}
+func SubmitSystemIntent(name: String, payload: Variant) -> Dictionary:
+	var sdk = load(ROOT + "sdk/package_sdk_facade.gd").new(self)
+	var handler = load(ROOT + "logic/sheet_authority.gd").new()
+	var outcome: Dictionary = await handler.handle(load(ROOT + "sdk/system_action_context.gd").new(self, "sheet"), sdk, name, payload)
+	var reply := {"ok": true, "value": outcome}
+	if defer_update:
+		pending_sheet_reply = reply
+		return {"ok": false, "code": "pending", "requestId": 43}
+	return reply
+
+func SystemIntentReadActor(_token: String, id: String) -> Dictionary:
+	return ReadActor(id)
+
+func SystemIntentCommit(_token: String, changes: Array, _report: Dictionary) -> Dictionary:
+	for change in changes:
+		for actor in actors:
+			if actor.id == change.id:
+				actor.data = change.data.duplicate(true)
 	return {"ok": true}

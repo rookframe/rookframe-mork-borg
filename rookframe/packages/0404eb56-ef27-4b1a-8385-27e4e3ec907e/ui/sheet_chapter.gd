@@ -1,6 +1,7 @@
 extends VBoxContainer
 signal resource_requested(id: String)
 signal resource_changed(field: String, value: String)
+@onready var _route_quick = get_node(^"QuickResources")
 var _resource := "power_uses"
 var _setting_resource := false
 var _story: Array[Dictionary] = []
@@ -116,3 +117,47 @@ func focus_entry(id: String) -> bool:
 		if get_node(path).focus_entry(id):
 			return true
 	return false
+
+func configure_route(chapter: int, phone: bool, tablet: bool, details: bool, modal: bool, condition_reference: bool, data: Dictionary, editing: bool, draft: Dictionary, navigation: Dictionary) -> void:
+	var _chapter_tabs = get_node(^"Tabs")
+	var _chapter_collections = get_node(^"Collections")
+	var _chapter_journal_panel = get_node(^"JournalPanel")
+	var _condition_ui = get_node(^"Condition")
+	var _section = get_node(^"Section")
+	var _quick = _route_quick
+	var _chapter_primary = get_node(^"Collections/Primary")
+	var _chapter_secondary = get_node(^"Collections/Secondary")
+	var _chapter_resources = get_node(^"Collections/Secondary/Resources")
+	var _chapter_companions = get_node(^"Collections/Secondary/Companions")
+	var _chapter_caption = get_node(^"ChapterCaption")
+	var _chapter_story = get_node(^"JournalPanel/Story")
+	var _chapter_notes = get_node(^"JournalPanel/Notes")
+	var obscured := details and not modal
+	_chapter_tabs.visible = not obscured
+	_chapter_collections.visible = not obscured and chapter in [0, 1, 2]
+	_chapter_journal_panel.visible = not obscured and chapter == 3
+	get_node(^"AppearanceIntro").visible = not obscured and chapter == 4 and not phone
+	get_node(^"AppearanceStatus").visible = not obscured and chapter == 4
+	_condition_ui.visible = not obscured and chapter == 0 and not condition_reference and not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd").new().condition(data).is_empty()
+	_section.visible = phone and not details and chapter in [0, 1, 2, 3]
+	_quick.visible = phone and not details and chapter != 4 and not _condition_ui.visible
+	_section.clear()
+	for title in (["Features & traits", "Resources", "Companions"] if chapter == 0 else ["Powers", "Decoctions & resources"] if chapter == 1 else ["All belongings", "Arms", "Supplies", "Ready"] if chapter == 2 else ["All", "Story", "Notes"]):
+		_section.add_item(str(title))
+	_section.select(mini(int(navigation.get("inventory_filter", 0) if chapter == 2 else navigation.get("section", 0)), _section.item_count - 1))
+	_chapter_primary.visible = chapter == 2 or not phone or _section.selected == 0
+	_chapter_secondary.visible = chapter == 0 and (not phone or _section.selected != 0) or chapter == 1 and phone and _section.selected == 1
+	_chapter_resources.visible = not phone or _section.selected == 1
+	_chapter_companions.visible = chapter == 0 and (condition_reference or preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd").new().condition(data).is_empty()) and (not phone or _section.selected == 2)
+	if phone and _condition_ui.visible:
+		_chapter_collections.visible = false
+		_section.visible = false
+	get_node(^"ReferenceBack").visible = phone and condition_reference and not details and chapter == 0
+	var resource_editor = get_node(^"Collections/Secondary/ResourceEditors")
+	resource_editor.visible = editing and chapter == 0 and (not phone or _section.selected == 1)
+	resource_editor.configure(draft, phone, tablet)
+	_chapter_resources.visible = _chapter_resources.visible and not (chapter == 0 and editing)
+	configure_caption(chapter, phone, int(navigation.get("inventory_filter", 0)), data, draft if editing else {}, int(navigation.get("section", 0)))
+	_chapter_caption.visible = not obscured and not phone and chapter in [1, 2, 3]
+	_chapter_story.visible = not phone or _section.selected < 2
+	_chapter_notes.visible = not phone or _section.selected == 2

@@ -66,3 +66,35 @@ layout, so feedback that changes page capacity cannot move focus to another item
 Nested references retain page history; native editor focus returns after World
 refresh. Escape cancels the shared sheet draft; Back retains it. Save validates
 through the same character correction boundary used by the inline resource rows.
+
+## Shared Actor Favorites (RFG-338)
+
+Eligible inventory, Power and active feature Details expose an immediate star.
+The Character's companion Details expose separate stars for each authorized
+Creature attack. Stars work outside Edit sheet and while a field draft is open.
+Abilities, Recovery, passive rules and descriptive companions remain unchanged.
+Item-backed class descriptions refer to their owned item rather than duplicating
+its action as a feature.
+
+Membership is ordinary System-owned Actor data under `favorites`; absence means
+empty. Records identify the exact owned entry and action and retain its display
+name and category. Inventory serials never reuse removed identities. Traits gain
+stable Package-generated `favorite_entry_id` identities before the sheet offers
+stars. Companion keys include both its Actor ID and attack inventory ID.
+
+Only explicit star changes alter membership. Removed sources appear as unavailable
+entries in the corresponding sheet collection, and their Details retain an active
+unstar control. A new same-catalogue copy starts unfavorited. The full sheet keeps
+its established Window Dice and separate Attack/Damage interactions.
+
+The package-owned `logic/actor_favorites.gd` projects `entries(data, actor_id,
+companions)` with stable `key`, source context, category, name, `starred`, `present`
+and `available` values. Call `logic/character_actions.gd`'s `set_favorite(key,
+starred)` for the same immediate write from a HUD consumer. No availability
+projection prunes membership. The projection does not launch workflows.
+
+Character corrections, inventory, portrait and preferred Miniature mutations now
+use `sheet.*` System intents. Authority applies each domain operation to the current
+Actor and commits through the existing SDK. Field drafts never submit favorite
+membership, and favorite writes never submit stale character fields. Owner/GM
+mutation checks and complete World sharing retain their existing SDK behavior.
