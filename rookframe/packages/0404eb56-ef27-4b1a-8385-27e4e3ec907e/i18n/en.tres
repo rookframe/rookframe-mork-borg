@@ -2,6 +2,12 @@
 
 [resource]
 messages = {
+[&"", &"Morning"]: [&"Morning"],
+[&"", &"Morning Power allowance"]: [&"Morning Power allowance"],
+[&"", &"No targets"]: [&"No targets"],
+[&"", &"Unarmed"]: [&"Unarmed"],
+[&"", &"Improvised weapon"]: [&"Improvised weapon"],
+[&"", &"Regain Omens"]: [&"Regain Omens"],
 [&"", &"Character sheet"]: [&"Character sheet"],
 [&"", &"No entries"]: [&"No entries"],
 [&"", &"Show all"]: [&"Show all"],

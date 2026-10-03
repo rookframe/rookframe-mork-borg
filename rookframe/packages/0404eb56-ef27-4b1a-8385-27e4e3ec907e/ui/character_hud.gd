@@ -3,6 +3,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const ROW = preload(ROOT + "ui/hud_row.tscn")
+const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
 const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
 const TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_palette.gd")
@@ -21,9 +22,11 @@ const CATEGORY_ICONS := {
 const ABILITIES := ["Strength", "Agility", "Presence", "Toughness"]
 const ABILITY_ICONS := [preload(ROOT + "ui/hud_art/abilities.svg"), preload("res://rookframe/ui/icons/character/agility.svg"), preload(ROOT + "ui/hud_art/ability-presence.svg"), preload("res://rookframe/ui/icons/character/presence.svg")]
 
-## Following action slices supply owned entries and handle these domain handoffs.
+## The managed action receives the initiating Actor and stable source key.
 signal entry_requested(actor: SDK.ActorId, category: String, entry_id: String)
 signal favorite_requested(actor: SDK.ActorId, category: String, entry_id: String, favorite: bool)
+var _favorites := FAVORITES.new()
+var _pending_favorites: Dictionary = {}
 var _actor: SDK.ActorId
 var _category := ""
 var _page := 0
@@ -58,6 +61,8 @@ func ready() -> void:
 		get_node("Panel/More/" + category + "/Title").text = sdk.translations.text(category)
 		get_node("Panel/More/" + category + "/Icon").texture = CATEGORY_ICONS.get(category)
 		get_node("Panel/More/" + category + "/Icon").modulate = GOLD
+	_favorites.sdk = sdk
+	favorite_requested.connect(_change_favorite)
 	_launcher.bind(sdk)
 	_launcher.changed.connect(_action_changed)
 	sdk.character_hud.context_changed.connect(_refresh)
@@ -90,6 +95,8 @@ func ready() -> void:
 func set_entries(category: String, entries: Array[ENTRY]) -> void:
 	if category not in CATEGORIES or category == "Abilities":
 		return
+	for entry in entries:
+		entry.favorite_editable = not _pending_favorites.has(_favorite_request_key(_actor, entry.id))
 	_entries[category] = entries
 	if _category == category:
 		_render_panel()
@@ -133,9 +140,50 @@ func _refresh() -> void:
 		entry.available = can_roll
 		entries.append(entry)
 	_entries["Abilities"] = entries
+	_project_favorites(source.actor)
 	visible = true
 	if not _category.is_empty() and not get_node("Panel/Detail").visible:
 		_render_panel()
+
+func _project_favorites(actor: SDK.Actor) -> void:
+	var sources := _favorites.entries(actor)
+	for category in ["Attacks", "Powers", "Items", "Features", "Companions"]:
+		var entries: Array[ENTRY] = []
+		for source in sources:
+			if str(source.get("category", "")) != category:
+				continue
+			var entry := ENTRY.new()
+			entry.id = str(source.key)
+			entry.title = sdk.translations.text(str(source.get("name", "Favorite")))
+			entry.detail = sdk.translations.text(str(source.get("detail", "")))
+			entry.value = str(source.get("damage", ""))
+			entry.icon = CATEGORY_ICONS.get(category)
+			entry.available = source.get("available", false)
+			entry.favorite = source.get("starred", false)
+			entries.append(entry)
+		set_entries(category, entries)
+
+func _favorite_request_key(actor: SDK.ActorId, key: String) -> String:
+	return actor.value + ":" + key if actor != null else ""
+
+func _change_favorite(actor: SDK.ActorId, _category_name: String, key: String, starred: bool) -> void:
+	if actor == null:
+		return
+	var request_key := _favorite_request_key(actor, key)
+	if _pending_favorites.has(request_key):
+		return
+	var current := sdk.actors.read(actor)
+	if not current.ok or current.actor.access_level != "Owner":
+		_refresh()
+		return
+	_pending_favorites[request_key] = true
+	_refresh()
+	var result := await _favorites.change(current.actor, key, starred)
+	_pending_favorites.erase(request_key)
+	if not result.ok:
+		_error(result.message)
+	# Refresh only the currently displayed context. The mutation kept its Actor.
+	_refresh()
 
 func _action_changed() -> void:
 	if _actor == null:
@@ -179,6 +227,13 @@ func _open_category(category: String) -> void:
 	get_node("Panel/Detail").visible = false
 	_panel.visible = true
 	_render_panel()
+	if category != "More" and _actor != null:
+		var initiating_actor := _actor
+		var result := await _favorites.prepare(initiating_actor)
+		if not result.ok:
+			_error(result.message)
+		if _actor != null and _actor.value == initiating_actor.value:
+			_refresh()
 
 func _back_or_close() -> void:
 	if get_node("Panel/Detail").visible:
@@ -274,6 +329,7 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	value.add_theme_color_override("font_color", TOKENS.COLOR_ACCENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
 	title.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
 	row.get_node("Favorite").visible = not fixed
+	row.get_node("Favorite").disabled = not entry.favorite_editable
 	row.get_node("Favorite").set_pressed_no_signal(entry.favorite)
 	row.get_node("Favorite").text = "★" if entry.favorite else "☆"
 	row.get_node("Favorite").add_theme_color_override("font_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
