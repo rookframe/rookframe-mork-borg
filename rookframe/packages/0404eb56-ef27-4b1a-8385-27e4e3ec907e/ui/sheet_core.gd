@@ -34,11 +34,15 @@ signal entry_requested(entry: String)
 signal field_changed(text: String, field: String)
 
 func _ready() -> void:
+	get_node(^"WeaponHeading/Actions/Options").pressed.connect(_ready_weapon_pressed)
 	for key in PROJECTION.ABILITIES:
 		get_node(_ability_paths.get(str(key), ^"Abilities/StrengthRow/Strength")).pressed.connect(_ability_pressed.bind(str(key)))
 		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Abilities/StrengthRow/StrengthEditField/Editor")).text_changed.connect(_field_typed.bind(str(key)))
 	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
 		get_node(_vital_edit_paths.get(str(pair[0]), ^"Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor")).text_changed.connect(_field_typed.bind(str(pair[1])))
+
+func _ready_weapon_pressed() -> void:
+	entry_requested.emit("ready_weapon")
 
 func _ability_pressed(key: String) -> void:
 	entry_requested.emit("ability:" + key)
@@ -141,7 +145,7 @@ func configure_condition(data: Dictionary, condition: Dictionary, phone: bool) -
 	get_node(^"ConditionReminder").configure(data, condition, phone)
 
 func focused_entry() -> Control:
-	for path in [^"Abilities/StrengthRow/Strength", ^"Abilities/AgilityRow/Agility", ^"Abilities/PresenceRow/Presence", ^"Abilities/ToughnessRow/Toughness"]:
+	for path in [^"WeaponHeading/Actions/Options", ^"Abilities/StrengthRow/Strength", ^"Abilities/AgilityRow/Agility", ^"Abilities/PresenceRow/Presence", ^"Abilities/ToughnessRow/Toughness"]:
 		if get_node(path).has_focus():
 			return get_node(path)
 	return null

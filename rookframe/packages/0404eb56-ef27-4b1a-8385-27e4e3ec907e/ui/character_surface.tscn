@@ -1006,17 +1006,21 @@ alignment = 0
 
 [node name="WeaponHeading" type="PanelContainer" parent="Margin/Layout/Body/Core"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 40)
+custom_minimum_size = Vector2(0, 44)
 theme_override_styles/panel = SubResource("CoreHeading")
 mouse_filter = 2
-[node name="Center" type="CenterContainer" parent="Margin/Layout/Body/Core/WeaponHeading"]
+[node name="Actions" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading"]
+layout_mode = 2
+
+[node name="Center" type="CenterContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Actions"]
+size_flags_horizontal = 3
 layout_mode = 2
 mouse_filter = 2
-[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Center"]
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center"]
 layout_mode = 2
 theme_override_constants/separation = 10
 mouse_filter = 2
-[node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/WeaponHeading/Center/Row"]
+[node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(24, 24)
 size_flags_vertical = 4
@@ -1025,7 +1029,7 @@ expand_mode = 1
 stretch_mode = 5
 self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
 mouse_filter = 2
-[node name="Title" type="Label" parent="Margin/Layout/Body/Core/WeaponHeading/Center/Row"]
+[node name="Title" type="Label" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center/Row"]
 layout_mode = 2
 text = "READY WEAPON"
 theme_override_font_sizes/font_size = 16
@@ -1033,6 +1037,14 @@ theme_override_fonts/font = ExtResource("display")
 theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
 vertical_alignment = 1
 mouse_filter = 2
+
+[node name="Options" type="Button" parent="Margin/Layout/Body/Core/WeaponHeading/Actions"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskQuiet"
+text = "Options"
+tooltip_text = "Weapon selection and attack options"
+accessibility_name = "Ready weapon options"
 
 [node name="Weapon" type="OptionButton" parent="Margin/Layout/Body/Core"]
 
