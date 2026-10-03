@@ -61,3 +61,14 @@ second shares the existing workflow's casting restrictions in `powers.gd`.
 
 Review totals: Standards one hard finding and one optional judgement, both
 addressed; Spec two findings, both addressed.
+
+The final retained run passed all 304 existing cases across 25 suites in 32.145
+seconds, with zero errors, failures, skips, flaky retries or orphan Nodes; see
+`retained-suite-results.xml`. The first full run exposed a creation-fixture
+mismatch: a simulated queued command committed before a simulated refusal.
+The existing fixture now delays Authority execution until completion, preserving
+its original pending/refusal semantics. No new retained case is added.
+
+Standards and Spec reviewers rechecked the committed fixes independently and
+reported no unresolved actionable findings. Both temporary suites and their UIDs
+are absent from the final tree; no temporary helper or runner wiring remains.

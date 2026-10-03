@@ -80,7 +80,8 @@ Membership is ordinary System-owned Actor data under `favorites`; absence means
 empty. Records identify the exact owned entry and action and retain its display
 name and category. Inventory serials never reuse removed identities. Traits gain
 stable Package-generated `favorite_entry_id` identities before the sheet offers
-stars. Companion keys include both its Actor ID and attack inventory ID.
+stars. Companion keys include both its Actor ID and attack inventory ID. Legacy
+companion entries gain saved identities before the sheet offers their stars.
 
 Only explicit star changes alter membership. Removed sources appear as unavailable
 entries in the corresponding sheet collection, and their Details retain an active
@@ -91,7 +92,8 @@ The package-owned `logic/actor_favorites.gd` projects `entries(data, actor_id,
 companions)` with stable `key`, source context, category, name, `starred`, `present`
 and `available` values. Call `logic/character_actions.gd`'s `set_favorite(key,
 starred)` for the same immediate write from a HUD consumer. No availability
-projection prunes membership. The projection does not launch workflows.
+projection prunes membership. The projection does not launch workflows. Power availability shares the existing
+casting restrictions with the Power workflow.
 
 Character corrections, inventory, portrait and preferred Miniature mutations now
 use `sheet.*` System intents. Authority applies each domain operation to the current
