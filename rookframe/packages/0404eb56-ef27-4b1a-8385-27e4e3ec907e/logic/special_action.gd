@@ -1,11 +1,15 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_action.gd"
 var _elapsed := 0.0
+var _queued_scrolls: Array[String] = []
 func _init(facade: SDK) -> void:
 	super(facade)
 	_operation = "special"
 	_active_states = ["pending", "scrolls", "witnesses", "shield"]
 func choose_scrolls(ids: Array[String]) -> void:
-	if state != "scrolls" or _reading or _closed:
+	if state != "scrolls" or _closed:
+		return
+	if _reading:
+		_queued_scrolls = ids.duplicate()
 		return
 	_reading = true
 	var result := await _submit("special.scrolls", {"id": _id, "scrolls": ids})
@@ -15,6 +19,12 @@ func choose_scrolls(ids: Array[String]) -> void:
 	if _retired and not _cancelling:
 		queue_free()
 func _process(delta: float) -> void:
+	# Preserve a selection made while a remote refresh is in flight.
+	if not _queued_scrolls.is_empty() and not _reading:
+		var selected := _queued_scrolls
+		_queued_scrolls = []
+		choose_scrolls(selected)
+		return
 	_elapsed += delta
 	if _elapsed >= 0.5:
 		_elapsed = 0.0
