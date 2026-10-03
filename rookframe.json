@@ -175,8 +175,8 @@
       "compatibleVersions": ">=1.0.111 <2.0.0"
     }
   ],
-  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.119/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.119.json",
-  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.119/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.119.rookpackage",
+  "manifest": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.120/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.120.json",
+  "download": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.120/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.120.rookpackage",
   "defaultLocale": "en",
   "translations": [
     {
