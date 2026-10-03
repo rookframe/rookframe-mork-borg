@@ -79,10 +79,10 @@ func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, readin
 	get_node(^"FooterFrame/FooterInset").add_theme_constant_override("margin_top", 7 if phone else 8)
 	get_node(^"FooterFrame/FooterInset").add_theme_constant_override("margin_bottom", 7 if phone else 8)
 
-func append_draft_field(field: String, title: String, value: String, phone: bool, profile: bool) -> ENTRY_FIELD:
+func append_draft_field(field: String, title: String, value: String, phone: bool) -> ENTRY_FIELD:
 	var control = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_field.tscn").instantiate()
 	field_host(field).add_child(control)
-	control.configure_layout(phone, profile)
+	control.configure_layout(phone)
 	register_field(control)
 	control.configure(field, title, value, field in ["description", "origin", "class_rules", "pack"] or field.ends_with(":rules"))
 	return control

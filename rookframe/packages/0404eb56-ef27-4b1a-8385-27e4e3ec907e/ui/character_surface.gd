@@ -366,6 +366,7 @@ func _restore_pages() -> void:
 func _show_route() -> void:
 	var chapter := int(_nav.get("chapter", 0))
 	var details := not _detail.is_empty()
+	get_node(^"Margin/Layout").place_status(_phone and not details)
 	var task := _detail in ["workflow:rest", "workflow:improve"]
 	var modal := details and not _phone and not task
 	var detail_parent = _workflow_slot if task else get_node(^"EntryDialog/Surface/Inset") if modal else _chapter_ui
@@ -530,6 +531,8 @@ func _save_sheet() -> void:
 func _cancel_edit() -> void:
 	_detail = ""
 	_history.clear()
+	_validation_error = {}
+	_status("")
 	get_node(^"Margin/Layout").clear_errors()
 	_draft.discard()
 	_refresh_pending = true
@@ -737,14 +740,14 @@ func _character_field(field: String, title: String) -> void:
 	if not _draft.active:
 		_text(title + "\n" + str(_projection.fields(_actor.data).get(field, "")))
 		return
-	var control = _detail_ui.append_draft_field(field, title, _draft.value(field), _phone, _detail == "profile")
+	var control = _detail_ui.append_draft_field(field, title, _draft.value(field), _phone)
 	control.changed.connect(_draft_typed)
 	_fields.append(control)
 
 func _item_field(field: String, value: String, independent: bool) -> void:
 	var control = FIELD.instantiate()
 	_detail_ui.field_host(field).add_child(control)
-	control.configure_layout(_phone, _detail == "profile")
+	control.configure_layout(_phone)
 	_detail_ui.register_field(control)
 	control.configure(field, field.replace("_", " ").capitalize(), value, field == "rules", independent)
 	control.submitted.connect(_item_field_saved)
@@ -1074,7 +1077,7 @@ func _use_allowed(rule: Dictionary) -> bool:
 func _workflow_field(field: String, title: String) -> void:
 	var control = FIELD.instantiate()
 	_detail_ui.field_host(field).add_child(control)
-	control.configure_layout(_phone, _detail == "profile")
+	control.configure_layout(_phone)
 	_detail_ui.register_field(control)
 	control.configure(field, title, str(_action_input.get(field, 0)))
 	control.changed.connect(_workflow_typed)
@@ -1405,12 +1408,9 @@ func _close() -> void:
 	sdk.windows.close(load(ROOT + "ui/character_surface.tres"))
 
 func _status(message: String) -> void:
-	get_node(^"Margin/Layout/Status").text = _locale.text(message)
+	get_node(^"Margin/Layout").show_status(_locale.text(message))
 	if int(_nav.get("chapter", 0)) == 4:
 		_chapter_ui.get_node(^"AppearanceStatus").text = _locale.text(message)
-	get_node(^"Margin/Layout/Status").visible = not message.is_empty()
-	get_node(^"Margin/Layout/Status").tooltip_text = _locale.text(message)
-	get_node(^"Margin/Layout/Status").accessibility_description = _locale.text(message)
 
 func _density() -> void:
 	var canvas := get_viewport_rect().size
@@ -1431,13 +1431,13 @@ func _density() -> void:
 		_render_condition(_actor.data)
 		_show_route()
 
-func _unhandled_key_input(event: InputEvent) -> void:
-	if not is_visible_in_tree():
-		return
-	if event.is_action_pressed("ui_cancel"):
+func _input(event: InputEvent) -> void:
+	if is_visible_in_tree() and event.is_action_pressed("ui_cancel"):
 		_escape()
 		accept_event()
-	elif _detail.is_empty():
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if is_visible_in_tree() and _detail.is_empty():
 		var key := event as InputEventKey
 		if key == null or not key.pressed or key.echo:
 			return

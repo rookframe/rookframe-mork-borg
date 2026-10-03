@@ -57,6 +57,10 @@ current maximum HP; the incident keeps the original die result.
 
 Details use one bounded authored body and a public pager in their fixed footer.
 Field labels, editors and validation copy remain together on one content page.
+Phone paged multiline editors use the approved compact height, including item
+Rules. Phone status copy stays in the chapter column so the persistent core and
+its actions retain their full touch area. Cancel clears the abandoned draft's
+validation, and both sheet and Details windows handle Escape before editors.
 Nested references retain page history; native editor focus returns after World
 refresh. Escape cancels the shared sheet draft; Back retains it. Save validates
 through the same character correction boundary used by the inline resource rows.

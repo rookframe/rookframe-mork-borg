@@ -16,7 +16,7 @@ func present(active: bool, canvas: Vector2, presentation: String = "entry") -> v
 		size = extent
 		popup_centered()
 
-func _unhandled_key_input(event: InputEvent) -> void:
+func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		set_input_as_handled()
 		escape_requested.emit()

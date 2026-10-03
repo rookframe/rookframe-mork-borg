@@ -1,4 +1,5 @@
 extends VBoxContainer
+@onready var _status: Label = get_node(^"Status")
 ## Routes draft text and validation to each authored inline copy of a shared field.
 ## Retain native references before phone footers reparent the quick controls.
 @onready var _fields: Dictionary = {
@@ -30,3 +31,15 @@ func show_error(field: String, message: String) -> void:
 func clear_errors() -> void:
 	for field in _fields.keys():
 		show_error(str(field), "")
+
+func place_status(in_chapter: bool) -> void:
+	var destination: Node = get_node(^"Body/Chapter") if in_chapter else self
+	if _status.get_parent() != destination:
+		_status.get_parent().remove_child(_status)
+		destination.add_child(_status)
+
+func show_status(message: String) -> void:
+	_status.text = message
+	_status.visible = not message.is_empty()
+	_status.tooltip_text = message
+	_status.accessibility_description = message
