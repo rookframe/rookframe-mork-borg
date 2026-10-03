@@ -252,7 +252,7 @@ size_flags_horizontal = 3
 [node name="Roll" type="Label" parent="Body/Content/Abilities/Strength"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Strength"]
@@ -261,7 +261,7 @@ mouse_filter = 2
 [node name="Change" type="Label" parent="Body/Content/Abilities/Strength"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Strength"]
@@ -290,7 +290,7 @@ size_flags_horizontal = 3
 [node name="Roll" type="Label" parent="Body/Content/Abilities/Agility"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Agility"]
@@ -299,7 +299,7 @@ mouse_filter = 2
 [node name="Change" type="Label" parent="Body/Content/Abilities/Agility"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Agility"]
@@ -328,7 +328,7 @@ size_flags_horizontal = 3
 [node name="Roll" type="Label" parent="Body/Content/Abilities/Presence"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Presence"]
@@ -337,7 +337,7 @@ mouse_filter = 2
 [node name="Change" type="Label" parent="Body/Content/Abilities/Presence"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Presence"]
@@ -366,7 +366,7 @@ size_flags_horizontal = 3
 [node name="Roll" type="Label" parent="Body/Content/Abilities/Toughness"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
 theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Toughness"]
@@ -375,7 +375,7 @@ mouse_filter = 2
 [node name="Change" type="Label" parent="Body/Content/Abilities/Toughness"]
 layout_mode = 2
 text = ""
-autowrap_mode = 3
+autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
 theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Toughness"]
