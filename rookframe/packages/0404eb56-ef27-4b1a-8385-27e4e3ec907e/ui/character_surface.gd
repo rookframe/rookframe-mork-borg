@@ -1190,7 +1190,11 @@ func _primary_action() -> void:
 		else:
 			_field_error(corrections.invalid_field, result.message)
 	elif _detail.begins_with("actor:"):
-		sdk.windows.open_actor(preload(ROOT + "ui/window_button.tres").window, SDK.ActorId.new(_detail.trim_prefix("actor:")))
+		var result := sdk.windows.open_actor(preload(ROOT + "ui/window_button.tres").window, SDK.ActorId.new(_detail.trim_prefix("actor:")))
+		if result.ok:
+			_close()
+		else:
+			_status(result.message)
 
 func _direct_ability(ability: String) -> void:
 	if not _can_act() or _action_live():
