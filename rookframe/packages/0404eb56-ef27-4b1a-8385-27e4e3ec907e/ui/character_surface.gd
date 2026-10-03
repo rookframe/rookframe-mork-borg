@@ -974,6 +974,10 @@ func _render_workflow() -> void:
 			_secondary("Continue procedure")
 			return
 	if _action != null:
+		var special := _action as SPECIAL
+		if special != null and special.choosing_scrolls:
+			_text("Adding selected scrolls…")
+			return
 		if _action_kind != "improve":
 			_text(_action.message)
 		if _action.state in ["continue", "ready"]:

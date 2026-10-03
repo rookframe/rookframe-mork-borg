@@ -19,12 +19,20 @@ func test_scroll_selection_during_delayed_refresh_is_accepted_once(close_before_
 	assert_str(action.state).is_equal("scrolls")
 	host.defer_reply = true
 	action.refresh()
+	action.refresh()
 	await action.choose_scrolls(["enochian-syntax", "aegis-of-sorrow"])
+	action.refresh()
 	if close_before_reply:
 		await action.cancel()
+	else:
+		host.defer_reply = true
 	host.complete_reply()
 	await get_tree().process_frame
 	await get_tree().process_frame
+	if not close_before_reply:
+		assert_int(host.submissions.get("special.scrolls", 0)).is_equal(1)
+		host.complete_reply()
+		await get_tree().process_frame
 	assert_str(action.state).is_equal("ended" if close_before_reply else "resolved")
 	assert_int(host.actors.hero.data.inventory.size()).is_equal(2 if close_before_reply else 4)
 	assert_int(host.actors.hero.data.traits[0].uses).is_equal(0)
