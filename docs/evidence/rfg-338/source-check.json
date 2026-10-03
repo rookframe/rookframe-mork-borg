@@ -13,7 +13,6 @@
           "Diagnostics": [],
           "UsedNativeMembers": [
             "constructor:Button",
-            "constructor:HBoxContainer",
             "constructor:Label",
             "constructor:StyleBoxFlat",
             "constructor:Timer",

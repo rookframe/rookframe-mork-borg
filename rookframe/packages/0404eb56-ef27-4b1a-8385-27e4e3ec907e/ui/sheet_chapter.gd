@@ -118,7 +118,14 @@ func focus_entry(id: String) -> bool:
 			return true
 	return false
 
-func configure_route(chapter: int, phone: bool, tablet: bool, details: bool, modal: bool, condition_reference: bool, data: Dictionary, editing: bool, draft: Dictionary, navigation: Dictionary) -> void:
+func configure_route(view: Dictionary, data: Dictionary, draft: Dictionary, navigation: Dictionary) -> void:
+	var chapter: int = view.chapter
+	var phone: bool = view.phone
+	var tablet: bool = view.tablet
+	var details: bool = view.details
+	var modal: bool = view.modal
+	var condition_reference: bool = view.condition_reference
+	var editing: bool = view.editing
 	var _chapter_tabs = get_node(^"Tabs")
 	var _chapter_collections = get_node(^"Collections")
 	var _chapter_journal_panel = get_node(^"JournalPanel")

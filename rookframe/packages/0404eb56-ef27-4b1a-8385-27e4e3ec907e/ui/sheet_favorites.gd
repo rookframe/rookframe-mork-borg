@@ -4,7 +4,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
 const STAR_SCRIPT = preload(ROOT + "ui/sheet_favorite.gd")
-const STAR = preload(ROOT + "ui/sheet_favorite.tscn")
+const COMPANION = preload(ROOT + "ui/sheet_companion_favorite.tscn")
 const PROJECTION = preload(ROOT + "ui/sheet_projection.gd")
 signal favorite_changed(key: String, starred: bool)
 var sdk: SDK
@@ -61,18 +61,10 @@ func append_companions(content: Control, actor: SDK.Actor, companion: String, bu
 	for entry in entries(actor):
 		if str(entry.get("actor", "")) != companion:
 			continue
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 12)
+		var row = COMPANION.instantiate()
 		content.add_child(row)
-		var title := Label.new()
-		title.text = str(entry.get("name", "Attack"))
-		title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		title.autowrap_mode = 3 # TextServer.AUTOWRAP_WORD_SMART
-		row.add_child(title)
-		var star = STAR.instantiate()
-		row.add_child(star)
-		star.configure(entry, actor.access_level == "Owner", busy)
-		star.favorite_changed.connect(_changed)
+		row.configure(entry, actor.access_level == "Owner", busy)
+		row.favorite_changed.connect(_changed)
 
 func prepare(id: SDK.ActorId) -> SDK.ActorResult:
 	var current := sdk.actors.read(id)
@@ -86,7 +78,8 @@ func prepare(id: SDK.ActorId) -> SDK.ActorResult:
 			if actor.access_level == "Owner" and str(data.get("schema", "")) == "mork-borg-adversary/v1" and _model.is_companion(current.actor.data, id.value, data) and _model.needs_companion_identity(data):
 				companions.append(actor.id.value)
 	if needs_identity(current.actor.data) or not companions.is_empty():
-		return await preload(ROOT + "logic/character_actions.gd").new(sdk, id).prepare_favorites(companions)
+		var result := await preload(ROOT + "logic/character_actions.gd").new(sdk, id).prepare_favorites(companions)
+		return _latest(id, result)
 	return current
 
 func item(actor: SDK.Actor, id: String) -> Dictionary:
@@ -99,10 +92,10 @@ func item(actor: SDK.Actor, id: String) -> Dictionary:
 
 func change(actor: SDK.Actor, key: String, starred: bool) -> SDK.ActorResult:
 	var result := await preload(ROOT + "logic/character_actions.gd").new(sdk, actor.id).set_favorite(key, starred)
-	if result.ok:
-		var latest := sdk.actors.read(actor.id)
-		return latest if latest.ok else result
-	return result
+	return _latest(actor.id, result)
+
+func _latest(id: SDK.ActorId, result: SDK.ActorResult) -> SDK.ActorResult:
+	return sdk.actors.read(id) if result.ok else result
 
 func _changed(key: String, starred: bool) -> void:
 	favorite_changed.emit(key, starred)

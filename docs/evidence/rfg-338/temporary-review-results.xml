@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="3" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="rfg338_review_fixes" package="tests" timestamp="2026-10-03T22:23:36" hostname="localhost" tests="3" failures="0" errors="0" skipped="0" flaky="0" time="4.276">
+		<testcase name="test_power_availability_reuses_workflow_restrictions" classname="rfg338_review_fixes" time="0.002">
+		</testcase>
+		<testcase name="test_native_fingersmith_and_authored_companion_stars:0 (1920, 1080)" classname="rfg338_review_fixes" time="2.250">
+		</testcase>
+		<testcase name="test_native_fingersmith_and_authored_companion_stars:1 (844, 390)" classname="rfg338_review_fixes" time="2.009">
+		</testcase>
+	</testsuite>
+</testsuites>

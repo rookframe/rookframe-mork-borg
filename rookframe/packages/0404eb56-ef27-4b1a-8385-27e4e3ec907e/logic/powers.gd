@@ -115,3 +115,21 @@ func report(id: String, values: Array[int], presence: int) -> String:
 	if id in ["enochian-syntax"]:
 		return "One creature blindly obeys a single command. Give and resolve the command at the table."
 	return ""
+
+## Shared workflow-start rules for sheet and favorite consumers.
+func casting_restriction(data: Dictionary, inventory: Array) -> String:
+	if str(data.get("class_id", "")) == "fanged-deserter":
+		return "Fanged Deserters cannot understand scrolls."
+	for raw in inventory:
+		if typeof(raw) != TYPE_DICTIONARY:
+			return "Inventory data is malformed."
+		var item: Dictionary = raw
+		if not item.get("equipped", false):
+			continue
+		if str(item.get("source_item_id", "")) == "zweihander" or item.get("two_handed", false):
+			return "Scrolls do not work while wielding zweihand weapons. Unequip the weapon first."
+		if str(item.get("kind", "")) == "Armor":
+			var tier: int = item.get("penalty_tier", item.get("armor_tier", 0))
+			if tier >= 3 or (tier == 2 and str(data.get("class_id", "")) != "heretical-priest"):
+				return "Scrolls do not work in medium/heavy armor. Only the Heretical Priest may cast in medium armor."
+	return ""

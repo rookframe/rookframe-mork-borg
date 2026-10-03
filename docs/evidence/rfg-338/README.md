@@ -33,3 +33,31 @@ No retained test cases or routine gate wiring are added. The existing creation
 boundary fixture is adjusted to exercise the same production sheet operations
 through the SDK's System intent/commit callbacks. Passing reports and captures
 are evidence only, not an executable regression matrix.
+
+After review fixes, three additional temporary cases passed in 4.276 seconds,
+with zero errors, failures, skips, flaky retries or orphan Nodes. They verified
+that casting availability uses the real workflow's Zweihänder and armor-penalty
+restrictions, the real Filthy fingersmith starting feature remains favoritable,
+and authored companion stars work through native mouse input on desktop and
+phone. A pending favorite reply also preserved a newer inspected Character.
+See `temporary-review-results.xml`. These additional scripts are discarded too.
+
+The Package authoring source checker accepted the final source with no diagnostics;
+see `source-check.json`. This is source admission, not prepared export admission.
+
+## Standards
+
+Review found one hard violation: a stable companion favorite row was constructed
+in code. It now uses an authored scene and its ordinary Godot controller. The
+optional Data Clumps finding on chapter routing was addressed by grouping route
+and viewport state into a named view dictionary.
+
+## Spec
+
+Review found two gaps: starting lockpicks hid the active Filthy fingersmith star,
+and favorite Power availability duplicated an incomplete casting guard. The first
+now excludes only item descriptions referring to the same action source; the
+second shares the existing workflow's casting restrictions in `powers.gd`.
+
+Review totals: Standards one hard finding and one optional judgement, both
+addressed; Spec two findings, both addressed.

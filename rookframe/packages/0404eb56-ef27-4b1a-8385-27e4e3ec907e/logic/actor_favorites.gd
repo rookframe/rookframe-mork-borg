@@ -60,7 +60,8 @@ func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = 
 		var feature: Dictionary = raw
 		var source := str(feature.get("id", ""))
 		var identity := str(feature.get("favorite_entry_id", ""))
-		if identity.is_empty() or feature.has("item") or source in PASSIVE or RULES.new().definition(source).is_empty() and source != "cowards-jab":
+		var gift: Dictionary = feature.get("item", {})
+		if identity.is_empty() or str(gift.get("source_item_id", "")) == source or source in PASSIVE or RULES.new().definition(source).is_empty() and source != "cowards-jab":
 			continue
 		result.append({"key": "feature:" + identity + ":use", "category": "Attacks" if source == "cowards-jab" else "Features", "name": str(feature.get("name", "Feature")), "action": "use", "source": source, "entry": identity, "present": true, "available": BROKEN.new().can_act(data) and int(feature.get("uses", 1)) > 0})
 	for companion in companions:
@@ -119,15 +120,8 @@ func _available(data: Dictionary, item: Dictionary, action: String, inventory: A
 	if action == "attack":
 		return item.get("equipped", false)
 	if action == "cast":
-		if int(data.get("power_uses", 0)) < 1 or str(data.get("class_id", "")) == "fanged-deserter":
+		if int(data.get("power_uses", 0)) < 1 or not POWERS.new().casting_restriction(data, inventory).is_empty():
 			return false
-		for raw in inventory:
-			var worn: Dictionary = raw
-			if not worn.get("equipped", false) or worn.get("broken", false) or int(worn.get("quantity", 0)) < 1:
-				continue
-			var tier := int(worn.get("armor_tier", 0))
-			if str(worn.get("source_item_id", "")) == "zweihand" or tier >= (3 if str(data.get("class_id", "")) == "heretical-priest" else 2):
-				return false
 	if item.has("dose_pool"):
 		for raw in inventory:
 			var pool: Dictionary = raw

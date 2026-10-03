@@ -141,6 +141,8 @@ var _rendered_chapter := -1
 var _locale := I18N.new()
 
 func ready() -> void:
+	if sdk == null:
+		return
 	_favorites.sdk = sdk
 	_favorites.favorite_changed.connect(_favorite_changed)
 	_favorite_button.favorite_changed.connect(_favorite_changed)
@@ -229,6 +231,8 @@ func opened(id: SDK.ActorId) -> void:
 	_actor = source.actor
 	if _owner():
 		var prepared := await _favorites.prepare(id)
+		if _actor == null or _actor.id.value != id.value:
+			return
 		if prepared.ok:
 			_actor = prepared.actor
 	_nav = navigation.read(sdk.context().session_id, id.value)
@@ -267,8 +271,9 @@ func _process(delta: float) -> void:
 			if prepared.ok:
 				latest = prepared
 			_busy = false
-			_accept_actor(latest.actor)
-			_refresh()
+			if _actor != null and _actor.id.value == latest.actor.id.value:
+				_accept_actor(latest.actor)
+				_refresh()
 		else:
 			_draft.discard()
 			_end_action()
@@ -421,7 +426,7 @@ func _show_route() -> void:
 	_appearance_ui.visible = not obscured and chapter == 4
 	_detail_ui.visible = details and _detail != "workflow:rest"
 	(_actions_ui.get_node(^"Utility/PagerSlot") as Control).visible = _detail_ui.visible
-	_chapter_ui.configure_route(chapter, _phone, tablet, details, modal, _condition_reference, _actor.data, _draft.active, _draft.values(), _nav)
+	_chapter_ui.configure_route({"chapter": chapter, "phone": _phone, "tablet": tablet, "details": details, "modal": modal, "condition_reference": _condition_reference, "editing": _draft.active}, _actor.data, _draft.values(), _nav)
 	var resource_editor = _chapter_ui.get_node(^"Collections/Secondary/ResourceEditors")
 	var footer = _chapter_ui
 	if _phone and not details and chapter in [0, 1, 2] and not _condition_ui.visible:
@@ -1493,8 +1498,9 @@ func _favorite_changed(key: String, starred: bool) -> void:
 	var result := await _favorites.change(_actor, key, starred)
 	_favorite_busy = false
 	if result.ok:
-		_accept_actor(result.actor)
-		_refresh()
+		if _actor != null and _actor.id.value == result.actor.id.value:
+			_accept_actor(result.actor)
+			_refresh()
 	else:
 		_status(result.message)
 	_sync_favorite()

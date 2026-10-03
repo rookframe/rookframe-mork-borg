@@ -110,10 +110,11 @@ func SelectedRookContext() -> Dictionary:
 
 func complete_update() -> void:
 	defer_update = false
-	if not pending_sheet_reply.is_empty():
-		pending_sheet_reply["requestId"] = 43
-		TabletopCommandCompleted.emit(pending_sheet_reply)
-		pending_sheet_reply = {}
+	if not pending_sheet_intent.is_empty():
+		var reply: Dictionary = await _sheet_reply(pending_sheet_intent.name, pending_sheet_intent.payload)
+		pending_sheet_intent = {}
+		reply["requestId"] = 43
+		TabletopCommandCompleted.emit(reply)
 		return
 	var result: Dictionary = UpdateActor(pending_update.id, pending_update.data)
 	result["requestId"] = 43
@@ -190,16 +191,18 @@ func PreviewMiniature(_package: String, _id: String, _target: Control) -> Dictio
 	return {"ok": true}
 
 # Substitute only the host's authenticated, durable System-intent boundary.
-var pending_sheet_reply: Dictionary = {}
+var pending_sheet_intent: Dictionary = {}
 func SubmitSystemIntent(name: String, payload: Variant) -> Dictionary:
+	if defer_update:
+		pending_sheet_intent = {"name": name, "payload": payload.duplicate(true)}
+		return {"ok": false, "code": "pending", "requestId": 43}
+	return await _sheet_reply(name, payload)
+
+func _sheet_reply(name: String, payload: Variant) -> Dictionary:
 	var sdk = load(ROOT + "sdk/package_sdk_facade.gd").new(self)
 	var handler = load(ROOT + "logic/sheet_authority.gd").new()
 	var outcome: Dictionary = await handler.handle(load(ROOT + "sdk/system_action_context.gd").new(self, "sheet"), sdk, name, payload)
-	var reply := {"ok": true, "value": outcome}
-	if defer_update:
-		pending_sheet_reply = reply
-		return {"ok": false, "code": "pending", "requestId": 43}
-	return reply
+	return {"ok": true, "value": outcome}
 
 func SystemIntentReadActor(_token: String, id: String) -> Dictionary:
 	return ReadActor(id)

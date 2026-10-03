@@ -132,7 +132,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Enter a whole-number situational modifier from −20 to +20.")
 	if input.get("sheet", false) and not BROKEN.new().can_act(data):
 		return _error("This Character cannot cast. Rules references remain available.")
-	var restriction := _restriction(data)
+	var restriction := POWERS.new().casting_restriction(data, data.get("inventory", []))
 	if not restriction.is_empty():
 		return _error(restriction)
 	var targeting := {"state": "ready", "label": "Table outcome", "targets": []} if input.get("sheet", false) else _targets(context, caller, str(input.get("rook", "")), source.actor.id, scroll)
@@ -176,7 +176,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		data["power_uses"] = usable
 		data["power_uses_total"] = usable
 		return _complete(context, action, [SDK.ActorChange.new(source.actor.id, data)], "Daily allowance", "Morning allowance: Presence %+d + d4 %d = %d. %d usable Powers today. The table establishes the morning; no time or replenishment is automatic. Raw Roll #%d." % [presence, daily_face, count, usable, result.sequence])
-	if action["phase"] == "casting" and (_scroll(data, action.item).is_empty() or not _restriction(data).is_empty()):
+	if action["phase"] == "casting" and (_scroll(data, action.item).is_empty() or not POWERS.new().casting_restriction(data, data.get("inventory", [])).is_empty()):
 		return _end(context, action)
 	if action["phase"] == "resistance":
 		return _sleep_result(context, action, result.terms[0].results, result.sequence)
@@ -479,24 +479,6 @@ func _request(context: SDK.SystemActionContext, action: Dictionary, phase: Strin
 		return _end(context, action)
 	action["message"] = message.replace("the Dice Tray", "Window Dice") if action.get("sheet", false) else message
 	return _public(action)
-
-func _restriction(data: Dictionary) -> String:
-	if str(data.get("class_id", "")) == "fanged-deserter":
-		return "Fanged Deserters cannot understand scrolls."
-	var inventory: Array = data.inventory
-	for raw in inventory:
-		if typeof(raw) != TYPE_DICTIONARY:
-			return "Inventory data is malformed."
-		var item: Dictionary = raw
-		if not item.get("equipped", false):
-			continue
-		if str(item.get("source_item_id", "")) == "zweihander" or item.get("two_handed", false):
-			return "Scrolls do not work while wielding zweihand weapons. Unequip the weapon first."
-		if str(item.get("kind", "")) == "Armor":
-			var tier: int = item.get("penalty_tier", item.get("armor_tier", 0))
-			if tier >= 3 or (tier == 2 and str(data.get("class_id", "")) != "heretical-priest"):
-				return "Scrolls do not work in medium/heavy armor. Only the Heretical Priest may cast in medium armor."
-	return ""
 
 func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook: String, source: SDK.ActorId, power: Dictionary, count: int = 0) -> Dictionary:
 	var mode: String = power.target_mode
