@@ -25,6 +25,7 @@ const ABILITY_ICONS := [preload(ROOT + "ui/hud_art/abilities.svg"), preload("res
 ## The managed action receives the initiating Actor and stable source key.
 signal entry_requested(actor: SDK.ActorId, category: String, entry_id: String)
 signal favorite_requested(actor: SDK.ActorId, category: String, entry_id: String, favorite: bool)
+signal morning_requested(actor: SDK.ActorId)
 var _favorites := FAVORITES.new()
 var _pending_favorites: Dictionary = {}
 var _actor: SDK.ActorId
@@ -74,6 +75,9 @@ func ready() -> void:
 	get_node("Panel/Empty/Sheet").pressed.connect(_open_sheet)
 	get_node("Panel/Header/Close").pressed.connect(_back_or_close)
 	get_node("Panel/Header/ShowAll").toggled.connect(_toggle_all)
+	get_node("Panel/Header/Morning").pressed.connect(_morning)
+	get_node("Panel/Header/Morning").text = sdk.translations.text("Morning")
+	get_node("Panel/Header/Morning").accessibility_name = sdk.translations.text("Morning Power allowance")
 	get_node("Panel/Footer/Previous").pressed.connect(_change_page.bind(-1))
 	get_node("Panel/Footer/Next").pressed.connect(_change_page.bind(1))
 	for category in BUTTONS:
@@ -251,6 +255,12 @@ func _close_panel() -> void:
 		button.set_pressed_no_signal(false)
 		get_node("Bar/Categories/" + category + "/Title").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT)
 
+func _morning() -> void:
+	var initiating_actor := _actor
+	_close_panel()
+	if initiating_actor != null:
+		morning_requested.emit(initiating_actor)
+
 func _toggle_all(enabled: bool) -> void:
 	_show_all[_category] = enabled
 	_page = 0
@@ -271,6 +281,7 @@ func _render_panel() -> void:
 	var fixed := _category in ["Abilities", "Recovery", "More"]
 	get_node("Panel/Header/Title").text = sdk.translations.text(_category)
 	get_node("Panel/Header/ShowAll").visible = not fixed
+	get_node("Panel/Header/Morning").visible = _category == "Powers"
 	get_node("Panel/Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
 	for category in BUTTONS:
 		var button: Button = get_node("Bar/Categories/" + category)
@@ -364,6 +375,7 @@ func _full_name(title: String) -> void:
 	_more.visible = false
 	get_node("Panel/Footer").visible = false
 	get_node("Panel/Header/ShowAll").visible = false
+	get_node("Panel/Header/Morning").visible = false
 	_layout_panel()
 
 func _check_names() -> void:
@@ -459,9 +471,13 @@ func _layout_panel() -> void:
 	get_node("Panel/Frame").pointer = clampf(anchor-left, 12, width-12)
 	get_node("Panel/Frame").queue_redraw()
 	_rect(get_node("Panel/Header"), pad, top, width-pad*2, header)
-	_rect(get_node("Panel/Header/Title"), 0, 0, width-pad*2-44-120 if get_node("Panel/Header/ShowAll").visible else width-pad*2-44, header)
+	var morning_width := 72 if get_node("Panel/Header/Morning").visible else 0
+	var all_width := 88 if morning_width > 0 else 120
+	var all_left := width-pad*2-44-morning_width-all_width
+	_rect(get_node("Panel/Header/Title"), 0, 0, all_left if get_node("Panel/Header/ShowAll").visible else width-pad*2-44-morning_width, header)
 	get_node("Panel/Header/Title").add_theme_font_size_override("font_size", 17 if _phone else 22)
-	_rect(get_node("Panel/Header/ShowAll"), width-pad*2-164, 0, 120, header)
+	_rect(get_node("Panel/Header/ShowAll"), all_left, 0, all_width, header)
+	_rect(get_node("Panel/Header/Morning"), width-pad*2-44-morning_width, 0, morning_width, header)
 	_rect(get_node("Panel/Header/Close"), width-pad*2-44, 0, 44, header)
 	_rect(get_node("Panel/Header/Rule"), 0, header-1, width-pad*2, 1)
 	_rect(_list, pad, top+header, width-pad*2, body)
@@ -484,6 +500,8 @@ func _style() -> void:
 	get_node("Panel/Empty/Title").add_theme_font_size_override("font_size", 13 if _phone else 14)
 	get_node("Panel/Header/Close").add_theme_font_size_override("font_size", 26)
 	get_node("Panel/Header/ShowAll").add_theme_font_size_override("font_size", 12 if _phone else 13)
+	get_node("Panel/Header/Morning").add_theme_font_size_override("font_size", 12 if _phone else 13)
+	get_node("Panel/Header/Morning").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
 	get_node("Panel/Detail").add_theme_font_size_override("font_size", 13 if _phone else 16)
 	get_node("Bar/Dice/Title").add_theme_font_size_override("font_size", 13)
 	get_node("Bar/Dice/Title").add_theme_color_override("font_color", Color(0.94117647058823528, 0.85098039215686272, 0.55686274509803924, 1.0))
