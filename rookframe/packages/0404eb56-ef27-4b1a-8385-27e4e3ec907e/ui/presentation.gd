@@ -48,8 +48,7 @@ func inspect_actor(actor: SDK.ActorId) -> void:
 	if str(data.get("schema", "")) == "mork-borg-character/v1":
 		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), actor)
 		return
-	var entry: SDK.WindowButton = DESKTOP_WINDOW_BUTTON if sdk.presentation_experience().is_desktop else WINDOW_BUTTON
-	sdk.windows.open_actor(entry.window, actor)
+	sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
 
 var _reading_defences := false
 var _seen_defences: Dictionary = {}

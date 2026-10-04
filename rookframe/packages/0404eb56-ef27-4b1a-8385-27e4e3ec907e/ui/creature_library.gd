@@ -23,8 +23,7 @@ func create(definition: SDK.ContentReference, scene: SDK.SceneId = null, positio
 			var removed := await sdk.actors.delete(actor)
 			return _failure(placed.message + (" " + removed.message if not removed.ok else ""))
 	else:
-		var entry: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_desktop.tres") if sdk.presentation_experience().is_desktop else preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
-		sdk.windows.open_actor(entry.window, actor)
+		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
 	return sdk.actors.read(actor)
 
 func _failure(message: String) -> SDK.ActorResult:

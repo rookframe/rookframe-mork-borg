@@ -76,6 +76,12 @@ theme_override_constants/separation = 12
 layout_mode = 2
 theme_override_constants/separation = 0
 
+[node name="InventoryAdd" type="Button" parent="Inset/Layout/Body/Workspace"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Add Item"
+theme_type_variation = "TaskButton"
+visible = false
 [node name="Encounter" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)

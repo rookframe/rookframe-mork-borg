@@ -1395,4 +1395,18 @@ messages = {
 [&"", &"Starting HP"]: [&"Starting HP"],
 [&"", &"Obeys only its owner."]: [&"Obeys only its owner."],
 [&"", &"Ignores its owner but loves them."]: [&"Ignores its owner but loves them."],
+[&"", &"Creature sheet · Owner"]: [&"Creature sheet · Owner"],
+[&"", &"Creature sheet · Viewer"]: [&"Creature sheet · Viewer"],
+[&"", &"Add equipment from the core catalogue or create custom loot."]: [&"Add equipment from the core catalogue or create custom loot."],
+[&"", &"Custom loot"]: [&"Custom loot"],
+[&"", &"Range feet"]: [&"Range feet"],
+
+[&"", &"Defence penalty +%d"]: [&"Defence penalty +%d"],
+[&"", &"Damage reduction"]: [&"Damage reduction"],
+[&"", &"Shield reduction"]: [&"Shield reduction"],
+[&"", &"Edit item"]: [&"Edit item"],
+[&"", &"Finish item editing"]: [&"Finish item editing"],
+[&"", &"Weight"]: [&"Weight"],
+[&"", &"Price"]: [&"Price"],
+[&"", &"No attacks recorded."]: [&"No attacks recorded."],
 }
