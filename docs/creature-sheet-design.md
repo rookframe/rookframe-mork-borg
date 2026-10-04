@@ -1,39 +1,47 @@
-# Creature Actor sheet review contract
+# Creature sheet review contract
 
-Use the unchanged Rookframe design system: Exo 2 headings and Inter body text,
-17px item identity, 16px metadata, 28px stat values; package ink #010c10,
-text #d9d4d1, muted #91999a, gold #f0bb32 and aqua #44e9e9.
-The existing font pair is mandatory. No alternative fonts or palette are added.
-Spacing uses 4/8/12/16px: 12px dock inset, 16px between sections, 16px section
-padding, 12px row separation and 8px between 44px icon targets.
+RFG-345 replaces the older compact Creature sheet. The accepted product contract
+and approved desktop/tablet/phone monster HTML authorities live in
+`rookframe-godot/docs/product/mork-borg-creature-sheet.md` and
+`rookframe-godot/docs/product/mockups/tabletop-shell-*/`. Use that repository's
+unchanged Rookframe design system and its vendored asset boundary. Review desktop
+at 1920 × 1080, tablet at 1024 × 768 and landscape phone at 844 × 390.
 
-Creature shows public identity and one settings gear, then HP/morale/armor,
-attacks and rules. Inventory and Appearance own their respective content.
-Settings opens corrections with a fixed Save/Cancel footer. There is no body
-Inventory shortcut, Duplicate or Place Rook button. The ordinary Actor drag
-flow remains the placement affordance.
+Library and live Actor sheets share the authored Full-viewport composition:
+identity, Encounter / Inventory / Appearance, bounded native UI Kit pages,
+readable Details and Source. A live sheet reads the current SDK Actor state;
+Library starting values never replace saved identity, signed HP, protection,
+morale or capabilities. Preserved effective shield reduction and defence penalties
+remain recorded protection independently of carried shield loot.
 
-The icon-only inventory controls have native keyboard focus, named tooltips and
-accessible names including the item identity. Equip uses native toggle state
-and a selected frame; Unequip is the accessible action for equipped items.
-Disabled buttons retain the kit disabled styling. The shared component retains
-Cast/Use semantics and suitable sigil/bolt icons for Character equipment.
-Empty inventory keeps its guidance and + action; read-only access disables
-mutations. Saving/error feedback and Miniature loading/empty/error states reuse
-the existing native workflows.
+Creature Inventory is independent carried loot. Its overview shows identity,
+quantity and kind; Details retains complete recorded rules and facts. Owner
+operations are a searchable core catalogue, custom addition, independent field
+saves and removal. Creature loot has no Equip, Attack, Cast or Use operation.
+Character equipment keeps its existing semantics. Owner/Viewer presentation and
+permitted mutations remain separate from complete shared World gameplay data.
 
-## Visual and interaction smoke
+Appearance preserves immediate SDK preferred-Miniature choice and clearing,
+using the existing full-viewport browser. Existing Rooks keep their Miniature.
+Portrait choice/reset and expanded World Library defaults belong to RFG-353.
+RFG-349 through RFG-352 supply corrections, HP adjustment/death and Window Dice;
+the live adapter exposes explicit signals and opt-in controls for those slices.
 
-Acquire the exact published HTTPS Manifest in a fresh World. At phone 844x390
-with a 375px dock, tablet 1024x768 and desktop 1920x1080, create Zukuma from
-Library and inspect the live Actor sheet. Compare the actual sheet, including
-its managed chrome, not only a standalone component. Verify all three tabs,
-readable names and details, full 44px frames, stable section spacing, no
-horizontal overflow, and no redundant action block. Inspect Creature, Inventory,
-Appearance, settings and item editing. Exercise equip/unequip, the spanner,
-Miniature picker and return to Appearance. Repeat phone with Russian and long
-item names. Focus traversal must keep controls in the scroll viewport.
+Back/Escape restores the Inventory entry and its native focus. Per-Actor local
+chapter/page state lasts for the World Application session and resets on restart.
+Absent values, removed entries and unavailable content retain readable states.
+Actor placement remains the ordinary Actors drag-and-drop operation. Existing
+captured targeted tabletop procedures retain their separate task route.
 
-Focused GdUnit composition tests guard task hierarchy, text width, action size,
-read-only behavior and signal semantics. Native published-package evidence uses
-rookframe-godot's retained Rfg281MorkBorgVisualEvidence --actor-sheet-only route.
+Authored source checks and disposable source fixtures may inspect native layout
+and SDK boundaries without application setup. Retain the five focused Library
+checks and two severe saved-capability/loot checks; remove the obsolete compact
+375px composition matrix. These checks do not establish native acquisition,
+render/input, network replication or durable application persistence.
+
+RFG-354 owns unified native acceptance after official publication. Install the
+exact public HTTPS Manifest normally and acquire World requirements through
+normal join. Compare the actual authored sheet at the three canonical viewports,
+including long text/loot, English/Russian, readable focus, current Actor state,
+Owner/Viewer operations, Appearance return and durable close/reopen/rejoin.
+Do not reuse the superseded compact Actor-sheet tour or copied Package stores.

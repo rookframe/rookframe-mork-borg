@@ -8,6 +8,8 @@ const I18N = preload(ROOT + "ui/localization.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 signal chapter_changed(chapter: int)
 signal entry_requested(id: String)
+signal inventory_add_requested
+signal reader_closed
 signal close_requested
 signal create_requested
 signal edit_requested
@@ -31,6 +33,7 @@ var _section := 0
 var _reader := false
 var _focus_card = null
 var _focus_source := false
+var _return_entry := ""
 var _texture: Texture2D
 var _groups: Array[Dictionary] = []
 var _layout_pending := false
@@ -40,6 +43,7 @@ func _ready() -> void:
 	for index in range(3):
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).pressed.connect(show_chapter.bind(index))
 	get_node(WORK + "Tabs/Source").pressed.connect(show_source)
+	get_node(WORK + "InventoryAdd").pressed.connect(_inventory_add)
 	get_node(WORK + "Reader/Back").pressed.connect(back)
 	get_node(WORK + "Reader/Publication").pressed.connect(_publication)
 	get_node("Inset/Layout/Footer/Close").pressed.connect(_close)
@@ -97,19 +101,25 @@ func _layout() -> void:
 	get_node(IDENTITY + "Classification").text = _locale.text(str(_data.get("classification", metadata.get("classification", ""))))
 	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 10 if _phone else 12 if _tablet else 16)
 	get_node(IDENTITY + "Portrait").texture = _texture
-	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", 0)) if _library else _data.get("hit_points", 0)) + ("" if _library else " / " + str(_data.get("maximum_hit_points", 0)))
+	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", "—")) if _library else _data.get("hit_points", "—")) + ("" if _library else " / " + str(_data.get("maximum_hit_points", "—")))
 	get_node(IDENTITY + "Health").custom_minimum_size = Vector2(0, 44 if _phone else 62)
 	get_node(IDENTITY + "Health").add_theme_font_size_override("font_size", 16 if _phone else 23 if _tablet else 28)
-	get_node(IDENTITY + "Health").disabled = _library or not _can_edit
+	get_node(IDENTITY + "Health").disabled = _library or not _can_edit or not bool(_data.get("health_available", false))
 	var armor: Dictionary = _data.get("armor", {})
-	get_node(IDENTITY + "Vitals/Armor").text = _locale.text(str(armor.get("name", "No armor"))) + "\n" + ("—" if str(armor.get("reduction", "")).is_empty() else "−" + str(armor.reduction))
+	var protection := "—" if str(armor.get("reduction", "")).is_empty() else "−" + str(armor.reduction)
+	if int(armor.get("shield_reduction", 0)) > 0:
+		protection += " · " + _locale.text("Shield") + " −" + str(armor.shield_reduction)
+	if int(armor.get("defence_penalty", 0)) != 0:
+		protection += "\n" + _locale.text("Defence penalty +%d") % int(armor.defence_penalty)
+	get_node(IDENTITY + "Vitals/Armor").text = _locale.text(str(armor.get("name", "Protection"))) + "\n" + protection
+	get_node(IDENTITY + "Vitals/Armor").tooltip_text = _locale.text("Protection") + ": " + _locale.text(str(armor.get("name", "Protection"))) + "\n" + protection
 	var morale: Dictionary = _data.get("morale", {})
 	get_node(IDENTITY + "Vitals/Morale").text = _locale.text("Morale") + "\n" + (str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else _locale.text("Special") if str(morale.get("kind", "")) == "special" else "—")
 	for key in ["Armor", "Morale"]:
 		var button = get_node(IDENTITY + "Vitals/" + key)
 		button.custom_minimum_size = Vector2(0, 44 if _phone else 62)
 		button.add_theme_font_size_override("font_size", 11 if _phone else 14 if _tablet else 18)
-		button.disabled = _library or not _can_edit or int(_data.get("hit_points", 0)) <= 0 or _data.get("editing", false) or (str(armor.get("reduction", "")).is_empty() if key == "Armor" else str(morale.get("kind", "")) != "fixed")
+		button.disabled = _library or _rolls_disabled() or (str(armor.get("reduction", "")).is_empty() if key == "Armor" else str(morale.get("kind", "")) != "fixed")
 	for title in ["Encounter", "Inventory", "Appearance"]:
 		get_node(WORK + "Tabs/" + title).text = _locale.text(title)
 		get_node(WORK + "Tabs/" + title).add_theme_font_size_override("font_size", 11 if _phone else 14 if _tablet else 18)
@@ -123,6 +133,9 @@ func _layout() -> void:
 	get_node("Inset/Layout/Footer/Create").text = _locale.text("Create Actor")
 	get_node("Inset/Layout/Footer/Edit").visible = not _library and _can_edit
 	get_node("Inset/Layout/Footer/Edit").text = _locale.text("Edit sheet")
+	get_node("Inset/Layout/Footer/Edit").disabled = not bool(_data.get("corrections_available", false))
+	get_node(WORK + "InventoryAdd").text = _locale.text("Add Item")
+	get_node(WORK + "InventoryAdd").disabled = not _can_edit
 	get_node("Inset/Layout/Footer/Close").text = _locale.text("Close")
 	get_node(WORK + "Reader/Back").text = _locale.text("Back to creature")
 	get_node(WORK + "Reader/Publication").text = _locale.text("Open publication")
@@ -141,8 +154,18 @@ func _build_groups(metadata: Dictionary) -> void:
 	for raw in attacks:
 		var attack: Dictionary = raw
 		attack_entries.append({"id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "text": str(attack.get("rules", "")), "dice": str(attack.get("dice", "")), "attack_dr": attack.get("attack_dr", null), "attack": true})
+	if attack_entries.is_empty():
+		attack_entries.append({"id": "no-attacks", "name": "Attacks", "text": "No attacks recorded."})
 	_groups.append({"title": "Attacks", "lane": "primary", "entries": attack_entries})
-	var authored: Array = _data.get("rule_groups", metadata.get("rule_groups", []))
+	var armor: Dictionary = _data.get("armor", {})
+	if armor.has("shield_reduction") or armor.has("defence_penalty"):
+		var protection := _locale.text(str(armor.get("name", "Protection"))) + "\n" + _locale.text("Damage reduction") + ": " + ("—" if str(armor.get("reduction", "")).is_empty() else "−" + str(armor.reduction))
+		if armor.has("shield_reduction"):
+			protection += "\n" + _locale.text("Shield reduction") + ": −" + str(armor.shield_reduction)
+		if armor.has("defence_penalty"):
+			protection += "\n" + _locale.text("Defence penalty +%d") % int(armor.defence_penalty)
+		_groups.append({"title": "Protection", "lane": "secondary", "entries": [{"id": "protection", "name": "Protection", "text": protection}]})
+	var authored: Array = _data.get("rule_groups", metadata.get("rule_groups", []) if _library else [])
 	for raw in authored:
 		var group: Dictionary = raw
 		_groups.append(group.duplicate(true))
@@ -210,7 +233,7 @@ func _render_encounter() -> void:
 	get_node(WORK + "Encounter/Secondary").visible = not _phone
 
 func _rolls_disabled() -> bool:
-	return not _can_edit or int(_data.get("hit_points", 0)) <= 0 or _data.get("editing", false)
+	return not _can_edit or not bool(_data.get("rolls_available", false)) or int(_data.get("hit_points", 0)) <= 0 or _data.get("editing", false)
 
 func _render_inventory() -> void:
 	var pages = get_node(WORK + "Inventory")
@@ -222,7 +245,7 @@ func _render_inventory() -> void:
 		_append(content, {"name": "Inventory", "text": "No starting loot is authored for this creature." if _library else "No carried loot."})
 	for raw in items:
 		var item: Dictionary = raw
-		_append(content, {"id": str(item.get("inventory_id", "")), "name": str(item.get("name", "Item")), "text": str(item.get("quantity", 1)) + " × " + _locale.text(str(item.get("kind", "Item"))) + ("\n" + _locale.text(str(item.get("rules", ""))) if not str(item.get("rules", "")).is_empty() else "")}, [{"name": "Details", "part": "details"}])
+		_append(content, {"id": str(item.get("inventory_id", "")), "name": str(item.get("name", "Item")), "text": str(item.get("quantity", 1)) + " × " + _locale.text(str(item.get("kind", "Item"))) + ("\n" + _locale.text(str(item.get("rules", ""))) if _library and not str(item.get("rules", "")).is_empty() else "")}, [{"name": "Details", "part": "details"}])
 	pages.restore_state(state)
 
 func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
@@ -239,6 +262,7 @@ func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
 		roll_requested.emit(part, id)
 
 func show_entry(entry: Dictionary, opener: CARD_SCRIPT = null) -> void:
+	_return_entry = str(entry.get("inventory_id", ""))
 	_focus_card = opener
 	_focus_source = false
 	_reader = true
@@ -259,6 +283,7 @@ func _source() -> Dictionary:
 	return source
 
 func show_source() -> void:
+	_return_entry = ""
 	_focus_card = null
 	_focus_source = true
 	_reader = true
@@ -275,10 +300,16 @@ func show_source() -> void:
 func back() -> void:
 	_reader = false
 	_update_visibility()
+	_restore_return_focus.call_deferred()
+	reader_closed.emit()
+
+func _restore_return_focus() -> void:
 	if _focus_source:
 		get_node(WORK + "Tabs/Source").grab_focus()
 	elif is_instance_valid(_focus_card) and _focus_card.restore_focus():
-		return
+		pass
+	elif not _return_entry.is_empty() and focus_entry(_return_entry):
+		pass
 	else:
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
 
@@ -292,6 +323,7 @@ func _update_visibility() -> void:
 	(get_node(IDENTITY) as Control).visible = not (_phone and (_chapter == 2 or _reader))
 	get_node(WORK + "Tabs").visible = not _reader
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not _reader
+	get_node(WORK + "InventoryAdd").visible = _chapter == 1 and not _reader and not _library and _can_edit
 	get_node(WORK + "Encounter").visible = _chapter == 0 and not _reader
 	get_node(WORK + "Inventory").visible = _chapter == 1 and not _reader
 	get_node(WORK + "Appearance").visible = _chapter == 2 and not _reader
@@ -339,3 +371,54 @@ func _portrait() -> void:
 	portrait_requested.emit()
 func _portrait_reset() -> void:
 	portrait_reset_requested.emit()
+
+func _inventory_add() -> void:
+	inventory_add_requested.emit()
+
+## Local route state only; never Actor or World gameplay data.
+func capture_navigation() -> Dictionary:
+	var pages: Dictionary = {}
+	for key in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
+		pages[key] = get_node(WORK + key).capture_state()
+	return {"chapter": _chapter, "section": _section, "pages": pages}
+
+func restore_navigation(state: Dictionary) -> void:
+	_chapter = clampi(int(state.get("chapter", 0)), 0, 2)
+	_section = maxi(0, int(state.get("section", 0)))
+	_reader = false
+	var pages: Dictionary = state.get("pages", {})
+	for key in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
+		var value: Dictionary = pages.get(key, {})
+		get_node(WORK + key).restore_state(value)
+	_queue_layout()
+
+func open_reader(title: String, return_entry: String = "") -> void:
+	_focus_card = null
+	_focus_source = false
+	_return_entry = return_entry
+	_reader = true
+	_clear(reader_content())
+	_append_reference(reader_content(), {"name": title, "text": ""})
+	(get_node(WORK + "Reader/Publication") as Control).visible = false
+	get_node(WORK + "Reader/Pages").restore_state({})
+	_update_visibility()
+	get_node(WORK + "Reader/Back").grab_focus()
+
+func reader_content() -> Control:
+	return get_node(WORK + "Reader/Pages/Area/Content") as Control
+
+func reader_state() -> Dictionary:
+	return get_node(WORK + "Reader/Pages").capture_state()
+
+func restore_reader(state: Dictionary) -> void:
+	get_node(WORK + "Reader/Pages").restore_state(state)
+
+func focus_entry(id: String) -> bool:
+	for child in get_node(WORK + "Inventory/Area/Content").get_children():
+		var card := child as CARD_SCRIPT
+		if card != null and card.entry_id == id and card.restore_focus():
+			return true
+	return false
+
+func focus_miniature() -> void:
+	get_node(WORK + "Appearance/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").grab_focus()

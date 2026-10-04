@@ -1395,5 +1395,19 @@ messages = {
 [&"", &"Starting HP"]: [&"Стартовые ОЗ"],
 [&"", &"Obeys only its owner."]: [&"Слушается только своего владельца."],
 [&"", &"Ignores its owner but loves them."]: [&"Игнорирует своего владельца, но любит его."],
+[&"", &"Creature sheet · Owner"]: [&"Лист существа · Владелец"],
+[&"", &"Creature sheet · Viewer"]: [&"Лист существа · Просмотр"],
+[&"", &"Add equipment from the core catalogue or create custom loot."]: [&"Добавьте предмет из основного каталога или создайте собственную добычу."],
+[&"", &"Custom loot"]: [&"Собственная добыча"],
+[&"", &"Range feet"]: [&"Дальность в футах"],
+
+[&"", &"Defence penalty +%d"]: [&"Штраф защиты +%d"],
+[&"", &"Damage reduction"]: [&"Снижение урона"],
+[&"", &"Shield reduction"]: [&"Снижение урона щитом"],
+[&"", &"Edit item"]: [&"Изменить предмет"],
+[&"", &"Finish item editing"]: [&"Завершить правку предмета"],
+[&"", &"Weight"]: [&"Вес"],
+[&"", &"Price"]: [&"Цена"],
+[&"", &"No attacks recorded."]: [&"Атаки не записаны."],
 }
 locale = "ru"

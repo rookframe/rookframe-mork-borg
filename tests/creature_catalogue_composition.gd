@@ -59,6 +59,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	surface.show_source()
 	assert_bool(surface.get_node(surface.WORK + "Reader").is_visible_in_tree()).is_true()
 	surface.back()
+	await get_tree().process_frame
 	assert_bool(source_button.has_focus()).is_true()
 
 func test_button_creates_actor_without_placing_rook() -> void:

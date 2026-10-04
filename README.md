@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.23` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.24` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `e2a1e807d73c907bf360aa38a21a55b1773965e2` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -497,9 +497,9 @@ Character creation is contributed to the shared Actors window.
 
 ## Creature Actor sheet
 
-Creature, Inventory and Appearance share one set of native ButtonGroup tabs on desktop and touch. The Creature view keeps public identity, HP, morale, armor, attacks and rules; a 44px settings gear opens corrections with fixed Save/Cancel actions. Miniature choices belong only to Appearance. Actor placement stays in the Actors drag-and-drop flow.
+Live Creature inspection, Library creation and companion opening use the shared fixed Full-viewport Creature sheet. Encounter, Inventory and Appearance keep current Actor values, independent carried loot and SDK Miniature operations together. Owner loot edits preserve the current stat block; Viewers can read it. Bounded Details return to the entry and focus, and Actor-local chapter/page state lasts for the World Application session. Corrections, HP adjustments and Window Dice are enabled by their dependent rule adapters. Existing captured targeted tabletop procedures retain their separate legacy task route. Actor placement stays in the Actors drag-and-drop flow.
 
-Inventory uses existing accessible icon actions, row gaps and section padding. Character equipment retains Attack and Equip controls; Creature loot exposes only addition and entry editing. The shared inventory component also serves the equipment catalogue. See [the visual smoke contract](docs/creature-sheet-design.md).
+Creature Inventory keeps a bounded carried-loot list with readable Details, a searchable core catalogue, custom item creation, independent field saves and removal. Character equipment retains its existing Attack/Equip/Cast/Use behavior. See [the review contract](docs/creature-sheet-design.md).
 
 ## Character HUD
 
