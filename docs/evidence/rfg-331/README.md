@@ -22,4 +22,17 @@ After all category adapters were composed, the same four native cases passed aga
 
 All 304 retained extension cases passed across 25 suites in 32.284 seconds with zero errors, failures, skips, flaky cases or orphan nodes (`retained-results.xml`). Public SDK source admission and prepared-artifact verification passed (`source123.json`, `artifact123.json`). The [review-fix evidence](../rfg-331-review/README.md) additionally records 25 disposable checks and 157 affected regressions; independent Standards and Spec re-review found no outstanding functional findings. Temporary verification source and wiring were removed.
 
-Whole-workspace public acquisition, independent empty-store automatic joining, reopening persistence and native layer/input acceptance are verified separately by RFG-344 against this release. Those checks began after publication; this source/artifact record does not substitute for their application evidence.
+Application diagnostics began after public 1.0.123 publication and uncovered the context, dock-layout and pagination fixes recorded separately. Those failed runs remain diagnostics. Whole-workspace diagnostics continue with public 1.0.124. Final independent empty-store automatic joining, reopening persistence and native layer/input acceptance are pending; source/artifact checks do not substitute for that application evidence.
+
+
+## Reviewed public 1.0.124 release
+
+[Public v1.0.124](https://github.com/rookframe/rookframe-mork-borg/releases/tag/v1.0.124) is built from source `d74638399917c4848ae15f53f2156e0301c5933f`, Build ID `fa64f9cc-a404-4883-9943-11dac8ad96e9`. Its [HTTPS Manifest](https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.124/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.124.json) and archive passed public read-back verification (`release124.json`). Public SDK v0.32.23 remains Edition 2029 revision 28. Runtime UI Kit commit `e2a1e807d73c907bf360aa38a21a55b1773965e2` was acquired normally from its official repository; released SDK defaults and earlier Package releases remain immutable.
+
+All 304 retained extension cases passed across 25 suites in 32.189 seconds with zero errors, failures, skips, flaky cases or orphan nodes (`retained124-results.xml`). Public SDK source admission and prepared-artifact verification passed (`source124.json`, `artifact124.json`). Independent final Standards and Spec source reviews found zero outstanding findings.
+
+The [dock-layout record](../rfg-331-dock-layout/README.md) contains 14 disposable native cases. The [header-width record](../rfg-331-header-width/README.md) contains nine native GdUnit cases with actual mouse and touch input at all three canonical canvases. The public UI Kit lifecycle record contains four native GdUnit cases with 20 assertion checkpoints; earlier standalone counters are diagnostic evidence only. Temporary source, helpers and wiring were discarded, with no new retained profile matrix or Fast Gate expansion.
+
+Public 1.0.124 native run19 failed: Authority one failure in 158.111 seconds; Participant 15 failures in 138.190 seconds, with zero in-case errors and two outside-case GL texture teardown errors. Later Power and Item starts reported earlier actions still active. Cancellation during managed Actor-task destruction is under investigation; no final native acceptance is claimed. Failed native reports and captures are retained in the host RFG-344 diagnostic record.
+
+FINAL_NATIVE_ACCEPTANCE_PENDING
