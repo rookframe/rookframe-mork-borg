@@ -168,7 +168,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		ammunition = resources[0]
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Agility", {})
-	var action := {"id": input.id, "source": input.source, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new().attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	var target_rooks: PackedStringArray = caller.targets
+	var captured_target_rook := ""
+	for target_rook_id in target_rooks:
+		captured_target_rook = str(target_rook_id)
+	var action := {"id": input.id, "source": input.source, "rook": str(input.get("rook", "")), "target_rook": captured_target_rook, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new().attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
 	if creature_target:
 		var source_dr: int = action.difficulty
 		action["difficulty"] = source_dr + CREATURES.new().defence_test_difficulty(data, input.get("piercing", false)) - 12
@@ -383,6 +387,10 @@ func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 			defender_present = true
 			defender_is_gm = entry.is_gm
 	if not initiator_present or not defender_present:
+		return false
+	# Use the Authority's active-Scene distance, never local selection.
+	var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(action.target_rook)))
+	if not spatial.ok:
 		return false
 	var source := context.read_actor(SDK.ActorId.new(action.source))
 	var target := context.read_actor(SDK.ActorId.new(action.target))

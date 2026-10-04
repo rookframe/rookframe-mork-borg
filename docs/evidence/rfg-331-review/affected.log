@@ -1,0 +1,529 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/rfg331-review-regressions
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/melee_attack.gd
+  res://tests/melee_attack.gd > test_melee_attack STARTED
+  res://tests/melee_attack.gd > test_melee_attack PASSED 3ms
+
+  res://tests/melee_attack.gd > test_d2_faces STARTED
+  res://tests/melee_attack.gd > test_d2_faces PASSED 3ms
+
+  res://tests/melee_attack.gd > test_boundaries STARTED
+  res://tests/melee_attack.gd > test_boundaries PASSED 5ms
+
+  res://tests/melee_attack.gd > test_lifetime STARTED
+  res://tests/melee_attack.gd > test_lifetime PASSED 20ms
+
+  res://tests/melee_attack.gd > test_review_regressions STARTED
+  res://tests/melee_attack.gd > test_review_regressions PASSED 2s 214ms
+
+Statistics: 5 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 261ms
+
+
+Run Test Suite: res://tests/player_defence.gd
+  res://tests/player_defence.gd > test_defender_receives_agility_throw_and_success_report STARTED
+  res://tests/player_defence.gd > test_defender_receives_agility_throw_and_success_report PASSED 3ms
+
+  res://tests/player_defence.gd > test_failed_defence_offers_protected_damage_or_one_broken_shield STARTED
+  res://tests/player_defence.gd > test_failed_defence_offers_protected_damage_or_one_broken_shield PASSED 4ms
+
+  res://tests/player_defence.gd > test_natural_faces_and_fumble_armor_survive_shield_cancellation STARTED
+  res://tests/player_defence.gd > test_natural_faces_and_fumble_armor_survive_shield_cancellation PASSED 5ms
+
+  res://tests/player_defence.gd > test_disconnect_or_reconnect_after_damage_refuses_late_choice STARTED
+  res://tests/player_defence.gd > test_disconnect_or_reconnect_after_damage_refuses_late_choice PASSED 7ms
+
+  res://tests/player_defence.gd > test_armor_defence_penalty_and_source_automatic_hit STARTED
+  res://tests/player_defence.gd > test_armor_defence_penalty_and_source_automatic_hit PASSED 6ms
+
+  res://tests/player_defence.gd > test_shield_choice_rejects_changed_equipment_or_failed_save_without_late_mutation STARTED
+  res://tests/player_defence.gd > test_shield_choice_rejects_changed_equipment_or_failed_save_without_late_mutation PASSED 6ms
+
+  res://tests/player_defence.gd > test_explicit_owner_selection_and_no_player_owner_fallback STARTED
+  res://tests/player_defence.gd > test_explicit_owner_selection_and_no_player_owner_fallback PASSED 7ms
+
+  res://tests/player_defence.gd > test_live_client_close_during_roll_reply_cancels_once_and_never_resumes STARTED
+  res://tests/player_defence.gd > test_live_client_close_during_roll_reply_cancels_once_and_never_resumes PASSED 13ms
+
+  res://tests/player_defence.gd > test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence STARTED
+  res://tests/player_defence.gd > test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence PASSED 5ms
+
+  res://tests/player_defence.gd > test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current STARTED
+  res://tests/player_defence.gd > test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:0 ('brown-scimitar-of-galgenbeck', 'fanged-deserter', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:0 ('brown-scimitar-of-galgenbeck', 'fanged-deserter', 10) PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:1 ('blade-of-your-ancestors', 'wretched-royalty', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:1 ('blade-of-your-ancestors', 'wretched-royalty', 10) PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:2 ('stolen-mitre', 'heretical-priest', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:2 ('stolen-mitre', 'heretical-priest', 10) PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:3 ('sword', 'gutterborn-scum', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:3 ('sword', 'gutterborn-scum', 10) PASSED 6ms
+
+Statistics: 14 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 118ms
+
+
+Run Test Suite: res://tests/power_casting.gd
+  res://tests/power_casting.gd > test_cast_from_owned_scroll_spends_only_success_and_reports_manual_outcome STARTED
+  res://tests/power_casting.gd > test_cast_from_owned_scroll_spends_only_success_and_reports_manual_outcome PASSED 2ms
+
+  res://tests/power_casting.gd > test_palms_applies_independent_damage_after_armor_and_shield_once STARTED
+  res://tests/power_casting.gd > test_palms_applies_independent_damage_after_armor_and_shield_once PASSED 3ms
+
+  res://tests/power_casting.gd > test_grace_heals_each_chosen_actor_once_after_rolled_target_count STARTED
+  res://tests/power_casting.gd > test_grace_heals_each_chosen_actor_once_after_rolled_target_count PASSED 6ms
+
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:0 ('shield') STARTED
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:0 ('shield') PASSED 6ms
+
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:1 ('broken') STARTED
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:1 ('broken') PASSED 6ms
+
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:2 ('unequipped') STARTED
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:2 ('unequipped') PASSED 6ms
+
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:3 ('empty') STARTED
+  res://tests/power_casting.gd > test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:3 ('empty') PASSED 6ms
+
+  res://tests/power_casting.gd > test_palms_changed_armor_discards_the_whole_set_without_reapplying_late_rolls STARTED
+  res://tests/power_casting.gd > test_palms_changed_armor_discards_the_whole_set_without_reapplying_late_rolls PASSED 6ms
+
+  res://tests/power_casting.gd > test_failure_and_natural_faces_preserve_their_distinct_resource_rules STARTED
+  res://tests/power_casting.gd > test_failure_and_natural_faces_preserve_their_distinct_resource_rules PASSED 6ms
+
+  res://tests/power_casting.gd > test_roskoe_rolls_independent_hp_loss_for_four_targets_without_armor STARTED
+  res://tests/power_casting.gd > test_roskoe_rolls_independent_hp_loss_for_four_targets_without_armor PASSED 6ms
+
+  res://tests/power_casting.gd > test_hp_targets_revalidate_the_entire_confirmed_set_before_commit STARTED
+  res://tests/power_casting.gd > test_hp_targets_revalidate_the_entire_confirmed_set_before_commit PASSED 7ms
+
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:0 ('too-many') STARTED
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:0 ('too-many') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:1 ('hp') STARTED
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:1 ('hp') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:2 ('maximum') STARTED
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:2 ('maximum') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:3 ('dead') STARTED
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:3 ('dead') PASSED 7ms
+
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:4 ('no-maximum') STARTED
+  res://tests/power_casting.gd > test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:4 ('no-maximum') PASSED 6ms
+
+  res://tests/power_casting.gd > test_narrative_parameters_and_manual_hp_boundaries STARTED
+  res://tests/power_casting.gd > test_narrative_parameters_and_manual_hp_boundaries PASSED 11ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:0 ('count') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:0 ('count') PASSED 3ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:1 ('duplicate') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:1 ('duplicate') PASSED 3ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:2 ('range') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:2 ('range') PASSED 7ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:3 ('cancel') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:3 ('cancel') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:4 ('disconnect') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:4 ('disconnect') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:5 ('owner') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:5 ('owner') PASSED 7ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:6 ('relink') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:6 ('relink') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:7 ('malformed') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:7 ('malformed') PASSED 6ms
+
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:8 ('save') STARTED
+  res://tests/power_casting.gd > test_immediate_corrections_interruption_and_atomic_refusal:8 ('save') PASSED 6ms
+
+  res://tests/power_casting.gd > test_shared_and_long_public_labels_keep_per_target_dice_distinct:0 (false) STARTED
+  res://tests/power_casting.gd > test_shared_and_long_public_labels_keep_per_target_dice_distinct:0 (false) PASSED 6ms
+
+  res://tests/power_casting.gd > test_shared_and_long_public_labels_keep_per_target_dice_distinct:1 (true) STARTED
+  res://tests/power_casting.gd > test_shared_and_long_public_labels_keep_per_target_dice_distinct:1 (true) PASSED 6ms
+
+  res://tests/power_casting.gd > test_lightning_reports_each_bolt_without_assigning_damage STARTED
+  res://tests/power_casting.gd > test_lightning_reports_each_bolt_without_assigning_damage PASSED 6ms
+
+  res://tests/power_casting.gd > test_restrictions_and_unfinished_powers_refuse_before_any_throw STARTED
+  res://tests/power_casting.gd > test_restrictions_and_unfinished_powers_refuse_before_any_throw PASSED 6ms
+
+  res://tests/power_casting.gd > test_every_target_is_validated_at_authored_range_without_private_data STARTED
+  res://tests/power_casting.gd > test_every_target_is_validated_at_authored_range_without_private_data PASSED 7ms
+
+  res://tests/power_casting.gd > test_daily_allowance_is_an_explicit_human_throw_and_never_a_timer STARTED
+  res://tests/power_casting.gd > test_daily_allowance_is_an_explicit_human_throw_and_never_a_timer PASSED 6ms
+
+  res://tests/power_casting.gd > test_interruption_preserves_accepted_use_and_refuses_late_parameters STARTED
+  res://tests/power_casting.gd > test_interruption_preserves_accepted_use_and_refuses_late_parameters PASSED 6ms
+
+  res://tests/power_casting.gd > test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance STARTED
+  res://tests/power_casting.gd > test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance PASSED 6ms
+
+  res://tests/power_casting.gd > test_eyelid_pc_only_outcome_reports_manual_test_and_one_hour STARTED
+  res://tests/power_casting.gd > test_eyelid_pc_only_outcome_reports_manual_test_and_one_hour PASSED 6ms
+
+  res://tests/power_casting.gd > test_owner_routing_malformed_inputs_and_failed_commits STARTED
+  res://tests/power_casting.gd > test_owner_routing_malformed_inputs_and_failed_commits PASSED 6ms
+
+  res://tests/power_casting.gd > test_all_twenty_core_scrolls_have_an_explicit_playable_boundary STARTED
+  res://tests/power_casting.gd > test_all_twenty_core_scrolls_have_an_explicit_playable_boundary PASSED 8ms
+
+  res://tests/power_casting.gd > test_invisible_college_scroll_is_consumed_after_successful_cast STARTED
+  res://tests/power_casting.gd > test_invisible_college_scroll_is_consumed_after_successful_cast PASSED 4ms
+
+Statistics: 38 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 270ms
+
+
+Run Test Suite: res://tests/special_actions.gd
+  res://tests/special_actions.gd > test_scroll_selection_during_delayed_refresh_is_accepted_once:0 (false) STARTED
+  res://tests/special_actions.gd > test_scroll_selection_during_delayed_refresh_is_accepted_once:0 (false) PASSED 14ms
+
+  res://tests/special_actions.gd > test_scroll_selection_during_delayed_refresh_is_accepted_once:1 (true) STARTED
+  res://tests/special_actions.gd > test_scroll_selection_during_delayed_refresh_is_accepted_once:1 (true) PASSED 13ms
+
+  res://tests/special_actions.gd > test_medicine_heals_and_consumes_one_use_atomically STARTED
+  res://tests/special_actions.gd > test_medicine_heals_and_consumes_one_use_atomically PASSED 3ms
+
+  res://tests/special_actions.gd > test_poison_routes_resistance_and_applies_hp_loss:0 ('poison-red', true, 10, 7) STARTED
+  res://tests/special_actions.gd > test_poison_routes_resistance_and_applies_hp_loss:0 ('poison-red', true, 10, 7) PASSED 3ms
+
+  res://tests/special_actions.gd > test_poison_routes_resistance_and_applies_hp_loss:1 ('poison-black', false, 12, 4) STARTED
+  res://tests/special_actions.gd > test_poison_routes_resistance_and_applies_hp_loss:1 ('poison-black', false, 12, 4) PASSED 3ms
+
+  res://tests/special_actions.gd > test_poison_routes_resistance_and_applies_hp_loss:2 ('red-poison-decoction', false, 12, 0) STARTED
+  res://tests/special_actions.gd > test_poison_routes_resistance_and_applies_hp_loss:2 ('red-poison-decoction', false, 12, 0) PASSED 2ms
+
+  res://tests/special_actions.gd > test_elixir_uses_shared_doses_and_heals_private_target_at_contact STARTED
+  res://tests/special_actions.gd > test_elixir_uses_shared_doses_and_heals_private_target_at_contact PASSED 3ms
+
+  res://tests/special_actions.gd > test_wizard_teeth_request_four_dice_and_report_manual_maximum_damage STARTED
+  res://tests/special_actions.gd > test_wizard_teeth_request_four_dice_and_report_manual_maximum_damage PASSED 3ms
+
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:0 ('master-of-fate', true, 7, 'right way') STARTED
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:0 ('master-of-fate', true, 7, 'right way') PASSED 2ms
+
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:1 ('filthy-fingersmith', true, 7, 'pockets and locks') STARTED
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:1 ('filthy-fingersmith', true, 7, 'pockets and locks') PASSED 2ms
+
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:2 ('list-of-sins', false, 9, 'discovered') STARTED
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:2 ('list-of-sins', false, 9, 'discovered') PASSED 3ms
+
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:3 ('horn-of-the-schleswig-lords', false, 11, 'automatic success') STARTED
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:3 ('horn-of-the-schleswig-lords', false, 11, 'automatic success') PASSED 3ms
+
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:4 ('stones-taken-from-thel-emas-lost-temple', false, 8, 'sunset') STARTED
+  res://tests/special_actions.gd > test_printed_class_tests_resolve_without_automating_later_benefits:4 ('stones-taken-from-thel-emas-lost-temple', false, 8, 'sunset') PASSED 3ms
+
+  res://tests/special_actions.gd > test_decoctions_consume_shared_pool_and_report_durations:0 ('fernors-philtre', [4], '4 hours') STARTED
+  res://tests/special_actions.gd > test_decoctions_consume_shared_pool_and_report_durations:0 ('fernors-philtre', [4], '4 hours') PASSED 3ms
+
+  res://tests/special_actions.gd > test_decoctions_consume_shared_pool_and_report_durations:1 ('spider-owl-soup', [], '30 minutes') STARTED
+  res://tests/special_actions.gd > test_decoctions_consume_shared_pool_and_report_durations:1 ('spider-owl-soup', [], '30 minutes') PASSED 3ms
+
+  res://tests/special_actions.gd > test_decoctions_consume_shared_pool_and_report_durations:2 ('hyphos-enervating-snuff', [], 'DR14') STARTED
+  res://tests/special_actions.gd > test_decoctions_consume_shared_pool_and_report_durations:2 ('hyphos-enervating-snuff', [], 'DR14') PASSED 3ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:0 ('speaker-of-truths', true, [], 'lowered by 4') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:0 ('speaker-of-truths', true, [], 'lowered by 4') PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:1 ('harp', false, [3], '+3') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:1 ('harp', false, [3], '+3') PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:2 ('blasphemous-nechrubel-bible', false, [4], 'five minutes') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:2 ('blasphemous-nechrubel-bible', false, [4], 'five minutes') PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:3 ('dodging-death', true, [1, 3], '10 rounds') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:3 ('dodging-death', true, [1, 3], '10 rounds') PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:4 ('excretal-stealth', true, [], 'DR16') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:4 ('excretal-stealth', true, [], 'DR16') PASSED 1ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:5 ('escaping-fate', true, [], 'Omen') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:5 ('escaping-fate', true, [], 'Omen') PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:6 ('crumpled-monster-mask', false, [], 'every round') STARTED
+  res://tests/special_actions.gd > test_class_parameters_and_manual_benefits:6 ('crumpled-monster-mask', false, [], 'every round') PASSED 2ms
+
+  res://tests/special_actions.gd > test_book_creature_resistance_summons_printed_berserkers_and_spends_daily_use STARTED
+  res://tests/special_actions.gd > test_book_creature_resistance_summons_printed_berserkers_and_spends_daily_use PASSED 3ms
+
+  res://tests/special_actions.gd > test_brewing_replaces_two_recipes_and_one_shared_dose_pool STARTED
+  res://tests/special_actions.gd > test_brewing_replaces_two_recipes_and_one_shared_dose_pool PASSED 3ms
+
+  res://tests/special_actions.gd > test_invisible_college_rolls_count_and_family_then_keeps_table_selected_scrolls STARTED
+  res://tests/special_actions.gd > test_invisible_college_rolls_count_and_family_then_keeps_table_selected_scrolls PASSED 2ms
+
+  res://tests/special_actions.gd > test_mitre_requires_wearing_and_table_selected_stealth_ability STARTED
+  res://tests/special_actions.gd > test_mitre_requires_wearing_and_table_selected_stealth_ability PASSED 3ms
+
+  res://tests/special_actions.gd > test_crucifix_rolls_morale_with_explicit_presence_sign_and_private_label STARTED
+  res://tests/special_actions.gd > test_crucifix_rolls_morale_with_explicit_presence_sign_and_private_label PASSED 2ms
+
+  res://tests/special_actions.gd > test_vapor_resistance_is_requested_with_table_chosen_ability STARTED
+  res://tests/special_actions.gd > test_vapor_resistance_is_requested_with_table_chosen_ability PASSED 3ms
+
+  res://tests/special_actions.gd > test_gob_lobber_rolls_fight_uses_spends_spit_then_routes_witness_tests STARTED
+  res://tests/special_actions.gd > test_gob_lobber_rolls_fight_uses_spends_spit_then_routes_witness_tests PASSED 3ms
+
+  res://tests/special_actions.gd > test_cancel_after_bible_parity_preserves_spent_use_and_logs_once STARTED
+  res://tests/special_actions.gd > test_cancel_after_bible_parity_preserves_spent_use_and_logs_once PASSED 2ms
+
+  res://tests/special_actions.gd > test_pending_action_stops_after_item_removal_and_on_source_access_loss:0 ('item') STARTED
+  res://tests/special_actions.gd > test_pending_action_stops_after_item_removal_and_on_source_access_loss:0 ('item') PASSED 1ms
+
+  res://tests/special_actions.gd > test_pending_action_stops_after_item_removal_and_on_source_access_loss:1 ('access') STARTED
+  res://tests/special_actions.gd > test_pending_action_stops_after_item_removal_and_on_source_access_loss:1 ('access') PASSED 2ms
+
+  res://tests/special_actions.gd > test_pending_action_stops_after_item_removal_and_on_source_access_loss:2 ('session') STARTED
+  res://tests/special_actions.gd > test_pending_action_stops_after_item_removal_and_on_source_access_loss:2 ('session') PASSED 2ms
+
+  res://tests/special_actions.gd > test_all_invalid_ranges_report_public_labels_and_roll_nothing STARTED
+  res://tests/special_actions.gd > test_all_invalid_ranges_report_public_labels_and_roll_nothing PASSED 2ms
+
+  res://tests/special_actions.gd > test_concurrent_actions_from_same_character_are_refused STARTED
+  res://tests/special_actions.gd > test_concurrent_actions_from_same_character_are_refused PASSED 2ms
+
+  res://tests/special_actions.gd > test_ancestors_blade_checks_treachery_then_resolves_attack_against_self STARTED
+  res://tests/special_actions.gd > test_ancestors_blade_checks_treachery_then_resolves_attack_against_self PASSED 3ms
+
+  res://tests/special_actions.gd > test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:0 ('bomb', [5, 2], 2) STARTED
+  res://tests/special_actions.gd > test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:0 ('bomb', [5, 2], 2) PASSED 2ms
+
+  res://tests/special_actions.gd > test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:1 ('bear-trap', [4, 2], 3) STARTED
+  res://tests/special_actions.gd > test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:1 ('bear-trap', [4, 2], 3) PASSED 2ms
+
+  res://tests/special_actions.gd > test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:2 ('caltrops', [3, 2, 1], 4) STARTED
+  res://tests/special_actions.gd > test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:2 ('caltrops', [3, 2, 1], 4) PASSED 2ms
+
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:0 ('dried-food', 0, 2, 'one day') STARTED
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:0 ('dried-food', 0, 2, 'one day') PASSED 2ms
+
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:1 ('waterskin', 1, 1, 'water') STARTED
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:1 ('waterskin', 1, 1, 'water') PASSED 2ms
+
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:2 ('lard', 1, 1, 'meal') STARTED
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:2 ('lard', 1, 1, 'meal') PASSED 2ms
+
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:3 ('lantern-oil', 0, 2, '7 hours') STARTED
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:3 ('lantern-oil', 0, 2, '7 hours') PASSED 2ms
+
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:4 ('torch', 0, 2, 'Burns') STARTED
+  res://tests/special_actions.gd > test_food_water_and_oil_use_prescribed_resources_without_timers:4 ('torch', 0, 2, 'Burns') PASSED 2ms
+
+  res://tests/special_actions.gd > test_treacherous_blade_offers_existing_shield_choice_before_hp_change STARTED
+  res://tests/special_actions.gd > test_treacherous_blade_offers_existing_shield_choice_before_hp_change PASSED 4ms
+
+  res://tests/special_actions.gd > test_removed_college_ends_before_chosen_scrolls_are_created STARTED
+  res://tests/special_actions.gd > test_removed_college_ends_before_chosen_scrolls_are_created PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_agility_tests_include_worn_armor:0 ('filthy-fingersmith', 2, 10) STARTED
+  res://tests/special_actions.gd > test_class_agility_tests_include_worn_armor:0 ('filthy-fingersmith', 2, 10) PASSED 2ms
+
+  res://tests/special_actions.gd > test_class_agility_tests_include_worn_armor:1 ('stolen-mitre', 3, 12) STARTED
+  res://tests/special_actions.gd > test_class_agility_tests_include_worn_armor:1 ('stolen-mitre', 3, 12) PASSED 2ms
+
+  res://tests/special_actions.gd > test_special_damage_rejects_changed_protection STARTED
+  res://tests/special_actions.gd > test_special_damage_rejects_changed_protection PASSED 2ms
+
+  res://tests/special_actions.gd > test_shield_continuation_requires_source_item_and_range:0 ('item') STARTED
+  res://tests/special_actions.gd > test_shield_continuation_requires_source_item_and_range:0 ('item') PASSED 3ms
+
+  res://tests/special_actions.gd > test_shield_continuation_requires_source_item_and_range:1 ('range') STARTED
+  res://tests/special_actions.gd > test_shield_continuation_requires_source_item_and_range:1 ('range') PASSED 3ms
+
+  res://tests/special_actions.gd > test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:0 ('break') STARTED
+  res://tests/special_actions.gd > test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:0 ('break') PASSED 4ms
+
+  res://tests/special_actions.gd > test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:1 ('cancel') STARTED
+  res://tests/special_actions.gd > test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:1 ('cancel') PASSED 3ms
+
+  res://tests/special_actions.gd > test_taking_caltrops_damage_preserves_rolled_infection_report STARTED
+  res://tests/special_actions.gd > test_taking_caltrops_damage_preserves_rolled_infection_report PASSED 3ms
+
+Statistics: 55 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 222ms
+
+
+Run Test Suite: res://tests/companions.gd
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:0 (1, 'belze-skeleton', '') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:0 (1, 'belze-skeleton', '') PASSED 3ms
+
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:1 (3, 'belze-skeleton', '') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:1 (3, 'belze-skeleton', '') PASSED 3ms
+
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:2 (4, 'nodh-zombie', 'd2') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:2 (4, 'nodh-zombie', 'd2') PASSED 3ms
+
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:3 (6, 'nodh-zombie', 'd2') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:3 (6, 'nodh-zombie', 'd2') PASSED 3ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:0 ('cancel') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:0 ('cancel') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:1 ('tray') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:1 ('tray') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:2 ('disconnect') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:2 ('disconnect') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:3 ('access') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:3 ('access') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:4 ('save') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:4 ('save') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:5 ('restart') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:5 ('restart') PASSED 2ms
+
+  res://tests/companions.gd > test_gm_cast_for_player_grants_the_casters_normal_access STARTED
+  res://tests/companions.gd > test_gm_cast_for_player_grants_the_casters_normal_access PASSED 3ms
+
+  res://tests/companions.gd > test_owned_creature_requests_the_other_characters_defence STARTED
+  res://tests/companions.gd > test_owned_creature_requests_the_other_characters_defence PASSED 2ms
+
+  res://tests/companions.gd > test_creature_attack_uses_its_own_rook_and_equipped_action STARTED
+  res://tests/companions.gd > test_creature_attack_uses_its_own_rook_and_equipped_action PASSED 2ms
+
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') PASSED 4ms
+
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') PASSED 14ms
+
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state STARTED
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state PASSED 4ms
+
+  res://tests/companions.gd > test_companion_ranged_resource_is_spent_once_after_defence_roll STARTED
+  res://tests/companions.gd > test_companion_ranged_resource_is_spent_once_after_defence_roll PASSED 4ms
+
+  res://tests/companions.gd > test_critical_armor_damage_survives_unrelated_creature_inventory_edit STARTED
+  res://tests/companions.gd > test_critical_armor_damage_survives_unrelated_creature_inventory_edit PASSED 3ms
+
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:0 ('melee') STARTED
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:0 ('melee') PASSED 3ms
+
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:1 ('power') STARTED
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:1 ('power') PASSED 4ms
+
+  res://tests/companions.gd > test_companion_flat_attack_combines_printed_drs_and_hides_private_target STARTED
+  res://tests/companions.gd > test_companion_flat_attack_combines_printed_drs_and_hides_private_target PASSED 3ms
+
+  res://tests/companions.gd > test_companion_defends_flat_with_printed_exceptions_and_its_own_armor STARTED
+  res://tests/companions.gd > test_companion_defends_flat_with_printed_exceptions_and_its_own_armor PASSED 3ms
+
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:0 ('bony-knuckles', true) STARTED
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:0 ('bony-knuckles', true) PASSED 2ms
+
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:1 ('knife', false) STARTED
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:1 ('knife', false) PASSED 2ms
+
+  res://tests/companions.gd > test_companion_defence_fumble_and_shield_choice_persist_individual_equipment STARTED
+  res://tests/companions.gd > test_companion_defence_fumble_and_shield_choice_persist_individual_equipment PASSED 4ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:0 ('cancel') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:0 ('cancel') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:1 ('disconnect') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:1 ('disconnect') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:2 ('access') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:2 ('access') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:3 ('save') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:3 ('save') PASSED 3ms
+
+  res://tests/companions.gd > test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions STARTED
+  res://tests/companions.gd > test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions PASSED 2ms
+
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:0 (false) STARTED
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:0 (false) PASSED 2ms
+
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:1 (true) STARTED
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:1 (true) PASSED 1ms
+
+  res://tests/companions.gd > test_companion_defence_presentation_offers_flat_test_at_phone_dock_width STARTED
+  res://tests/companions.gd > test_companion_defence_presentation_offers_flat_test_at_phone_dock_width PASSED 11ms
+
+  res://tests/companions.gd > test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence STARTED
+  res://tests/companions.gd > test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence PASSED 3ms
+
+  res://tests/companions.gd > test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice STARTED
+  res://tests/companions.gd > test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice PASSED 3ms
+
+  res://tests/companions.gd > test_companion_defence_presentation_hides_when_owner_access_is_lost STARTED
+  res://tests/companions.gd > test_companion_defence_presentation_hides_when_owner_access_is_lost PASSED 14ms
+
+  res://tests/companions.gd > test_companion_defence_scene_resolves_the_compact_shield_choice STARTED
+  res://tests/companions.gd > test_companion_defence_scene_resolves_the_compact_shield_choice PASSED 1s 229ms
+
+Statistics: 37 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 394ms
+
+
+Run Test Suite: res://tests/power_composition.gd
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body STARTED
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body PASSED 620ms
+
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp STARTED
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp PASSED 1s 831ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 464ms
+
+
+Run Test Suite: res://tests/special_composition.gd
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome STARTED
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome PASSED 616ms
+
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices STARTED
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices PASSED 26ms
+
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection STARTED
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection PASSED 15ms
+
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw STARTED
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw PASSED 7ms
+
+Statistics: 4 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 686ms
+
+
+Run Test Suite: res://tests/defence_composition.gd
+  res://tests/defence_composition.gd > test_compact_shield_geometry_focus_pending_and_close STARTED
+  res://tests/defence_composition.gd > test_compact_shield_geometry_focus_pending_and_close PASSED 40ms
+
+  res://tests/defence_composition.gd > test_switching_actor_discards_the_previous_defence_presentation STARTED
+  res://tests/defence_composition.gd > test_switching_actor_discards_the_previous_defence_presentation PASSED 4ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 54ms
+
+
+Overall Summary: 157 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (8/8)
+Executed test cases : (157/157)
+Total execution time: 7s 469ms
+ Open XML Report at: file://reports/rfg331-review-regressions/report_1/results.xml
+Open HTML Report at: file://reports/rfg331-review-regressions/report_1/index.html
+Exit code: 0
+Run dispose test resources

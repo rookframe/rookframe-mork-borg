@@ -420,7 +420,7 @@ func _target(context: SDK.SystemActionContext, caller: Dictionary, input: Dictio
 		return {"actor": "", "rook": "", "label": "Table outcome", "untargeted": true}
 	var rook_id := SDK.RookId.new(str(input.get("rook", "")))
 	var rook := context.read_rook(rook_id)
-	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value or rook.rook.scene.value != "main":
+	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value:
 		return {"error": "Select this Character's source Rook."}
 	var outside := ""
 	var selected: Dictionary = {}

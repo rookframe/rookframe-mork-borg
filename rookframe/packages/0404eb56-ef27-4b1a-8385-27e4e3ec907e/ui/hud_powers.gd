@@ -6,6 +6,7 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
+const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
 const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/hud_power_surface.tres")
 const ICON = preload("res://rookframe/ui/icons/character/book.svg")
@@ -55,9 +56,10 @@ func morning(actor: SDK.ActorId) -> void:
 
 func _source_rook(actor: SDK.ActorId) -> String:
 	var context := _sdk.character_hud.context()
-	if context.ok and context.actor != null and context.actor.value == actor.value and context.rook != null:
-		return context.rook.value
-	return ""
+	var preferred := context.rook.value if context.ok and context.actor != null and context.actor.value == actor.value and context.rook != null else ""
+	var resolver := SOURCE_ROOKS.new()
+	var rook := resolver.resolve(resolver.candidates(_sdk, actor), preferred)
+	return rook.value if rook != null else ""
 
 func _report(result: SDK.OperationResult) -> void:
 	if result.ok:

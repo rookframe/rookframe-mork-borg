@@ -69,7 +69,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var untargeted: bool = input.get("tabletop", false) and caller.targets.is_empty()
 	var rook_id := SDK.RookId.new(str(input.get("rook", "")))
 	var rook := context.read_rook(rook_id)
-	if (not untargeted or not rook_id.value.is_empty()) and (not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.actor.id.value or rook.rook.scene.value != "main"):
+	if (not untargeted or not rook_id.value.is_empty()) and (not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.actor.id.value):
 		return _error("Select this Actor’s source Rook in the current Scene.")
 	var items := _inventory(source.actor.id, data)
 	var weapon := _weapon(items, str(input.get("item", "")))
@@ -132,7 +132,9 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var target_ids: PackedStringArray = caller.targets
 	var targets: Array[SDK.Actor] = []
 	var outside: Array[String] = []
+	var captured_target_rook := ""
 	for target_id in target_ids:
+		captured_target_rook = str(target_id)
 		var target_rook := context.read_rook(SDK.RookId.new(target_id))
 		if not target_rook.ok or target_rook.rook.actor == null:
 			return _error("Every target must be a Creature Rook.")
@@ -209,7 +211,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var ability: Dictionary = abilities.get(ability_name, {})
 	var ability_modifier: int = 0 if creature_source else ability.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "untargeted": untargeted, "target": "" if untargeted else targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": "" if untargeted else _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "jab": jab, "natural": weapon.get("natural", false) or bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": 0 if untargeted else CREATURE_ITEMS.new(null, targets[0].id).shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "rook": rook_id.value, "target_rook": captured_target_rook, "untargeted": untargeted, "target": "" if untargeted else targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": "" if untargeted else _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "jab": jab, "natural": weapon.get("natural", false) or bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": 0 if untargeted else CREATURE_ITEMS.new(null, targets[0].id).shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var initial_terms: Array[SDK.DiceTerm] = [SDK.DiceTerm.new("Attack", 20)]
 	if bite or special == "eurekia":
 		initial_terms.append(SDK.DiceTerm.new("Free attack chance" if bite else "Eurekia consequence", 6))
@@ -255,6 +257,11 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 				if entry.participant_id == action.owner and entry.access_level == "Owner" and entry.is_connected and entry.session_id == action.owner_session:
 					connected = true
 		if not connected:
+			return _end(context, action)
+	# A captured spatial action cannot complete after its Scene is left.
+	if not action.get("untargeted", false):
+		var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(action.target_rook)))
+		if not spatial.ok:
 			return _end(context, action)
 	var result := context.read_throw(action.request)
 	if not result.ok or result.status == "cancelled":

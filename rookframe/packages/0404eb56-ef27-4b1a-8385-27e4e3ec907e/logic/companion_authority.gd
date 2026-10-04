@@ -16,9 +16,15 @@ func _init(melee: MELEE, defence: DEFENCE) -> void:
 	_defence = defence
 
 func handle(context: SDK.SystemActionContext, name: String, payload: Variant) -> Dictionary:
-	if name != "companion.start" or typeof(payload) != TYPE_DICTIONARY:
+	if not name in ["companion.start", "companion.cancel"] or typeof(payload) != TYPE_DICTIONARY:
 		return _error("The companion action is malformed.")
 	var input: Dictionary = payload
+	if name == "companion.cancel":
+		if typeof(input.get("id", "")) != TYPE_STRING or not _routes.has(str(input.get("id", ""))):
+			return _error("The companion action is unavailable.")
+		var route := str(_routes.get(str(input.id)))
+		# Existing authorities retain the initiating Participant/session checks.
+		return _defence.handle(context, "defence.cancel", input) if route == "defence" else _melee.handle_system_intent(context, "melee.cancel", input)
 	for key in ["id", "source", "character", "item"]:
 		if typeof(input.get(str(key), "")) != TYPE_STRING or str(input.get(str(key), "")).is_empty():
 			return _error("Choose the exact companion and owned attack.")

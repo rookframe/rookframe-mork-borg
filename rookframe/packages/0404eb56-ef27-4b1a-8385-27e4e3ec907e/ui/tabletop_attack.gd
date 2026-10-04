@@ -8,6 +8,7 @@ const ACTION = preload(ROOT + "logic/melee_action.gd")
 const COMPANION_ACTION = preload(ROOT + "logic/companion_action.gd")
 const DEFENCE_FLOW = preload(ROOT + "ui/creature_defence_flow.gd")
 const VIEW = preload(ROOT + "ui/melee_attack.gd")
+const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 var _actor: SDK.ActorId
@@ -36,6 +37,12 @@ func ready() -> void:
 	var locale := I18N.new()
 	locale.bind(sdk)
 	_view.localize(locale)
+	get_node("Margin/Content/Scroll/Body/Weapon/Title").text = sdk.translations.text("Coward’s jab · choose a light one-handed weapon")
+	get_node("Margin/Content/Scroll/Body/Improvised/Object").placeholder_text = sdk.translations.text("Improvised object")
+	var mode: OptionButton = get_node("Margin/Content/Scroll/Body/Improvised/Mode")
+	mode.clear()
+	mode.add_item(sdk.translations.text("Melee · Strength · 5 ft"))
+	mode.add_item(sdk.translations.text("Ranged · Presence · 30 ft"))
 	_defence.localize(locale)
 	_defence.changed.connect(_defence_changed)
 	_defence.resolved.connect(_changed)
@@ -159,18 +166,10 @@ func _refresh() -> void:
 	_refreshing = false
 
 func _resolve_rooks() -> void:
-	_rooks = []
-	_rook = null
+	var resolver := SOURCE_ROOKS.new()
+	_rooks = resolver.candidates(sdk, _actor)
 	var chosen := sdk.rooks.selected()
-	var all := sdk.rooks.list()
-	if all.ok:
-		for rook in all.items:
-			if rook.actor != null and rook.actor.value == _actor.value and rook.scene.value == "main":
-				_rooks.append(rook.id)
-				if chosen != null and chosen.value == rook.id.value:
-					_rook = rook.id
-	if _rook == null and _rooks.size() == 1:
-		_rook = _rooks[0]
+	_rook = resolver.resolve(_rooks, chosen.value if chosen != null else "")
 	var choice: OptionButton = get_node("Margin/Content/Scroll/Body/Source/Choice")
 	choice.clear()
 	choice.add_item(sdk.translations.text("Choose the source Rook"))

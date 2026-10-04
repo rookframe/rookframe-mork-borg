@@ -2,6 +2,16 @@
 
 [resource]
 messages = {
+[&"", &"Coward’s jab · choose a light one-handed weapon"]: [&"Coward’s jab · choose a light one-handed weapon"],
+[&"", &"Improvised object"]: [&"Improvised object"],
+[&"", &"Melee · Strength · 5 ft"]: [&"Melee · Strength · 5 ft"],
+[&"", &"Ranged · Presence · 30 ft"]: [&"Ranged · Presence · 30 ft"],
+[&"", &"Choose a weapon"]: [&"Choose a weapon"],
+[&"", &"Choose the source Rook"]: [&"Choose the source Rook"],
+[&"", &"Rook %d"]: [&"Rook %d"],
+[&"", &"No target · resolve at the table"]: [&"No target · resolve at the table"],
+[&"", &"Attack and damage are rolled in sequence. Resolve the results at the table."]: [&"Attack and damage are rolled in sequence. Resolve the results at the table."],
+[&"", &"Flat test · %d ft"]: [&"Flat test · %d ft"],
 [&"", &"Catch breath"]: [&"Catch breath"],
 [&"", &"Full night’s sleep"]: [&"Full night’s sleep"],
 [&"", &"d4 HP"]: [&"d4 HP"],
@@ -1284,4 +1294,5 @@ messages = {
 [&"", &"%d days of dried food"]: [&"%d days of dried food"],
 [&"", &"Placement failed"]: [&"Placement failed"],
 [&"", &"Owner access is required to place this Actor."]: [&"Owner access is required to place this Actor."],
+[&"", &"The companion action is unavailable."]: [&"The companion action is unavailable."],
 }
