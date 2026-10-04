@@ -5,6 +5,8 @@ const SOURCES = preload(ROOT + "logic/attack_sources.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const ACTION = preload(ROOT + "logic/melee_action.gd")
+const COMPANION_ACTION = preload(ROOT + "logic/companion_action.gd")
+const DEFENCE_FLOW = preload(ROOT + "ui/creature_defence_flow.gd")
 const VIEW = preload(ROOT + "ui/melee_attack.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
@@ -23,7 +25,9 @@ var _prepared := false
 var _target_summary := ""
 var _started_data: Dictionary = {}
 var _started_item: Dictionary = {}
+var _defending := false
 @onready var _view: VIEW = get_node("Margin/Content/Scroll/Body/Attack")
+@onready var _defence: DEFENCE_FLOW = get_node("Margin/Content/Scroll/Body/Defence")
 @onready var _start_button: Button = get_node("Margin/Content/Actions/Start")
 
 func ready() -> void:
@@ -32,6 +36,10 @@ func ready() -> void:
 	var locale := I18N.new()
 	locale.bind(sdk)
 	_view.localize(locale)
+	_defence.localize(locale)
+	_defence.changed.connect(_defence_changed)
+	_defence.resolved.connect(_changed)
+	_defence.access_lost.connect(_close)
 	_view.targets_requested.connect(_choose_targets)
 	get_node("Margin/Content/Actions/Close").pressed.connect(_close)
 	_start_button.pressed.connect(_start)
@@ -52,6 +60,7 @@ func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
 	_prepared = false
 	_started_data = {}
 	_started_item = {}
+	_defending = false
 	_target_summary = ""
 	get_node("Margin/Content/Scroll/Body/Improvised/Object").text = ""
 	get_node("Margin/Content/Scroll/Body/Improvised/Mode").select(0)
@@ -112,9 +121,10 @@ func _refresh() -> void:
 				_item = item
 	var improvised := str(_task.get("item", "")) == "intrinsic:improvised"
 	var state := _action.state if _action != null else "ready"
-	get_node("Margin/Content/Scroll/Body/Improvised").visible = improvised and state in ["ready", "error"]
-	get_node("Margin/Content/Scroll/Body/Source").visible = state in ["ready", "error"] and _rooks.size() > 1
-	if state not in ["ready", "error"] and not _started_data.is_empty():
+	var editable := _action == null or state == "error"
+	get_node("Margin/Content/Scroll/Body/Improvised").visible = improvised and editable
+	get_node("Margin/Content/Scroll/Body/Source").visible = editable and _rooks.size() > 1
+	if not editable and not _started_data.is_empty():
 		data = _started_data
 		_item = _started_item
 	var display_item := _item.duplicate(true)
@@ -124,11 +134,13 @@ func _refresh() -> void:
 	var message := _action.message if _action != null else ""
 	_view.configure(data, display_item, _options, state, message)
 	_view.get_node("Outcome").visible = not message.is_empty()
+	if not editable:
+		_view.get_node("Rules").visible = false
 	if _item.get("natural", false):
 		_view.get_node("Context").text = str(data.get("name", "Actor")) + " · " + str(_item.get("name", "Attack"))
 	_view.get_node("SourceRules").text = sdk.translations.text(str(_item.get("rules", "")))
 	_view.get_node("SourceRules").visible = not str(_item.get("rules", "")).is_empty()
-	_view.get_node("Target/Change").disabled = state not in ["ready", "error"]
+	_view.get_node("Target/Change").disabled = not editable
 	_prepared = true
 	if str(_task.get("mode", "")) == "jab":
 		_view.get_node("Rules/Jab").set_pressed_no_signal(true)
@@ -136,8 +148,10 @@ func _refresh() -> void:
 	_start_button.visible = _action == null or state == "error"
 	_start_button.disabled = _item.is_empty() or not SOURCES.new().usable(_item, str(data.get("schema", "")) == "mork-borg-adversary/v1")
 	get_node("Margin/Content/Actions/Close").text = sdk.translations.text("Cancel" if _action == null or _action.pending else "Done")
+	_present_defence()
+	_present_owners()
 	var snapshot := await sdk.targeting.snapshot()
-	if not _closed and state in ["ready", "error"]:
+	if not _closed and editable:
 		var targeted: bool = snapshot.ok and not snapshot.snapshot.rooks.is_empty()
 		_target_summary = await TARGETS.new().describe(sdk, _rook, float(_item.get("range_feet", 0))) if targeted else sdk.translations.text("No target · resolve at the table")
 		_view.set_targets(_target_summary)
@@ -166,6 +180,9 @@ func _resolve_rooks() -> void:
 			choice.select(index + 1)
 
 func _start() -> void:
+	if _defending:
+		await _defence.roll()
+		return
 	if _closed or (_action != null and _action.pending):
 		return
 	var options: Dictionary = _view.options()
@@ -180,6 +197,9 @@ func _start() -> void:
 	input["source"] = _actor.value
 	input["rook"] = _rook.value if _rook != null else ""
 	input["item"] = str(_task.get("item", ""))
+	if _task.get("companion", false):
+		input["character"] = str(_task.get("character", ""))
+		input["owner"] = str(_task.get("owner", ""))
 	if _action != null:
 		await _action.retire()
 	if _closed:
@@ -193,7 +213,7 @@ func _start() -> void:
 	var intrinsic := SOURCES.new().intrinsic(_started_data, str(_task.get("item", "")), options)
 	if not intrinsic.is_empty():
 		_started_item = intrinsic
-	var action := ACTION.new(sdk)
+	var action: ACTION = COMPANION_ACTION.new(sdk) if _task.get("companion", false) else ACTION.new(sdk)
 	add_child(action)
 	_action = action
 	action.changed.connect(_changed)
@@ -234,6 +254,9 @@ func _close() -> void:
 func _cancel() -> void:
 	_closed = true
 	_actor = null
+	_defending = false
+	if _defence != null:
+		_defence.close()
 	if _action != null:
 		_action.retire()
 		_action = null
@@ -246,3 +269,46 @@ func _capture_options(options: Dictionary) -> void:
 	for key in ["mode", "eligible", "small_medium", "faithless_human", "ammunition", "difficulty", "modifier", "fumble", "piercing"]:
 		if options.has(str(key)):
 			_options[str(key)] = options.get(str(key))
+
+func _present_defence() -> void:
+	var outcome: Dictionary = _action.snapshot if _action != null else {}
+	_defending = _action != null and outcome.has("defender") and str(outcome.get("defender", "")) == sdk.context().participant_id and str(outcome.get("state", "")) != "error"
+	_view.visible = not _defending
+	_defence.visible = _defending
+	if _defending:
+		_defence.present(sdk, outcome)
+		_start_button.visible = _action.state == "ready"
+		_start_button.disabled = false
+		_start_button.text = sdk.translations.text("Roll damage" if outcome.get("automatic_hit", false) else "Roll defence")
+	elif _action != null and outcome.has("defender") and _action.state in ["ready", "shield"]:
+		_view.get_node("Outcome").visible = true
+		_view.get_node("Outcome").text = sdk.translations.text("Waiting for the defending Player.")
+	else:
+		_start_button.text = sdk.translations.text("Roll attack")
+
+func _defence_changed(state: String, can_roll: bool, automatic_hit: bool) -> void:
+	if not _defending:
+		return
+	_start_button.visible = can_roll
+	_start_button.text = sdk.translations.text("Roll damage" if automatic_hit else "Roll defence")
+	get_node("Margin/Content/Actions/Close").text = sdk.translations.text("Done" if state in ["resolved", "ended"] else "Cancel")
+
+func _present_owners() -> void:
+	var owners: VBoxContainer = get_node("Margin/Content/Scroll/Body/Owners")
+	for child in owners.get_children():
+		owners.remove_child(child)
+		child.queue_free()
+	var choices: Array = _action.snapshot.get("owners", []) if _action != null else []
+	owners.visible = not choices.is_empty()
+	for raw in choices:
+		var choice: Dictionary = raw
+		var button := Button.new()
+		button.text = str(choice.get("name", "Player"))
+		button.custom_minimum_size = Vector2(0, 44)
+		button.theme_type_variation = "RookframeSecondaryButton"
+		button.pressed.connect(_owner_selected.bind(str(choice.id)))
+		owners.add_child(button)
+
+func _owner_selected(participant: String) -> void:
+	_task["owner"] = participant
+	await _start()

@@ -1,0 +1,222 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/rfg343-native
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/rfg343_temporary.gd
+  res://tests/rfg343_temporary.gd > test_companion_projection_duplicate_identity_tombstones_and_ownership STARTED
+  res://tests/rfg343_temporary.gd > test_companion_projection_duplicate_identity_tombstones_and_ownership PASSED 3ms
+
+  res://tests/rfg343_temporary.gd > test_untargeted_companion_sequence_captures_own_stats_and_cancels STARTED
+  res://tests/rfg343_temporary.gd > test_untargeted_companion_sequence_captures_own_stats_and_cancels PASSED 3ms
+
+  res://tests/rfg343_temporary.gd > test_targeted_companion_retains_exact_owned_attack_and_existing_damage STARTED
+  res://tests/rfg343_temporary.gd > test_targeted_companion_retains_exact_owned_attack_and_existing_damage PASSED 3ms
+
+  res://tests/rfg343_temporary.gd > test_native_companion_handoff_uses_actual_actor_rook_and_throw STARTED
+  res://tests/rfg343_temporary.gd > test_native_companion_handoff_uses_actual_actor_rook_and_throw PASSED 1s 974ms
+
+  res://tests/rfg343_temporary.gd > test_native_self_defence_uses_existing_defender_controls STARTED
+  res://tests/rfg343_temporary.gd > test_native_self_defence_uses_existing_defender_controls PASSED 1s 498ms
+
+  res://tests/rfg343_temporary.gd > test_remote_defence_inbox_opens_actual_usable_native_entry STARTED
+  res://tests/rfg343_temporary.gd > test_remote_defence_inbox_opens_actual_usable_native_entry PASSED 2s 250ms
+
+Statistics: 6 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 5s 745ms
+
+
+Run Test Suite: res://tests/melee_attack.gd
+  res://tests/melee_attack.gd > test_melee_attack STARTED
+  res://tests/melee_attack.gd > test_melee_attack PASSED 6ms
+
+  res://tests/melee_attack.gd > test_d2_faces STARTED
+  res://tests/melee_attack.gd > test_d2_faces PASSED 6ms
+
+  res://tests/melee_attack.gd > test_boundaries STARTED
+  res://tests/melee_attack.gd > test_boundaries PASSED 7ms
+
+  res://tests/melee_attack.gd > test_lifetime STARTED
+  res://tests/melee_attack.gd > test_lifetime PASSED 15ms
+
+  res://tests/melee_attack.gd > test_review_regressions STARTED
+  res://tests/melee_attack.gd > test_review_regressions PASSED 2s 214ms
+
+Statistics: 5 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 281ms
+
+
+Run Test Suite: res://tests/player_defence.gd
+  res://tests/player_defence.gd > test_defender_receives_agility_throw_and_success_report STARTED
+  res://tests/player_defence.gd > test_defender_receives_agility_throw_and_success_report PASSED 3ms
+
+  res://tests/player_defence.gd > test_failed_defence_offers_protected_damage_or_one_broken_shield STARTED
+  res://tests/player_defence.gd > test_failed_defence_offers_protected_damage_or_one_broken_shield PASSED 5ms
+
+  res://tests/player_defence.gd > test_natural_faces_and_fumble_armor_survive_shield_cancellation STARTED
+  res://tests/player_defence.gd > test_natural_faces_and_fumble_armor_survive_shield_cancellation PASSED 4ms
+
+  res://tests/player_defence.gd > test_disconnect_or_reconnect_after_damage_refuses_late_choice STARTED
+  res://tests/player_defence.gd > test_disconnect_or_reconnect_after_damage_refuses_late_choice PASSED 5ms
+
+  res://tests/player_defence.gd > test_armor_defence_penalty_and_source_automatic_hit STARTED
+  res://tests/player_defence.gd > test_armor_defence_penalty_and_source_automatic_hit PASSED 3ms
+
+  res://tests/player_defence.gd > test_shield_choice_rejects_changed_equipment_or_failed_save_without_late_mutation STARTED
+  res://tests/player_defence.gd > test_shield_choice_rejects_changed_equipment_or_failed_save_without_late_mutation PASSED 7ms
+
+  res://tests/player_defence.gd > test_explicit_owner_selection_and_no_player_owner_fallback STARTED
+  res://tests/player_defence.gd > test_explicit_owner_selection_and_no_player_owner_fallback PASSED 6ms
+
+  res://tests/player_defence.gd > test_live_client_close_during_roll_reply_cancels_once_and_never_resumes STARTED
+  res://tests/player_defence.gd > test_live_client_close_during_roll_reply_cancels_once_and_never_resumes PASSED 14ms
+
+  res://tests/player_defence.gd > test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence STARTED
+  res://tests/player_defence.gd > test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence PASSED 4ms
+
+  res://tests/player_defence.gd > test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current STARTED
+  res://tests/player_defence.gd > test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:0 ('brown-scimitar-of-galgenbeck', 'fanged-deserter', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:0 ('brown-scimitar-of-galgenbeck', 'fanged-deserter', 10) PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:1 ('blade-of-your-ancestors', 'wretched-royalty', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:1 ('blade-of-your-ancestors', 'wretched-royalty', 10) PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:2 ('stolen-mitre', 'heretical-priest', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:2 ('stolen-mitre', 'heretical-priest', 10) PASSED 6ms
+
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:3 ('sword', 'gutterborn-scum', 10) STARTED
+  res://tests/player_defence.gd > test_equipped_class_defence_exception_and_scum_keep_armor_penalty:3 ('sword', 'gutterborn-scum', 10) PASSED 6ms
+
+Statistics: 14 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 127ms
+
+
+Run Test Suite: res://tests/companions.gd
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:0 (1, 'belze-skeleton', '') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:0 (1, 'belze-skeleton', '') PASSED 3ms
+
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:1 (3, 'belze-skeleton', '') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:1 (3, 'belze-skeleton', '') PASSED 3ms
+
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:2 (4, 'nodh-zombie', 'd2') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:2 (4, 'nodh-zombie', 'd2') PASSED 3ms
+
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:3 (6, 'nodh-zombie', 'd2') STARTED
+  res://tests/companions.gd > test_psychopomp_creates_individual_source_profiles_once:3 (6, 'nodh-zombie', 'd2') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:0 ('cancel') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:0 ('cancel') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:1 ('tray') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:1 ('tray') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:2 ('disconnect') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:2 ('disconnect') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:3 ('access') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:3 ('access') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:4 ('save') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:4 ('save') PASSED 2ms
+
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:5 ('restart') STARTED
+  res://tests/companions.gd > test_summon_termination_preserves_casting_use_and_rejects_late_materialization:5 ('restart') PASSED 2ms
+
+  res://tests/companions.gd > test_gm_cast_for_player_grants_the_casters_normal_access STARTED
+  res://tests/companions.gd > test_gm_cast_for_player_grants_the_casters_normal_access PASSED 2ms
+
+  res://tests/companions.gd > test_owned_creature_requests_the_other_characters_defence STARTED
+  res://tests/companions.gd > test_owned_creature_requests_the_other_characters_defence PASSED 3ms
+
+  res://tests/companions.gd > test_creature_attack_uses_its_own_rook_and_equipped_action STARTED
+  res://tests/companions.gd > test_creature_attack_uses_its_own_rook_and_equipped_action PASSED 2ms
+
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') PASSED 5ms
+
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') PASSED 15ms
+
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state STARTED
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state PASSED 3ms
+
+  res://tests/companions.gd > test_companion_ranged_resource_is_spent_once_after_defence_roll STARTED
+  res://tests/companions.gd > test_companion_ranged_resource_is_spent_once_after_defence_roll PASSED 4ms
+
+  res://tests/companions.gd > test_critical_armor_damage_survives_unrelated_creature_inventory_edit STARTED
+  res://tests/companions.gd > test_critical_armor_damage_survives_unrelated_creature_inventory_edit PASSED 3ms
+
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:0 ('melee') STARTED
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:0 ('melee') PASSED 2ms
+
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:1 ('power') STARTED
+  res://tests/companions.gd > test_equipped_creature_shield_reduces_melee_and_power_damage:1 ('power') PASSED 3ms
+
+  res://tests/companions.gd > test_companion_flat_attack_combines_printed_drs_and_hides_private_target STARTED
+  res://tests/companions.gd > test_companion_flat_attack_combines_printed_drs_and_hides_private_target PASSED 2ms
+
+  res://tests/companions.gd > test_companion_defends_flat_with_printed_exceptions_and_its_own_armor STARTED
+  res://tests/companions.gd > test_companion_defends_flat_with_printed_exceptions_and_its_own_armor PASSED 2ms
+
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:0 ('bony-knuckles', true) STARTED
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:0 ('bony-knuckles', true) PASSED 2ms
+
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:1 ('knife', false) STARTED
+  res://tests/companions.gd > test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:1 ('knife', false) PASSED 2ms
+
+  res://tests/companions.gd > test_companion_defence_fumble_and_shield_choice_persist_individual_equipment STARTED
+  res://tests/companions.gd > test_companion_defence_fumble_and_shield_choice_persist_individual_equipment PASSED 4ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:0 ('cancel') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:0 ('cancel') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:1 ('disconnect') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:1 ('disconnect') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:2 ('access') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:2 ('access') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:3 ('save') STARTED
+  res://tests/companions.gd > test_companion_attack_termination_rejects_late_damage:3 ('save') PASSED 2ms
+
+  res://tests/companions.gd > test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions STARTED
+  res://tests/companions.gd > test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions PASSED 2ms
+
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:0 (false) STARTED
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:0 (false) PASSED 2ms
+
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:1 (true) STARTED
+  res://tests/companions.gd > test_creature_targeting_selects_one_rolling_side_from_ordinary_access:1 (true) PASSED 1ms
+
+  res://tests/companions.gd > test_companion_defence_presentation_offers_flat_test_at_phone_dock_width STARTED
+  res://tests/companions.gd > test_companion_defence_presentation_offers_flat_test_at_phone_dock_width PASSED 8ms
+
+  res://tests/companions.gd > test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence STARTED
+  res://tests/companions.gd > test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence PASSED 3ms
+
+  res://tests/companions.gd > test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice STARTED
+  res://tests/companions.gd > test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice PASSED 4ms
+
+  res://tests/companions.gd > test_companion_defence_presentation_hides_when_owner_access_is_lost STARTED
+  res://tests/companions.gd > test_companion_defence_presentation_hides_when_owner_access_is_lost PASSED 14ms
+
+  res://tests/companions.gd > test_companion_defence_scene_resolves_the_compact_shield_choice STARTED
+  res://tests/companions.gd > test_companion_defence_scene_resolves_the_compact_shield_choice PASSED 1s 234ms
+
+Statistics: 37 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 402ms
+
+
+Overall Summary: 62 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (4/4)
+Executed test cases : (62/62)
+Total execution time: 9s 555ms
+ Open XML Report at: file://reports/rfg343-native/report_1/results.xml
+Open HTML Report at: file://reports/rfg343-native/report_1/index.html
+Exit code: 0
+Run dispose test resources

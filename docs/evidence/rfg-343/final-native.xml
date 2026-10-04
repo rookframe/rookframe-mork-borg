@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="7" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="rfg343_temporary" package="tests" timestamp="2026-10-04T00:32:15" hostname="localhost" tests="7" failures="0" errors="0" skipped="0" flaky="0" time="10.916">
+		<testcase name="test_companion_projection_duplicate_identity_tombstones_and_ownership" classname="rfg343_temporary" time="0.005">
+		</testcase>
+		<testcase name="test_untargeted_companion_sequence_captures_own_stats_and_cancels" classname="rfg343_temporary" time="0.005">
+		</testcase>
+		<testcase name="test_targeted_companion_retains_exact_owned_attack_and_existing_damage" classname="rfg343_temporary" time="0.002">
+		</testcase>
+		<testcase name="test_native_companion_handoff_uses_actual_actor_rook_and_throw" classname="rfg343_temporary" time="1.941">
+		</testcase>
+		<testcase name="test_native_self_defence_uses_existing_defender_controls" classname="rfg343_temporary" time="1.499">
+		</testcase>
+		<testcase name="test_closed_native_task_reopens_for_same_character_or_companion" classname="rfg343_temporary" time="5.183">
+		</testcase>
+		<testcase name="test_remote_defence_inbox_opens_actual_usable_native_entry" classname="rfg343_temporary" time="2.265">
+		</testcase>
+	</testsuite>
+</testsuites>
