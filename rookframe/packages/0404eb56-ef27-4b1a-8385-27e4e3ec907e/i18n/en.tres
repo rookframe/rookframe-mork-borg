@@ -2,6 +2,7 @@
 
 [resource]
 messages = {
+[&"", &"%s · %s"]: [&"%s · %s"],
 [&"", &"Dice"]: [&"Dice"],
 [&"", &"Ability roll"]: [&"Ability roll"],
 [&"", &"Companion attack"]: [&"Companion attack"],

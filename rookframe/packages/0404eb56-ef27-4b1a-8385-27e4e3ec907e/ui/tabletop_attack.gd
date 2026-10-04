@@ -137,7 +137,7 @@ func _refresh() -> void:
 		_item = _started_item
 	var display_item := _item.duplicate(true)
 	if not display_item.is_empty():
-		display_item["renamed"] = FAVORITES.new().is_renamed(_item, data)
+		display_item["literal_name"] = FAVORITES.new().uses_literal_name(_item, data)
 	if str(_task.get("mode", "")) == "jab" and not display_item.is_empty():
 		display_item["attack_ability"] = "Agility"
 		display_item["damage"] = str(display_item.get("damage", "")) + "+3"
@@ -149,7 +149,8 @@ func _refresh() -> void:
 	if _item.get("natural", false):
 		var source_name := str(_item.get("name", "Attack"))
 		var named_object := str(_item.get("source_item_id", "")) == "improvised" and not str(_options.get("object", "")).strip_edges().is_empty()
-		_view.get_node("Context").text = str(data.get("name", "Actor")) + " · " + (source_name if _item.get("custom", false) or named_object else sdk.translations.text(source_name))
+		var display_name := source_name if FAVORITES.new().uses_literal_name(_item, data) or named_object else sdk.translations.text(source_name)
+		_view.get_node("Context").text = sdk.translations.text("%s · %s") % [str(data.get("name", "Actor")), display_name]
 	_view.get_node("SourceRules").text = sdk.translations.text(str(_item.get("rules", "")))
 	_view.get_node("SourceRules").visible = not str(_item.get("rules", "")).is_empty()
 	_view.get_node("Target/Change").disabled = not editable

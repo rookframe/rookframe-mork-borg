@@ -34,6 +34,8 @@ func entries(character: SDK.Actor) -> Array[ENTRY]:
 	return result
 
 func _title(favorite: Dictionary, companions: Array[SDK.Actor]) -> String:
+	if not favorite.get("present", false):
+		return str(favorite.get("name", "Companion"))
 	for companion in companions:
 		if companion.id.value != str(favorite.get("actor", "")):
 			continue
@@ -42,8 +44,8 @@ func _title(favorite: Dictionary, companions: Array[SDK.Actor]) -> String:
 			var attack: Dictionary = raw
 			if str(attack.inventory_id) == str(favorite.get("item", "")):
 				var name := str(attack.get("name", "Attack"))
-				var editable_name: bool = attack.get("custom", false) or MODEL.new().is_renamed(attack, data)
-				return str(data.get("name", "Companion")) + " · " + (name if editable_name else _sdk.translations.text(name))
+				var display_name := name if MODEL.new().uses_literal_name(attack, data) else _sdk.translations.text(name)
+				return _sdk.translations.text("%s · %s") % [str(data.get("name", "Companion")), display_name]
 	return str(favorite.get("name", "Companion"))
 
 func available(character: SDK.Actor, entry: Dictionary) -> bool:

@@ -29,7 +29,7 @@ func configure(character: Dictionary, item: Dictionary, options: Dictionary, sta
 	var faithless_human: bool = options.get("faithless_human", false)
 	get_node(^"Rules/Faithless").button_pressed = faithless_human
 	var disappointed: bool = options.get("disappointed", false)
-	get_node(^"Context").text = _t("%s · Equipped %s") % [str(character.get("name", "Character")), (str(item.get("name", "weapon")) if item.get("custom", false) or item.get("renamed", false) else _t(str(item.get("name", "weapon"))))]
+	get_node(^"Context").text = _t("%s · Equipped %s") % [str(character.get("name", "Character")), (str(item.get("name", "weapon")) if item.get("custom", false) or item.get("literal_name", false) else _t(str(item.get("name", "weapon"))))]
 	get_node(^"Metrics/Damage/Content/Value").text = str(item.get("damage", "—"))
 	get_node(^"Metrics/Reach/Content/Value").text = str(item.get("range_feet", 0)) + _t(" ft")
 	var abilities: Dictionary = character.get("abilities", {})

@@ -1,0 +1,60 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-review-red
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_russian_review_temp.gd
+  res://tests/hud_russian_review_temp.gd > test_saved_companion_caption_and_complete_translated_templates STARTED
+  res://tests/hud_russian_review_temp.gd > test_saved_companion_caption_and_complete_translated_templates FAILED 765ms
+  Report:
+  Expecting:
+ 'Strength — Укус'
+ but was
+ 'Strength —· Укус'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:36
+	at '_click' in res://tests/hud_russian_review_temp.gd:81
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ 'Strength — Без оружия'
+ but was
+ 'Strength —· Без оружия'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:43
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ 'Strength · Bite'
+ but was
+ 'StreChangthed Player Name · BiteУкус'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:53
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ 'Strength · Bite'
+ but was
+ 'StreChangthed Player Name · BiteУкус'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:53
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ '%s · %s'
+ but was
+ '%s · %s'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:57
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ '%s · %s'
+ but was
+ '%s · %s'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:58
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85
+
+Statistics: 1 test cases | 0 errors | 6 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 778ms
+
+
+Overall Summary: 1 test cases | 0 errors | 6 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 778ms
+ Open XML Report at: file://reports/russian-review-red/report_1/results.xml
+Open HTML Report at: file://reports/russian-review-red/report_1/index.html
+Exit code: 100
+Run dispose test resources

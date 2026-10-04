@@ -45,7 +45,9 @@ func item_entry(item: Dictionary) -> Dictionary:
 		return {}
 	return {"key": "item:%s:%s" % [str(item.inventory_id), action], "category": category, "name": str(item.get("name", "Item")), "action": action, "item": str(item.inventory_id), "source": source, "custom": item.get("custom", false), "damage": str(item.get("damage", "")), "attack_ability": str(item.get("attack_ability", "Strength")), "range_feet": int(item.get("range_feet", 0)), "detail": ""}
 
-func is_renamed(source: Dictionary, data: Dictionary = {}) -> bool:
+func uses_literal_name(source: Dictionary, data: Dictionary = {}) -> bool:
+	if source.get("custom", false):
+		return true
 	var id := str(source.get("source_item_id", source.get("source", "")))
 	var original: Dictionary = {} if id.is_empty() else ITEMS.EQUIPMENT.new().item(id)
 	if original.is_empty():
