@@ -4,6 +4,9 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const ROW = preload(ROOT + "ui/hud_row.tscn")
 const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
+const ATTACKS = preload(ROOT + "ui/hud_attacks.gd")
+const POWERS = preload(ROOT + "ui/hud_powers.gd")
+const ITEMS = preload(ROOT + "ui/hud_items.gd")
 const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
 const TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_palette.gd")
@@ -27,6 +30,10 @@ signal entry_requested(actor: SDK.ActorId, category: String, entry_id: String)
 signal favorite_requested(actor: SDK.ActorId, category: String, entry_id: String, favorite: bool)
 signal morning_requested(actor: SDK.ActorId)
 var _favorites := FAVORITES.new()
+var _attacks := ATTACKS.new()
+var _powers := POWERS.new()
+var _items := ITEMS.new()
+var _can_morning := false
 var _pending_favorites: Dictionary = {}
 var _actor: SDK.ActorId
 var _category := ""
@@ -64,6 +71,12 @@ func ready() -> void:
 		get_node("Panel/More/" + category + "/Icon").modulate = GOLD
 	_favorites.sdk = sdk
 	favorite_requested.connect(_change_favorite)
+	add_child(_attacks)
+	_attacks.bind(sdk)
+	_powers.bind(sdk)
+	_items.bind(sdk)
+	entry_requested.connect(_launch_entry)
+	morning_requested.connect(_powers.morning)
 	_launcher.bind(sdk)
 	_launcher.changed.connect(_action_changed)
 	sdk.character_hud.context_changed.connect(_refresh)
@@ -154,8 +167,13 @@ func _refresh() -> void:
 		_render_panel()
 
 func _project_favorites(actor: SDK.Actor) -> void:
+	_entries["Attacks"] = _attacks.entries(actor)
+	_entries["Powers"] = _powers.entries(actor)
+	_entries["Items"] = _items.entries(actor)
+	_entries["Features"] = _items.entries(actor, "Features")
+	_can_morning = _powers.can_morning(actor)
 	var sources := _favorites.entries(actor)
-	for category in ["Attacks", "Powers", "Items", "Features", "Companions"]:
+	for category in ["Companions"]:
 		var entries: Array[ENTRY] = []
 		for source in sources:
 			if str(source.get("category", "")) != category:
@@ -170,6 +188,14 @@ func _project_favorites(actor: SDK.Actor) -> void:
 			entry.favorite = source.get("starred", false)
 			entries.append(entry)
 		_entries[category] = entries
+
+func _launch_entry(actor: SDK.ActorId, category: String, key: String) -> void:
+	if category == "Attacks":
+		_attacks.launch(actor, {"key": key})
+	elif category == "Powers":
+		_powers.launch(actor, key)
+	elif category in ["Items", "Features"]:
+		_items.launch(actor, key)
 
 func _favorite_request_key(actor: SDK.ActorId, key: String) -> String:
 	return actor.value + ":" + key if actor != null else ""
@@ -286,6 +312,7 @@ func _render_panel() -> void:
 	get_node("Panel/Header/Title").text = sdk.translations.text(_category)
 	get_node("Panel/Header/ShowAll").visible = not fixed
 	get_node("Panel/Header/Morning").visible = _category == "Powers"
+	get_node("Panel/Header/Morning").disabled = not _can_morning
 	get_node("Panel/Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
 	for category in BUTTONS:
 		var button: Button = get_node("Bar/Categories/" + category)

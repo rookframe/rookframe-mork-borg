@@ -65,9 +65,10 @@ func _source_rook(actor: SDK.ActorId) -> String:
 	return ""
 
 func _presentation(actor: SDK.Actor, source: Dictionary) -> Dictionary:
+	var data: Dictionary = actor.data
 	var kind := str(source.get("source", ""))
 	var id := "owned-feature:" + str(source.get("entry", "")) if str(source.category) == "Features" else str(source.get("item", ""))
-	var item := RULES.new().owned(actor.data, id)
+	var item := RULES.new().owned(data, id)
 	var rule := RULES.new().definition(kind)
 	var value := str(VALUES.get(kind, "Use"))
 	var detail := _sdk.translations.text(str(DETAILS.get(kind, "Class action" if str(source.category) == "Features" else "Equipment")))
@@ -79,12 +80,12 @@ func _presentation(actor: SDK.Actor, source: Dictionary) -> Dictionary:
 	elif rule.get("healing", false):
 		value = "d6 healing"
 	elif rule.get("poison", false):
-		value = "TOU DR%d · d%d HP" % [int(rule.dr), int(rule.die)]
+		value = _sdk.translations.text("TOU DR%d · d%d HP") % [int(rule.dr), int(rule.die)]
 	elif rule.get("damage", false):
-		value = "d%d damage" % int(rule.die)
+		value = _sdk.translations.text("d%d damage") % int(rule.die)
 	if not item.is_empty():
 		if item.has("dose_pool"):
-			var inventory: Array = actor.data.get("inventory", [])
+			var inventory: Array = data.get("inventory", [])
 			for raw in inventory:
 				var pool: Dictionary = raw
 				if str(pool.get("source_item_id", "")) == str(item.dose_pool) and int(pool.get("quantity", 0)) > 0 and not pool.get("broken", false):
