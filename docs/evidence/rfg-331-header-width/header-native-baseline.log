@@ -1,0 +1,244 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+[2J[H[38;2;233;150;122m
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------[0m
+[38;2;0;191;255mDisabled fail fast![0m
+[38;2;0;191;255mSet write reports to reports/header-native-baseline[0m
+[38;2;100;149;237mInstalling GdUnit4 session system hooks.[0m
+[38;2;100;149;237mSession hook 'GdUnitHtmlTestReporter' installed.[0m
+[38;2;100;149;237mSession hook 'GdUnitXMLTestReporter' installed.[0m
+[38;2;0;206;209mRun Test Suite: [0m[38;2;250;235;215mres://tests/hud_header_temp.gd[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_bounds:0 (2, Vector2i(844, 390))[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+[DEBUG-rfg331-header] device=2 all=[P: (460.0, 222.0), S: (106.0, 46.0)] min=(106.0, 46.0) morning=[P: (548.0, 222.0), S: (72.0, 44.0)] close=[P: (620.0, 222.0), S: (44.0, 57.0)] header=[P: (320.0, 222.0), S: (344.0, 44.0)]
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_bounds:0 (2, Vector2i(844, 390))[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 194ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:47
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_bounds:1 (1, Vector2i(1024, 768))[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+[DEBUG-rfg331-header] device=1 all=[P: (575.1428, 548.0), S: (110.0, 48.0)] min=(110.0, 46.0) morning=[P: (663.1428, 548.0), S: (76.0, 48.0)] close=[P: (735.1428, 548.0), S: (44.0, 57.0)] header=[P: (403.1429, 548.0), S: (376.0, 48.0)]
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_bounds:1 (1, Vector2i(1024, 768))[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 199ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:47
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:48
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_bounds:2 (0, Vector2i(1920, 1080))[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+[DEBUG-rfg331-header] device=0 all=[P: (1131.714, 796.0), S: (110.0, 48.0)] min=(110.0, 46.0) morning=[P: (1219.714, 796.0), S: (76.0, 48.0)] close=[P: (1291.714, 796.0), S: (44.0, 57.0)] header=[P: (899.7143, 796.0), S: (436.0, 48.0)]
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_bounds:2 (0, Vector2i(1920, 1080))[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 198ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:47
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:48
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:0 (2, Vector2i(844, 390), true)[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:0 (2, Vector2i(844, 390), true)[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 529ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[true, [48;2;38;0;0m[38;2;255;255;255mfalse[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m[true][0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]1[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]false[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:1 (1, Vector2i(1024, 768), true)[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:1 (1, Vector2i(1024, 768), true)[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 530ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[true, [48;2;38;0;0m[38;2;255;255;255mfalse[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m[true][0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]1[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]false[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:2 (0, Vector2i(1920, 1080), false)[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:2 (0, Vector2i(1920, 1080), false)[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 529ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[true, [48;2;38;0;0m[38;2;255;255;255mfalse[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m[true][0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]1[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]false[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:3 (2, Vector2i(844, 390), false)[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:3 (2, Vector2i(844, 390), false)[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 526ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[true, [48;2;38;0;0m[38;2;255;255;255mfalse[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m[true][0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]1[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]false[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:4 (1, Vector2i(1024, 768), false)[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:4 (1, Vector2i(1024, 768), false)[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 532ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[true, [48;2;38;0;0m[38;2;255;255;255mfalse[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m[true][0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]1[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]false[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:5 (0, Vector2i(1920, 1080), true)[0m[38;2;34;139;34m STARTED[0m[38;2;128;128;128m[0m
+  [38;2;250;235;215mres://tests/hud_header_temp.gd[0m[38;2;128;128;128m > [0m[38;2;250;235;215mtest_powers_header_native_input:5 (0, Vector2i(1920, 1080), true)[0m[38;2;178;34;34m[1m FAILED[0m[38;2;100;149;237m 528ms[0m
+  [38;2;0;206;209m[1m[4mReport:[0m
+  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[[48;2;38;0;0m[38;2;255;255;255mtrue[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m<empty>[0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]0[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]true[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mtrue[0m' but is '[38;2;30;144;255mfalse[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m
+ '[38;2;30;144;255m[true, [48;2;38;0;0m[38;2;255;255;255mfalse[0m[38;2;30;144;255m[48;2;38;0;0m[0m[38;2;30;144;255m][0m'
+ but was
+ '[38;2;30;144;255m[true][0m'
+
+[38;2;255;69;0mDifferences found:[0m
+[table=3][cell][right][1mIndex[0m[/right]	[/cell][cell][right][1mCurrent[0m[/right]	[/cell][cell][right][1mExpected[0m[/right]	[/cell][cell][right]1[/right]	[/cell][cell][right]<N/A>[/right]	[/cell][cell][right]false[/right]	[/cell][/table][0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m  [38;2;128;128;128m[38;2;255;69;0mExpecting:[0m '[38;2;30;144;255mfalse[0m' but is '[38;2;30;144;255mtrue[0m'[0m[38;2;173;216;230m	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125[0m[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+[38;2;30;144;255mStatistics:[0m[38;2;128;128;128m 9 test cases | 0 errors | 59 failures | 0 flaky | 0 skipped | 0 orphans |[0m[38;2;34;139;34m PASSED[0m[38;2;100;149;237m 3s 806ms[0m
+[38;2;128;128;128m[0m
+[38;2;128;128;128m[0m
+[38;2;30;144;255mOverall Summary:[0m[38;2;255;255;255m 9 test cases | 0 errors | 59 failures | 0 flaky | 0 skipped | 0 orphans |[0m
+[38;2;233;150;122mExecuted test suites: (1/1)[0m
+[38;2;233;150;122mExecuted test cases : (9/9)[0m
+[38;2;233;150;122mTotal execution time: 3s 806ms[0m
+[38;2;255;255;255m [0m[38;2;100;149;237mOpen XML Report at: file://reports/header-native-baseline/report_1/results.xml[0m
+[38;2;100;149;237mOpen HTML Report at: file://reports/header-native-baseline/report_1/index.html[0m
+[38;2;178;34;34mExit code: 100[0m
+Run dispose test resources
