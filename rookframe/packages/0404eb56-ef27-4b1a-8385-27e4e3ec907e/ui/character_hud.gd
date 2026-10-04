@@ -500,8 +500,10 @@ func _layout_panel() -> void:
 	get_node("Panel/Frame").pointer = clampf(anchor-left, 12, width-12)
 	get_node("Panel/Frame").queue_redraw()
 	_rect(get_node("Panel/Header"), pad, top, width-pad*2, header)
-	var morning_width := 72 if get_node("Panel/Header/Morning").visible else 0
-	var all_width := 88 if morning_width > 0 else 120
+	var morning: Button = get_node("Panel/Header/Morning")
+	var show_all: CheckBox = get_node("Panel/Header/ShowAll")
+	var morning_width: float = maxf(72, morning.get_combined_minimum_size().x) if morning.visible else 0.0
+	var all_width := maxf(88 if morning_width > 0 else 120, show_all.get_combined_minimum_size().x)
 	var all_left := width-pad*2-44-morning_width-all_width
 	_rect(get_node("Panel/Header/Title"), 0, 0, all_left if get_node("Panel/Header/ShowAll").visible else width-pad*2-44-morning_width, header)
 	get_node("Panel/Header/Title").add_theme_font_size_override("font_size", 17 if _phone else 22)
