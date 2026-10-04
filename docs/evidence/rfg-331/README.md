@@ -35,4 +35,27 @@ The [dock-layout record](../rfg-331-dock-layout/README.md) contains 14 disposabl
 
 Public 1.0.124 native run19 failed: Authority one failure in 158.111 seconds; Participant 15 failures in 138.190 seconds, with zero in-case errors and two outside-case GL texture teardown errors. Later Power and Item starts reported earlier actions still active. Cancellation during managed Actor-task destruction is under investigation; no final native acceptance is claimed. Failed native reports and captures are retained in the host RFG-344 diagnostic record.
 
-FINAL_NATIVE_ACCEPTANCE_PENDING
+Public125 supersedes this release; its publication and diagnostic results are
+recorded below.
+
+
+## Reviewed public 1.0.125 release
+
+[Public v1.0.125](https://github.com/rookframe/rookframe-mork-borg/releases/tag/v1.0.125) is built from source `46977f51024bb91847ad90b9f4599b34cefcf8a8`, Build ID `9519f229-5355-4959-a6e2-8757805ed704`. Its [HTTPS Manifest](https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.125/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.125.json) and archive passed public read-back verification (`release125.json`). Public SDK v0.32.23 and exact runtime UI Kit `e2a1e807d73c907bf360aa38a21a55b1773965e2` remain unchanged. Earlier releases remain immutable.
+
+All 304 retained cases pass across 25 suites in 32.135 seconds with zero errors, failures, skips, flaky cases or orphan nodes (`retained125-results.xml`). Public SDK source admission and prepared-artifact verification pass with no diagnostics (`source125.json`, `artifact125.json`). Independent Standards and Spec cancellation reviews each report zero findings.
+
+The [cancellation record](../rfg-331-action-cancellation/README.md) verifies the real authored task/controller closure seam with substituted transport timing: 16 disposable cases pass in 4.259 seconds, while the matching original baseline fails 15 cases with 37 assertion failures. All 84 affected retained cases pass in 6.429 seconds. Existing Nodes, signals, authored UI, Authority, gameplay and SDK rules remain in place; one stock RefCounted helper completes pending submissions and cancellation retries after task destruction, then releases. Temporary suites, helpers, UIDs and debug instrumentation were discarded.
+
+The original complete public125 run28 remains red: Authority one case in
+140.175 seconds and Participant one case in 119.812 seconds, each with one
+failure and zero in-case errors. The later Attacks panel closes during an
+incomplete native World update. Two GL texture errors also occur after the
+Authority case during engine shutdown. These reports and captures remain
+diagnostics, not final acceptance.
+
+The paired [HUD readiness correction](../rfg-331-hud-readiness/README.md) now
+preserves confirmed presentation through transient refusals. Its authored UI
+proof and the host's authenticated Session proof are scoped separately; the
+combined application requires a new immutable public release and a passing
+complete native journey. No final native acceptance is claimed for public125.
