@@ -1,0 +1,183 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface.gd" id="script"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.tscn" id="appearance"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.gd" id="appearance_script"]
+[node name="CreatureSheet" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("theme")
+script = ExtResource("script")
+[node name="Inset" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_bottom = 16
+[node name="Layout" type="VBoxContainer" parent="Inset"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Body" type="HBoxContainer" parent="Inset/Layout"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 32
+[node name="Identity" type="VBoxContainer" parent="Inset/Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 1.0
+theme_override_constants/separation = 12
+[node name="Name" type="Label" parent="Inset/Layout/Body/Identity"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 42
+[node name="Classification" type="Label" parent="Inset/Layout/Body/Identity"]
+layout_mode = 2
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 16
+[node name="Portrait" type="TextureRect" parent="Inset/Layout/Body/Identity"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+[node name="Health" type="Button" parent="Inset/Layout/Body/Identity"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 62)
+theme_type_variation = "TaskChoice"
+theme_override_font_sizes/font_size = 28
+[node name="Vitals" type="HBoxContainer" parent="Inset/Layout/Body/Identity"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Armor" type="Button" parent="Inset/Layout/Body/Identity/Vitals"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(44, 62)
+theme_type_variation = "TaskChoice"
+[node name="Morale" type="Button" parent="Inset/Layout/Body/Identity/Vitals"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(44, 62)
+theme_type_variation = "TaskChoice"
+[node name="Workspace" type="VBoxContainer" parent="Inset/Layout/Body"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 2.0
+theme_override_constants/separation = 12
+[node name="Tabs" type="HBoxContainer" parent="Inset/Layout/Body/Workspace"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Encounter" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 48)
+text = "Encounter"
+toggle_mode = true
+
+[node name="Inventory" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 48)
+text = "Inventory"
+toggle_mode = true
+
+[node name="Appearance" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 48)
+text = "Appearance"
+toggle_mode = true
+
+[node name="Source" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 48)
+text = "Source"
+theme_type_variation = "TaskButton"
+[node name="Section" type="OptionButton" parent="Inset/Layout/Body/Workspace"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+visible = false
+[node name="Encounter" type="HBoxContainer" parent="Inset/Layout/Body/Workspace"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 32
+
+[node name="Primary" parent="Inset/Layout/Body/Workspace/Encounter" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/Primary/Area"]
+layout_mode = 0
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="Secondary" parent="Inset/Layout/Body/Workspace/Encounter" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/Secondary/Area"]
+layout_mode = 0
+size_flags_horizontal = 3
+theme_override_constants/separation = 24
+
+[node name="Inventory" parent="Inset/Layout/Body/Workspace" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_vertical = 3
+visible = false
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Inventory/Area"]
+layout_mode = 0
+theme_override_constants/separation = 16
+[node name="Appearance" parent="Inset/Layout/Body/Workspace" instance=ExtResource("appearance")]
+layout_mode = 2
+visible = false
+script = ExtResource("appearance_script")
+[node name="Reader" type="VBoxContainer" parent="Inset/Layout/Body/Workspace"]
+layout_mode = 2
+size_flags_vertical = 3
+visible = false
+[node name="Back" type="Button" parent="Inset/Layout/Body/Workspace/Reader"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Back to creature"
+theme_type_variation = "TaskButton"
+[node name="Pages" parent="Inset/Layout/Body/Workspace/Reader" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Reader/Pages/Area"]
+layout_mode = 0
+theme_override_constants/separation = 16
+[node name="Publication" type="Button" parent="Inset/Layout/Body/Workspace/Reader"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Open publication"
+theme_type_variation = "TaskButton"
+[node name="Footer" type="HBoxContainer" parent="Inset/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Close" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Close"
+theme_type_variation = "TaskButton"
+[node name="Status" type="Label" parent="Inset/Layout/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 12
+[node name="Edit" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Edit sheet"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Create" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Create Actor"
+theme_type_variation = "TaskPrimary"

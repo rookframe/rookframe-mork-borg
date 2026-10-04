@@ -168,6 +168,12 @@
           "type": "actor_definition",
           "payload": "content/occult-herbmaster-character.tres",
           "displayName": "Occult Herbmaster Character"
+        },
+        {
+          "id": "bone-bowyer",
+          "type": "actor_definition",
+          "payload": "content/bone-bowyer.tres",
+          "displayName": "The Bone Bowyer"
         }
       ],
       "targetSystemPackageId": "0404eb56-ef27-4b1a-8385-27e4e3ec907e",
