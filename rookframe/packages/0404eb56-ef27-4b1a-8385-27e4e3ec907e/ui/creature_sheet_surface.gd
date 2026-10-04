@@ -422,3 +422,6 @@ func focus_entry(id: String) -> bool:
 
 func focus_miniature() -> void:
 	get_node(WORK + "Appearance/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").grab_focus()
+
+func focus_portrait() -> void:
+	get_node(WORK + "Appearance/PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait").grab_focus()
