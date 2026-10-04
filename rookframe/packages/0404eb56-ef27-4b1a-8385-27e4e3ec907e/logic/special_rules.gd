@@ -80,12 +80,12 @@ const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec90
 const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd")
 
 func owned(data: Dictionary, id: String) -> Dictionary:
-	if id.begins_with("feature:"):
+	if id.begins_with("feature:") or id.begins_with("owned-feature:"):
 		var traits: Array = data.get("traits", [])
 		for raw in traits:
 			var trait_data: Dictionary = raw
 			var feature_id: String = trait_data.get("id", "")
-			if "feature:" + feature_id == id:
+			if feature_matches(trait_data, id):
 				var name: String = trait_data.get("name", feature_id)
 				var rules: String = trait_data.get("rules", "")
 				var feature := {"source_item_id": feature_id, "inventory_id": id, "name": name, "rules": rules}
@@ -101,3 +101,9 @@ func owned(data: Dictionary, id: String) -> Dictionary:
 			return item
 	return {}
 
+
+func feature_matches(feature: Dictionary, owned_id: String) -> bool:
+	if owned_id.begins_with("owned-feature:"):
+		var identity := str(feature.get("favorite_entry_id", ""))
+		return not identity.is_empty() and "owned-feature:" + identity == owned_id
+	return "feature:" + str(feature.get("id", "")) == owned_id

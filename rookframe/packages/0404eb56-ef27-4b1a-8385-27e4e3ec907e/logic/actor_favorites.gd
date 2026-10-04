@@ -64,7 +64,12 @@ func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = 
 		var gift: Dictionary = feature.get("item", {})
 		if identity.is_empty() or str(gift.get("source_item_id", "")) == source or source in PASSIVE or RULES.new().definition(source).is_empty() and source != "cowards-jab":
 			continue
-		result.append({"key": "feature:" + identity + ":use", "category": "Attacks" if source == "cowards-jab" else "Features", "name": str(feature.get("name", "Feature")), "action": "use", "source": source, "entry": identity, "present": true, "available": BROKEN.new().can_act(data) and (not ATTACKS.new().jab_weapons(inventory).is_empty() if source == "cowards-jab" else int(feature.get("uses", 1)) > 0)})
+		var available := int(feature.get("uses", 1)) > 0
+		if source == "abominable-gob-lobber":
+			available = true
+		elif source == "cowards-jab":
+			available = not ATTACKS.new().jab_weapons(inventory).is_empty()
+		result.append({"key": "feature:" + identity + ":use", "category": "Attacks" if source == "cowards-jab" else "Features", "name": str(feature.get("name", "Feature")), "action": "use", "source": source, "entry": identity, "present": true, "available": BROKEN.new().can_act(data) and available})
 	for companion in companions:
 		var other: Dictionary = companion.data
 		if companion.access_level != "Owner" or str(other.get("schema", "")) != "mork-borg-adversary/v1" or not is_companion(data, actor_id, other):
@@ -125,10 +130,16 @@ func _available(data: Dictionary, item: Dictionary, action: String, inventory: A
 	if action == "cast":
 		if int(data.get("power_uses", 0)) < 1 or not POWERS.new().casting_restriction(data, inventory).is_empty():
 			return false
+	var source := str(item.get("source_item_id", ""))
+	if source == "stolen-mitre" and not item.get("equipped", false):
+		return false
+	if source == "portable-laboratory":
+		# Brewing replaces the shared pool, including an exhausted batch.
+		return str(data.get("class_id", "")) == "occult-herbmaster"
 	if item.has("dose_pool"):
 		for raw in inventory:
 			var pool: Dictionary = raw
-			if str(pool.get("source_item_id", "")) == str(item.dose_pool):
+			if str(pool.get("source_item_id", "")) == str(item.dose_pool) and int(pool.get("quantity", 0)) > 0 and not pool.get("broken", false):
 				return int(pool.get("uses", 0)) > 0
 		return false
 	if str(item.get("source_item_id", "")) == "eurekia" and item.get("drawn", false):

@@ -30,6 +30,8 @@ var _scroll_options: Array = []
 var _first_scroll := ""
 var _second_scroll := ""
 var _ability := ""
+var _tabletop := false
+var _title := ""
 
 func _ready() -> void:
 	resized.connect(_layout)
@@ -39,6 +41,13 @@ func _ready() -> void:
 	get_node(^"Columns/Recipient/Content/Change").pressed.connect(_choose_targets)
 	get_node(^"Columns/Recipient/Content/Self").pressed.connect(_self_changed)
 
+func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
+	_tabletop = true
+	_source_rook = SDK.RookId.new(rook) if not rook.is_empty() else null
+	# A recipient is never inferred from the authored sheet's Self default.
+	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
+	configure(actor, facade, item)
+
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
 	_sdk = facade
@@ -47,11 +56,12 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_item = item
 	_entry = RULES.new().owned(actor.data, item)
 	_rule = RULES.new().definition(str(_entry.get("source_item_id", "")))
+	_title = str(_entry.get("name", "Use item"))
 	if not _sdk.targeting.changed.is_connected(_targets_changed):
 		_sdk.targeting.changed.connect(_targets_changed)
 	if not _sdk.world_changed.is_connected(_world_changed):
 		_sdk.world_changed.connect(_world_changed)
-	if _source_rook == null:
+	if _source_rook == null and not _tabletop:
 		_source_rook = _sdk.rooks.selected()
 	if _rule.get("book", false):
 		get_node(^"Columns/Recipient/Content/Self").button_pressed = false
@@ -62,7 +72,7 @@ func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
 	var editing := state in ["ready", "error"]
-	var title := str(_entry.get("name", "Use item"))
+	var title := _title
 	get_node(^"Columns/Item/Content/Name").visible = false
 	get_node(^"Columns/Item/Content/Rules").text = _t(str(_entry.get("rules", "")))
 	if _rule.get("blade", false):
@@ -188,6 +198,8 @@ func _process(_delta: float) -> void:
 		var summary := await TARGETS.new().describe(_sdk, _source_rook, reach)
 		_reading_targets = false
 		if is_inside_tree():
+			if _tabletop and summary == _t("Choose one target"):
+				summary = _t("No targets")
 			get_node(^"Columns/Recipient/Content/Copy").text = summary
 
 func _targets_changed(_snapshot: SDK.TargetSnapshot) -> void:
