@@ -65,7 +65,8 @@ func _miniature() -> Dictionary:
 	var defaults: Dictionary = data.get("creature_miniatures", {})
 	var id := str(_definition.local_id)
 	if defaults.has(id):
-		return defaults[id].duplicate(true)
+		var reference: Dictionary = defaults.get(id, {})
+		return reference.duplicate(true)
 	return CREATURES.new().default_miniature(id)
 
 func _create() -> void:
@@ -114,7 +115,7 @@ func _close() -> void:
 func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and get_node("MiniatureWorkflow").visible and event.is_action_pressed("ui_cancel"):
 		get_node("MiniatureWorkflow")._cancel()
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 func _chapter_changed(_chapter: int) -> void:
 	_refresh_appearance()

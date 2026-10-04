@@ -607,5 +607,38 @@ const ENTRIES: Dictionary = {
 }
 
 func details(definition: String) -> Dictionary:
-	var found: Dictionary = ENTRIES.get(definition, {})
-	return found.duplicate(true)
+	if definition == "seth-goblin":
+		return ENTRIES["seth-goblin"].duplicate(true)
+	if definition == "bent-scum":
+		return ENTRIES["bent-scum"].duplicate(true)
+	if definition == "zukuma-berserker":
+		return ENTRIES["zukuma-berserker"].duplicate(true)
+	if definition == "wrat-wraith":
+		return ENTRIES["wrat-wraith"].duplicate(true)
+	if definition == "belze-skeleton":
+		return ENTRIES["belze-skeleton"].duplicate(true)
+	if definition == "lich-necromancer":
+		return ENTRIES["lich-necromancer"].duplicate(true)
+	if definition == "arbint-troll":
+		return ENTRIES["arbint-troll"].duplicate(true)
+	if definition == "nodh-zombie":
+		return ENTRIES["nodh-zombie"].duplicate(true)
+	if definition == "lady-porcelain":
+		return ENTRIES["lady-porcelain"].duplicate(true)
+	if definition == "thinx-grotesque":
+		return ENTRIES["thinx-grotesque"].duplicate(true)
+	if definition == "aland-wickhead":
+		return ENTRIES["aland-wickhead"].duplicate(true)
+	if definition == "eulotha-wyvern":
+		return ENTRIES["eulotha-wyvern"].duplicate(true)
+	if definition == "ancient-gore-hound":
+		return ENTRIES["ancient-gore-hound"].duplicate(true)
+	if definition == "hawk-as-weapon":
+		return ENTRIES["hawk-as-weapon"].duplicate(true)
+	if definition == "dog-small-but-vicious":
+		return ENTRIES["dog-small-but-vicious"].duplicate(true)
+	if definition == "monkey":
+		return ENTRIES["monkey"].duplicate(true)
+	if definition == "bone-bowyer":
+		return ENTRIES["bone-bowyer"].duplicate(true)
+	return {}

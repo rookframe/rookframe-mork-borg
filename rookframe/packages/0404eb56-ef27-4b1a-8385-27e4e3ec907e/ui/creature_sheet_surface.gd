@@ -3,7 +3,9 @@ extends Control
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const CONTENT = preload(ROOT + "logic/creature_content.gd")
 const CARD = preload(ROOT + "ui/creature_rule_card.tscn")
+const CARD_SCRIPT = preload(ROOT + "ui/creature_rule_card.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
+const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 signal chapter_changed(chapter: int)
 signal entry_requested(id: String)
 signal close_requested
@@ -19,7 +21,7 @@ signal health_requested
 const WORK := "Inset/Layout/Body/Workspace/"
 const IDENTITY := "Inset/Layout/Body/Identity/"
 var _data: Dictionary = {}
-var _locale: RefCounted = I18N.new()
+var _locale: I18N = I18N.new()
 var _library := true
 var _can_edit := false
 var _phone := false
@@ -27,7 +29,8 @@ var _tablet := false
 var _chapter := 0
 var _section := 0
 var _reader := false
-var _focus: Control
+var _focus_card = null
+var _focus_source := false
 var _texture: Texture2D
 var _groups: Array[Dictionary] = []
 var _layout_pending := false
@@ -46,7 +49,7 @@ func _ready() -> void:
 	get_node(IDENTITY + "Vitals/Armor").pressed.connect(_roll_armor)
 	get_node(IDENTITY + "Vitals/Morale").pressed.connect(_roll_morale)
 	get_node(WORK + "Section").item_selected.connect(_section_selected)
-	var appearance = get_node(WORK + "Appearance")
+	var appearance: APPEARANCE = get_node(WORK + "Appearance")
 	appearance.miniature_requested.connect(_miniature)
 	appearance.miniature_clear_requested.connect(_miniature_clear)
 	appearance.portrait_requested.connect(_portrait)
@@ -54,7 +57,7 @@ func _ready() -> void:
 	resized.connect(_queue_layout)
 	_queue_layout()
 
-func configure(data: Dictionary, locale: RefCounted, library: bool = true, can_edit: bool = false, texture: Texture2D = null) -> void:
+func configure(data: Dictionary, locale: I18N, library: bool = true, can_edit: bool = false, texture: Texture2D = null) -> void:
 	_data = data.duplicate(true)
 	_locale = locale
 	_library = library
@@ -82,9 +85,9 @@ func _layout() -> void:
 		get_node("Inset").add_theme_constant_override("margin_" + edge, 12 if _phone else 24 if _tablet else 32)
 	get_node("Inset/Layout").add_theme_constant_override("separation", 6 if _phone else 12)
 	get_node("Inset/Layout/Body").add_theme_constant_override("separation", 18 if _phone else 24 if _tablet else 32)
-	get_node(IDENTITY).add_theme_constant_override("separation", 5 if _phone else 12)
-	get_node(IDENTITY).size_flags_stretch_ratio = 0.85 if _phone else 1.0
-	get_node(WORK).size_flags_stretch_ratio = 2.15 if _phone else 2.0
+	(get_node(IDENTITY) as Control).add_theme_constant_override("separation", 5 if _phone else 12)
+	(get_node(IDENTITY) as Control).size_flags_stretch_ratio = 0.85 if _phone else 1.0
+	(get_node(WORK) as Control).size_flags_stretch_ratio = 2.15 if _phone else 2.0
 	var name := str(_data.get("name", "Creature"))
 	var metadata := CONTENT.new().details(str(_data.get("definition_id", "")))
 	if _library and name.contains(","):
@@ -94,8 +97,8 @@ func _layout() -> void:
 	get_node(IDENTITY + "Classification").text = _locale.text(str(_data.get("classification", metadata.get("classification", ""))))
 	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 10 if _phone else 12 if _tablet else 16)
 	get_node(IDENTITY + "Portrait").texture = _texture
-	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", 0))) + ("" if _library else " / " + str(_data.get("maximum_hit_points", 0)))
-	get_node(IDENTITY + "Health").custom_minimum_size.y = 44 if _phone else 62
+	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", 0)) if _library else _data.get("hit_points", 0)) + ("" if _library else " / " + str(_data.get("maximum_hit_points", 0)))
+	get_node(IDENTITY + "Health").custom_minimum_size = Vector2(0, 44 if _phone else 62)
 	get_node(IDENTITY + "Health").add_theme_font_size_override("font_size", 16 if _phone else 23 if _tablet else 28)
 	get_node(IDENTITY + "Health").disabled = _library or not _can_edit
 	var armor: Dictionary = _data.get("armor", {})
@@ -104,7 +107,7 @@ func _layout() -> void:
 	get_node(IDENTITY + "Vitals/Morale").text = _locale.text("Morale") + "\n" + (str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else _locale.text("Special") if str(morale.get("kind", "")) == "special" else "—")
 	for key in ["Armor", "Morale"]:
 		var button = get_node(IDENTITY + "Vitals/" + key)
-		button.custom_minimum_size.y = 44 if _phone else 62
+		button.custom_minimum_size = Vector2(0, 44 if _phone else 62)
 		button.add_theme_font_size_override("font_size", 11 if _phone else 14 if _tablet else 18)
 		button.disabled = _library or not _can_edit or int(_data.get("hit_points", 0)) <= 0 or _data.get("editing", false) or (str(armor.get("reduction", "")).is_empty() if key == "Armor" else str(morale.get("kind", "")) != "fixed")
 	for title in ["Encounter", "Inventory", "Appearance"]:
@@ -123,7 +126,7 @@ func _layout() -> void:
 	get_node("Inset/Layout/Footer/Close").text = _locale.text("Close")
 	get_node(WORK + "Reader/Back").text = _locale.text("Back to creature")
 	get_node(WORK + "Reader/Publication").text = _locale.text("Open publication")
-	get_node(WORK + "Appearance").configure(_locale, _texture, _library, _can_edit, _phone, _tablet)
+	(get_node(WORK + "Appearance") as APPEARANCE).configure(_locale, _texture, _library, _can_edit, _phone, _tablet)
 	for button in ["ChangePortrait", "ClearPortrait"]:
 		get_node(WORK + "Appearance/PortraitPanel/Inset/Content/PortraitButtons/" + button).disabled = not _data.get("portrait_editable", _can_edit)
 	_build_groups(metadata)
@@ -141,7 +144,8 @@ func _build_groups(metadata: Dictionary) -> void:
 	_groups.append({"title": "Attacks", "lane": "primary", "entries": attack_entries})
 	var authored: Array = _data.get("rule_groups", metadata.get("rule_groups", []))
 	for raw in authored:
-		_groups.append(raw.duplicate(true))
+		var group: Dictionary = raw
+		_groups.append(group.duplicate(true))
 	# Live corrections remain the sole accepted free rules text. Preserve unknown/custom rules.
 	if authored.is_empty() and not str(_data.get("rules", "")).is_empty():
 		_groups.append({"title": "Special rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Special rules", "text": str(_data.rules)}]})
@@ -161,10 +165,16 @@ func _clear(content: Node) -> void:
 		child.queue_free()
 
 func _append(host: Node, entry: Dictionary, actions: Array = []) -> void:
-	var card = CARD.instantiate()
+	var card: CARD_SCRIPT = CARD.instantiate()
 	host.add_child(card)
-	card.configure(entry, _locale, _phone, _tablet, actions)
-	card.requested.connect(_requested)
+	card.configure(entry, _locale, _phone, _tablet)
+	card.configure_actions(actions, _locale, _phone)
+	card.requested.connect(_requested.bind(card))
+
+func _append_reference(host: Node, entry: Dictionary) -> void:
+	var card: CARD_SCRIPT = CARD.instantiate()
+	host.add_child(card)
+	card.configure(entry, _locale, _phone, _tablet)
 
 func _render_encounter() -> void:
 	for lane in ["Primary", "Secondary"]:
@@ -176,7 +186,9 @@ func _render_encounter() -> void:
 			if _phone and index != _section or not _phone and str(group.get("lane", "primary")) != lane.to_lower():
 				continue
 			_append(pages.get_node("Area/Content"), {"name": group.title, "text": ""})
-			for entry in group.entries:
+			var entries: Array = group.entries
+			for raw in entries:
+				var entry: Dictionary = raw
 				var actions: Array = []
 				if entry.get("attack", false):
 					if not _library and entry.get("attack_dr") != null:
@@ -189,7 +201,9 @@ func _render_encounter() -> void:
 				if not _library:
 					if entry.has("own_test"):
 						actions.append({"name": str(entry.name), "part": str(entry.own_test), "disabled": _rolls_disabled()})
-					for roll in entry.get("rolls", []):
+					var rolls: Array = entry.get("rolls", [])
+					for raw_roll in rolls:
+						var roll: Dictionary = raw_roll
 						actions.append({"name": str(roll.name), "part": "printed:" + str(roll.id), "dice": str(roll.dice), "disabled": _rolls_disabled()})
 				_append(pages.get_node("Area/Content"), entry, actions)
 		pages.restore_state(state)
@@ -206,47 +220,54 @@ func _render_inventory() -> void:
 	var items: Array = _data.get("inventory", [])
 	if items.is_empty():
 		_append(content, {"name": "Inventory", "text": "No starting loot is authored for this creature." if _library else "No carried loot."})
-	for item in items:
+	for raw in items:
+		var item: Dictionary = raw
 		_append(content, {"id": str(item.get("inventory_id", "")), "name": str(item.get("name", "Item")), "text": str(item.get("quantity", 1)) + " × " + _locale.text(str(item.get("kind", "Item"))) + ("\n" + _locale.text(str(item.get("rules", ""))) if not str(item.get("rules", "")).is_empty() else "")}, [{"name": "Details", "part": "details"}])
 	pages.restore_state(state)
 
-func _requested(part: String, id: String) -> void:
+func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
 	if part == "details":
 		entry_requested.emit(id)
 		if not _library:
 			return
-		for item in _data.get("inventory", []):
+		var items: Array = _data.get("inventory", [])
+		for raw in items:
+			var item: Dictionary = raw
 			if str(item.get("inventory_id", "")) == id:
-				show_entry(item)
+				show_entry(item, opener)
 	else:
 		roll_requested.emit(part, id)
 
-func show_entry(entry: Dictionary) -> void:
-	_focus = get_viewport().gui_get_focus_owner()
+func show_entry(entry: Dictionary, opener: CARD_SCRIPT = null) -> void:
+	_focus_card = opener
+	_focus_source = false
 	_reader = true
 	var content = get_node(WORK + "Reader/Pages/Area/Content")
 	_clear(content)
-	_append(content, {"name": str(entry.get("name", "Item")), "text": str(entry.get("rules", ""))})
+	_append_reference(content, {"name": str(entry.get("name", "Item")), "text": str(entry.get("rules", ""))})
 	for key in ["kind", "quantity", "damage", "armor_tier", "defence_penalty", "uses", "weight", "price"]:
 		if entry.has(key):
-			_append(content, {"name": key.capitalize(), "text": str(entry[key])})
-	get_node(WORK + "Reader/Publication").visible = false
+			_append_reference(content, {"name": key.capitalize(), "text": str(entry[key])})
+	(get_node(WORK + "Reader/Publication") as Control).visible = false
 	get_node(WORK + "Reader/Pages").restore_state({})
 	_update_visibility()
 	get_node(WORK + "Reader/Back").grab_focus()
 
 func _source() -> Dictionary:
-	return _data.get("source", CONTENT.new().details(str(_data.get("definition_id", ""))).get("source", {}))
+	var metadata: Dictionary = CONTENT.new().details(str(_data.get("definition_id", "")))
+	var source: Dictionary = _data.get("source", metadata.get("source", {}))
+	return source
 
 func show_source() -> void:
-	_focus = get_viewport().gui_get_focus_owner()
+	_focus_card = null
+	_focus_source = true
 	_reader = true
 	var content = get_node(WORK + "Reader/Pages/Area/Content")
 	_clear(content)
-	var source := _source()
-	_append(content, {"name": "Published source", "text": str(source.get("title", "")) + "\n" + str(source.get("page", "")) + "\n" + str(source.get("author", ""))})
-	_append(content, {"name": "Attribution", "text": "MÖRK BORG is © Ockult Örtmästare Games & Stockholm Kartell. Mechanical facts are restated; study artwork is not official book art."})
-	get_node(WORK + "Reader/Publication").visible = not str(source.get("url", "")).is_empty()
+	var source: Dictionary = _source()
+	_append_reference(content, {"name": "Published source", "text": str(source.get("title", "")) + "\n" + str(source.get("page", "")) + "\n" + str(source.get("author", ""))})
+	_append_reference(content, {"name": "Attribution", "text": "MÖRK BORG is © Ockult Örtmästare Games & Stockholm Kartell. Mechanical facts are restated; study artwork is not official book art."})
+	(get_node(WORK + "Reader/Publication") as Control).visible = not str(source.get("url", "")).is_empty()
 	get_node(WORK + "Reader/Pages").restore_state({})
 	_update_visibility()
 	get_node(WORK + "Reader/Back").grab_focus()
@@ -254,8 +275,10 @@ func show_source() -> void:
 func back() -> void:
 	_reader = false
 	_update_visibility()
-	if is_instance_valid(_focus) and _focus.is_visible_in_tree():
-		_focus.grab_focus()
+	if _focus_source:
+		get_node(WORK + "Tabs/Source").grab_focus()
+	elif is_instance_valid(_focus_card) and _focus_card.restore_focus():
+		return
 	else:
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
 
@@ -266,7 +289,7 @@ func show_chapter(chapter: int) -> void:
 	chapter_changed.emit(_chapter)
 
 func _update_visibility() -> void:
-	get_node(IDENTITY).visible = not (_phone and (_chapter == 2 or _reader))
+	(get_node(IDENTITY) as Control).visible = not (_phone and (_chapter == 2 or _reader))
 	get_node(WORK + "Tabs").visible = not _reader
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not _reader
 	get_node(WORK + "Encounter").visible = _chapter == 0 and not _reader
@@ -279,19 +302,19 @@ func _update_visibility() -> void:
 func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and event.is_action_pressed("ui_cancel") and _reader:
 		back()
-		get_viewport().set_input_as_handled()
+		accept_event()
 
 func status(message: String) -> void:
 	get_node("Inset/Layout/Footer/Status").text = _locale.text(message)
 
 func miniature(title: String, package: String, assigned: bool) -> void:
-	get_node(WORK + "Appearance").miniature(_locale, title, package, assigned)
+	(get_node(WORK + "Appearance") as APPEARANCE).miniature(_locale, title, package, assigned)
 
 func miniature_preview_target() -> Control:
 	return get_node(WORK + "Appearance/MiniaturePanel/Inset/Content/MiniaturePreview")
 
 func _publication() -> void:
-	var source := _source()
+	var source: Dictionary = _source()
 	publication_requested.emit(str(source.get("url", "")))
 func _close() -> void:
 	close_requested.emit()
