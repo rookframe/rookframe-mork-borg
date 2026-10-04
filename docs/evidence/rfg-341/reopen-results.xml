@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="6" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="reopen" package="tests/rfg_reopen_temp" timestamp="2026-10-04T00:40:22" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="2.254">
+		<testcase name="test_item_done_reopens_same_window_for_new_actor_and_owned_feature" classname="reopen" time="0.803">
+		</testcase>
+		<testcase name="test_cancelled_scroll_draft_reopens_fresh_family_and_native_choice" classname="reopen" time="1.442">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="special_composition" package="tests" timestamp="2026-10-04T00:40:24" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="0.660">
+		<testcase name="test_use_item_shows_recipient_focus_pending_and_healing_outcome" classname="special_composition" time="0.613">
+		</testcase>
+		<testcase name="test_book_preview_uses_selected_recipient_and_stock_radio_choices" classname="special_composition" time="0.020">
+		</testcase>
+		<testcase name="test_separate_sheets_keep_independent_radio_selection" classname="special_composition" time="0.009">
+		</testcase>
+		<testcase name="test_malformed_dr_adjustment_does_not_request_a_throw" classname="special_composition" time="0.005">
+		</testcase>
+	</testsuite>
+</testsuites>
