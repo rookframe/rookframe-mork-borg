@@ -1,0 +1,391 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="37" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_temp" package="tests" timestamp="2026-10-04T08:50:31" hostname="localhost" tests="1" failures="37" errors="0" skipped="0" flaky="0" time="6.765">
+		<testcase name="test_russian_actual_controls_names_bounds_and_native_fullname" classname="hud_russian_temp" time="6.756">
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:52" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:52
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:53" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:53
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:69" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:69
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:88" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:88
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:115" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:115
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:125" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:125
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:138" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:138
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:155" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:155
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:168" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:168
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:179" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Укус'
+ but was
+ 'Strength · УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:179
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:203" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:203
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:52" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:52
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:53" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:53
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:69" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:69
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:256" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:256
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:88" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:88
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:115" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:115
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:125" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:125
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:138" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:138
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:155" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:155
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:168" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:168
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:179" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Укус'
+ but was
+ 'Strength · УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:179
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:203" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:203
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:52" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:52
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:53" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:53
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:69" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:69
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:88" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:88
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:115" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:115
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:125" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:125
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:138" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:138
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:155" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:155
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:168" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:168
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:179" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Укус'
+ but was
+ 'Strength · УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:179
+	at '_click' in res://tests/hud_russian_temp.gd:283
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:203" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:203
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:232" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Strength'
+ but was
+ 'Strength · В руках: StrengthСила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:232
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:235" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Бросок характеристики'
+ but was
+ 'БросокAbility характеристикиroll'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:235
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:236" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Атака спутника'
+ but was
+ 'АтакаCompanion спутникаattack'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:236
+	at '_settle' in res://tests/hud_russian_temp.gd:291
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

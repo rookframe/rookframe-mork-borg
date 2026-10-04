@@ -5,6 +5,7 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
+const ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
 const ICON = preload("res://rookframe/ui/icons/character/psychopomp.svg")
 var _sdk: SDK
@@ -23,7 +24,7 @@ func entries(character: SDK.Actor) -> Array[ENTRY]:
 			continue
 		var row := ENTRY.new()
 		row.id = str(favorite.key)
-		row.title = str(favorite.get("name", "Companion"))
+		row.title = _title(favorite, companions)
 		row.detail = _sdk.translations.text("Flat test · %d ft") % int(favorite.get("range_feet", 0)) if favorite.has("range_feet") else _sdk.translations.text(str(favorite.get("detail", "")))
 		row.value = str(favorite.get("damage", ""))
 		row.icon = ICON
@@ -31,6 +32,21 @@ func entries(character: SDK.Actor) -> Array[ENTRY]:
 		row.available = available(character, favorite)
 		result.append(row)
 	return result
+
+func _title(favorite: Dictionary, companions: Array[SDK.Actor]) -> String:
+	if not favorite.get("present", false):
+		return str(favorite.get("name", "Companion"))
+	for companion in companions:
+		if companion.id.value != str(favorite.get("actor", "")):
+			continue
+		var data: Dictionary = companion.data
+		for raw in ITEMS.new(_sdk, companion.id).inventory(data):
+			var attack: Dictionary = raw
+			if str(attack.inventory_id) == str(favorite.get("item", "")):
+				var name := str(attack.get("name", "Attack"))
+				var display_name := name if MODEL.new().uses_literal_name(attack, data) else _sdk.translations.text(name)
+				return _sdk.translations.text("%s · %s") % [str(data.get("name", "Companion")), display_name]
+	return str(favorite.get("name", "Companion"))
 
 func available(character: SDK.Actor, entry: Dictionary) -> bool:
 	if _sdk == null or character == null or character.access_level != "Owner" or not entry.get("present", false) or not entry.get("available", false):

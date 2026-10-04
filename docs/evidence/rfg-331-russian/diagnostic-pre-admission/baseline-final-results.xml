@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="21" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_temp" package="tests" timestamp="2026-10-04T08:22:10" hostname="localhost" tests="1" failures="21" errors="0" skipped="0" flaky="0" time="3.702">
+		<testcase name="test_russian_authored_hud_and_task_copy_across_canonical_profiles" classname="hud_russian_temp" time="3.695">
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:57" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:57
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:58" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:58
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:74" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:74
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:94
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:123" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:123
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:134" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:134
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:57" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:57
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:58" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:58
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:171" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_check_bounds' in res://tests/hud_russian_temp.gd:171
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:69
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:74" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:74
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:94
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:123" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:123
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:134" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:134
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:57" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:57
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:58" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:58
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:74" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:74
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:94
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:123" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:123
+	at '_click' in res://tests/hud_russian_temp.gd:198
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:134" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:134
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:150" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Бросок характеристики'
+ but was
+ 'БросокAbility характеристикиroll'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:150
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:151" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Атака спутника'
+ but was
+ 'АтакаCompanion спутникаattack'
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:151
+	at '_settle' in res://tests/hud_russian_temp.gd:206
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

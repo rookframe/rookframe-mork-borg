@@ -1,0 +1,122 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-baseline4
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_russian_temp.gd
+  res://tests/hud_russian_temp.gd > test_russian_authored_hud_and_task_copy_across_canonical_profiles STARTED
+RUSSIAN BOUNDS: {"row":[403.142852783203,556.0,376.0,52.0],"title":[450.142852783203,551.0,174.0,44.0]}
+  res://tests/hud_russian_temp.gd > test_russian_authored_hud_and_task_copy_across_canonical_profiles FAILED 3s 699ms
+  Report:
+  Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:55
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:56
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:71
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:86
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:114
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:125
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:55
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:56
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting: 'true' but is 'false'	at '_check_bounds' in res://tests/hud_russian_temp.gd:162
+	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:67
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:71
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:86
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:114
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:125
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Кости'
+ but was
+ 'КостиDice'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:55
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:56
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:71
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength'
+ but was
+ 'StrengthСила'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:86
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Восстановить знамения'
+ but was
+ 'Восстановить предзнаменования'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:114
+	at '_click' in res://tests/hud_russian_temp.gd:184
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Strength · Без оружия'
+ but was
+ 'Strength · Без оружияUnarmed'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:125
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Бросок характеристики'
+ but was
+ 'БросокAbility характеристикиroll'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:141
+	at '_settle' in res://tests/hud_russian_temp.gd:192  Expecting:
+ 'Атака спутника'
+ but was
+ 'АтакаCompanion спутникаattack'	at 'test_russian_authored_hud_and_task_copy_across_canonical_profiles' in res://tests/hud_russian_temp.gd:142
+	at '_settle' in res://tests/hud_russian_temp.gd:192
+
+Statistics: 1 test cases | 0 errors | 21 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 3s 709ms
+
+
+Overall Summary: 1 test cases | 0 errors | 21 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 3s 709ms
+ Open XML Report at: file://reports/russian-baseline4/report_1/results.xml
+Open HTML Report at: file://reports/russian-baseline4/report_1/index.html
+Exit code: 100
+Run dispose test resources

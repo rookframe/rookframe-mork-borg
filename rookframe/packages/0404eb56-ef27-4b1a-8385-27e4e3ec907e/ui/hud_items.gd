@@ -33,7 +33,7 @@ func entries(actor: SDK.Actor, category: String = "Items") -> Array[ENTRY]:
 			continue
 		var entry := ENTRY.new()
 		entry.id = str(source.key)
-		entry.title = _sdk.translations.text(str(source.get("name", "Item" if category == "Items" else "Feature")))
+		entry.title = str(source.name) if FAVORITES.new().uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Item" if category == "Items" else "Feature")))
 		var presentation := _presentation(actor, source)
 		entry.detail = presentation.detail
 		entry.value = presentation.value

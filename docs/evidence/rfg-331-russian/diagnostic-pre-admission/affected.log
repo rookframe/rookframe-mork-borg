@@ -1,0 +1,87 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-affected
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/localization.gd
+  res://tests/localization.gd > test_russian_creation_uses_display_labels_without_changing_draft STARTED
+  res://tests/localization.gd > test_russian_creation_uses_display_labels_without_changing_draft PASSED 127ms
+
+  res://tests/localization.gd > test_dynamic_inventory_and_search_preserve_source_ids STARTED
+  res://tests/localization.gd > test_dynamic_inventory_and_search_preserve_source_ids PASSED 69ms
+
+  res://tests/localization.gd > test_editable_values_and_fallback STARTED
+  res://tests/localization.gd > test_editable_values_and_fallback PASSED 35ms
+
+  res://tests/localization.gd > test_edit_labels_translate_without_rewriting_named_content STARTED
+  res://tests/localization.gd > test_edit_labels_translate_without_rewriting_named_content PASSED 47ms
+
+  res://tests/localization.gd > test_catalog_covers_all_authored_rule_content_and_preserves_formats STARTED
+  res://tests/localization.gd > test_catalog_covers_all_authored_rule_content_and_preserves_formats PASSED 57ms
+
+  res://tests/localization.gd > test_long_russian_definition_names_fit_phone_width STARTED
+  res://tests/localization.gd > test_long_russian_definition_names_fit_phone_width PASSED 146ms
+
+  res://tests/localization.gd > test_russian_cast_confirmation_wraps_inside_phone_width STARTED
+  res://tests/localization.gd > test_russian_cast_confirmation_wraps_inside_phone_width PASSED 34ms
+
+Statistics: 7 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 532ms
+
+
+Run Test Suite: res://tests/character_inventory.gd
+  res://tests/character_inventory.gd > test_character_inventory STARTED
+  res://tests/character_inventory.gd > test_character_inventory PASSED 580ms
+
+  res://tests/character_inventory.gd > test_overview_groups_actions_in_responsive_sections STARTED
+  res://tests/character_inventory.gd > test_overview_groups_actions_in_responsive_sections PASSED 82ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 684ms
+
+
+Run Test Suite: res://tests/power_composition.gd
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body STARTED
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body PASSED 650ms
+
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp STARTED
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp PASSED 1s 863ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 539ms
+
+
+Run Test Suite: res://tests/special_composition.gd
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome STARTED
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome PASSED 639ms
+
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices STARTED
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices PASSED 45ms
+
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection STARTED
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection PASSED 17ms
+
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw STARTED
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw PASSED 8ms
+
+Statistics: 4 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 735ms
+
+
+Overall Summary: 15 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (4/4)
+Executed test cases : (15/15)
+Total execution time: 4s 490ms
+ Open XML Report at: file://reports/russian-affected/report_1/results.xml
+Open HTML Report at: file://reports/russian-affected/report_1/index.html
+Exit code: 0
+Run dispose test resources

@@ -21,7 +21,7 @@ func entries(actor: SDK.Actor) -> Array[ENTRY]:
 			continue
 		var entry := ENTRY.new()
 		entry.id = str(source.key)
-		entry.title = str(source.get("name", "Attack")) if source.get("custom", false) else _sdk.translations.text(str(source.get("name", "Attack")))
+		entry.title = str(source.get("name", "Attack")) if MODEL.new().uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Attack")))
 		entry.detail = _sdk.translations.text("%s · %s ft") % [_sdk.translations.text(str(source.get("attack_ability", "Strength"))), int(source.get("range_feet", 0))] if source.has("range_feet") else _sdk.translations.text(str(source.get("detail", "")))
 		entry.value = str(source.get("damage", ""))
 		entry.icon = ICON

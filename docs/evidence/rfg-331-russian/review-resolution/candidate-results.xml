@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_review_temp" package="tests" timestamp="2026-10-04T09:07:31" hostname="localhost" tests="1" failures="0" errors="0" skipped="0" flaky="0" time="0.799">
+		<testcase name="test_saved_companion_caption_and_complete_translated_templates" classname="hud_russian_review_temp" time="0.791">
+		</testcase>
+	</testsuite>
+</testsuites>

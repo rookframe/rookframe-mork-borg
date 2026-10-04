@@ -1,0 +1,611 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="57" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_temp" package="tests" timestamp="2026-10-04T08:37:09" hostname="localhost" tests="1" failures="57" errors="7" skipped="0" flaky="0" time="1.559">
+		<testcase name="test_russian_actual_controls_names_bounds_and_native_fullname" classname="hud_russian_temp" time="1.547">
+			<error message="ERROR: res://tests/hud_russian_temp.gd:47" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Parse Error: Identifier "FAVORITES" not declared in the current scope.'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47
+]]>
+			</error>
+			<error message="ERROR: res://tests/hud_russian_temp.gd:47" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Compile Error: Failed to compile depended scripts.'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47
+]]>
+			</error>
+			<error message="ERROR: res://tests/hud_russian_temp.gd:47" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Failed to load script "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd" with error "Compilation failed".'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47
+]]>
+			</error>
+			<error message="ERROR: res://tests/hud_russian_temp.gd:36" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Invalid call. Nonexistent function 'new' in base 'GDScript'.'
+	at '@implicit_new' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:36
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47
+]]>
+			</error>
+			<error message="ERROR: res://tests/hud_russian_temp.gd:79" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Invalid call. Nonexistent function 'bind' in base 'Nil'.'
+	at 'ready' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:79
+	at '_ready' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd:11
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:49
+]]>
+			</error>
+			<error message="ERROR: res://tests/hud_russian_temp.gd:15" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Condition "indices.is_empty()" is true.'
+	at '_draw' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_frame.gd:15
+]]>
+			</error>
+			<error message="ERROR: res://tests/hud_russian_temp.gd:97" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Cannot call method 'get_node' on a null value.'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:97
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</error>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:52" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:52
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:53" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Кости'
+ but was
+ 'Кости'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:53
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:55" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'Strength'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:55
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:57" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[P: (256.0, 932.0), S: (1408.0, 124.0)]'
+ but was
+ '[P: (0.0, 0.0), S: (0.0, 0.0)]'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:57
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:59" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Характеристики'
+ but was
+ 'ХарактеристикиAbilities'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:59" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Атаки'
+ but was
+ 'АтакиAttacks'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:59" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Силы'
+ but was
+ 'СилыPowers'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:59" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Предметы'
+ but was
+ 'ПредметыItems'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:201" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:61
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:62" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Силы'
+ but was
+ 'Силы'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:62
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:63" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Утро'
+ but was
+ 'УтроMorning'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:63
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:64" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Все'
+ but was
+ 'ВсеShow all'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:64
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:65" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(0.0, 0.0)'
+ in range between
+ '(459.999, 195.999)' <> '(460.001, 196.001)'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:65
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:67" type="FAILURE">
+<![CDATA[
+Expecting:
+ 2
+ but was
+ 4
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:67
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:68" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Милость мёртвого святого'
+ but was
+ 'Милость мёртвого святого'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:68
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:69" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'Strength'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:69
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:192" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:192" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:192" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:201" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:77
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Характеристики'
+ but was
+ 'Характеристики'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:79
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:82" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Сила'
+ but was
+ 'Сила'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:82
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:192" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:192" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:192" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:194" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:198" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:201" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:85
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:201" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:87
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:88" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength'
+ but was
+ 'Strength'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:88
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:201" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:89
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:201" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:91
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:96" type="FAILURE">
+<![CDATA[
+Expecting: not to be '<null>'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:96
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

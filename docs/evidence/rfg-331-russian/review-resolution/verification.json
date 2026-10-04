@@ -1,0 +1,67 @@
+{
+  "base": "4b33c32bf2bb14e0b9c1c6038555daf530edb314",
+  "source_scope": "Headless stock authored HUD and natural attack Controls; public generated SDK with substituted external locale/context/Actor state. The alternate compound translation proves complete-template composition through rendered labels, not private call counters. No public Package install/network/physical input claim.",
+  "reports": {
+    "baseline": {
+      "cases": 1,
+      "suite_seconds": 0.778,
+      "assertion_failures": 6,
+      "errors": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    },
+    "candidate": {
+      "cases": 1,
+      "suite_seconds": 0.799,
+      "assertion_failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    },
+    "affected": {
+      "cases": 12,
+      "suite_seconds": 0.705,
+      "assertion_failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    },
+    "diagnostic-fixture": {
+      "cases": 1,
+      "suite_seconds": 0.786,
+      "assertion_failures": 6,
+      "errors": 2,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    }
+  },
+  "suite_sha256_before_removal": "e779f04f69f213cdf234bb3470165f18b262397ca27bc13f69418e810a292ddb",
+  "production_file_sha256": {
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/i18n/en.tres": "1ccc7079751c9996f42d070b704fb1bf2d5de6de20957d655c06b345c5b92219",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/i18n/ru.tres": "0da891c14a0e04d3c52c1b185a9f8f8a74ccdf7da2d750038ebac1c2904750f4",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_favorites.gd": "fed4b237d5473cb90c8faf6f4ad449e2a89df3fbdde4074d4f8edc33352c7b90",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_attacks.gd": "aa97146ebfeeeffe3ba646b4fbea42ccd1f80a9b3d0a4881b10f89538a055173",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_companions.gd": "b3300fc0adcff296b90d5a2367a9364d0877ba57a71fbf4aac4791c7670780cd",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_items.gd": "c258843b345c72def79c4e8ea3f8b8fe835c3b0be8bcbf1852e71004f23bb476",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_powers.gd": "eb5d21b9b6799645d3753b409b436484da79f5c221debc166e14690ddcf5448c",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.gd": "6c2a46c8f2d89055244b4311c5309836cacf037df27a39ef757296a0457297d0",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd": "fb24aabb3290297768a12efc7d05347d6dd5bf6905e0d280275796a1d46d0557"
+  },
+  "source_admission": {
+    "accepted": true,
+    "diagnostics": 0,
+    "scope": "Source only"
+  },
+  "cleanup": {
+    "removed": [
+      "tests/hud_russian_review_temp.gd"
+    ],
+    "uid_removed_if_created": "tests/hud_russian_review_temp.gd.uid",
+    "external_source_snapshots": 0,
+    "new_retained_cases": 0
+  }
+}

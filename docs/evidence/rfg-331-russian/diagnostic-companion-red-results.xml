@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="6" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_temp" package="tests" timestamp="2026-10-04T08:41:27" hostname="localhost" tests="1" failures="6" errors="0" skipped="0" flaky="0" time="6.784">
+		<testcase name="test_russian_actual_controls_names_bounds_and_native_fullname" classname="hud_russian_temp" time="6.774">
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:179" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Укус'
+ but was
+ 'Strength · УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:179
+	at '_click' in res://tests/hud_russian_temp.gd:266
+	at '_settle' in res://tests/hud_russian_temp.gd:274
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:185" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Укус'
+ but was
+ 'Strength · В руках: УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:185
+	at '_settle' in res://tests/hud_russian_temp.gd:274
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:179" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Укус'
+ but was
+ 'Strength · УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:179
+	at '_click' in res://tests/hud_russian_temp.gd:266
+	at '_settle' in res://tests/hud_russian_temp.gd:274
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:185" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Укус'
+ but was
+ 'Strength · В руках: УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:185
+	at '_settle' in res://tests/hud_russian_temp.gd:274
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:179" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · Укус'
+ but was
+ 'Strength · УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:179
+	at '_click' in res://tests/hud_russian_temp.gd:266
+	at '_settle' in res://tests/hud_russian_temp.gd:274
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:185" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Strength · В руках: Укус'
+ but was
+ 'Strength · В руках: УкусBite'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:185
+	at '_settle' in res://tests/hud_russian_temp.gd:274
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="3" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_temp" package="tests" timestamp="2026-10-04T08:37:52" hostname="localhost" tests="1" failures="3" errors="1" skipped="0" flaky="0" time="2.329">
+		<testcase name="test_russian_actual_controls_names_bounds_and_native_fullname" classname="hud_russian_temp" time="2.322">
+			<error message="ERROR: res://tests/hud_russian_temp.gd:164" type="ABORT">
+<![CDATA[
+Godot Runtime Error !
+  'Cannot call method 'get_node' on a null value.'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:164
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</error>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:224" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_russian_temp.gd:163" type="FAILURE">
+<![CDATA[
+Expecting: not to be '<null>'
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:163
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

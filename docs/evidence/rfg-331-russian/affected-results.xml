@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="20" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="localization" package="tests" timestamp="2026-10-04T08:51:54" hostname="localhost" tests="7" failures="0" errors="0" skipped="0" flaky="0" time="0.620">
+		<testcase name="test_russian_creation_uses_display_labels_without_changing_draft" classname="localization" time="0.147">
+		</testcase>
+		<testcase name="test_dynamic_inventory_and_search_preserve_source_ids" classname="localization" time="0.129">
+		</testcase>
+		<testcase name="test_editable_values_and_fallback" classname="localization" time="0.037">
+		</testcase>
+		<testcase name="test_edit_labels_translate_without_rewriting_named_content" classname="localization" time="0.050">
+		</testcase>
+		<testcase name="test_catalog_covers_all_authored_rule_content_and_preserves_formats" classname="localization" time="0.058">
+		</testcase>
+		<testcase name="test_long_russian_definition_names_fit_phone_width" classname="localization" time="0.148">
+		</testcase>
+		<testcase name="test_russian_cast_confirmation_wraps_inside_phone_width" classname="localization" time="0.033">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="character_inventory" package="tests" timestamp="2026-10-04T08:51:55" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.688">
+		<testcase name="test_character_inventory" classname="character_inventory" time="0.583">
+		</testcase>
+		<testcase name="test_overview_groups_actions_in_responsive_sections" classname="character_inventory" time="0.084">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="power_composition" package="tests" timestamp="2026-10-04T08:51:55" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="2.545">
+		<testcase name="test_cast_controls_and_terminal_gm_report_in_phone_body" classname="power_composition" time="0.650">
+		</testcase>
+		<testcase name="test_immediate_healing_guides_count_errors_and_reports_applied_hp" classname="power_composition" time="1.863">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="special_composition" package="tests" timestamp="2026-10-04T08:51:58" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="0.753">
+		<testcase name="test_use_item_shows_recipient_focus_pending_and_healing_outcome" classname="special_composition" time="0.649">
+		</testcase>
+		<testcase name="test_book_preview_uses_selected_recipient_and_stock_radio_choices" classname="special_composition" time="0.048">
+		</testcase>
+		<testcase name="test_separate_sheets_keep_independent_radio_selection" classname="special_composition" time="0.016">
+		</testcase>
+		<testcase name="test_malformed_dr_adjustment_does_not_request_a_throw" classname="special_composition" time="0.008">
+		</testcase>
+	</testsuite>
+	<testsuite id="4" name="ranged_attack" package="tests" timestamp="2026-10-04T08:51:59" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.050">
+		<testcase name="test_equipped_bow_view_selects_only_matching_ammunition" classname="ranged_attack" time="0.011">
+		</testcase>
+		<testcase name="test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log" classname="ranged_attack" time="0.020">
+		</testcase>
+	</testsuite>
+	<testsuite id="5" name="companions" package="tests" timestamp="2026-10-04T08:51:59" hostname="localhost" tests="3" failures="0" errors="0" skipped="0" flaky="0" time="0.096">
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:0 (&apos;Owner&apos;)" classname="companions" time="0.037">
+		</testcase>
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:1 (&apos;Viewer&apos;)" classname="companions" time="0.033">
+		</testcase>
+		<testcase name="test_creature_inventory_edits_preserve_profiles_and_individual_state" classname="companions" time="0.008">
+		</testcase>
+	</testsuite>
+</testsuites>

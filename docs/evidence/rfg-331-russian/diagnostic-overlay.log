@@ -1,0 +1,48 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-final-presentation
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_russian_temp.gd
+  res://tests/hud_russian_temp.gd > test_russian_actual_controls_names_bounds_and_native_fullname STARTED
+SCRIPT ERROR: Cannot call method 'get_node' on a null value.
+          at: test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:164)
+          GDScript backtrace (most recent call first):
+              [0] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:164)
+              [1] _click (res://tests/hud_russian_temp.gd:225)
+              [2] _settle (res://tests/hud_russian_temp.gd:233)
+  res://tests/hud_russian_temp.gd > test_russian_actual_controls_names_bounds_and_native_fullname FAILED 2s 322ms
+  Report:
+  Godot Runtime Error !
+  'Cannot call method 'get_node' on a null value.'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:164
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: not to be '<null>'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:163
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+
+Statistics: 1 test cases | 1 errors | 3 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 329ms
+
+
+Overall Summary: 1 test cases | 1 errors | 3 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 2s 329ms
+ Open XML Report at: file://reports/russian-final-presentation/report_1/results.xml
+Open HTML Report at: file://reports/russian-final-presentation/report_1/index.html
+Exit code: 100
+Run dispose test resources

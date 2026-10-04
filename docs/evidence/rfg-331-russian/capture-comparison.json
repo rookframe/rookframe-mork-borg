@@ -1,0 +1,37 @@
+{
+  "phone-abilities.png": {
+    "reviewed_capture_sha256": "9db4d8f7b43243aaa12939e9ef237d86f99fd4a006cf06713914a6bba49963f1",
+    "accepted_capture_sha256": "9db4d8f7b43243aaa12939e9ef237d86f99fd4a006cf06713914a6bba49963f1",
+    "same_bytes": true
+  },
+  "phone-powers.png": {
+    "reviewed_capture_sha256": "39fb4642843e2fd5ba0d262a0090c6cadd03a93d3f6a1fdcf8b8f50561444387",
+    "accepted_capture_sha256": "39fb4642843e2fd5ba0d262a0090c6cadd03a93d3f6a1fdcf8b8f50561444387",
+    "same_bytes": true
+  },
+  "phone-more.png": {
+    "reviewed_capture_sha256": "35b3b5fa6bebfbaf56ff19d5d583940ef2169965ce5232e9056f0e25eb842fbf",
+    "accepted_capture_sha256": "35b3b5fa6bebfbaf56ff19d5d583940ef2169965ce5232e9056f0e25eb842fbf",
+    "same_bytes": true
+  },
+  "tablet-abilities.png": {
+    "reviewed_capture_sha256": "8f6171cd90f2a89a424770d33fc4c82b53d0db3eede35212fc57621787ba2f81",
+    "accepted_capture_sha256": "8f6171cd90f2a89a424770d33fc4c82b53d0db3eede35212fc57621787ba2f81",
+    "same_bytes": true
+  },
+  "desktop-abilities.png": {
+    "reviewed_capture_sha256": "7d5adcffbef18e4de8c464f3a7af63728395f762b1e5a0e6a29650fa6ea4504f",
+    "accepted_capture_sha256": "7d5adcffbef18e4de8c464f3a7af63728395f762b1e5a0e6a29650fa6ea4504f",
+    "same_bytes": true
+  },
+  "desktop-powers.png": {
+    "reviewed_capture_sha256": "a841a5c8c669fb8a5dccf32a23a9770aa8d218d76dff14121a2dbb25ea9cc892",
+    "accepted_capture_sha256": "a841a5c8c669fb8a5dccf32a23a9770aa8d218d76dff14121a2dbb25ea9cc892",
+    "same_bytes": true
+  },
+  "tablet-powers.png": {
+    "reviewed_capture_sha256": "fce68162fe7553d7b6d014986b3513aceecf67708e7ad567a8905da915b36833",
+    "accepted_capture_sha256": "fce68162fe7553d7b6d014986b3513aceecf67708e7ad567a8905da915b36833",
+    "same_bytes": true
+  }
+}
