@@ -371,11 +371,11 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	return _complete(context, action, [SDK.ActorChange.new(target.actor.id, data)], str(lost) + " damage", text)
 
 func _fumble(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor) -> Dictionary:
-	if action.natural or str(source.data.get("schema", "")) == "mork-borg-adversary/v1":
+	var current: Dictionary = source.data
+	if action.natural or str(current.get("schema", "")) == "mork-borg-adversary/v1":
 		var roll_sequence: int = action.sequence
 		return _complete(context, action, [], "Fumble", "%s: fumble. The GM determines the consequence. Natural 1; Raw Roll #%d." % [str(action.name), roll_sequence] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
-	var data: Dictionary = source.data
-	data = data.duplicate(true)
+	var data: Dictionary = current.duplicate(true)
 	var items := _inventory(source.id, data)
 	var item := _weapon(items, action.item)
 	if item.is_empty():

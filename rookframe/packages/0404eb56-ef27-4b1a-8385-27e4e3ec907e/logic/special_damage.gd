@@ -75,12 +75,16 @@ func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Di
 
 func damage_armor(id: SDK.ActorId, data: Dictionary) -> void:
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
-		data.merge(CREATURES.new().damage_protection(data), true)
+		var changed: Dictionary = CREATURES.new().damage_protection(data)
+		for key in ["attacks", "armor", "creature_stat_block"]:
+			if changed.has(key):
+				data[key] = changed[key]
 		data.erase("creature_inventory")
 		return
 	var items := ITEMS.new(null, id).inventory(data)
 	var worn: Dictionary = {}
-	for item in items:
+	for raw_item in items:
+		var item: Dictionary = raw_item
 		if str(item.get("kind", "")) == "Armor" and item.get("equipped", false) and not item.get("broken", false) and int(item.get("quantity", 0)) > 0:
 			worn = item
 	if worn.is_empty():
@@ -88,7 +92,8 @@ func damage_armor(id: SDK.ActorId, data: Dictionary) -> void:
 	var tier: int = worn.get("armor_tier", {"d2": 1, "d4": 2, "d6": 3}.get(str(worn.get("reduction", "")), 0))
 	if tier < 1:
 		return
-	worn["penalty_tier"] = worn.get("penalty_tier", tier)
+	var penalty_tier: int = worn.get("penalty_tier", tier)
+	worn["penalty_tier"] = penalty_tier
 	worn["armor_tier"] = tier - 1
 	worn["reduction"] = ["", "d2", "d4"][tier - 1]
 	if tier == 1:
