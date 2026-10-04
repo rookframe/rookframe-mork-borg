@@ -22,6 +22,12 @@ var _new_item: Dictionary = {}
 var _fields: Array[FIELD_SCRIPT] = []
 var _detail_pages: Dictionary = {}
 var _busy := false
+var _portrait_pending := false
+var _portrait_epoch := 0
+var _portrait_image := PackedByteArray()
+var _portrait_texture: Texture2D
+var _portrait_error := ""
+var _portrait_feedback := ""
 var _refresh_pending := false
 var _detail_pending := false
 var _edit_item := false
@@ -49,6 +55,8 @@ func ready() -> void:
 	sheet.publication_requested.connect(_publication)
 	sheet.miniature_requested.connect(_choose_miniature)
 	sheet.miniature_clear_requested.connect(_clear_miniature)
+	sheet.portrait_requested.connect(_choose_portrait)
+	sheet.portrait_reset_requested.connect(_reset_portrait)
 	sheet.edit_requested.connect(_correct)
 	sheet.health_requested.connect(_health)
 	sheet.roll_requested.connect(_roll)
@@ -58,6 +66,8 @@ func ready() -> void:
 	sdk.world_changed.connect(_world_changed)
 
 func opened(id: SDK.ActorId) -> void:
+	_end_portrait()
+	_portrait_feedback = ""
 	_remember()
 	_detail = ""
 	_edit_item = false
@@ -123,14 +133,17 @@ func _refresh() -> void:
 	var data := current_data()
 	_items = ITEMS.new(sdk, actor.id).inventory(data)
 	data["inventory"] = _items
-	data["portrait_editable"] = false
 	# Dedicated follow-ups enable these parts after their accepted domain actions exist.
 	data["corrections_available"] = _corrections_available
 	data["health_available"] = _health_available
 	data["rolls_available"] = _rolls_available
-	sheet.configure(data, locale, false, owner() and not _busy)
+	sheet.configure(data, locale, false, owner() and not _busy, _portrait(data))
 	sdk.windows.set_title(str(data.get("name", "Creature")))
 	sheet.status("Creature sheet · Owner" if owner() else "Creature sheet · Viewer")
+	if not _portrait_error.is_empty():
+		sheet.status(_portrait_error)
+	elif not _portrait_feedback.is_empty():
+		sheet.status(_portrait_feedback)
 	if not _detail.is_empty():
 		if not owner():
 			_edit_item = false
@@ -360,6 +373,76 @@ func _clear_miniature() -> void:
 		if not result.ok:
 			sheet.status(result.message)
 
+func _portrait(data: Dictionary) -> Texture2D:
+	var image: PackedByteArray = data.get("portrait", PackedByteArray()) if typeof(data.get("portrait", PackedByteArray())) == typeof(PackedByteArray()) else PackedByteArray()
+	if image != _portrait_image:
+		_portrait_image = image
+		_portrait_texture = null
+		_portrait_error = ""
+		if not image.is_empty():
+			var decoded := sdk.portraits.decode(image)
+			if decoded.ok:
+				_portrait_texture = decoded.texture
+			else:
+				_portrait_error = decoded.message
+	if image.is_empty():
+		_portrait_error = ""
+	if data.has("portrait") and typeof(data.portrait) != typeof(PackedByteArray()):
+		_portrait_error = "Portrait is unavailable. Choose a replacement."
+	return _portrait_texture
+
+func _choose_portrait() -> void:
+	if not owner() or _busy:
+		return
+	var id := actor.id
+	var epoch := _portrait_epoch
+	_portrait_pending = true
+	_portrait_feedback = ""
+	_busy = true
+	_refresh()
+	sheet.status("Choosing portrait…")
+	var selected := await sdk.portraits.choose()
+	if epoch != _portrait_epoch or actor == null or actor.id.value != id.value:
+		return
+	if not selected.ok:
+		_portrait_pending = false
+		_busy = false
+		_refresh_pending = true
+		_portrait_feedback = selected.message if selected.code != "cancelled" else ""
+		_refresh()
+		sheet.focus_portrait.call_deferred()
+		return
+	await _save_portrait(id, selected.image, epoch)
+
+func _reset_portrait() -> void:
+	if not owner() or _busy:
+		return
+	_portrait_pending = true
+	_portrait_feedback = ""
+	_busy = true
+	_refresh()
+	await _save_portrait(actor.id, PackedByteArray(), _portrait_epoch)
+
+func _save_portrait(id: SDK.ActorId, image: PackedByteArray, epoch: int) -> void:
+	sheet.status("Saving portrait…")
+	var result := await ITEMS.new(sdk, id).set_portrait(image)
+	if epoch != _portrait_epoch or actor == null or actor.id.value != id.value:
+		return
+	_portrait_pending = false
+	_busy = false
+	if result.ok:
+		actor = result.actor
+	_portrait_feedback = "Appearance updated." if result.ok else result.message
+	_refresh_pending = true
+	_refresh()
+	sheet.focus_portrait.call_deferred()
+
+func _end_portrait() -> void:
+	_portrait_epoch += 1
+	if _portrait_pending:
+		_busy = false
+	_portrait_pending = false
+
 func _refresh_appearance() -> void:
 	if actor == null or sdk == null:
 		return
@@ -414,6 +497,7 @@ func restore_reconnect_state(state: Dictionary) -> void:
 	_remember()
 
 func _closed() -> void:
+	_end_portrait()
 	_remember()
 	get_node("MiniatureWorkflow").visible = false
 	sheet.visible = true

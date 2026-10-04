@@ -488,8 +488,8 @@ See [Miniature ownership and defaults](docs/miniatures.md).
 
 Rookframe owns the right rail in the order Actors, Scenes, Library, Builder, Menu.
 MÖRK BORG adds no Creature catalogue window. Its imported Actor Definitions appear
-in Library under Creatures. Opening one shows a separate docked definition sheet;
-Its Appearance tab owns the Miniature default for new Actors. The + button on its
+in Library under Creatures. Opening one shows a separate Full-viewport definition sheet;
+Its Appearance chapter owns World-local portrait and Miniature defaults for new Actors. The + button on its
 Library row and Create Actor on its sheet create Actors. Dragging a
 Creature onto the tabletop creates an Actor and a linked Rook at the drop position.
 Creation is a GM operation. Failed placement cleans up its partial Actor and Rook.
@@ -497,7 +497,7 @@ Character creation is contributed to the shared Actors window.
 
 ## Creature Actor sheet
 
-Live Creature inspection, Library creation and companion opening use the shared fixed Full-viewport Creature sheet. Encounter, Inventory and Appearance keep current Actor values, independent carried loot and SDK Miniature operations together. Owner loot edits preserve the current stat block; Viewers can read it. Bounded Details return to the entry and focus, and Actor-local chapter/page state lasts for the World Application session. Corrections, HP adjustments and Window Dice are enabled by their dependent rule adapters. Existing captured targeted tabletop procedures retain their separate legacy task route. Actor placement stays in the Actors drag-and-drop flow.
+Live Creature inspection, Library creation and companion opening use the shared fixed Full-viewport Creature sheet. Encounter, Inventory and Appearance keep current Actor values, independent carried loot and SDK appearance operations together. Portrait image choice/reset and Miniature changes commit immediately outside stat-block Save/Cancel. Library defaults snapshot only into future Actors; existing Actors and Rooks keep their appearance. Owner loot and appearance edits preserve the current stat block; Viewers can read it. Bounded Details return to the entry and focus, and Actor-local chapter/page state lasts for the World Application session. Corrections, HP adjustments and Window Dice are enabled by their dependent rule adapters. Existing captured targeted tabletop procedures retain their separate legacy task route. Actor placement stays in the Actors drag-and-drop flow.
 
 Creature Inventory keeps a bounded carried-loot list with readable Details, a searchable core catalogue, custom item creation, independent field saves and removal. Character equipment retains its existing Attack/Equip/Cast/Use behavior. See [the review contract](docs/creature-sheet-design.md).
 

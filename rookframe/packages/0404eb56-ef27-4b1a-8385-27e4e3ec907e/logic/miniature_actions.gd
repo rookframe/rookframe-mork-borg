@@ -21,9 +21,7 @@ func set_actor(actor: SDK.ActorId, reference: Dictionary) -> SDK.ActorResult:
 	var current_data: Dictionary = current.actor.data
 	if str(current_data.get("schema", "")) == "mork-borg-character/v1":
 		return await preload(ROOT + "logic/character_actions.gd").new(sdk, actor).set_miniature(reference)
-	var data: Dictionary = CREATURES.new().stat_block(current_data)
-	data["preferred_miniature"] = reference.duplicate(true)
-	return await sdk.actors.update(actor, data)
+	return await preload(ROOT + "logic/creature_actions.gd").new(sdk, actor).set_miniature(reference)
 
 func place(actor: SDK.ActorId) -> SDK.RookResult:
 	var scene := sdk.scenes.current()

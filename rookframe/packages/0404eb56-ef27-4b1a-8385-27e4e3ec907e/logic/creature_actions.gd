@@ -17,3 +17,14 @@ func change_item(id: String, field: String, text: String) -> SDK.ActorResult:
 	if field == "equipped":
 		return _failure("Creature loot has no equipment state.")
 	return await super.change_item(id, field, text)
+
+func set_portrait(image: PackedByteArray) -> SDK.ActorResult:
+	return await _appearance("portrait", {"image": image})
+
+func set_miniature(reference: Dictionary) -> SDK.ActorResult:
+	return await _appearance("miniature", {"reference": reference})
+
+func _appearance(operation: String, payload: Dictionary) -> SDK.ActorResult:
+	payload["actor"] = _id.value
+	var response := await _sdk.system_actions.submit("creature-appearance." + operation, payload)
+	return SDK.ActorResult.new(response.value) if response.ok else _failure(response.message)

@@ -24,10 +24,14 @@ var _encounter := ENCOUNTER.new()
 
 const MINIATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_authority.gd")
 var _miniatures := MINIATURES.new()
+const CREATURE_APPEARANCE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_appearance_authority.gd")
+var _creature_appearance := CREATURE_APPEARANCE.new()
 const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/sheet_combat.gd")
 var _sheet_combat := SHEET_COMBAT.new()
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("creature-appearance."):
+		return _creature_appearance.handle(context, sdk, name, payload)
 	if name.begins_with("companion."):
 		return _companions.handle(context, name, payload)
 	if name.begins_with("sheet."):
