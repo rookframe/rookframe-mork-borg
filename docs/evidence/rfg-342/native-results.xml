@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_2" tests="59" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="recovery_hud_temp" package="tests" timestamp="2026-10-04T00:34:30" hostname="localhost" tests="24" failures="0" errors="0" skipped="0" flaky="0" time="1.483">
+		<testcase name="test_fixed_recovery_entries_never_depend_on_targets_or_favorites" classname="recovery_hud_temp" time="0.003">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:0 (&apos;classless&apos;, 1, 1)" classname="recovery_hud_temp" time="0.004">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:1 (&apos;classless&apos;, 4, 2)" classname="recovery_hud_temp" time="0.003">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:2 (&apos;esoteric-hermit&apos;, 3, 3)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:3 (&apos;heretical-priest&apos;, 4, 4)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:4 (&apos;fanged-deserter&apos;, 3, 2)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:5 (&apos;gutterborn-scum&apos;, 2, 1)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:6 (&apos;wretched-royalty&apos;, 4, 2)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_regain_omens_uses_printed_class_die_once_and_preserves_other_actor_data:7 (&apos;occult-herbmaster&apos;, 1, 1)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_omen_start_refuses_ineligible_or_unconfirmed_input:0 (&apos;not-rested&apos;)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_omen_start_refuses_ineligible_or_unconfirmed_input:1 (&apos;remaining&apos;)" classname="recovery_hud_temp" time="0.007">
+		</testcase>
+		<testcase name="test_omen_start_refuses_ineligible_or_unconfirmed_input:2 (&apos;malformed-confirmation&apos;)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_omen_start_refuses_ineligible_or_unconfirmed_input:3 (&apos;unknown-class&apos;)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_omen_start_refuses_ineligible_or_unconfirmed_input:4 (&apos;dead&apos;)" classname="recovery_hud_temp" time="0.009">
+		</testcase>
+		<testcase name="test_rest_preserves_rule_distinctions_and_does_not_refill_other_resources:0 (&apos;breath&apos;, true, false, 4)" classname="recovery_hud_temp" time="0.002">
+		</testcase>
+		<testcase name="test_rest_preserves_rule_distinctions_and_does_not_refill_other_resources:1 (&apos;sleep&apos;, true, false, 6)" classname="recovery_hud_temp" time="0.007">
+		</testcase>
+		<testcase name="test_rest_preserves_rule_distinctions_and_does_not_refill_other_resources:2 (&apos;breath&apos;, false, false, 0)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_rest_preserves_rule_distinctions_and_does_not_refill_other_resources:3 (&apos;sleep&apos;, true, true, 0)" classname="recovery_hud_temp" time="0.005">
+		</testcase>
+		<testcase name="test_pending_omen_recovery_refuses_late_access_loss_or_changed_source:0 (&apos;access&apos;)" classname="recovery_hud_temp" time="0.007">
+		</testcase>
+		<testcase name="test_pending_omen_recovery_refuses_late_access_loss_or_changed_source:1 (&apos;omens&apos;)" classname="recovery_hud_temp" time="0.006">
+		</testcase>
+		<testcase name="test_pending_omen_recovery_refuses_late_access_loss_or_changed_source:2 (&apos;class&apos;)" classname="recovery_hud_temp" time="0.007">
+		</testcase>
+		<testcase name="test_pending_omen_recovery_refuses_late_access_loss_or_changed_source:3 (&apos;cancel&apos;)" classname="recovery_hud_temp" time="0.007">
+		</testcase>
+		<testcase name="test_native_task_captures_actor_and_requires_rest_confirmation:0 (460)" classname="recovery_hud_temp" time="0.665">
+		</testcase>
+		<testcase name="test_native_task_captures_actor_and_requires_rest_confirmation:1 (360)" classname="recovery_hud_temp" time="0.653">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="recovery_improvement" package="tests" timestamp="2026-10-04T00:34:32" hostname="localhost" tests="33" failures="0" errors="0" skipped="0" flaky="0" time="0.112">
+		<testcase name="test_recovery_uses_human_throw_caps_hp_and_keeps_omens" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_owner_starts_improvement_directly_and_applies_ordered_steps:0 (false)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_owner_starts_improvement_directly_and_applies_ordered_steps:1 (true)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_broken_reports_delayed_recovery_without_healing:0 (1, [3, 4], &apos;awaken with 4 HP after 3 rounds&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_broken_reports_delayed_recovery_without_healing:1 (2, [6, 2, 3], &apos;Lost eye&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_broken_reports_delayed_recovery_without_healing:2 (3, [3], &apos;death in 2 hours&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_broken_reports_delayed_recovery_without_healing:3 (4, [], &apos;Dead&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_found_scroll_is_chosen_in_rolled_family_and_added_before_abilities" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_scum_first_improvement_adds_specialty_then_later_allows_optional_reroll" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_rest_restrictions_and_sleep:0 (-1, &apos;error&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_rest_restrictions_and_sleep:1 (7, &apos;pending&apos;)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_owner_and_valid_options_are_required:0 (&apos;viewer&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_owner_and_valid_options_are_required:1 (&apos;obsolete_grant&apos;)" classname="recovery_improvement" time="0.001">
+		</testcase>
+		<testcase name="test_owner_and_valid_options_are_required:2 (&apos;malformed&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_interruption_rejects_late_changes_and_preserves_accepted_improvement:0 (&apos;cancel&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_interruption_rejects_late_changes_and_preserves_accepted_improvement:1 (&apos;disconnect&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_interruption_rejects_late_changes_and_preserves_accepted_improvement:2 (&apos;access&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_interruption_rejects_late_changes_and_preserves_accepted_improvement:3 (&apos;restart&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_interruption_rejects_late_changes_and_preserves_accepted_improvement:4 (&apos;save&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_broken_requires_zero_and_negative_hp_reports_death:0 (5, &apos;error&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_broken_requires_zero_and_negative_hp_reports_death:1 (-2, &apos;resolved&apos;)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:0 (-3, 1, -3)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:1 (-3, 2, -2)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:2 (-1, 1, -2)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:3 (0, 1, -1)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:4 (1, 1, 0)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:5 (1, 2, 2)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:6 (2, 1, 1)" classname="recovery_improvement" time="0.003">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:7 (2, 2, 3)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:8 (5, 4, 4)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_ability_changes_apply_source_boundaries:9 (6, 6, 6)" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_gm_routes_recovery_to_connected_player_and_cannot_replace_offline_owner" classname="recovery_improvement" time="0.002">
+		</testcase>
+		<testcase name="test_interrupted_scum_can_finish_with_ordinary_sheet_corrections" classname="recovery_improvement" time="0.002">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="health_composition" package="tests" timestamp="2026-10-04T00:34:32" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.654">
+		<testcase name="test_recovery_panel_direct_submit_focus_pending_and_result" classname="health_composition" time="0.618">
+		</testcase>
+		<testcase name="test_specialty_corrections_refresh_live_fields_and_preserve_other_drafts" classname="health_composition" time="0.030">
+		</testcase>
+	</testsuite>
+</testsuites>
