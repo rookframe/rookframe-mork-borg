@@ -32,21 +32,48 @@ var _second_scroll := ""
 var _ability := ""
 var _tabletop := false
 var _title := ""
+var _context_version := 0
 
 func _ready() -> void:
 	resized.connect(_layout)
 	for node in get_node(^"Options/Ability/Choices").get_children():
 		var choice := node as Button
 		choice.pressed.connect(_choose_ability.bind(choice.text))
+	for index in range(2):
+		var list := get_node(^"Scrolls/First" if index == 0 else ^"Scrolls/Second")
+		for number in range(list.get_child_count()):
+			var row := list.get_child(number) as Button
+			row.pressed.connect(_choose_scroll_option.bind(index, number))
 	get_node(^"Columns/Recipient/Content/Change").pressed.connect(_choose_targets)
 	get_node(^"Columns/Recipient/Content/Self").pressed.connect(_self_changed)
 
 func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
+	_reset_task()
 	_tabletop = true
 	_source_rook = SDK.RookId.new(rook) if not rook.is_empty() else null
 	# A recipient is never inferred from the authored sheet's Self default.
 	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
 	configure(actor, facade, item)
+
+func _reset_task() -> void:
+	_context_version += 1
+	_update_pending = false
+	if _action != null:
+		_action.retire()
+		_action = null
+	_scroll_options = []
+	_first_scroll = ""
+	_second_scroll = ""
+	_ability = ""
+	for path in [^"Options/Ability/Choices", ^"Scrolls/First", ^"Scrolls/Second"]:
+		for child in get_node(path).get_children():
+			var choice := child as Button
+			choice.button_pressed = false
+	get_node(^"Options/Adjustment").value = "0"
+	get_node(^"Options/Morale/Value").value = "0"
+	get_node(^"Options/Eligible").button_pressed = false
+	get_node(^"Options/NewFight").button_pressed = false
+	get_node(^"Options/Morale/Subtract").button_pressed = false
 
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
@@ -111,7 +138,6 @@ func _render() -> void:
 				var scroll: Dictionary = _scroll_options[number]
 				var row := list.get_child(number) as Button
 				row.text = _t(str(scroll.name))
-				row.pressed.connect(_choose_scroll.bind(index, str(scroll.source_item_id)))
 		var count: int = _action.snapshot.get("count", 0)
 		get_node(^"Scrolls/Second").visible = count == 2
 	if state == "shield":
@@ -194,10 +220,11 @@ func _process(_delta: float) -> void:
 	if _targets_pending and not _reading_targets and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
 		_targets_pending = false
 		_reading_targets = true
+		var version := _context_version
 		var reach: float = _rule.get("range_feet", 0)
 		var summary := await TARGETS.new().describe(_sdk, _source_rook, reach)
 		_reading_targets = false
-		if is_inside_tree():
+		if is_inside_tree() and version == _context_version:
 			if _tabletop and summary == _t("Choose one target"):
 				summary = _t("No targets")
 			get_node(^"Columns/Recipient/Content/Copy").text = summary
@@ -231,6 +258,12 @@ func _layout() -> void:
 
 func _choose_ability(ability: String) -> void:
 	_ability = ability
+
+func _choose_scroll_option(index: int, number: int) -> void:
+	if number >= _scroll_options.size():
+		return
+	var scroll: Dictionary = _scroll_options[number]
+	_choose_scroll(index, str(scroll.source_item_id))
 
 func _choose_scroll(index: int, id: String) -> void:
 	if index == 0:
