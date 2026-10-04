@@ -1,0 +1,59 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[2J[H
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/favorite-size-accepted
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/favorite_size_temp.gd
+  res://tests/favorite_size_temp.gd > test_authored_favorite_size_matches_reference_in_three_native_profiles STARTED
+RFG331 favorite size: profile=desktop starred=false font_size=24 variation= minimum=(49.0, 54.0)
+RFG331 favorite size: profile=desktop starred=true font_size=24 variation= minimum=(49.0, 54.0)
+RFG331 favorite size: profile=tablet starred=false font_size=24 variation= minimum=(49.0, 54.0)
+RFG331 favorite size: profile=tablet starred=true font_size=24 variation= minimum=(49.0, 54.0)
+RFG331 favorite size: profile=phone starred=false font_size=21 variation= minimum=(46.0, 51.0)
+RFG331 favorite size: profile=phone starred=true font_size=21 variation= minimum=(46.0, 51.0)
+  res://tests/favorite_size_temp.gd > test_authored_favorite_size_matches_reference_in_three_native_profiles FAILED 496ms
+  Report:
+  Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31  Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31  Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31  Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31  Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(46.0, 51.0)'	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31  Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(46.0, 51.0)'	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+
+Statistics: 1 test cases | 0 errors | 6 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 504ms
+
+
+Overall Summary: 1 test cases | 0 errors | 6 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 504ms
+ Open XML Report at: file://reports/favorite-size-accepted/report_1/results.xml
+Open HTML Report at: file://reports/favorite-size-accepted/report_1/index.html
+Exit code: 100
+Run dispose test resources

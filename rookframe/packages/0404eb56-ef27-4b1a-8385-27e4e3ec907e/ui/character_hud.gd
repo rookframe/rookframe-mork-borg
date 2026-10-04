@@ -379,9 +379,11 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	row.get_node("Favorite").disabled = _pending_favorites.has(_favorite_request_key(_actor, str(entry.id)))
 	row.get_node("Favorite").set_pressed_no_signal(bool(entry.favorite))
 	row.get_node("Favorite").text = "★" if entry.favorite else "☆"
+	row.get_node("Favorite").add_theme_font_size_override("font_size", 21 if _phone else 24)
 	row.get_node("Favorite").accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
 	row.get_node("FullName").accessibility_name = sdk.translations.text("Show full name")
 	row.get_node("Favorite").add_theme_color_override("font_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
+	row.get_node("Favorite").add_theme_color_override("font_hover_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
 	row.get_node("Favorite").add_theme_color_override("font_pressed_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
 	row.get_node("Favorite").add_theme_color_override("font_hover_pressed_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
 	if _phone:

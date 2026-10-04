@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="6" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="favorite_size_temp" package="tests" timestamp="2026-10-04T06:45:25" hostname="localhost" tests="1" failures="6" errors="0" skipped="0" flaky="0" time="0.504">
+		<testcase name="test_authored_favorite_size_matches_reference_in_three_native_profiles" classname="favorite_size_temp" time="0.496">
+			<failure message="FAILED: res://tests/favorite_size_temp.gd:31" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'
+	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/favorite_size_temp.gd:31" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'
+	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/favorite_size_temp.gd:31" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'
+	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/favorite_size_temp.gd:31" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(49.0, 54.0)'
+	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/favorite_size_temp.gd:31" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(46.0, 51.0)'
+	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/favorite_size_temp.gd:31" type="FAILURE">
+<![CDATA[
+Expecting:
+ '(44.0, 44.0)'
+ but was
+ '(46.0, 51.0)'
+	at 'test_authored_favorite_size_matches_reference_in_three_native_profiles' in res://tests/favorite_size_temp.gd:31
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>
