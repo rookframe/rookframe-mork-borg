@@ -23,6 +23,7 @@ var _target_reading := false
 var _update_pending := false
 var _tabletop := false
 var _morning_only := false
+var _context_version := 0
 
 func _ready() -> void:
 	resized.connect(_layout)
@@ -55,14 +56,28 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_render()
 
 func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
+	_reset_task()
 	_tabletop = true
+	_morning_only = false
 	_source_rook = SDK.RookId.new(rook) if not rook.is_empty() else null
 	configure(actor, facade, item)
 
 func configure_morning(actor: SDK.Actor, facade: SDK) -> void:
+	_reset_task()
+	_source_rook = null
 	_tabletop = true
 	_morning_only = true
 	configure(actor, facade, "")
+
+func _reset_task() -> void:
+	_context_version += 1
+	_update_pending = false
+	if _action != null:
+		_action.retire()
+		_action = null
+	get_node(^"Cast/Options/Eligible").button_pressed = false
+	get_node(^"Cast/Options/Modifier").value = "0"
+	_status("")
 
 func _list(items: Array) -> void:
 	var list := get_node(^"Scrolls")
@@ -188,6 +203,7 @@ func _process(_delta: float) -> void:
 	if _target_pending and not _target_reading and not _power.is_empty():
 		_target_pending = false
 		_target_reading = true
+		var version := _context_version
 		var reach: float = _power.get("area_feet", _power.get("range_feet", 0))
 		var summary := await TARGETS.new().describe(_sdk, _source_rook, reach)
 		if _tabletop:
@@ -195,7 +211,7 @@ func _process(_delta: float) -> void:
 			if selected.ok and selected.snapshot.rooks.is_empty():
 				summary = _t("No targets")
 		_target_reading = false
-		if is_inside_tree():
+		if is_inside_tree() and version == _context_version:
 			get_node(^"Cast/Columns/Targets/Content/Copy").text = summary
 
 func _choose_targets() -> void:

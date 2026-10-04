@@ -59,4 +59,6 @@ func _close() -> void:
 		sdk.windows.close(surface)
 
 func _closed() -> void:
+	_opened = false
+	_actor = null
 	_panel.close_action()
