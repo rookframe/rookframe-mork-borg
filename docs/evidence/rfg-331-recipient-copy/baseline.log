@@ -1,0 +1,110 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[2J[H
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/recipient-copy-baseline-clean
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/recipient_copy_temp.gd
+  res://tests/recipient_copy_temp.gd > test_tabletop_zero_range_keeps_captured_actor_with_empty_targets STARTED
+  res://tests/recipient_copy_temp.gd > test_tabletop_zero_range_keeps_captured_actor_with_empty_targets FAILED 72ms
+  Report:
+  Expecting:
+ 'Graveworm
+4 / 8 HP'
+ but was
+ 'GNo taravgeworm<LF>4 / 8 HPts'	at 'test_tabletop_zero_range_keeps_captured_actor_with_empty_targets' in res://tests/recipient_copy_temp.gd:34
+	at '_settle' in res://tests/recipient_copy_temp.gd:22  Expecting:
+ 0
+ but was
+ 1	at 'test_tabletop_zero_range_keeps_captured_actor_with_empty_targets' in res://tests/recipient_copy_temp.gd:35
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+
+  res://tests/recipient_copy_temp.gd > test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp STARTED
+  res://tests/recipient_copy_temp.gd > test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp FAILED 81ms
+  Report:
+  Expecting:
+ 'Graveworm
+4 / 8 HP'
+ but was
+ 'GHooded stravngeworm
+4.0 /ft 8· HPOut of range'	at 'test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp' in res://tests/recipient_copy_temp.gd:43
+	at '_settle' in res://tests/recipient_copy_temp.gd:22  Expecting:
+ 0
+ but was
+ 2	at 'test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp' in res://tests/recipient_copy_temp.gd:51
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+
+  res://tests/recipient_copy_temp.gd > test_ranged_item_keeps_target_and_explicit_self_behavior STARTED
+  res://tests/recipient_copy_temp.gd > test_ranged_item_keeps_target_and_explicit_self_behavior PASSED 110ms
+
+  res://tests/recipient_copy_temp.gd > test_favorited_star_uses_approved_gold_in_native_pressed_states:0 (0) STARTED
+RFG331 authored star device=0 state=font_color color=(0.8863, 0.7686, 0.4275, 1.0)
+RFG331 authored star device=0 state=font_pressed_color color=(0.851, 0.8314, 0.8196, 1.0)
+RFG331 authored star device=0 state=font_hover_pressed_color color=(1.0, 1.0, 1.0, 1.0)
+  res://tests/recipient_copy_temp.gd > test_favorited_star_uses_approved_gold_in_native_pressed_states:0 (0) FAILED 405ms
+  Report:
+  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(1.0, 1.0, 1.0, 1.0)'	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+
+  res://tests/recipient_copy_temp.gd > test_favorited_star_uses_approved_gold_in_native_pressed_states:1 (1) STARTED
+RFG331 authored star device=1 state=font_color color=(0.8863, 0.7686, 0.4275, 1.0)
+RFG331 authored star device=1 state=font_pressed_color color=(0.851, 0.8314, 0.8196, 1.0)
+RFG331 authored star device=1 state=font_hover_pressed_color color=(1.0, 1.0, 1.0, 1.0)
+  res://tests/recipient_copy_temp.gd > test_favorited_star_uses_approved_gold_in_native_pressed_states:1 (1) FAILED 29ms
+  Report:
+  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(1.0, 1.0, 1.0, 1.0)'	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+
+  res://tests/recipient_copy_temp.gd > test_favorited_star_uses_approved_gold_in_native_pressed_states:2 (2) STARTED
+RFG331 authored star device=2 state=font_color color=(0.8863, 0.7686, 0.4275, 1.0)
+RFG331 authored star device=2 state=font_pressed_color color=(0.851, 0.8314, 0.8196, 1.0)
+RFG331 authored star device=2 state=font_hover_pressed_color color=(1.0, 1.0, 1.0, 1.0)
+  res://tests/recipient_copy_temp.gd > test_favorited_star_uses_approved_gold_in_native_pressed_states:2 (2) FAILED 29ms
+  Report:
+  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(1.0, 1.0, 1.0, 1.0)'	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+
+Statistics: 6 test cases | 0 errors | 10 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 745ms
+
+
+Overall Summary: 6 test cases | 0 errors | 10 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (6/6)
+Total execution time: 745ms
+ Open XML Report at: file://reports/recipient-copy-baseline-clean/report_1/results.xml
+Open HTML Report at: file://reports/recipient-copy-baseline-clean/report_1/index.html
+Exit code: 100
+Run dispose test resources
