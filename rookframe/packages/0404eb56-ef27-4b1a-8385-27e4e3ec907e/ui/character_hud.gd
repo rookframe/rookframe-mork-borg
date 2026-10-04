@@ -318,6 +318,7 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var launch: Button = row.get_node("Launch")
 	launch.disabled = not entry.available
+	launch.accessibility_name = entry.title
 	var content: HBoxContainer = row.get_node("Launch/Content")
 	content.add_theme_constant_override("separation", 8 if _phone else 14)
 	var icon: TextureRect = content.get_node("Icon")
@@ -343,6 +344,8 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	row.get_node("Favorite").disabled = not entry.favorite_editable
 	row.get_node("Favorite").set_pressed_no_signal(entry.favorite)
 	row.get_node("Favorite").text = "★" if entry.favorite else "☆"
+	row.get_node("Favorite").accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
+	row.get_node("FullName").accessibility_name = sdk.translations.text("Show full name")
 	row.get_node("Favorite").add_theme_color_override("font_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
 	if _phone:
 		content.offset_left = 2

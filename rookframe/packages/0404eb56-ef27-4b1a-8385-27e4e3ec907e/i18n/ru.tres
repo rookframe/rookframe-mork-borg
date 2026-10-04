@@ -2,6 +2,9 @@
 
 [resource]
 messages = {
+[&"", &"Add %s to favorites"]: [&"Добавить «%s» в избранное"],
+[&"", &"Remove %s from favorites"]: [&"Удалить «%s» из избранного"],
+[&"", &"Show full name"]: [&"Показать полное название"],
 [&"", &"Morning"]: [&"Утро"],
 [&"", &"Morning Power allowance"]: [&"Утренний запас Сил"],
 [&"", &"No targets"]: [&"Без целей"],

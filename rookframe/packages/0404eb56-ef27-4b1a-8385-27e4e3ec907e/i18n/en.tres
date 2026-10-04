@@ -2,6 +2,9 @@
 
 [resource]
 messages = {
+[&"", &"Add %s to favorites"]: [&"Add %s to favorites"],
+[&"", &"Remove %s from favorites"]: [&"Remove %s from favorites"],
+[&"", &"Show full name"]: [&"Show full name"],
 [&"", &"Morning"]: [&"Morning"],
 [&"", &"Morning Power allowance"]: [&"Morning Power allowance"],
 [&"", &"No targets"]: [&"No targets"],
