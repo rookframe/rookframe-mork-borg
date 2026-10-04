@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="3" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="dock_layout_disposable" package="tests" timestamp="2026-10-04T02:31:59" hostname="localhost" tests="1" failures="3" errors="0" skipped="0" flaky="0" time="0.217">
+		<testcase name="test_power_body_in_managed_dock_container" classname="dock_layout_disposable" time="0.208">
+			<failure message="FAILED: res://tests/dock_layout_disposable.gd:43" type="FAILURE">
+<![CDATA[
+Expecting to be greater than:
+ 100.000000 but was 0.000000
+	at 'test_power_body_in_managed_dock_container' in res://tests/dock_layout_disposable.gd:43
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/dock_layout_disposable.gd:48" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_power_body_in_managed_dock_container' in res://tests/dock_layout_disposable.gd:48
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/dock_layout_disposable.gd:49" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_power_body_in_managed_dock_container' in res://tests/dock_layout_disposable.gd:49
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

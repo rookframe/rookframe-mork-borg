@@ -1,0 +1,108 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/dock-wheel-release
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/dock_layout_disposable.gd
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:0 ('power', 900) STARTED
+[DEBUG-dock-click] power control=[P: (12.0, 517.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Eligible:<CheckBox#234746808566>
+[DEBUG-dock] power height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 138.0), S: (436.0, 686.0)] panel_min=(191.0, 532.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:0 ('power', 900) PASSED 182ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:1 ('morning', 900) STARTED
+[DEBUG-dock-click] morning control=[P: (112.0, 832.0), S: (336.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Primary:<Button#243152193776>
+[DEBUG-dock] morning height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 138.0), S: (436.0, 686.0)] panel_min=(125.0, 169.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:1 ('morning', 900) PASSED 163ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:2 ('item', 900) STARTED
+[DEBUG-dock-click] item control=[P: (12.0, 453.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Eligible:<CheckBox#260952820076>
+[DEBUG-dock] item height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 138.0), S: (436.0, 686.0)] panel_min=(139.0, 359.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:2 ('item', 900) PASSED 200ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:3 ('feature', 900) STARTED
+[DEBUG-dock-click] feature control=[P: (12.0, 323.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Eligible:<CheckBox#270280952159>
+[DEBUG-dock] feature height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 138.0), S: (436.0, 686.0)] panel_min=(80.0, 229.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:3 ('feature', 900) PASSED 167ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:4 ('recovery', 900) STARTED
+[DEBUG-dock-click] recovery control=[P: (12.0, 188.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Sleep:<Button#284373813470>
+[DEBUG-dock] recovery height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 132.0), S: (436.0, 692.0)] panel_min=(246.0, 186.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:4 ('recovery', 900) PASSED 185ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:5 ('attack', 900) STARTED
+[DEBUG-dock-click] attack control=[P: (12.0, 405.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Piercing:<Button#301671123410>
+[DEBUG-dock] attack height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 76.0), S: (436.0, 744.0)] panel_min=(236.0, 456.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:5 ('attack', 900) PASSED 175ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:6 ('companion', 900) STARTED
+[DEBUG-dock-click] companion control=[P: (12.0, 405.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 900)
+[DEBUG-dock-hover] Piercing:<Button#313297734089>
+[DEBUG-dock] companion height=900 task=[P: (0.0, 0.0), S: (460.0, 824.0)] body=[P: (12.0, 76.0), S: (436.0, 744.0)] panel_min=(236.0, 456.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:6 ('companion', 900) PASSED 164ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:7 ('power', 390) STARTED
+[DEBUG-dock-click] power control=[P: (12.0, 286.0), S: (428.0, 44.0)] scroll=231 viewport=(460, 390)
+[DEBUG-dock-hover] Eligible:<CheckBox#323364063657>
+[DEBUG-dock] power height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 138.0), S: (436.0, 206.0)] panel_min=(191.0, 558.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:7 ('power', 390) PASSED 322ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:8 ('morning', 390) STARTED
+[DEBUG-dock-click] morning control=[P: (112.0, 352.0), S: (336.0, 44.0)] scroll=0 viewport=(460, 390)
+[DEBUG-dock-hover] Primary:<Button#335259109796>
+[DEBUG-dock] morning height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 138.0), S: (436.0, 206.0)] panel_min=(125.0, 169.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:8 ('morning', 390) PASSED 162ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:9 ('item', 390) STARTED
+[DEBUG-dock-click] item control=[P: (12.0, 300.0), S: (428.0, 44.0)] scroll=153 viewport=(460, 390)
+[DEBUG-dock-hover] Eligible:<CheckBox#341517011175>
+[DEBUG-dock] item height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 138.0), S: (436.0, 206.0)] panel_min=(139.0, 359.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:9 ('item', 390) PASSED 266ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:10 ('feature', 390) STARTED
+[DEBUG-dock-click] feature control=[P: (12.0, 300.0), S: (428.0, 44.0)] scroll=23 viewport=(460, 390)
+[DEBUG-dock-hover] Eligible:<CheckBox#353210730719>
+[DEBUG-dock] feature height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 138.0), S: (436.0, 206.0)] panel_min=(80.0, 229.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:10 ('feature', 390) PASSED 180ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:11 ('recovery', 390) STARTED
+[DEBUG-dock-click] recovery control=[P: (12.0, 188.0), S: (436.0, 44.0)] scroll=0 viewport=(460, 390)
+[DEBUG-dock-hover] Sleep:<Button#361649670539>
+[DEBUG-dock] recovery height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 132.0), S: (436.0, 212.0)] panel_min=(246.0, 186.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:11 ('recovery', 390) PASSED 160ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:12 ('attack', 390) STARTED
+[DEBUG-dock-click] attack control=[P: (12.0, 273.0), S: (428.0, 44.0)] scroll=132 viewport=(460, 390)
+[DEBUG-dock-hover] Piercing:<Button#371967658341>
+[DEBUG-dock] attack height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 76.0), S: (436.0, 264.0)] panel_min=(236.0, 456.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:12 ('attack', 390) PASSED 238ms
+
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:13 ('companion', 390) STARTED
+[DEBUG-dock-click] companion control=[P: (12.0, 273.0), S: (428.0, 44.0)] scroll=132 viewport=(460, 390)
+[DEBUG-dock-hover] Piercing:<Button#385204881827>
+[DEBUG-dock] companion height=390 task=[P: (0.0, 0.0), S: (460.0, 344.0)] body=[P: (12.0, 76.0), S: (436.0, 264.0)] panel_min=(236.0, 456.0) presses=1
+  res://tests/dock_layout_disposable.gd > test_task_body_and_actual_pointer:13 ('companion', 390) PASSED 234ms
+
+Statistics: 14 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 842ms
+
+
+Overall Summary: 14 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (14/14)
+Total execution time: 2s 842ms
+ Open XML Report at: file://reports/dock-wheel-release/report_1/results.xml
+Open HTML Report at: file://reports/dock-wheel-release/report_1/index.html
+Exit code: 0
+Run dispose test resources

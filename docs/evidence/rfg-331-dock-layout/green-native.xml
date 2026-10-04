@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="14" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="dock_layout_disposable" package="tests" timestamp="2026-10-04T02:37:39" hostname="localhost" tests="14" failures="0" errors="0" skipped="0" flaky="0" time="2.842">
+		<testcase name="test_task_body_and_actual_pointer:0 (&apos;power&apos;, 900)" classname="dock_layout_disposable" time="0.182">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:1 (&apos;morning&apos;, 900)" classname="dock_layout_disposable" time="0.163">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:2 (&apos;item&apos;, 900)" classname="dock_layout_disposable" time="0.200">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:3 (&apos;feature&apos;, 900)" classname="dock_layout_disposable" time="0.167">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:4 (&apos;recovery&apos;, 900)" classname="dock_layout_disposable" time="0.185">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:5 (&apos;attack&apos;, 900)" classname="dock_layout_disposable" time="0.175">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:6 (&apos;companion&apos;, 900)" classname="dock_layout_disposable" time="0.164">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:7 (&apos;power&apos;, 390)" classname="dock_layout_disposable" time="0.322">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:8 (&apos;morning&apos;, 390)" classname="dock_layout_disposable" time="0.162">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:9 (&apos;item&apos;, 390)" classname="dock_layout_disposable" time="0.266">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:10 (&apos;feature&apos;, 390)" classname="dock_layout_disposable" time="0.180">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:11 (&apos;recovery&apos;, 390)" classname="dock_layout_disposable" time="0.160">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:12 (&apos;attack&apos;, 390)" classname="dock_layout_disposable" time="0.238">
+		</testcase>
+		<testcase name="test_task_body_and_actual_pointer:13 (&apos;companion&apos;, 390)" classname="dock_layout_disposable" time="0.234">
+		</testcase>
+	</testsuite>
+</testsuites>
