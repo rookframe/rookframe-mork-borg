@@ -231,7 +231,7 @@ func _open_category(category: String) -> void:
 	get_node("Panel/Detail").visible = false
 	_panel.visible = true
 	_render_panel()
-	if category != "More" and _actor != null:
+	if category in ["Attacks", "Powers", "Items", "Features", "Companions"] and _actor != null:
 		var initiating_actor := _actor
 		var result := await _favorites.prepare(initiating_actor)
 		if not result.ok:
