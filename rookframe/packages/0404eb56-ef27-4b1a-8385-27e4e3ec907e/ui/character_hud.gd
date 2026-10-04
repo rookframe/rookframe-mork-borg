@@ -123,7 +123,16 @@ func set_entries(category: String, entries: Array[ENTRY]) -> void:
 
 func _refresh() -> void:
 	var context := sdk.character_hud.context()
+	# Incomplete replication has not confirmed a different Actor or access level.
+	if not context.ok and context.code in ["not_ready", "operation_in_progress"]:
+		if _actor == null:
+			visible = false
+		return
 	var source: SDK.ActorResult = sdk.actors.read(context.actor) if context.ok and context.actor != null else null
+	if source != null and not source.ok and source.code in ["not_ready", "operation_in_progress"]:
+		if _actor == null:
+			visible = false
+		return
 	if source == null or not source.ok or source.actor == null or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
 		_actor = null
 		_close_panel()
@@ -259,7 +268,7 @@ func _open_category(category: String) -> void:
 	if category in ["Attacks", "Powers", "Items", "Features", "Companions"] and _actor != null:
 		var initiating_actor := _actor
 		var result := await _favorites.prepare(initiating_actor)
-		if not result.ok:
+		if not result.ok and result.code not in ["not_ready", "operation_in_progress"]:
 			_error(result.message)
 		if _actor != null and _actor.value == initiating_actor.value:
 			_refresh()
