@@ -1,0 +1,72 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/dock-affected
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/power_composition.gd
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body STARTED
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body PASSED 626ms
+
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp STARTED
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp PASSED 1s 812ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 453ms
+
+
+Run Test Suite: res://tests/special_composition.gd
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome STARTED
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome PASSED 612ms
+
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices STARTED
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices PASSED 20ms
+
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection STARTED
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection PASSED 9ms
+
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw STARTED
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw PASSED 5ms
+
+Statistics: 4 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 663ms
+
+
+Run Test Suite: res://tests/health_composition.gd
+  res://tests/health_composition.gd > test_recovery_panel_direct_submit_focus_pending_and_result STARTED
+  res://tests/health_composition.gd > test_recovery_panel_direct_submit_focus_pending_and_result PASSED 614ms
+
+  res://tests/health_composition.gd > test_specialty_corrections_refresh_live_fields_and_preserve_other_drafts STARTED
+  res://tests/health_composition.gd > test_specialty_corrections_refresh_live_fields_and_preserve_other_drafts PASSED 18ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 644ms
+
+
+Run Test Suite: res://tests/defence_composition.gd
+  res://tests/defence_composition.gd > test_compact_shield_geometry_focus_pending_and_close STARTED
+  res://tests/defence_composition.gd > test_compact_shield_geometry_focus_pending_and_close PASSED 41ms
+
+  res://tests/defence_composition.gd > test_switching_actor_discards_the_previous_defence_presentation STARTED
+  res://tests/defence_composition.gd > test_switching_actor_discards_the_previous_defence_presentation PASSED 4ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 52ms
+
+
+Overall Summary: 10 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (4/4)
+Executed test cases : (10/10)
+Total execution time: 3s 812ms
+ Open XML Report at: file://reports/dock-affected/report_1/results.xml
+Open HTML Report at: file://reports/dock-affected/report_1/index.html
+Exit code: 0
+Run dispose test resources
