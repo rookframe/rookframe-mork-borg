@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="6" failures="10" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="recipient_copy_temp" package="tests" timestamp="2026-10-04T06:26:52" hostname="localhost" tests="6" failures="10" errors="0" skipped="0" flaky="0" time="0.745">
+		<testcase name="test_tabletop_zero_range_keeps_captured_actor_with_empty_targets" classname="recipient_copy_temp" time="0.072">
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:34" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Graveworm
+4 / 8 HP'
+ but was
+ 'GNo taravgeworm<LF>4 / 8 HPts'
+	at 'test_tabletop_zero_range_keeps_captured_actor_with_empty_targets' in res://tests/recipient_copy_temp.gd:34
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:35" type="FAILURE">
+<![CDATA[
+Expecting:
+ 0
+ but was
+ 1
+	at 'test_tabletop_zero_range_keeps_captured_actor_with_empty_targets' in res://tests/recipient_copy_temp.gd:35
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp" classname="recipient_copy_temp" time="0.081">
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:43" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Graveworm
+4 / 8 HP'
+ but was
+ 'GHooded stravngeworm
+4.0 /ft 8· HPOut of range'
+	at 'test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp' in res://tests/recipient_copy_temp.gd:43
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:51" type="FAILURE">
+<![CDATA[
+Expecting:
+ 0
+ but was
+ 2
+	at 'test_zero_range_ignores_targets_selection_but_refreshes_captured_actor_hp' in res://tests/recipient_copy_temp.gd:51
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_ranged_item_keeps_target_and_explicit_self_behavior" classname="recipient_copy_temp" time="0.110">
+		</testcase>
+		<testcase name="test_favorited_star_uses_approved_gold_in_native_pressed_states:0 (0)" classname="recipient_copy_temp" time="0.405">
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:89" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'
+	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:89" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(1.0, 1.0, 1.0, 1.0)'
+	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_favorited_star_uses_approved_gold_in_native_pressed_states:1 (1)" classname="recipient_copy_temp" time="0.029">
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:89" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'
+	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:89" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(1.0, 1.0, 1.0, 1.0)'
+	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_favorited_star_uses_approved_gold_in_native_pressed_states:2 (2)" classname="recipient_copy_temp" time="0.029">
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:89" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'
+	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/recipient_copy_temp.gd:89" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(1.0, 1.0, 1.0, 1.0)'
+	at 'test_favorited_star_uses_approved_gold_in_native_pressed_states' in res://tests/recipient_copy_temp.gd:89
+	at '_settle' in res://tests/recipient_copy_temp.gd:22
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

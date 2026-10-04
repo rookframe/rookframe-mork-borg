@@ -239,7 +239,7 @@ func _process(_delta: float) -> void:
 			_actor = latest.actor
 			_entry = RULES.new().owned(_actor.data, _item)
 		_render()
-	if _targets_pending and not _reading_targets and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
+	if _targets_pending and not _reading_targets and _rule.get("range_feet", 0) > 0 and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
 		_targets_pending = false
 		_reading_targets = true
 		var version := _context_version
