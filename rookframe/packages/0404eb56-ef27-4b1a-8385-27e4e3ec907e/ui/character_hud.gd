@@ -7,6 +7,8 @@ const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
 const ATTACKS = preload(ROOT + "ui/hud_attacks.gd")
 const POWERS = preload(ROOT + "ui/hud_powers.gd")
 const ITEMS = preload(ROOT + "ui/hud_items.gd")
+const COMPANIONS = preload(ROOT + "ui/hud_companions.gd")
+const RECOVERY = preload(ROOT + "ui/hud_recovery.gd")
 const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
 const TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_palette.gd")
@@ -33,6 +35,8 @@ var _favorites := FAVORITES.new()
 var _attacks := ATTACKS.new()
 var _powers := POWERS.new()
 var _items := ITEMS.new()
+var _companions := COMPANIONS.new()
+var _recovery := RECOVERY.new()
 var _can_morning := false
 var _pending_favorites: Dictionary = {}
 var _actor: SDK.ActorId
@@ -75,6 +79,9 @@ func ready() -> void:
 	_attacks.bind(sdk)
 	_powers.bind(sdk)
 	_items.bind(sdk)
+	add_child(_companions)
+	_companions.bind(sdk)
+	_recovery.bind(sdk)
 	entry_requested.connect(_launch_entry)
 	morning_requested.connect(_powers.morning)
 	_launcher.bind(sdk)
@@ -161,33 +168,19 @@ func _refresh() -> void:
 		entry.available = can_roll
 		entries.append(entry)
 	_entries["Abilities"] = entries
-	_project_favorites(source.actor)
+	_project_categories(source.actor)
 	visible = true
 	if not _category.is_empty() and not get_node("Panel/Detail").visible:
 		_render_panel()
 
-func _project_favorites(actor: SDK.Actor) -> void:
+func _project_categories(actor: SDK.Actor) -> void:
 	_entries["Attacks"] = _attacks.entries(actor)
 	_entries["Powers"] = _powers.entries(actor)
 	_entries["Items"] = _items.entries(actor)
 	_entries["Features"] = _items.entries(actor, "Features")
+	_entries["Companions"] = _companions.entries(actor)
+	_entries["Recovery"] = _recovery.entries(actor)
 	_can_morning = _powers.can_morning(actor)
-	var sources := _favorites.entries(actor)
-	for category in ["Companions"]:
-		var entries: Array[ENTRY] = []
-		for source in sources:
-			if str(source.get("category", "")) != category:
-				continue
-			var entry := ENTRY.new()
-			entry.id = str(source.key)
-			entry.title = sdk.translations.text(str(source.get("name", "Favorite")))
-			entry.detail = sdk.translations.text(str(source.get("detail", "")))
-			entry.value = str(source.get("damage", ""))
-			entry.icon = CATEGORY_ICONS.get(category)
-			entry.available = source.get("available", false)
-			entry.favorite = source.get("starred", false)
-			entries.append(entry)
-		_entries[category] = entries
 
 func _launch_entry(actor: SDK.ActorId, category: String, key: String) -> void:
 	if category == "Attacks":
@@ -196,6 +189,10 @@ func _launch_entry(actor: SDK.ActorId, category: String, key: String) -> void:
 		_powers.launch(actor, key)
 	elif category in ["Items", "Features"]:
 		_items.launch(actor, key)
+	elif category == "Companions":
+		_companions.launch(actor, key)
+	elif category == "Recovery":
+		_recovery.launch(actor, key)
 
 func _favorite_request_key(actor: SDK.ActorId, key: String) -> String:
 	return actor.value + ":" + key if actor != null else ""

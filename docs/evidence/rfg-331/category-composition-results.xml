@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="4" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="native" package="tests/rfg331_temp" timestamp="2026-10-04T00:48:39" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="1.195">
+		<testcase name="test_native_shared_stars_tombstone_and_geometry:0 (&apos;desktop&apos;, 1920, 1080, 256, 124, 24)" classname="native" time="0.319">
+		</testcase>
+		<testcase name="test_native_shared_stars_tombstone_and_geometry:1 (&apos;tablet&apos;, 1024, 768, 128, 68, 16)" classname="native" time="0.313">
+		</testcase>
+		<testcase name="test_native_shared_stars_tombstone_and_geometry:2 (&apos;phone&apos;, 844, 390, 172, 48, 8)" classname="native" time="0.320">
+		</testcase>
+		<testcase name="test_pending_star_retains_actor_when_hud_context_changes" classname="native" time="0.219">
+		</testcase>
+	</testsuite>
+</testsuites>

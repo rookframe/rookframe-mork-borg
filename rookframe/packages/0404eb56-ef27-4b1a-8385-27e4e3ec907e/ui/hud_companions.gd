@@ -6,6 +6,7 @@ const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
+const ICON = preload("res://rookframe/ui/icons/character/psychopomp.svg")
 var _sdk: SDK
 
 func bind(facade: SDK) -> void:
@@ -25,6 +26,7 @@ func entries(character: SDK.Actor) -> Array[ENTRY]:
 		row.title = str(favorite.get("name", "Companion"))
 		row.detail = str(favorite.get("detail", ""))
 		row.value = str(favorite.get("damage", ""))
+		row.icon = ICON
 		row.favorite = favorite.get("starred", false)
 		row.available = available(character, favorite)
 		result.append(row)
