@@ -1,0 +1,145 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/rfg339-regressions
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/melee_attack.gd
+  res://tests/melee_attack.gd > test_melee_attack STARTED
+  res://tests/melee_attack.gd > test_melee_attack PASSED 3ms
+
+  res://tests/melee_attack.gd > test_d2_faces STARTED
+  res://tests/melee_attack.gd > test_d2_faces PASSED 3ms
+
+  res://tests/melee_attack.gd > test_boundaries STARTED
+  res://tests/melee_attack.gd > test_boundaries PASSED 4ms
+
+  res://tests/melee_attack.gd > test_lifetime STARTED
+  res://tests/melee_attack.gd > test_lifetime PASSED 20ms
+
+  res://tests/melee_attack.gd > test_review_regressions STARTED
+  res://tests/melee_attack.gd > test_review_regressions PASSED 2s 222ms
+
+Statistics: 5 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 267ms
+
+
+Run Test Suite: res://tests/ranged_attack.gd
+  res://tests/ranged_attack.gd > test_bow_uses_presence_and_one_arrow_for_a_miss STARTED
+  res://tests/ranged_attack.gd > test_bow_uses_presence_and_one_arrow_for_a_miss PASSED 5ms
+
+  res://tests/ranged_attack.gd > test_presence_hit_spends_ammunition_before_damage_and_preserves_it_on_cancel STARTED
+  res://tests/ranged_attack.gd > test_presence_hit_spends_ammunition_before_damage_and_preserves_it_on_cancel PASSED 4ms
+
+  res://tests/ranged_attack.gd > test_selected_creature_alternative_owns_its_range STARTED
+  res://tests/ranged_attack.gd > test_selected_creature_alternative_owns_its_range PASSED 4ms
+
+  res://tests/ranged_attack.gd > test_gutterborn_presence_exception_keeps_source_difficulty STARTED
+  res://tests/ranged_attack.gd > test_gutterborn_presence_exception_keeps_source_difficulty PASSED 3ms
+
+  res://tests/ranged_attack.gd > test_equipped_bow_view_selects_only_matching_ammunition STARTED
+  res://tests/ranged_attack.gd > test_equipped_bow_view_selects_only_matching_ammunition PASSED 10ms
+
+  res://tests/ranged_attack.gd > test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log STARTED
+  res://tests/ranged_attack.gd > test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log PASSED 5ms
+
+  res://tests/ranged_attack.gd > test_creature_source_ranges_and_exceptions_survive_selection STARTED
+  res://tests/ranged_attack.gd > test_creature_source_ranges_and_exceptions_survive_selection PASSED 6ms
+
+  res://tests/ranged_attack.gd > test_saved_creature_combined_attack_keeps_live_values_and_gains_source_choices STARTED
+  res://tests/ranged_attack.gd > test_saved_creature_combined_attack_keeps_live_values_and_gains_source_choices PASSED 2ms
+
+  res://tests/ranged_attack.gd > test_unspecified_custom_projectile_is_rejected_before_any_roll STARTED
+  res://tests/ranged_attack.gd > test_unspecified_custom_projectile_is_rejected_before_any_roll PASSED 8ms
+
+Statistics: 9 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 77ms
+
+
+Run Test Suite: res://tests/ranged_resources.gd
+  res://tests/ranged_resources.gd > test_crossbow_critical_and_fumble_spend_bolts_once STARTED
+  res://tests/ranged_resources.gd > test_crossbow_critical_and_fumble_spend_bolts_once PASSED 3ms
+
+  res://tests/ranged_resources.gd > test_rejected_targets_and_cancelled_throws_preserve_resources STARTED
+  res://tests/ranged_resources.gd > test_rejected_targets_and_cancelled_throws_preserve_resources PASSED 5ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 18ms
+
+
+Run Test Suite: res://tests/special_weapons.gd
+  res://tests/special_weapons.gd > test_special_weapon_reach_difficulty_and_damage:0 ('blade-of-your-ancestors', [3], 2) STARTED
+  res://tests/special_weapons.gd > test_special_weapon_reach_difficulty_and_damage:0 ('blade-of-your-ancestors', [3], 2) PASSED 2ms
+
+  res://tests/special_weapons.gd > test_special_weapon_reach_difficulty_and_damage:1 ('snake-skin-gift', [1], 0) STARTED
+  res://tests/special_weapons.gd > test_special_weapon_reach_difficulty_and_damage:1 ('snake-skin-gift', [1], 0) PASSED 2ms
+
+  res://tests/special_weapons.gd > test_special_weapon_reach_difficulty_and_damage:2 ('old-sigurds-sling', [2, 3], 1) STARTED
+  res://tests/special_weapons.gd > test_special_weapon_reach_difficulty_and_damage:2 ('old-sigurds-sling', [2, 3], 1) PASSED 2ms
+
+  res://tests/special_weapons.gd > test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:0 ('brown-scimitar-of-galgenbeck', [3, 1], 3, '10 minutes') STARTED
+  res://tests/special_weapons.gd > test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:0 ('brown-scimitar-of-galgenbeck', [3, 1], 3, '10 minutes') PASSED 2ms
+
+  res://tests/special_weapons.gd > test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:1 ('shoe-of-deaths-horse', [2, 1], 0, 'instantly') STARTED
+  res://tests/special_weapons.gd > test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:1 ('shoe-of-deaths-horse', [2, 1], 0, 'instantly') PASSED 2ms
+
+  res://tests/special_weapons.gd > test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:2 ('sacred-shepherds-crook', [3], 3, 'faithless') STARTED
+  res://tests/special_weapons.gd > test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:2 ('sacred-shepherds-crook', [3], 3, 'faithless') PASSED 2ms
+
+  res://tests/special_weapons.gd > test_bite_and_cowards_jab_use_their_printed_tests:0 ('bite') STARTED
+  res://tests/special_weapons.gd > test_bite_and_cowards_jab_use_their_printed_tests:0 ('bite') PASSED 2ms
+
+  res://tests/special_weapons.gd > test_bite_and_cowards_jab_use_their_printed_tests:1 ('jab') STARTED
+  res://tests/special_weapons.gd > test_bite_and_cowards_jab_use_their_printed_tests:1 ('jab') PASSED 2ms
+
+  res://tests/special_weapons.gd > test_eurekia_destroys_sword_and_records_hamfund_death_on_one_even_on_miss STARTED
+  res://tests/special_weapons.gd > test_eurekia_destroys_sword_and_records_hamfund_death_on_one_even_on_miss PASSED 2ms
+
+  res://tests/special_weapons.gd > test_eurekia_vanish_on_fumble_does_not_restore_sword_from_stale_snapshot STARTED
+  res://tests/special_weapons.gd > test_eurekia_vanish_on_fumble_does_not_restore_sword_from_stale_snapshot PASSED 2ms
+
+  res://tests/special_weapons.gd > test_eurekia_remaining_draw_correction_starts_a_fresh_combat STARTED
+  res://tests/special_weapons.gd > test_eurekia_remaining_draw_correction_starts_a_fresh_combat PASSED 2ms
+
+Statistics: 11 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 43ms
+
+
+Run Test Suite: res://tests/rfg339_temporary.gd
+  res://tests/rfg339_temporary.gd > test_unconditional_attack_damage_and_no_recipient_mutation STARTED
+  res://tests/rfg339_temporary.gd > test_unconditional_attack_damage_and_no_recipient_mutation PASSED 3ms
+
+  res://tests/rfg339_temporary.gd > test_native_intrinsics_and_exact_class_mode STARTED
+  res://tests/rfg339_temporary.gd > test_native_intrinsics_and_exact_class_mode PASSED 4ms
+
+  res://tests/rfg339_temporary.gd > test_projection_identity_availability_and_sheet_star_context STARTED
+  res://tests/rfg339_temporary.gd > test_projection_identity_availability_and_sheet_star_context PASSED 7ms
+
+  res://tests/rfg339_temporary.gd > test_cancel_and_lost_authorization_prevent_late_rolls STARTED
+  res://tests/rfg339_temporary.gd > test_cancel_and_lost_authorization_prevent_late_rolls PASSED 6ms
+
+  res://tests/rfg339_temporary.gd > test_eurekia_draw_spend_remains_independent_of_manual_consequence STARTED
+  res://tests/rfg339_temporary.gd > test_eurekia_draw_spend_remains_independent_of_manual_consequence PASSED 7ms
+
+  res://tests/rfg339_temporary.gd > test_untargeted_ranged_ammunition_and_companion_stats STARTED
+  res://tests/rfg339_temporary.gd > test_untargeted_ranged_ammunition_and_companion_stats PASSED 6ms
+
+Statistics: 6 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 43ms
+
+
+Overall Summary: 33 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (5/5)
+Executed test cases : (33/33)
+Total execution time: 2s 448ms
+ Open XML Report at: file://reports/rfg339-regressions/report_1/results.xml
+Open HTML Report at: file://reports/rfg339-regressions/report_1/index.html
+Exit code: 0
+Run dispose test resources

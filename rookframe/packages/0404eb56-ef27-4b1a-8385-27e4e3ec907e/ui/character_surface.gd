@@ -612,7 +612,7 @@ func _render_detail() -> void:
 	if _detail.begins_with("favorite:"):
 		var favorite := _favorites.find(_actor, _detail.trim_prefix("favorite:"))
 		_detail_title.text = str(favorite.get("name", "Favorite"))
-		_text("Unavailable")
+		_text(str(favorite.get("detail", "")) if favorite.get("present", false) else "Unavailable")
 	elif _detail in ["profile", "class"]:
 		_detail_title.text = str(data.get("name", "Character")) if _detail == "profile" else str(data.get("class_title", "Class"))
 		if _detail_tab == 0:

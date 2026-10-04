@@ -50,6 +50,8 @@ func append_missing(rows: Dictionary, actor: SDK.Actor, chapter: int) -> void:
 	var primary: Array = rows.primary
 	for entry in entries(actor):
 		if entry.present:
+			if chapter == 2 and str(entry.get("key", "")).begins_with("intrinsic:"):
+				primary.append(PROJECTION.new().row("favorite:" + str(entry.key), str(entry.name), str(entry.get("detail", "")), str(entry.get("damage", ""))))
 			continue
 		var row := PROJECTION.new().row("favorite:" + str(entry.key), str(entry.get("name", "Favorite")), "Unavailable")
 		if chapter == 0 and entry.category == "Companions":
