@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="4" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="reopen" package="tests/rfg_reopen_temp" timestamp="2026-10-04T00:40:20" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.911">
+		<testcase name="test_completed_cast_closes_and_reopens_same_window_with_new_actor_source" classname="reopen" time="0.788">
+		</testcase>
+		<testcase name="test_morning_cancel_cast_and_morning_reopen_reset_mode_and_draft" classname="reopen" time="0.118">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="power_composition" package="tests" timestamp="2026-10-04T00:40:21" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="2.459">
+		<testcase name="test_cast_controls_and_terminal_gm_report_in_phone_body" classname="power_composition" time="0.628">
+		</testcase>
+		<testcase name="test_immediate_healing_guides_count_errors_and_reports_applied_hp" classname="power_composition" time="1.820">
+		</testcase>
+	</testsuite>
+</testsuites>
