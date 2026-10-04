@@ -62,6 +62,12 @@ and the severe first-appearance write/stale-data check; remove the obsolete comp
 375px composition matrix. These checks do not establish native acquisition,
 render/input, network replication or durable application persistence.
 
+The removed Creature title-width localization case also depended on that
+compact sheet's `Layout/Tabs/Creature/Preview/Identity/Content/Title` node and
+351px content area. It cannot observe the current full-viewport composition.
+Retain catalog coverage of complete authored Creature rules and format parity;
+review Russian title wrapping with the canonical native views in RFG-354.
+
 RFG-354 owns unified native acceptance after official publication. Install the
 exact public HTTPS Manifest normally and acquire World requirements through
 normal join. Compare the actual authored sheet at the three canonical viewports,
