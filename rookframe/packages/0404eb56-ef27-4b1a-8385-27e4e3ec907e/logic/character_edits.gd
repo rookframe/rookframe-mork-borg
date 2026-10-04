@@ -266,11 +266,7 @@ func _companion(id: String, character: Dictionary) -> SDK.ActorResult:
 		return _failure("This companion attack is unavailable.")
 	if not FAVORITES.new().needs_companion_identity(current):
 		return result
-	var data: Dictionary = current.duplicate(true)
-	var items := FAVORITES.CREATURE_ITEMS.new(null, result.actor.id).inventory(data)
-	data["inventory"] = items
-	data["inventory_serial"] = _serial(data, items)
-	data["creature_inventory"] = true
+	var data: Dictionary = FAVORITES.CREATURES.new().stat_block(current)
 	_companion_changes.append(SDK.ActorChange.new(result.actor.id, data))
 	result.actor.data = data
 	return result

@@ -20,11 +20,11 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 		var row = ROW.instantiate()
 		row.localize(i18n)
 		var equipped: bool = item.get("equipped", false)
-		var target: NodePath = ^"EquippedSection/Content/Items" if equipped else ^"CarriedSection/Content/Items"
+		var target: NodePath = ^"EquippedSection/Content/Items" if equipped and not creature else ^"CarriedSection/Content/Items"
 		if get_node(target).get_child_count() > 0:
 			get_node(target).add_child(DIVIDER.instantiate())
 		get_node(target).add_child(row)
-		row.configure(item, false, read_only, not creature)
+		row.configure(item, false, read_only, not creature, creature)
 		row.mutation_requested.connect(_mutation)
 		row.navigate_requested.connect(_navigate)
 	get_node(^"EquippedSection").visible = get_node(^"EquippedSection/Content/Items").get_child_count() > 0

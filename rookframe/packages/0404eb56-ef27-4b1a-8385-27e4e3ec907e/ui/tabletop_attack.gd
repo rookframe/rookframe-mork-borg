@@ -3,7 +3,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SOURCES = preload(ROOT + "logic/attack_sources.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
-const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const ACTION = preload(ROOT + "logic/melee_action.gd")
 const COMPANION_ACTION = preload(ROOT + "logic/companion_action.gd")
 const DEFENCE_FLOW = preload(ROOT + "ui/creature_defence_flow.gd")
@@ -87,7 +87,7 @@ func _process(_delta: float) -> void:
 		_refresh()
 
 func _inventory(actor: SDK.Actor) -> Array:
-	return CREATURE_ITEMS.new(sdk, actor.id).inventory(actor.data) if str(actor.data.get("schema", "")) == "mork-borg-adversary/v1" else ITEMS.new(sdk, actor.id).inventory(actor.data)
+	return CREATURES.new().combat_attacks(actor.data) if str(actor.data.get("schema", "")) == "mork-borg-adversary/v1" else ITEMS.new(sdk, actor.id).inventory(actor.data)
 
 func _refresh() -> void:
 	if _actor == null or _closed:
