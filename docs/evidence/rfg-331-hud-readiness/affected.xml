@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="13" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="character_sheet_composition" package="tests" timestamp="2026-10-04T05:34:51" hostname="localhost" tests="9" failures="0" errors="0" skipped="0" flaky="0" time="52.098">
+		<testcase name="test_phone_overview_has_one_edit_and_inline_omens" classname="character_sheet_composition" time="0.079">
+		</testcase>
+		<testcase name="test_health_has_no_eligibility_or_authorization_widgets" classname="character_sheet_composition" time="0.023">
+		</testcase>
+		<testcase name="test_sheet_at_constrained_sizes:0 (326, 315, &apos;en&apos;)" classname="character_sheet_composition" time="8.179">
+		</testcase>
+		<testcase name="test_sheet_at_constrained_sizes:1 (326, 315, &apos;ru&apos;)" classname="character_sheet_composition" time="10.458">
+		</testcase>
+		<testcase name="test_sheet_at_constrained_sizes:2 (375, 313, &apos;en&apos;)" classname="character_sheet_composition" time="7.908">
+		</testcase>
+		<testcase name="test_sheet_at_constrained_sizes:3 (375, 313, &apos;ru&apos;)" classname="character_sheet_composition" time="9.808">
+		</testcase>
+		<testcase name="test_sheet_at_constrained_sizes:4 (412, 712, &apos;en&apos;)" classname="character_sheet_composition" time="7.670">
+		</testcase>
+		<testcase name="test_sheet_at_constrained_sizes:5 (960, 888, &apos;en&apos;)" classname="character_sheet_composition" time="7.737">
+		</testcase>
+		<testcase name="test_omen_counter_pending_failure_retry_and_read_only" classname="character_sheet_composition" time="0.205">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="creature_sheet_composition" package="tests" timestamp="2026-10-04T05:35:43" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="20.290">
+		<testcase name="test_creature_tabs_editing_and_viewer_at_phone_width:0 (375)" classname="creature_sheet_composition" time="8.128">
+		</testcase>
+		<testcase name="test_creature_tabs_editing_and_viewer_at_phone_width:1 (328)" classname="creature_sheet_composition" time="8.190">
+		</testcase>
+		<testcase name="test_inventory_names_keep_space_and_icons_keep_accessible_actions" classname="creature_sheet_composition" time="0.053">
+		</testcase>
+		<testcase name="test_hidden_character_workflow_cannot_replace_creature_chrome" classname="creature_sheet_composition" time="3.903">
+		</testcase>
+	</testsuite>
+</testsuites>

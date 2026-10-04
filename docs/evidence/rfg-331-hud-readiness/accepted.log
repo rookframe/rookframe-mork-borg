@@ -1,0 +1,69 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[2J[H
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/readiness-accepted
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_readiness_temp.gd
+  res://tests/hud_readiness_temp.gd > test_incomplete_context_preserves_opened_panel:0 ('not_ready') STARTED
+  res://tests/hud_readiness_temp.gd > test_incomplete_context_preserves_opened_panel:0 ('not_ready') PASSED 480ms
+
+  res://tests/hud_readiness_temp.gd > test_incomplete_context_preserves_opened_panel:1 ('operation_in_progress') STARTED
+  res://tests/hud_readiness_temp.gd > test_incomplete_context_preserves_opened_panel:1 ('operation_in_progress') PASSED 70ms
+
+  res://tests/hud_readiness_temp.gd > test_incomplete_actor_read_preserves_panel_without_error_feedback:0 ('not_ready') STARTED
+  res://tests/hud_readiness_temp.gd > test_incomplete_actor_read_preserves_panel_without_error_feedback:0 ('not_ready') PASSED 67ms
+
+  res://tests/hud_readiness_temp.gd > test_incomplete_actor_read_preserves_panel_without_error_feedback:1 ('operation_in_progress') STARTED
+  res://tests/hud_readiness_temp.gd > test_incomplete_actor_read_preserves_panel_without_error_feedback:1 ('operation_in_progress') PASSED 70ms
+
+  res://tests/hud_readiness_temp.gd > test_permanent_context_failure_hides_immediately:0 ('session_ended') STARTED
+  res://tests/hud_readiness_temp.gd > test_permanent_context_failure_hides_immediately:0 ('session_ended') PASSED 68ms
+
+  res://tests/hud_readiness_temp.gd > test_permanent_context_failure_hides_immediately:1 ('authority_unavailable') STARTED
+  res://tests/hud_readiness_temp.gd > test_permanent_context_failure_hides_immediately:1 ('authority_unavailable') PASSED 68ms
+
+  res://tests/hud_readiness_temp.gd > test_permanent_context_failure_hides_immediately:2 ('access_denied') STARTED
+  res://tests/hud_readiness_temp.gd > test_permanent_context_failure_hides_immediately:2 ('access_denied') PASSED 69ms
+
+  res://tests/hud_readiness_temp.gd > test_permanent_actor_failure_hides_immediately:0 ('not_found') STARTED
+  res://tests/hud_readiness_temp.gd > test_permanent_actor_failure_hides_immediately:0 ('not_found') PASSED 69ms
+
+  res://tests/hud_readiness_temp.gd > test_permanent_actor_failure_hides_immediately:1 ('access_denied') STARTED
+  res://tests/hud_readiness_temp.gd > test_permanent_actor_failure_hides_immediately:1 ('access_denied') PASSED 67ms
+
+  res://tests/hud_readiness_temp.gd > test_confirmed_context_clear_hides_immediately STARTED
+  res://tests/hud_readiness_temp.gd > test_confirmed_context_clear_hides_immediately PASSED 68ms
+
+  res://tests/hud_readiness_temp.gd > test_unconfirmed_initial_context_stays_hidden:0 ('context') STARTED
+  res://tests/hud_readiness_temp.gd > test_unconfirmed_initial_context_stays_hidden:0 ('context') PASSED 41ms
+
+  res://tests/hud_readiness_temp.gd > test_unconfirmed_initial_context_stays_hidden:1 ('actor') STARTED
+  res://tests/hud_readiness_temp.gd > test_unconfirmed_initial_context_stays_hidden:1 ('actor') PASSED 39ms
+
+  res://tests/hud_readiness_temp.gd > test_confirmed_other_schema_hides_immediately STARTED
+  res://tests/hud_readiness_temp.gd > test_confirmed_other_schema_hides_immediately PASSED 68ms
+
+Statistics: 13 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 272ms
+
+
+Overall Summary: 13 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (13/13)
+Total execution time: 1s 272ms
+ Open XML Report at: file://reports/readiness-accepted/report_1/results.xml
+Open HTML Report at: file://reports/readiness-accepted/report_1/index.html
+Exit code: 0
+Run dispose test resources

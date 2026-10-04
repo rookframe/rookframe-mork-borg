@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="13" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_readiness_temp" package="tests" timestamp="2026-10-04T05:27:42" hostname="localhost" tests="13" failures="0" errors="0" skipped="0" flaky="0" time="1.272">
+		<testcase name="test_incomplete_context_preserves_opened_panel:0 (&apos;not_ready&apos;)" classname="hud_readiness_temp" time="0.480">
+		</testcase>
+		<testcase name="test_incomplete_context_preserves_opened_panel:1 (&apos;operation_in_progress&apos;)" classname="hud_readiness_temp" time="0.070">
+		</testcase>
+		<testcase name="test_incomplete_actor_read_preserves_panel_without_error_feedback:0 (&apos;not_ready&apos;)" classname="hud_readiness_temp" time="0.067">
+		</testcase>
+		<testcase name="test_incomplete_actor_read_preserves_panel_without_error_feedback:1 (&apos;operation_in_progress&apos;)" classname="hud_readiness_temp" time="0.070">
+		</testcase>
+		<testcase name="test_permanent_context_failure_hides_immediately:0 (&apos;session_ended&apos;)" classname="hud_readiness_temp" time="0.068">
+		</testcase>
+		<testcase name="test_permanent_context_failure_hides_immediately:1 (&apos;authority_unavailable&apos;)" classname="hud_readiness_temp" time="0.068">
+		</testcase>
+		<testcase name="test_permanent_context_failure_hides_immediately:2 (&apos;access_denied&apos;)" classname="hud_readiness_temp" time="0.069">
+		</testcase>
+		<testcase name="test_permanent_actor_failure_hides_immediately:0 (&apos;not_found&apos;)" classname="hud_readiness_temp" time="0.069">
+		</testcase>
+		<testcase name="test_permanent_actor_failure_hides_immediately:1 (&apos;access_denied&apos;)" classname="hud_readiness_temp" time="0.067">
+		</testcase>
+		<testcase name="test_confirmed_context_clear_hides_immediately" classname="hud_readiness_temp" time="0.068">
+		</testcase>
+		<testcase name="test_unconfirmed_initial_context_stays_hidden:0 (&apos;context&apos;)" classname="hud_readiness_temp" time="0.041">
+		</testcase>
+		<testcase name="test_unconfirmed_initial_context_stays_hidden:1 (&apos;actor&apos;)" classname="hud_readiness_temp" time="0.039">
+		</testcase>
+		<testcase name="test_confirmed_other_schema_hides_immediately" classname="hud_readiness_temp" time="0.068">
+		</testcase>
+	</testsuite>
+</testsuites>
