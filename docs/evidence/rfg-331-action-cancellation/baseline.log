@@ -1,0 +1,217 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/action-task-lifetime-baseline-final
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/action_task_lifetime_temp.gd
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:0 ('power', 'first') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:0 ('power', 'first') FAILED 18ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 1
+ but was
+ 0	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:1 ('morning', 'first') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:1 ('morning', 'first') FAILED 19ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 1
+ but was
+ 0	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:2 ('item', 'first') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:2 ('item', 'first') FAILED 19ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 1
+ but was
+ 0	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:3 ('health', 'first') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:3 ('health', 'first') FAILED 21ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 1
+ but was
+ 0	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:4 ('power', 'retry') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:4 ('power', 'retry') FAILED 676ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 2
+ but was
+ 1	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:5 ('morning', 'retry') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:5 ('morning', 'retry') FAILED 672ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 2
+ but was
+ 1	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:6 ('item', 'retry') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:6 ('item', 'retry') FAILED 672ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 2
+ but was
+ 1	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:7 ('health', 'retry') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_authored_task_cancellation_survives_release:7 ('health', 'retry') FAILED 671ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85  Expecting:
+ 2
+ but was
+ 1	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86  Expecting:
+ 'pending'
+ but was
+ 'pendingrror'	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+
+  res://tests/action_task_lifetime_temp.gd > test_closed_first_reply_keeps_authority_access_and_session_rules:0 ('access') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_closed_first_reply_keeps_authority_access_and_session_rules:0 ('access') FAILED 25ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:113  Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:114
+
+  res://tests/action_task_lifetime_temp.gd > test_closed_first_reply_keeps_authority_access_and_session_rules:1 ('actor') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_closed_first_reply_keeps_authority_access_and_session_rules:1 ('actor') FAILED 20ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:113  Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:114
+
+  res://tests/action_task_lifetime_temp.gd > test_closed_first_reply_keeps_authority_access_and_session_rules:2 ('session') STARTED
+  res://tests/action_task_lifetime_temp.gd > test_closed_first_reply_keeps_authority_access_and_session_rules:2 ('session') FAILED 19ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:113  Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:114
+
+  res://tests/action_task_lifetime_temp.gd > test_permanent_cancel_refusal_releases_request_without_retry:0 (false) STARTED
+  res://tests/action_task_lifetime_temp.gd > test_permanent_cancel_refusal_releases_request_without_retry:0 (false) PASSED 659ms
+
+  res://tests/action_task_lifetime_temp.gd > test_permanent_cancel_refusal_releases_request_without_retry:1 (true) STARTED
+  res://tests/action_task_lifetime_temp.gd > test_permanent_cancel_refusal_releases_request_without_retry:1 (true) FAILED 668ms
+  Report:
+  Expecting:
+ 2
+ but was
+ 1	at 'test_permanent_cancel_refusal_releases_request_without_retry' in res://tests/action_task_lifetime_temp.gd:134
+
+  res://tests/action_task_lifetime_temp.gd > test_companion_authored_task_first_reply_survives_release:0 (false) STARTED
+  res://tests/action_task_lifetime_temp.gd > test_companion_authored_task_first_reply_survives_release:0 (false) FAILED 27ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'pendeding'	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:165  Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:168  Expecting:
+ 1
+ but was
+ 0	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:170
+
+  res://tests/action_task_lifetime_temp.gd > test_companion_authored_task_first_reply_survives_release:1 (true) STARTED
+  res://tests/action_task_lifetime_temp.gd > test_companion_authored_task_first_reply_survives_release:1 (true) FAILED 23ms
+  Report:
+  Expecting:
+ 'ended'
+ but was
+ 'renadedy'	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:165  Expecting:
+ 1
+ but was
+ 0	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:170
+
+  res://tests/action_task_lifetime_temp.gd > test_accepted_cancel_reply_releases_request_after_task_free STARTED
+  res://tests/action_task_lifetime_temp.gd > test_accepted_cancel_reply_releases_request_after_task_free FAILED 18ms
+  Report:
+  Expecting: 'true' but is 'false'	at 'test_accepted_cancel_reply_releases_request_after_task_free' in res://tests/action_task_lifetime_temp.gd:184
+	at '_free_task' in res://tests/action_task_lifetime_temp.gd:46
+
+Statistics: 16 test cases | 0 errors | 37 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 4s 284ms
+
+
+Overall Summary: 16 test cases | 0 errors | 37 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (16/16)
+Total execution time: 4s 284ms
+ Open XML Report at: file://reports/action-task-lifetime-baseline-final/report_1/results.xml
+Open HTML Report at: file://reports/action-task-lifetime-baseline-final/report_1/index.html
+Exit code: 100
+Run dispose test resources

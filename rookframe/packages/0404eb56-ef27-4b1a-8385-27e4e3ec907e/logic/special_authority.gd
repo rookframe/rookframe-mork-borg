@@ -86,7 +86,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		if not chosen in ["Agility", "Presence", "Strength", "Toughness"]:
 			return _error("The source leaves the ability unspecified. Choose it with the table.")
 		rule["ability"] = chosen
-	if input.get("sheet", false) and (rule.has("ability") or (rule.get("gob", false) and not input.get("new_fight", false))) and not BROKEN.new().can_act(data):
+	if (not input.get("sheet", false) or rule.has("ability") or rule.get("gob", false) and not input.get("new_fight", false)) and not BROKEN.new().can_act(data):
 		return _error("This Character cannot make a test while unable to act or dead.")
 	if str(item.source_item_id) == "stolen-mitre" and not item.get("equipped", false):
 		return _error("Wear the mitre and confirm that its ears are covered outside battle.")
@@ -102,14 +102,14 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if target.has("error"):
 		return _error(str(target.error))
 	var recipient := context.read_actor(SDK.ActorId.new(str(target.actor)))
-	if healing and (not recipient.ok or not _healable(recipient.actor.data)):
+	if healing and not target.get("untargeted", false) and (not recipient.ok or not _healable(recipient.actor.data)):
 		return _error("Healing requires a living target with valid maximum HP.")
 	var owner := {"id": str(caller.participant_id), "session": str(caller.session_id)} if input.get("sheet", false) else PARTICIPANTS.new().owner(context, caller, source.actor.id)
 	if owner.has("error"):
 		return _error(str(owner.error))
-	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "item": str(input.item), "kind": str(item.source_item_id), "target": target, "sheet": input.get("sheet", false), "rook": str(input.get("rook", "")), "resource": str(resource.get("inventory_id", "")), "rule": rule, "adjustment": input.get("adjustment", 0), "request": str(input.id), "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "source": source.actor.id.value, "participant": str(caller.participant_id), "session": str(caller.session_id), "owner": str(owner.id), "owner_session": str(owner.session), "item": str(input.item), "kind": str(item.source_item_id), "target": target, "sheet": input.get("sheet", false), "untargeted": target.get("untargeted", false), "rook": str(input.get("rook", "")), "resource": str(resource.get("inventory_id", "")), "rule": rule, "adjustment": input.get("adjustment", 0), "request": str(input.id), "state": "pending", "message": "Complete the requested Throw in the Dice Tray."}
 	var terms: Array[SDK.DiceTerm] = []
-	if input.get("sheet", false) and (rule.get("poison", false) or rule.get("book", false) or rule.get("resistance", false) or rule.get("damage", false) or rule.get("morale", false)):
+	if (input.get("sheet", false) or target.get("untargeted", false)) and (rule.get("healing", false) and target.get("untargeted", false) or rule.get("poison", false) or rule.get("book", false) or rule.get("resistance", false) or rule.get("damage", false) or rule.get("morale", false)):
 		action["phase"] = "sheet-target"
 		if rule.get("morale", false):
 			if typeof(input.get("presence_sign")) != TYPE_INT or input.presence_sign not in [-1, 1] or typeof(input.get("morale")) != TYPE_INT:
@@ -117,6 +117,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			action["presence_sign"] = input.presence_sign
 			action["morale"] = input.morale
 			terms = [SDK.DiceTerm.new("Morale", 6, 2)]
+		elif rule.get("healing", false):
+			terms = [SDK.DiceTerm.new("Healing", 6)]
 		elif rule.has("die"):
 			terms = [SDK.DiceTerm.new("Printed outcome", int(rule.die))]
 		else:
@@ -207,9 +209,10 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _end(context, action)
 	var current: Dictionary = source.actor.data
 	var tested_rule: Dictionary = action.rule
-	if action.get("sheet", false) and action.get("phase", "") != "sheet-target" and (tested_rule.has("ability") or action.get("phase", "") in ["spit", "blade-attack"]) and not BROKEN.new().can_act(current):
+	if (not action.get("sheet", false) or action.get("phase", "") != "sheet-target" and (tested_rule.has("ability") or action.get("phase", "") in ["spit", "blade-attack"])) and not BROKEN.new().can_act(current):
 		return _end(context, action)
-	if not _valid(current) or RULES.new().owned(current, str(action.item)).is_empty():
+	var current_item := RULES.new().owned(current, str(action.item))
+	if not _valid(current) or current_item.is_empty() or str(current_item.get("source_item_id", "")) != str(action.kind):
 		return _end(context, action)
 	var roll := context.read_throw(str(action.request))
 	if not roll.ok or roll.status == "cancelled":
@@ -391,7 +394,7 @@ func _resource(data: Dictionary, item: Dictionary) -> Dictionary:
 	for raw in ITEMS.new(null, SDK.ActorId.new("")).inventory(data):
 		var entry: Dictionary = raw
 		var quantity: int = entry.get("quantity", 0)
-		if str(entry.get("source_item_id", "")) == str(item.dose_pool) and quantity > 0:
+		if str(entry.get("source_item_id", "")) == str(item.dose_pool) and quantity > 0 and not entry.get("broken", false):
 			return entry
 	return {}
 
@@ -408,11 +411,17 @@ func _healable(value: Variant) -> bool:
 func _target(context: SDK.SystemActionContext, caller: Dictionary, input: Dictionary, source: SDK.ActorId, reach: int = 5) -> Dictionary:
 	if reach == 0 or input.get("self", false):
 		return {"actor": source.value, "rook": "", "label": "Self"}
+	var ids: PackedStringArray = caller.targets
+	var has_targets := false
+	for _target_id in ids:
+		has_targets = true
+		break
+	if not has_targets:
+		return {"actor": "", "rook": "", "label": "Table outcome", "untargeted": true}
 	var rook_id := SDK.RookId.new(str(input.get("rook", "")))
 	var rook := context.read_rook(rook_id)
-	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value or rook.rook.scene.value != "main":
+	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value:
 		return {"error": "Select this Character's source Rook."}
-	var ids: PackedStringArray = caller.targets
 	var outside := ""
 	var selected: Dictionary = {}
 	var target_count := 0
@@ -477,7 +486,7 @@ func _consume(data: Dictionary, action: Dictionary) -> bool:
 	var resource: Dictionary = _resource(data, item)
 	var default_uses: int = rule.get("uses", 0)
 	var uses: int = resource.get("uses", default_uses)
-	if uses < 1:
+	if str(resource.get("inventory_id", "")) != str(action.resource) or uses < 1:
 		return false
 	var items := ITEMS.new(null, SDK.ActorId.new("")).inventory(data)
 	for raw in items:
@@ -486,11 +495,11 @@ func _consume(data: Dictionary, action: Dictionary) -> bool:
 			entry["uses"] = uses - 1
 			data["inventory"] = items
 			return true
-	if str(action.item).begins_with("feature:"):
+	if str(action.item).begins_with("feature:") or str(action.item).begins_with("owned-feature:"):
 		var traits: Array = data.get("traits", [])
 		for raw in traits:
 			var feature: Dictionary = raw
-			if "feature:" + str(feature.get("id", "")) == str(action.item):
+			if RULES.new().feature_matches(feature, str(action.item)):
 				feature["uses"] = uses - 1
 				return true
 	return false
@@ -811,7 +820,7 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 		var traits: Array = data.get("traits", [])
 		for raw in traits:
 			var feature: Dictionary = raw
-			if str(feature.get("id", "")) == str(action.kind):
+			if RULES.new().feature_matches(feature, str(action.item)):
 				feature["uses"] = count
 		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "%d spits available this fight (physical d4 halved, rounded up). Raw Roll #%d." % [count, roll.sequence]):
 			return _end(context, action)
@@ -828,7 +837,7 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 		var face: int = roll.terms[0].results[0]
 		var success := face + modifier >= 8
 		var text := "Gob Lobber: d20 %d %+d vs DR8. %s One spit spent. Raw Roll #%d." % [face, modifier, "Hit." if success else "Miss.", roll.sequence]
-		if action.get("sheet", false) and not success:
+		if (action.get("sheet", false) or action.get("untargeted", false)) and not success:
 			return _resolve(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text + " Witness Toughness tests and vomiting remain at the table.")
 		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text):
 			return _end(context, action)
@@ -839,9 +848,9 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 		return _public(action)
 	if phase == "gob-duration":
 		var target: Dictionary = action.target
-		var label := "Table-chosen target" if action.get("sheet", false) else str(target.label)
+		var label := "Table-chosen target" if action.get("sheet", false) or action.get("untargeted", false) else str(target.label)
 		var text := "%s: blinded, retching and vomiting for %d rounds. Handle these consequences manually. Raw Roll #%d." % [label, roll.terms[0].results[0], roll.sequence]
-		if action.get("sheet", false):
+		if action.get("sheet", false) or action.get("untargeted", false):
 			return _resolve(context, action, [], text + " Witness Toughness tests and vomiting remain at the table.")
 		if not _record(context, [], text):
 			return _end(context, action)
@@ -1087,7 +1096,9 @@ func _current(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 			var entry: Dictionary = raw
 			if str(entry.inventory_id) == str(action.item) and str(entry.get("source_item_id", "")) == str(action.kind):
 				item = entry
-	if item.is_empty():
+	if item.is_empty() or str(item.get("source_item_id", "")) != str(action.kind):
+		return false
+	if not action.get("sheet", false) and not BROKEN.new().can_act(data):
 		return false
 	if (rule.get("blade", false) or str(action.kind) == "stolen-mitre") and not item.get("equipped", false):
 		return false
@@ -1119,6 +1130,19 @@ func _sheet_target_result(context: SDK.SystemActionContext, action: Dictionary, 
 		return _end(context, action)
 	var text := "%s: %s. Resolve the printed target outcome with the table. No target state changed. Raw Roll #%d." % [str(action.kind), str(values), sequence]
 	var rule: Dictionary = action.rule
+	if action.get("untargeted", false):
+		var item := RULES.new().owned(current, str(action.item))
+		var label := str(item.get("name", action.kind))
+		if rule.get("book", false):
+			text = label + ": enemy resistance DR12 remains at the table. On failed resistance, resolve d2 Berserker-slayers and d6 disposition with ordinary dice. One daily use spent. No recipient was chosen and no Actors were summoned."
+		elif not rule.get("morale", false):
+			var outcome := "%d HP healing" % values[0] if rule.get("healing", false) else "%d damage" % values[0] if rule.get("damage", false) else "%d HP loss parameter; resistance DR%d" % [values[0], int(rule.dr)] if rule.get("poison", false) else str(rule.get("text", "")) % values[0]
+			text = label + ": " + outcome + ". "
+			if rule.get("quantity_use", false):
+				text += "One item consumed. "
+			elif rule.get("consume", false) or rule.has("uses"):
+				text += "One use spent. "
+			text += "Recipients, resistance, protection and HP changes remain at the table. No target state changed. Raw Roll #%d." % sequence
 	if rule.get("morale", false):
 		var abilities: Dictionary = current.get("abilities", {})
 		var presence: Dictionary = abilities.get("Presence", {})

@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="16" failures="37" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="action_task_lifetime_temp" package="tests" timestamp="2026-10-04T04:06:07" hostname="localhost" tests="16" failures="37" errors="0" skipped="0" flaky="0" time="4.284">
+		<testcase name="test_authored_task_cancellation_survives_release:0 (&apos;power&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.018">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:1 (&apos;morning&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.019">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:2 (&apos;item&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.019">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:3 (&apos;health&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.021">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:4 (&apos;power&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.676">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 2
+ but was
+ 1
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:5 (&apos;morning&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.672">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 2
+ but was
+ 1
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:6 (&apos;item&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.672">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 2
+ but was
+ 1
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:7 (&apos;health&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.671">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:85" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:85
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:86" type="FAILURE">
+<![CDATA[
+Expecting:
+ 2
+ but was
+ 1
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:86
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:92" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'pending'
+ but was
+ 'pendingrror'
+	at 'test_authored_task_cancellation_survives_release' in res://tests/action_task_lifetime_temp.gd:92
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_closed_first_reply_keeps_authority_access_and_session_rules:0 (&apos;access&apos;)" classname="action_task_lifetime_temp" time="0.025">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:113" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:113
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:114" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'
+	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:114
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_closed_first_reply_keeps_authority_access_and_session_rules:1 (&apos;actor&apos;)" classname="action_task_lifetime_temp" time="0.020">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:113" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:113
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:114" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'
+	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:114
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_closed_first_reply_keeps_authority_access_and_session_rules:2 (&apos;session&apos;)" classname="action_task_lifetime_temp" time="0.019">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:113" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:113
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:114" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'
+	at 'test_closed_first_reply_keeps_authority_access_and_session_rules' in res://tests/action_task_lifetime_temp.gd:114
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_permanent_cancel_refusal_releases_request_without_retry:0 (false)" classname="action_task_lifetime_temp" time="0.659">
+		</testcase>
+		<testcase name="test_permanent_cancel_refusal_releases_request_without_retry:1 (true)" classname="action_task_lifetime_temp" time="0.668">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:134" type="FAILURE">
+<![CDATA[
+Expecting:
+ 2
+ but was
+ 1
+	at 'test_permanent_cancel_refusal_releases_request_without_retry' in res://tests/action_task_lifetime_temp.gd:134
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_companion_authored_task_first_reply_survives_release:0 (false)" classname="action_task_lifetime_temp" time="0.027">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:165" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'pendeding'
+	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:165
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:168" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'cancelled'
+ but was
+ 'capencelleding'
+	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:168
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:170" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:170
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_companion_authored_task_first_reply_survives_release:1 (true)" classname="action_task_lifetime_temp" time="0.023">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:165" type="FAILURE">
+<![CDATA[
+Expecting:
+ 'ended'
+ but was
+ 'renadedy'
+	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:165
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:170" type="FAILURE">
+<![CDATA[
+Expecting:
+ 1
+ but was
+ 0
+	at 'test_companion_authored_task_first_reply_survives_release' in res://tests/action_task_lifetime_temp.gd:170
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_accepted_cancel_reply_releases_request_after_task_free" classname="action_task_lifetime_temp" time="0.018">
+			<failure message="FAILED: res://tests/action_task_lifetime_temp.gd:184" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_accepted_cancel_reply_releases_request_after_task_free' in res://tests/action_task_lifetime_temp.gd:184
+	at '_free_task' in res://tests/action_task_lifetime_temp.gd:46
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

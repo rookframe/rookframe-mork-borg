@@ -241,6 +241,12 @@ theme_override_fonts/font = ExtResource("display")
 [node name="ShowAll" type="CheckBox" parent="Panel/Header"]
 text = "Show all"
 
+[node name="Morning" type="Button" parent="Panel/Header"]
+visible = false
+disabled = true
+text = "Morning"
+flat = true
+
 [node name="Close" type="Button" parent="Panel/Header"]
 text = "×"
 flat = true

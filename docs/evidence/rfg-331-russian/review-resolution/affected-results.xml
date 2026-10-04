@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="12" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="localization" package="tests" timestamp="2026-10-04T09:09:17" hostname="localhost" tests="7" failures="0" errors="0" skipped="0" flaky="0" time="0.559">
+		<testcase name="test_russian_creation_uses_display_labels_without_changing_draft" classname="localization" time="0.129">
+		</testcase>
+		<testcase name="test_dynamic_inventory_and_search_preserve_source_ids" classname="localization" time="0.075">
+		</testcase>
+		<testcase name="test_editable_values_and_fallback" classname="localization" time="0.038">
+		</testcase>
+		<testcase name="test_edit_labels_translate_without_rewriting_named_content" classname="localization" time="0.049">
+		</testcase>
+		<testcase name="test_catalog_covers_all_authored_rule_content_and_preserves_formats" classname="localization" time="0.056">
+		</testcase>
+		<testcase name="test_long_russian_definition_names_fit_phone_width" classname="localization" time="0.161">
+		</testcase>
+		<testcase name="test_russian_cast_confirmation_wraps_inside_phone_width" classname="localization" time="0.033">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="companions" package="tests" timestamp="2026-10-04T09:09:17" hostname="localhost" tests="3" failures="0" errors="0" skipped="0" flaky="0" time="0.090">
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:0 (&apos;Owner&apos;)" classname="companions" time="0.036">
+		</testcase>
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:1 (&apos;Viewer&apos;)" classname="companions" time="0.034">
+		</testcase>
+		<testcase name="test_creature_inventory_edits_preserve_profiles_and_individual_state" classname="companions" time="0.005">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="ranged_attack" package="tests" timestamp="2026-10-04T09:09:17" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.056">
+		<testcase name="test_equipped_bow_view_selects_only_matching_ammunition" classname="ranged_attack" time="0.009">
+		</testcase>
+		<testcase name="test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log" classname="ranged_attack" time="0.019">
+		</testcase>
+	</testsuite>
+</testsuites>

@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="9" failures="59" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_header_temp" package="tests" timestamp="2026-10-04T03:25:29" hostname="localhost" tests="9" failures="59" errors="0" skipped="0" flaky="0" time="3.806">
+		<testcase name="test_powers_header_bounds:0 (2, Vector2i(844, 390))" classname="hud_header_temp" time="0.194">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:47" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:47
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_bounds:1 (1, Vector2i(1024, 768))" classname="hud_header_temp" time="0.199">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:47" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:47
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:48" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:48
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_bounds:2 (0, Vector2i(1920, 1080))" classname="hud_header_temp" time="0.198">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:47" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:47
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:48" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_bounds' in res://tests/hud_header_temp.gd:48
+	at '_mounted' in res://tests/hud_header_temp.gd:36
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_native_input:0 (2, Vector2i(844, 390), true)" classname="hud_header_temp" time="0.529">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:76" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:77" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:78" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:80" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:87" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:91" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true, false]'
+ but was
+ '[true]'
+
+Differences found:
+Index	Current	Expected	1	<N/A>	false
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:95" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_native_input:1 (1, Vector2i(1024, 768), true)" classname="hud_header_temp" time="0.530">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:76" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:77" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:78" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:80" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:87" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:91" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true, false]'
+ but was
+ '[true]'
+
+Differences found:
+Index	Current	Expected	1	<N/A>	false
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:95" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_native_input:2 (0, Vector2i(1920, 1080), false)" classname="hud_header_temp" time="0.529">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:76" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:77" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:78" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:80" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:87" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:91" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true, false]'
+ but was
+ '[true]'
+
+Differences found:
+Index	Current	Expected	1	<N/A>	false
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:95" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_native_input:3 (2, Vector2i(844, 390), false)" classname="hud_header_temp" time="0.526">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:76" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:77" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:78" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:80" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:87" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:91" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true, false]'
+ but was
+ '[true]'
+
+Differences found:
+Index	Current	Expected	1	<N/A>	false
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:95" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_native_input:4 (1, Vector2i(1024, 768), false)" classname="hud_header_temp" time="0.532">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:76" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:77" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:78" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:80" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:87" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:91" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true, false]'
+ but was
+ '[true]'
+
+Differences found:
+Index	Current	Expected	1	<N/A>	false
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:95" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+		<testcase name="test_powers_header_native_input:5 (0, Vector2i(1920, 1080), true)" classname="hud_header_temp" time="0.528">
+			<failure message="FAILED: res://tests/hud_header_temp.gd:76" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:76
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:77" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:77
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:78" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:78
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:79" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:79
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:80" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:80
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:87" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true]'
+ but was
+ '<empty>'
+
+Differences found:
+Index	Current	Expected	0	<N/A>	true
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:87
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:91" type="FAILURE">
+<![CDATA[
+Expecting: 'true' but is 'false'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:91
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:94" type="FAILURE">
+<![CDATA[
+Expecting:
+ '[true, false]'
+ but was
+ '[true]'
+
+Differences found:
+Index	Current	Expected	1	<N/A>	false
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:94
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+			<failure message="FAILED: res://tests/hud_header_temp.gd:95" type="FAILURE">
+<![CDATA[
+Expecting: 'false' but is 'true'
+	at 'test_powers_header_native_input' in res://tests/hud_header_temp.gd:95
+	at '_settle' in res://tests/hud_header_temp.gd:125
+]]>
+			</failure>
+		</testcase>
+	</testsuite>
+</testsuites>

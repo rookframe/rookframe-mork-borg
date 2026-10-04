@@ -1,0 +1,40 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-presentation-candidate
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_russian_temp.gd
+  res://tests/hud_russian_temp.gd > test_russian_actual_controls_names_bounds_and_native_fullname STARTED
+SCRIPT ERROR: Cannot call method 'get_node' on a null value.
+          at: test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:166)
+          GDScript backtrace (most recent call first):
+              [0] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:166)
+              [1] _click (res://tests/hud_russian_temp.gd:226)
+              [2] _settle (res://tests/hud_russian_temp.gd:234)
+  res://tests/hud_russian_temp.gd > test_russian_actual_controls_names_bounds_and_native_fullname FAILED 4s 797ms
+  Report:
+  Godot Runtime Error !
+  'Cannot call method 'get_node' on a null value.'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:166
+	at '_click' in res://tests/hud_russian_temp.gd:226
+	at '_settle' in res://tests/hud_russian_temp.gd:234  Expecting: not to be '<null>'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:165
+	at '_click' in res://tests/hud_russian_temp.gd:226
+	at '_settle' in res://tests/hud_russian_temp.gd:234
+
+Statistics: 1 test cases | 1 errors | 1 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 4s 804ms
+
+
+Overall Summary: 1 test cases | 1 errors | 1 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 4s 804ms
+ Open XML Report at: file://reports/russian-presentation-candidate/report_1/results.xml
+Open HTML Report at: file://reports/russian-presentation-candidate/report_1/index.html
+Exit code: 100
+Run dispose test resources

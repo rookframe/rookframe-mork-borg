@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="6" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="native" package="tests/rfg341_temp" timestamp="2026-10-04T00:15:49" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="3.766">
+		<testcase name="test_native_untargeted_healing_uses_tray_and_preserves_actor_source_footer:0 (390)" classname="native" time="0.882">
+		</testcase>
+		<testcase name="test_native_untargeted_healing_uses_tray_and_preserves_actor_source_footer:1 (720)" classname="native" time="0.879">
+		</testcase>
+		<testcase name="test_native_explicit_self_healing_and_initial_supplied_targets_preserved:0 (true)" classname="native" time="0.869">
+		</testcase>
+		<testcase name="test_native_explicit_self_healing_and_initial_supplied_targets_preserved:1 (false)" classname="native" time="0.832">
+		</testcase>
+		<testcase name="test_native_feature_uses_exact_copy_and_close_cancels_requested_throw" classname="native" time="0.270">
+		</testcase>
+		<testcase name="test_projection_excludes_passive_reactive_actions_and_keeps_busy_sources_grey" classname="native" time="0.008">
+		</testcase>
+	</testsuite>
+</testsuites>

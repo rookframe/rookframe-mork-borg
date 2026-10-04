@@ -1,0 +1,94 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-review-baseline
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_russian_review_temp.gd
+  res://tests/hud_russian_review_temp.gd > test_saved_companion_caption_and_complete_translated_templates STARTED
+SCRIPT ERROR: Invalid access to property or key 'name' on a base object of type 'Dictionary'.
+          at: _init (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scene.gd:9)
+          GDScript backtrace (most recent call first):
+              [0] _init (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scene.gd:9)
+              [1] _init (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scene_result.gd:10)
+              [2] current (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scenes.gd:14)
+              [3] candidates (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/source_rooks.gd:8)
+              [4] _resolve_rooks (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:175)
+              [5] opened_task (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:81)
+              [6] test_saved_companion_caption_and_complete_translated_templates (res://tests/hud_russian_review_temp.gd:41)
+              [7] _click (res://tests/hud_russian_review_temp.gd:81)
+              [8] _settle (res://tests/hud_russian_review_temp.gd:85)
+SCRIPT ERROR: Invalid access to property or key 'display_name' on a base object of type 'Dictionary'.
+          at: _init (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/target_snapshot.gd:16)
+          GDScript backtrace (most recent call first):
+              [0] _init (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/target_snapshot.gd:16)
+              [1] _init (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/target_snapshot_result.gd:10)
+              [2] snapshot (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/targeting.gd:17)
+              [3] _refresh (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:165)
+              [4] _process (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:87)
+  res://tests/hud_russian_review_temp.gd > test_saved_companion_caption_and_complete_translated_templates FAILED 776ms
+  Report:
+  Godot Runtime Error !
+  'Invalid access to property or key 'name' on a base object of type 'Dictionary'.'	at '_init' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scene.gd:9
+	at '_init' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scene_result.gd:10
+	at 'current' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/scenes.gd:14
+	at 'candidates' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/source_rooks.gd:8
+	at '_resolve_rooks' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:175
+	at 'opened_task' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:81
+	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:41
+	at '_click' in res://tests/hud_russian_review_temp.gd:81
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Godot Runtime Error !
+  'Invalid access to property or key 'display_name' on a base object of type 'Dictionary'.'	at '_init' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/target_snapshot.gd:16
+	at '_init' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/target_snapshot_result.gd:10
+	at 'snapshot' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/targeting.gd:17
+	at '_refresh' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:165
+	at '_process' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd:87  Expecting:
+ 'Strength — Укус'
+ but was
+ 'Strength —· Укус'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:36
+	at '_click' in res://tests/hud_russian_review_temp.gd:81
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ 'Strength — Без оружия'
+ but was
+ 'Strength —· Без оружия'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:43
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ 'Strength · Bite'
+ but was
+ 'StreChangthed Player Name · BiteУкус'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:53
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ 'Strength · Bite'
+ but was
+ 'StreChangthed Player Name · BiteУкус'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:53
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ '%s · %s'
+ but was
+ '%s · %s'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:57
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85  Expecting:
+ '%s · %s'
+ but was
+ '%s · %s'	at 'test_saved_companion_caption_and_complete_translated_templates' in res://tests/hud_russian_review_temp.gd:58
+	at '_settle' in res://tests/hud_russian_review_temp.gd:85
+
+Statistics: 1 test cases | 2 errors | 6 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 786ms
+
+
+Overall Summary: 1 test cases | 2 errors | 6 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 786ms
+ Open XML Report at: file://reports/russian-review-baseline/report_1/results.xml
+Open HTML Report at: file://reports/russian-review-baseline/report_1/index.html
+Exit code: 100
+Run dispose test resources

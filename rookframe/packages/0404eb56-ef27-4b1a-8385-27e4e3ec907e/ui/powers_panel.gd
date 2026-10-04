@@ -8,6 +8,7 @@ const POWERS = preload(ROOT + "logic/powers.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const ACTION = preload(ROOT + "logic/power_action.gd")
 const ROW = preload(ROOT + "ui/power_row.tscn")
+const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
@@ -18,12 +19,17 @@ var _item := ""
 var _power: Dictionary = {}
 var _action: ACTION
 var _source_rook: SDK.RookId
+var _source_rooks: Array[SDK.RookId] = []
 var _target_pending := false
 var _target_reading := false
 var _update_pending := false
+var _tabletop := false
+var _morning_only := false
+var _context_version := 0
 
 func _ready() -> void:
 	resized.connect(_layout)
+	get_node(^"Source/Choice").item_selected.connect(_source_selected)
 	get_node(^"Browse/Back").pressed.connect(_back)
 	get_node(^"Daily/Roll").pressed.connect(_daily)
 	get_node(^"Cast/Columns/Targets/Content/Change").pressed.connect(_choose_targets)
@@ -45,12 +51,55 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 		var entry: Dictionary = raw
 		if str(entry.inventory_id) == item:
 			_power = POWERS.new().definition(str(entry.get("source_item_id", "")))
-	if _source_rook == null:
+	if _source_rook == null and not _tabletop:
 		_source_rook = _sdk.rooks.selected()
-	if item.is_empty():
+	if item.is_empty() and not _morning_only:
 		_list(inventory)
 	_target_pending = true
 	_render()
+
+func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
+	_reset_task()
+	_tabletop = true
+	_morning_only = false
+	_configure_source(facade, actor.id, rook)
+	configure(actor, facade, item)
+
+func configure_morning(actor: SDK.Actor, facade: SDK) -> void:
+	_reset_task()
+	_source_rook = null
+	_source_rooks = []
+	_tabletop = true
+	_morning_only = true
+	configure(actor, facade, "")
+
+func _configure_source(facade: SDK, actor: SDK.ActorId, preferred: String) -> void:
+	var resolver := SOURCE_ROOKS.new()
+	_source_rooks = resolver.candidates(facade, actor)
+	_source_rook = resolver.resolve(_source_rooks, preferred)
+	var choice: OptionButton = get_node(^"Source/Choice")
+	choice.clear()
+	choice.add_item(facade.translations.text("Choose the source Rook"))
+	for index in range(_source_rooks.size()):
+		choice.add_item(facade.translations.text("Rook %d") % (index + 1))
+		if _source_rook != null and _source_rook.value == _source_rooks[index].value:
+			choice.select(index + 1)
+
+func _source_selected(index: int) -> void:
+	if _action != null and _action.state != "error":
+		return
+	_source_rook = _source_rooks[index - 1] if index > 0 and index <= _source_rooks.size() else null
+	_target_pending = true
+
+func _reset_task() -> void:
+	_context_version += 1
+	_update_pending = false
+	if _action != null:
+		_action.retire()
+		_action = null
+	get_node(^"Cast/Options/Eligible").button_pressed = false
+	get_node(^"Cast/Options/Modifier").value = "0"
+	_status("")
 
 func _list(items: Array) -> void:
 	var list := get_node(^"Scrolls")
@@ -76,18 +125,20 @@ func _list(items: Array) -> void:
 func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
+	get_node(^"Source").visible = _tabletop and not _morning_only and _source_rooks.size() > 1 and state in ["ready", "error"]
 	var casting := not _item.is_empty()
-	var terminal := casting and state in ["resolved", "ended"]
+	var terminal := (casting or _morning_only) and state in ["resolved", "ended"]
 	var adjudication := str(_action.snapshot.get("adjudication", "")) if _action != null and state == "resolved" else ""
-	get_node(^"Browse").visible = not casting
-	get_node(^"Scrolls").visible = not casting
-	get_node(^"Daily").visible = not casting
+	get_node(^"Browse").visible = not casting and not _tabletop
+	get_node(^"Scrolls").visible = not casting and not _morning_only
+	get_node(^"Daily").visible = not casting and not terminal
+	get_node(^"Daily/Roll").visible = not _morning_only
 	get_node(^"Daily/Roll").disabled = _actor.access_level != "Owner" or (_action != null and _action.pending)
 	get_node(^"Metrics").visible = not terminal or not adjudication.is_empty()
-	get_node(^"Metrics/Difficulty").visible = not terminal
+	get_node(^"Metrics/Difficulty").visible = not terminal and not _morning_only
 	get_node(^"Result").visible = terminal
 	get_node(^"Cast").visible = casting and not terminal
-	get_node(^"Empty").visible = not casting and get_node(^"Scrolls").get_child_count() == 0
+	get_node(^"Empty").visible = not casting and not _morning_only and get_node(^"Scrolls").get_child_count() == 0
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Presence", {})
 	var presence: int = ability.get("modifier", 0)
@@ -105,14 +156,14 @@ func _render() -> void:
 	get_node(^"Cast/Options").visible = state in ["ready", "error"]
 	if _action != null:
 		_status(_action.message, state == "error" or _action.snapshot.get("target_error", false))
-	var title := str(_power.get("name", "Cast a Power")) if casting else "Powers & scrolls"
+	var title := "Morning Power allowance" if _morning_only else str(_power.get("name", "Cast a Power")) if casting else "Powers & scrolls"
 	if terminal:
-		title = "Action ended" if state == "ended" else ("Power " + adjudication if not adjudication.is_empty() else "Power resolved")
+		title = "Action ended" if state == "ended" else "Daily allowance" if _morning_only else ("Power " + adjudication if not adjudication.is_empty() else "Power resolved")
 		get_node(^"Outcome").visible = false
-		get_node(^"Result/Power").text = _t(str(_power.get("name", "Power")))
+		get_node(^"Result/Power").text = _t("Morning Power allowance" if _morning_only else str(_power.get("name", "Power")))
 		get_node(^"Result/Section/Content/Heading").text = _t("The action was interrupted") if state == "ended" else (_t("GM determines the outcome") if not adjudication.is_empty() else _t(str(_action.snapshot.get("outcome", "Manual outcome"))))
 		get_node(^"Result/Section/Content/Copy").text = _t(_action.message)
-	workflow_changed.emit("cast" if casting else "powers", title, terminal or (casting and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and _power.get("playable", false)), state == "pending")
+	workflow_changed.emit("cast" if casting else "powers", title, terminal or ((casting or _morning_only) and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and (_morning_only or _power.get("playable", false))), state == "pending")
 	_layout()
 
 func submit() -> void:
@@ -123,6 +174,9 @@ func submit() -> void:
 		await _action.confirm_targets()
 		return
 	if _action != null and _action.pending:
+		return
+	if _morning_only:
+		await _daily()
 		return
 	var text: String = get_node(^"Cast/Options/Modifier").value.strip_edges()
 	if not text.is_valid_int():
@@ -135,6 +189,8 @@ func submit() -> void:
 func primary_text() -> String:
 	if _action != null and _action.state in ["resolved", "ended"]:
 		return "Done"
+	if _morning_only:
+		return "Morning: roll daily uses"
 	return "Confirm targets" if _action != null and _action.state == "targets" else "Roll casting test"
 
 func _daily() -> void:
@@ -164,16 +220,21 @@ func _process(_delta: float) -> void:
 		var latest := _sdk.actors.read(_actor.id)
 		if latest.ok:
 			_actor = latest.actor
-		if _item.is_empty():
+		if _item.is_empty() and not _morning_only:
 			_list(ITEMS.new(_sdk, _actor.id).inventory(_actor.data))
 		_render()
 	if _target_pending and not _target_reading and not _power.is_empty():
 		_target_pending = false
 		_target_reading = true
+		var version := _context_version
 		var reach: float = _power.get("area_feet", _power.get("range_feet", 0))
 		var summary := await TARGETS.new().describe(_sdk, _source_rook, reach)
+		if _tabletop:
+			var selected := await _sdk.targeting.snapshot()
+			if selected.ok and selected.snapshot.rooks.is_empty():
+				summary = _t("No targets")
 		_target_reading = false
-		if is_inside_tree():
+		if is_inside_tree() and version == _context_version:
 			get_node(^"Cast/Columns/Targets/Content/Copy").text = summary
 
 func _choose_targets() -> void:

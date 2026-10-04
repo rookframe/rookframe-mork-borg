@@ -56,6 +56,26 @@ toggle_mode = true
 text = "Full night’s sleep · d6 HP"
 button_group = SubResource("RestGroup")
 
+[node name="Omens" type="PanelContainer" parent="Columns/Task"]
+layout_mode = 2
+theme_type_variation = &"RookframePackageInk"
+visible = false
+
+[node name="Content" type="VBoxContainer" parent="Columns/Task/Omens"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Rules" type="Label" parent="Columns/Task/Omens/Content"]
+layout_mode = 2
+theme_type_variation = &"RookframeBody"
+autowrap_mode = 2
+
+[node name="SixHours" type="CheckBox" parent="Columns/Task/Omens/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 44)
+autowrap_mode = 2
+text = "At least six hours of rest completed"
+
 [node name="Improvement" type="VBoxContainer" parent="Columns/Task"]
 layout_mode = 2
 theme_override_constants/separation = 8

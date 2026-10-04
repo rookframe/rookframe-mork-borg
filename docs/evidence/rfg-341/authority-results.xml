@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="98" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="authority" package="tests/rfg341_temp" timestamp="2026-10-04T00:20:53" hostname="localhost" tests="39" failures="0" errors="0" skipped="0" flaky="0" time="0.146">
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:0 (&apos;master-of-fate&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:1 (&apos;filthy-fingersmith&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:2 (&apos;list-of-sins&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:3 (&apos;horn-of-the-schleswig-lords&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:4 (&apos;stones-taken-from-thel-emas-lost-temple&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:5 (&apos;stolen-mitre&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:6 (&apos;speaker-of-truths&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:7 (&apos;harp&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:8 (&apos;blasphemous-nechrubel-bible&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:9 (&apos;wizard-teeth&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:10 (&apos;medicine-box&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:11 (&apos;life-elixir&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:12 (&apos;elixir-vitalis&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:13 (&apos;poison-red&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:14 (&apos;poison-black&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:15 (&apos;ezumiels-vapor&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:16 (&apos;southern-frog-stew&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:17 (&apos;fernors-philtre&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:18 (&apos;spider-owl-soup&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:19 (&apos;hyphos-enervating-snuff&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:20 (&apos;wrong-jesus-crucifix&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:21 (&apos;book-of-boiling-blood&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:22 (&apos;portable-laboratory&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:23 (&apos;initiate-of-the-invisible-college&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:24 (&apos;bomb&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:25 (&apos;dried-food&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:26 (&apos;waterskin&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:27 (&apos;torch&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:28 (&apos;lantern-oil&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_all_initiating_sources_allow_no_targets_and_never_change_recipient_hp:29 (&apos;lard&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_duplicate_feature_uses_and_new_fight_allowance_address_exact_owned_copy:0 (&apos;initiate-of-the-invisible-college&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_duplicate_feature_uses_and_new_fight_allowance_address_exact_owned_copy:1 (&apos;abominable-gob-lobber&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_brew_exhausted_pool_replaces_recipes_but_preserves_old_favorites" classname="authority" time="0.004">
+		</testcase>
+		<testcase name="test_shared_resource_replacement_does_not_spend_a_new_same_catalogue_pool" classname="authority" time="0.004">
+		</testcase>
+		<testcase name="test_source_removed_or_replaced_cannot_resume:0 (&apos;removed&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_source_removed_or_replaced_cannot_resume:1 (&apos;replaced&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_resource_availability_retains_star_and_restores_same_owned_source:0 (&apos;uses&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_resource_availability_retains_star_and_restores_same_owned_source:1 (&apos;broken&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_resource_availability_retains_star_and_restores_same_owned_source:2 (&apos;quantity&apos;)" classname="authority" time="0.002">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="special_actions" package="tests" timestamp="2026-10-04T00:20:53" hostname="localhost" tests="55" failures="0" errors="0" skipped="0" flaky="0" time="0.252">
+		<testcase name="test_scroll_selection_during_delayed_refresh_is_accepted_once:0 (false)" classname="special_actions" time="0.015">
+		</testcase>
+		<testcase name="test_scroll_selection_during_delayed_refresh_is_accepted_once:1 (true)" classname="special_actions" time="0.014">
+		</testcase>
+		<testcase name="test_medicine_heals_and_consumes_one_use_atomically" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_poison_routes_resistance_and_applies_hp_loss:0 (&apos;poison-red&apos;, true, 10, 7)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_poison_routes_resistance_and_applies_hp_loss:1 (&apos;poison-black&apos;, false, 12, 4)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_poison_routes_resistance_and_applies_hp_loss:2 (&apos;red-poison-decoction&apos;, false, 12, 0)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_elixir_uses_shared_doses_and_heals_private_target_at_contact" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_wizard_teeth_request_four_dice_and_report_manual_maximum_damage" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:0 (&apos;master-of-fate&apos;, true, 7, &apos;right way&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:1 (&apos;filthy-fingersmith&apos;, true, 7, &apos;pockets and locks&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:2 (&apos;list-of-sins&apos;, false, 9, &apos;discovered&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:3 (&apos;horn-of-the-schleswig-lords&apos;, false, 11, &apos;automatic success&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:4 (&apos;stones-taken-from-thel-emas-lost-temple&apos;, false, 8, &apos;sunset&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_decoctions_consume_shared_pool_and_report_durations:0 (&apos;fernors-philtre&apos;, [4], &apos;4 hours&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_decoctions_consume_shared_pool_and_report_durations:1 (&apos;spider-owl-soup&apos;, [], &apos;30 minutes&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_decoctions_consume_shared_pool_and_report_durations:2 (&apos;hyphos-enervating-snuff&apos;, [], &apos;DR14&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:0 (&apos;speaker-of-truths&apos;, true, [], &apos;lowered by 4&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:1 (&apos;harp&apos;, false, [3], &apos;+3&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:2 (&apos;blasphemous-nechrubel-bible&apos;, false, [4], &apos;five minutes&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:3 (&apos;dodging-death&apos;, true, [1, 3], &apos;10 rounds&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:4 (&apos;excretal-stealth&apos;, true, [], &apos;DR16&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:5 (&apos;escaping-fate&apos;, true, [], &apos;Omen&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:6 (&apos;crumpled-monster-mask&apos;, false, [], &apos;every round&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_book_creature_resistance_summons_printed_berserkers_and_spends_daily_use" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_brewing_replaces_two_recipes_and_one_shared_dose_pool" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_invisible_college_rolls_count_and_family_then_keeps_table_selected_scrolls" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_mitre_requires_wearing_and_table_selected_stealth_ability" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_crucifix_rolls_morale_with_explicit_presence_sign_and_private_label" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_vapor_resistance_is_requested_with_table_chosen_ability" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_gob_lobber_rolls_fight_uses_spends_spit_then_routes_witness_tests" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_cancel_after_bible_parity_preserves_spent_use_and_logs_once" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_pending_action_stops_after_item_removal_and_on_source_access_loss:0 (&apos;item&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_pending_action_stops_after_item_removal_and_on_source_access_loss:1 (&apos;access&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_pending_action_stops_after_item_removal_and_on_source_access_loss:2 (&apos;session&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_all_invalid_ranges_report_public_labels_and_roll_nothing" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_concurrent_actions_from_same_character_are_refused" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_ancestors_blade_checks_treachery_then_resolves_attack_against_self" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:0 (&apos;bomb&apos;, [5, 2], 2)" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:1 (&apos;bear-trap&apos;, [4, 2], 3)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:2 (&apos;caltrops&apos;, [3, 2, 1], 4)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:0 (&apos;dried-food&apos;, 0, 2, &apos;one day&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:1 (&apos;waterskin&apos;, 1, 1, &apos;water&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:2 (&apos;lard&apos;, 1, 1, &apos;meal&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:3 (&apos;lantern-oil&apos;, 0, 2, &apos;7 hours&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:4 (&apos;torch&apos;, 0, 2, &apos;Burns&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_treacherous_blade_offers_existing_shield_choice_before_hp_change" classname="special_actions" time="0.005">
+		</testcase>
+		<testcase name="test_removed_college_ends_before_chosen_scrolls_are_created" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_class_agility_tests_include_worn_armor:0 (&apos;filthy-fingersmith&apos;, 2, 10)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_agility_tests_include_worn_armor:1 (&apos;stolen-mitre&apos;, 3, 12)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_special_damage_rejects_changed_protection" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_shield_continuation_requires_source_item_and_range:0 (&apos;item&apos;)" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_shield_continuation_requires_source_item_and_range:1 (&apos;range&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:0 (&apos;break&apos;)" classname="special_actions" time="0.005">
+		</testcase>
+		<testcase name="test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:1 (&apos;cancel&apos;)" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_taking_caltrops_damage_preserves_rolled_infection_report" classname="special_actions" time="0.004">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="special_composition" package="tests" timestamp="2026-10-04T00:20:54" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="0.710">
+		<testcase name="test_use_item_shows_recipient_focus_pending_and_healing_outcome" classname="special_composition" time="0.657">
+		</testcase>
+		<testcase name="test_book_preview_uses_selected_recipient_and_stock_radio_choices" classname="special_composition" time="0.017">
+		</testcase>
+		<testcase name="test_separate_sheets_keep_independent_radio_selection" classname="special_composition" time="0.017">
+		</testcase>
+		<testcase name="test_malformed_dr_adjustment_does_not_request_a_throw" classname="special_composition" time="0.007">
+		</testcase>
+	</testsuite>
+</testsuites>

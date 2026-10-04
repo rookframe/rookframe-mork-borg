@@ -3,10 +3,17 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/windo
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const ROW = preload(ROOT + "ui/hud_row.tscn")
+const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
+const ATTACKS = preload(ROOT + "ui/hud_attacks.gd")
+const POWERS = preload(ROOT + "ui/hud_powers.gd")
+const ITEMS = preload(ROOT + "ui/hud_items.gd")
+const COMPANIONS = preload(ROOT + "ui/hud_companions.gd")
+const RECOVERY = preload(ROOT + "ui/hud_recovery.gd")
 const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
 const TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_palette.gd")
 const GOLD := Color(0.88627450980392153, 0.7686274509803922, 0.42745098039215684, 1.0)
+const ROW_COPY_GAP := 3 # Authored Launch/Content/Copy VBox separation in hud_row.tscn.
 const CATEGORIES := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery"]
 const BUTTONS := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery", "More"]
 const CATEGORY_ICONS := {
@@ -21,9 +28,18 @@ const CATEGORY_ICONS := {
 const ABILITIES := ["Strength", "Agility", "Presence", "Toughness"]
 const ABILITY_ICONS := [preload(ROOT + "ui/hud_art/abilities.svg"), preload("res://rookframe/ui/icons/character/agility.svg"), preload(ROOT + "ui/hud_art/ability-presence.svg"), preload("res://rookframe/ui/icons/character/presence.svg")]
 
-## Following action slices supply owned entries and handle these domain handoffs.
+## The managed action receives the initiating Actor and stable source key.
 signal entry_requested(actor: SDK.ActorId, category: String, entry_id: String)
 signal favorite_requested(actor: SDK.ActorId, category: String, entry_id: String, favorite: bool)
+signal morning_requested(actor: SDK.ActorId)
+var _favorites := FAVORITES.new()
+var _attacks := ATTACKS.new()
+var _powers := POWERS.new()
+var _items := ITEMS.new()
+var _companions := COMPANIONS.new()
+var _recovery := RECOVERY.new()
+var _can_morning := false
+var _pending_favorites: Dictionary = {}
 var _actor: SDK.ActorId
 var _category := ""
 var _page := 0
@@ -58,6 +74,15 @@ func ready() -> void:
 		get_node("Panel/More/" + category + "/Title").text = sdk.translations.text(category)
 		get_node("Panel/More/" + category + "/Icon").texture = CATEGORY_ICONS.get(category)
 		get_node("Panel/More/" + category + "/Icon").modulate = GOLD
+	_favorites.sdk = sdk
+	favorite_requested.connect(_change_favorite)
+	_attacks.bind(sdk)
+	_powers.bind(sdk)
+	_items.bind(sdk)
+	_companions.bind(sdk)
+	_recovery.bind(sdk)
+	entry_requested.connect(_launch_entry)
+	morning_requested.connect(_powers.morning)
 	_launcher.bind(sdk)
 	_launcher.changed.connect(_action_changed)
 	sdk.character_hud.context_changed.connect(_refresh)
@@ -65,10 +90,14 @@ func ready() -> void:
 	resized.connect(_layout)
 	get_node("Bar/Dice").pressed.connect(_open_dice)
 	get_node("Bar/Dice").accessibility_name = sdk.translations.text("Dice")
+	get_node("Bar/Dice/Title").text = sdk.translations.text("Dice").to_upper()
 	get_node("Bar/Identity").pressed.connect(_open_sheet)
 	get_node("Panel/Empty/Sheet").pressed.connect(_open_sheet)
 	get_node("Panel/Header/Close").pressed.connect(_back_or_close)
 	get_node("Panel/Header/ShowAll").toggled.connect(_toggle_all)
+	get_node("Panel/Header/Morning").pressed.connect(_morning)
+	get_node("Panel/Header/Morning").text = sdk.translations.text("Morning")
+	get_node("Panel/Header/Morning").accessibility_name = sdk.translations.text("Morning Power allowance")
 	get_node("Panel/Footer/Previous").pressed.connect(_change_page.bind(-1))
 	get_node("Panel/Footer/Next").pressed.connect(_change_page.bind(1))
 	for category in BUTTONS:
@@ -96,8 +125,23 @@ func set_entries(category: String, entries: Array[ENTRY]) -> void:
 
 func _refresh() -> void:
 	var context := sdk.character_hud.context()
+	# Incomplete replication has not confirmed a different Actor or access level.
+	if not context.ok and context.code in ["not_ready", "operation_in_progress"]:
+		if _actor == null:
+			visible = false
+		return
 	var source: SDK.ActorResult = sdk.actors.read(context.actor) if context.ok and context.actor != null else null
-	if source == null or not source.ok or source.actor == null or source.actor.access_level != "Owner" or str(source.actor.data.get("schema", "")) != "mork-borg-character/v1":
+	if source != null and not source.ok and source.code in ["not_ready", "operation_in_progress"]:
+		if _actor == null:
+			visible = false
+		return
+	if source == null or not source.ok or source.actor == null or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
+		_actor = null
+		_close_panel()
+		visible = false
+		return
+	var data: Dictionary = source.actor.data
+	if str(data.get("schema", "")) != "mork-borg-character/v1":
 		_actor = null
 		_close_panel()
 		visible = false
@@ -107,7 +151,6 @@ func _refresh() -> void:
 		_entries = {}
 		_show_all = {}
 	_actor = source.actor.id
-	var data: Dictionary = source.actor.data
 	get_node("Bar/Identity").accessibility_name = str(data.get("name", "")) + " · " + sdk.translations.text("Character sheet")
 	get_node("Bar/Identity/Name").text = str(data.get("name", sdk.translations.text("Unnamed Actor")))
 	get_node("Bar/Identity/Class").text = sdk.translations.text(str(data.get("class_title", "")))
@@ -127,15 +170,60 @@ func _refresh() -> void:
 		var entry := ENTRY.new()
 		entry.id = ABILITIES[index]
 		entry.title = sdk.translations.text(entry.id)
-		var modifier := int(abilities.get(entry.id, {}).get("modifier", 0))
+		var ability: Dictionary = abilities.get(entry.id, {})
+		var modifier := int(ability.get("modifier", 0))
 		entry.value = ("+" if modifier >= 0 else "") + str(modifier)
 		entry.icon = ABILITY_ICONS[index]
 		entry.available = can_roll
 		entries.append(entry)
 	_entries["Abilities"] = entries
+	_project_categories(source.actor)
 	visible = true
 	if not _category.is_empty() and not get_node("Panel/Detail").visible:
 		_render_panel()
+
+func _project_categories(actor: SDK.Actor) -> void:
+	_entries["Attacks"] = _attacks.entries(actor)
+	_entries["Powers"] = _powers.entries(actor)
+	_entries["Items"] = _items.entries(actor)
+	_entries["Features"] = _items.entries(actor, "Features")
+	_entries["Companions"] = _companions.entries(actor)
+	_entries["Recovery"] = _recovery.entries(actor)
+	_can_morning = _powers.can_morning(actor)
+
+func _launch_entry(actor: SDK.ActorId, category: String, key: String) -> void:
+	if category == "Attacks":
+		_attacks.launch(actor, {"key": key})
+	elif category == "Powers":
+		_powers.launch(actor, key)
+	elif category in ["Items", "Features"]:
+		_items.launch(actor, key)
+	elif category == "Companions":
+		_companions.launch(actor, key)
+	elif category == "Recovery":
+		_recovery.launch(actor, key)
+
+func _favorite_request_key(actor: SDK.ActorId, key: String) -> String:
+	return actor.value + ":" + key if actor != null else ""
+
+func _change_favorite(actor: SDK.ActorId, _category_name: String, key: String, starred: bool) -> void:
+	if actor == null:
+		return
+	var request_key := _favorite_request_key(actor, key)
+	if _pending_favorites.has(request_key):
+		return
+	var current := sdk.actors.read(actor)
+	if not current.ok or current.actor.access_level != "Owner":
+		_refresh()
+		return
+	_pending_favorites[request_key] = true
+	_refresh()
+	var result := await _favorites.change(current.actor, key, starred)
+	_pending_favorites.erase(request_key)
+	if not result.ok:
+		_error(result.message)
+	# Refresh only the currently displayed context. The mutation kept its Actor.
+	_refresh()
 
 func _action_changed() -> void:
 	if _actor == null:
@@ -179,6 +267,13 @@ func _open_category(category: String) -> void:
 	get_node("Panel/Detail").visible = false
 	_panel.visible = true
 	_render_panel()
+	if category in ["Attacks", "Powers", "Items", "Features", "Companions"] and _actor != null:
+		var initiating_actor := _actor
+		var result := await _favorites.prepare(initiating_actor)
+		if not result.ok and result.code not in ["not_ready", "operation_in_progress"]:
+			_error(result.message)
+		if _actor != null and _actor.value == initiating_actor.value:
+			_refresh()
 
 func _back_or_close() -> void:
 	if get_node("Panel/Detail").visible:
@@ -195,6 +290,12 @@ func _close_panel() -> void:
 		var button: Button = get_node("Bar/Categories/" + category)
 		button.set_pressed_no_signal(false)
 		get_node("Bar/Categories/" + category + "/Title").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT)
+
+func _morning() -> void:
+	var initiating_actor := _actor
+	_close_panel()
+	if initiating_actor != null:
+		morning_requested.emit(initiating_actor)
 
 func _toggle_all(enabled: bool) -> void:
 	_show_all[_category] = enabled
@@ -216,6 +317,8 @@ func _render_panel() -> void:
 	var fixed := _category in ["Abilities", "Recovery", "More"]
 	get_node("Panel/Header/Title").text = sdk.translations.text(_category)
 	get_node("Panel/Header/ShowAll").visible = not fixed
+	get_node("Panel/Header/Morning").visible = _category == "Powers"
+	get_node("Panel/Header/Morning").disabled = not _can_morning
 	get_node("Panel/Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
 	for category in BUTTONS:
 		var button: Button = get_node("Bar/Categories/" + category)
@@ -252,6 +355,7 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var launch: Button = row.get_node("Launch")
 	launch.disabled = not entry.available
+	launch.accessibility_name = entry.title
 	var content: HBoxContainer = row.get_node("Launch/Content")
 	content.add_theme_constant_override("separation", 8 if _phone else 14)
 	var icon: TextureRect = content.get_node("Icon")
@@ -267,6 +371,11 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	detail.visible = not entry.detail.is_empty()
 	detail.add_theme_font_size_override("font_size", 11 if _phone else 12)
 	detail.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
+	var copy_height := row.custom_minimum_size.y - content.offset_top + content.offset_bottom
+	if detail.visible:
+		copy_height -= detail.get_minimum_size().y + ROW_COPY_GAP
+	title.max_lines_visible = 1
+	title.max_lines_visible = clampi(int(copy_height / maxf(1, title.get_minimum_size().y)), 1, 2)
 	var value: Label = content.get_node("Value")
 	value.text = entry.value
 	value.visible = not entry.value.is_empty()
@@ -274,9 +383,16 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	value.add_theme_color_override("font_color", TOKENS.COLOR_ACCENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
 	title.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
 	row.get_node("Favorite").visible = not fixed
-	row.get_node("Favorite").set_pressed_no_signal(entry.favorite)
+	row.get_node("Favorite").disabled = _pending_favorites.has(_favorite_request_key(_actor, str(entry.id)))
+	row.get_node("Favorite").set_pressed_no_signal(bool(entry.favorite))
 	row.get_node("Favorite").text = "★" if entry.favorite else "☆"
+	row.get_node("Favorite").add_theme_font_size_override("font_size", 21 if _phone else 24)
+	row.get_node("Favorite").accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
+	row.get_node("FullName").accessibility_name = sdk.translations.text("Show full name")
 	row.get_node("Favorite").add_theme_color_override("font_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
+	row.get_node("Favorite").add_theme_color_override("font_hover_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
+	row.get_node("Favorite").add_theme_color_override("font_pressed_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
+	row.get_node("Favorite").add_theme_color_override("font_hover_pressed_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
 	if _phone:
 		content.offset_left = 2
 		content.offset_right = -2
@@ -308,11 +424,13 @@ func _full_name(title: String) -> void:
 	_more.visible = false
 	get_node("Panel/Footer").visible = false
 	get_node("Panel/Header/ShowAll").visible = false
+	get_node("Panel/Header/Morning").visible = false
 	_layout_panel()
 
 func _check_names() -> void:
 	for row in _rows:
-		row.get_node("FullName").visible = row.get_node("Launch/Content/Copy/Title").get_line_count() > 2
+		var title: Label = row.get_node("Launch/Content/Copy/Title")
+		row.get_node("FullName").visible = title.get_line_count() > title.max_lines_visible
 	_layout_panel()
 
 func _rect(control: Control, x: float, y: float, w: float, h: float) -> void:
@@ -403,9 +521,15 @@ func _layout_panel() -> void:
 	get_node("Panel/Frame").pointer = clampf(anchor-left, 12, width-12)
 	get_node("Panel/Frame").queue_redraw()
 	_rect(get_node("Panel/Header"), pad, top, width-pad*2, header)
-	_rect(get_node("Panel/Header/Title"), 0, 0, width-pad*2-44-120 if get_node("Panel/Header/ShowAll").visible else width-pad*2-44, header)
+	var morning: Button = get_node("Panel/Header/Morning")
+	var show_all: CheckBox = get_node("Panel/Header/ShowAll")
+	var morning_width: float = maxf(72, morning.get_combined_minimum_size().x) if morning.visible else 0.0
+	var all_width := maxf(88 if morning_width > 0 else 120, show_all.get_combined_minimum_size().x)
+	var all_left := width-pad*2-44-morning_width-all_width
+	_rect(get_node("Panel/Header/Title"), 0, 0, all_left if get_node("Panel/Header/ShowAll").visible else width-pad*2-44-morning_width, header)
 	get_node("Panel/Header/Title").add_theme_font_size_override("font_size", 17 if _phone else 22)
-	_rect(get_node("Panel/Header/ShowAll"), width-pad*2-164, 0, 120, header)
+	_rect(get_node("Panel/Header/ShowAll"), all_left, 0, all_width, header)
+	_rect(get_node("Panel/Header/Morning"), width-pad*2-44-morning_width, 0, morning_width, header)
 	_rect(get_node("Panel/Header/Close"), width-pad*2-44, 0, 44, header)
 	_rect(get_node("Panel/Header/Rule"), 0, header-1, width-pad*2, 1)
 	_rect(_list, pad, top+header, width-pad*2, body)
@@ -428,6 +552,8 @@ func _style() -> void:
 	get_node("Panel/Empty/Title").add_theme_font_size_override("font_size", 13 if _phone else 14)
 	get_node("Panel/Header/Close").add_theme_font_size_override("font_size", 26)
 	get_node("Panel/Header/ShowAll").add_theme_font_size_override("font_size", 12 if _phone else 13)
+	get_node("Panel/Header/Morning").add_theme_font_size_override("font_size", 12 if _phone else 13)
+	get_node("Panel/Header/Morning").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
 	get_node("Panel/Detail").add_theme_font_size_override("font_size", 13 if _phone else 16)
 	get_node("Bar/Dice/Title").add_theme_font_size_override("font_size", 13)
 	get_node("Bar/Dice/Title").add_theme_color_override("font_color", Color(0.94117647058823528, 0.85098039215686272, 0.55686274509803924, 1.0))

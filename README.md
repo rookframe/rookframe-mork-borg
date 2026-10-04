@@ -17,8 +17,8 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.21` | `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `b8aa5fa929f0f352096d63a53f01bf1e0af39b70` | `rookframe/ui/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.23` | `addons/rookframe_sdk/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `e2a1e807d73c907bf360aa38a21a55b1773965e2` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
@@ -142,6 +142,30 @@ covers the System/public-SDK boundary; host lifetime, durable-save failure and
 replication checks live in rookframe-godot.
 
 ## Weapon attacks
+
+HUD Attacks uses the Actor's exact owned weapon or stable intrinsic action.
+Unarmed uses Strength DR12 and d2; Improvised weapon asks for an object and
+melee Strength or ranged Presence use with d4. Deserter Bite and Coward's Jab
+retain their class rules. Inventory and HUD share their stars, including
+unavailable favorites that remain until explicitly removed.
+
+HUD targets are optional. With no target, the native tabletop action requests
+an attack Throw followed by damage even after a natural 1 or would-miss result.
+It reports both raw Rolls through the Dice Tray and Action Log. The table rules
+on hits, criticals, fumbles, protection and damage recipients; this path has no
+HP application or Apply damage step. Ordinary ammunition and an independent
+Eurekia draw still spend the exact source resource once. The open action keeps
+its Actor and source across HUD selection changes. The full-viewport sheet's
+separate Attack/Damage and Window Dice behavior remains intact.
+
+The Companions category projects only authorized companion Creature attacks.
+Each favorite identifies the Creature Actor and its exact inventory attack;
+descriptive-only companions supply no invented combat action. Launch opens the
+same captured native task bound to that Creature, using its flat test, damage
+and matching Rook. Untargeted play uses the common attack/damage sequence;
+supplied targets use the existing attack or defending Player workflow.
+Remote defence requests open the existing defence-capable window, while
+ordinary Character inspection still opens the completed full-viewport sheet.
 
 Select the Character’s linked Rook, open its equipped weapon in Inventory, and
 choose one Creature through tabletop targeting. Done restores the same managed

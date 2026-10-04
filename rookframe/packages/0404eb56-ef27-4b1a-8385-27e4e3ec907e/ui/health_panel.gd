@@ -6,6 +6,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ACTION = preload(ROOT + "logic/health_action.gd")
+const RECOVERY = preload(ROOT + "logic/recovery_rules.gd")
 const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 signal action_created(action: ACTION)
@@ -29,6 +30,7 @@ func _ready() -> void:
 	get_node(^"Columns/Task/Rest/Content/Sleep").pressed.connect(_rest_changed)
 	get_node(^"Columns/Context/Content/Restrictions/Food").pressed.connect(_changed)
 	get_node(^"Columns/Context/Content/Restrictions/Infected").pressed.connect(_changed)
+	get_node(^"Columns/Task/Omens/Content/SixHours").pressed.connect(_changed)
 	_rest_changed()
 
 func _rest_changed() -> void:
@@ -48,24 +50,48 @@ func configure(actor: SDK.Actor, facade: SDK, route: String) -> void:
 		_sdk.world_changed.connect(_changed)
 	_render()
 
+func configure_tabletop(actor: SDK.Actor, facade: SDK, recovery: String) -> void:
+	if _action != null:
+		_action.retire()
+		_action = null
+	_terminal_shown = false
+	get_node(^"Columns/Task/Rest/Content/Breath").button_pressed = recovery == "breath"
+	get_node(^"Columns/Task/Rest/Content/Sleep").button_pressed = recovery == "sleep"
+	get_node(^"Columns/Task/Omens/Content/SixHours").button_pressed = false
+	_rest_changed()
+	configure(actor, facade, "omens" if recovery == "omens" else "rest")
+
+func has_live_action() -> bool:
+	return _action != null and _action.pending
+
 func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
 	var editing := state in ["ready", "error"]
 	var terminal := state in ["resolved", "ended"]
 	var improve := _route == "improve"
-	var title: String = {"rest": "Rest", "improve": "Level up", "broken": "Broken & death"}.get(_route, "Recovery")
+	var title: String = {"rest": "Rest", "omens": "Regain Omens", "improve": "Level up", "broken": "Broken & death"}.get(_route, "Recovery")
 	if terminal:
-		title = "Action ended" if state == "ended" else ("Improvement resolved" if improve else "Recovery resolved" if _route == "rest" else "Broken & death")
+		title = "Action ended" if state == "ended" else ("Improvement resolved" if improve else "Recovery resolved" if _route in ["rest", "omens"] else "Broken & death")
 	get_node(^"Columns").visible = not terminal
 	get_node(^"Result").visible = terminal
 	get_node(^"Columns/Task/Rest").visible = _route == "rest"
+	get_node(^"Columns/Task/Omens").visible = _route == "omens"
+	get_node(^"Columns/Task/Omens/Content/SixHours").disabled = not editing
 	get_node(^"Columns/Task/Improvement").visible = improve
 	get_node(^"Columns/Task/Broken").visible = _route == "broken"
 	get_node(^"Columns/Context/Content/Heading").text = _t("CURRENT VALUES")
 	get_node(^"Columns/Context/Content/Copy").text = _t("When the GM calls for improvement, roll each step in order.") if improve else (_t("Without food and drink, or while infected, rest restores no HP.") if _route == "rest" else _t("Roll at 0 HP. Below 0 HP means death."))
 	get_node(^"Columns/Context/Content/Copy").visible = _route != "rest" or not get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed or get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed
 	get_node(^"Columns/Context/Content/Values").text = _t("HP · %s / %s") % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
+	if _route == "omens":
+		var faces := RECOVERY.new().omen_faces(data)
+		get_node(^"Columns/Context/Content/Copy").text = _t("Only when depleted, after at least six hours of rest.")
+		get_node(^"Columns/Context/Content/Copy").visible = true
+		get_node(^"Columns/Context/Content/Values").text = _t("Omens · %d") % int(data.get("omens", 0))
+		get_node(^"Columns/Task/Omens/Content/Rules").text = _t("Roll d%d Omens.") % faces
+		if faces == 2:
+			get_node(^"Columns/Task/Omens/Content/Rules").text += " " + _t("Use a physical d4, halved and rounded up.")
 	if improve:
 		var abilities: Dictionary = data.get("abilities", {})
 		var labels := ""
@@ -104,6 +130,8 @@ func _render() -> void:
 	_terminal_shown = terminal
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if state == "error" else "RookframeMeta"
 	var can_submit := state in ["resolved", "ended", "scroll", "specialties"] or (editing and _actor.access_level == "Owner")
+	if _route == "omens" and editing:
+		can_submit = can_submit and RECOVERY.new().can_regain_omens(data) and get_node(^"Columns/Task/Omens/Content/SixHours").button_pressed
 	workflow_changed.emit(_route, title, can_submit, state == "pending")
 	_layout()
 
@@ -144,7 +172,7 @@ func submit() -> void:
 	action_created.emit(action)
 	_action = action
 	_action.changed.connect(_changed)
-	await _action.start({"source": _actor.id.value, "kind": _route, "rest": "sleep" if get_node(^"Columns/Task/Rest/Content/Sleep").button_pressed else "breath", "food_and_drink": get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed, "infected": get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed})
+	await _action.start({"source": _actor.id.value, "kind": _route, "rest": "sleep" if get_node(^"Columns/Task/Rest/Content/Sleep").button_pressed else "breath", "food_and_drink": get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed, "infected": get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed, "six_hours": get_node(^"Columns/Task/Omens/Content/SixHours").button_pressed})
 
 func primary_text() -> String:
 	var state := _action.state if _action != null else "ready"
@@ -156,6 +184,8 @@ func primary_text() -> String:
 		return "Confirm specialties"
 	if state == "pending":
 		return "Waiting…"
+	if _route == "omens":
+		return "Roll Omen die"
 	if _route == "improve":
 		return "Roll 6d10"
 	if _route == "broken":
@@ -193,6 +223,7 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
+	get_node(^"Columns/Task/Omens/Content/SixHours").text = _t("At least six hours of rest completed")
 	get_node(^"Columns/Context/Content/Heading").text = _t("BEFORE ROLLING")
 	get_node(^"Columns/Context/Content/Restrictions/Food").text = _t("Food & drink")
 	get_node(^"Columns/Context/Content/Restrictions/Infected").text = _t("Infected")

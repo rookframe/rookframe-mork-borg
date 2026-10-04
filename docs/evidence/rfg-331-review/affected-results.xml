@@ -1,0 +1,333 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="157" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="melee_attack" package="tests" timestamp="2026-10-04T01:27:29" hostname="localhost" tests="5" failures="0" errors="0" skipped="0" flaky="0" time="2.261">
+		<testcase name="test_melee_attack" classname="melee_attack" time="0.003">
+		</testcase>
+		<testcase name="test_d2_faces" classname="melee_attack" time="0.003">
+		</testcase>
+		<testcase name="test_boundaries" classname="melee_attack" time="0.005">
+		</testcase>
+		<testcase name="test_lifetime" classname="melee_attack" time="0.020">
+		</testcase>
+		<testcase name="test_review_regressions" classname="melee_attack" time="2.214">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="player_defence" package="tests" timestamp="2026-10-04T01:27:31" hostname="localhost" tests="14" failures="0" errors="0" skipped="0" flaky="0" time="0.118">
+		<testcase name="test_defender_receives_agility_throw_and_success_report" classname="player_defence" time="0.003">
+		</testcase>
+		<testcase name="test_failed_defence_offers_protected_damage_or_one_broken_shield" classname="player_defence" time="0.004">
+		</testcase>
+		<testcase name="test_natural_faces_and_fumble_armor_survive_shield_cancellation" classname="player_defence" time="0.005">
+		</testcase>
+		<testcase name="test_disconnect_or_reconnect_after_damage_refuses_late_choice" classname="player_defence" time="0.007">
+		</testcase>
+		<testcase name="test_armor_defence_penalty_and_source_automatic_hit" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_shield_choice_rejects_changed_equipment_or_failed_save_without_late_mutation" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_explicit_owner_selection_and_no_player_owner_fallback" classname="player_defence" time="0.007">
+		</testcase>
+		<testcase name="test_live_client_close_during_roll_reply_cancels_once_and_never_resumes" classname="player_defence" time="0.013">
+		</testcase>
+		<testcase name="test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence" classname="player_defence" time="0.005">
+		</testcase>
+		<testcase name="test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:0 (&apos;brown-scimitar-of-galgenbeck&apos;, &apos;fanged-deserter&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:1 (&apos;blade-of-your-ancestors&apos;, &apos;wretched-royalty&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:2 (&apos;stolen-mitre&apos;, &apos;heretical-priest&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:3 (&apos;sword&apos;, &apos;gutterborn-scum&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="power_casting" package="tests" timestamp="2026-10-04T01:27:32" hostname="localhost" tests="38" failures="0" errors="0" skipped="0" flaky="0" time="0.270">
+		<testcase name="test_cast_from_owned_scroll_spends_only_success_and_reports_manual_outcome" classname="power_casting" time="0.002">
+		</testcase>
+		<testcase name="test_palms_applies_independent_damage_after_armor_and_shield_once" classname="power_casting" time="0.003">
+		</testcase>
+		<testcase name="test_grace_heals_each_chosen_actor_once_after_rolled_target_count" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:0 (&apos;shield&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:1 (&apos;broken&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:2 (&apos;unequipped&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:3 (&apos;empty&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_changed_armor_discards_the_whole_set_without_reapplying_late_rolls" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_failure_and_natural_faces_preserve_their_distinct_resource_rules" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_roskoe_rolls_independent_hp_loss_for_four_targets_without_armor" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_hp_targets_revalidate_the_entire_confirmed_set_before_commit" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:0 (&apos;too-many&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:1 (&apos;hp&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:2 (&apos;maximum&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:3 (&apos;dead&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:4 (&apos;no-maximum&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_narrative_parameters_and_manual_hp_boundaries" classname="power_casting" time="0.011">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:0 (&apos;count&apos;)" classname="power_casting" time="0.003">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:1 (&apos;duplicate&apos;)" classname="power_casting" time="0.003">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:2 (&apos;range&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:3 (&apos;cancel&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:4 (&apos;disconnect&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:5 (&apos;owner&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:6 (&apos;relink&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:7 (&apos;malformed&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:8 (&apos;save&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_shared_and_long_public_labels_keep_per_target_dice_distinct:0 (false)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_shared_and_long_public_labels_keep_per_target_dice_distinct:1 (true)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_lightning_reports_each_bolt_without_assigning_damage" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_restrictions_and_unfinished_powers_refuse_before_any_throw" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_every_target_is_validated_at_authored_range_without_private_data" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_daily_allowance_is_an_explicit_human_throw_and_never_a_timer" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_interruption_preserves_accepted_use_and_refuses_late_parameters" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_eyelid_pc_only_outcome_reports_manual_test_and_one_hour" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_owner_routing_malformed_inputs_and_failed_commits" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_all_twenty_core_scrolls_have_an_explicit_playable_boundary" classname="power_casting" time="0.008">
+		</testcase>
+		<testcase name="test_invisible_college_scroll_is_consumed_after_successful_cast" classname="power_casting" time="0.004">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="special_actions" package="tests" timestamp="2026-10-04T01:27:32" hostname="localhost" tests="55" failures="0" errors="0" skipped="0" flaky="0" time="0.222">
+		<testcase name="test_scroll_selection_during_delayed_refresh_is_accepted_once:0 (false)" classname="special_actions" time="0.014">
+		</testcase>
+		<testcase name="test_scroll_selection_during_delayed_refresh_is_accepted_once:1 (true)" classname="special_actions" time="0.013">
+		</testcase>
+		<testcase name="test_medicine_heals_and_consumes_one_use_atomically" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_poison_routes_resistance_and_applies_hp_loss:0 (&apos;poison-red&apos;, true, 10, 7)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_poison_routes_resistance_and_applies_hp_loss:1 (&apos;poison-black&apos;, false, 12, 4)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_poison_routes_resistance_and_applies_hp_loss:2 (&apos;red-poison-decoction&apos;, false, 12, 0)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_elixir_uses_shared_doses_and_heals_private_target_at_contact" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_wizard_teeth_request_four_dice_and_report_manual_maximum_damage" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:0 (&apos;master-of-fate&apos;, true, 7, &apos;right way&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:1 (&apos;filthy-fingersmith&apos;, true, 7, &apos;pockets and locks&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:2 (&apos;list-of-sins&apos;, false, 9, &apos;discovered&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:3 (&apos;horn-of-the-schleswig-lords&apos;, false, 11, &apos;automatic success&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_printed_class_tests_resolve_without_automating_later_benefits:4 (&apos;stones-taken-from-thel-emas-lost-temple&apos;, false, 8, &apos;sunset&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_decoctions_consume_shared_pool_and_report_durations:0 (&apos;fernors-philtre&apos;, [4], &apos;4 hours&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_decoctions_consume_shared_pool_and_report_durations:1 (&apos;spider-owl-soup&apos;, [], &apos;30 minutes&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_decoctions_consume_shared_pool_and_report_durations:2 (&apos;hyphos-enervating-snuff&apos;, [], &apos;DR14&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:0 (&apos;speaker-of-truths&apos;, true, [], &apos;lowered by 4&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:1 (&apos;harp&apos;, false, [3], &apos;+3&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:2 (&apos;blasphemous-nechrubel-bible&apos;, false, [4], &apos;five minutes&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:3 (&apos;dodging-death&apos;, true, [1, 3], &apos;10 rounds&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:4 (&apos;excretal-stealth&apos;, true, [], &apos;DR16&apos;)" classname="special_actions" time="0.001">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:5 (&apos;escaping-fate&apos;, true, [], &apos;Omen&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_parameters_and_manual_benefits:6 (&apos;crumpled-monster-mask&apos;, false, [], &apos;every round&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_book_creature_resistance_summons_printed_berserkers_and_spends_daily_use" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_brewing_replaces_two_recipes_and_one_shared_dose_pool" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_invisible_college_rolls_count_and_family_then_keeps_table_selected_scrolls" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_mitre_requires_wearing_and_table_selected_stealth_ability" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_crucifix_rolls_morale_with_explicit_presence_sign_and_private_label" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_vapor_resistance_is_requested_with_table_chosen_ability" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_gob_lobber_rolls_fight_uses_spends_spit_then_routes_witness_tests" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_cancel_after_bible_parity_preserves_spent_use_and_logs_once" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_pending_action_stops_after_item_removal_and_on_source_access_loss:0 (&apos;item&apos;)" classname="special_actions" time="0.001">
+		</testcase>
+		<testcase name="test_pending_action_stops_after_item_removal_and_on_source_access_loss:1 (&apos;access&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_pending_action_stops_after_item_removal_and_on_source_access_loss:2 (&apos;session&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_all_invalid_ranges_report_public_labels_and_roll_nothing" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_concurrent_actions_from_same_character_are_refused" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_ancestors_blade_checks_treachery_then_resolves_attack_against_self" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:0 (&apos;bomb&apos;, [5, 2], 2)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:1 (&apos;bear-trap&apos;, [4, 2], 3)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb:2 (&apos;caltrops&apos;, [3, 2, 1], 4)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:0 (&apos;dried-food&apos;, 0, 2, &apos;one day&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:1 (&apos;waterskin&apos;, 1, 1, &apos;water&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:2 (&apos;lard&apos;, 1, 1, &apos;meal&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:3 (&apos;lantern-oil&apos;, 0, 2, &apos;7 hours&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_food_water_and_oil_use_prescribed_resources_without_timers:4 (&apos;torch&apos;, 0, 2, &apos;Burns&apos;)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_treacherous_blade_offers_existing_shield_choice_before_hp_change" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_removed_college_ends_before_chosen_scrolls_are_created" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_agility_tests_include_worn_armor:0 (&apos;filthy-fingersmith&apos;, 2, 10)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_class_agility_tests_include_worn_armor:1 (&apos;stolen-mitre&apos;, 3, 12)" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_special_damage_rejects_changed_protection" classname="special_actions" time="0.002">
+		</testcase>
+		<testcase name="test_shield_continuation_requires_source_item_and_range:0 (&apos;item&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_shield_continuation_requires_source_item_and_range:1 (&apos;range&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:0 (&apos;break&apos;)" classname="special_actions" time="0.004">
+		</testcase>
+		<testcase name="test_bomb_spends_once_before_shield_and_never_refunds_on_cancel:1 (&apos;cancel&apos;)" classname="special_actions" time="0.003">
+		</testcase>
+		<testcase name="test_taking_caltrops_damage_preserves_rolled_infection_report" classname="special_actions" time="0.003">
+		</testcase>
+	</testsuite>
+	<testsuite id="4" name="companions" package="tests" timestamp="2026-10-04T01:27:32" hostname="localhost" tests="37" failures="0" errors="0" skipped="0" flaky="0" time="1.394">
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:0 (1, &apos;belze-skeleton&apos;, &apos;&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:1 (3, &apos;belze-skeleton&apos;, &apos;&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:2 (4, &apos;nodh-zombie&apos;, &apos;d2&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:3 (6, &apos;nodh-zombie&apos;, &apos;d2&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:0 (&apos;cancel&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:1 (&apos;tray&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:2 (&apos;disconnect&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:3 (&apos;access&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:4 (&apos;save&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:5 (&apos;restart&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_gm_cast_for_player_grants_the_casters_normal_access" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_owned_creature_requests_the_other_characters_defence" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_creature_attack_uses_its_own_rook_and_equipped_action" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:0 (&apos;Owner&apos;)" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:1 (&apos;Viewer&apos;)" classname="companions" time="0.014">
+		</testcase>
+		<testcase name="test_creature_inventory_edits_preserve_profiles_and_individual_state" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_companion_ranged_resource_is_spent_once_after_defence_roll" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_critical_armor_damage_survives_unrelated_creature_inventory_edit" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_equipped_creature_shield_reduces_melee_and_power_damage:0 (&apos;melee&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_equipped_creature_shield_reduces_melee_and_power_damage:1 (&apos;power&apos;)" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_companion_flat_attack_combines_printed_drs_and_hides_private_target" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_companion_defends_flat_with_printed_exceptions_and_its_own_armor" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:0 (&apos;bony-knuckles&apos;, true)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:1 (&apos;knife&apos;, false)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_defence_fumble_and_shield_choice_persist_individual_equipment" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:0 (&apos;cancel&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:1 (&apos;disconnect&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:2 (&apos;access&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:3 (&apos;save&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_creature_targeting_selects_one_rolling_side_from_ordinary_access:0 (false)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_creature_targeting_selects_one_rolling_side_from_ordinary_access:1 (true)" classname="companions" time="0.001">
+		</testcase>
+		<testcase name="test_companion_defence_presentation_offers_flat_test_at_phone_dock_width" classname="companions" time="0.011">
+		</testcase>
+		<testcase name="test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_companion_defence_presentation_hides_when_owner_access_is_lost" classname="companions" time="0.014">
+		</testcase>
+		<testcase name="test_companion_defence_scene_resolves_the_compact_shield_choice" classname="companions" time="1.229">
+		</testcase>
+	</testsuite>
+	<testsuite id="5" name="power_composition" package="tests" timestamp="2026-10-04T01:27:33" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="2.464">
+		<testcase name="test_cast_controls_and_terminal_gm_report_in_phone_body" classname="power_composition" time="0.620">
+		</testcase>
+		<testcase name="test_immediate_healing_guides_count_errors_and_reports_applied_hp" classname="power_composition" time="1.831">
+		</testcase>
+	</testsuite>
+	<testsuite id="6" name="special_composition" package="tests" timestamp="2026-10-04T01:27:36" hostname="localhost" tests="4" failures="0" errors="0" skipped="0" flaky="0" time="0.686">
+		<testcase name="test_use_item_shows_recipient_focus_pending_and_healing_outcome" classname="special_composition" time="0.616">
+		</testcase>
+		<testcase name="test_book_preview_uses_selected_recipient_and_stock_radio_choices" classname="special_composition" time="0.026">
+		</testcase>
+		<testcase name="test_separate_sheets_keep_independent_radio_selection" classname="special_composition" time="0.015">
+		</testcase>
+		<testcase name="test_malformed_dr_adjustment_does_not_request_a_throw" classname="special_composition" time="0.007">
+		</testcase>
+	</testsuite>
+	<testsuite id="7" name="defence_composition" package="tests" timestamp="2026-10-04T01:27:37" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.054">
+		<testcase name="test_compact_shield_geometry_focus_pending_and_close" classname="defence_composition" time="0.040">
+		</testcase>
+		<testcase name="test_switching_actor_discards_the_previous_defence_presentation" classname="defence_composition" time="0.004">
+		</testcase>
+	</testsuite>
+</testsuites>

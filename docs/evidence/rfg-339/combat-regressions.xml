@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="33" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="melee_attack" package="tests" timestamp="2026-10-04T00:04:36" hostname="localhost" tests="5" failures="0" errors="0" skipped="0" flaky="0" time="2.267">
+		<testcase name="test_melee_attack" classname="melee_attack" time="0.003">
+		</testcase>
+		<testcase name="test_d2_faces" classname="melee_attack" time="0.003">
+		</testcase>
+		<testcase name="test_boundaries" classname="melee_attack" time="0.004">
+		</testcase>
+		<testcase name="test_lifetime" classname="melee_attack" time="0.020">
+		</testcase>
+		<testcase name="test_review_regressions" classname="melee_attack" time="2.222">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="ranged_attack" package="tests" timestamp="2026-10-04T00:04:39" hostname="localhost" tests="9" failures="0" errors="0" skipped="0" flaky="0" time="0.077">
+		<testcase name="test_bow_uses_presence_and_one_arrow_for_a_miss" classname="ranged_attack" time="0.005">
+		</testcase>
+		<testcase name="test_presence_hit_spends_ammunition_before_damage_and_preserves_it_on_cancel" classname="ranged_attack" time="0.004">
+		</testcase>
+		<testcase name="test_selected_creature_alternative_owns_its_range" classname="ranged_attack" time="0.004">
+		</testcase>
+		<testcase name="test_gutterborn_presence_exception_keeps_source_difficulty" classname="ranged_attack" time="0.003">
+		</testcase>
+		<testcase name="test_equipped_bow_view_selects_only_matching_ammunition" classname="ranged_attack" time="0.010">
+		</testcase>
+		<testcase name="test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log" classname="ranged_attack" time="0.005">
+		</testcase>
+		<testcase name="test_creature_source_ranges_and_exceptions_survive_selection" classname="ranged_attack" time="0.006">
+		</testcase>
+		<testcase name="test_saved_creature_combined_attack_keeps_live_values_and_gains_source_choices" classname="ranged_attack" time="0.002">
+		</testcase>
+		<testcase name="test_unspecified_custom_projectile_is_rejected_before_any_roll" classname="ranged_attack" time="0.008">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="ranged_resources" package="tests" timestamp="2026-10-04T00:04:39" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="0.018">
+		<testcase name="test_crossbow_critical_and_fumble_spend_bolts_once" classname="ranged_resources" time="0.003">
+		</testcase>
+		<testcase name="test_rejected_targets_and_cancelled_throws_preserve_resources" classname="ranged_resources" time="0.005">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="special_weapons" package="tests" timestamp="2026-10-04T00:04:39" hostname="localhost" tests="11" failures="0" errors="0" skipped="0" flaky="0" time="0.043">
+		<testcase name="test_special_weapon_reach_difficulty_and_damage:0 (&apos;blade-of-your-ancestors&apos;, [3], 2)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_special_weapon_reach_difficulty_and_damage:1 (&apos;snake-skin-gift&apos;, [1], 0)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_special_weapon_reach_difficulty_and_damage:2 (&apos;old-sigurds-sling&apos;, [2, 3], 1)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:0 (&apos;brown-scimitar-of-galgenbeck&apos;, [3, 1], 3, &apos;10 minutes&apos;)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:1 (&apos;shoe-of-deaths-horse&apos;, [2, 1], 0, &apos;instantly&apos;)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries:2 (&apos;sacred-shepherds-crook&apos;, [3], 3, &apos;faithless&apos;)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_bite_and_cowards_jab_use_their_printed_tests:0 (&apos;bite&apos;)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_bite_and_cowards_jab_use_their_printed_tests:1 (&apos;jab&apos;)" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_eurekia_destroys_sword_and_records_hamfund_death_on_one_even_on_miss" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_eurekia_vanish_on_fumble_does_not_restore_sword_from_stale_snapshot" classname="special_weapons" time="0.002">
+		</testcase>
+		<testcase name="test_eurekia_remaining_draw_correction_starts_a_fresh_combat" classname="special_weapons" time="0.002">
+		</testcase>
+	</testsuite>
+	<testsuite id="4" name="rfg339_temporary" package="tests" timestamp="2026-10-04T00:04:39" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="0.043">
+		<testcase name="test_unconditional_attack_damage_and_no_recipient_mutation" classname="rfg339_temporary" time="0.003">
+		</testcase>
+		<testcase name="test_native_intrinsics_and_exact_class_mode" classname="rfg339_temporary" time="0.004">
+		</testcase>
+		<testcase name="test_projection_identity_availability_and_sheet_star_context" classname="rfg339_temporary" time="0.007">
+		</testcase>
+		<testcase name="test_cancel_and_lost_authorization_prevent_late_rolls" classname="rfg339_temporary" time="0.006">
+		</testcase>
+		<testcase name="test_eurekia_draw_spend_remains_independent_of_manual_consequence" classname="rfg339_temporary" time="0.007">
+		</testcase>
+		<testcase name="test_untargeted_ranged_ammunition_and_companion_stats" classname="rfg339_temporary" time="0.006">
+		</testcase>
+	</testsuite>
+</testsuites>

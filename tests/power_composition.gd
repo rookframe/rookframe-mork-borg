@@ -74,7 +74,7 @@ func test_immediate_healing_guides_count_errors_and_reports_applied_hp() -> void
 	assert_str(panel.primary_text()).is_equal("Confirm targets")
 	assert_str(panel.get_node("Outcome").text).contains("exactly 1")
 	assert_bool(panel.get_node("Cast/Columns/Targets/Content/Change").disabled).is_false()
-	host.targets = PackedStringArray()
+	host.targets = PackedStringArray(["enemy-rook", "hero-rook"])
 	await panel.submit()
 	await get_tree().process_frame
 	await get_tree().process_frame

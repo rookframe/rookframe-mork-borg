@@ -1,0 +1,91 @@
+[gd_scene load_steps=4 format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd" id="script"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.tscn" id="attack"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_defence_flow.tscn" id="defence"]
+[node name="TabletopAttack" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_vertical = 3
+script = ExtResource("script")
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+[node name="Content" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Scroll" type="ScrollContainer" parent="Margin/Content"]
+layout_mode = 2
+size_flags_vertical = 3
+horizontal_scroll_mode = 0
+[node name="Body" type="VBoxContainer" parent="Margin/Content/Scroll"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 12
+[node name="Weapon" type="VBoxContainer" parent="Margin/Content/Scroll/Body"]
+layout_mode = 2
+visible = false
+[node name="Title" type="Label" parent="Margin/Content/Scroll/Body/Weapon"]
+layout_mode = 2
+text = "Coward’s jab · choose a light one-handed weapon"
+autowrap_mode = 2
+theme_type_variation = &"RookframeBody"
+[node name="Choice" type="OptionButton" parent="Margin/Content/Scroll/Body/Weapon"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,44)
+theme_type_variation = &"RookframeSecondaryButton"
+[node name="Improvised" type="VBoxContainer" parent="Margin/Content/Scroll/Body"]
+layout_mode = 2
+visible = false
+[node name="Object" type="LineEdit" parent="Margin/Content/Scroll/Body/Improvised"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,44)
+placeholder_text = "Improvised object"
+[node name="Mode" type="OptionButton" parent="Margin/Content/Scroll/Body/Improvised"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,44)
+item_count = 2
+popup/item_0/text = "Melee · Strength · 5 ft"
+popup/item_0/id = 0
+popup/item_1/text = "Ranged · Presence · 30 ft"
+popup/item_1/id = 1
+[node name="Source" type="VBoxContainer" parent="Margin/Content/Scroll/Body"]
+layout_mode = 2
+visible = false
+[node name="Choice" type="OptionButton" parent="Margin/Content/Scroll/Body/Source"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,44)
+[node name="Attack" parent="Margin/Content/Scroll/Body" instance=ExtResource("attack")]
+layout_mode = 2
+[node name="Defence" parent="Margin/Content/Scroll/Body" instance=ExtResource("defence")]
+visible = false
+layout_mode = 2
+[node name="Owners" type="VBoxContainer" parent="Margin/Content/Scroll/Body"]
+visible = false
+layout_mode = 2
+[node name="Actions" type="HBoxContainer" parent="Margin/Content"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Close" type="Button" parent="Margin/Content/Actions"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,44)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeSecondaryButton"
+text = "Cancel"
+[node name="Start" type="Button" parent="Margin/Content/Actions"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,44)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframePrimaryButton"
+text = "Roll attack"

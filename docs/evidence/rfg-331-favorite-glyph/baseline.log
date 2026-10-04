@@ -1,0 +1,137 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+[2J[H
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/favorite-style-baseline-final
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/favorite_size_temp.gd
+  res://tests/favorite_size_temp.gd > test_authored_favorite_style_and_geometry_matches_three_profiles STARTED
+RFG331 Favorite profile=desktop starred=false font=15 minimum=(44.0, 44.0) hit_rect=[P: (1291.714, 844.0), S: (44.0, 64.0)] row=(436.0, 64.0) panel=(460.0001, 132.0) hovered=true draw_mode=2 normal_color=(0.5686, 0.6, 0.6039, 1.0) hover_color=(0.851, 0.8314, 0.8196, 1.0) pressed_color=(0.5686, 0.6, 0.6039, 1.0) hover_pressed_color=(0.5686, 0.6, 0.6039, 1.0)
+RFG331 Favorite style: desktop normal margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop hover margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop pressed margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop hover_pressed margins=[4.0, 4.0, 4.0, 4.0]
+RFG331 Favorite style: desktop disabled margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop focus margins=[0.0, 0.0, 0.0, 0.0]
+RFG331 Favorite profile=desktop starred=true font=15 minimum=(44.0, 44.0) hit_rect=[P: (1291.714, 844.0), S: (44.0, 64.0)] row=(436.0, 64.0) panel=(460.0001, 132.0) hovered=true draw_mode=4 normal_color=(0.8863, 0.7686, 0.4275, 1.0) hover_color=(0.851, 0.8314, 0.8196, 1.0) pressed_color=(0.8863, 0.7686, 0.4275, 1.0) hover_pressed_color=(0.8863, 0.7686, 0.4275, 1.0)
+RFG331 Favorite style: desktop normal margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop hover margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop pressed margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop hover_pressed margins=[4.0, 4.0, 4.0, 4.0]
+RFG331 Favorite style: desktop disabled margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: desktop focus margins=[0.0, 0.0, 0.0, 0.0]
+RFG331 Favorite profile=tablet starred=false font=15 minimum=(44.0, 44.0) hit_rect=[P: (735.1428, 608.0), S: (44.0, 52.0)] row=(376.0, 52.0) panel=(400.0, 120.0) hovered=true draw_mode=2 normal_color=(0.5686, 0.6, 0.6039, 1.0) hover_color=(0.851, 0.8314, 0.8196, 1.0) pressed_color=(0.5686, 0.6, 0.6039, 1.0) hover_pressed_color=(0.5686, 0.6, 0.6039, 1.0)
+RFG331 Favorite style: tablet normal margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet hover margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet pressed margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet hover_pressed margins=[4.0, 4.0, 4.0, 4.0]
+RFG331 Favorite style: tablet disabled margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet focus margins=[0.0, 0.0, 0.0, 0.0]
+RFG331 Favorite profile=tablet starred=true font=15 minimum=(44.0, 44.0) hit_rect=[P: (735.1428, 608.0), S: (44.0, 52.0)] row=(376.0, 52.0) panel=(400.0, 120.0) hovered=true draw_mode=4 normal_color=(0.8863, 0.7686, 0.4275, 1.0) hover_color=(0.851, 0.8314, 0.8196, 1.0) pressed_color=(0.8863, 0.7686, 0.4275, 1.0) hover_pressed_color=(0.8863, 0.7686, 0.4275, 1.0)
+RFG331 Favorite style: tablet normal margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet hover margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet pressed margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet hover_pressed margins=[4.0, 4.0, 4.0, 4.0]
+RFG331 Favorite style: tablet disabled margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: tablet focus margins=[0.0, 0.0, 0.0, 0.0]
+RFG331 Favorite profile=phone starred=false font=15 minimum=(44.0, 44.0) hit_rect=[P: (620.0, 270.0), S: (44.0, 48.0)] row=(344.0, 48.0) panel=(360.0, 102.0) hovered=true draw_mode=2 normal_color=(0.5686, 0.6, 0.6039, 1.0) hover_color=(0.851, 0.8314, 0.8196, 1.0) pressed_color=(0.5686, 0.6, 0.6039, 1.0) hover_pressed_color=(0.5686, 0.6, 0.6039, 1.0)
+RFG331 Favorite style: phone normal margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone hover margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone pressed margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone hover_pressed margins=[4.0, 4.0, 4.0, 4.0]
+RFG331 Favorite style: phone disabled margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone focus margins=[0.0, 0.0, 0.0, 0.0]
+RFG331 Favorite profile=phone starred=true font=15 minimum=(44.0, 44.0) hit_rect=[P: (620.0, 270.0), S: (44.0, 48.0)] row=(344.0, 48.0) panel=(360.0, 102.0) hovered=true draw_mode=4 normal_color=(0.8863, 0.7686, 0.4275, 1.0) hover_color=(0.851, 0.8314, 0.8196, 1.0) pressed_color=(0.8863, 0.7686, 0.4275, 1.0) hover_pressed_color=(0.8863, 0.7686, 0.4275, 1.0)
+RFG331 Favorite style: phone normal margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone hover margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone pressed margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone hover_pressed margins=[4.0, 4.0, 4.0, 4.0]
+RFG331 Favorite style: phone disabled margins=[12.0, 12.0, 12.0, 12.0]
+RFG331 Favorite style: phone focus margins=[0.0, 0.0, 0.0, 0.0]
+  res://tests/favorite_size_temp.gd > test_authored_favorite_style_and_geometry_matches_three_profiles FAILED 1s 182ms
+  Report:
+  Expecting:
+ 24
+ but was
+ 15	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:57
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 'Color(0.5686, 0.6, 0.6039, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:66
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 24
+ but was
+ 15	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:57
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:66
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 24
+ but was
+ 15	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:57
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 'Color(0.5686, 0.6, 0.6039, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:66
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 24
+ but was
+ 15	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:57
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:66
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 21
+ but was
+ 15	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:57
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 'Color(0.5686, 0.6, 0.6039, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:66
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 21
+ but was
+ 15	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:57
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8  Expecting:
+ 'Color(0.8863, 0.7686, 0.4275, 1.0)'
+ but was
+ 'Color(0.851, 0.8314, 0.8196, 1.0)'	at 'test_authored_favorite_style_and_geometry_matches_three_profiles' in res://tests/favorite_size_temp.gd:66
+	at '_move' in res://tests/favorite_size_temp.gd:13
+	at '_settle' in res://tests/favorite_size_temp.gd:8
+
+Statistics: 1 test cases | 0 errors | 12 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 192ms
+
+
+Overall Summary: 1 test cases | 0 errors | 12 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 1s 192ms
+ Open XML Report at: file://reports/favorite-style-baseline-final/report_1/results.xml
+Open HTML Report at: file://reports/favorite-style-baseline-final/report_1/index.html
+Exit code: 100
+Run dispose test resources

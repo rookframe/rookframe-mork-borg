@@ -54,6 +54,9 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		action["target_rooks"] = caller.targets
 		action["label"] = selected.label
 		var power: Dictionary = action.scroll
+		var selected_targets: Array = selected.targets
+		if selected_targets.is_empty():
+			return _untargeted_parameters(context, action)
 		if str(power.source_item_id) in ["grace-of-a-dead-saint", "roskoes-consuming-glare", "palms-open-the-southern-gate"]:
 			var healing: bool = str(power.source_item_id) == "grace-of-a-dead-saint"
 			var damage: bool = str(power.source_item_id) == "palms-open-the-southern-gate"
@@ -130,7 +133,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var situation: int = input.get("modifier", 0)
 	if situation < -20 or situation > 20:
 		return _error("Enter a whole-number situational modifier from −20 to +20.")
-	if input.get("sheet", false) and not BROKEN.new().can_act(data):
+	if not BROKEN.new().can_act(data):
 		return _error("This Character cannot cast. Rules references remain available.")
 	var restriction := POWERS.new().casting_restriction(data, data.get("inventory", []))
 	if not restriction.is_empty():
@@ -141,6 +144,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var presence: Dictionary = abilities.get("Presence", {})
 	var modifier: int = presence.get("modifier", 0)
 	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "owner": owner.id, "owner_session": owner.session, "item": str(input.item), "scroll": scroll, "sheet": input.get("sheet", false), "presence": modifier, "phase": "casting", "sequence": 0, "modifier": modifier + situation, "difficulty": 10 if str(data.get("class_id", "")) == "gutterborn-scum" else 12, "label": targeting.label, "targets": targeting.get("targets", []), "rook": str(input.get("rook", "")), "request": str(input.id), "state": "pending", "message": "Waiting for the casting Throw in the Dice Tray."}
+	var chosen_targets: Array = action.targets
+	action["untargeted"] = not action.sheet and str(scroll.target_mode) != "self" and chosen_targets.is_empty()
 	if action.get("sheet", false):
 		action["message"] = "Resolving casting in Window Dice…"
 	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, action.owner, [SDK.DiceTerm.new("Casting", 20)]))
@@ -158,6 +163,13 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var data: Dictionary = source.actor.data
 	if not _valid_character(data):
 		return _end(context, action)
+	if not action.get("sheet", false):
+		var captured_targets: Array = action.get("targets", [])
+		for raw in captured_targets:
+			var target: Dictionary = raw
+			var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(target.rook)))
+			if not spatial.ok:
+				return _end(context, action)
 	var result := context.read_throw(action.request)
 	if not result.ok or result.status == "cancelled":
 		return _end(context, action)
@@ -168,6 +180,12 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var power: Dictionary = action.get("scroll", {})
 	if action["phase"] == "hp":
 		return _hp_result(context, action, result)
+	if action["phase"] == "manual_hp":
+		var amounts: Array[int] = []
+		for term in result.terms:
+			amounts.append(term.results[0])
+		var purpose := "healing" if str(power.source_item_id) == "grace-of-a-dead-saint" else "damage" if str(power.source_item_id) == "palms-open-the-southern-gate" else "HP loss"
+		return _complete(context, action, [], "Manual outcome", "%s · %d creatures; %s rolls: %s. Recipients, protection and HP changes belong to the table. No target effects were applied. One daily use spent. Raw Rolls #%d, #%d, #%d." % [str(power.name), int(action.count), purpose, str(amounts), int(action.sequence), int(action.quantity_sequence), result.sequence])
 	if action["phase"] == "daily":
 		var daily_face: int = result.terms[0].results[0]
 		var count: int = daily_face + presence
@@ -176,8 +194,10 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		data["power_uses"] = usable
 		data["power_uses_total"] = usable
 		return _complete(context, action, [SDK.ActorChange.new(source.actor.id, data)], "Daily allowance", "Morning allowance: Presence %+d + d4 %d = %d. %d usable Powers today. The table establishes the morning; no time or replenishment is automatic. Raw Roll #%d." % [presence, daily_face, count, usable, result.sequence])
-	if action["phase"] == "casting" and (_scroll(data, action.item).is_empty() or not POWERS.new().casting_restriction(data, data.get("inventory", [])).is_empty()):
-		return _end(context, action)
+	if action["phase"] == "casting":
+		var current := _scroll(data, action.item)
+		if current.is_empty() or str(current.source_item_id) != str(power.source_item_id) or not BROKEN.new().can_act(data) or not POWERS.new().casting_restriction(data, data.get("inventory", [])).is_empty():
+			return _end(context, action)
 	if action["phase"] == "resistance":
 		return _sleep_result(context, action, result.terms[0].results, result.sequence)
 	if str(action.phase) in ["parameters", "bolts"]:
@@ -194,6 +214,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 			var count: int = int((values[0] + 1) / 2) if d2 else values[0]
 			action["count"] = count
 			action["quantity_sequence"] = result.sequence
+			if action.get("untargeted", false):
+				return _untargeted_parameters(context, action)
 			action["state"] = "targets"
 			var message := "Choose exactly %d distinct creatures within 30 ft, then confirm targets." % count
 			if d2:
@@ -203,6 +225,8 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		if action["phase"] == "parameters" and str(power.source_item_id) == "eyelid-blinds-the-mind":
 			action["count"] = values[0]
 			action["quantity_sequence"] = result.sequence
+			if action.get("untargeted", false):
+				return _untargeted_parameters(context, action)
 			action["state"] = "targets"
 			action["message"] = "Choose exactly %d distinct creatures within 30 ft, then confirm targets. Creature resistance is DR14; the source does not specify a PC ability." % values[0]
 			return _public(action)
@@ -246,6 +270,20 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report).ok:
 		return _end(context, action)
 	return _request(context, action, "parameters", terms, "Power activated. Throw its stated quantities in the Dice Tray.")
+
+func _untargeted_parameters(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
+	# A target-free cast keeps the printed dice, without inventing recipients,
+	# protection or effects. The sheet's existing Window Dice path is separate.
+	var power: Dictionary = action.scroll
+	var count: int = action.count
+	if str(power.source_item_id) == "eyelid-blinds-the-mind":
+		return _complete(context, action, [], "Manual sleep", "Eyelid blinds the mind: %d creatures fall asleep for one hour unless they succeed a DR14 test. Choose recipients and resolve resistance at the table. No target effects or conditions were applied. One daily use spent. Raw Rolls #%d and #%d." % [count, int(action.sequence), int(action.quantity_sequence)])
+	var healing := str(power.source_item_id) == "grace-of-a-dead-saint"
+	var purpose := "Healing" if healing else "Damage" if str(power.source_item_id) == "palms-open-the-southern-gate" else "HP loss"
+	var terms: Array[SDK.DiceTerm] = []
+	for index in range(count):
+		terms.append(SDK.DiceTerm.new("%s %d" % [purpose, index + 1], 10 if healing else 8))
+	return _request(context, action, "manual_hp", terms, "Throw the Power's stated amounts in the Dice Tray; recipients and application stay with the table.")
 
 func _summon(context: SDK.SystemActionContext, action: Dictionary, values: Array[int], sequence: int) -> Dictionary:
 	var skeletons: bool = values[0] <= 3
@@ -465,7 +503,7 @@ func _scroll(data: Dictionary, id: String) -> Dictionary:
 	for raw in items:
 		var item: Dictionary = raw
 		var quantity: int = item.get("quantity", 0)
-		if str(item.get("inventory_id", "")) != id or quantity <= 0:
+		if str(item.get("inventory_id", "")) != id or quantity <= 0 or item.get("broken", false) or int(item.get("uses", 1)) <= 0:
 			continue
 		return POWERS.new().definition(str(item.get("source_item_id", "")))
 	return {}
@@ -484,11 +522,17 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 	var mode: String = power.target_mode
 	if mode == "self":
 		return {"state": "ready", "label": "Self", "targets": []}
+	var target_ids: PackedStringArray = caller.targets
+	var has_targets := false
+	for _target_id in target_ids:
+		has_targets = true
+		break
+	if not has_targets:
+		return {"state": "ready", "label": "Table outcome", "targets": []}
 	var rook_id := SDK.RookId.new(source_rook)
 	var rook := context.read_rook(rook_id)
-	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value or rook.rook.scene.value != "main":
+	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value:
 		return _error("Select this Character’s source Rook in the current Scene.")
-	var target_ids: PackedStringArray = caller.targets
 	var targets: Array = []
 	var labels := ""
 	var outside := ""
@@ -541,7 +585,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 			invalid = distance.message
 		elif distance.distance > float(reach) * 0.3048 + 0.000001:
 			outside += ("\n" if not outside.is_empty() else "") + "target %s not in range" % label
-		targets.append({"actor": actor_id, "schema": schema, "label": label, "protection": protection})
+		targets.append({"actor": actor_id, "rook": id, "schema": schema, "label": label, "protection": protection})
 		labels += (", " if not labels.is_empty() else "") + label
 	if not outside.is_empty():
 		var report := SDK.ActionLogMessage.new("Power out of range")

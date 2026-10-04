@@ -12,6 +12,7 @@ const SHIELD_SCRIPT = preload(ROOT + "ui/shield_dialog.gd")
 const BACKDROP = preload(ROOT + "ui/shield_backdrop.tscn")
 var _shield: SHIELD_SCRIPT
 var _backdrop: CanvasLayer
+const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
@@ -23,6 +24,7 @@ var _rule: Dictionary = {}
 var _entry: Dictionary = {}
 var _action: ACTION
 var _source_rook: SDK.RookId
+var _source_rooks: Array[SDK.RookId] = []
 var _update_pending := false
 var _targets_pending := false
 var _reading_targets := false
@@ -30,14 +32,69 @@ var _scroll_options: Array = []
 var _first_scroll := ""
 var _second_scroll := ""
 var _ability := ""
+var _tabletop := false
+var _title := ""
+var _context_version := 0
 
 func _ready() -> void:
 	resized.connect(_layout)
+	get_node(^"Source/Choice").item_selected.connect(_source_selected)
 	for node in get_node(^"Options/Ability/Choices").get_children():
 		var choice := node as Button
 		choice.pressed.connect(_choose_ability.bind(choice.text))
+	for index in range(2):
+		var list := get_node(^"Scrolls/First" if index == 0 else ^"Scrolls/Second")
+		for number in range(list.get_child_count()):
+			var row := list.get_child(number) as Button
+			row.pressed.connect(_choose_scroll_option.bind(index, number))
 	get_node(^"Columns/Recipient/Content/Change").pressed.connect(_choose_targets)
 	get_node(^"Columns/Recipient/Content/Self").pressed.connect(_self_changed)
+
+func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
+	_reset_task()
+	_tabletop = true
+	_configure_source(facade, actor.id, rook)
+	# A recipient is never inferred from the authored sheet's Self default.
+	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
+	configure(actor, facade, item)
+
+func _configure_source(facade: SDK, actor: SDK.ActorId, preferred: String) -> void:
+	var resolver := SOURCE_ROOKS.new()
+	_source_rooks = resolver.candidates(facade, actor)
+	_source_rook = resolver.resolve(_source_rooks, preferred)
+	var choice: OptionButton = get_node(^"Source/Choice")
+	choice.clear()
+	choice.add_item(facade.translations.text("Choose the source Rook"))
+	for index in range(_source_rooks.size()):
+		choice.add_item(facade.translations.text("Rook %d") % (index + 1))
+		if _source_rook != null and _source_rook.value == _source_rooks[index].value:
+			choice.select(index + 1)
+
+func _source_selected(index: int) -> void:
+	if _action != null and _action.state != "error":
+		return
+	_source_rook = _source_rooks[index - 1] if index > 0 and index <= _source_rooks.size() else null
+	_targets_pending = true
+
+func _reset_task() -> void:
+	_context_version += 1
+	_update_pending = false
+	if _action != null:
+		_action.retire()
+		_action = null
+	_scroll_options = []
+	_first_scroll = ""
+	_second_scroll = ""
+	_ability = ""
+	for path in [^"Options/Ability/Choices", ^"Scrolls/First", ^"Scrolls/Second"]:
+		for child in get_node(path).get_children():
+			var choice := child as Button
+			choice.button_pressed = false
+	get_node(^"Options/Adjustment").value = "0"
+	get_node(^"Options/Morale/Value").value = "0"
+	get_node(^"Options/Eligible").button_pressed = false
+	get_node(^"Options/NewFight").button_pressed = false
+	get_node(^"Options/Morale/Subtract").button_pressed = false
 
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
@@ -47,11 +104,12 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_item = item
 	_entry = RULES.new().owned(actor.data, item)
 	_rule = RULES.new().definition(str(_entry.get("source_item_id", "")))
+	_title = str(_entry.get("name", "Use item"))
 	if not _sdk.targeting.changed.is_connected(_targets_changed):
 		_sdk.targeting.changed.connect(_targets_changed)
 	if not _sdk.world_changed.is_connected(_world_changed):
 		_sdk.world_changed.connect(_world_changed)
-	if _source_rook == null:
+	if _source_rook == null and not _tabletop:
 		_source_rook = _sdk.rooks.selected()
 	if _rule.get("book", false):
 		get_node(^"Columns/Recipient/Content/Self").button_pressed = false
@@ -62,7 +120,8 @@ func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
 	var editing := state in ["ready", "error"]
-	var title := str(_entry.get("name", "Use item"))
+	get_node(^"Source").visible = _tabletop and _source_rooks.size() > 1 and editing
+	var title := _title
 	get_node(^"Columns/Item/Content/Name").visible = false
 	get_node(^"Columns/Item/Content/Rules").text = _t(str(_entry.get("rules", "")))
 	if _rule.get("blade", false):
@@ -101,7 +160,6 @@ func _render() -> void:
 				var scroll: Dictionary = _scroll_options[number]
 				var row := list.get_child(number) as Button
 				row.text = _t(str(scroll.name))
-				row.pressed.connect(_choose_scroll.bind(index, str(scroll.source_item_id)))
 		var count: int = _action.snapshot.get("count", 0)
 		get_node(^"Scrolls/Second").visible = count == 2
 	if state == "shield":
@@ -181,13 +239,16 @@ func _process(_delta: float) -> void:
 			_actor = latest.actor
 			_entry = RULES.new().owned(_actor.data, _item)
 		_render()
-	if _targets_pending and not _reading_targets and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
+	if _targets_pending and not _reading_targets and _rule.get("range_feet", 0) > 0 and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
 		_targets_pending = false
 		_reading_targets = true
+		var version := _context_version
 		var reach: float = _rule.get("range_feet", 0)
 		var summary := await TARGETS.new().describe(_sdk, _source_rook, reach)
 		_reading_targets = false
-		if is_inside_tree():
+		if is_inside_tree() and version == _context_version:
+			if _tabletop and summary == _t("Choose one target"):
+				summary = _t("No targets")
 			get_node(^"Columns/Recipient/Content/Copy").text = summary
 
 func _targets_changed(_snapshot: SDK.TargetSnapshot) -> void:
@@ -219,6 +280,12 @@ func _layout() -> void:
 
 func _choose_ability(ability: String) -> void:
 	_ability = ability
+
+func _choose_scroll_option(index: int, number: int) -> void:
+	if number >= _scroll_options.size():
+		return
+	var scroll: Dictionary = _scroll_options[number]
+	_choose_scroll(index, str(scroll.source_item_id))
 
 func _choose_scroll(index: int, id: String) -> void:
 	if index == 0:

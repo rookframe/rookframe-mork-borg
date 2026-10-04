@@ -1,0 +1,20 @@
+{
+  "status": "published",
+  "repository": "rookframe/rookframe-mork-borg",
+  "tag": "v1.0.127",
+  "commit": "ae521114fda16e33846a1180dcca77f704cada91",
+  "buildId": "0e9c3554-8577-4d17-900c-b57cc636a5f1",
+  "profiles": [
+    "package"
+  ],
+  "manifestUrl": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.127/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.127.json",
+  "archiveUrl": "https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.127/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.127.rookpackage",
+  "assets": [
+    "0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.127.json",
+    "0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.127.rookpackage"
+  ],
+  "releaseId": 402880410,
+  "releaseUrl": "https://github.com/rookframe/rookframe-mork-borg/releases/tag/v1.0.127",
+  "draft": false,
+  "next": "Run catalogue propose --manifest with this hosted Manifest, review the returned proposal, then explicitly submit it."
+}

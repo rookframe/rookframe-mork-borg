@@ -8,6 +8,7 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
+const RECOVERY = preload(ROOT + "logic/recovery_rules.gd")
 const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
@@ -108,6 +109,12 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		if not _record(context, [SDK.ActorChange.new(source.actor.id, improved)], "Improvement begun. Accepted changes remain if interrupted; resolve unfinished steps manually."):
 			return _end(context, action)
 		return _request(context, action, "more_hp", [SDK.DiceTerm.new("More HP", 10, 6)], true)
+	if str(input.kind) == "omens":
+		if not RECOVERY.new().can_regain_omens(data) or typeof(input.get("six_hours")) != TYPE_BOOL or not input.six_hours:
+			return _error("Omens must be depleted after at least six hours of rest.")
+		var omen_faces := RECOVERY.new().omen_faces(data)
+		action["omen_faces"] = omen_faces
+		return _request(context, action, "omens", [SDK.DiceTerm.new("Regain Omens (d%d)" % omen_faces, 4)], true)
 	if str(input.kind) != "rest":
 		return _error("Choose a supported health action.")
 	if not str(input.get("rest", "")) in ["breath", "sleep"]:
@@ -115,6 +122,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var hp: int = data.hit_points
 	if BROKEN.new().is_dead(data):
 		return _error("Rest does not resurrect a dead Character.")
+	if typeof(input.get("food_and_drink", true)) != TYPE_BOOL or typeof(input.get("infected", false)) != TYPE_BOOL:
+		return _error("Choose valid food, drink and infection conditions.")
+	if not input.get("food_and_drink", true) or input.get("infected", false):
+		return _finish(context, action, [], "Without food and drink, or while infected, rest restores no HP. Daily HP loss remains table-managed.", "No HP restored")
 	var faces := 4 if str(input.rest) == "breath" else 6
 	var request := context.request_throw(SDK.HumanThrowRequest.new(str(input.id), str(owner.id), [SDK.DiceTerm.new("Recovery", faces)]))
 	return action if request.ok else _error(request.message)
@@ -129,6 +140,17 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 		return _broken(context, action, current, roll)
 	if str(action.kind) == "improve":
 		return _improve(context, action, current, roll)
+	if str(action.kind) == "omens":
+		if not RECOVERY.new().can_regain_omens(current) or RECOVERY.new().omen_faces(current) != int(action.omen_faces):
+			return _end(context, action)
+		var face: int = roll.terms[0].results[0]
+		var regained := int((face + 1) / 2) if int(action.omen_faces) == 2 else face
+		var data := current.duplicate(true)
+		data["omens"] = regained
+		var text := "Regain Omens: %d Omens after at least six hours of rest. Raw Roll #%d." % [regained, roll.sequence]
+		if int(action.omen_faces) == 2:
+			text += " d2 uses a physical d4 halved, rounded up."
+		return _finish(context, action, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], text, "%d Omens" % regained, "success")
 	var hp: int = current.hit_points
 	var maximum: int = current.maximum_hit_points
 	if BROKEN.new().is_dead(current):

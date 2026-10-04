@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_10" tests="25" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="review" package="tests/rfg331_review_temp" timestamp="2026-10-04T01:27:46" hostname="localhost" tests="25" failures="0" errors="0" skipped="0" flaky="0" time="7.744">
+		<testcase name="test_fallback_targeted_power_and_item_capture_only_actor_current_scene_rook:0 (true)" classname="review" time="1.145">
+		</testcase>
+		<testcase name="test_fallback_targeted_power_and_item_capture_only_actor_current_scene_rook:1 (false)" classname="review" time="1.125">
+		</testcase>
+		<testcase name="test_multiple_rooks_require_native_source_choice_and_freeze_after_start:0 (true)" classname="review" time="0.716">
+		</testcase>
+		<testcase name="test_multiple_rooks_require_native_source_choice_and_freeze_after_start:1 (false)" classname="review" time="0.687">
+		</testcase>
+		<testcase name="test_no_target_no_rook_path_still_requests_dice:0 (true)" classname="review" time="0.703">
+		</testcase>
+		<testcase name="test_no_target_no_rook_path_still_requests_dice:1 (false)" classname="review" time="0.654">
+		</testcase>
+		<testcase name="test_delayed_companion_start_close_cancels_underlying_throw_and_inbox:0 (false)" classname="review" time="0.765">
+		</testcase>
+		<testcase name="test_delayed_companion_start_close_cancels_underlying_throw_and_inbox:1 (true)" classname="review" time="0.781">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:0 (&apos;melee.start&apos;, false)" classname="review" time="0.004">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:1 (&apos;melee.start&apos;, true)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:2 (&apos;attack.validate&apos;, false)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:3 (&apos;attack.validate&apos;, true)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:4 (&apos;power.start&apos;, false)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:5 (&apos;power.start&apos;, true)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:6 (&apos;special.start&apos;, false)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_authority_spatial_checks_accept_arbitrary_active_scene_and_reject_inactive:7 (&apos;special.start&apos;, true)" classname="review" time="0.005">
+		</testcase>
+		<testcase name="test_complete_russian_templates_and_native_attack_choices_preserve_names" classname="review" time="1.032">
+		</testcase>
+		<testcase name="test_captured_spatial_action_ends_before_effect_after_scene_switch:0 (&apos;melee&apos;)" classname="review" time="0.005">
+		</testcase>
+		<testcase name="test_captured_spatial_action_ends_before_effect_after_scene_switch:1 (&apos;defence&apos;)" classname="review" time="0.007">
+		</testcase>
+		<testcase name="test_captured_spatial_action_ends_before_effect_after_scene_switch:2 (&apos;power&apos;)" classname="review" time="0.007">
+		</testcase>
+		<testcase name="test_captured_spatial_action_ends_before_effect_after_scene_switch:3 (&apos;special&apos;)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_fresh_profile_and_edited_duplicate_companion_keep_exact_attack_identity:0 (false)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_fresh_profile_and_edited_duplicate_companion_keep_exact_attack_identity:1 (true)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_early_companion_cancel_keeps_original_session_guard:0 (false)" classname="review" time="0.006">
+		</testcase>
+		<testcase name="test_early_companion_cancel_keeps_original_session_guard:1 (true)" classname="review" time="0.006">
+		</testcase>
+	</testsuite>
+</testsuites>

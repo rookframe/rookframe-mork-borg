@@ -1,0 +1,74 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-review-affected
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/localization.gd
+  res://tests/localization.gd > test_russian_creation_uses_display_labels_without_changing_draft STARTED
+  res://tests/localization.gd > test_russian_creation_uses_display_labels_without_changing_draft PASSED 129ms
+
+  res://tests/localization.gd > test_dynamic_inventory_and_search_preserve_source_ids STARTED
+  res://tests/localization.gd > test_dynamic_inventory_and_search_preserve_source_ids PASSED 75ms
+
+  res://tests/localization.gd > test_editable_values_and_fallback STARTED
+  res://tests/localization.gd > test_editable_values_and_fallback PASSED 38ms
+
+  res://tests/localization.gd > test_edit_labels_translate_without_rewriting_named_content STARTED
+  res://tests/localization.gd > test_edit_labels_translate_without_rewriting_named_content PASSED 49ms
+
+  res://tests/localization.gd > test_catalog_covers_all_authored_rule_content_and_preserves_formats STARTED
+  res://tests/localization.gd > test_catalog_covers_all_authored_rule_content_and_preserves_formats PASSED 56ms
+
+  res://tests/localization.gd > test_long_russian_definition_names_fit_phone_width STARTED
+  res://tests/localization.gd > test_long_russian_definition_names_fit_phone_width PASSED 161ms
+
+  res://tests/localization.gd > test_russian_cast_confirmation_wraps_inside_phone_width STARTED
+  res://tests/localization.gd > test_russian_cast_confirmation_wraps_inside_phone_width PASSED 33ms
+
+Statistics: 7 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 559ms
+
+
+Run Test Suite: res://tests/companions.gd
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') PASSED 36ms
+
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') PASSED 34ms
+
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state STARTED
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state PASSED 5ms
+
+Statistics: 3 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 90ms
+
+
+Run Test Suite: res://tests/ranged_attack.gd
+  res://tests/ranged_attack.gd > test_equipped_bow_view_selects_only_matching_ammunition STARTED
+  res://tests/ranged_attack.gd > test_equipped_bow_view_selects_only_matching_ammunition PASSED 9ms
+
+  res://tests/ranged_attack.gd > test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log STARTED
+  res://tests/ranged_attack.gd > test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log PASSED 19ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 56ms
+
+
+Overall Summary: 12 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (3/3)
+Executed test cases : (12/12)
+Total execution time: 705ms
+ Open XML Report at: file://reports/russian-review-affected/report_1/results.xml
+Open HTML Report at: file://reports/russian-review-affected/report_1/index.html
+Exit code: 0
+Run dispose test resources

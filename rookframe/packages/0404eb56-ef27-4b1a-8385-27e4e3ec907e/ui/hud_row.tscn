@@ -60,6 +60,7 @@ flat = true
 
 [node name="Favorite" type="Button" parent="."]
 custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskGlyphButton"
 text = "☆"
 toggle_mode = true
 flat = true
