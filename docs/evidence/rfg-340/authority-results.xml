@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="48" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="authority" package="tests/rfg340_temp" timestamp="2026-10-04T00:22:31" hostname="localhost" tests="8" failures="0" errors="0" skipped="0" flaky="0" time="0.050">
+		<testcase name="test_all_twenty_untargeted_scrolls_roll_without_source_rook_or_invented_target_effects" classname="authority" time="0.014">
+		</testcase>
+		<testcase name="test_target_free_hp_powers_roll_quantity_then_amounts_without_armor_or_recipients:0 (&apos;grace-of-a-dead-saint&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_target_free_hp_powers_roll_quantity_then_amounts_without_armor_or_recipients:1 (&apos;palms-open-the-southern-gate&apos;)" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_target_free_hp_powers_roll_quantity_then_amounts_without_armor_or_recipients:2 (&apos;roskoes-consuming-glare&apos;)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_clearing_targets_at_quantity_confirmation_uses_manual_amounts" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_daily_and_single_use_keep_favorite_membership_and_do_not_bind_new_copy" classname="authority" time="0.003">
+		</testcase>
+		<testcase name="test_casting_cannot_redirect_when_exact_source_is_removed_or_replaced:0 (false)" classname="authority" time="0.002">
+		</testcase>
+		<testcase name="test_casting_cannot_redirect_when_exact_source_is_removed_or_replaced:1 (true)" classname="authority" time="0.002">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="power_casting" package="tests" timestamp="2026-10-04T00:22:31" hostname="localhost" tests="38" failures="0" errors="0" skipped="0" flaky="0" time="0.270">
+		<testcase name="test_cast_from_owned_scroll_spends_only_success_and_reports_manual_outcome" classname="power_casting" time="0.002">
+		</testcase>
+		<testcase name="test_palms_applies_independent_damage_after_armor_and_shield_once" classname="power_casting" time="0.003">
+		</testcase>
+		<testcase name="test_grace_heals_each_chosen_actor_once_after_rolled_target_count" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:0 (&apos;shield&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:1 (&apos;broken&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:2 (&apos;unequipped&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_boundary:3 (&apos;empty&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_palms_changed_armor_discards_the_whole_set_without_reapplying_late_rolls" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_failure_and_natural_faces_preserve_their_distinct_resource_rules" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_roskoe_rolls_independent_hp_loss_for_four_targets_without_armor" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_hp_targets_revalidate_the_entire_confirmed_set_before_commit" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:0 (&apos;too-many&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:1 (&apos;hp&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:2 (&apos;maximum&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:3 (&apos;dead&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_target_count_and_hp_data_are_validated_before_requesting_dice:4 (&apos;no-maximum&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_narrative_parameters_and_manual_hp_boundaries" classname="power_casting" time="0.009">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:0 (&apos;count&apos;)" classname="power_casting" time="0.003">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:1 (&apos;duplicate&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:2 (&apos;range&apos;)" classname="power_casting" time="0.005">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:3 (&apos;cancel&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:4 (&apos;disconnect&apos;)" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:5 (&apos;owner&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:6 (&apos;relink&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:7 (&apos;malformed&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_immediate_corrections_interruption_and_atomic_refusal:8 (&apos;save&apos;)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_shared_and_long_public_labels_keep_per_target_dice_distinct:0 (false)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_shared_and_long_public_labels_keep_per_target_dice_distinct:1 (true)" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_lightning_reports_each_bolt_without_assigning_damage" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_restrictions_and_unfinished_powers_refuse_before_any_throw" classname="power_casting" time="0.005">
+		</testcase>
+		<testcase name="test_every_target_is_validated_at_authored_range_without_private_data" classname="power_casting" time="0.007">
+		</testcase>
+		<testcase name="test_daily_allowance_is_an_explicit_human_throw_and_never_a_timer" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_interruption_preserves_accepted_use_and_refuses_late_parameters" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_eyelid_pc_only_outcome_reports_manual_test_and_one_hour" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_owner_routing_malformed_inputs_and_failed_commits" classname="power_casting" time="0.006">
+		</testcase>
+		<testcase name="test_all_twenty_core_scrolls_have_an_explicit_playable_boundary" classname="power_casting" time="0.008">
+		</testcase>
+		<testcase name="test_invisible_college_scroll_is_consumed_after_successful_cast" classname="power_casting" time="0.004">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="power_composition" package="tests" timestamp="2026-10-04T00:22:31" hostname="localhost" tests="2" failures="0" errors="0" skipped="0" flaky="0" time="2.463">
+		<testcase name="test_cast_controls_and_terminal_gm_report_in_phone_body" classname="power_composition" time="0.630">
+		</testcase>
+		<testcase name="test_immediate_healing_guides_count_errors_and_reports_applied_hp" classname="power_composition" time="1.818">
+		</testcase>
+	</testsuite>
+</testsuites>
