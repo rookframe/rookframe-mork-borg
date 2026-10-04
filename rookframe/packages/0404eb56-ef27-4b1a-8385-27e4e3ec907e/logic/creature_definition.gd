@@ -84,7 +84,12 @@ func stat_block(current: Dictionary) -> Dictionary:
 		return data
 	if typeof(data.get("attacks", [])) != TYPE_ARRAY or typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("armor", {})) != TYPE_DICTIONARY:
 		return data
-	for raw in data.get("attacks", []) + data.get("inventory", []):
+	var saved_attacks: Array = data.get("attacks", [])
+	for raw in saved_attacks:
+		if typeof(raw) != TYPE_DICTIONARY:
+			return data
+	var saved_items: Array = data.get("inventory", [])
+	for raw in saved_items:
 		if typeof(raw) != TYPE_DICTIONARY:
 			return data
 	var attacks := _inventory_attacks(data) if data.get("creature_inventory", false) else _profile_attacks(data)
@@ -128,9 +133,11 @@ func attack_options(data: Dictionary) -> Array:
 ## These records never come from carried loot and have no ammunition counter.
 func combat_attacks(data: Dictionary) -> Array:
 	var result: Array = []
-	for attack in attack_options(data):
-		if typeof(attack) != TYPE_DICTIONARY:
+	var attacks: Array = attack_options(data)
+	for raw_attack in attacks:
+		if typeof(raw_attack) != TYPE_DICTIONARY:
 			return []
+		var attack: Dictionary = raw_attack
 		var item: Dictionary = attack.duplicate(true)
 		item["inventory_id"] = "creature:" + str(attack.get("id", ""))
 		item["damage"] = str(attack.get("dice", ""))
