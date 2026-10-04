@@ -99,8 +99,6 @@ func ready() -> void:
 func set_entries(category: String, entries: Array[ENTRY]) -> void:
 	if category not in CATEGORIES or category == "Abilities":
 		return
-	for entry in entries:
-		entry.favorite_editable = not _pending_favorites.has(_favorite_request_key(_actor, entry.id))
 	_entries[category] = entries
 	if _category == category:
 		_render_panel()
@@ -108,7 +106,13 @@ func set_entries(category: String, entries: Array[ENTRY]) -> void:
 func _refresh() -> void:
 	var context := sdk.character_hud.context()
 	var source: SDK.ActorResult = sdk.actors.read(context.actor) if context.ok and context.actor != null else null
-	if source == null or not source.ok or source.actor == null or source.actor.access_level != "Owner" or str(source.actor.data.get("schema", "")) != "mork-borg-character/v1":
+	if source == null or not source.ok or source.actor == null or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
+		_actor = null
+		_close_panel()
+		visible = false
+		return
+	var data: Dictionary = source.actor.data
+	if str(data.get("schema", "")) != "mork-borg-character/v1":
 		_actor = null
 		_close_panel()
 		visible = false
@@ -118,7 +122,6 @@ func _refresh() -> void:
 		_entries = {}
 		_show_all = {}
 	_actor = source.actor.id
-	var data: Dictionary = source.actor.data
 	get_node("Bar/Identity").accessibility_name = str(data.get("name", "")) + " · " + sdk.translations.text("Character sheet")
 	get_node("Bar/Identity/Name").text = str(data.get("name", sdk.translations.text("Unnamed Actor")))
 	get_node("Bar/Identity/Class").text = sdk.translations.text(str(data.get("class_title", "")))
@@ -138,7 +141,8 @@ func _refresh() -> void:
 		var entry := ENTRY.new()
 		entry.id = ABILITIES[index]
 		entry.title = sdk.translations.text(entry.id)
-		var modifier := int(abilities.get(entry.id, {}).get("modifier", 0))
+		var ability: Dictionary = abilities.get(entry.id, {})
+		var modifier := int(ability.get("modifier", 0))
 		entry.value = ("+" if modifier >= 0 else "") + str(modifier)
 		entry.icon = ABILITY_ICONS[index]
 		entry.available = can_roll
@@ -165,7 +169,7 @@ func _project_favorites(actor: SDK.Actor) -> void:
 			entry.available = source.get("available", false)
 			entry.favorite = source.get("starred", false)
 			entries.append(entry)
-		set_entries(category, entries)
+		_entries[category] = entries
 
 func _favorite_request_key(actor: SDK.ActorId, key: String) -> String:
 	return actor.value + ":" + key if actor != null else ""
@@ -341,8 +345,8 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	value.add_theme_color_override("font_color", TOKENS.COLOR_ACCENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
 	title.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
 	row.get_node("Favorite").visible = not fixed
-	row.get_node("Favorite").disabled = not entry.favorite_editable
-	row.get_node("Favorite").set_pressed_no_signal(entry.favorite)
+	row.get_node("Favorite").disabled = _pending_favorites.has(_favorite_request_key(_actor, str(entry.id)))
+	row.get_node("Favorite").set_pressed_no_signal(bool(entry.favorite))
 	row.get_node("Favorite").text = "★" if entry.favorite else "☆"
 	row.get_node("Favorite").accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
 	row.get_node("FullName").accessibility_name = sdk.translations.text("Show full name")

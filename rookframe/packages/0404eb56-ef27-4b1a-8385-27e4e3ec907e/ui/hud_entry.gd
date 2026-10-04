@@ -8,4 +8,3 @@ extends Resource
 @export var icon: Texture2D
 @export var available := true
 @export var favorite := false
-@export var favorite_editable := true
