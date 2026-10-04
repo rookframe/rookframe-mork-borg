@@ -22,6 +22,8 @@ const CORE_DEFINITIONS: Dictionary = {
 }
 
 
+const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd")
+
 const ROOKFRAME_CONTENT := "fbf21a78-626e-4f35-b2ce-bd196083d9b7"
 const AUTHORED_MINIATURES := {"bent-scum": "bandit", "seth-goblin": "goblin", "zukuma-berserker": "barbarian"}
 
@@ -48,7 +50,8 @@ func create_data(raw_choices: Variant) -> Variant:
 		"morale": definition.get("morale", {"kind": "none"}),
 		"armor": definition.get("armor", {"name": "No armor", "reduction": ""}),
 		"attacks": definition.get("attacks", []),
-		"inventory": [],
+		"inventory": definition.get("loot", []).duplicate(true),
+		"creature_stat_block": true,
 		"rules": definition.get("rules", ""),
 	}
 	for field in ["defence_dr", "piercing_defence_dr", "destroy_at_damage"]:
@@ -58,19 +61,94 @@ func create_data(raw_choices: Variant) -> Variant:
 		data["creation_id"] = choices["creation_id"]
 	if choices.has("creation_roll_sequence"):
 		data["creation_roll_sequence"] = choices["creation_roll_sequence"]
-	for key in ["preferred_miniature", "creature_inventory", "inventory_serial", "summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory"]:
+	for key in ["preferred_miniature", "inventory_serial", "summoner_actor", "summon_action", "grant_source", "name", "hit_points", "maximum_hit_points", "morale", "armor", "attacks", "inventory", "classification", "rule_groups", "reference", "source", "portrait"]:
 		if choices.has(key):
 			data[key] = choices[key]
 	if not data.has("preferred_miniature"):
 		data["preferred_miniature"] = default_miniature(resource_name)
 	return data
 
-## Older saved core Actors used one entry for paired attacks. Resolve those
-## source entries into authored alternatives without mutating the live sheet.
+## Project saved effective capabilities into a Creature Stat Block before any
+## loot edit. The saved inventory remains untouched; only the old equipment
+## interpretation is retired. The first ordinary accepted Actor update persists
+## this value, so removed attacks and old source defaults cannot return.
+func stat_block(current: Dictionary) -> Dictionary:
+	var data := current.duplicate(true)
+	if str(data.get("schema", "")) != "mork-borg-adversary/v1" or data.get("creature_stat_block", false):
+		return data
+	if typeof(data.get("attacks", [])) != TYPE_ARRAY or typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("armor", {})) != TYPE_DICTIONARY:
+		return data
+	for raw in data.get("attacks", []) + data.get("inventory", []):
+		if typeof(raw) != TYPE_DICTIONARY:
+			return data
+	var attacks := _inventory_attacks(data) if data.get("creature_inventory", false) else _profile_attacks(data)
+	var retained: Array = []
+	for raw in attacks:
+		var attack: Dictionary = raw
+		if not attack.get("equipped", true) or attack.get("broken", false) or int(attack.get("quantity", 1)) < 1:
+			continue
+		for key in ["inventory_id", "equipped", "broken", "quantity", "ammunition"]:
+			attack.erase(key)
+		retained.append(attack)
+	data["attacks"] = retained
+	var armor: Dictionary = data.get("armor", {"name": "No armor", "reduction": ""})
+	var shield := 0
+	var defence_penalty := 0
+	for raw in ITEMS.new(null, null).inventory(data):
+		var item: Dictionary = raw
+		if not item.get("equipped", false) or int(item.get("quantity", 0)) < 1:
+			continue
+		if str(item.get("kind", "")) == "Armor" and int(item.get("penalty_tier", item.get("armor_tier", 0))) >= 2:
+			defence_penalty += 2
+		if str(item.get("kind", "")) == "Shield" and not item.get("broken", false):
+			shield = 1
+	if shield > 0:
+		armor["shield_reduction"] = shield
+	if defence_penalty > 0:
+		armor["defence_penalty"] = defence_penalty
+	data["armor"] = armor
+	data["creature_stat_block"] = true
+	data.erase("creature_inventory")
+	return data
+
 func attack_options(data: Dictionary) -> Array:
-	if data.get("creature_inventory", false):
-		return _inventory_attacks(data)
-	return _profile_attacks(data)
+	var normalized := stat_block(data)
+	if typeof(normalized.get("attacks", [])) != TYPE_ARRAY:
+		return []
+	var attacks: Array = normalized.get("attacks", [])
+	return attacks.duplicate(true)
+
+## Adapt explicit capabilities for the existing targeted combat operation.
+## These records never come from carried loot and have no ammunition counter.
+func combat_attacks(data: Dictionary) -> Array:
+	var result: Array = []
+	for attack in attack_options(data):
+		if typeof(attack) != TYPE_DICTIONARY:
+			return []
+		var item: Dictionary = attack.duplicate(true)
+		item["inventory_id"] = "creature:" + str(attack.get("id", ""))
+		item["damage"] = str(attack.get("dice", ""))
+		item.erase("ammunition")
+		item["kind"] = "Weapon"
+		item["quantity"] = 1
+		item["equipped"] = true
+		result.append(item)
+	return result
+
+func shield_reduction(data: Dictionary) -> int:
+	var normalized := stat_block(data)
+	var armor: Dictionary = normalized.get("armor", {})
+	return int(armor.get("shield_reduction", 0))
+
+## Targeted tabletop criticals change recorded protection, never carried loot.
+func damage_protection(current: Dictionary) -> Dictionary:
+	var data := stat_block(current)
+	var armor: Dictionary = data.get("armor", {})
+	var tier: int = {"d2": 1, "d4": 2, "d6": 3}.get(str(armor.get("reduction", "")), 0)
+	if tier > 0:
+		armor["reduction"] = ["", "d2", "d4"][tier - 1]
+		data["armor"] = armor
+	return data
 
 func _profile_attacks(data: Dictionary) -> Array:
 	var saved: Array = data.get("attacks", [])

@@ -1,21 +1,22 @@
 extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
-const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 
 func plan(actor: SDK.Actor, faces: int, infection: bool) -> Dictionary:
-	var data: Dictionary = actor.data
+	var data: Dictionary = CREATURES.new().stat_block(actor.data)
 	if typeof(data.get("hit_points")) != TYPE_INT:
 		return {"error": "Recipient HP is malformed."}
 	var protection := ""
 	var shield := 0
 	var shield_id := ""
-	if str(data.get("schema", "")) == "mork-borg-adversary/v1" and not data.get("creature_inventory", false):
+	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
 		if typeof(data.get("armor", {})) != TYPE_DICTIONARY:
 			return {"error": "Recipient armor is malformed."}
 		var armor: Dictionary = data.get("armor", {})
 		protection = str(armor.get("reduction", ""))
+		shield = CREATURES.new().shield_reduction(data)
 	else:
 		if typeof(data.get("inventory", [])) != TYPE_ARRAY:
 			return {"error": "Recipient equipment is malformed."}
@@ -49,7 +50,7 @@ func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Di
 	var current: Dictionary = actor.data
 	if typeof(current.get("hit_points")) != TYPE_INT:
 		return {"error": "Recipient HP is malformed."}
-	var data := current.duplicate(true)
+	var data := CREATURES.new().stat_block(current)
 	var bonus: int = plan.bonus
 	var damage := roll.terms[0].results[0] + bonus
 	if plan.critical:
@@ -66,14 +67,34 @@ func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Di
 	var hp: int = data.hit_points
 	data["hit_points"] = hp - loss
 	if plan.critical:
-		CREATURE_ITEMS.new(null, actor.id).damage_armor(data)
+		damage_armor(actor.id, data)
 	var text := "d2 protection uses a physical d4 halved, rounded up." if str(plan.protection) == "d2" else ""
 	if plan.infection and roll.terms[-1].results[0] == 1:
 		text += " Infection; handle this condition manually."
 	return {"data": data, "loss": loss, "text": text}
 
 func damage_armor(id: SDK.ActorId, data: Dictionary) -> void:
-	CREATURE_ITEMS.new(null, id).damage_armor(data)
+	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
+		data.merge(CREATURES.new().damage_protection(data), true)
+		data.erase("creature_inventory")
+		return
+	var items := ITEMS.new(null, id).inventory(data)
+	var worn: Dictionary = {}
+	for item in items:
+		if str(item.get("kind", "")) == "Armor" and item.get("equipped", false) and not item.get("broken", false) and int(item.get("quantity", 0)) > 0:
+			worn = item
+	if worn.is_empty():
+		return
+	var tier: int = worn.get("armor_tier", {"d2": 1, "d4": 2, "d6": 3}.get(str(worn.get("reduction", "")), 0))
+	if tier < 1:
+		return
+	worn["penalty_tier"] = worn.get("penalty_tier", tier)
+	worn["armor_tier"] = tier - 1
+	worn["reduction"] = ["", "d2", "d4"][tier - 1]
+	if tier == 1:
+		worn["broken"] = true
+		worn["ruined"] = true
+	data["inventory"] = items
 
 func protection_current(actor: SDK.Actor, original: Dictionary) -> bool:
 	var faces: int = original.faces

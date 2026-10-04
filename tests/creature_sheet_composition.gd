@@ -83,43 +83,6 @@ func test_creature_tabs_editing_and_viewer_at_phone_width(width: int, _test_para
 	await _settle()
 	assert_bool(gear.is_visible_in_tree()).is_false()
 
-func test_inventory_names_keep_space_and_icons_keep_accessible_actions() -> void:
-	var viewport: SubViewport = auto_free(SubViewport.new())
-	viewport.size = Vector2i(351, 313)
-	add_child(viewport)
-	var inventory = auto_free(load(ROOT + "ui/character_sheet_inventory.tscn").instantiate())
-	inventory.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
-	viewport.add_child(inventory)
-	inventory.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
-	inventory.configure({"schema": "mork-borg-adversary/v1", "inventory": [
-		{"inventory_id": "1", "name": "Long flail", "kind": "Weapon", "equipped": true, "damage": "d8", "range_feet": 10},
-		{"inventory_id": "2", "name": "Heavy mace", "kind": "Weapon", "equipped": true, "damage": "d10", "range_feet": 5},
-		{"inventory_id": "3", "name": "An unusually long item name that must remain readable", "kind": "Weapon", "equipped": false, "damage": "d6"}
-	]}, [])
-	await _settle()
-	assert_str(inventory.get_node("Toolbar/Add").text).is_empty()
-	var rows: Node = inventory.get_node("EquippedSection/Content/Items")
-	var row: Control = rows.get_child(0)
-	assert_bool(row.get_node("Copy").size.x >= 130).is_true()
-	assert_bool(row.get_node("Copy/Title").size.y <= 25).is_true()
-	for name in ["Attack", "Equip", "Edit"]:
-		var button: Button = row.get_node("Actions/" + name)
-		assert_str(button.text).is_empty()
-		assert_bool(button.icon != null).is_true()
-		assert_str(button.accessibility_name).contains("Long flail")
-		assert_bool(button.size.x == 24 and button.size.y == 24).is_true()
-		assert_bool(inventory.get_global_rect().encloses(button.get_global_rect())).is_true()
-	assert_bool(row.get_node("Actions/Equip").button_pressed).is_true()
-	var edits: Array = []
-	row.navigate_requested.connect(func(route, id): edits.append([route, id]))
-	row.get_node("Actions/Edit").pressed.emit()
-	assert_array(edits).is_equal([["item", "1"]])
-	var mutations: Array = []
-	row.mutation_requested.connect(func(operation, arguments): mutations.append([operation, arguments]))
-	row.get_node("Actions/Equip").pressed.emit()
-	assert_array(mutations).is_equal([["item", ["1", "equipped", "false"]]])
-	assert_bool(rows.get_child(2).position.y - row.position.y <= 64).is_true()
-
 func _capture(viewport: SubViewport, name: String) -> void:
 	var directory := OS.get_environment("MORK_SHEET_CAPTURE_DIR")
 	if directory.is_empty() or DisplayServer.get_name() == "headless":

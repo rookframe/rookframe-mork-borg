@@ -514,7 +514,7 @@ func test_special_damage_rejects_changed_protection() -> void:
 func test_shield_continuation_requires_source_item_and_range(change: String, _test_parameters := [["item"], ["range"]]) -> void:
 	var host := _host("blade-of-your-ancestors")
 	host.actors.hero.data.inventory[-1]["equipped"] = true
-	host.actors.enemy.data["creature_inventory"] = true
+	host.actors.enemy.data["schema"] = "mork-borg-character/v1"
 	host.actors.enemy.data["inventory"] = [{"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true}]
 	var input := _use_input()
 	input.self = false

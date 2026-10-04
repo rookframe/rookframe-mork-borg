@@ -5,8 +5,6 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const TARGETING = preload(ROOT + "logic/attack_targeting.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
-const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
-const AMMUNITION = preload(ROOT + "logic/ammunition.gd")
 const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Array[Dictionary] = []
@@ -75,8 +73,6 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		if not result.ok or result.status == "cancelled":
 			return _end(context, action)
 		if result.ok and result.status == "rolled":
-			if not _spend_source_resource(context, action, result.sequence):
-				return _end(context, action)
 			if action.phase == "damage":
 				return _damage_rolled(context, action, result)
 			var raw: int = result.terms[0].results[0]
@@ -111,7 +107,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if validated.resolution != "defence":
 		return _error("Roll the acting Creature’s attack against this target.")
 	var target := context.read_actor(SDK.ActorId.new(str(validated.target)))
-	var data: Dictionary = target.actor.data
+	var data: Dictionary = CREATURES.new().stat_block(target.actor.data)
 	var creature_target := str(data.get("schema", "")) == "mork-borg-adversary/v1"
 	for previous in _actions:
 		if str(previous.target) == target.actor.id.value and str(previous.state) in ["ready", "pending", "shield"]:
@@ -157,15 +153,6 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _error("The GM must be connected to defend this Actor.")
 	var source := context.read_actor(SDK.ActorId.new(input.source))
 	var attack: Dictionary = validated.attack
-	var ammunition: Dictionary = {}
-	var kind := str(attack.get("ammunition", ""))
-	if not kind.is_empty():
-		var source_data: Dictionary = source.actor.data
-		var inventory := CREATURE_ITEMS.new(null, source.actor.id).inventory(source_data)
-		var resources := AMMUNITION.new().available(inventory, kind)
-		if resources.is_empty():
-			return _error("Add available %s ammunition in this Creature’s Inventory." % kind)
-		ammunition = resources[0]
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get("Agility", {})
 	var target_rooks: PackedStringArray = caller.targets
@@ -187,9 +174,12 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 					base_dr = item_dr
 		var current_dr: int = action.difficulty
 		action["difficulty"] = current_dr + base_dr - 12 - (2 if str(data.get("class_id", "")) == "gutterborn-scum" else 0)
-	action["ammunition"] = str(ammunition.get("inventory_id", ""))
-	action["ammunition_kind"] = kind
-	action["resource_spent"] = false
+	if creature_target:
+		var armor: Dictionary = data.get("armor", {})
+		action["protection"] = str(armor.get("reduction", ""))
+		action["armor"] = "stat-block" if not str(action.protection).is_empty() else ""
+		action["shield_reduction"] = CREATURES.new().shield_reduction(data)
+		action["difficulty"] = int(action.difficulty) + int(armor.get("defence_penalty", 0))
 	for raw_item in _inventory(target.actor.id, data):
 		var item: Dictionary = raw_item
 		var equipped: bool = item.equipped
@@ -227,7 +217,7 @@ func _damage_rolled(context: SDK.SystemActionContext, action: Dictionary, roll: 
 	if action.raw == 1:
 		damage *= 2
 	var protection := _total(action.protection, roll.terms[1].results) if roll.terms.size() > 1 else 0
-	var shield_reduction := 0 if str(action.shield).is_empty() else 1
+	var shield_reduction: int = action.get("shield_reduction", 0 if str(action.shield).is_empty() else 1)
 	var loss: int = damage - protection - shield_reduction
 	action["loss"] = loss if loss > 0 else 0
 	action["damage_sequence"] = roll.sequence
@@ -245,16 +235,16 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 	if not target.ok:
 		return false
 	var current: Dictionary = target.actor.data
-	var data := current.duplicate(true)
+	var data := CREATURES.new().stat_block(current)
 	if action.flat_test:
-		CREATURE_ITEMS.new(null, target.actor.id).damage_armor(data)
-		var creature_report := SDK.ActionLogMessage.new("Defence fumble")
-		creature_report.result = "Armor damaged"
-		creature_report.text = [SDK.ActionLogText.new("Natural 1: double damage; armor reduced one tier. Existing penalties remain.")]
-		var creature_saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], creature_report)
-		if creature_saved.ok:
+		data = CREATURES.new().damage_protection(data)
+		var report := SDK.ActionLogMessage.new("Defence fumble")
+		report.result = "Protection reduced"
+		report.text = [SDK.ActionLogText.new("Natural 1: double damage; recorded protection reduced one tier.")]
+		var saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], report)
+		if saved.ok:
 			action["armor_damaged"] = true
-		return creature_saved.ok
+		return saved.ok
 	var items := _inventory(target.actor.id, data)
 	for raw_item in items:
 		var item: Dictionary = raw_item
@@ -285,7 +275,7 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 	if not target.ok:
 		return _end(context, action)
 	var current: Dictionary = target.actor.data
-	var data := current.duplicate(true)
+	var data := CREATURES.new().stat_block(current)
 	var items := _inventory(target.actor.id, data)
 	var shield_present := str(action.shield).is_empty()
 	for raw_item in items:
@@ -317,9 +307,8 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 	var threshold: int = data.get("destroy_at_damage", 0)
 	if threshold > 0 and loss >= threshold and hp - loss > 0:
 		data.hit_points = 0
-	data.inventory = items
-	if action.flat_test:
-		data["creature_inventory"] = true
+	if not action.flat_test:
+		data.inventory = items
 	var report := SDK.ActionLogMessage.new("Defence")
 	report.result = "Shield broken" if break_shield else "%d damage" % loss
 	var sequence: int = action.sequence
@@ -435,39 +424,7 @@ func _find(id: String) -> Dictionary:
 			return action
 	return {}
 
-func _spend_source_resource(context: SDK.SystemActionContext, action: Dictionary, sequence: int) -> bool:
-	if str(action.ammunition).is_empty() or action.resource_spent:
-		return true
-	var source := context.read_actor(SDK.ActorId.new(str(action.source)))
-	if not source.ok:
-		return false
-	var current: Dictionary = source.actor.data
-	var data: Dictionary = current.duplicate(true)
-	var items := CREATURE_ITEMS.new(null, source.actor.id).inventory(data)
-	var resource: Dictionary = {}
-	for item in AMMUNITION.new().available(items, str(action.ammunition_kind)):
-		if str(item.inventory_id) == str(action.ammunition):
-			resource = item
-	if resource.is_empty():
-		return false
-	var field := str(resource.get("resource_field", "quantity"))
-	var remaining: int = resource.get(field, 0)
-	if field == "uses":
-		resource["uses"] = remaining - 1
-	else:
-		resource["quantity"] = remaining - 1
-	data["inventory"] = items
-	data["creature_inventory"] = true
-	var report := SDK.ActionLogMessage.new("Ammunition used")
-	report.result = "1 spent"
-	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.attacker), str(action.ammunition_kind), sequence])]
-	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report)
-	if not saved.ok:
-		return false
-	action["resource_spent"] = true
-	return true
-
 func _inventory(id: SDK.ActorId, data: Dictionary) -> Array:
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
-		return CREATURE_ITEMS.new(null, id).inventory(data)
+		return []
 	return ITEMS.new(null, id).inventory(data)

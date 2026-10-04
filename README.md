@@ -159,7 +159,7 @@ its Actor and source across HUD selection changes. The full-viewport sheet's
 separate Attack/Damage and Window Dice behavior remains intact.
 
 The Companions category projects only authorized companion Creature attacks.
-Each favorite identifies the Creature Actor and its exact inventory attack;
+Each favorite identifies the Creature Actor and its exact stat-block attack;
 descriptive-only companions supply no invented combat action. Launch opens the
 same captured native task bound to that Creature, using its flat test, damage
 and matching Rook. Untargeted play uses the common attack/damage sequence;
@@ -211,7 +211,7 @@ spend, raw Roll and report. Sling and unrelated use counters are not depleted.
 Custom weapons without authored attack rules retain only the supported 5/10-ft
 melee case; choose the core catalogue for a ranged attack.
 
-Creature inventory exposes every authored alternative before reach validation,
+Creature Stat Block exposes every authored alternative before reach validation,
 including Goblin knife/shortbow and Grotesque claws/eye-beam. Existing saved core
 Actors receive these choices without replacing their live damage or sheet values.
 Contact, extended and projectile alternatives have separate 5/10/30-ft reaches;
@@ -331,7 +331,7 @@ restart and repeated requests cannot create late or duplicate summons. No
 allegiance, duration or automatic Rook placement is added.
 
 Starting and summoned Creatures share the Character's Companions list. Open
-sheet and Place Rook address each individual Actor. Equipped Inventory attacks
+sheet and Place Rook address each individual Actor. Explicit stat-block attacks
 validate that Creature's own selected source Rook and authored reach. An owned
 Creature attacking a Character requests the defending Character's controlling
 Participant. Granted Creatures also request their responsible Player’s flat defence. Attacks
@@ -339,16 +339,20 @@ against unowned Creatures use the acting Creature’s flat d20, with DR12 plus
 independent printed difficulty adjustments. A single strike uses one hit test.
 This table ruling was approved in RFG-291 after research into printed rules and
 creator practice; the owner’s Character abilities never apply. Ordinary damage,
-armor, criticals and carried-weapon fumbles apply. Natural-weapon fumbles are GM
-adjudication and do not automatically disable teeth or claws. Situational DR
+armor and criticals apply through the recorded Creature Stat Block. Creature
+fumbles are table adjudication and never change carried loot. Situational DR
 and modifier choices remain available.
 
-Owner Players can add catalogue equipment or custom items, edit quantities and
-uses, equip or unequip, and remove items from each Creature's Inventory. Profile
-attacks keep their original source rules when first exposed as editable items;
-removed attacks do not return. Ranged equipment spends its ammunition once after
-the accepted hit test. Equipped shields reduce supported damage, and armor
-lost to a critical remains damaged through subsequent inventory edits.
+Owner Players can add catalogue loot or custom items, edit supported fields,
+quantities and uses, and remove entries from each Creature's Inventory. Loot
+has no Equip, Cast or Use action, and changes no Creature capability. Initial
+loot is explicitly authored separately from attacks and natural protection.
+Older saved Creatures retain their effective attacks, protection and carried
+entries on their next accepted edit. Removed attacks do not return. Creature
+combat uses that independent Stat Block; it never spends ammunition or damages
+carried loot. Targeted tabletop criticals can reduce recorded protection without
+changing an inventory item. Full-sheet interactions have their own table-resolved
+consequence boundary.
 
 ## Class abilities and consumables
 
@@ -495,7 +499,7 @@ Character creation is contributed to the shared Actors window.
 
 Creature, Inventory and Appearance share one set of native ButtonGroup tabs on desktop and touch. The Creature view keeps public identity, HP, morale, armor, attacks and rules; a 44px settings gear opens corrections with fixed Save/Cancel actions. Miniature choices belong only to Appearance. Actor placement stays in the Actors drag-and-drop flow.
 
-Inventory uses 44px accessible icon actions (add, attack, equip and item edit), 12px row gaps and 16px section padding. Equipped armor/shield controls retain a pressed state and context-specific accessible names. The shared inventory component also improves Character inventories and the equipment catalogue. See [the visual smoke contract](docs/creature-sheet-design.md).
+Inventory uses existing accessible icon actions, row gaps and section padding. Character equipment retains Attack and Equip controls; Creature loot exposes only addition and entry editing. The shared inventory component also serves the equipment catalogue. See [the visual smoke contract](docs/creature-sheet-design.md).
 
 ## Character HUD
 
