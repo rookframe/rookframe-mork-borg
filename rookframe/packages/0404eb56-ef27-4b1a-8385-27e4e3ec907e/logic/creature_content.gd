@@ -1,7 +1,7 @@
 extends RefCounted
 ## Published mechanical restatements and attribution, separate from live capabilities.
 ## Review cases Simple/Middle/Boss never enter Actor data. See docs/creature-sources.md.
-const ENTRIES := {
+const ENTRIES: Dictionary = {
 	"seth-goblin": {
 		"classification": "Goblin",
 		"source": {
@@ -607,4 +607,5 @@ const ENTRIES := {
 }
 
 func details(definition: String) -> Dictionary:
-	return ENTRIES.get(definition, {}).duplicate(true)
+	var found: Dictionary = ENTRIES.get(definition, {})
+	return found.duplicate(true)

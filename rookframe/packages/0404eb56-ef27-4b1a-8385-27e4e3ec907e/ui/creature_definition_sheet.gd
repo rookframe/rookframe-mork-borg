@@ -18,7 +18,7 @@ func ready() -> void:
 	sheet.miniature_requested.connect(_choose)
 	sheet.miniature_clear_requested.connect(_clear)
 	sheet.publication_requested.connect(_publication)
-	sheet.chapter_changed.connect(func(_chapter: int): _refresh_appearance())
+	sheet.chapter_changed.connect(_chapter_changed)
 	get_node("MiniatureWorkflow").closed.connect(_miniature_closed)
 	if not sdk.world_changed.is_connected(_refresh):
 		sdk.world_changed.connect(_refresh)
@@ -115,3 +115,6 @@ func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and get_node("MiniatureWorkflow").visible and event.is_action_pressed("ui_cancel"):
 		get_node("MiniatureWorkflow")._cancel()
 		get_viewport().set_input_as_handled()
+
+func _chapter_changed(_chapter: int) -> void:
+	_refresh_appearance()

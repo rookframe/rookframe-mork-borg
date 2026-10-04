@@ -35,22 +35,22 @@ var _pages: Dictionary = {}
 
 func _ready() -> void:
 	for index in range(3):
-		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).pressed.connect(func(): show_chapter(index))
+		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).pressed.connect(show_chapter.bind(index))
 	get_node(WORK + "Tabs/Source").pressed.connect(show_source)
 	get_node(WORK + "Reader/Back").pressed.connect(back)
-	get_node(WORK + "Reader/Publication").pressed.connect(func(): publication_requested.emit(str(_source().get("url", ""))))
-	get_node("Inset/Layout/Footer/Close").pressed.connect(func(): close_requested.emit())
-	get_node("Inset/Layout/Footer/Create").pressed.connect(func(): create_requested.emit())
-	get_node("Inset/Layout/Footer/Edit").pressed.connect(func(): edit_requested.emit())
-	get_node(IDENTITY + "Health").pressed.connect(func(): health_requested.emit())
-	get_node(IDENTITY + "Vitals/Armor").pressed.connect(func(): roll_requested.emit("armor", ""))
-	get_node(IDENTITY + "Vitals/Morale").pressed.connect(func(): roll_requested.emit("morale", ""))
-	get_node(WORK + "Section").item_selected.connect(func(index: int): _section = index; _render_encounter())
+	get_node(WORK + "Reader/Publication").pressed.connect(_publication)
+	get_node("Inset/Layout/Footer/Close").pressed.connect(_close)
+	get_node("Inset/Layout/Footer/Create").pressed.connect(_create)
+	get_node("Inset/Layout/Footer/Edit").pressed.connect(_edit)
+	get_node(IDENTITY + "Health").pressed.connect(_health)
+	get_node(IDENTITY + "Vitals/Armor").pressed.connect(_roll_armor)
+	get_node(IDENTITY + "Vitals/Morale").pressed.connect(_roll_morale)
+	get_node(WORK + "Section").item_selected.connect(_section_selected)
 	var appearance = get_node(WORK + "Appearance")
-	appearance.miniature_requested.connect(func(): miniature_requested.emit())
-	appearance.miniature_clear_requested.connect(func(): miniature_clear_requested.emit())
-	appearance.portrait_requested.connect(func(): portrait_requested.emit())
-	appearance.portrait_reset_requested.connect(func(): portrait_reset_requested.emit())
+	appearance.miniature_requested.connect(_miniature)
+	appearance.miniature_clear_requested.connect(_miniature_clear)
+	appearance.portrait_requested.connect(_portrait)
+	appearance.portrait_reset_requested.connect(_portrait_reset)
 	resized.connect(_queue_layout)
 	_queue_layout()
 
@@ -289,3 +289,30 @@ func miniature(title: String, package: String, assigned: bool) -> void:
 
 func miniature_preview_target() -> Control:
 	return get_node(WORK + "Appearance/MiniaturePanel/Inset/Content/MiniaturePreview")
+
+func _publication() -> void:
+	var source := _source()
+	publication_requested.emit(str(source.get("url", "")))
+func _close() -> void:
+	close_requested.emit()
+func _create() -> void:
+	create_requested.emit()
+func _edit() -> void:
+	edit_requested.emit()
+func _health() -> void:
+	health_requested.emit()
+func _roll_armor() -> void:
+	roll_requested.emit("armor", "")
+func _roll_morale() -> void:
+	roll_requested.emit("morale", "")
+func _section_selected(index: int) -> void:
+	_section = index
+	_render_encounter()
+func _miniature() -> void:
+	miniature_requested.emit()
+func _miniature_clear() -> void:
+	miniature_clear_requested.emit()
+func _portrait() -> void:
+	portrait_requested.emit()
+func _portrait_reset() -> void:
+	portrait_reset_requested.emit()

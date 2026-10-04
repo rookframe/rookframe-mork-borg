@@ -7,10 +7,10 @@ signal portrait_reset_requested
 const PORTRAIT := "PortraitPanel/Inset/Content/"
 const MINIATURE := "MiniaturePanel/Inset/Content/"
 func _ready() -> void:
-	get_node(PORTRAIT + "PortraitButtons/ChangePortrait").pressed.connect(func(): portrait_requested.emit())
-	get_node(PORTRAIT + "PortraitButtons/ClearPortrait").pressed.connect(func(): portrait_reset_requested.emit())
-	get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").pressed.connect(func(): miniature_requested.emit())
-	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").pressed.connect(func(): miniature_clear_requested.emit())
+	get_node(PORTRAIT + "PortraitButtons/ChangePortrait").pressed.connect(_portrait)
+	get_node(PORTRAIT + "PortraitButtons/ClearPortrait").pressed.connect(_portrait_reset)
+	get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").pressed.connect(_miniature)
+	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").pressed.connect(_miniature_clear)
 
 func configure(locale: RefCounted, texture: Texture2D, library: bool, can_edit: bool, phone: bool, tablet: bool) -> void:
 	get_node(PORTRAIT + "PortraitPreview/Image").texture = texture
@@ -40,3 +40,12 @@ func miniature(locale: RefCounted, title: String, package: String, assigned: boo
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").visible = assigned
 	get_node(MINIATURE + "EmptyPreview").visible = not assigned
 	get_node(MINIATURE + "MiniaturePreview").visible = assigned
+
+func _portrait() -> void:
+	portrait_requested.emit()
+func _portrait_reset() -> void:
+	portrait_reset_requested.emit()
+func _miniature() -> void:
+	miniature_requested.emit()
+func _miniature_clear() -> void:
+	miniature_clear_requested.emit()

@@ -20,6 +20,9 @@ func configure(entry: Dictionary, locale: RefCounted, phone: bool, tablet: bool,
 		button.add_theme_font_size_override("font_size", 11 if phone else 14)
 		button.accessibility_name = get_node("Heading").text + ": " + button.text
 		button.disabled = action.get("disabled", false)
-		button.pressed.connect(func(): requested.emit(str(action.get("part", "details")), entry_id))
+		button.pressed.connect(_action_requested.bind(str(action.get("part", "details"))))
 		get_node("Actions").add_child(button)
 	get_node("Actions").visible = not actions.is_empty()
+
+func _action_requested(part: String) -> void:
+	requested.emit(part, entry_id)
