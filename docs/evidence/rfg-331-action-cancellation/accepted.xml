@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="16" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="action_task_lifetime_temp" package="tests" timestamp="2026-10-04T04:12:07" hostname="localhost" tests="16" failures="0" errors="0" skipped="0" flaky="0" time="4.259">
+		<testcase name="test_authored_task_cancellation_survives_release:0 (&apos;power&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.016">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:1 (&apos;morning&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.020">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:2 (&apos;item&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.022">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:3 (&apos;health&apos;, &apos;first&apos;)" classname="action_task_lifetime_temp" time="0.019">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:4 (&apos;power&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.663">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:5 (&apos;morning&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.666">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:6 (&apos;item&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.675">
+		</testcase>
+		<testcase name="test_authored_task_cancellation_survives_release:7 (&apos;health&apos;, &apos;retry&apos;)" classname="action_task_lifetime_temp" time="0.673">
+		</testcase>
+		<testcase name="test_closed_first_reply_keeps_authority_access_and_session_rules:0 (&apos;access&apos;)" classname="action_task_lifetime_temp" time="0.026">
+		</testcase>
+		<testcase name="test_closed_first_reply_keeps_authority_access_and_session_rules:1 (&apos;actor&apos;)" classname="action_task_lifetime_temp" time="0.020">
+		</testcase>
+		<testcase name="test_closed_first_reply_keeps_authority_access_and_session_rules:2 (&apos;session&apos;)" classname="action_task_lifetime_temp" time="0.019">
+		</testcase>
+		<testcase name="test_permanent_cancel_refusal_releases_request_without_retry:0 (false)" classname="action_task_lifetime_temp" time="0.660">
+		</testcase>
+		<testcase name="test_permanent_cancel_refusal_releases_request_without_retry:1 (true)" classname="action_task_lifetime_temp" time="0.661">
+		</testcase>
+		<testcase name="test_companion_authored_task_first_reply_survives_release:0 (false)" classname="action_task_lifetime_temp" time="0.028">
+		</testcase>
+		<testcase name="test_companion_authored_task_first_reply_survives_release:1 (true)" classname="action_task_lifetime_temp" time="0.022">
+		</testcase>
+		<testcase name="test_accepted_cancel_reply_releases_request_after_task_free" classname="action_task_lifetime_temp" time="0.018">
+		</testcase>
+	</testsuite>
+</testsuites>
