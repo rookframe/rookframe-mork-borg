@@ -25,7 +25,10 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 			return _error("Creature attack data is malformed.")
 		var attack: Dictionary = raw
 		var exact := str(input.get("item", ""))
-		if (not exact.is_empty() and str(attack.get("inventory_id", "")) == exact) or (exact.is_empty() and str(attack.get("id", "")) == str(input.get("attack", "")) and not str(attack.get("id", "")).is_empty()):
+		var identity := str(attack.get("inventory_id", ""))
+		if identity.is_empty() and not data.get("creature_inventory", false):
+			identity = "creature:" + str(attack.get("id", ""))
+		if (not exact.is_empty() and identity == exact) or (exact.is_empty() and str(attack.get("id", "")) == str(input.get("attack", "")) and not str(attack.get("id", "")).is_empty()):
 			selected = attack
 	if selected.is_empty() or typeof(selected.get("range_feet", 0)) != TYPE_INT:
 		return _error("Select one attack with an authored range.")
@@ -37,7 +40,7 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 		return _error("Select one attack with an authored range.")
 	var rook_id := SDK.RookId.new(str(input.get("rook", "")))
 	var rook := context.read_rook(rook_id)
-	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.actor.id.value or rook.rook.scene.value != "main":
+	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.actor.id.value:
 		return _error("Select this Creature’s source Rook in the current Scene.")
 	var values: Dictionary = caller.value
 	var targets: PackedStringArray = values.targets

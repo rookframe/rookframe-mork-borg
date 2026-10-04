@@ -75,11 +75,9 @@ func ready() -> void:
 		get_node("Panel/More/" + category + "/Icon").modulate = GOLD
 	_favorites.sdk = sdk
 	favorite_requested.connect(_change_favorite)
-	add_child(_attacks)
 	_attacks.bind(sdk)
 	_powers.bind(sdk)
 	_items.bind(sdk)
-	add_child(_companions)
 	_companions.bind(sdk)
 	_recovery.bind(sdk)
 	entry_requested.connect(_launch_entry)

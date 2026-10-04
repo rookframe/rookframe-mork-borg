@@ -1,4 +1,4 @@
-extends Node
+extends RefCounted
 ## Character favorites refer to actual Creature Actors and exact owned attacks.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
@@ -24,7 +24,7 @@ func entries(character: SDK.Actor) -> Array[ENTRY]:
 		var row := ENTRY.new()
 		row.id = str(favorite.key)
 		row.title = str(favorite.get("name", "Companion"))
-		row.detail = str(favorite.get("detail", ""))
+		row.detail = _sdk.translations.text("Flat test · %d ft") % int(favorite.get("range_feet", 0)) if favorite.has("range_feet") else _sdk.translations.text(str(favorite.get("detail", "")))
 		row.value = str(favorite.get("damage", ""))
 		row.icon = ICON
 		row.favorite = favorite.get("starred", false)

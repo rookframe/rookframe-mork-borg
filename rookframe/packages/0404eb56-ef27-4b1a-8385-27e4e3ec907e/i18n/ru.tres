@@ -2,6 +2,16 @@
 
 [resource]
 messages = {
+[&"", &"Coward’s jab · choose a light one-handed weapon"]: [&"Подлый укол · выберите лёгкое одноручное оружие"],
+[&"", &"Improvised object"]: [&"Подручный предмет"],
+[&"", &"Melee · Strength · 5 ft"]: [&"Ближний бой · Сила · 5 фт"],
+[&"", &"Ranged · Presence · 30 ft"]: [&"Дальний бой · Присутствие · 30 фт"],
+[&"", &"Choose a weapon"]: [&"Выберите оружие"],
+[&"", &"Choose the source Rook"]: [&"Выберите исходную фигуру"],
+[&"", &"Rook %d"]: [&"Фигура %d"],
+[&"", &"No target · resolve at the table"]: [&"Нет цели · решите за столом"],
+[&"", &"Attack and damage are rolled in sequence. Resolve the results at the table."]: [&"Атака и урон бросаются последовательно. Решите результат за столом."],
+[&"", &"Flat test · %d ft"]: [&"Без модификатора · %d фт"],
 [&"", &"Catch breath"]: [&"Перевести дух"],
 [&"", &"Full night’s sleep"]: [&"Полный ночной сон"],
 [&"", &"d4 HP"]: [&"d4 ОЗ"],
@@ -1284,5 +1294,6 @@ messages = {
 [&"", &"%d days of dried food"]: [&"Сухой паёк: дней — %d"],
 [&"", &"Placement failed"]: [&"Не удалось разместить"],
 [&"", &"Owner access is required to place this Actor."]: [&"Для размещения этого актёра нужны права владельца."],
+[&"", &"The companion action is unavailable."]: [&"Действие спутника недоступно."],
 }
 locale = "ru"

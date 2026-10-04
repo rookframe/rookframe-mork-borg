@@ -163,6 +163,13 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var data: Dictionary = source.actor.data
 	if not _valid_character(data):
 		return _end(context, action)
+	if not action.get("sheet", false):
+		var captured_targets: Array = action.get("targets", [])
+		for raw in captured_targets:
+			var target: Dictionary = raw
+			var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(target.rook)))
+			if not spatial.ok:
+				return _end(context, action)
 	var result := context.read_throw(action.request)
 	if not result.ok or result.status == "cancelled":
 		return _end(context, action)
@@ -524,7 +531,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 		return {"state": "ready", "label": "Table outcome", "targets": []}
 	var rook_id := SDK.RookId.new(source_rook)
 	var rook := context.read_rook(rook_id)
-	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value or rook.rook.scene.value != "main":
+	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.value:
 		return _error("Select this Character’s source Rook in the current Scene.")
 	var targets: Array = []
 	var labels := ""
@@ -578,7 +585,7 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 			invalid = distance.message
 		elif distance.distance > float(reach) * 0.3048 + 0.000001:
 			outside += ("\n" if not outside.is_empty() else "") + "target %s not in range" % label
-		targets.append({"actor": actor_id, "schema": schema, "label": label, "protection": protection})
+		targets.append({"actor": actor_id, "rook": id, "schema": schema, "label": label, "protection": protection})
 		labels += (", " if not labels.is_empty() else "") + label
 	if not outside.is_empty():
 		var report := SDK.ActionLogMessage.new("Power out of range")

@@ -12,6 +12,7 @@ const SHIELD_SCRIPT = preload(ROOT + "ui/shield_dialog.gd")
 const BACKDROP = preload(ROOT + "ui/shield_backdrop.tscn")
 var _shield: SHIELD_SCRIPT
 var _backdrop: CanvasLayer
+const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
@@ -23,6 +24,7 @@ var _rule: Dictionary = {}
 var _entry: Dictionary = {}
 var _action: ACTION
 var _source_rook: SDK.RookId
+var _source_rooks: Array[SDK.RookId] = []
 var _update_pending := false
 var _targets_pending := false
 var _reading_targets := false
@@ -36,6 +38,7 @@ var _context_version := 0
 
 func _ready() -> void:
 	resized.connect(_layout)
+	get_node(^"Source/Choice").item_selected.connect(_source_selected)
 	for node in get_node(^"Options/Ability/Choices").get_children():
 		var choice := node as Button
 		choice.pressed.connect(_choose_ability.bind(choice.text))
@@ -50,10 +53,28 @@ func _ready() -> void:
 func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
 	_reset_task()
 	_tabletop = true
-	_source_rook = SDK.RookId.new(rook) if not rook.is_empty() else null
+	_configure_source(facade, actor.id, rook)
 	# A recipient is never inferred from the authored sheet's Self default.
 	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
 	configure(actor, facade, item)
+
+func _configure_source(facade: SDK, actor: SDK.ActorId, preferred: String) -> void:
+	var resolver := SOURCE_ROOKS.new()
+	_source_rooks = resolver.candidates(facade, actor)
+	_source_rook = resolver.resolve(_source_rooks, preferred)
+	var choice: OptionButton = get_node(^"Source/Choice")
+	choice.clear()
+	choice.add_item(facade.translations.text("Choose the source Rook"))
+	for index in range(_source_rooks.size()):
+		choice.add_item(facade.translations.text("Rook %d") % (index + 1))
+		if _source_rook != null and _source_rook.value == _source_rooks[index].value:
+			choice.select(index + 1)
+
+func _source_selected(index: int) -> void:
+	if _action != null and _action.state != "error":
+		return
+	_source_rook = _source_rooks[index - 1] if index > 0 and index <= _source_rooks.size() else null
+	_targets_pending = true
 
 func _reset_task() -> void:
 	_context_version += 1
@@ -99,6 +120,7 @@ func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
 	var editing := state in ["ready", "error"]
+	get_node(^"Source").visible = _tabletop and _source_rooks.size() > 1 and editing
 	var title := _title
 	get_node(^"Columns/Item/Content/Name").visible = false
 	get_node(^"Columns/Item/Content/Rules").text = _t(str(_entry.get("rules", "")))

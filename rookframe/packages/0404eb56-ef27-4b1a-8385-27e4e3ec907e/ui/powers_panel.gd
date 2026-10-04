@@ -8,6 +8,7 @@ const POWERS = preload(ROOT + "logic/powers.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const ACTION = preload(ROOT + "logic/power_action.gd")
 const ROW = preload(ROOT + "ui/power_row.tscn")
+const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
@@ -18,6 +19,7 @@ var _item := ""
 var _power: Dictionary = {}
 var _action: ACTION
 var _source_rook: SDK.RookId
+var _source_rooks: Array[SDK.RookId] = []
 var _target_pending := false
 var _target_reading := false
 var _update_pending := false
@@ -27,6 +29,7 @@ var _context_version := 0
 
 func _ready() -> void:
 	resized.connect(_layout)
+	get_node(^"Source/Choice").item_selected.connect(_source_selected)
 	get_node(^"Browse/Back").pressed.connect(_back)
 	get_node(^"Daily/Roll").pressed.connect(_daily)
 	get_node(^"Cast/Columns/Targets/Content/Change").pressed.connect(_choose_targets)
@@ -59,15 +62,34 @@ func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: Strin
 	_reset_task()
 	_tabletop = true
 	_morning_only = false
-	_source_rook = SDK.RookId.new(rook) if not rook.is_empty() else null
+	_configure_source(facade, actor.id, rook)
 	configure(actor, facade, item)
 
 func configure_morning(actor: SDK.Actor, facade: SDK) -> void:
 	_reset_task()
 	_source_rook = null
+	_source_rooks = []
 	_tabletop = true
 	_morning_only = true
 	configure(actor, facade, "")
+
+func _configure_source(facade: SDK, actor: SDK.ActorId, preferred: String) -> void:
+	var resolver := SOURCE_ROOKS.new()
+	_source_rooks = resolver.candidates(facade, actor)
+	_source_rook = resolver.resolve(_source_rooks, preferred)
+	var choice: OptionButton = get_node(^"Source/Choice")
+	choice.clear()
+	choice.add_item(facade.translations.text("Choose the source Rook"))
+	for index in range(_source_rooks.size()):
+		choice.add_item(facade.translations.text("Rook %d") % (index + 1))
+		if _source_rook != null and _source_rook.value == _source_rooks[index].value:
+			choice.select(index + 1)
+
+func _source_selected(index: int) -> void:
+	if _action != null and _action.state != "error":
+		return
+	_source_rook = _source_rooks[index - 1] if index > 0 and index <= _source_rooks.size() else null
+	_target_pending = true
 
 func _reset_task() -> void:
 	_context_version += 1
@@ -103,6 +125,7 @@ func _list(items: Array) -> void:
 func _render() -> void:
 	var data: Dictionary = _actor.data
 	var state := _action.state if _action != null else "ready"
+	get_node(^"Source").visible = _tabletop and not _morning_only and _source_rooks.size() > 1 and state in ["ready", "error"]
 	var casting := not _item.is_empty()
 	var terminal := (casting or _morning_only) and state in ["resolved", "ended"]
 	var adjudication := str(_action.snapshot.get("adjudication", "")) if _action != null and state == "resolved" else ""
