@@ -2,6 +2,8 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/imple
 
 const SHEET = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/sheet_authority.gd")
 var _sheet := SHEET.new()
+const CREATURE_CORRECTIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_authority.gd")
+var _creature_corrections := CREATURE_CORRECTIONS.new()
 
 const MELEE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd")
 var _melee := MELEE.new()
@@ -34,6 +36,8 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 		return _creature_appearance.handle(context, sdk, name, payload)
 	if name.begins_with("companion."):
 		return _companions.handle(context, name, payload)
+	if name.begins_with("creature."):
+		return await _creature_corrections.handle(context, name, payload)
 	if name.begins_with("sheet."):
 		return await _sheet.handle(context, sdk, name, payload)
 	if name.begins_with("sheet-combat."):
