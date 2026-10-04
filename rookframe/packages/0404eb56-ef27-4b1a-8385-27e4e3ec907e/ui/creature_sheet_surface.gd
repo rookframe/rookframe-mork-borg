@@ -1,6 +1,7 @@
 extends Control
 ## Shared authored Full-viewport composition. Domain adapters own mutations/rolls.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
 const CONTENT = preload(ROOT + "logic/creature_content.gd")
 const CARD = preload(ROOT + "ui/creature_rule_card.tscn")
 const CARD_SCRIPT = preload(ROOT + "ui/creature_rule_card.gd")
@@ -12,6 +13,9 @@ signal inventory_add_requested
 signal reader_closed
 signal close_requested
 signal create_requested
+signal correction_entry_requested(route: String)
+signal save_requested
+signal cancel_requested
 signal edit_requested
 signal miniature_requested
 signal miniature_clear_requested
@@ -38,6 +42,10 @@ var _texture: Texture2D
 var _groups: Array[Dictionary] = []
 var _layout_pending := false
 var _pages: Dictionary = {}
+var _draft: Dictionary = {}
+var _editing := false
+var _return_correction := ""
+var _return_focus_frames := 0
 
 func _ready() -> void:
 	for index in range(3):
@@ -49,6 +57,9 @@ func _ready() -> void:
 	get_node("Inset/Layout/Footer/Close").pressed.connect(_close)
 	get_node("Inset/Layout/Footer/Create").pressed.connect(_create)
 	get_node("Inset/Layout/Footer/Edit").pressed.connect(_edit)
+	get_node("Inset/Layout/Footer/Save").pressed.connect(_save_corrections)
+	get_node("Inset/Layout/Footer/Core").pressed.connect(_core_corrections)
+	get_node("Inset/Layout/Footer/Cancel").pressed.connect(_cancel_corrections)
 	get_node(IDENTITY + "Health").pressed.connect(_health)
 	get_node(IDENTITY + "Vitals/Armor").pressed.connect(_roll_armor)
 	get_node(IDENTITY + "Vitals/Morale").pressed.connect(_roll_morale)
@@ -96,25 +107,26 @@ func _layout() -> void:
 	var metadata := CONTENT.new().details(str(_data.get("definition_id", "")))
 	if _library and name.contains(","):
 		name = name.split(",")[0]
-	get_node(IDENTITY + "Name").text = _locale.text(name)
+	get_node(IDENTITY + "Name").text = _locale.text(str(_draft.get("name", name)) if _editing else name)
 	get_node(IDENTITY + "Name").add_theme_font_size_override("font_size", 24 if _phone else 32 if _tablet else 46)
-	get_node(IDENTITY + "Classification").text = _locale.text(str(_data.get("classification", metadata.get("classification", ""))))
+	get_node(IDENTITY + "Classification").text = _locale.text(str(_draft.get("classification", "")) if _editing else str(_data.get("classification", metadata.get("classification", ""))))
 	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 10 if _phone else 12 if _tablet else 16)
 	get_node(IDENTITY + "Portrait").texture = _texture
-	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", "—")) if _library else _data.get("hit_points", "—")) + ("" if _library else " / " + str(_data.get("maximum_hit_points", "—")))
+	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", "—")) if _library else _draft.get("hit_points", _data.get("hit_points", "—"))) + ("" if _library else " / " + str(_draft.get("maximum_hit_points", _data.get("maximum_hit_points", "—"))))
 	get_node(IDENTITY + "Health").custom_minimum_size = Vector2(0, 44 if _phone else 62)
 	get_node(IDENTITY + "Health").add_theme_font_size_override("font_size", 16 if _phone else 23 if _tablet else 28)
 	get_node(IDENTITY + "Health").disabled = _library or not _can_edit or not bool(_data.get("health_available", false))
 	var armor: Dictionary = _data.get("armor", {})
-	var protection := "—" if str(armor.get("reduction", "")).is_empty() else "−" + str(armor.reduction)
+	var reduction := str(_draft.get("armor:reduction", armor.get("reduction", "")))
+	var protection := "—" if reduction.is_empty() else "−" + reduction
 	if int(armor.get("shield_reduction", 0)) > 0:
 		protection += " · " + _locale.text("Shield") + " −" + str(armor.shield_reduction)
 	if int(armor.get("defence_penalty", 0)) != 0:
 		protection += "\n" + _locale.text("Defence penalty +%d") % int(armor.defence_penalty)
-	get_node(IDENTITY + "Vitals/Armor").text = _locale.text(str(armor.get("name", "Protection"))) + "\n" + protection
-	get_node(IDENTITY + "Vitals/Armor").tooltip_text = _locale.text("Protection") + ": " + _locale.text(str(armor.get("name", "Protection"))) + "\n" + protection
+	get_node(IDENTITY + "Vitals/Armor").text = _locale.text(str(_draft.get("armor:name", armor.get("name", "Protection")))) + "\n" + protection
+	get_node(IDENTITY + "Vitals/Armor").tooltip_text = _locale.text("Protection") + ": " + _locale.text(str(_draft.get("armor:name", armor.get("name", "Protection")))) + "\n" + protection
 	var morale: Dictionary = _data.get("morale", {})
-	get_node(IDENTITY + "Vitals/Morale").text = _locale.text("Morale") + "\n" + (str(morale.get("value", 0)) if str(morale.get("kind", "")) == "fixed" else _locale.text("Special") if str(morale.get("kind", "")) == "special" else "—")
+	get_node(IDENTITY + "Vitals/Morale").text = _locale.text("Morale") + "\n" + (str(_draft.get("morale", morale.get("value", 0))) if str(morale.get("kind", "")) == "fixed" else _locale.text("Special") if str(morale.get("kind", "")) == "special" else "—")
 	for key in ["Armor", "Morale"]:
 		var button = get_node(IDENTITY + "Vitals/" + key)
 		button.custom_minimum_size = Vector2(0, 44 if _phone else 62)
@@ -131,9 +143,15 @@ func _layout() -> void:
 	get_node("Inset/Layout/Footer/Create").visible = _library
 	get_node("Inset/Layout/Footer/Create").disabled = not _can_edit
 	get_node("Inset/Layout/Footer/Create").text = _locale.text("Create Actor")
-	get_node("Inset/Layout/Footer/Edit").visible = not _library and _can_edit
+	get_node("Inset/Layout/Footer/Edit").visible = not _library and _can_edit and not _editing
 	get_node("Inset/Layout/Footer/Edit").text = _locale.text("Edit sheet")
 	get_node("Inset/Layout/Footer/Edit").disabled = not bool(_data.get("corrections_available", false))
+	for action in ["Save", "Cancel", "Core"]:
+		get_node("Inset/Layout/Footer/" + action).visible = _editing
+		get_node("Inset/Layout/Footer/" + action).disabled = not _can_edit
+	get_node("Inset/Layout/Footer/Save").text = _locale.text("Save sheet")
+	get_node("Inset/Layout/Footer/Cancel").text = _locale.text("Cancel")
+	get_node("Inset/Layout/Footer/Core").text = _locale.text("Core values")
 	get_node(WORK + "InventoryAdd").text = _locale.text("Add Item")
 	get_node(WORK + "InventoryAdd").disabled = not _can_edit
 	get_node("Inset/Layout/Footer/Close").text = _locale.text("Close")
@@ -151,9 +169,10 @@ func _build_groups(metadata: Dictionary) -> void:
 	_groups.clear()
 	var attacks: Array = _data.get("attacks", [])
 	var attack_entries: Array = []
-	for raw in attacks:
+	for index in range(attacks.size()):
+		var raw = attacks[index]
 		var attack: Dictionary = raw
-		attack_entries.append({"id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "text": str(attack.get("rules", "")), "dice": str(attack.get("dice", "")), "attack_dr": attack.get("attack_dr", null), "attack": true})
+		attack_entries.append({"id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "text": str(attack.get("rules", "")), "dice": str(attack.get("dice", "")), "attack_dr": attack.get("attack_dr", null), "attack": true, "correction_route": "attack:%d" % index, "correction_identity": str(attack.get("correction_entry_id", "")) + "|" + str(attack.get("id", ""))})
 	if attack_entries.is_empty():
 		attack_entries.append({"id": "no-attacks", "name": "Attacks", "text": "No attacks recorded."})
 	_groups.append({"title": "Attacks", "lane": "primary", "entries": attack_entries})
@@ -166,12 +185,22 @@ func _build_groups(metadata: Dictionary) -> void:
 			protection += "\n" + _locale.text("Defence penalty +%d") % int(armor.defence_penalty)
 		_groups.append({"title": "Protection", "lane": "secondary", "entries": [{"id": "protection", "name": "Protection", "text": protection}]})
 	var authored: Array = _data.get("rule_groups", metadata.get("rule_groups", []) if _library else [])
+	var rule_index := 0
 	for raw in authored:
 		var group: Dictionary = raw
-		_groups.append(group.duplicate(true))
+		var copy: Dictionary = group.duplicate(true)
+		var entries: Array = copy.get("entries", [])
+		for raw_entry in entries:
+			var entry: Dictionary = raw_entry
+			entry["correction_route"] = "rule:%d" % rule_index
+			entry["correction_identity"] = str(entry.get("correction_entry_id", "")) + "|" + str(entry.get("id", ""))
+			rule_index += 1
+		_groups.append(copy)
 	# Live corrections remain the sole accepted free rules text. Preserve unknown/custom rules.
-	if authored.is_empty() and not str(_data.get("rules", "")).is_empty():
-		_groups.append({"title": "Special rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Special rules", "text": str(_data.rules)}]})
+	if authored.is_empty() and (not str(_data.get("rules", "")).is_empty() or _editing):
+		_groups.append({"title": "Special rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Special rules", "text": str(_data.rules), "correction_route": "rules"}]})
+	if not authored.is_empty() and not PROJECTION.new().rules_mirror(_data):
+		_groups.append({"title": "Additional rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Additional rules", "text": str(_data.get("rules", "")), "correction_route": "rules"}]})
 	var reference: Array = _data.get("reference", metadata.get("reference", []))
 	if not reference.is_empty():
 		_groups.append({"title": "Reference", "lane": "secondary", "entries": reference})
@@ -213,6 +242,8 @@ func _render_encounter() -> void:
 			for raw in entries:
 				var entry: Dictionary = raw
 				var actions: Array = []
+				if _editing and entry.has("correction_route"):
+					actions.append({"name": "Correct", "part": "correct:" + str(entry.correction_route), "disabled": not _can_edit})
 				if entry.get("attack", false):
 					if not _library and entry.get("attack_dr") != null:
 						actions.append({"name": "Attack", "part": "attack", "dice": "d20 / DR" + str(entry.attack_dr), "disabled": _rolls_disabled()})
@@ -228,6 +259,9 @@ func _render_encounter() -> void:
 					for raw_roll in rolls:
 						var roll: Dictionary = raw_roll
 						actions.append({"name": str(roll.name), "part": "printed:" + str(roll.id), "dice": str(roll.dice), "disabled": _rolls_disabled()})
+				if _editing and entry.has("correction_route"):
+					entry = entry.duplicate(true)
+					entry["id"] = str(entry.get("correction_identity", "rules"))
 				_append(pages.get_node("Area/Content"), entry, actions)
 		pages.restore_state(state)
 	get_node(WORK + "Encounter/Secondary").visible = not _phone
@@ -249,7 +283,11 @@ func _render_inventory() -> void:
 	pages.restore_state(state)
 
 func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
-	if part == "details":
+	if part.begins_with("correct:"):
+		_return_correction = opener.entry_id
+		_focus_card = opener
+		correction_entry_requested.emit(part.trim_prefix("correct:"))
+	elif part == "details":
 		entry_requested.emit(id)
 		if not _library:
 			return
@@ -300,13 +338,17 @@ func show_source() -> void:
 func back() -> void:
 	_reader = false
 	_update_visibility()
-	_restore_return_focus.call_deferred()
+	_return_focus_frames = 2
 	reader_closed.emit()
 
 func _restore_return_focus() -> void:
 	if _focus_source:
 		get_node(WORK + "Tabs/Source").grab_focus()
+	elif _return_correction == "core" and get_node("Inset/Layout/Footer/Core").is_visible_in_tree():
+		get_node("Inset/Layout/Footer/Core").grab_focus()
 	elif is_instance_valid(_focus_card) and _focus_card.restore_focus():
+		pass
+	elif not _return_correction.is_empty() and focus_correction(_return_correction):
 		pass
 	elif not _return_entry.is_empty() and focus_entry(_return_entry):
 		pass
@@ -320,7 +362,7 @@ func show_chapter(chapter: int) -> void:
 	chapter_changed.emit(_chapter)
 
 func _update_visibility() -> void:
-	(get_node(IDENTITY) as Control).visible = not (_phone and (_chapter == 2 or _reader))
+	(get_node(IDENTITY) as Control).visible = _editing or not (_phone and (_chapter == 2 or _reader))
 	get_node(WORK + "Tabs").visible = not _reader
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not _reader
 	get_node(WORK + "InventoryAdd").visible = _chapter == 1 and not _reader and not _library and _can_edit
@@ -332,8 +374,11 @@ func _update_visibility() -> void:
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).set_pressed_no_signal(index == _chapter)
 
 func _input(event: InputEvent) -> void:
-	if is_visible_in_tree() and event.is_action_pressed("ui_cancel") and _reader:
-		back()
+	if is_visible_in_tree() and event.is_action_pressed("ui_cancel") and (_reader or _editing):
+		if _editing:
+			cancel_requested.emit()
+		else:
+			back()
 		accept_event()
 
 func status(message: String) -> void:
@@ -392,10 +437,11 @@ func restore_navigation(state: Dictionary) -> void:
 		get_node(WORK + key).restore_state(value)
 	_queue_layout()
 
-func open_reader(title: String, return_entry: String = "") -> void:
+func open_reader(title: String, return_entry: String = "", correction_route: String = "") -> void:
 	_focus_card = null
 	_focus_source = false
 	_return_entry = return_entry
+	_return_correction = correction_route
 	_reader = true
 	_clear(reader_content())
 	_append_reference(reader_content(), {"name": title, "text": ""})
@@ -422,3 +468,40 @@ func focus_entry(id: String) -> bool:
 
 func focus_miniature() -> void:
 	get_node(WORK + "Appearance/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").grab_focus()
+
+## Local correction text stays separate from accepted Actor data.
+func configure_draft(values: Dictionary, active: bool) -> void:
+	_draft = values.duplicate(true)
+	_editing = active
+	_queue_layout()
+
+func sync_draft_field(key: String, text: String) -> void:
+	_draft[key] = text
+	_queue_layout()
+
+func focus_correction(route: String) -> bool:
+	for lane in ["Primary", "Secondary"]:
+		for child in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+			var card := child as CARD_SCRIPT
+			if card != null and card.entry_id == route and card.restore_focus():
+				return true
+	return false
+
+func _process(_delta: float) -> void:
+	if _return_focus_frames > 0:
+		_return_focus_frames -= 1
+		if _return_focus_frames == 0:
+			_restore_return_focus()
+
+func _save_corrections() -> void:
+	save_requested.emit()
+
+func _cancel_corrections() -> void:
+	cancel_requested.emit()
+
+func _core_corrections() -> void:
+	correction_entry_requested.emit("core")
+
+func correction_pending(pending: bool) -> void:
+	for action in ["Core", "Cancel", "Save"]:
+		get_node("Inset/Layout/Footer/" + action).disabled = pending

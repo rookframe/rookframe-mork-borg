@@ -24,8 +24,22 @@ permitted mutations remain separate from complete shared World gameplay data.
 Appearance preserves immediate SDK preferred-Miniature choice and clearing,
 using the existing full-viewport browser. Existing Rooks keep their Miniature.
 Portrait choice/reset and expanded World Library defaults belong to RFG-353.
-RFG-349 through RFG-352 supply corrections, HP adjustment/death and Window Dice;
-the live adapter exposes explicit signals and opt-in controls for those slices.
+Edit sheet retains one shared changed-fields draft for core values, explicit
+attacks, structured rules and supported printed formulas. Its core editors open
+in the bounded workspace reader while identity, substantial portrait and core
+context stay visible, including on phone. Core values is accessible across
+chapters; Back retains the draft and Cancel/Escape rereads accepted values.
+Untouched fields refresh while native editors keep typed text and focus. Stable
+Actor-local correction identities protect replaced entries and printed Rolls.
+Save submits semantic field choices for Authority to merge into its latest
+Actor, preserving independent accepted loot, Appearance and additional prose.
+Known old rule aggregates track their structured edits; independent additional
+rules remain readable and editable. Gameplay roll initiation is inactive while
+editing. Only two severe-risk correction checks are retained.
+
+RFG-350 through RFG-352 supply HP adjustment/death and Window Dice; the live
+adapter exposes editing_sheet(), draft_value() and change_draft() for those
+follow-ups alongside accepted current_data() and explicit action signals.
 
 Back/Escape restores the Inventory entry and its native focus. Per-Actor local
 chapter/page state lasts for the World Application session and resets on restart.

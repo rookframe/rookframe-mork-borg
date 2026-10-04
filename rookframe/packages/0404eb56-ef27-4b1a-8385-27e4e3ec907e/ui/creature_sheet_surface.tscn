@@ -182,6 +182,24 @@ custom_minimum_size = Vector2(44, 44)
 text = "Edit sheet"
 theme_type_variation = "TaskButton"
 visible = false
+[node name="Core" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Core values"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Cancel" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Cancel"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Save" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Save sheet"
+theme_type_variation = "TaskPrimary"
+visible = false
 [node name="Create" type="Button" parent="Inset/Layout/Footer"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)

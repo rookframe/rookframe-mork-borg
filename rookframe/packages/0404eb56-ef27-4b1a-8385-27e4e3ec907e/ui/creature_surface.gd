@@ -1,6 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 ## Live SDK Actor adapter. Rules, loot and Appearance retain separate boundaries.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const DRAFT = preload(ROOT + "ui/sheet_draft.gd")
+const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
 const SHEET = preload(ROOT + "ui/creature_sheet_surface.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
@@ -16,6 +18,7 @@ const SEARCH_SCRIPT = preload("res://rookframe/ui/components/forms/text_field.gd
 @onready var sheet: SHEET = get_node("Sheet")
 var locale := I18N.new()
 var actor: SDK.Actor
+var _accepted: Dictionary = {}
 var _items: Array = []
 var _detail := ""
 var _new_item: Dictionary = {}
@@ -25,7 +28,15 @@ var _busy := false
 var _refresh_pending := false
 var _detail_pending := false
 var _edit_item := false
-var _corrections_available := false
+var _corrections_available := true
+var _draft := DRAFT.new()
+var _projection := PROJECTION.new()
+var _correction_identity := ""
+var _correction_feedback := ""
+var _correction_epoch := 0
+var _draft_refresh_pending := false
+var _render_pending := false
+var _validation: Dictionary = {}
 var _health_available := false
 var _rolls_available := false
 var _nav: Dictionary = {}
@@ -50,6 +61,9 @@ func ready() -> void:
 	sheet.miniature_requested.connect(_choose_miniature)
 	sheet.miniature_clear_requested.connect(_clear_miniature)
 	sheet.edit_requested.connect(_correct)
+	sheet.correction_entry_requested.connect(_open_correction)
+	sheet.save_requested.connect(_save_sheet)
+	sheet.cancel_requested.connect(_cancel_edit)
 	sheet.health_requested.connect(_health)
 	sheet.roll_requested.connect(_roll)
 	get_node("MiniatureWorkflow").closed.connect(_picker_closed)
@@ -58,7 +72,11 @@ func ready() -> void:
 	sdk.world_changed.connect(_world_changed)
 
 func opened(id: SDK.ActorId) -> void:
+	_correction_epoch += 1
+	_correction_feedback = ""
 	_remember()
+	_draft.discard()
+	_validation = {}
 	_detail = ""
 	_edit_item = false
 	_new_item = {}
@@ -87,8 +105,7 @@ func owner() -> bool:
 	return actor != null and actor.access_level == "Owner"
 
 func current_data() -> Dictionary:
-	var data: Dictionary = actor.data if actor != null else {}
-	return CREATURES.new().stat_block(data)
+	return _accepted.duplicate(true) if actor != null else {}
 
 func _world_changed() -> void:
 	_refresh_pending = true
@@ -110,6 +127,21 @@ func _process(_delta: float) -> void:
 			else:
 				actor = result.actor
 				_refresh()
+	if _draft_refresh_pending and not _busy and actor != null:
+		_draft_refresh_pending = false
+		var accepted := current_data()
+		if _draft.refresh(_projection.fields(accepted), _projection.identities(accepted)):
+			_detail_pending = true
+		sheet.configure_draft(_draft.values(), _draft.active)
+		if _detail.begins_with("correction:"):
+			if not _correction_current(_detail.trim_prefix("correction:")):
+				_detail_pending = true
+			else:
+				for field in _fields:
+					field.sync_draft_value(_draft.value(field._field))
+	if _render_pending and not _busy:
+		_render_pending = false
+		_render_accepted()
 	if _detail_pending and not _busy:
 		_detail_pending = false
 		_render_detail()
@@ -117,10 +149,24 @@ func _process(_delta: float) -> void:
 func _refresh() -> void:
 	if actor == null:
 		return
+	var current: Dictionary = actor.data
+	_accepted = CREATURES.new().stat_block(current)
+	_draft_refresh_pending = _draft.active
+	_render_pending = true
+
+## All native composition refreshes coalesce into one subsequent process frame.
+func _render_accepted() -> void:
+	if actor == null:
+		return
 	if not owner() and get_node("MiniatureWorkflow").visible:
 		get_node("MiniatureWorkflow").visible = false
 		sheet.visible = true
 	var data := current_data()
+	if not owner():
+		_draft.discard()
+		_validation = {}
+	data["editing"] = _draft.active
+	sheet.configure_draft(_draft.values() if _draft.active else {}, _draft.active)
 	_items = ITEMS.new(sdk, actor.id).inventory(data)
 	data["inventory"] = _items
 	data["portrait_editable"] = false
@@ -130,14 +176,21 @@ func _refresh() -> void:
 	data["rolls_available"] = _rolls_available
 	sheet.configure(data, locale, false, owner() and not _busy)
 	sdk.windows.set_title(str(data.get("name", "Creature")))
-	sheet.status("Creature sheet · Owner" if owner() else "Creature sheet · Viewer")
+	sheet.status(_correction_feedback if not _correction_feedback.is_empty() else "Creature sheet · Owner" if owner() else "Creature sheet · Viewer")
 	if not _detail.is_empty():
 		if not owner():
 			_edit_item = false
 			if _detail in ["catalogue", "custom"]:
 				_detail = ""
 				sheet.back()
-		if _detail.begins_with("item:") and not _fields.is_empty() and owner() and _edit_item:
+		if _detail.begins_with("correction:") and not _fields.is_empty() and _draft.active:
+			var route := _detail.trim_prefix("correction:")
+			if not _correction_current(route):
+				_detail_pending = true
+			else:
+				for field in _fields:
+					field.sync_draft_value(_draft.value(field._field))
+		elif _detail.begins_with("item:") and not _fields.is_empty() and owner() and _edit_item:
 			var item := _item(_detail.trim_prefix("item:"))
 			if item.is_empty():
 				_detail_pending = true
@@ -176,6 +229,9 @@ func _open_detail(route: String) -> void:
 	_detail_pending = true
 
 func _render_detail() -> void:
+	if _detail.begins_with("correction:"):
+		_render_correction()
+		return
 	if _detail.is_empty() or actor == null:
 		return
 	var page: Dictionary = _detail_pages.get(_detail, {})
@@ -254,10 +310,10 @@ func _option(title: String, action: Callable, enabled: bool) -> Button:
 	sheet.reader_content().add_child(button)
 	return button
 
-func _item_field(key: String, value: String, independent: bool) -> void:
+func _item_field(key: String, value: String, independent: bool, title: String = "", multiline: bool = false) -> void:
 	var field: FIELD_SCRIPT = FIELD.instantiate()
 	sheet.reader_content().add_child(field)
-	field.configure(key, locale.text(key.replace("_", " ").capitalize()), value, key == "rules", independent)
+	field.configure(key, locale.text(title if not title.is_empty() else key.replace("_", " ").capitalize()), value, multiline or key == "rules", independent)
 	field.configure_layout(sheet.size.x <= 900)
 	field.get_node("Save").text = locale.text("Save") + " " + locale.text(key.capitalize())
 	field.submitted.connect(_save_field)
@@ -267,6 +323,8 @@ func _item_field(key: String, value: String, independent: bool) -> void:
 func _custom_typed(key: String, value: String) -> void:
 	if _detail == "custom":
 		_new_item[key] = value
+	elif _detail.begins_with("correction:"):
+		_draft_typed(key, value)
 
 func _item(id: String) -> Dictionary:
 	for raw in _items:
@@ -414,7 +472,12 @@ func restore_reconnect_state(state: Dictionary) -> void:
 	_remember()
 
 func _closed() -> void:
+	_correction_epoch += 1
+	_correction_feedback = ""
 	_remember()
+	_draft.discard()
+	_validation = {}
+	sheet.configure_draft({}, false)
 	get_node("MiniatureWorkflow").visible = false
 	sheet.visible = true
 	_detail = ""
@@ -427,16 +490,44 @@ func _close() -> void:
 	sdk.windows.close(load(ROOT + "ui/creature_surface.tres"))
 
 func _correct() -> void:
+	if not owner() or _busy or _draft.active:
+		return
+	_busy = true
+	var id := actor.id.value
+	var epoch := _correction_epoch
+	sheet.status("Preparing corrections…")
+	var result := await ITEMS.new(sdk, actor.id).prepare_corrections()
+	_busy = false
+	if actor == null or actor.id.value != id or epoch != _correction_epoch:
+		return
+	if not result.ok:
+		sheet.status(result.message)
+		return
+	actor = result.actor
+	var data: Dictionary = result.actor.data
+	_draft.begin(_projection.fields(data), _projection.identities(data))
+	_validation = {}
+	_correction_feedback = ""
+	_detail = ""
+	sheet.back()
+	_refresh()
+	_open_correction("core")
 	correction_requested.emit()
 func _health() -> void:
-	health_adjustment_requested.emit()
+	if _draft.active:
+		_open_correction("core")
+	else:
+		health_adjustment_requested.emit()
 func _roll(part: String, id: String) -> void:
-	gameplay_roll_requested.emit(part, id)
+	if not _draft.active:
+		gameplay_roll_requested.emit(part, id)
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if is_visible_in_tree() and not _busy and event.is_action_pressed("ui_cancel"):
 		if get_node("MiniatureWorkflow").visible:
 			get_node("MiniatureWorkflow")._cancel()
+		elif _draft.active:
+			_cancel_edit()
 		else:
 			_close()
 		accept_event()
@@ -458,3 +549,124 @@ func request_refresh() -> void:
 
 func operation_pending() -> bool:
 	return _busy
+
+## Follow-up HP/roll adapters must use accepted current_data(), and guard this mode.
+func editing_sheet() -> bool:
+	return _draft.active
+
+func draft_value(field: String) -> String:
+	return _draft.value(field)
+
+func change_draft(field: String, text: String) -> void:
+	_draft_typed(field, text)
+
+func _draft_typed(field: String, text: String) -> void:
+	if not _draft.active or _busy:
+		return
+	_draft.change(field, text)
+	_validation = {}
+	_correction_feedback = ""
+	sheet.sync_draft_field(field, text)
+	for control in _fields:
+		if control._field == field and _detail.begins_with("correction:"):
+			control.sync_draft_value(text)
+
+func _open_correction(route: String) -> void:
+	if not _draft.active or not owner() or _busy:
+		return
+	_capture_detail()
+	_correction_identity = str(_draft.identities().get(route, route))
+	_open_detail("correction:" + route)
+
+func _correction_current(route: String) -> bool:
+	return _draft.active and (route == "core" or route == "rules" and _draft.values().has("rules") or _correction_identity == str(_draft.identities().get(route, "")))
+
+func _render_correction() -> void:
+	if actor == null:
+		return
+	var route := _detail.trim_prefix("correction:")
+	var page: Dictionary = _detail_pages.get(_detail, {})
+	if not _fields.is_empty():
+		page = sheet.reader_state()
+	_fields.clear()
+	sheet.open_reader("Core values" if route == "core" else "Creature rules" if route.begins_with("rule") else "Attack", "", _correction_identity)
+	if not _correction_current(route):
+		_text("This entry was removed or replaced. Its obsolete corrections were discarded.")
+	else:
+		var values := _draft.values()
+		var printed := _projection.printed_routes(current_data())
+		for key in values.keys():
+			var field := str(key)
+			if route == "core":
+				if field.begins_with("attack:") or field.begins_with("rule:") or field.begins_with("printed:") or field == "rules":
+					continue
+			elif field != route and not field.begins_with(route + ":") and str(printed.get(field, "")) != route:
+				continue
+			var member := str(field.split(":")[-1])
+			var title := _projection.title(field if route == "core" else member)
+			if field.begins_with("printed:"):
+				title = "Printed dice formula"
+			_item_field(field, _draft.value(field), false, title, member in ["rules", "text"])
+	sheet.restore_reader(page)
+	if str(_validation.get("route", "")) == route:
+		for field in _fields:
+			if field._field == str(_validation.get("field", "")):
+				field.show_error(locale.text(str(_validation.get("message", ""))))
+
+func _save_sheet() -> void:
+	if not _draft.active or not owner() or _busy:
+		return
+	_correction_pending(true)
+	var id := actor.id.value
+	var epoch := _correction_epoch
+	sheet.status("Saving sheet…")
+	var actions := ITEMS.new(sdk, actor.id)
+	var result := await actions.correct_many(_draft.changes(), _draft.identities())
+	_correction_pending(false)
+	if actor == null or actor.id.value != id or epoch != _correction_epoch:
+		return
+	if result.ok:
+		_draft.discard()
+		_validation = {}
+		actor = result.actor
+		if _detail.begins_with("correction:"):
+			_detail = ""
+			_fields.clear()
+			sheet.back()
+		_refresh()
+		_correction_feedback = "Sheet saved."
+		sheet.status(_correction_feedback)
+	else:
+		# Refresh accepted untouched fields even when validation or Authority rejects Save.
+		request_refresh()
+		_correction_feedback = result.message
+		sheet.status(_correction_feedback)
+		var field := actions.invalid_field
+		if not field.is_empty():
+			var parts := field.split(":")
+			var route := str(_projection.printed_routes(current_data()).get(field, "")) if field.begins_with("printed:") else parts[0] + ":" + parts[1] if parts.size() == 3 else "rules" if field == "rules" else "core"
+			_validation = {"route": route, "field": field, "message": result.message}
+			_open_correction(route)
+
+func _cancel_edit() -> void:
+	if _busy or not _draft.active:
+		return
+	_draft.discard()
+	_validation = {}
+	_correction_feedback = ""
+	if _detail.begins_with("correction:"):
+		_detail = ""
+		_fields.clear()
+		sheet.back()
+	var result := sdk.actors.read(actor.id)
+	if result.ok and result.actor != null:
+		actor = result.actor
+	_refresh()
+	sheet.status("")
+
+func _correction_pending(pending: bool) -> void:
+	_busy = pending
+	sheet.correction_pending(pending)
+	for field in _fields:
+		field.get_node("Value").editable = not pending
+		field.get_node("Text").editable = not pending
