@@ -13,6 +13,7 @@ const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
 const TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_palette.gd")
 const GOLD := Color(0.88627450980392153, 0.7686274509803922, 0.42745098039215684, 1.0)
+const ROW_COPY_GAP := 3 # Authored Launch/Content/Copy VBox separation in hud_row.tscn.
 const CATEGORIES := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery"]
 const BUTTONS := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery", "More"]
 const CATEGORY_ICONS := {
@@ -89,6 +90,7 @@ func ready() -> void:
 	resized.connect(_layout)
 	get_node("Bar/Dice").pressed.connect(_open_dice)
 	get_node("Bar/Dice").accessibility_name = sdk.translations.text("Dice")
+	get_node("Bar/Dice/Title").text = sdk.translations.text("Dice").to_upper()
 	get_node("Bar/Identity").pressed.connect(_open_sheet)
 	get_node("Panel/Empty/Sheet").pressed.connect(_open_sheet)
 	get_node("Panel/Header/Close").pressed.connect(_back_or_close)
@@ -369,6 +371,11 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	detail.visible = not entry.detail.is_empty()
 	detail.add_theme_font_size_override("font_size", 11 if _phone else 12)
 	detail.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
+	var copy_height := row.custom_minimum_size.y - content.offset_top + content.offset_bottom
+	if detail.visible:
+		copy_height -= detail.get_minimum_size().y + ROW_COPY_GAP
+	title.max_lines_visible = 1
+	title.max_lines_visible = clampi(int(copy_height / maxf(1, title.get_minimum_size().y)), 1, 2)
 	var value: Label = content.get_node("Value")
 	value.text = entry.value
 	value.visible = not entry.value.is_empty()
@@ -422,7 +429,8 @@ func _full_name(title: String) -> void:
 
 func _check_names() -> void:
 	for row in _rows:
-		row.get_node("FullName").visible = row.get_node("Launch/Content/Copy/Title").get_line_count() > 2
+		var title: Label = row.get_node("Launch/Content/Copy/Title")
+		row.get_node("FullName").visible = title.get_line_count() > title.max_lines_visible
 	_layout_panel()
 
 func _rect(control: Control, x: float, y: float, w: float, h: float) -> void:

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="hud_russian_temp" package="tests" timestamp="2026-10-04T08:53:16" hostname="localhost" tests="1" failures="0" errors="0" skipped="0" flaky="0" time="6.865">
+		<testcase name="test_russian_actual_controls_names_bounds_and_native_fullname" classname="hud_russian_temp" time="6.859">
+		</testcase>
+	</testsuite>
+</testsuites>

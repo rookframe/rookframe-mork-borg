@@ -2,6 +2,9 @@
 
 [resource]
 messages = {
+[&"", &"Dice"]: [&"Dice"],
+[&"", &"Ability roll"]: [&"Ability roll"],
+[&"", &"Companion attack"]: [&"Companion attack"],
 [&"", &"Coward’s jab · choose a light one-handed weapon"]: [&"Coward’s jab · choose a light one-handed weapon"],
 [&"", &"Improvised object"]: [&"Improvised object"],
 [&"", &"Melee · Strength · 5 ft"]: [&"Melee · Strength · 5 ft"],

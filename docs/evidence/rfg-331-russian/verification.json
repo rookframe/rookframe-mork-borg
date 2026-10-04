@@ -1,0 +1,91 @@
+{
+  "base": "9deb5834319a4db9efc079d0e287321d3c32ea59",
+  "branch": "codex/rfg-331-russian-followup",
+  "source_scope": "Actual authored HUD/task Controls with generated public SDK facade; existing external localization/context/Actor state boundary is substituted. No app setup, installed Package, network, or physical-device claim.",
+  "sdk": "v0.32.23",
+  "ui_kit": "e2a1e807d73c907bf360aa38a21a55b1773965e2",
+  "gdunit": "v6.2.1 / 08ffc7c65b61b1b2edd545616061a99973c13ce1",
+  "godot": "4.7.2.stable.mono.official.ed1daf0bf",
+  "baseline_suite_sha256": "9709d3ef999e97c7aff53ca35dffc42a7251c26e633168934250d4ef6ed329f1",
+  "candidate_suite_sha256_before_removal": "d22d1959e01cdb14e4d928cdd81ce3075da1d9a5941c7c342b3f9e5e90ba9182",
+  "observation_only_delta": "Capture Omens string at its assertion before pooled rows are reused; expectations/input/workflows unchanged. Diagnostic JSON retained.",
+  "profiles": {
+    "desktop": [
+      1920,
+      1080
+    ],
+    "tablet": [
+      1024,
+      768
+    ],
+    "phone": [
+      844,
+      390
+    ]
+  },
+  "reports": {
+    "baseline": {
+      "cases": 1,
+      "suite_seconds": 6.765,
+      "errors": 0,
+      "assertion_failures": 37,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    },
+    "candidate": {
+      "cases": 1,
+      "suite_seconds": 6.865,
+      "errors": 0,
+      "assertion_failures": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    },
+    "affected": {
+      "cases": 20,
+      "suite_seconds": 4.752,
+      "errors": 0,
+      "assertion_failures": 0,
+      "skipped": 0,
+      "flaky": 0,
+      "orphans": 0
+    }
+  },
+  "retained_scope": [
+    "localization: all 7 cases",
+    "character_inventory: both cases",
+    "power_composition: both cases",
+    "special_composition: all 4 cases",
+    "ranged_attack: two existing authored melee view cases",
+    "companions: Owner/Viewer row cases and existing inventory editing case"
+  ],
+  "source_admission": {
+    "status": "source_checked",
+    "accepted": true,
+    "diagnostics": 0,
+    "scope": "Source only; prepared export/runtime admission remains separate.",
+    "stderr_bytes": 0
+  },
+  "production_file_sha256": {
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/i18n/en.tres": "800a8ffd0d49d545cbb967c3e516e004d304fd3fab84a91270b01527041a8184",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/i18n/ru.tres": "e19e03308ed451dd2060709ad4517bd290cf3582f6be843234ce90155a735ddb",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_favorites.gd": "1f57d296f5d196d04fecc2e550061e0a9d91d0a5683a2573c9a8c654be996c97",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd": "defe6714d43e55237dc3c950e0802a1b9c8a67cee30a5c77306b156b7362fe9b",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_attacks.gd": "867853db0297d3a88b6deb4f72915b07b46804ab924ffbc1cd356011261f497b",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_companions.gd": "a842ffce333d863f5c39c22ab356c351926fa38304051d3801846e893c1ee61c",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_items.gd": "07f28b4e8445efb5206e7ff81f27574ad62c5aadbd2b3ea8d4905c583a820a18",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_powers.gd": "8f55c0c5945a12f6ab461424f944939e77a51be6967206c361947932355c8abd",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/melee_attack.gd": "a07780a58fd17e1003d28fdd3cc03ccee764bad17ac327bc4a9e294f7975b8a4",
+    "rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack.gd": "5938309e39b40601337c2fa0b800d251bcdf755340eec590fbc9a798f6b51524"
+  },
+  "captures_byte_identical_to_root_review": true,
+  "cleanup": {
+    "removed": [
+      "tests/hud_russian_temp.gd"
+    ],
+    "uid_removed_if_created": "tests/hud_russian_temp.gd.uid",
+    "external_source_snapshots": 0,
+    "new_retained_tests": 0
+  }
+}

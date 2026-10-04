@@ -1,0 +1,110 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-complete-affected
+
+Headless mode is ignored by option '--ignoreHeadlessMode'"
+
+Please note that tests that use UI interaction do not work correctly in headless mode.
+Godot 'InputEvents' are not transported by the Godot engine in headless mode and therefore
+have no effect in the test!
+
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/localization.gd
+  res://tests/localization.gd > test_russian_creation_uses_display_labels_without_changing_draft STARTED
+  res://tests/localization.gd > test_russian_creation_uses_display_labels_without_changing_draft PASSED 147ms
+
+  res://tests/localization.gd > test_dynamic_inventory_and_search_preserve_source_ids STARTED
+  res://tests/localization.gd > test_dynamic_inventory_and_search_preserve_source_ids PASSED 129ms
+
+  res://tests/localization.gd > test_editable_values_and_fallback STARTED
+  res://tests/localization.gd > test_editable_values_and_fallback PASSED 37ms
+
+  res://tests/localization.gd > test_edit_labels_translate_without_rewriting_named_content STARTED
+  res://tests/localization.gd > test_edit_labels_translate_without_rewriting_named_content PASSED 50ms
+
+  res://tests/localization.gd > test_catalog_covers_all_authored_rule_content_and_preserves_formats STARTED
+  res://tests/localization.gd > test_catalog_covers_all_authored_rule_content_and_preserves_formats PASSED 58ms
+
+  res://tests/localization.gd > test_long_russian_definition_names_fit_phone_width STARTED
+  res://tests/localization.gd > test_long_russian_definition_names_fit_phone_width PASSED 148ms
+
+  res://tests/localization.gd > test_russian_cast_confirmation_wraps_inside_phone_width STARTED
+  res://tests/localization.gd > test_russian_cast_confirmation_wraps_inside_phone_width PASSED 33ms
+
+Statistics: 7 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 620ms
+
+
+Run Test Suite: res://tests/character_inventory.gd
+  res://tests/character_inventory.gd > test_character_inventory STARTED
+  res://tests/character_inventory.gd > test_character_inventory PASSED 583ms
+
+  res://tests/character_inventory.gd > test_overview_groups_actions_in_responsive_sections STARTED
+  res://tests/character_inventory.gd > test_overview_groups_actions_in_responsive_sections PASSED 84ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 688ms
+
+
+Run Test Suite: res://tests/power_composition.gd
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body STARTED
+  res://tests/power_composition.gd > test_cast_controls_and_terminal_gm_report_in_phone_body PASSED 650ms
+
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp STARTED
+  res://tests/power_composition.gd > test_immediate_healing_guides_count_errors_and_reports_applied_hp PASSED 1s 863ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 2s 545ms
+
+
+Run Test Suite: res://tests/special_composition.gd
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome STARTED
+  res://tests/special_composition.gd > test_use_item_shows_recipient_focus_pending_and_healing_outcome PASSED 649ms
+
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices STARTED
+  res://tests/special_composition.gd > test_book_preview_uses_selected_recipient_and_stock_radio_choices PASSED 48ms
+
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection STARTED
+  res://tests/special_composition.gd > test_separate_sheets_keep_independent_radio_selection PASSED 16ms
+
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw STARTED
+  res://tests/special_composition.gd > test_malformed_dr_adjustment_does_not_request_a_throw PASSED 8ms
+
+Statistics: 4 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 753ms
+
+
+Run Test Suite: res://tests/ranged_attack.gd
+  res://tests/ranged_attack.gd > test_equipped_bow_view_selects_only_matching_ammunition STARTED
+  res://tests/ranged_attack.gd > test_equipped_bow_view_selects_only_matching_ammunition PASSED 11ms
+
+  res://tests/ranged_attack.gd > test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log STARTED
+  res://tests/ranged_attack.gd > test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log PASSED 20ms
+
+Statistics: 2 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 50ms
+
+
+Run Test Suite: res://tests/companions.gd
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:0 ('Owner') PASSED 37ms
+
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') STARTED
+  res://tests/companions.gd > test_companion_rows_keep_owner_actions_at_touch_size:1 ('Viewer') PASSED 33ms
+
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state STARTED
+  res://tests/companions.gd > test_creature_inventory_edits_preserve_profiles_and_individual_state PASSED 8ms
+
+Statistics: 3 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 96ms
+
+
+Overall Summary: 20 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (6/6)
+Executed test cases : (20/20)
+Total execution time: 4s 752ms
+ Open XML Report at: file://reports/russian-complete-affected/report_1/results.xml
+Open HTML Report at: file://reports/russian-complete-affected/report_1/index.html
+Exit code: 0
+Run dispose test resources

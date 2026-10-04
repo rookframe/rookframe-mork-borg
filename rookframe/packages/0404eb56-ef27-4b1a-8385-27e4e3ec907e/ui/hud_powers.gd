@@ -26,7 +26,7 @@ func entries(actor: SDK.Actor) -> Array[ENTRY]:
 		var power := POWERS.new().definition(str(source.get("source", "")))
 		var entry := ENTRY.new()
 		entry.id = str(source.key)
-		entry.title = _sdk.translations.text(str(source.get("name", "Power")))
+		entry.title = str(source.name) if source.get("custom", false) or FAVORITES.new().is_renamed(source) else _sdk.translations.text(str(source.get("name", "Power")))
 		entry.detail = _sdk.translations.text("Sacred scroll" if str(power.get("family", "")) == "sacred" else "Unclean scroll")
 		entry.value = _sdk.translations.text("Cast")
 		entry.icon = ICON

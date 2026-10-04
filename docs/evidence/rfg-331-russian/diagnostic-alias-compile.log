@@ -1,0 +1,335 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/russian-final-no-persistence
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/hud_russian_temp.gd
+  res://tests/hud_russian_temp.gd > test_russian_actual_controls_names_bounds_and_native_fullname STARTED
+SCRIPT ERROR: Parse Error: Identifier "FAVORITES" not declared in the current scope.
+          at: GDScript::reload (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_attacks.gd:24)
+          GDScript backtrace (most recent call first):
+              [0] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:47)
+              [1] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+              [2] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+              [3] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+              [4] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [5] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+              [6] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [7] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+              [8] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [9] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+SCRIPT ERROR: Compile Error: Failed to compile depended scripts.
+          at: GDScript::reload (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:0)
+          GDScript backtrace (most recent call first):
+              [0] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:47)
+              [1] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+              [2] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+              [3] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+              [4] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [5] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+              [6] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [7] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+              [8] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [9] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+ERROR: Failed to load script "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd" with error "Compilation failed".
+   at: load (modules/gdscript/gdscript_resource_format.cpp:46)
+   GDScript backtrace (most recent call first):
+       [0] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:47)
+       [1] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+       [2] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+       [3] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+       [4] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+       [5] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+       [6] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+       [7] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+       [8] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+       [9] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+SCRIPT ERROR: Invalid call. Nonexistent function 'new' in base 'GDScript'.
+          at: @implicit_new (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:36)
+          GDScript backtrace (most recent call first):
+              [0] @implicit_new (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:36)
+              [1] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:47)
+              [2] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+              [3] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+              [4] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+              [5] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [6] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+              [7] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [8] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+              [9] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [10] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+SCRIPT ERROR: Invalid call. Nonexistent function 'bind' in base 'Nil'.
+          at: ready (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:79)
+          GDScript backtrace (most recent call first):
+              [0] ready (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:79)
+              [1] _ready (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd:11)
+              [2] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:49)
+              [3] _execute_test_case (res://addons/gdUnit4/src/core/_TestCase.gd:79)
+              [4] execute (res://addons/gdUnit4/src/core/_TestCase.gd:40)
+              [5] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleTestStage.gd:10)
+              [6] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [7] _execute (res://addons/gdUnit4/src/core/execution/stages/single/GdUnitTestCaseSingleExecutionStage.gd:17)
+              [8] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [9] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestCaseExecutionStage.gd:26)
+              [10] execute (res://addons/gdUnit4/src/core/execution/stages/IGdUnitExecutionStage.gd:19)
+              [11] _execute (res://addons/gdUnit4/src/core/execution/stages/GdUnitTestSuiteExecutionStage.gd:36)
+ERROR: Invalid polygon data, triangulation failed.
+   at: canvas_item_add_polygon (servers/rendering/renderer_canvas_cull.cpp:1770)
+   GDScript backtrace (most recent call first):
+       [0] _draw (res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_frame.gd:15)
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+RUSSIAN BOUNDS: {"row":[0.0,0.0,70.0,44.0],"title":[-16.5,-8.5,1.0,19.0]}
+SCRIPT ERROR: Cannot call method 'get_node' on a null value.
+          at: test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:97)
+          GDScript backtrace (most recent call first):
+              [0] test_russian_actual_controls_names_bounds_and_native_fullname (res://tests/hud_russian_temp.gd:97)
+              [1] _click (res://tests/hud_russian_temp.gd:225)
+              [2] _settle (res://tests/hud_russian_temp.gd:233)
+  res://tests/hud_russian_temp.gd > test_russian_actual_controls_names_bounds_and_native_fullname FAILED 1s 547ms
+  Report:
+  Godot Runtime Error !
+  'Parse Error: Identifier "FAVORITES" not declared in the current scope.'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47  Godot Runtime Error !
+  'Compile Error: Failed to compile depended scripts.'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47  Godot Runtime Error !
+  'Failed to load script "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd" with error "Compilation failed".'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47  Godot Runtime Error !
+  'Invalid call. Nonexistent function 'new' in base 'GDScript'.'	at '@implicit_new' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:36
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:47  Godot Runtime Error !
+  'Invalid call. Nonexistent function 'bind' in base 'Nil'.'	at 'ready' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd:79
+	at '_ready' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd:11
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:49  Godot Runtime Error !
+  'Condition "indices.is_empty()" is true.'	at '_draw' in res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_frame.gd:15  Godot Runtime Error !
+  'Cannot call method 'get_node' on a null value.'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:97
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'КОСТИ'
+ but was
+ 'КОСТИDICE'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:52
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Кости'
+ but was
+ 'Кости'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:53
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Strength'
+ but was
+ 'Strength'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:55
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ '[P: (256.0, 932.0), S: (1408.0, 124.0)]'
+ but was
+ '[P: (0.0, 0.0), S: (0.0, 0.0)]'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:57
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Характеристики'
+ but was
+ 'ХарактеристикиAbilities'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Атаки'
+ but was
+ 'АтакиAttacks'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Силы'
+ but was
+ 'СилыPowers'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Предметы'
+ but was
+ 'ПредметыItems'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:59
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:61
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Силы'
+ but was
+ 'Силы'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:62
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Утро'
+ but was
+ 'УтроMorning'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:63
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Все'
+ but was
+ 'ВсеShow all'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:64
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ '(0.0, 0.0)'
+ in range between
+ '(459.999, 195.999)' <> '(460.001, 196.001)'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:65
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 2
+ but was
+ 4	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:67
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Милость мёртвого святого'
+ but was
+ 'Милость мёртвого святого'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:68
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Strength'
+ but was
+ 'Strength'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:69
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'false' but is 'true'	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'false' but is 'true'	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'false' but is 'true'	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:70
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:77
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Характеристики'
+ but was
+ 'Характеристики'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:79
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Сила'
+ but was
+ 'Сила'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:82
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'false' but is 'true'	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'false' but is 'true'	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'false' but is 'true'	at '_bounds' in res://tests/hud_russian_temp.gd:192
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:194
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_bounds' in res://tests/hud_russian_temp.gd:198
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:83
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:85
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:87
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 'Strength'
+ but was
+ 'Strength'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:88
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:89
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: 'true' but is 'false'	at '_click' in res://tests/hud_russian_temp.gd:201
+	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:91
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting:
+ 1
+ but was
+ 0	at '_click' in res://tests/hud_russian_temp.gd:224
+	at '_settle' in res://tests/hud_russian_temp.gd:233  Expecting: not to be '<null>'	at 'test_russian_actual_controls_names_bounds_and_native_fullname' in res://tests/hud_russian_temp.gd:96
+	at '_click' in res://tests/hud_russian_temp.gd:225
+	at '_settle' in res://tests/hud_russian_temp.gd:233
+
+Statistics: 1 test cases | 7 errors | 57 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 1s 559ms
+
+
+Overall Summary: 1 test cases | 7 errors | 57 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (1/1)
+Total execution time: 1s 559ms
+ Open XML Report at: file://reports/russian-final-no-persistence/report_1/results.xml
+Open HTML Report at: file://reports/russian-final-no-persistence/report_1/index.html
+Exit code: 100
+Run dispose test resources

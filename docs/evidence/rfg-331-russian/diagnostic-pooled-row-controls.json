@@ -1,0 +1,74 @@
+{
+	"controls": [
+		{
+			"bar": [
+				256.0,
+				932.0,
+				1408.0,
+				124.0
+			],
+			"canvas": [
+				1920,
+				1080
+			],
+			"custom_flags": [
+				false,
+				false
+			],
+			"custom_name": "Strength — оружие с очень длинным неизменённым названием игрока для проверки полного текста",
+			"dice": "КОСТИ",
+			"dice_accessibility": "Кости",
+			"omens": "Импровизированное оружие",
+			"profile": "desktop",
+			"renamed_core_item": "Strength",
+			"renamed_core_scroll": "Strength"
+		},
+		{
+			"bar": [
+				128.0,
+				684.0,
+				768.0,
+				68.0
+			],
+			"canvas": [
+				1024,
+				768
+			],
+			"custom_flags": [
+				false,
+				false
+			],
+			"custom_name": "Strength — оружие с очень длинным неизменённым названием игрока для проверки полного текста",
+			"dice": "КОСТИ",
+			"dice_accessibility": "Кости",
+			"omens": "Импровизированное оружие",
+			"profile": "tablet",
+			"renamed_core_item": "Strength",
+			"renamed_core_scroll": "Strength"
+		},
+		{
+			"bar": [
+				172.0,
+				334.0,
+				500.0,
+				48.0
+			],
+			"canvas": [
+				844,
+				390
+			],
+			"custom_flags": [
+				false,
+				false
+			],
+			"custom_name": "Strength — оружие с очень длинным неизменённым названием игрока для проверки полного текста",
+			"dice": "КОСТИ",
+			"dice_accessibility": "Кости",
+			"omens": "Strength · Strength",
+			"profile": "phone",
+			"renamed_core_item": "Strength",
+			"renamed_core_scroll": "Strength"
+		}
+	],
+	"scope": "Actual authored native controls and public SDK facade with existing external host locale/context/state substituted; no full app/public Manifest acquisition or physical-device claim"
+}

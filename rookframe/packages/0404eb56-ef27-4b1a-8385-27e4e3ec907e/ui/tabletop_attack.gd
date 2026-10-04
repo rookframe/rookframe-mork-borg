@@ -11,6 +11,7 @@ const VIEW = preload(ROOT + "ui/melee_attack.gd")
 const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
+const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
 var _actor: SDK.ActorId
 var _task: Dictionary = {}
 var _item: Dictionary = {}
@@ -135,6 +136,8 @@ func _refresh() -> void:
 		data = _started_data
 		_item = _started_item
 	var display_item := _item.duplicate(true)
+	if not display_item.is_empty():
+		display_item["renamed"] = FAVORITES.new().is_renamed(_item, data)
 	if str(_task.get("mode", "")) == "jab" and not display_item.is_empty():
 		display_item["attack_ability"] = "Agility"
 		display_item["damage"] = str(display_item.get("damage", "")) + "+3"
@@ -144,7 +147,9 @@ func _refresh() -> void:
 	if not editable:
 		_view.get_node("Rules").visible = false
 	if _item.get("natural", false):
-		_view.get_node("Context").text = str(data.get("name", "Actor")) + " · " + str(_item.get("name", "Attack"))
+		var source_name := str(_item.get("name", "Attack"))
+		var named_object := str(_item.get("source_item_id", "")) == "improvised" and not str(_options.get("object", "")).strip_edges().is_empty()
+		_view.get_node("Context").text = str(data.get("name", "Actor")) + " · " + (source_name if _item.get("custom", false) or named_object else sdk.translations.text(source_name))
 	_view.get_node("SourceRules").text = sdk.translations.text(str(_item.get("rules", "")))
 	_view.get_node("SourceRules").visible = not str(_item.get("rules", "")).is_empty()
 	_view.get_node("Target/Change").disabled = not editable

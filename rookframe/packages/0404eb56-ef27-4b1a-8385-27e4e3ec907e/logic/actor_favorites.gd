@@ -45,6 +45,20 @@ func item_entry(item: Dictionary) -> Dictionary:
 		return {}
 	return {"key": "item:%s:%s" % [str(item.inventory_id), action], "category": category, "name": str(item.get("name", "Item")), "action": action, "item": str(item.inventory_id), "source": source, "custom": item.get("custom", false), "damage": str(item.get("damage", "")), "attack_ability": str(item.get("attack_ability", "Strength")), "range_feet": int(item.get("range_feet", 0)), "detail": ""}
 
+func is_renamed(source: Dictionary, data: Dictionary = {}) -> bool:
+	var id := str(source.get("source_item_id", source.get("source", "")))
+	var original: Dictionary = {} if id.is_empty() else ITEMS.EQUIPMENT.new().item(id)
+	if original.is_empty():
+		var profile: Dictionary = CREATURE_ITEMS.CREATURES.CORE_DEFINITIONS.get(str(data.get("definition_id", "")), {})
+		for raw in profile.get("attacks", []):
+			var attack: Dictionary = raw
+			if str(attack.get("id", "")) == str(source.get("source_attack_id", "")):
+				original = attack
+				break
+	if original.is_empty():
+		return not str(source.get("source_attack_id", "")).is_empty()
+	return str(source.get("name", "")) != str(original.get("name", ""))
+
 func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = []) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
 	var inventory := ITEMS.new(null, SDK.ActorId.new(actor_id)).inventory(data)
