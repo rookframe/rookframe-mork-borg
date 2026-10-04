@@ -70,7 +70,10 @@ func _check_defences() -> void:
 			_seen_defences[id] = true
 			if str(outcome.initiator) == sdk.context().participant_id:
 				continue
-			inspect_actor(SDK.ActorId.new(str(outcome.target)))
+			# The existing defence view consumes this inbox in Window.opened.
+			# Ordinary inspection continues to open the completed full sheet.
+			var entry: SDK.WindowButton = DESKTOP_WINDOW_BUTTON if sdk.presentation_experience().is_desktop else WINDOW_BUTTON
+			sdk.windows.open_actor(entry.window, SDK.ActorId.new(str(outcome.target)))
 			return
 
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")

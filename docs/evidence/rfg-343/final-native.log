@@ -1,0 +1,45 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+OpenGL API 4.1 Metal - 90.5 - Compatibility - Using Device: Apple - Apple M3 Pro
+
+
+--------------------------------------------------------------------------------------------------
+GdUnit4 Comandline Tool
+--------------------------------------------------------------------------------------------------
+Disabled fail fast!
+Set write reports to reports/rfg343-final-native
+Installing GdUnit4 session system hooks.
+Session hook 'GdUnitHtmlTestReporter' installed.
+Session hook 'GdUnitXMLTestReporter' installed.
+Run Test Suite: res://tests/rfg343_temporary.gd
+  res://tests/rfg343_temporary.gd > test_companion_projection_duplicate_identity_tombstones_and_ownership STARTED
+  res://tests/rfg343_temporary.gd > test_companion_projection_duplicate_identity_tombstones_and_ownership PASSED 5ms
+
+  res://tests/rfg343_temporary.gd > test_untargeted_companion_sequence_captures_own_stats_and_cancels STARTED
+  res://tests/rfg343_temporary.gd > test_untargeted_companion_sequence_captures_own_stats_and_cancels PASSED 5ms
+
+  res://tests/rfg343_temporary.gd > test_targeted_companion_retains_exact_owned_attack_and_existing_damage STARTED
+  res://tests/rfg343_temporary.gd > test_targeted_companion_retains_exact_owned_attack_and_existing_damage PASSED 2ms
+
+  res://tests/rfg343_temporary.gd > test_native_companion_handoff_uses_actual_actor_rook_and_throw STARTED
+  res://tests/rfg343_temporary.gd > test_native_companion_handoff_uses_actual_actor_rook_and_throw PASSED 1s 941ms
+
+  res://tests/rfg343_temporary.gd > test_native_self_defence_uses_existing_defender_controls STARTED
+  res://tests/rfg343_temporary.gd > test_native_self_defence_uses_existing_defender_controls PASSED 1s 499ms
+
+  res://tests/rfg343_temporary.gd > test_closed_native_task_reopens_for_same_character_or_companion STARTED
+  res://tests/rfg343_temporary.gd > test_closed_native_task_reopens_for_same_character_or_companion PASSED 5s 183ms
+
+  res://tests/rfg343_temporary.gd > test_remote_defence_inbox_opens_actual_usable_native_entry STARTED
+  res://tests/rfg343_temporary.gd > test_remote_defence_inbox_opens_actual_usable_native_entry PASSED 2s 265ms
+
+Statistics: 7 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans | PASSED 10s 916ms
+
+
+Overall Summary: 7 test cases | 0 errors | 0 failures | 0 flaky | 0 skipped | 0 orphans |
+Executed test suites: (1/1)
+Executed test cases : (7/7)
+Total execution time: 10s 916ms
+ Open XML Report at: file://reports/rfg343-final-native/report_1/results.xml
+Open HTML Report at: file://reports/rfg343-final-native/report_1/index.html
+Exit code: 0
+Run dispose test resources

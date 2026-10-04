@@ -6,7 +6,7 @@ const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 
 func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> Dictionary:
-	for key in ["source", "rook", "attack"]:
+	for key in ["source", "rook", "attack", "item"]:
 		if typeof(input.get(key, "")) != TYPE_STRING:
 			return _error("The selected attack is malformed.")
 	var caller := context.caller()
@@ -24,7 +24,8 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 		if typeof(raw) != TYPE_DICTIONARY:
 			return _error("Creature attack data is malformed.")
 		var attack: Dictionary = raw
-		if str(attack.get("id", "")) == str(input.get("attack", "")) and not str(attack.get("id", "")).is_empty():
+		var exact := str(input.get("item", ""))
+		if (not exact.is_empty() and str(attack.get("inventory_id", "")) == exact) or (exact.is_empty() and str(attack.get("id", "")) == str(input.get("attack", "")) and not str(attack.get("id", "")).is_empty()):
 			selected = attack
 	if selected.is_empty() or typeof(selected.get("range_feet", 0)) != TYPE_INT:
 		return _error("Select one attack with an authored range.")

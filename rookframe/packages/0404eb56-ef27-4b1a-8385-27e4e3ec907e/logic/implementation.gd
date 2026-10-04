@@ -8,6 +8,8 @@ var _melee := MELEE.new()
 
 const DEFENCE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/defence_authority.gd")
 var _defence := DEFENCE.new()
+const COMPANIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/companion_authority.gd")
+var _companions := COMPANIONS.new(_melee, _defence)
 const POWERS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/power_authority.gd")
 var _powers := POWERS.new()
 
@@ -26,6 +28,8 @@ const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-2
 var _sheet_combat := SHEET_COMBAT.new()
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("companion."):
+		return _companions.handle(context, name, payload)
 	if name.begins_with("sheet."):
 		return await _sheet.handle(context, sdk, name, payload)
 	if name.begins_with("sheet-combat."):

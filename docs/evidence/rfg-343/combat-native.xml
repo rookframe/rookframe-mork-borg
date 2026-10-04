@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="62" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="rfg343_temporary" package="tests" timestamp="2026-10-04T00:29:07" hostname="localhost" tests="6" failures="0" errors="0" skipped="0" flaky="0" time="5.745">
+		<testcase name="test_companion_projection_duplicate_identity_tombstones_and_ownership" classname="rfg343_temporary" time="0.003">
+		</testcase>
+		<testcase name="test_untargeted_companion_sequence_captures_own_stats_and_cancels" classname="rfg343_temporary" time="0.003">
+		</testcase>
+		<testcase name="test_targeted_companion_retains_exact_owned_attack_and_existing_damage" classname="rfg343_temporary" time="0.003">
+		</testcase>
+		<testcase name="test_native_companion_handoff_uses_actual_actor_rook_and_throw" classname="rfg343_temporary" time="1.974">
+		</testcase>
+		<testcase name="test_native_self_defence_uses_existing_defender_controls" classname="rfg343_temporary" time="1.498">
+		</testcase>
+		<testcase name="test_remote_defence_inbox_opens_actual_usable_native_entry" classname="rfg343_temporary" time="2.250">
+		</testcase>
+	</testsuite>
+	<testsuite id="1" name="melee_attack" package="tests" timestamp="2026-10-04T00:29:13" hostname="localhost" tests="5" failures="0" errors="0" skipped="0" flaky="0" time="2.281">
+		<testcase name="test_melee_attack" classname="melee_attack" time="0.006">
+		</testcase>
+		<testcase name="test_d2_faces" classname="melee_attack" time="0.006">
+		</testcase>
+		<testcase name="test_boundaries" classname="melee_attack" time="0.007">
+		</testcase>
+		<testcase name="test_lifetime" classname="melee_attack" time="0.015">
+		</testcase>
+		<testcase name="test_review_regressions" classname="melee_attack" time="2.214">
+		</testcase>
+	</testsuite>
+	<testsuite id="2" name="player_defence" package="tests" timestamp="2026-10-04T00:29:15" hostname="localhost" tests="14" failures="0" errors="0" skipped="0" flaky="0" time="0.127">
+		<testcase name="test_defender_receives_agility_throw_and_success_report" classname="player_defence" time="0.003">
+		</testcase>
+		<testcase name="test_failed_defence_offers_protected_damage_or_one_broken_shield" classname="player_defence" time="0.005">
+		</testcase>
+		<testcase name="test_natural_faces_and_fumble_armor_survive_shield_cancellation" classname="player_defence" time="0.004">
+		</testcase>
+		<testcase name="test_disconnect_or_reconnect_after_damage_refuses_late_choice" classname="player_defence" time="0.005">
+		</testcase>
+		<testcase name="test_armor_defence_penalty_and_source_automatic_hit" classname="player_defence" time="0.003">
+		</testcase>
+		<testcase name="test_shield_choice_rejects_changed_equipment_or_failed_save_without_late_mutation" classname="player_defence" time="0.007">
+		</testcase>
+		<testcase name="test_explicit_owner_selection_and_no_player_owner_fallback" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_live_client_close_during_roll_reply_cancels_once_and_never_resumes" classname="player_defence" time="0.014">
+		</testcase>
+		<testcase name="test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence" classname="player_defence" time="0.004">
+		</testcase>
+		<testcase name="test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:0 (&apos;brown-scimitar-of-galgenbeck&apos;, &apos;fanged-deserter&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:1 (&apos;blade-of-your-ancestors&apos;, &apos;wretched-royalty&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:2 (&apos;stolen-mitre&apos;, &apos;heretical-priest&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+		<testcase name="test_equipped_class_defence_exception_and_scum_keep_armor_penalty:3 (&apos;sword&apos;, &apos;gutterborn-scum&apos;, 10)" classname="player_defence" time="0.006">
+		</testcase>
+	</testsuite>
+	<testsuite id="3" name="companions" package="tests" timestamp="2026-10-04T00:29:15" hostname="localhost" tests="37" failures="0" errors="0" skipped="0" flaky="0" time="1.402">
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:0 (1, &apos;belze-skeleton&apos;, &apos;&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:1 (3, &apos;belze-skeleton&apos;, &apos;&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:2 (4, &apos;nodh-zombie&apos;, &apos;d2&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_psychopomp_creates_individual_source_profiles_once:3 (6, &apos;nodh-zombie&apos;, &apos;d2&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:0 (&apos;cancel&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:1 (&apos;tray&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:2 (&apos;disconnect&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:3 (&apos;access&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:4 (&apos;save&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_summon_termination_preserves_casting_use_and_rejects_late_materialization:5 (&apos;restart&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_gm_cast_for_player_grants_the_casters_normal_access" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_owned_creature_requests_the_other_characters_defence" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_creature_attack_uses_its_own_rook_and_equipped_action" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:0 (&apos;Owner&apos;)" classname="companions" time="0.005">
+		</testcase>
+		<testcase name="test_companion_rows_keep_owner_actions_at_touch_size:1 (&apos;Viewer&apos;)" classname="companions" time="0.015">
+		</testcase>
+		<testcase name="test_creature_inventory_edits_preserve_profiles_and_individual_state" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_companion_ranged_resource_is_spent_once_after_defence_roll" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_critical_armor_damage_survives_unrelated_creature_inventory_edit" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_equipped_creature_shield_reduces_melee_and_power_damage:0 (&apos;melee&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_equipped_creature_shield_reduces_melee_and_power_damage:1 (&apos;power&apos;)" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_companion_flat_attack_combines_printed_drs_and_hides_private_target" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_defends_flat_with_printed_exceptions_and_its_own_armor" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:0 (&apos;bony-knuckles&apos;, true)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_natural_fumble_keeps_attack_usable_but_carried_weapon_breaks:1 (&apos;knife&apos;, false)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_defence_fumble_and_shield_choice_persist_individual_equipment" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:0 (&apos;cancel&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:1 (&apos;disconnect&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:2 (&apos;access&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_attack_termination_rejects_late_damage:3 (&apos;save&apos;)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_creature_targeting_selects_one_rolling_side_from_ordinary_access:0 (false)" classname="companions" time="0.002">
+		</testcase>
+		<testcase name="test_creature_targeting_selects_one_rolling_side_from_ordinary_access:1 (true)" classname="companions" time="0.001">
+		</testcase>
+		<testcase name="test_companion_defence_presentation_offers_flat_test_at_phone_dock_width" classname="companions" time="0.008">
+		</testcase>
+		<testcase name="test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence" classname="companions" time="0.003">
+		</testcase>
+		<testcase name="test_natural_attack_presentation_explains_adjudication_without_weapon_loss_choice" classname="companions" time="0.004">
+		</testcase>
+		<testcase name="test_companion_defence_presentation_hides_when_owner_access_is_lost" classname="companions" time="0.014">
+		</testcase>
+		<testcase name="test_companion_defence_scene_resolves_the_compact_shield_choice" classname="companions" time="1.234">
+		</testcase>
+	</testsuite>
+</testsuites>

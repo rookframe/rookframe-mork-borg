@@ -158,6 +158,15 @@ Eurekia draw still spend the exact source resource once. The open action keeps
 its Actor and source across HUD selection changes. The full-viewport sheet's
 separate Attack/Damage and Window Dice behavior remains intact.
 
+The Companions category projects only authorized companion Creature attacks.
+Each favorite identifies the Creature Actor and its exact inventory attack;
+descriptive-only companions supply no invented combat action. Launch opens the
+same captured native task bound to that Creature, using its flat test, damage
+and matching Rook. Untargeted play uses the common attack/damage sequence;
+supplied targets use the existing attack or defending Player workflow.
+Remote defence requests open the existing defence-capable window, while
+ordinary Character inspection still opens the completed full-viewport sheet.
+
 Select the Character’s linked Rook, open its equipped weapon in Inventory, and
 choose one Creature through tabletop targeting. Done restores the same managed
 window and keyboard focus. Difficulty defaults to the source Creature rule;

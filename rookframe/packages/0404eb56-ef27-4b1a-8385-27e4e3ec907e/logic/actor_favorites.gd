@@ -74,7 +74,7 @@ func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = 
 			var attack: Dictionary = raw
 			if str(attack.get("kind", "")) != "Weapon" or str(attack.get("damage", "")).is_empty():
 				continue
-			result.append({"key": companion_key(companion.id.value, str(attack.inventory_id)), "category": "Companions", "name": str(other.get("name", "Companion")) + " · " + str(attack.get("name", "Attack")), "action": "attack", "actor": companion.id.value, "item": str(attack.inventory_id), "present": true, "available": _available(other, attack, "attack", attacks)})
+			result.append({"key": companion_key(companion.id.value, str(attack.inventory_id)), "category": "Companions", "name": str(other.get("name", "Companion")) + " · " + str(attack.get("name", "Attack")), "action": "attack", "actor": companion.id.value, "item": str(attack.inventory_id), "damage": str(attack.damage), "detail": "Flat test · %d ft" % int(attack.get("range_feet", 0)), "present": true, "available": _available(other, attack, "attack", attacks)})
 	for intrinsic in ATTACKS.new().entries(data):
 		result.append(intrinsic)
 	var saved: Array = data.get("favorites", [])
