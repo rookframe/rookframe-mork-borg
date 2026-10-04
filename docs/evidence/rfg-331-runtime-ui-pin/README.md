@@ -1,0 +1,9 @@
+# RFG-331 public UI Kit acquisition
+
+Base extension: `49c9462`. `plug.gd`, `.rookframe/authoring.lock.json` and README now select the official reviewed UI Kit commit [`e2a1e807d73c907bf360aa38a21a55b1773965e2`](https://github.com/rookframe/rookframe-ui-kit/commit/e2a1e807d73c907bf360aa38a21a55b1773965e2), tree `c2cc267830358c45a013b09d918996cbdb6650e3`. It contains the reviewed stock lifecycle guard for deferred pagination after removal.
+
+`runtime-ui-extension-acquisition.log` records ordinary public gd-plug acquisition. `public-acquisition.json` records the exact public checkout and the installed pagination script's matching committed byte identity. No installed mirror was edited/copied and no local Package archive/store was used.
+
+SDK 0.32.23, Edition 2029 revision 28, generated facades, Package version and Manifest remain unchanged. The SDK's immutable default UI Kit pin remains `b8aa5fa929f0f352096d63a53f01bf1e0af39b70`; its supported independent-UI-release check validates this explicit newer pin against the public committed tree. `source-check.json` confirms complete Package source admission with no diagnostics. It does not claim prepared-export or application-runtime acceptance.
+
+After the standard Godot asset import, the 10 retained Power, Special, Health and Defence composition cases passed in 3.836 seconds, zero errors/failures/skips/flaky/orphans (`affected.xml`, `runtime-ui-affected-imported.log`). The initial run before import encountered missing SVG import resources after gd-plug replaced the tree; that prerequisite failure is preserved outside source at `/tmp/rfg-331-context/runtime-ui-affected.log` and was resolved by normal import. No test code or temporary wiring was introduced. The coordinating task owns whole-suite verification, the superseding Package release and the original public application/native rerun.

@@ -1,0 +1,16 @@
+Godot Engine v4.7.2.stable.mono.official.ed1daf0bf - https://godotengine.org
+
+Installing...
+gdUnit4 frozen at commit "08ffc7c65b61b1b2edd545616061a99973c13ce1"
+rookframe-sdk frozen at tag "v0.32.23"
+rookframe-ui-kit frozen at commit "e2a1e807d73c907bf360aa38a21a55b1773965e2"
+rookframe-ui-kit changed [&"commit"]
+rookframe-ui-kit repository setting changed, update required
+rookframe-ui-kit cloning from https://git::@github.com/rookframe/rookframe-ui-kit.git...
+Uninstalling 369 files for rookframe-ui-kit...
+Uninstalled 369 files for rookframe-ui-kit
+Downloading rookframe-ui-kit from https://git::@github.com/rookframe/rookframe-ui-kit.git...
+Successfully download rookframe-ui-kit
+Installing files for rookframe-ui-kit...
+Installed 369 files for rookframe-ui-kit
+Finished, elapsed 1.261s
