@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites id="2026-10-04" name="report_1" tests="1" failures="0" skipped="0" flaky="0" time="0.000">
+	<testsuite id="0" name="favorite_size_temp" package="tests" timestamp="2026-10-04T06:59:26" hostname="localhost" tests="1" failures="0" errors="0" skipped="0" flaky="0" time="1.173">
+		<testcase name="test_authored_favorite_style_and_geometry_matches_three_profiles" classname="favorite_size_temp" time="1.164">
+		</testcase>
+	</testsuite>
+</testsuites>
