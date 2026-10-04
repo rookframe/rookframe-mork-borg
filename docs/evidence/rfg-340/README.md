@@ -1,0 +1,11 @@
+# RFG-340 Power workflow evidence
+
+Godot 4.7.2 Mono with publicly acquired pinned gd-plug SDK/UI Kit/GdUnit dependencies. No application Package installation, local archive import, installed-store copying or Prop fixtures were used.
+
+`authority-results.xml`: 48 passing cases (40 existing Power authority/composition checks and 8 temporary cases), 2.783 seconds. The disposable cases exercised all 20 scroll definitions without targets/source Rooks; quantity followed by printed independent HP amounts; no invented recipients, armor or target HP mutations; target clearing at quantity confirmation; exact removed/replaced source refusal; single-use favorites/new-copy separation; and Morning allowance recovery. Existing targeted healing/damage, armor/shield, resistance, class restrictions, natural faces and lifecycle checks passed. One existing native invalid-target check now supplies a wrong nonempty count because an empty target set is valid.
+
+`native-results.xml`: 5 passing temporary graphical cases, 2.717 seconds. Actual authored Power task and shared Powers panel Controls ran under the stock renderer in 422 × 390 and 460 × 720 managed bodies. Native `SubViewport.push_input` mouse-button events activated eligibility and the fixed primary footer. Real System action requests produced casting and Morning dice, Actor context changes retained the initiating Actor/source, Done closed the correct scene, and explicit closure cancelled unfinished casting. Screenshots show those authored scenes, without application-managed host chrome or tabletop; the gray background is the standalone viewport clear color.
+
+These narrow checks substitute only the external SDK host services, not the Power workflow or native controls. They do not establish public Manifest joining/reopening or whole-workspace composition; RFG-344 owns that integration evidence. The native launch uses the generated public SDK 0.32.23 facade, from hud.launch/hud.morning through the host opener and generated Window callback. source-check.json records passing official SDK source admission for this Package; prepared exports and runtime selection admission remain integration work.
+
+Temporary suites and helper boundaries are removed before commit. Full logs and captures remain outside the repository under `/tmp/rfg-340-*`; no engine test suite was added.
