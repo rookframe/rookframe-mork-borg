@@ -18,7 +18,7 @@ func ready() -> void:
 		return
 	i18n.bind(sdk)
 	var sheet = get_node("Sheet")
-	sheet.create_requested.connect(_create)
+	sheet.create_requested.connect(_queue_create)
 	sheet.close_requested.connect(_close)
 	sheet.miniature_requested.connect(_choose)
 	sheet.miniature_clear_requested.connect(_clear)
@@ -78,6 +78,11 @@ func _miniature() -> Dictionary:
 		var reference: Dictionary = defaults.get(id, {})
 		return reference.duplicate(true)
 	return CREATURES.new().default_miniature(id)
+
+func _queue_create() -> void:
+	# Leave the shared sheet's signal stack before the live window reloads it.
+	# https://docs.godotengine.org/en/stable/classes/class_callable.html#class-callable-method-call-deferred
+	_create.call_deferred()
 
 func _create() -> void:
 	if _busy or _definition == null:

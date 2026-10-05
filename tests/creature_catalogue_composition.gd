@@ -7,13 +7,26 @@ const SYSTEM = preload(ROOT + "logic/implementation.gd")
 class Boundary extends "res://tests/miniature_boundary.gd":
 	var feedback: Array = []
 	var fail_link := false
+	var surface_parent: Node
+	var create_signal_active := false
+	var opened_during_create_signal := false
 	func ReadContent(package: String, id: String) -> Dictionary:
 		if package == PackageId() and id == "seth-goblin":
 			return {"ok": true, "value": {"packageId": package, "localId": id, "displayName": "Seth, Goblin", "localizedDisplayName": "Seth, Goblin", "type": "actor_definition", "available": true}}
 		return super.ReadContent(package, id)
-	func OpenActorWindowWithPresentation(scene: PackedScene, _actor: String, _options: Dictionary) -> Dictionary:
+	func OpenActorWindowWithPresentation(scene: PackedScene, actor: String, _options: Dictionary) -> Dictionary:
 		opened_surfaces.append(scene.resource_path)
+		if surface_parent != null:
+			opened_during_create_signal = create_signal_active
+			# Match the host's checked fresh scene load, including shared scripts.
+			var loaded: PackedScene = ResourceLoader.load(scene.resource_path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
+			var content := loaded.instantiate()
+			content.set_meta("rookframe_sdk", self)
+			surface_parent.add_child(content)
+			content._rookframe_open_actor(actor)
 		return {"ok": true}
+	func opened_count() -> int:
+		return opened_surfaces.size()
 	func ShowFeedback(title: String, message: String, severity: String, actions: Array) -> int:
 		feedback.append({"title": title, "message": message, "severity": severity, "actions": actions})
 		return feedback.size()
@@ -62,13 +75,32 @@ func test_library_definition_opens_independent_sheet() -> void:
 	# Stable return focus follows the native layout frames.
 	await assert_func(source_button, "has_focus").wait_until(1000).is_true()
 
-func test_button_creates_actor_without_placing_rook() -> void:
+func test_button_creates_actor_and_loads_live_sheet_after_create_signal_returns() -> void:
 	var host := _host()
-	var result = await LIBRARY.new(SDK.new(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"))
-	assert_bool(result.ok).is_true()
+	var viewport: SubViewport = auto_free(SubViewport.new())
+	viewport.size = Vector2i(1920, 1080)
+	add_child(viewport)
+	host.surface_parent = viewport
+	var scene: PackedScene = ResourceLoader.load(ROOT + "ui/creature_definition_sheet.tscn", "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
+	var sheet := scene.instantiate()
+	sheet.set_meta("rookframe_sdk", host)
+	viewport.add_child(sheet)
+	sheet._rookframe_open_definition(host.PackageId(), "seth-goblin")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var create: Button = sheet.get_node("Sheet/Inset/Layout/Footer/Create")
+	assert_bool(create.disabled).is_false()
+	host.create_signal_active = true
+	create.pressed.emit()
+	host.create_signal_active = false
+	await assert_func(host, "opened_count").wait_until(1000).is_equal(1)
+	assert_bool(host.opened_during_create_signal).is_false()
 	assert_int(host.actors.size()).is_equal(3)
 	assert_int(host.placed.size()).is_equal(0)
 	assert_int(host.opened_surfaces.size()).is_equal(1)
+	var live: Control = viewport.get_child(1)
+	assert_str(live.actor.data.name).is_equal("Seth, Goblin")
+	assert_str(live.sheet.get_node(live.sheet.IDENTITY + "Name").text).is_equal("Seth, Goblin")
 
 func test_drop_creates_linked_rook_at_selected_scene_and_position() -> void:
 	var host := _host()
