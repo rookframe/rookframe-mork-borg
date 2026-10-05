@@ -1,6 +1,7 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
+const PORTRAIT_CACHE = preload(ROOT + "ui/creature_portrait_cache.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const CONTENT = preload(ROOT + "logic/creature_content.gd")
 const LIBRARY = preload(ROOT + "ui/creature_library.gd")
@@ -11,9 +12,7 @@ var _portrait_epoch := 0
 var _appearance_session := ""
 var _world: Dictionary = {}
 var _world_error := ""
-var _portrait_path := ""
-var _portrait_texture: Texture2D
-var _portrait_error := ""
+var _portrait_cache := PORTRAIT_CACHE.new()
 
 @onready var _miniature_picker := get_node(^"MiniatureWorkflow")
 
@@ -39,9 +38,7 @@ func opened_definition(definition: SDK.ContentReference) -> void:
 	_end_appearance()
 	_definition = definition
 	if _appearance_session != sdk.context().session_id:
-		_portrait_path = ""
-		_portrait_texture = null
-		_portrait_error = ""
+		_portrait_cache.clear()
 	_appearance_session = sdk.context().session_id
 	_world = {}
 	get_node("Sheet").visible = true
@@ -70,8 +67,8 @@ func _refresh() -> void:
 	get_node("Sheet").configure(data, i18n, true, not _busy and _world_error.is_empty() and sdk.context().is_gm and found.content_entry.available, _portrait())
 	if not _world_error.is_empty():
 		get_node("Sheet").status(_world_error)
-	elif not _portrait_error.is_empty():
-		get_node("Sheet").status(_portrait_error)
+	elif not _portrait_cache.message.is_empty():
+		get_node("Sheet").status(_portrait_cache.message)
 	_refresh_appearance.call_deferred()
 
 func _refresh_appearance() -> void:
@@ -143,25 +140,7 @@ func _closed() -> void:
 func _portrait() -> Texture2D:
 	var defaults: Dictionary = _world.get("creature_portraits", {})
 	var value: Variant = defaults.get(str(_definition.local_id), "")
-	var path: String = value if typeof(value) == TYPE_STRING else ""
-	if path != _portrait_path:
-		_portrait_path = path
-		_portrait_texture = null
-		_portrait_error = ""
-	# Acquisition can finish after the Actor reference arrives. Failed decoding
-	# retries on the ordinary World change notification; successful textures cache.
-	if not path.is_empty() and _portrait_texture == null:
-		var decoded := sdk.portraits.decode(path)
-		if decoded.ok:
-			_portrait_texture = decoded.texture
-			_portrait_error = ""
-		else:
-			_portrait_error = decoded.message
-	if path.is_empty():
-		_portrait_error = ""
-	if typeof(value) != TYPE_STRING:
-		_portrait_error = "Portrait is unavailable. Choose a replacement."
-	return _portrait_texture
+	return _portrait_cache.resolve(value, sdk.portraits)
 
 func _choose_portrait() -> void:
 	if _busy or not _can_edit():

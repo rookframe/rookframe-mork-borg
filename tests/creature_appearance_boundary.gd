@@ -4,6 +4,7 @@ var before_appearance: Dictionary = {}
 var retained_portraits: Dictionary = {}
 var fail_retention := false
 var retention_calls := 0
+var decode_calls := 0
 var authority := true
 
 func WorldContext() -> Dictionary:
@@ -35,6 +36,7 @@ func RetainActorPortrait(bytes: PackedByteArray) -> Dictionary:
 	return {"ok": true, "path": path}
 
 func DecodeActorPortrait(path: String) -> Dictionary:
+	decode_calls += 1
 	if not retained_portraits.has(path):
 		return {"ok": false, "code": "portrait_unavailable", "message": "Portrait is unavailable. Choose a replacement."}
 	var image := Image.new()

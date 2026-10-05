@@ -9,6 +9,7 @@ const ACTIONS = preload(ROOT + "logic/creature_actions.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const CHARACTERS = preload(ROOT + "logic/character_actions.gd")
 const BOUNDARY = preload("res://tests/creature_appearance_boundary.gd")
+const PORTRAIT_CACHE = preload(ROOT + "ui/creature_portrait_cache.gd")
 const REFERENCE := {"package_id": "external-miniatures", "local_id": "warden"}
 
 func _legacy() -> Dictionary:
@@ -166,3 +167,40 @@ func test_late_library_upload_after_reset_is_rejected_and_unrelated_world_change
 	assert_bool(saved.value.ok).is_true()
 	assert_str(host.world_data.unrelated).is_equal("accepted later")
 	assert_int(host.world_data.creature_portrait_revisions["seth-goblin"]).is_equal(3)
+
+func test_portrait_cache_retries_acquisition_and_discards_previous_session_textures() -> void:
+	var host := BOUNDARY.new()
+	var sdk := SDK.new(host)
+	var cache := PORTRAIT_CACHE.new()
+	var path := "portraits/pending.png"
+	# Replicated data may become readable before the retained original arrives.
+	assert_object(cache.resolve(path, sdk.portraits)).is_null()
+	assert_str(cache.message).is_equal("Portrait is unavailable. Choose a replacement.")
+	var image := Image.create(8, 4, false, Image.FORMAT_RGBA8)
+	image.fill(Color.DARK_RED)
+	host.retained_portraits[path] = image.save_png_to_buffer()
+	var first := cache.resolve(path, sdk.portraits)
+	assert_object(first).is_not_null()
+	assert_str(cache.message).is_empty()
+	assert_int(host.decode_calls).is_equal(2)
+	assert_object(cache.resolve(path, sdk.portraits)).is_same(first)
+	assert_int(host.decode_calls).is_equal(2)
+	# Changing to an unavailable or invalid reference must never show the old image.
+	assert_object(cache.resolve("portraits/not-acquired.png", sdk.portraits)).is_null()
+	assert_str(cache.message).is_not_empty()
+	assert_object(cache.resolve(42, sdk.portraits)).is_null()
+	assert_str(cache.message).is_equal("Portrait is unavailable. Choose a replacement.")
+	assert_object(cache.resolve("", sdk.portraits)).is_null()
+	assert_str(cache.message).is_empty()
+	assert_int(host.decode_calls).is_equal(3)
+	assert_object(cache.resolve(path, sdk.portraits)).is_not_null()
+	# A later World may use the same relative path for different original bytes.
+	var later := BOUNDARY.new()
+	image.fill(Color.DARK_BLUE)
+	later.retained_portraits[path] = image.save_png_to_buffer()
+	cache.clear()
+	assert_str(cache.message).is_empty()
+	var fresh := cache.resolve(path, SDK.new(later).portraits)
+	assert_object(fresh).is_not_same(first)
+	assert_int(later.decode_calls).is_equal(1)
+	assert_str(fresh.get_image().get_pixel(0, 0).to_html()).is_equal(Color.DARK_BLUE.to_html())

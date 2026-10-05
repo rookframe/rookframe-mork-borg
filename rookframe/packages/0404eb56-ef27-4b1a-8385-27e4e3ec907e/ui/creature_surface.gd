@@ -5,6 +5,7 @@ const DRAFT = preload(ROOT + "ui/sheet_draft.gd")
 const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
 const SHEET = preload(ROOT + "ui/creature_sheet_surface.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
+const PORTRAIT_CACHE = preload(ROOT + "ui/creature_portrait_cache.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
@@ -34,9 +35,7 @@ var _busy := false
 var _portrait_pending := false
 var _portrait_epoch := 0
 var _appearance_session := ""
-var _portrait_path := ""
-var _portrait_texture: Texture2D
-var _portrait_error := ""
+var _portrait_cache := PORTRAIT_CACHE.new()
 var _portrait_feedback := ""
 var _refresh_pending := false
 var _detail_pending := false
@@ -109,9 +108,7 @@ func ready() -> void:
 func opened(id: SDK.ActorId) -> void:
 	_end_portrait()
 	if _appearance_session != sdk.context().session_id:
-		_portrait_path = ""
-		_portrait_texture = null
-		_portrait_error = ""
+		_portrait_cache.clear()
 	_appearance_session = sdk.context().session_id
 	_end_health()
 	_roll_workflow.opened(id.value)
@@ -241,8 +238,8 @@ func _render_accepted() -> void:
 		sheet.status(_health_feedback)
 	elif not _correction_feedback.is_empty():
 		sheet.status(_correction_feedback)
-	elif not _portrait_error.is_empty():
-		sheet.status(_portrait_error)
+	elif not _portrait_cache.message.is_empty():
+		sheet.status(_portrait_cache.message)
 	elif not _portrait_feedback.is_empty():
 		sheet.status(_portrait_feedback)
 	if not _detail.is_empty():
@@ -505,25 +502,7 @@ func _clear_miniature() -> void:
 
 func _portrait(data: Dictionary) -> Texture2D:
 	var value: Variant = data.get("portrait", "")
-	var path: String = value if typeof(value) == TYPE_STRING else ""
-	if path != _portrait_path:
-		_portrait_path = path
-		_portrait_texture = null
-		_portrait_error = ""
-	# Acquisition can finish after the Actor reference arrives. Failed decoding
-	# retries on the ordinary World change notification; successful textures cache.
-	if not path.is_empty() and _portrait_texture == null:
-		var decoded := sdk.portraits.decode(path)
-		if decoded.ok:
-			_portrait_texture = decoded.texture
-			_portrait_error = ""
-		else:
-			_portrait_error = decoded.message
-	if path.is_empty():
-		_portrait_error = ""
-	if typeof(value) != TYPE_STRING:
-		_portrait_error = "Portrait is unavailable. Choose a replacement."
-	return _portrait_texture
+	return _portrait_cache.resolve(value, sdk.portraits)
 
 func _choose_portrait() -> void:
 	if not owner() or _busy:
