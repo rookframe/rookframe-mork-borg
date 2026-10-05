@@ -19,6 +19,9 @@ const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 @export var section_frame: StyleBoxFlat
 @export var chapter_normal: StyleBoxFlat
 @export var chapter_selected: StyleBoxFlat
+@export var desktop_source_icon_alignment: HorizontalAlignment
+@export var touch_source_icon_alignment: HorizontalAlignment
+@export var source_frame: StyleBoxFlat
 signal chapter_changed(chapter: int)
 signal entry_requested(id: String)
 signal inventory_add_requested
@@ -129,7 +132,10 @@ func _layout() -> void:
 		name = name.split(",")[0]
 	get_node(IDENTITY + "Name").text = _locale.text(str(_draft.get("name", name)) if _editing else name)
 	get_node(IDENTITY + "Name").add_theme_font_size_override("font_size", 22 if _phone else 29 if _tablet else 34)
-	get_node(IDENTITY + "Classification").text = _locale.text(str(_draft.get("classification", "")) if _editing else str(_data.get("classification", metadata.get("classification", ""))))
+	var classification: String = _data.get("classification", metadata.get("classification", ""))
+	if _editing:
+		classification = str(_draft.get("classification", ""))
+	get_node(IDENTITY + "Classification").text = _locale.text(classification)
 	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 9 if _phone else 11 if _tablet else 13)
 	get_node(IDENTITY + "Portrait").texture = _texture
 	_layout_identity(metadata)
@@ -175,9 +181,10 @@ func _build_groups(metadata: Dictionary) -> void:
 			rules += ("\n" if not rules.is_empty() else "") + _locale.text("Player defence DR%d.") % int(attack.defence_dr)
 		attack_entries.append({"id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "text": rules, "dice": str(attack.get("dice", "")), "attack_dr": own_attacks.get(str(attack.get("id", ""))), "attack": true, "correction_route": "attack:%d" % index, "correction_identity": str(attack.get("correction_entry_id", "")) + "|" + str(attack.get("id", ""))})
 	if not _editing and str(_data.get("definition_id", "")) == "seth-goblin" and own_attacks.is_empty() and _default_seth_attacks(attacks):
-		attack_entries[0].name = "Knife / shortbow"
-		attack_entries[0].text = _locale.text("Damage") + " d4."
-		attack_entries = [attack_entries[0]]
+		var combined: Dictionary = attack_entries[0]
+		combined["name"] = "Knife / shortbow"
+		combined["text"] = _locale.text("Damage") + " d4."
+		attack_entries = [combined]
 	if attack_entries.is_empty():
 		attack_entries.append({"id": "no-attacks", "name": "Attacks", "text": "No attacks recorded."})
 	groups.append({"title": "Attacks", "lane": "primary", "entries": attack_entries})
@@ -220,7 +227,8 @@ func _build_groups(metadata: Dictionary) -> void:
 	# Presentation aliases retain saved identities and distinct correction routes.
 	var definition := str(_data.get("definition_id", ""))
 	if definition == "lich-necromancer":
-		groups[0].title = "Attacks & powers"
+		var attack_group: Dictionary = groups[0]
+		attack_group["title"] = "Attacks & powers"
 		if not _editing and attack_entries.size() == 1:
 			var strike: Dictionary = attack_entries[0]
 			if strike.id == "strike" and strike.name == "Strike" and str(strike.text).is_empty():
@@ -361,7 +369,7 @@ func _render_encounter() -> void:
 				_append(pages.get_node("Area/Content"), entry, actions)
 				if _phone:
 					var gap := Control.new()
-					gap.set_meta("entry_page_gap", true)
+					gap.name = "EntryPageGap" + str(pages.get_node("Area/Content").get_child_count())
 					pages.get_node("Area/Content").add_child(gap)
 		pages.restore_state(state)
 	get_node(WORK + "Encounter/Secondary").visible = not _phone
@@ -835,7 +843,10 @@ func _layout_chapters() -> void:
 	appearance.add_theme_color_override("icon_pressed_color", Color(0.266667, 0.913725, 0.913725, 1))
 	var source: Button = get_node(WORK + "Tabs/Source")
 	source.text = "" if _phone or _tablet else _locale.text("Source")
-	source.icon_alignment = HORIZONTAL_ALIGNMENT_RIGHT if _phone or _tablet else HORIZONTAL_ALIGNMENT_LEFT
+	source.icon_alignment = touch_source_icon_alignment if _phone or _tablet else desktop_source_icon_alignment
+	var frame: StyleBoxFlat = source_frame.duplicate()
+	frame.content_margin_bottom = 8 if _phone or _tablet else 6
+	source.add_theme_stylebox_override("normal", frame)
 	source.icon = preload("res://rookframe/ui/icons/character/book.svg")
 	source.accessibility_name = _locale.text("Published source")
 	source.tooltip_text = _locale.text("Published source")
@@ -847,11 +858,14 @@ func _layout_chapters() -> void:
 
 func _update_decorations() -> void:
 	var footer: Control = get_node("Inset/Layout/Footer")
-	get_node("FooterRule").position = footer.position + get_node("Inset/Layout").position + get_node("Inset").position
+	var sheet_rect: Rect2 = get_global_rect()
+	var footer_rect: Rect2 = footer.get_global_rect()
+	get_node("FooterRule").position = Vector2(footer_rect.position.x - sheet_rect.position.x, footer_rect.position.y - sheet_rect.position.y)
 	get_node("FooterRule").size = Vector2(footer.size.x, 1)
 	var tabs: Control = get_node(WORK + "Tabs")
+	var tabs_rect: Rect2 = tabs.get_global_rect()
 	get_node("ChapterRule").visible = tabs.is_visible_in_tree()
-	get_node("ChapterRule").global_position = tabs.global_position + Vector2(0, tabs.size.y - 1)
+	get_node("ChapterRule").position = Vector2(tabs_rect.position.x - sheet_rect.position.x, tabs_rect.position.y - sheet_rect.position.y + tabs.size.y - 1)
 	get_node("ChapterRule").size = Vector2(tabs.size.x, 1)
 
 func _update_pager_labels() -> void:
@@ -874,19 +888,23 @@ func _fit_phone_entries() -> void:
 	var height := pages.size.y - 44
 	if height <= 0:
 		return
-	var content := pages.get_node("Area/Content")
-	var children := content.get_children()
-	for index in range(children.size()):
-		var child: Control = children[index]
-		if not child.has_meta("entry_page_gap") or index == 0:
+	var content: VBoxContainer = get_node(WORK + "Encounter/Primary/Area/Content")
+	var article_height := 0.0
+	var has_article := false
+	for node in content.get_children():
+		var child: Control = node
+		if not str(child.name).begins_with("EntryPageGap"):
+			article_height = child.get_combined_minimum_size().y
+			has_article = true
 			continue
-		var preceding: Control = children[index - 1]
+		if not has_article:
+			continue
 		# Small complete articles each own a bounded phone page. Long prose keeps
 		# the public component's measured line paging; no text is dropped.
-		var article_height := preceding.get_combined_minimum_size().y
 		var gap := maxf(0, height - article_height) if article_height <= height else 0.0
 		# The final spacer also ensures the public pager reserves its 44px row.
-		if absf(child.custom_minimum_size.y - gap) > 0.1:
+		var difference := child.custom_minimum_size.y - gap
+		if difference > 0.1 or difference < -0.1:
 			child.custom_minimum_size = Vector2(child.custom_minimum_size.x, gap)
 
 func _fit_identity() -> void:
@@ -897,5 +915,6 @@ func _fit_identity() -> void:
 	var available := size.y - (11 if _phone else 17 if _tablet else 25) - (53 if _phone else 57 if _tablet else 65)
 	var other_height := column.get_combined_minimum_size().y - portrait.custom_minimum_size.y
 	var target := minf(148 if _phone else 430 if _tablet else 510, maxf(0, available - other_height))
-	if absf(target - portrait.custom_minimum_size.y) > 0.1:
+	var difference := target - portrait.custom_minimum_size.y
+	if difference > 0.1 or difference < -0.1:
 		portrait.custom_minimum_size = Vector2(0, target)

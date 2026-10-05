@@ -42,7 +42,8 @@ border_width_top = 1
 border_color = Color(0.27451,0.321569,0.337255,1)
 
 
-[sub_resource type="StyleBoxEmpty" id="source_normal"]
+[sub_resource type="StyleBoxFlat" id="source_normal"]
+bg_color = Color(0, 0, 0, 0)
 content_margin_left = 4.0
 content_margin_right = 4.0
 content_margin_top = 6.0
@@ -59,6 +60,9 @@ identity_frame = ExtResource("identity_frame")
 section_frame = ExtResource("section_frame")
 chapter_normal = ExtResource("chapter_normal")
 chapter_selected = ExtResource("chapter_selected")
+desktop_source_icon_alignment = 0
+touch_source_icon_alignment = 2
+source_frame = SubResource("source_normal")
 [node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
