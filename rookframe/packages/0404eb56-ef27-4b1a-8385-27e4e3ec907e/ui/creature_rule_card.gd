@@ -4,6 +4,7 @@ signal requested(part: String, id: String)
 const BUTTON = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_text_button.tscn")
 var entry_id := ""
 var _buttons := []
+var _parts: Array[String] = []
 
 func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> void:
 	entry_id = str(entry.get("id", ""))
@@ -16,6 +17,7 @@ func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> vo
 
 func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 	_buttons.clear()
+	_parts.clear()
 	for child in get_node("Actions").get_children():
 		get_node("Actions").remove_child(child)
 		child.queue_free()
@@ -30,14 +32,16 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 		button.pressed.connect(_action_requested.bind(str(action.get("part", "details"))))
 		get_node("Actions").add_child(button)
 		_buttons.append(button)
+		_parts.append(str(action.get("part", "details")))
 	get_node("Actions").visible = not actions.is_empty()
 
 func _action_requested(part: String) -> void:
 	requested.emit(part, entry_id)
 
-func restore_focus() -> bool:
-	for button in _buttons:
-		if button.is_visible_in_tree():
+func restore_focus(part: String = "") -> bool:
+	for index in range(_buttons.size()):
+		var button: Button = _buttons[index]
+		if (part.is_empty() or _parts[index] == part) and button.is_visible_in_tree() and not button.disabled:
 			button.grab_focus()
 			return true
 	return false

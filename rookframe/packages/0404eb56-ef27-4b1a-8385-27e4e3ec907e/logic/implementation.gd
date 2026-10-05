@@ -6,6 +6,8 @@ const CREATURE_CORRECTIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1
 var _creature_corrections := CREATURE_CORRECTIONS.new()
 const CREATURE_HEALTH = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_health_authority.gd")
 var _creature_health := CREATURE_HEALTH.new()
+const CREATURE_ROLL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_roll_authority.gd")
+var _creature_roll := CREATURE_ROLL.new()
 
 const MELEE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/melee_authority.gd")
 var _melee := MELEE.new()
@@ -34,6 +36,8 @@ const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-2
 var _sheet_combat := SHEET_COMBAT.new()
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
+	if name.begins_with("creature-roll."):
+		return _creature_roll.handle(context, name, payload)
 	if name.begins_with("creature-health."):
 		return _creature_health.handle(context, name, payload)
 	if name.begins_with("creature-appearance."):

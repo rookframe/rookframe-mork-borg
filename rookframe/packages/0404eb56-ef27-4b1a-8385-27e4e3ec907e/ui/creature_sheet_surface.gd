@@ -50,6 +50,8 @@ var _editing := false
 var _return_correction := ""
 var _return_focus_frames := 0
 var _health_reader := false
+var _roll_reader := false
+var _return_roll := ""
 
 func _ready() -> void:
 	for index in range(3):
@@ -255,7 +257,7 @@ func _render_encounter() -> void:
 					actions.append({"name": "Correct", "part": "correct:" + str(entry.correction_route), "disabled": not _can_edit})
 				if entry.get("attack", false):
 					if not _library and entry.get("attack_dr") != null:
-						actions.append({"name": "Attack", "part": "attack", "dice": "d20 / DR" + str(entry.attack_dr), "disabled": _rolls_disabled()})
+						actions.append({"name": "Attack", "part": "attack", "dice": "d20 / DR" + str(entry.attack_dr), "disabled": true})
 					if _library:
 						entry = entry.duplicate(true)
 						entry.text = (_locale.text("Attack") + " d20 / DR" + str(entry.attack_dr) + "\n" if entry.get("attack_dr") != null else "") + _locale.text("Damage") + " " + str(entry.dice) + ("\n" + str(entry.text) if not str(entry.text).is_empty() else "")
@@ -263,7 +265,7 @@ func _render_encounter() -> void:
 						actions.append({"name": "Damage", "part": "damage", "dice": str(entry.dice), "disabled": _rolls_disabled()})
 				if not _library:
 					if entry.has("own_test"):
-						actions.append({"name": str(entry.name), "part": str(entry.own_test), "disabled": _rolls_disabled()})
+						actions.append({"name": str(entry.name), "part": str(entry.own_test), "disabled": true})
 					var rolls: Array = entry.get("rolls", [])
 					for raw_roll in rolls:
 						var roll: Dictionary = raw_roll
@@ -276,7 +278,7 @@ func _render_encounter() -> void:
 	get_node(WORK + "Encounter/Secondary").visible = not _phone
 
 func _rolls_disabled() -> bool:
-	return not _can_edit or not bool(_data.get("rolls_available", false)) or not HEALTH.new().can_roll(_data) or _data.get("editing", false)
+	return not _can_edit or not bool(_data.get("rolls_available", false)) or not HEALTH.new().can_roll(_data) or _data.get("editing", false) or _data.get("roll_pending", false)
 
 func _render_inventory() -> void:
 	var pages = get_node(WORK + "Inventory")
@@ -306,10 +308,12 @@ func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
 			if str(item.get("inventory_id", "")) == id:
 				show_entry(item, opener)
 	else:
+		_focus_card = opener
 		roll_requested.emit(part, id)
 
 func show_entry(entry: Dictionary, opener: CARD_SCRIPT = null) -> void:
 	_health_reader = false
+	_roll_reader = false
 	_return_entry = str(entry.get("inventory_id", ""))
 	_focus_card = opener
 	_focus_source = false
@@ -332,6 +336,7 @@ func _source() -> Dictionary:
 
 func show_source() -> void:
 	_health_reader = false
+	_roll_reader = false
 	_return_entry = ""
 	_focus_card = null
 	_focus_source = true
@@ -353,7 +358,13 @@ func back() -> void:
 	reader_closed.emit()
 
 func _restore_return_focus() -> void:
-	if _health_reader:
+	if _roll_reader:
+		_roll_reader = false
+		if _return_roll == "armor" or _return_roll == "morale":
+			get_node(IDENTITY + "Vitals/" + ("Armor" if _return_roll == "armor" else "Morale")).grab_focus()
+		elif not focus_roll(_return_entry):
+			get_node(WORK + "Tabs/Encounter").grab_focus()
+	elif _health_reader:
 		get_node(IDENTITY + "Health").grab_focus()
 		_health_reader = false
 	elif _focus_source:
@@ -373,11 +384,12 @@ func show_chapter(chapter: int) -> void:
 	_chapter = clampi(chapter, 0, 2)
 	_reader = false
 	_health_reader = false
+	_roll_reader = false
 	_update_visibility()
 	chapter_changed.emit(_chapter)
 
 func _update_visibility() -> void:
-	(get_node(IDENTITY) as Control).visible = _editing or _health_reader and _reader or not (_phone and (_chapter == 2 or _reader))
+	(get_node(IDENTITY) as Control).visible = _editing or (_health_reader or _roll_reader) and _reader or not (_phone and (_chapter == 2 or _reader))
 	get_node(WORK + "Tabs").visible = not _reader
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not _reader
 	get_node(WORK + "InventoryAdd").visible = _chapter == 1 and not _reader and not _library and _can_edit
@@ -454,6 +466,7 @@ func restore_navigation(state: Dictionary) -> void:
 
 func open_reader(title: String, return_entry: String = "", correction_route: String = "") -> void:
 	_health_reader = false
+	_roll_reader = false
 	_focus_card = null
 	_focus_source = false
 	_return_entry = return_entry
@@ -473,6 +486,20 @@ func open_health_reader() -> HEALTH_EDITOR_SCRIPT:
 	get_node(WORK + "Reader/Pages/Area/Content").add_child(editor)
 	_update_visibility()
 	return editor
+
+func open_roll_reader(title: String, part: String, entry: String) -> void:
+	open_reader(title, entry)
+	_roll_reader = true
+	_return_roll = part
+	_update_visibility()
+
+func focus_roll(id: String) -> bool:
+	for lane in ["Primary", "Secondary"]:
+		for child in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+			var card := child as CARD_SCRIPT
+			if card != null and card.entry_id == id and card.restore_focus(_return_roll):
+				return true
+	return false
 
 func reader_content() -> Control:
 	return get_node(WORK + "Reader/Pages/Area/Content") as Control

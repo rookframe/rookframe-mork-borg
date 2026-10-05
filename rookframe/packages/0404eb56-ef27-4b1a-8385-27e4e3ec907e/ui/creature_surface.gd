@@ -9,6 +9,7 @@ const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 const REQUEST = preload(ROOT + "logic/action_request.gd")
+const ROLL_WORKFLOW = preload(ROOT + "ui/creature_roll_workflow.gd")
 const ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
@@ -19,6 +20,7 @@ const SEARCH = preload("res://rookframe/ui/components/forms/task_text_field.tscn
 const SEARCH_SCRIPT = preload("res://rookframe/ui/components/forms/text_field.gd")
 @export var navigation: Resource
 @onready var sheet: SHEET = get_node("Sheet")
+@onready var _roll_workflow: ROLL_WORKFLOW = get_node("RollWorkflow")
 var locale := I18N.new()
 var actor: SDK.Actor
 var _accepted: Dictionary = {}
@@ -52,7 +54,9 @@ var _health_pending := false
 var _health_epoch := 0
 var _health_feedback := ""
 var _health_attempt: Dictionary = {}
-var _rolls_available := false
+var _rolls_available := true
+var _roll_feedback := ""
+var _roll_refresh_pending := false
 var _nav: Dictionary = {}
 var _catalogue_query := ""
 var _catalogue_buttons: Array[Button] = []
@@ -66,6 +70,8 @@ func ready() -> void:
 	if sdk == null:
 		return
 	locale.bind(sdk)
+	_roll_workflow.configure(sdk, self)
+	_roll_workflow.changed.connect(_roll_changed)
 	sheet.close_requested.connect(_close)
 	sheet.entry_requested.connect(_entry)
 	sheet.inventory_add_requested.connect(_catalogue)
@@ -90,6 +96,7 @@ func ready() -> void:
 func opened(id: SDK.ActorId) -> void:
 	_end_portrait()
 	_end_health()
+	_roll_workflow.opened(id.value)
 	_portrait_feedback = ""
 	_correction_epoch += 1
 	_correction_feedback = ""
@@ -97,6 +104,9 @@ func opened(id: SDK.ActorId) -> void:
 	_draft.discard()
 	_validation = {}
 	_detail = ""
+	if _roll_workflow.has_action and _roll_workflow.source == id.value:
+		_detail = "roll"
+		_detail_pending = true
 	_edit_item = false
 	_new_item = {}
 	_catalogue_query = ""
@@ -130,6 +140,13 @@ func _world_changed() -> void:
 	_refresh_pending = true
 
 func _process(_delta: float) -> void:
+	_roll_workflow.display_active = is_visible_in_tree()
+	if _roll_refresh_pending:
+		_roll_refresh_pending = false
+		_roll_feedback = _roll_workflow.summary()
+		_render_pending = true
+		if actor != null and actor.id.value == _roll_workflow.source and _detail == "roll":
+			_detail_pending = true
 	if _refresh_pending and not _busy and actor != null:
 		_refresh_pending = false
 		var result := sdk.actors.read(actor.id)
@@ -192,11 +209,16 @@ func _render_accepted() -> void:
 	data["corrections_available"] = _corrections_available
 	data["health_available"] = _health_available
 	data["rolls_available"] = _rolls_available
+	data["roll_pending"] = _roll_live()
+	data["corrections_available"] = _corrections_available and not _roll_live()
+	data["health_available"] = _health_available and not _roll_live()
 	sheet.configure(data, locale, false, owner() and not _busy, _portrait(data))
 	sdk.windows.set_title(str(data.get("name", "Creature")))
 	sheet.status("Creature sheet · Owner" if owner() else "Creature sheet · Viewer")
 	if _portrait_pending:
 		sheet.status(_portrait_feedback)
+	elif not _roll_feedback.is_empty() and _detail == "roll":
+		sheet.status(_roll_feedback)
 	elif not _health_feedback.is_empty():
 		sheet.status(_health_feedback)
 	elif not _correction_feedback.is_empty():
@@ -231,6 +253,7 @@ func _render_accepted() -> void:
 	_remember()
 
 func _unavailable(message: String) -> void:
+	_roll_workflow.abandon()
 	sheet.visible = false
 	get_node("MiniatureWorkflow").visible = false
 	get_node("Unavailable").visible = true
@@ -250,6 +273,8 @@ func _custom() -> void:
 		_open_detail("custom")
 
 func _open_detail(route: String) -> void:
+	if _detail == "roll" and route != "roll":
+		_leave_roll()
 	_capture_detail()
 	_detail = route
 	_edit_item = false
@@ -257,6 +282,9 @@ func _open_detail(route: String) -> void:
 	_detail_pending = true
 
 func _render_detail() -> void:
+	if _detail == "roll":
+		_render_roll()
+		return
 	if _detail == "health":
 		_render_health()
 		return
@@ -556,6 +584,8 @@ func _remember() -> void:
 	navigation.remember(actor.id.value, _nav)
 
 func _reader_closed() -> void:
+	if _detail == "roll":
+		_leave_roll()
 	_capture_detail()
 	_detail = ""
 	_edit_item = false
@@ -563,6 +593,8 @@ func _reader_closed() -> void:
 	_remember()
 
 func _chapter_changed(_chapter: int) -> void:
+	if _detail == "roll":
+		_leave_roll()
 	_capture_detail()
 	_detail = ""
 	_fields.clear()
@@ -580,6 +612,7 @@ func restore_reconnect_state(state: Dictionary) -> void:
 	_remember()
 
 func _closed() -> void:
+	_roll_workflow.closed()
 	_end_portrait()
 	_end_health()
 	_correction_epoch += 1
@@ -600,7 +633,7 @@ func _close() -> void:
 	sdk.windows.close(load(ROOT + "ui/creature_surface.tres"))
 
 func _correct() -> void:
-	if not owner() or _busy or _draft.active:
+	if not owner() or _busy or _draft.active or _roll_live():
 		return
 	_health_feedback = ""
 	_portrait_feedback = ""
@@ -626,7 +659,7 @@ func _correct() -> void:
 	_open_correction("core")
 	correction_requested.emit()
 func _health() -> void:
-	if not owner() or _busy:
+	if not owner() or _busy or _roll_live():
 		return
 	if _draft.active:
 		_open_correction("core")
@@ -639,15 +672,48 @@ func _health() -> void:
 		_open_detail("health")
 		health_adjustment_requested.emit()
 func _roll(part: String, id: String) -> void:
-	if can_roll():
-		gameplay_roll_requested.emit(part, id)
+	if not can_roll():
+		return
+	_roll_feedback = ""
+	_detail = "roll"
+	_detail_pending = true
+	_render_pending = true
+	gameplay_roll_requested.emit(part, id)
+	await _roll_workflow.start(actor.id.value, part, id)
 
-## RFG-351 shares this accepted-state guard. Draft HP never determines death.
+## Accepted HP and transient presentation guards are shared with own-test followups.
 func is_dead() -> bool:
 	return HEALTH.new().is_dead(current_data())
 
 func can_roll() -> bool:
-	return owner() and not _busy and not _draft.active and HEALTH.new().can_roll(current_data())
+	return owner() and not _busy and not _draft.active and not _roll_live() and HEALTH.new().can_roll(current_data())
+
+func _roll_live() -> bool:
+	return _roll_workflow.pending
+
+func _roll_changed() -> void:
+	_roll_refresh_pending = true
+
+func _render_roll() -> void:
+	if not _roll_workflow.has_action or actor == null or actor.id.value != _roll_workflow.source:
+		return
+	var choice: Dictionary = _roll_workflow.snapshot.get("choice", {})
+	sheet.open_roll_reader(str(choice.get("label", "Creature roll")), str(choice.get("part", "")), str(choice.get("entry", "")))
+	_text(str(choice.get("name", "")))
+	if choice.has("formula"):
+		_text(locale.text("Formula") + ": " + str(choice.formula))
+	_text(_roll_workflow.summary())
+	if _roll_workflow.pending:
+		_text("Back cancels unfinished dice. Close preserves a running Roll.")
+	else:
+		_option("Done", sheet.back, true)
+
+func _leave_roll() -> void:
+	var unfinished := _roll_live()
+	_roll_workflow.abandon()
+	if unfinished:
+		_roll_feedback = _roll_workflow.message
+		sheet.status(_roll_feedback)
 
 func _render_health() -> void:
 	if not is_instance_valid(_health_editor):
@@ -724,7 +790,7 @@ func request_refresh() -> void:
 	_refresh_pending = true
 
 func operation_pending() -> bool:
-	return _busy
+	return _busy or _roll_live()
 
 ## Follow-up HP/roll adapters must use accepted current_data(), and guard this mode.
 func editing_sheet() -> bool:

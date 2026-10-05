@@ -117,3 +117,52 @@ valid signs, leading zeroes and above-maximum gameplay HP intact. Validation is
 atomic and field-local. Native rendering remains coalesced; portrait cache,
 Appearance pending behavior and correction/portrait epochs retain their separate
 boundaries.
+
+## Named Creature rolls
+
+Ordinary enemy attack rows offer Damage directly. Damage, Protection, fixed
+Morale and explicitly authored printed dice run through existing physical
+Window Dice and ordinary Action Log outcomes. They need no target, Player,
+source Rook, range, Dice Tray assembly or throw gesture. Complete special-rule
+prose stays manual; the action writes no Actor, target, loot or condition data.
+Armor rolls report protection only, and morale reports its captured threshold
+without applying a response. Ordinary enemies do not gain their own Attack or
+Defence test from Owner access or a printed opposing Player difficulty.
+
+`logic/creature_rolls.gd` resolves an accepted named capability and validates one
+supported dice pool plus its signed integer modifier. Each d2 is a physical d4
+face mapped independently (1–2 to 1, 3–4 to 2), then summed before the modifier.
+`2d2+3` with physical faces 3 and 3 is 7. Formula capacity validation prevents
+integer wrap; unsupported formulas stay readable and require correction/manual
+resolution. No arbitrary prose or generic dice-rule parser is introduced.
+The captured original formula remains intact. Equivalent normalized expressions
+keep outcome summaries concise; long identity excerpts and printable report
+text honor the SDK's UTF-16 title/text limits without limiting saved sheet data.
+
+Semantic `creature-roll.start` takes `id`, `source`, `part`, `entry`; the parts
+are `damage`, `armor`, `morale`, or `printed:<authored-roll-id>`. Authority checks
+the current initiating Participant session, fresh Owner access and accepted
+health, then captures Actor identity/name, capability identity/name, formula and
+physical plan. `advance`/`cancel` take the same action `id`. Immutable raw plan,
+faces, Participant and sequence are validated before one atomic empty-gameplay
+commit publishes the interpreted outcome. Repeated completion acknowledges the
+cached result. Failed storage ends that workflow without a report; abandoned
+or late raw results cannot publish. A recorded request from an earlier Authority
+lifetime cannot restart under the same identity.
+
+The authored `RollWorkflow` scene child owns the existing `melee_action` /
+`action_request` transport, polling and `sdk.dice.roll_requested(request, root)`.
+It exposes `pending`, `source`, `state`, `snapshot`, `summary()`, `start()` and
+`abandon()` to the coalesced sheet adapter. Owner/Edit/pending/accepted-health
+guards remain in that adapter and the fresh Authority boundary. Closing hides
+presentation and preserves a pending Roll; reopening its initiating Actor can
+present it again. Opening a different Actor cannot redirect that request. Back,
+chapter change or another workflow abandons unfinished dice. The reader retains
+identity/portrait on phone and restores the exact named opener after layout.
+
+RFG-352 extends named own-test eligibility and matching critical Damage context
+at these seams. Its controls remain inactive until that accepted boundary exists.
+One retained severe SDK case covers accepted-once/failed/late completion and
+independent data preservation; ordinary guards, localization and authored focus
+are disposable checks. RFG-354 still owns actual native dice, accepted logs,
+public Manifest acquisition and application persistence proof.
