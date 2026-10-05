@@ -7,6 +7,7 @@ const CARD = preload(ROOT + "ui/creature_rule_card.tscn")
 const CARD_SCRIPT = preload(ROOT + "ui/creature_rule_card.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
+const OWN = preload(ROOT + "logic/creature_own_tests.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const HEALTH_EDITOR = preload(ROOT + "ui/creature_health_editor.tscn")
 const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
@@ -180,10 +181,14 @@ func _build_groups(metadata: Dictionary) -> void:
 	_groups.clear()
 	var attacks: Array = _data.get("attacks", [])
 	var attack_entries: Array = []
+	var own := OWN.new().presentation(_data)
+	var own_attacks: Dictionary = own.attacks
+	var own_defence: Dictionary = own.defence
+	var defence_present := false
 	for index in range(attacks.size()):
 		var raw = attacks[index]
 		var attack: Dictionary = raw
-		attack_entries.append({"id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "text": str(attack.get("rules", "")), "dice": str(attack.get("dice", "")), "attack_dr": attack.get("attack_dr", null), "attack": true, "correction_route": "attack:%d" % index, "correction_identity": str(attack.get("correction_entry_id", "")) + "|" + str(attack.get("id", ""))})
+		attack_entries.append({"id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "text": str(attack.get("rules", "")), "dice": str(attack.get("dice", "")), "attack_dr": own_attacks.get(str(attack.get("id", ""))), "attack": true, "correction_route": "attack:%d" % index, "correction_identity": str(attack.get("correction_entry_id", "")) + "|" + str(attack.get("id", ""))})
 	if attack_entries.is_empty():
 		attack_entries.append({"id": "no-attacks", "name": "Attacks", "text": "No attacks recorded."})
 	_groups.append({"title": "Attacks", "lane": "primary", "entries": attack_entries})
@@ -206,7 +211,15 @@ func _build_groups(metadata: Dictionary) -> void:
 			entry["correction_route"] = "rule:%d" % rule_index
 			entry["correction_identity"] = str(entry.get("correction_entry_id", "")) + "|" + str(entry.get("id", ""))
 			rule_index += 1
+			if str(entry.get("own_test", "")) == "defence" and not own_defence.is_empty():
+				defence_present = true
+				entry["own_dr"] = own_defence.difficulty
+				# Refresh only these exact known authored defaults; custom prose stays intact.
+				if str(entry.get("text", "")) in ["Unmodified d20 against DR10.", "Unmodified d20 against DR12."]:
+					entry["text"] = _locale.text("Unmodified d20 against DR%d.") % int(own_defence.difficulty)
 		_groups.append(copy)
+	if not own_defence.is_empty() and not defence_present:
+		_groups.append({"title": "Own tests", "lane": "primary", "entries": [{"id": own_defence.entry, "name": "Defence", "own_test": "defence", "own_dr": own_defence.difficulty, "text": _locale.text("Unmodified d20 against DR%d.") % int(own_defence.difficulty)}]})
 	# Live corrections remain the sole accepted free rules text. Preserve unknown/custom rules.
 	if authored.is_empty() and (not str(_data.get("rules", "")).is_empty() or _editing):
 		_groups.append({"title": "Special rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Special rules", "text": str(_data.rules), "correction_route": "rules"}]})
@@ -257,15 +270,15 @@ func _render_encounter() -> void:
 					actions.append({"name": "Correct", "part": "correct:" + str(entry.correction_route), "disabled": not _can_edit})
 				if entry.get("attack", false):
 					if not _library and entry.get("attack_dr") != null:
-						actions.append({"name": "Attack", "part": "attack", "dice": "d20 / DR" + str(entry.attack_dr), "disabled": true})
+						actions.append({"name": "Attack", "part": "attack", "dice": "d20 / DR" + str(entry.attack_dr), "disabled": _rolls_disabled()})
 					if _library:
 						entry = entry.duplicate(true)
 						entry.text = (_locale.text("Attack") + " d20 / DR" + str(entry.attack_dr) + "\n" if entry.get("attack_dr") != null else "") + _locale.text("Damage") + " " + str(entry.dice) + ("\n" + str(entry.text) if not str(entry.text).is_empty() else "")
 					else:
 						actions.append({"name": "Damage", "part": "damage", "dice": str(entry.dice), "disabled": _rolls_disabled()})
 				if not _library:
-					if entry.has("own_test"):
-						actions.append({"name": str(entry.name), "part": str(entry.own_test), "disabled": true})
+					if entry.has("own_test") and entry.has("own_dr"):
+						actions.append({"name": "Defence", "part": str(entry.own_test), "dice": "d20 / DR" + str(entry.own_dr), "disabled": _rolls_disabled()})
 					var rolls: Array = entry.get("rolls", [])
 					for raw_roll in rolls:
 						var roll: Dictionary = raw_roll

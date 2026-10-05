@@ -140,7 +140,8 @@ keep outcome summaries concise; long identity excerpts and printable report
 text honor the SDK's UTF-16 title/text limits without limiting saved sheet data.
 
 Semantic `creature-roll.start` takes `id`, `source`, `part`, `entry`; the parts
-are `damage`, `armor`, `morale`, or `printed:<authored-roll-id>`. Authority checks
+are `damage`, `attack`, `defence`, `armor`, `morale`, or
+`printed:<authored-roll-id>`. Authority checks
 the current initiating Participant session, fresh Owner access and accepted
 health, then captures Actor identity/name, capability identity/name, formula and
 physical plan. `advance`/`cancel` take the same action `id`. Immutable raw plan,
@@ -160,9 +161,40 @@ present it again. Opening a different Actor cannot redirect that request. Back,
 chapter change or another workflow abandons unfinished dice. The reader retains
 identity/portrait on phone and restores the exact named opener after layout.
 
-RFG-352 extends named own-test eligibility and matching critical Damage context
-at these seams. Its controls remain inactive until that accepted boundary exists.
-One retained severe SDK case covers accepted-once/failed/late completion and
-independent data preservation; ordinary guards, localization and authored focus
+`logic/creature_own_tests.gd` determines separate flat own Attack/Defence tests
+from accepted rule/origin evidence. Hawk and Ancient gore-hound have explicit
+profiles. Dog/monkey require their actual nonempty `creation_id`; supported
+Belze/Nodh summons require nonempty `summoner_actor` and `summon_action` with
+`grant_source: Foul Psychopomp`; Zukuma requires the same origin pair with
+`grant_source: Book of boiling blood`. Access alone supplies none of these rules.
+Attack uses the accepted own `attack_dr` or retained flat DR12. Hawk/hound
+Defence uses their accepted own `defence_dr`; the supported enemy-derived
+summons use `24 - defence_dr` for their recorded opposing difficulty. Situational rules
+stay manual. Buttons, readers and outcomes show the current accepted own DR;
+only exact known default prose is refreshed, while custom prose stays intact.
+Granted profiles without an authored Defence row gain a presentation-only row.
+No Character ability, target information or Player defence readout is used.
+
+Own d20 natural 20/natural 1 report Critical/Fumble; other faces report the base
+comparison to captured DR, with modifiers and consequences explicitly manual.
+Attack never chains Damage. Each accepted Attack replaces its Actor's transient
+context, capturing the stable source attack ID, known correction tag, immutable
+named Damage formula/plan and Attack Raw Roll sequence. Matching Damage uses
+that initiating Damage choice; a critical doubles its complete result after each
+d2 face conversion and modifier. Integer overflow ends without acceptance.
+The context is consumed only after a matching Damage report commits; unrelated
+Damage remains ordinary, failures/retries cannot consume/report twice, and a
+newer accepted Attack prevents late pending Damage consuming the newer context.
+
+Known nonempty correction tags must match exactly; removal or changed tag
+invalidates the old context. Legacy untagged matching requires the same Actor
+and exact nonempty source attack ID still present, with no known replacement.
+The first semantic Edit preparation may bind its newly assigned tag, preserving
+the captured formula/plan. No label/index/access inference recovers unknown
+origin or identity history. Context is Authority-lifetime state, with no new
+World or Actor fields; restart does not reconstruct a preceding Attack.
+Two narrow retained severe SDK cases cover accepted-once/failed/late completion,
+critical identity/consumption and independent data preservation; ordinary guards,
+localization and authored focus
 are disposable checks. RFG-354 still owns actual native dice, accepted logs,
 public Manifest acquisition and application persistence proof.

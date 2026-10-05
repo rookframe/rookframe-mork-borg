@@ -2,9 +2,10 @@ extends RefCounted
 ## Named accepted Creature capabilities, independent of loot and targets.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
+const OWN = preload(ROOT + "logic/creature_own_tests.gd")
 
 func choice(data: Dictionary, part: String, entry: String) -> Dictionary:
-	if part == "damage":
+	if part in ["damage", "attack"]:
 		if typeof(data.get("attacks", [])) != TYPE_ARRAY:
 			return {}
 		var attacks: Array = data.get("attacks", [])
@@ -13,7 +14,26 @@ func choice(data: Dictionary, part: String, entry: String) -> Dictionary:
 				continue
 			var attack: Dictionary = raw
 			if str(attack.get("id", "")) == entry:
-				return _choice("Damage", str(attack.get("name", "Attack")), attack.get("dice"), part, entry, str(attack.get("correction_entry_id", "")) + "|" + entry)
+				var identity := str(attack.get("correction_entry_id", "")) + "|" + entry
+				var damage := _choice("Damage", str(attack.get("name", "Attack")), attack.get("dice"), "damage", entry, identity)
+				if not damage.is_empty():
+					damage["correction_id"] = str(attack.get("correction_entry_id", ""))
+				if part == "damage":
+					return damage
+				var own := OWN.new().attack(data, attack)
+				if own.is_empty():
+					return {}
+				var chosen := _choice("Attack", str(attack.get("name", "Attack")), "d20", part, entry, identity)
+				chosen["difficulty"] = own.difficulty
+				chosen["damage"] = damage
+				chosen["correction_id"] = str(attack.get("correction_entry_id", ""))
+				return chosen
+	elif part == "defence":
+		var own := OWN.new().defence(data)
+		if not own.is_empty() and str(own.entry) == entry:
+			var chosen := _choice("Defence", str(own.name), "d20", part, entry, str(own.correction_id) + "|" + entry)
+			chosen["difficulty"] = own.difficulty
+			return chosen
 	elif part == "armor":
 		if typeof(data.get("armor", {})) != TYPE_DICTIONARY:
 			return {}
@@ -92,10 +112,21 @@ func total(plan: Dictionary, faces: Array[int]) -> int:
 		result += int((face + 1) / 2) if int(plan.faces) == 2 else face
 	return result + int(plan.modifier)
 
-func text(choice: Dictionary, value: int, sequence: int) -> String:
+func outcome(choice: Dictionary, face: int) -> String:
+	if face == 1:
+		return "Fumble"
+	if face == 20:
+		return "Critical"
+	return "Base succeeds" if face >= int(choice.difficulty) else "Base fails"
+
+func text(choice: Dictionary, value: int, sequence: int, critical: bool = false) -> String:
 	var label := str(choice.label)
 	var formula := str(choice.normalized)
 	var result := "%s: %s = %d. Raw Roll #%d." % [label, formula, value, sequence]
+	if choice.part in ["attack", "defence"]:
+		return "%s: d20 %d, DR%d — %s. Raw Roll #%d. Apply table modifiers and resolve consequences manually." % [label, value, int(choice.difficulty), outcome(choice, value), sequence]
+	if critical:
+		result += " Matching Attack critical: damage doubled."
 	var plan: Dictionary = choice.plan
 	if int(plan.faces) == 2:
 		result += " Physical d4 faces map 1–2 to 1 and 3–4 to 2 before the modifier."
