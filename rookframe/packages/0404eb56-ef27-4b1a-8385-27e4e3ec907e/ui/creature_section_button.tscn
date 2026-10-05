@@ -6,3 +6,4 @@ size_flags_vertical = 0
 toggle_mode = true
 clip_text = false
 theme_override_font_sizes/font_size = 11
+theme_override_colors/font_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
