@@ -79,6 +79,10 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_bottom", 4 if phone else 5 if _tablet else 6)
 			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_left", 2 if phone or _tablet else 4)
 			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_right", 2 if phone or _tablet else 4)
+			var minimum_height := button.custom_minimum_size.y
+			var value_label: Label = button.get_node("Inset/Row/Copy/Value")
+			value_label.resized.connect(_queue_fit_cell.bind(button, minimum_height))
+			_queue_fit_cell(button, minimum_height)
 			button.disabled = passive or bool(action.get("disabled", false))
 		else:
 			button.text = caption
@@ -96,6 +100,17 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 		host.add_child(space)
 	get_node("Content/Resolution").visible = not actions.is_empty()
 	get_node("Content/ResolutionGap").visible = not actions.is_empty()
+
+func _queue_fit_cell(button: Button, minimum_height: float) -> void:
+	_fit_cell.call_deferred(button, minimum_height)
+
+func _fit_cell(button: Button, minimum_height: float) -> void:
+	if not is_instance_valid(button):
+		return
+	# The Button is an indivisible pager item. Let its authored Containers fit
+	# the complete wrapped value, retaining the normal row and all its padding.
+	var inset: MarginContainer = button.get_node("Inset")
+	button.custom_minimum_size = Vector2(44, maxf(minimum_height, inset.get_combined_minimum_size().y))
 
 func _action_requested(part: String) -> void:
 	requested.emit(part, entry_id)

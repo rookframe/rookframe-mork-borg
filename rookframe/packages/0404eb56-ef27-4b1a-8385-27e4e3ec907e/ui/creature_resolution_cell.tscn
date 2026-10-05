@@ -35,6 +35,7 @@ theme_override_font_sizes/font_size = 11
 theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
 [node name="Value" type="Label" parent="Inset/Row/Copy"]
 layout_mode = 2
+autowrap_mode = 3
 theme_override_fonts/font = ExtResource("value")
 theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.266667,0.913725,0.913725,1)
