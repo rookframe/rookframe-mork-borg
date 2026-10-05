@@ -31,17 +31,26 @@ func sync_draft_value(value: String) -> void:
 		get_node(^"Value").value = value
 		get_node(^"Text").value = value
 		_setting = false
+	_refresh_error_copy()
 
 func _typed(text: String) -> void:
 	if not _setting:
 		get_node(^"Value").error_text = ""
 		get_node(^"Text").error_text = ""
+		_refresh_error_copy()
 		changed.emit(_field, text)
 
 func show_error(message: String) -> void:
 	get_node(^"Value").error_text = message
 	get_node(^"Text").error_text = message
+	_refresh_error_copy()
 	_focus_editor.call_deferred()
+
+func _refresh_error_copy() -> void:
+	# Keep the public field's validation/accessibility state; this Creature copy
+	# already contains its complete localized message.
+	get_node(^"Value/Error").text = get_node(^"Value").error_text
+	get_node(^"Text/Error").text = get_node(^"Text").error_text
 
 func _focus_editor() -> void:
 	if _multiline:
@@ -77,3 +86,4 @@ func configure_density(phone: bool) -> void:
 func set_editor_pending(active: bool) -> void:
 	get_node(^"Value").editable = not active
 	get_node(^"Text").editable = not active
+	_refresh_error_copy()
