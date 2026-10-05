@@ -35,7 +35,11 @@ func test_world_default_is_copied_only_to_new_creatures_and_survives_new_impleme
 	assert_str(sdk.world_data.read().value.unrelated).is_equal("retained")
 	await sdk.system_actions.submit("miniature.default", {"definition": "seth-goblin", "package_id": "", "local_id": ""})
 	var third := await sdk.system_actions.submit("miniature.create", {"definition": "seth-goblin"})
-	assert_dict(sdk.actors.read(SDK.ActorId.new(str(third.value.actor))).actor.data.preferred_miniature).is_equal({"package_id": "fbf21a78-626e-4f35-b2ce-bd196083d9b7", "local_id": "goblin"})
+	assert_dict(sdk.actors.read(SDK.ActorId.new(str(third.value.actor))).actor.data.preferred_miniature).is_empty()
+	assert_bool(host.world_data.creature_miniatures.has("seth-goblin")).is_true()
+	assert_dict(host.world_data.creature_miniatures["seth-goblin"]).is_empty()
+	assert_dict(sdk.actors.read(first_id).actor.data.preferred_miniature).is_equal(GOBLIN)
+	assert_dict(sdk.actors.read(SDK.ActorId.new(str(second.value.actor))).actor.data.preferred_miniature).is_equal(WARDEN)
 
 func test_refusals_preserve_world_defaults_and_actor_choice() -> void:
 	var host := _host()
@@ -80,6 +84,10 @@ func test_external_actor_choice_places_in_current_scene_and_changes_only_selecte
 	assert_str(sdk.rooks.read(first.rook.id).rook.miniature.local_id).is_equal("warden")
 	assert_bool(sdk.rooks.read(first.rook.id).rook.hidden).is_true()
 	assert_str(sdk.rooks.read(second.rook.id).rook.miniature.local_id).is_equal("goblin")
+	var rooks := host.placed.duplicate(true)
+	assert_bool((await actions.set_actor(id, {})).ok).is_true()
+	assert_dict(sdk.actors.read(id).actor.data.preferred_miniature).is_empty()
+	assert_dict(host.placed).is_equal(rooks)
 
 func test_picker_russian_selection_cancel_and_failed_save_keep_actor_unchanged() -> void:
 	var host := _host()
@@ -117,6 +125,7 @@ func test_application_defaults_and_explicit_choices() -> void:
 		assert_str(definitions.new().effective_miniature({"definition_id": entry[0]}).local_id).is_equal(entry[1])
 	assert_str(definitions.new().effective_miniature({"definition_id": "arbint-troll"}).local_id).is_equal("default-miniature")
 	assert_str(definitions.new().effective_miniature({}).local_id).is_equal("default-miniature")
+	assert_str(definitions.new().effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": {}}).local_id).is_equal("default-miniature")
 	assert_dict(definitions.new().effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": WARDEN})).is_equal(WARDEN)
 	assert_dict(definitions.new().effective_miniature({"preferred_miniature": {"package_id": "missing", "local_id": "saved"}})).is_equal({"package_id": "missing", "local_id": "saved"})
 

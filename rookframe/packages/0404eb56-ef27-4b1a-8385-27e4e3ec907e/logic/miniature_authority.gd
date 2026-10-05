@@ -30,10 +30,8 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 		var reference: Dictionary = {} if package_id.is_empty() and local_id.is_empty() else {"package_id": package_id, "local_id": local_id}
 		if not reference.is_empty() and not _available(sdk, reference):
 			return _error("This Miniature is unavailable. Choose another.")
-		if reference.is_empty():
-			defaults.erase(definition)
-		else:
-			defaults[definition] = {"package_id": str(reference.package_id), "local_id": str(reference.local_id)}
+		# Empty is an explicit None choice, distinct from an absent World override.
+		defaults[definition] = reference.duplicate(true)
 		world["creature_miniatures"] = defaults
 		var result := context.commit_world_data(world)
 		return {"state": "resolved", "message": "Library Miniature saved."} if result.ok else _error(result.message)

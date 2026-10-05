@@ -32,6 +32,7 @@ var _detail_pages: Dictionary = {}
 var _busy := false
 var _portrait_pending := false
 var _portrait_epoch := 0
+var _appearance_session := ""
 var _portrait_path := ""
 var _portrait_texture: Texture2D
 var _portrait_error := ""
@@ -66,6 +67,8 @@ signal correction_requested
 signal health_adjustment_requested
 signal gameplay_roll_requested(part: String, id: String)
 
+@onready var _miniature_picker := get_node(^"MiniatureWorkflow")
+
 func ready() -> void:
 	if sdk == null:
 		return
@@ -88,13 +91,18 @@ func ready() -> void:
 	sheet.cancel_requested.connect(_cancel_edit)
 	sheet.health_requested.connect(_health)
 	sheet.roll_requested.connect(_roll)
-	get_node("MiniatureWorkflow").closed.connect(_picker_closed)
+	_miniature_picker.closed.connect(_picker_closed)
 	get_node("Unavailable/Inset/Content/Close").pressed.connect(_close)
 	closed.connect(_closed)
 	sdk.world_changed.connect(_world_changed)
 
 func opened(id: SDK.ActorId) -> void:
 	_end_portrait()
+	if _appearance_session != sdk.context().session_id:
+		_portrait_path = ""
+		_portrait_texture = null
+		_portrait_error = ""
+	_appearance_session = sdk.context().session_id
 	_end_health()
 	_roll_workflow.opened(id.value)
 	_portrait_feedback = ""
@@ -111,7 +119,7 @@ func opened(id: SDK.ActorId) -> void:
 	_new_item = {}
 	_catalogue_query = ""
 	_fields.clear()
-	get_node("MiniatureWorkflow").visible = false
+	_miniature_picker.discard()
 	var result := sdk.actors.read(id)
 	if not result.ok or result.actor == null:
 		actor = null
@@ -137,6 +145,9 @@ func current_data() -> Dictionary:
 	return _accepted.duplicate(true) if actor != null else {}
 
 func _world_changed() -> void:
+	if sdk.context().session_id != _appearance_session:
+		_end_portrait()
+		_portrait_feedback = "This session has ended."
 	_refresh_pending = true
 
 func _process(_delta: float) -> void:
@@ -194,9 +205,6 @@ func _refresh() -> void:
 func _render_accepted() -> void:
 	if actor == null:
 		return
-	if not owner() and get_node("MiniatureWorkflow").visible:
-		get_node("MiniatureWorkflow").visible = false
-		sheet.visible = true
 	var data := current_data()
 	if not owner():
 		_draft.discard()
@@ -255,7 +263,6 @@ func _render_accepted() -> void:
 func _unavailable(message: String) -> void:
 	_roll_workflow.abandon()
 	sheet.visible = false
-	get_node("MiniatureWorkflow").visible = false
 	get_node("Unavailable").visible = true
 	get_node("Unavailable/Inset/Content/Message").text = locale.text(message if not message.is_empty() else "Private Creature data is unavailable.")
 	get_node("Unavailable/Inset/Content/Close").text = locale.text("Close")
@@ -449,30 +456,38 @@ func _mutate(operation: String, arguments: Array) -> void:
 func _choose_miniature() -> void:
 	if not owner() or _busy:
 		return
-	sheet.visible = false
+	var picker := _miniature_picker
+	var result := sdk.windows.push(self, picker, locale.text("Choose Miniature"))
+	if not result.ok:
+		sheet.status(result.message)
+		return
 	var data := current_data()
 	var saved: Dictionary = data.get("preferred_miniature", {})
-	get_node("MiniatureWorkflow").open(sdk, locale, actor.id, "", saved)
-	get_node("MiniatureWorkflow/Actions/Back").text = locale.text("Cancel")
+	picker.open(sdk, locale, actor.id, "", saved)
 
-func _picker_closed(_saved: bool) -> void:
-	sheet.visible = true
+func _picker_closed() -> void:
+	sheet.status("")
 	_refresh_pending = true
-	sheet.focus_miniature()
+	sheet.focus_miniature.call_deferred()
 
 func _clear_miniature() -> void:
 	if not owner() or _busy:
 		return
 	_busy = true
-	var id := actor.id.value
-	var result := await MINIATURES.new(sdk).set_actor(actor.id, {})
+	_portrait_pending = true
+	var id := actor.id
+	var epoch := _portrait_epoch
+	var result := await MINIATURES.new(sdk).set_actor(id, {})
+	if not _appearance_current(id, epoch):
+		return
 	_busy = false
-	if actor != null and actor.id.value == id:
+	_portrait_pending = false
+	if actor != null:
 		if result.ok:
 			actor = result.actor
 		_refresh()
-		if not result.ok:
-			sheet.status(result.message)
+		sheet.status("Appearance updated." if result.ok else result.message)
+		sheet.focus_miniature.call_deferred()
 
 func _portrait(data: Dictionary) -> Texture2D:
 	var value: Variant = data.get("portrait", "")
@@ -513,7 +528,7 @@ func _choose_portrait() -> void:
 	_refresh()
 	sheet.status(_portrait_feedback)
 	var selected := await sdk.portraits.choose()
-	if epoch != _portrait_epoch or actor == null or actor.id.value != id.value:
+	if not _appearance_current(id, epoch):
 		return
 	if not selected.ok:
 		_portrait_pending = false
@@ -522,6 +537,12 @@ func _choose_portrait() -> void:
 		_portrait_feedback = selected.message if selected.code != "cancelled" else ""
 		_refresh()
 		sheet.focus_portrait.call_deferred()
+		return
+	var latest := sdk.actors.read(id)
+	if not latest.ok or latest.actor == null or latest.actor.access_level != "Owner":
+		_end_portrait()
+		_refresh_pending = true
+		_portrait_feedback = "Owner access is required to change this Creature’s portrait."
 		return
 	await _save_portrait(id, selected.path, expected, revision, epoch)
 
@@ -543,7 +564,7 @@ func _save_portrait(id: SDK.ActorId, path: String, expected: String, revision: i
 	_portrait_feedback = "Saving portrait…"
 	sheet.status(_portrait_feedback)
 	var result := await ITEMS.new(sdk, id).set_portrait(path, expected, revision)
-	if epoch != _portrait_epoch or actor == null or actor.id.value != id.value:
+	if not _appearance_current(id, epoch):
 		return
 	_portrait_pending = false
 	_busy = false
@@ -553,6 +574,9 @@ func _save_portrait(id: SDK.ActorId, path: String, expected: String, revision: i
 	_refresh_pending = true
 	_refresh()
 	sheet.focus_portrait.call_deferred()
+
+func _appearance_current(id: SDK.ActorId, epoch: int) -> bool:
+	return epoch == _portrait_epoch and actor != null and actor.id.value == id.value and sdk.context().session_id == _appearance_session
 
 func _end_portrait() -> void:
 	_portrait_epoch += 1
@@ -633,7 +657,7 @@ func _closed() -> void:
 	_draft.discard()
 	_validation = {}
 	sheet.configure_draft({}, false)
-	get_node("MiniatureWorkflow").visible = false
+	_miniature_picker.discard()
 	sheet.visible = true
 	_detail = ""
 	_edit_item = false
@@ -778,8 +802,8 @@ func _end_health() -> void:
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if is_visible_in_tree() and not _busy and event.is_action_pressed("ui_cancel"):
-		if get_node("MiniatureWorkflow").visible:
-			get_node("MiniatureWorkflow")._cancel()
+		if _miniature_picker.visible:
+			_miniature_picker._cancel()
 		elif _draft.active:
 			_cancel_edit()
 		else:

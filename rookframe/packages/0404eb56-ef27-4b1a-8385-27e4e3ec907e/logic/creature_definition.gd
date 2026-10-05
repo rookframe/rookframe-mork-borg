@@ -37,6 +37,9 @@ func effective_miniature(data: Dictionary) -> Dictionary:
 	var preferred: Dictionary = data.get("preferred_miniature", {})
 	if not preferred.is_empty():
 		return preferred.duplicate(true)
+	# A cleared assignment must not resurrect the definition's authored Miniature.
+	if data.has("preferred_miniature"):
+		return {"package_id": ROOKFRAME_CONTENT, "local_id": "default-miniature"}
 	var authored := default_miniature(str(data.get("definition_id", "")))
 	return authored if not authored.is_empty() else {"package_id": ROOKFRAME_CONTENT, "local_id": "default-miniature"}
 

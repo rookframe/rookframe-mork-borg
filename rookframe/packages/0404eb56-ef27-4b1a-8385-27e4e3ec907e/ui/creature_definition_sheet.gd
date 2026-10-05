@@ -7,11 +7,15 @@ const LIBRARY = preload(ROOT + "ui/creature_library.gd")
 var i18n := I18N.new()
 var _definition: SDK.ContentReference
 var _busy := false
-var _portrait_pending := false
 var _portrait_epoch := 0
+var _appearance_session := ""
+var _world: Dictionary = {}
+var _world_error := ""
 var _portrait_path := ""
 var _portrait_texture: Texture2D
 var _portrait_error := ""
+
+@onready var _miniature_picker := get_node(^"MiniatureWorkflow")
 
 func ready() -> void:
 	if sdk == null:
@@ -26,21 +30,32 @@ func ready() -> void:
 	sheet.portrait_reset_requested.connect(_reset_portrait)
 	sheet.publication_requested.connect(_publication)
 	sheet.chapter_changed.connect(_chapter_changed)
-	get_node("MiniatureWorkflow").closed.connect(_miniature_closed)
+	_miniature_picker.closed.connect(_miniature_closed)
 	if not sdk.world_changed.is_connected(_refresh):
 		sdk.world_changed.connect(_refresh)
-	closed.connect(_end_portrait)
+	closed.connect(_closed)
 
 func opened_definition(definition: SDK.ContentReference) -> void:
-	_end_portrait()
+	_end_appearance()
 	_definition = definition
+	if _appearance_session != sdk.context().session_id:
+		_portrait_path = ""
+		_portrait_texture = null
+		_portrait_error = ""
+	_appearance_session = sdk.context().session_id
+	_world = {}
 	get_node("Sheet").visible = true
-	get_node("MiniatureWorkflow").visible = false
+	_miniature_picker.discard()
 	_refresh()
 
 func _refresh() -> void:
 	if _definition == null or sdk == null:
 		return
+	if sdk.context().session_id != _appearance_session:
+		_end_appearance()
+		get_node("Sheet").status("This session has ended.")
+		return
+	_read_defaults()
 	var found := sdk.content.read(_definition)
 	if not found.ok:
 		get_node("Sheet").status(found.message)
@@ -52,13 +67,15 @@ func _refresh() -> void:
 	for key in ["classification", "rule_groups", "reference", "source"]:
 		data[key] = metadata.get(key, data.get(key))
 	data.name = found.content_entry.localized_title
-	get_node("Sheet").configure(data, i18n, true, not _busy and sdk.context().is_gm and found.content_entry.available, _portrait())
-	if not _portrait_error.is_empty():
+	get_node("Sheet").configure(data, i18n, true, not _busy and _world_error.is_empty() and sdk.context().is_gm and found.content_entry.available, _portrait())
+	if not _world_error.is_empty():
+		get_node("Sheet").status(_world_error)
+	elif not _portrait_error.is_empty():
 		get_node("Sheet").status(_portrait_error)
 	_refresh_appearance.call_deferred()
 
 func _refresh_appearance() -> void:
-	if _definition == null or sdk == null:
+	if _definition == null or sdk == null or not _world_error.is_empty():
 		return
 	var reference := _miniature()
 	var content := sdk.content.read(SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", ""))))
@@ -76,9 +93,7 @@ func _refresh_appearance() -> void:
 			sheet.status(summary.message)
 
 func _miniature() -> Dictionary:
-	var saved := sdk.world_data.read()
-	var data: Dictionary = saved.value.duplicate(true) if saved.ok and typeof(saved.value) == TYPE_DICTIONARY else {}
-	var defaults: Dictionary = data.get("creature_miniatures", {})
+	var defaults: Dictionary = _world.get("creature_miniatures", {})
 	var id := str(_definition.local_id)
 	if defaults.has(id):
 		var reference: Dictionary = defaults.get(id, {})
@@ -91,31 +106,42 @@ func _queue_create() -> void:
 	_create.call_deferred()
 
 func _create() -> void:
-	if _busy or _definition == null:
+	if _busy or not _can_edit():
 		return
+	var definition := _definition.local_id
+	var epoch := _portrait_epoch
 	_busy = true
 	_refresh()
-	var result := await LIBRARY.new(sdk).create(_definition)
+	var result := await LIBRARY.new(sdk).create(_definition, null, Vector2(0, 0), false)
+	if not _appearance_current(definition, epoch):
+		return
 	_busy = false
 	get_node("Sheet").status("Actor created." if result.ok else result.message)
 	_refresh()
+	if result.ok and _can_edit():
+		sdk.windows.open_actor(preload(ROOT + "ui/creature_surface.tres"), result.actor.id)
 
 func _choose() -> void:
-	if _busy or not sdk.context().is_gm:
+	if _busy or not _can_edit():
 		return
-	get_node("Sheet").visible = false
-	get_node("MiniatureWorkflow").open(sdk, i18n, null, _definition.local_id, _miniature())
-	get_node("MiniatureWorkflow/Actions/Back").text = i18n.text("Cancel")
+	var picker := _miniature_picker
+	var result := sdk.windows.push(self, picker, i18n.text("Choose Miniature"))
+	if not result.ok:
+		get_node("Sheet").status(result.message)
+		return
+	picker.open(sdk, i18n, null, _definition.local_id, _miniature())
 
-func _miniature_closed(_saved: bool) -> void:
-	get_node("Sheet").visible = true
+func _miniature_closed() -> void:
+	get_node("Sheet").status("")
 	_refresh()
-	get_node("Sheet").focus_miniature()
+	get_node("Sheet").focus_miniature.call_deferred()
+
+func _closed() -> void:
+	_end_appearance()
+	_miniature_picker.discard()
 
 func _portrait() -> Texture2D:
-	var saved := sdk.world_data.read()
-	var world: Dictionary = saved.value if saved.ok and typeof(saved.value) == TYPE_DICTIONARY else {}
-	var defaults: Dictionary = world.get("creature_portraits", {}) if typeof(world.get("creature_portraits", {})) == TYPE_DICTIONARY else {}
+	var defaults: Dictionary = _world.get("creature_portraits", {})
 	var value: Variant = defaults.get(str(_definition.local_id), "")
 	var path: String = value if typeof(value) == TYPE_STRING else ""
 	if path != _portrait_path:
@@ -138,20 +164,18 @@ func _portrait() -> Texture2D:
 	return _portrait_texture
 
 func _choose_portrait() -> void:
-	if _busy or _definition == null or not sdk.context().is_gm:
+	if _busy or not _can_edit():
 		return
 	var definition := _definition.local_id
 	var expected := _default_portrait_choice()
 	var epoch := _portrait_epoch
-	_portrait_pending = true
 	_busy = true
 	_refresh()
 	get_node("Sheet").status("Choosing portrait…")
 	var selected := await sdk.portraits.choose()
-	if epoch != _portrait_epoch or _definition == null or _definition.local_id != definition:
+	if not _appearance_current(definition, epoch):
 		return
 	if not selected.ok:
-		_portrait_pending = false
 		_busy = false
 		if selected.code == "cancelled":
 			get_node("Sheet").status("")
@@ -160,13 +184,17 @@ func _choose_portrait() -> void:
 		if selected.code != "cancelled":
 			get_node("Sheet").status(selected.message)
 		return
+	if not _can_edit():
+		_end_appearance()
+		get_node("Sheet").status("Appearance is no longer editable.")
+		_refresh()
+		return
 	await _save_portrait(definition, selected.path, expected, epoch)
 
 func _reset_portrait() -> void:
-	if _busy or _definition == null or not sdk.context().is_gm:
+	if _busy or not _can_edit():
 		return
 	var expected := _default_portrait_choice()
-	_portrait_pending = true
 	_busy = true
 	_refresh()
 	await _save_portrait(_definition.local_id, "", expected, _portrait_epoch)
@@ -174,31 +202,34 @@ func _reset_portrait() -> void:
 func _save_portrait(definition: String, path: String, expected: Dictionary, epoch: int) -> void:
 	get_node("Sheet").status("Saving portrait…")
 	var result := await sdk.system_actions.submit("creature-appearance.default-portrait", {"definition": definition, "path": path, "expected": expected.path, "expected_revision": expected.revision})
-	if epoch != _portrait_epoch or _definition == null or _definition.local_id != definition:
+	if not _appearance_current(definition, epoch):
 		return
-	_portrait_pending = false
 	_busy = false
 	_refresh()
 	var outcome: Dictionary = result.value if result.ok else {}
 	get_node("Sheet").status(str(outcome.get("message", "")) if result.ok else result.message)
 	get_node("Sheet").focus_portrait.call_deferred()
 
-func _end_portrait() -> void:
+func _end_appearance() -> void:
 	_portrait_epoch += 1
-	if _portrait_pending:
-		_busy = false
-	_portrait_pending = false
+	_busy = false
 
 func _clear() -> void:
-	if _busy or not sdk.context().is_gm:
+	if _busy or not _can_edit():
 		return
+	var definition := _definition.local_id
+	var epoch := _portrait_epoch
 	_busy = true
 	_refresh()
-	var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition.local_id, "package_id": "", "local_id": ""})
+	get_node("Sheet").status("Saving Miniature…")
+	var result := await sdk.system_actions.submit("miniature.default", {"definition": definition, "package_id": "", "local_id": ""})
+	if not _appearance_current(definition, epoch):
+		return
 	var outcome: Dictionary = result.value if result.ok else {}
-	get_node("Sheet").status(result.message if not result.ok else str(outcome.get("message", "")))
 	_busy = false
 	_refresh()
+	get_node("Sheet").status(result.message if not result.ok else str(outcome.get("message", "")))
+	get_node("Sheet").focus_miniature.call_deferred()
 
 func _publication(url: String) -> void:
 	var result := await sdk.browser.open(url)
@@ -206,22 +237,67 @@ func _publication(url: String) -> void:
 		get_node("Sheet").status(result.message)
 
 func _close() -> void:
-	_end_portrait()
+	_end_appearance()
 	var surface := SDK.ExtensionSurface.new()
 	surface.scene = load(ROOT + "ui/creature_definition_sheet.tscn")
 	sdk.windows.close(surface)
 
 func _input(event: InputEvent) -> void:
-	if is_visible_in_tree() and get_node("MiniatureWorkflow").visible and event.is_action_pressed("ui_cancel"):
-		get_node("MiniatureWorkflow")._cancel()
+	if is_visible_in_tree() and _miniature_picker.visible and event.is_action_pressed("ui_cancel"):
+		_miniature_picker._cancel()
 		accept_event()
 
 func _chapter_changed(_chapter: int) -> void:
 	_refresh_appearance()
 
 func _default_portrait_choice() -> Dictionary:
-	var saved := sdk.world_data.read()
-	var world: Dictionary = saved.value if saved.ok and typeof(saved.value) == TYPE_DICTIONARY else {}
-	var defaults: Dictionary = world.get("creature_portraits", {}) if typeof(world.get("creature_portraits", {})) == TYPE_DICTIONARY else {}
-	var revisions: Dictionary = world.get("creature_portrait_revisions", {}) if typeof(world.get("creature_portrait_revisions", {})) == TYPE_DICTIONARY else {}
+	var defaults: Dictionary = _world.get("creature_portraits", {})
+	var revisions: Dictionary = _world.get("creature_portrait_revisions", {})
 	return {"path": str(defaults.get(str(_definition.local_id), "")), "revision": int(revisions.get(str(_definition.local_id), 0))}
+
+func _read_defaults() -> void:
+	var saved := sdk.world_data.read()
+	_world_error = ""
+	if not saved.ok:
+		_world_error = saved.message
+		return
+	if saved.value != null and typeof(saved.value) != TYPE_DICTIONARY:
+		_world_error = "Appearance defaults are unavailable."
+		return
+	var world: Dictionary = {} if saved.value == null else saved.value.duplicate(true)
+	if not _valid_defaults(world, _definition.local_id):
+		_world_error = "Appearance defaults are unavailable."
+		return
+	_world = world.duplicate(true)
+
+func _valid_defaults(world: Dictionary, id: String) -> bool:
+	for key in ["creature_miniatures", "creature_portraits", "creature_portrait_revisions"]:
+		if not world.has(key):
+			continue
+		var values: Variant = world.get(key)
+		if typeof(values) != TYPE_DICTIONARY:
+			return false
+		var choices: Dictionary = values
+		if not choices.has(id):
+			continue
+		var choice: Variant = choices.get(id)
+		if key == "creature_miniatures" and typeof(choice) != TYPE_DICTIONARY:
+			return false
+		if key == "creature_portraits" and typeof(choice) != TYPE_STRING:
+			return false
+		if key == "creature_portrait_revisions" and typeof(choice) != TYPE_INT:
+			return false
+	return true
+
+func _can_edit() -> bool:
+	if _definition == null or not sdk.context().is_gm or sdk.context().session_id != _appearance_session:
+		return false
+	_read_defaults()
+	if not _world_error.is_empty():
+		get_node("Sheet").status(_world_error)
+		return false
+	var found := sdk.content.read(_definition)
+	return found.ok and found.content_entry.available
+
+func _appearance_current(definition: String, epoch: int) -> bool:
+	return epoch == _portrait_epoch and _definition != null and _definition.local_id == definition and sdk.context().session_id == _appearance_session
