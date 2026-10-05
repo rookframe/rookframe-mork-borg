@@ -1555,6 +1555,7 @@ messages = {
 [&"", &"No Miniatures in this World."]: [&"В этом мире нет миниатюр."],
 "Published source is unavailable.": "Опубликованный источник недоступен.",
 "Full identity": "Полное имя и описание",
-"Not recorded": "Не указано"
+"Not recorded": "Не указано",
+"Heal Creature HP": "Вылечить"
 }
 locale = "ru"

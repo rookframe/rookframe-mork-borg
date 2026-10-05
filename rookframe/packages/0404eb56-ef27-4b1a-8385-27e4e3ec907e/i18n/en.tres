@@ -1555,5 +1555,6 @@ messages = {
 [&"", &"No Miniatures in this World."]: [&"No Miniatures in this World."],
 "Published source is unavailable.": "Published source is unavailable.",
 "Full identity": "Full identity",
-"Not recorded": "Not recorded"
+"Not recorded": "Not recorded",
+"Heal Creature HP": "Heal"
 }

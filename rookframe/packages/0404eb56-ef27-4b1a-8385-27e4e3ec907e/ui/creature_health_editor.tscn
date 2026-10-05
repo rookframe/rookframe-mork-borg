@@ -124,9 +124,15 @@ theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
 autowrap_mode = 3
 text = "SETH"
-[node name="Title" type="Label" parent="Panel/Inset/Layout/Content/Header/Inset/Row/Copy"]
+[node name="TitleBox" type="Control" parent="Panel/Inset/Layout/Content/Header/Inset/Row/Copy"]
 layout_mode = 2
 custom_minimum_size = Vector2(0,30)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Panel/Inset/Layout/Content/Header/Inset/Row/Copy/TitleBox"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 25
 theme_override_constants/line_spacing = 3
