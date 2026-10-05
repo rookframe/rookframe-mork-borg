@@ -1519,6 +1519,8 @@ messages = {
 [&"", &"The portrait's World Session ended."]: [&"Сессия мира этого портрета завершена."],
 [&"", &"The portrait upload could not start."]: [&"Не удалось начать загрузку портрета."],
 [&"", &"The portrait transfer ended before the complete file arrived."]: [&"Передача портрета прервалась до получения полного файла."],
-[&"", &"Portrait upload cancelled."]: [&"Загрузка портрета отменена."]
+[&"", &"Portrait upload cancelled."]: [&"Загрузка портрета отменена."],
+[&"", &"Details"]: [&"Подробнее"],
+[&"", &"Carried loot"]: [&"Переносимая добыча"]
 }
 locale = "ru"

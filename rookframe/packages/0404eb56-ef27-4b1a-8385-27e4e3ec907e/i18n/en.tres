@@ -1519,5 +1519,7 @@ messages = {
 [&"", &"The portrait's World Session ended."]: [&"The portrait's World Session ended."],
 [&"", &"The portrait upload could not start."]: [&"The portrait upload could not start."],
 [&"", &"The portrait transfer ended before the complete file arrived."]: [&"The portrait transfer ended before the complete file arrived."],
-[&"", &"Portrait upload cancelled."]: [&"Portrait upload cancelled."]
+[&"", &"Portrait upload cancelled."]: [&"Portrait upload cancelled."],
+[&"", &"Details"]: [&"Details"],
+[&"", &"Carried loot"]: [&"Carried loot"]
 }

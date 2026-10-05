@@ -325,11 +325,7 @@ func _render_detail() -> void:
 		if item.is_empty():
 			_text("This item was removed. Return to Inventory to see the current items.")
 		else:
-			_text(str(item.get("name", "Item")))
-			_text(str(item.get("rules", "")))
-			for key in ["kind", "quantity", "uses", "damage", "range_feet", "armor_tier", "reduction", "price", "weight", "source"]:
-				if item.has(key):
-					_text(locale.text(str(key).replace("_", " ").capitalize()) + ": " + str(item.get(key, "")))
+			sheet.show_entry(item)
 			for key in ["name", "quantity", "uses", "kind", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 				if key == "uses" and item.has("dose_pool") or key not in ["name", "quantity", "uses"] and not bool(item.get("custom", false)):
 					continue

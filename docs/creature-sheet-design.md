@@ -21,6 +21,16 @@ saves and removal. Creature loot has no Equip, Attack, Cast or Use operation.
 Character equipment keeps its existing semantics. Owner/Viewer presentation and
 permitted mutations remain separate from complete shared World gameplay data.
 
+Each ordinary loot overview entry keeps its name, quantity, kind and Details
+action in one native button, so the existing measured pager cannot strand a
+context-free Details tail. If the complete wrapped name makes that button taller
+than the available page, the full name remains paginated text above a compact
+action that repeats the name, quantity and kind. Only that repeated name may use
+native ellipsis; the complete name stays in the text, Details and accessible name.
+Neither branch limits the collection or adds scrolling. Details shares the
+Creature article typography while retaining the existing independent item-field
+saves, custom/catalogue addition and removal.
+
 Appearance commits portrait choice/reset and preferred-Miniature changes
 immediately, independently of the stat-block draft. The host-owned portrait
 picker retains original PNG/JPEG/WebP files in the shared World and returns

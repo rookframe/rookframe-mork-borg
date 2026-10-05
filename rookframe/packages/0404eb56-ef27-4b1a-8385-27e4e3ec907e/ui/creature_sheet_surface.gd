@@ -5,6 +5,8 @@ const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
 const CONTENT = preload(ROOT + "logic/creature_content.gd")
 const CARD = preload(ROOT + "ui/creature_rule_card.tscn")
 const CARD_SCRIPT = preload(ROOT + "ui/creature_rule_card.gd")
+const LOOT_ENTRY = preload(ROOT + "ui/creature_loot_entry.tscn")
+const LOOT_ENTRY_SCRIPT = preload(ROOT + "ui/creature_loot_entry.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 const OWN = preload(ROOT + "logic/creature_own_tests.gd")
@@ -300,13 +302,28 @@ func _render_inventory() -> void:
 	_clear(content)
 	var items: Array = _data.get("inventory", [])
 	if items.is_empty():
-		_append(content, {"name": "Inventory", "text": "No starting loot is authored for this creature." if _library else "No carried loot."})
+		_append_reference(content, {"name": "", "text": "No starting loot is authored for this creature." if _library else "No carried loot."})
 	for raw in items:
 		var item: Dictionary = raw
-		_append(content, {"id": str(item.get("inventory_id", "")), "name": str(item.get("name", "Item")), "text": str(item.get("quantity", 1)) + " × " + _locale.text(str(item.get("kind", "Item"))) + ("\n" + _locale.text(str(item.get("rules", ""))) if _library and not str(item.get("rules", "")).is_empty() else "")}, [{"name": "Details", "part": "details"}])
+		var row = LOOT_ENTRY.instantiate()
+		content.add_child(row)
+		row.configure(item, _locale, _phone, _tablet)
+		row.requested.connect(_requested.bind(row))
+	if not pages.resized.is_connected(_inventory_page_size_changed):
+		pages.resized.connect(_inventory_page_size_changed)
+	_inventory_page_size_changed()
 	pages.restore_state(state)
 
-func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
+func _inventory_page_size_changed() -> void:
+	var pages: Control = get_node(WORK + "Inventory")
+	var pager: Control = get_node(WORK + "Inventory/Pager")
+	var height := pages.size.y - pager.get_combined_minimum_size().y
+	for child in get_node(WORK + "Inventory/Area/Content").get_children():
+		var entry := child as LOOT_ENTRY_SCRIPT
+		if entry != null:
+			entry.set_page_height(height)
+
+func _requested(part: String, id: String, opener: Control) -> void:
 	if part.begins_with("correct:"):
 		_return_correction = opener.entry_id
 		_focus_card = opener
@@ -324,7 +341,7 @@ func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
 		_focus_card = opener
 		roll_requested.emit(part, id)
 
-func show_entry(entry: Dictionary, opener: CARD_SCRIPT = null) -> void:
+func show_entry(entry: Dictionary, opener: Control = null) -> void:
 	_health_reader = false
 	_roll_reader = false
 	_return_entry = str(entry.get("inventory_id", ""))
@@ -334,9 +351,9 @@ func show_entry(entry: Dictionary, opener: CARD_SCRIPT = null) -> void:
 	var content = get_node(WORK + "Reader/Pages/Area/Content")
 	_clear(content)
 	_append_reference(content, {"name": str(entry.get("name", "Item")), "text": str(entry.get("rules", ""))})
-	for key in ["kind", "quantity", "damage", "armor_tier", "defence_penalty", "uses", "weight", "price"]:
+	for key in ["kind", "quantity", "damage", "range_feet", "armor_tier", "reduction", "defence_penalty", "uses", "weight", "price", "source"]:
 		if entry.has(key):
-			_append_reference(content, {"name": key.capitalize(), "text": str(entry[key])})
+			_append_reference(content, {"name": key.replace("_", " ").capitalize(), "text": str(entry[key])})
 	(get_node(WORK + "Reader/Publication") as Control).visible = false
 	get_node(WORK + "Reader/Pages").restore_state({})
 	_update_visibility()
@@ -525,8 +542,8 @@ func restore_reader(state: Dictionary) -> void:
 
 func focus_entry(id: String) -> bool:
 	for child in get_node(WORK + "Inventory/Area/Content").get_children():
-		var card := child as CARD_SCRIPT
-		if card != null and card.entry_id == id and card.restore_focus():
+		var entry := child as LOOT_ENTRY_SCRIPT
+		if entry != null and entry.entry_id == id and entry.restore_focus():
 			return true
 	return false
 
