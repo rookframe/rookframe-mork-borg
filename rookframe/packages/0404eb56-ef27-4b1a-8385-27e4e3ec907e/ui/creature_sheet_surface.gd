@@ -12,13 +12,11 @@ const I18N = preload(ROOT + "ui/localization.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 const OWN = preload(ROOT + "logic/creature_own_tests.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
-const HEALTH_EDITOR = preload(ROOT + "ui/creature_health_editor.tscn")
 const CORRECTION_FORM = preload(ROOT + "ui/creature_correction_form.tscn")
 const CORRECTION_FORM_SCRIPT = preload(ROOT + "ui/creature_correction_form.gd")
 const CORRECTION_DETAILS = preload(ROOT + "ui/creature_correction_details.gd")
 @export var correction_frame: StyleBoxFlat = StyleBoxFlat.new()
 @export var footer_action_frame: StyleBoxFlat = StyleBoxFlat.new()
-const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 @export var canvas_frame: StyleBoxFlat
 @export var identity_frame: StyleBoxFlat
 @export var section_frame: StyleBoxFlat
@@ -77,7 +75,6 @@ var _draft: Dictionary = {}
 var _editing := false
 var _return_correction := ""
 var _return_focus_frames := 0
-var _health_reader := false
 var _roll_reader := false
 var _return_roll := ""
 var _correction_reader := false
@@ -494,7 +491,6 @@ func show_entry(entry: Dictionary, opener: Control = null) -> void:
 	_capture_reference_page()
 	_reference_route = ""
 	_focus_identity = false
-	_health_reader = false
 	_roll_reader = false
 	_return_entry = str(entry.get("inventory_id", ""))
 	_focus_card = opener
@@ -520,7 +516,6 @@ func show_source() -> void:
 	_capture_reference_page()
 	_reference_route = "source"
 	_focus_identity = false
-	_health_reader = false
 	_roll_reader = false
 	_return_entry = ""
 	_focus_card = null
@@ -561,9 +556,6 @@ func _restore_return_focus() -> void:
 			get_node(IDENTITY + "Vitals/" + ("Armor" if _return_roll == "armor" else "Morale")).grab_focus()
 		elif not focus_roll(_return_entry):
 			get_node(WORK + "Tabs/Encounter").grab_focus()
-	elif _health_reader:
-		get_node(IDENTITY + "Health").grab_focus()
-		_health_reader = false
 	elif _focus_source:
 		get_node(WORK + "Tabs/Source").grab_focus()
 	elif _return_correction == "core" and get_node("Inset/Layout/Footer/Core").is_visible_in_tree():
@@ -584,7 +576,6 @@ func show_chapter(chapter: int) -> void:
 	_focus_identity = false
 	_chapter = clampi(chapter, 0, 2)
 	_reader = false
-	_health_reader = false
 	_roll_reader = false
 	_update_visibility()
 	chapter_changed.emit(_chapter)
@@ -592,7 +583,7 @@ func show_chapter(chapter: int) -> void:
 func _update_visibility() -> void:
 	_update_correction_host()
 	var obscured := _reader and not (_correction_reader and not _phone)
-	(get_node(IDENTITY_PANEL) as Control).visible = not (_phone and _correction_reader) and (_editing or (_health_reader or _roll_reader) and _reader or not (_phone and (_chapter == 2 or _reader)))
+	(get_node(IDENTITY_PANEL) as Control).visible = not (_phone and _correction_reader) and (_editing or _roll_reader and _reader or not (_phone and (_chapter == 2 or _reader)))
 	get_node(WORK + "Tabs").visible = not obscured
 	get_node(WORK + "ChapterGap").visible = not obscured
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not obscured
@@ -701,7 +692,6 @@ func open_reader(title: String, return_entry: String = "", correction_route: Str
 	_capture_reference_page()
 	_reference_route = ""
 	_focus_identity = false
-	_health_reader = false
 	_roll_reader = false
 	_focus_card = null
 	_focus_source = false
@@ -715,13 +705,12 @@ func open_reader(title: String, return_entry: String = "", correction_route: Str
 	_update_visibility()
 	get_node(WORK + "Reader/Back").grab_focus()
 
-func open_health_reader() -> HEALTH_EDITOR_SCRIPT:
-	open_reader("Hit points")
-	_health_reader = true
-	var editor: HEALTH_EDITOR_SCRIPT = HEALTH_EDITOR.instantiate()
-	get_node(WORK + "Reader/Pages/Area/Content").add_child(editor)
-	_update_visibility()
-	return editor
+func focus_health() -> void:
+	var opener: Button = get_node(IDENTITY + "Health")
+	if opener.is_visible_in_tree() and not opener.disabled:
+		opener.grab_focus()
+	else:
+		get_node("Inset/Layout/Footer/Close").grab_focus()
 
 func open_roll_reader(title: String, part: String, entry: String) -> void:
 	open_reader(title, entry)
@@ -927,12 +916,20 @@ func _layout_identity(metadata: Dictionary) -> void:
 	(row.get_node("Maximum") as Label).text = "/ " + maximum
 	(row.get_node("Maximum") as Label).visible = not _library
 	(row.get_node("Maximum") as Label).add_theme_font_size_override("font_size", 10 if _phone else 13)
-	(row.get_node("Adjust") as Label).visible = not _library and _can_edit
+	(row.get_node("Adjust") as Label).visible = not _library and _can_edit and not _phone
 	for edge in ["left", "right"]:
 		(hp.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_" + edge, 7 if _phone else 12)
 	for edge in ["top", "bottom"]:
 		(hp.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_" + edge, 4 if _phone else 8)
 	var health := HEALTH.new()
+	var fraction := 1.0
+	if not _library:
+		fraction = 0.0
+		var shown := health.integer(value)
+		var shown_maximum := health.integer(maximum)
+		if bool(shown.get("ok", false)) and bool(shown_maximum.get("ok", false)) and int(shown_maximum.get("value", 0)) > 0:
+			fraction = clampf(float(shown.get("value", 0)) / float(shown_maximum.get("value", 1)), 0.0, 1.0)
+	get_node(IDENTITY + "Health/Indicator").anchor_right = fraction
 	get_node(IDENTITY + "Condition").visible = not _library and (health.is_dead(_data) or not health.valid(_data))
 	get_node(IDENTITY + "Condition").text = _locale.text("Dead" if health.is_dead(_data) else "HP needs correction")
 	get_node(IDENTITY + "Condition").add_theme_font_size_override("font_size", 12 if _phone else 18)
@@ -1233,7 +1230,6 @@ func open_correction(title: String, route: String, identity: String, available: 
 	_correction_reader = true
 	_reader = true
 	_reference_route = ""
-	_health_reader = false
 	_roll_reader = false
 	_return_correction = identity
 	_focus_card = null

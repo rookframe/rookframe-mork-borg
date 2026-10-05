@@ -50,8 +50,10 @@ var _draft_refresh_pending := false
 var _render_pending := false
 var _validation: Dictionary = {}
 var _health_available := true
-var _health_editor: HEALTH_EDITOR_SCRIPT
+@onready var _health_editor: HEALTH_EDITOR_SCRIPT = get_node(^"HealthDialog")
+var _health_session := ""
 var _health_pending := false
+var _health_return_focus := false
 var _health_epoch := 0
 var _health_feedback := ""
 var _health_attempt: Dictionary = {}
@@ -91,6 +93,11 @@ func ready() -> void:
 	sheet.save_requested.connect(_save_sheet)
 	sheet.cancel_requested.connect(_cancel_edit)
 	sheet.health_requested.connect(_health)
+	_health_editor.adjustment_requested.connect(_adjust_health)
+	_health_editor.correction_requested.connect(_health_correction)
+	_health_editor.dismissed.connect(_dismiss_health)
+	visibility_changed.connect(_health_visibility_changed)
+	resized.connect(_health_resized)
 	sheet.roll_requested.connect(_roll)
 	_miniature_picker.closed.connect(_picker_closed)
 	get_node("Unavailable/Inset/Content/Close").pressed.connect(_close)
@@ -147,6 +154,8 @@ func current_data() -> Dictionary:
 	return _accepted.duplicate(true) if actor != null else {}
 
 func _world_changed() -> void:
+	if _health_editor.visible and sdk.context().session_id != _health_session:
+		_dismiss_health(false)
 	if sdk.context().session_id != _appearance_session:
 		_end_portrait()
 		_portrait_feedback = "This session has ended."
@@ -160,7 +169,7 @@ func _process(_delta: float) -> void:
 		_render_pending = true
 		if actor != null and actor.id.value == _roll_workflow.source and _detail == "roll":
 			_detail_pending = true
-	if _refresh_pending and not _busy and actor != null:
+	if _refresh_pending and (not _busy or _health_pending) and actor != null:
 		_refresh_pending = false
 		var result := sdk.actors.read(actor.id)
 		if not result.ok or result.actor == null:
@@ -205,6 +214,7 @@ func _render_accepted() -> void:
 		return
 	var data := current_data()
 	if not owner():
+		_end_health()
 		_draft.discard()
 		_validation = {}
 	data["editing"] = _draft.active
@@ -236,7 +246,7 @@ func _render_accepted() -> void:
 	if not _detail.is_empty():
 		if not owner():
 			_edit_item = false
-			if _detail in ["catalogue", "custom", "health"] or _detail.begins_with("correction:"):
+			if _detail in ["catalogue", "custom"] or _detail.begins_with("correction:"):
 				_detail = ""
 				sheet.back()
 		if _detail.begins_with("item:") and not _fields.is_empty() and owner() and _edit_item:
@@ -249,10 +259,16 @@ func _render_accepted() -> void:
 		elif _detail not in ["custom", "catalogue"]:
 			_capture_detail()
 			_detail_pending = true
+	if _health_editor.visible:
+		_render_health()
+	if _health_return_focus and is_visible_in_tree():
+		_health_return_focus = false
+		sheet.focus_health.call_deferred()
 	_refresh_appearance.call_deferred()
 	_remember()
 
 func _unavailable(message: String) -> void:
+	_end_health()
 	_correction_epoch += 1
 	_correction_pending(false)
 	_draft.discard()
@@ -290,9 +306,6 @@ func _open_detail(route: String) -> void:
 func _render_detail() -> void:
 	if _detail == "roll":
 		_render_roll()
-		return
-	if _detail == "health":
-		_render_health()
 		return
 	if _detail.begins_with("correction:"):
 		_render_correction()
@@ -709,13 +722,32 @@ func _health() -> void:
 	if _draft.active:
 		_open_correction("core")
 	else:
-		_health_feedback = ""
-		_health_attempt = {}
+		_end_health()
+		_health_session = sdk.context().session_id
 		_portrait_feedback = ""
 		_correction_feedback = ""
-		_health_editor = null
-		_open_detail("health")
+		_health_editor.begin(locale, current_data(), sheet.size)
+		get_node("HealthScrim").visible = true
 		health_adjustment_requested.emit()
+
+func _health_resized() -> void:
+	if _health_editor.visible:
+		_health_editor.present(sheet.size)
+
+func _health_visibility_changed() -> void:
+	if not is_visible_in_tree():
+		_end_health()
+
+func _dismiss_health(restore_focus: bool = true) -> void:
+	_end_health()
+	_refresh_pending = true
+	if restore_focus and is_visible_in_tree():
+		_health_return_focus = true
+
+func _health_correction() -> void:
+	_end_health()
+	_correct()
+
 func _roll(part: String, id: String) -> void:
 	if not can_roll():
 		return
@@ -731,7 +763,7 @@ func is_dead() -> bool:
 	return HEALTH.new().is_dead(current_data())
 
 func can_roll() -> bool:
-	return owner() and not _busy and not _draft.active and not _roll_live() and HEALTH.new().can_roll(current_data())
+	return owner() and not _busy and not _health_editor.visible and not _draft.active and not _roll_live() and HEALTH.new().can_roll(current_data())
 
 func _roll_live() -> bool:
 	return _roll_workflow.pending
@@ -761,18 +793,14 @@ func _leave_roll() -> void:
 		sheet.status(_roll_feedback)
 
 func _render_health() -> void:
-	if not is_instance_valid(_health_editor):
-		_health_editor = sheet.open_health_reader()
-		_health_editor.configure(locale, sheet.size.x <= 900)
-		_health_editor.adjustment_requested.connect(_adjust_health)
-		_health_editor.correction_requested.connect(_correct)
 	_health_editor.refresh(current_data(), owner(), _health_pending)
 
 func _adjust_health(operation: String, amount: String) -> void:
-	if not owner() or _busy or _draft.active or _detail != "health":
+	if not owner() or _busy or _draft.active or not _health_editor.visible:
 		return
 	var id := actor.id
 	var epoch := _health_epoch
+	var session := _health_session
 	var actions := ITEMS.new(sdk, id)
 	var request := REQUEST.new(sdk, self)
 	if str(_health_attempt.get("operation", "")) != operation or str(_health_attempt.get("amount", "")) != amount:
@@ -786,32 +814,49 @@ func _adjust_health(operation: String, amount: String) -> void:
 	var result := await actions.adjust_health(action_id, operation, amount, request)
 	if epoch != _health_epoch or actor == null or actor.id.value != id.value:
 		return
+	if session != sdk.context().session_id:
+		_dismiss_health(false)
+		return
 	_busy = false
 	_health_pending = false
+	var latest := sdk.actors.read(id)
+	if not latest.ok or latest.actor == null:
+		_unavailable(latest.message)
+		return
+	actor = latest.actor
+	if not owner():
+		_end_health()
+		_refresh()
+		return
 	if result.ok:
-		_health_attempt = {}
-		actor = result.actor
-		_detail = ""
-		sheet.back()
-	_health_feedback = "Hit points updated." if result.ok else result.message
-	_refresh_pending = true
+		_end_health()
+		_health_feedback = "Hit points updated."
+		_health_return_focus = true
+	else:
+		_health_feedback = ""
 	_refresh()
-	if not result.ok and is_instance_valid(_health_editor):
+	if not result.ok:
 		_health_editor.refresh(current_data(), owner(), false)
 		_health_editor.show_error(result.message, actions.invalid_field)
 
 func _end_health() -> void:
 	_health_epoch += 1
+	_health_return_focus = false
 	if _health_pending:
 		_busy = false
 	_health_pending = false
-	_health_editor = null
+	_health_session = ""
 	_health_feedback = ""
 	_health_attempt = {}
+	if is_instance_valid(_health_editor):
+		_health_editor.discard()
+	get_node("HealthScrim").visible = false
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if is_visible_in_tree() and not _busy and event.is_action_pressed("ui_cancel"):
-		if _miniature_picker.visible:
+		if _health_editor.visible:
+			_dismiss_health()
+		elif _miniature_picker.visible:
 			_miniature_picker._cancel()
 		elif _draft.active:
 			_cancel_edit()
