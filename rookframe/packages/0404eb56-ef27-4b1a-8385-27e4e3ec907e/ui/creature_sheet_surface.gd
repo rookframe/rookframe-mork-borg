@@ -13,6 +13,11 @@ const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 const OWN = preload(ROOT + "logic/creature_own_tests.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const HEALTH_EDITOR = preload(ROOT + "ui/creature_health_editor.tscn")
+const CORRECTION_FORM = preload(ROOT + "ui/creature_correction_form.tscn")
+const CORRECTION_FORM_SCRIPT = preload(ROOT + "ui/creature_correction_form.gd")
+const CORRECTION_DETAILS = preload(ROOT + "ui/creature_correction_details.gd")
+@export var correction_frame: StyleBoxFlat = StyleBoxFlat.new()
+@export var footer_action_frame: StyleBoxFlat = StyleBoxFlat.new()
 const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 @export var canvas_frame: StyleBoxFlat
 @export var identity_frame: StyleBoxFlat
@@ -22,6 +27,7 @@ const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 @export var desktop_source_icon_alignment: HorizontalAlignment
 @export var touch_source_icon_alignment: HorizontalAlignment
 @export var source_frame: StyleBoxFlat
+signal correction_changed(field: String, text: String)
 signal chapter_changed(chapter: int)
 signal entry_requested(id: String)
 signal inventory_add_requested
@@ -74,8 +80,24 @@ var _return_focus_frames := 0
 var _health_reader := false
 var _roll_reader := false
 var _return_roll := ""
+var _correction_reader := false
+var _correction_busy := false
+var _inline_key: Array = []
+var _correction_focus := ""
+@onready var _correction_details: CORRECTION_DETAILS = get_node(WORK + "CorrectionSlot/Details")
+var _correction_parent: Control
 
 func _ready() -> void:
+	_correction_parent = get_node(WORK + "CorrectionSlot")
+	_correction_details.back_requested.connect(back)
+	_correction_details.save_requested.connect(_save_corrections)
+	_correction_details.cancel_requested.connect(_cancel_corrections)
+	_correction_details.changed.connect(_correction_typed)
+	get_node("CorrectionDialog").close_requested_by_user.connect(back)
+	get_node("CorrectionDialog").escape_requested.connect(_cancel_corrections)
+	for path in ["IdentityEditors", "HealthEditors/Inset/Fields", "ArmorEditors/Fields"]:
+		var form: CORRECTION_FORM_SCRIPT = get_node(IDENTITY + path)
+		form.changed.connect(_correction_typed)
 	for path in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
 		var pager: HBoxContainer = get_node(WORK + path + "/Pager")
 		# Preserve the public component and its connected controls; only their
@@ -169,8 +191,10 @@ func _layout() -> void:
 	for button in ["ChangePortrait", "ClearPortrait"]:
 		get_node(WORK + "Appearance/Columns/PortraitPanel/Inset/Content/PortraitButtons/" + button).disabled = not _data.get("portrait_editable", _can_edit)
 	_build_groups(metadata)
+	_configure_inline_core()
 	_render_encounter()
 	_render_inventory()
+	correction_pending(_correction_busy)
 	_update_visibility()
 	_reference_pending = true
 
@@ -352,6 +376,19 @@ func _capture_encounter_pages() -> void:
 		_pages[page_key] = get_node(WORK + "Encounter/" + lane).capture_state()
 
 func _render_encounter() -> void:
+	var inline_key: Array = []
+	if _editing and not _phone and not _tablet:
+		inline_key = [_draft.keys()]
+		for group in _groups:
+			inline_key.append(str(group.title))
+			var entries: Array = group.entries
+			for raw in entries:
+				var entry: Dictionary = raw
+				inline_key.append([entry.correction_route, entry.get("correction_identity", "rules")] if entry.has("correction_route") else entry)
+		if inline_key == _inline_key:
+			_sync_inline_fields()
+			return
+	_inline_key = inline_key.duplicate(true)
 	for lane in ["Primary", "Secondary"]:
 		var pages = get_node(WORK + "Encounter/" + lane)
 		var page_key: String = "phone:" + str(_groups[_section].title) + ":" + str(_groups[_section].get("lane", "primary")) if _phone and not _groups.is_empty() else lane
@@ -371,6 +408,15 @@ func _render_encounter() -> void:
 			var entries: Array = group.entries
 			for raw in entries:
 				var entry: Dictionary = raw
+				if _editing and not _phone and not _tablet and entry.has("correction_route"):
+					var frame := PanelContainer.new()
+					frame.add_theme_stylebox_override("panel", correction_frame)
+					pages.get_node("Area/Content").add_child(frame)
+					var form: CORRECTION_FORM_SCRIPT = CORRECTION_FORM.instantiate()
+					frame.add_child(form)
+					form.configure(correction_keys(str(entry.correction_route)), _draft, _locale, false, str(entry.get("correction_identity", "rules")))
+					form.changed.connect(_correction_typed)
+					continue
 				var actions: Array = []
 				if _editing and entry.has("correction_route"):
 					actions.append({"name": "Correct", "part": "correct:" + str(entry.correction_route), "disabled": not _can_edit})
@@ -493,6 +539,7 @@ func show_source() -> void:
 	get_node(WORK + "Reader/Back").grab_focus()
 
 func back() -> void:
+	_correction_reader = false
 	_capture_reference_page()
 	_reference_route = ""
 	_reader = false
@@ -531,6 +578,7 @@ func _restore_return_focus() -> void:
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
 
 func show_chapter(chapter: int) -> void:
+	_correction_reader = false
 	_capture_reference_page()
 	_reference_route = ""
 	_focus_identity = false
@@ -542,16 +590,18 @@ func show_chapter(chapter: int) -> void:
 	chapter_changed.emit(_chapter)
 
 func _update_visibility() -> void:
-	(get_node(IDENTITY_PANEL) as Control).visible = _editing or (_health_reader or _roll_reader) and _reader or not (_phone and (_chapter == 2 or _reader))
-	get_node(WORK + "Tabs").visible = not _reader
-	get_node(WORK + "ChapterGap").visible = not _reader
-	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not _reader
-	get_node(WORK + "InventoryHeading").visible = _chapter == 1 and not _reader
-	get_node(WORK + "InventoryHeading/Row/Add").visible = _chapter == 1 and not _reader and not _library and _can_edit
-	get_node(WORK + "Encounter").visible = _chapter == 0 and not _reader
-	get_node(WORK + "Inventory").visible = _chapter == 1 and not _reader
-	get_node(WORK + "Appearance").visible = _chapter == 2 and not _reader
-	get_node(WORK + "Reader").visible = _reader
+	_update_correction_host()
+	var obscured := _reader and not (_correction_reader and not _phone)
+	(get_node(IDENTITY_PANEL) as Control).visible = not (_phone and _correction_reader) and (_editing or (_health_reader or _roll_reader) and _reader or not (_phone and (_chapter == 2 or _reader)))
+	get_node(WORK + "Tabs").visible = not obscured
+	get_node(WORK + "ChapterGap").visible = not obscured
+	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not obscured
+	get_node(WORK + "InventoryHeading").visible = _chapter == 1 and not obscured
+	get_node(WORK + "InventoryHeading/Row/Add").visible = _chapter == 1 and not obscured and not _library and _can_edit
+	get_node(WORK + "Encounter").visible = _chapter == 0 and not obscured
+	get_node(WORK + "Inventory").visible = _chapter == 1 and not obscured
+	get_node(WORK + "Appearance").visible = _chapter == 2 and not obscured
+	get_node(WORK + "Reader").visible = _reader and not _correction_reader
 	for index in range(3):
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).set_pressed_no_signal(index == _chapter)
 
@@ -647,6 +697,7 @@ func restore_navigation(state: Dictionary) -> void:
 	_queue_layout()
 
 func open_reader(title: String, return_entry: String = "", correction_route: String = "") -> void:
+	_correction_reader = false
 	_capture_reference_page()
 	_reference_route = ""
 	_focus_identity = false
@@ -690,9 +741,14 @@ func reader_content() -> Control:
 	return get_node(WORK + "Reader/Pages/Area/Content") as Control
 
 func reader_state() -> Dictionary:
+	if _correction_reader:
+		return _correction_details.paging()
 	return get_node(WORK + "Reader/Pages").capture_state()
 
 func restore_reader(state: Dictionary) -> void:
+	if _correction_reader:
+		_correction_details.restore_paging(state)
+		return
 	get_node(WORK + "Reader/Pages").restore_state(state)
 
 func focus_entry(id: String) -> bool:
@@ -710,13 +766,24 @@ func focus_portrait() -> void:
 
 ## Local correction text stays separate from accepted Actor data.
 func configure_draft(values: Dictionary, active: bool) -> void:
+	var changed_mode := _editing != active
 	_draft = values.duplicate(true)
 	_editing = active
+	if not active:
+		_correction_reader = false
+		get_node("CorrectionDialog").hide()
+	if changed_mode:
+		_inline_key = []
 	_queue_layout()
 
 func sync_draft_field(key: String, text: String) -> void:
 	_draft[key] = text
-	_queue_layout()
+	for path in ["IdentityEditors", "HealthEditors/Inset/Fields", "ArmorEditors/Fields"]:
+		var form: CORRECTION_FORM_SCRIPT = get_node(IDENTITY + path)
+		form.sync_field(key, text)
+	_correction_details.form.sync_field(key, text)
+	if _phone or _tablet:
+		_queue_layout()
 
 func focus_correction(route: String) -> bool:
 	for lane in ["Primary", "Secondary"]:
@@ -724,6 +791,10 @@ func focus_correction(route: String) -> bool:
 			var card := child as CARD_SCRIPT
 			if card != null and card.entry_id == route and card.restore_focus():
 				return true
+			for authored in child.get_children():
+				var form := authored as CORRECTION_FORM_SCRIPT
+				if form != null and form.entry_id == route and form.restore_focus():
+					return true
 	return false
 
 func _process(_delta: float) -> void:
@@ -741,6 +812,15 @@ func _process(_delta: float) -> void:
 	_update_decorations()
 	_fit_phone_entries()
 	_update_pager_labels()
+	if not _correction_focus.is_empty() and not _layout_pending:
+		if _correction_focus == "first":
+			if _correction_reader:
+				_correction_details.focus_first()
+			else:
+				(get_node(IDENTITY + "IdentityEditors") as CORRECTION_FORM_SCRIPT).restore_focus()
+		elif _correction_focus == "edit" and get_node("Inset/Layout/Footer/Edit").is_visible_in_tree():
+			get_node("Inset/Layout/Footer/Edit").grab_focus()
+		_correction_focus = ""
 	if _return_focus_frames > 0:
 		_return_focus_frames -= 1
 		if _return_focus_frames == 0:
@@ -756,6 +836,18 @@ func _core_corrections() -> void:
 	correction_entry_requested.emit("core")
 
 func correction_pending(pending: bool) -> void:
+	_correction_busy = pending
+	get_node("Inset/Layout/Footer/Edit").disabled = pending or not bool(_data.get("corrections_available", false))
+	_correction_details.set_details_pending(pending)
+	for path in ["IdentityEditors", "HealthEditors/Inset/Fields", "ArmorEditors/Fields"]:
+		var form: CORRECTION_FORM_SCRIPT = get_node(IDENTITY + path)
+		form.set_fields_pending(pending)
+	for lane in ["Primary", "Secondary"]:
+		for panel in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+			for child in panel.get_children():
+				var form := child as CORRECTION_FORM_SCRIPT
+				if form != null:
+					form.set_fields_pending(pending)
 	for action in ["Core", "Cancel", "Save"]:
 		get_node("Inset/Layout/Footer/" + action).disabled = pending
 
@@ -799,10 +891,13 @@ func _layout_frame() -> void:
 	get_node("Inset/Layout/Footer").add_theme_constant_override("separation", 6 if _phone else 10)
 	get_node("Inset/Layout/Footer/Context").text = _locale.text("Published starting information" if _library else "Resolve consequences at the table.")
 	get_node("Inset/Layout/Footer/Context").add_theme_font_size_override("font_size", 10 if _phone else 12)
-	for action in ["Close", "Edit", "Create"]:
+	var action_frame: StyleBoxFlat = footer_action_frame.duplicate()
+	action_frame.content_margin_left = 6 if _phone else 12
+	action_frame.content_margin_right = 6 if _phone else 12
+	for action in ["Close", "Edit", "Create", "Save", "Cancel", "Core"]:
 		var button: Button = get_node("Inset/Layout/Footer/" + action)
 		button.add_theme_font_size_override("font_size", 10 if _phone else 11)
-		button.add_theme_stylebox_override("normal", StyleBoxEmpty.new())
+		button.add_theme_stylebox_override("normal", action_frame)
 		button.add_theme_color_override("font_color", Color(0.603922, 0.647059, 0.65098, 1))
 	var heading: PanelContainer = get_node(WORK + "InventoryHeading")
 	_configure_heading(heading, "Inventory" if _library else "Carried loot")
@@ -924,6 +1019,7 @@ func _update_decorations() -> void:
 	var footer: Control = get_node("Inset/Layout/Footer")
 	var sheet_rect: Rect2 = get_global_rect()
 	var footer_rect: Rect2 = footer.get_global_rect()
+	get_node("FooterRule").visible = footer.is_visible_in_tree()
 	get_node("FooterRule").position = Vector2(footer_rect.position.x - sheet_rect.position.x, footer_rect.position.y - sheet_rect.position.y)
 	get_node("FooterRule").size = Vector2(footer.size.x, 1)
 	var tabs: Control = get_node(WORK + "Tabs")
@@ -974,6 +1070,9 @@ func _fit_phone_entries() -> void:
 ## Keep the approved portrait/core usable. Only overflowing identity uses the
 ## Character-style full-text reader; accepted strings are never shortened.
 func _fit_identity() -> void:
+	if _editing and not _phone and not _tablet:
+		_fit_inline_core()
+		return
 	if not get_node(IDENTITY_PANEL).is_visible_in_tree():
 		return
 	var column: Control = get_node(IDENTITY)
@@ -1055,3 +1154,114 @@ func _refresh_reference() -> void:
 		show_source()
 	if focused != null and is_instance_valid(focused) and focused.is_visible_in_tree():
 		focused.grab_focus()
+
+func _correction_typed(field: String, text: String) -> void:
+	correction_changed.emit(field, text)
+
+func correction_keys(route: String) -> Array:
+	var keys: Array = []
+	var printed := PROJECTION.new().printed_routes(_data)
+	for key in _draft:
+		var field := str(key)
+		if route == "core":
+			if not field.begins_with("attack:") and not field.begins_with("rule:") and not field.begins_with("printed:") and field != "rules":
+				keys.append(field)
+		elif field == route or field.begins_with(route + ":") or str(printed.get(field, "")) == route:
+			keys.append(field)
+	# The approved entry order is Name, complete prose, then supported mechanics.
+	var ordered: Array = []
+	if route != "core":
+		for member in ["name", "rules", "text"]:
+			var key: String = route + ":" + str(member)
+			if keys.has(key):
+				ordered.append(key)
+	for key in keys:
+		if not ordered.has(key):
+			ordered.append(key)
+	return ordered
+
+func _configure_inline_core() -> void:
+	var inline := _editing and not _phone and not _tablet
+	for path in ["IdentityEditors", "HealthEditors", "ArmorEditors"]:
+		get_node(IDENTITY + path).visible = inline
+	get_node(IDENTITY + "Health").visible = not inline
+	get_node(IDENTITY + "Vitals").visible = not inline
+	if not inline:
+		return
+	for path in ["Name", "NameGap", "Classification", "IdentityDetails"]:
+		get_node(IDENTITY + path).visible = false
+	(get_node(IDENTITY + "IdentityEditors") as CORRECTION_FORM_SCRIPT).configure(["name", "classification"], _draft, _locale, false)
+	(get_node(IDENTITY + "HealthEditors/Inset/Fields") as CORRECTION_FORM_SCRIPT).configure(["hit_points", "maximum_hit_points"], _draft, _locale, false)
+	var armor_keys: Array = []
+	for key in ["armor:reduction", "armor:name", "morale", "armor:shield_reduction", "armor:defence_penalty"]:
+		if _draft.has(key):
+			armor_keys.append(key)
+	(get_node(IDENTITY + "ArmorEditors/Fields") as CORRECTION_FORM_SCRIPT).configure(armor_keys, _draft, _locale, false)
+
+func _sync_inline_fields() -> void:
+	for lane in ["Primary", "Secondary"]:
+		for panel in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+			for child in panel.get_children():
+				var form := child as CORRECTION_FORM_SCRIPT
+				if form != null:
+					for key in _draft:
+						form.sync_field(str(key), str(_draft[key]))
+
+func _fit_inline_core() -> void:
+	var column: Control = get_node(IDENTITY)
+	var other_height := 0.0
+	for child in column.get_children():
+		var control: Control = child
+		if control.visible and str(control.name) != "Portrait":
+			other_height += control.get_combined_minimum_size().y
+	var available := size.y - 90
+	var portrait: Control = get_node(IDENTITY + "Portrait")
+	var height := minf(510, maxf(0, available - other_height))
+	if absf(portrait.custom_minimum_size.y - height) > 0.1:
+		portrait.custom_minimum_size = Vector2(0, height)
+
+func begin_corrections() -> void:
+	_return_focus_frames = 0
+	if size.x > 1400:
+		_correction_focus = "first"
+	else:
+		correction_entry_requested.emit("core")
+
+func open_correction(title: String, route: String, identity: String, available: bool) -> void:
+	var opening := not _correction_reader
+	_correction_reader = true
+	_reader = true
+	_reference_route = ""
+	_health_reader = false
+	_roll_reader = false
+	_return_correction = identity
+	_focus_card = null
+	_focus_source = false
+	_focus_identity = false
+	_correction_details.configure(correction_keys(route) if available else [], _draft, _locale, _phone, identity, title)
+	_update_visibility()
+	if opening:
+		_correction_focus = "first"
+
+func show_correction_error(field: String, message: String) -> void:
+	_correction_details.show_error(field, message)
+
+func _update_correction_host() -> void:
+	var phone_host: Control = get_node(WORK + "CorrectionSlot")
+	var target: Control = phone_host if _phone else get_node("CorrectionDialog/Surface/Inset")
+	if target != _correction_parent:
+		_correction_parent.remove_child(_correction_details)
+		target.add_child(_correction_details)
+		_correction_parent = target
+	_correction_details.configure_density(_phone)
+	_correction_details.visible = _correction_reader
+	phone_host.visible = _correction_reader and _phone
+	get_node("CorrectionScrim").visible = _correction_reader and not _phone
+	get_node("CorrectionDialog").present(_correction_reader and not _phone and is_visible_in_tree(), size)
+	get_node("Inset/Layout/Footer").visible = not (_correction_reader and _phone)
+
+func finish_corrections() -> void:
+	_correction_reader = false
+	_return_focus_frames = 0
+	_correction_focus = "edit"
+	_update_visibility()

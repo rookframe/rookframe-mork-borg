@@ -499,6 +499,8 @@ Character creation is contributed to the shared Actors window.
 
 Live Creature inspection, Library creation and companion opening use the shared fixed Full-viewport Creature sheet. Encounter, Inventory and Appearance keep current Actor values, independent carried loot and SDK appearance operations together. Portrait image choice/reset and Miniature changes commit immediately outside stat-block Save/Cancel. Library defaults snapshot only into future Actors; existing Actors and Rooks keep their appearance. Owner loot and appearance edits preserve the current stat block; Viewers can read it. Bounded Details return to the entry and focus, and Actor-local chapter/page state lasts for the World Application session. Corrections, HP adjustments and Window Dice are enabled by their dependent rule adapters. Existing captured targeted tabletop procedures retain their separate legacy task route. Actor placement stays in the Actors drag-and-drop flow.
 
+Creature corrections use desktop inline fields, a bounded tablet Window, and a full phone chapter. One changed-fields draft retains native typing/focus and merges only changed values into current accepted data; Back keeps it, Cancel/Escape discards it, and loot/Appearance remain independent.
+
 Creature Inventory keeps a bounded carried-loot list with readable Details, a searchable core catalogue, custom item creation, independent field saves and removal. Character equipment retains its existing Attack/Equip/Cast/Use behavior. See [the review contract](docs/creature-sheet-design.md).
 
 ## Character HUD
