@@ -4,6 +4,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const ACTION = preload(ROOT + "logic/melee_action.gd")
+const WORKFLOW = preload(ROOT + "ui/creature_roll_workflow.gd")
 const BOUNDARY = preload("res://tests/melee_sdk_boundary.gd")
 
 func test_creature_roll_completion_is_once_immutable_and_late_abandonment_cancels() -> void:
@@ -68,3 +69,47 @@ func test_creature_roll_completion_is_once_immutable_and_late_abandonment_cancel
 	assert_str(result.value.state).is_equal("ended")
 	assert_int(host.reports.size()).is_equal(1)
 	assert_dict(host.actors).is_equal(before)
+
+	# Actual surface removal frees the poller, unlike Close. Cancellation must
+	# survive that free even when its accepted start reply arrives afterward.
+	for delayed in [false, true]:
+		var surface := Control.new()
+		add_child(surface)
+		var workflow := WORKFLOW.new()
+		surface.add_child(workflow)
+		workflow.configure(sdk, surface)
+		host.defer_reply = delayed
+		workflow.start("hero", "damage", str(input.entry))
+		var removed := host.last_request
+		var cancellations := int(host.submissions.get("creature-roll.cancel", 0))
+		# Same-Actor hide/Close preserves the accepted request.
+		workflow.closed()
+		assert_str(host.requests[removed].result.status).is_equal("pending")
+		remove_child(surface)
+		surface.queue_free()
+		await get_tree().process_frame
+		await get_tree().process_frame
+		assert_bool(is_instance_valid(workflow)).is_false()
+		if delayed:
+			assert_int(int(host.submissions.get("creature-roll.cancel", 0))).is_equal(cancellations)
+			host.complete_reply()
+			await get_tree().process_frame
+			await get_tree().process_frame
+		assert_str(host.requests[removed].result.status).is_equal("cancelled")
+		assert_int(int(host.submissions.get("creature-roll.cancel", 0))).is_equal(cancellations + 1)
+		var replacement := Control.new()
+		add_child(replacement)
+		var fresh := WORKFLOW.new()
+		replacement.add_child(fresh)
+		fresh.configure(sdk, replacement)
+		fresh.opened("enemy")
+		assert_bool(fresh.has_action).is_false()
+		assert_bool(fresh.pending).is_false()
+		assert_str(fresh.source).is_empty()
+		host.roll(removed, [20])
+		result = await sdk.system_actions.submit("creature-roll.advance", {"id": removed})
+		assert_str(result.value.state).is_equal("ended")
+		assert_int(host.reports.size()).is_equal(1)
+		assert_dict(host.actors).is_equal(before)
+		replacement.queue_free()
+		await get_tree().process_frame
