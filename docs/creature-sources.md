@@ -26,6 +26,9 @@ Verified on 4 October 2026 from the official distributions:
   The source leaves the detection ability unnamed. The separate bow reference
   retains repeated random retargeting until a hit and its inability to target or
   harm the Bowyer. All six commission alternatives remain reference text.
+  The child-abduction commission retains its nearby-village origin and delivery
+  to the Bowyer; both conditions were rechecked against the full source page on
+  5 October 2026.
 - Existing companions retain their previously verified rules: Ancient gore-hound
   (Bare Bones p. 47), Hawk as weapon (p. 51), dog and monkey equipment (p. 22).
   Their printed HP generation formulas and supported own tests do not become ordinary enemy tests, and absent

@@ -1,5 +1,9 @@
 extends RefCounted
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
+## Exact earlier published mirrors stay hidden without rewriting saved or custom rules.
+const LEGACY_RULE_MIRRORS := {
+	"bone-bowyer": "Test DR12 to detect the Bowyer or it gets two free shots. The bow deals d6 damage. A miss sends the arrow toward another random creature nearby; repeat until it hits. It cannot target or harm the Bone Bowyer. The Bowyer may craft a bow for a wicked character who completes a task: abduct a child; cruelly murder kin; desecrate a shrine or church; sow discord; spread disease; or burn a heretic."
+}
 ## Text fields and entry identities for one Creature stat-block correction.
 ## Numeric slots keep every entry field at exactly three colon-separated parts.
 
@@ -92,7 +96,7 @@ func rules_text(data: Dictionary) -> String:
 func rules_mirror(data: Dictionary) -> bool:
 	var text := str(data.get("rules", ""))
 	var definition: Dictionary = CREATURES.CORE_DEFINITIONS.get(str(data.get("definition_id", "")), {})
-	return text.is_empty() or text == rules_text(data) or text == str(definition.get("rules", ""))
+	return text.is_empty() or text == rules_text(data) or text == str(definition.get("rules", "")) or text == str(LEGACY_RULE_MIRRORS.get(str(data.get("definition_id", "")), ""))
 
 func title(field: String) -> String:
 	return str({"name": "Name", "classification": "Classification", "hit_points": "Current HP", "maximum_hit_points": "Maximum HP", "morale": "Morale", "armor:name": "Armor name", "armor:reduction": "Armor formula", "armor:shield_reduction": "Shield reduction", "armor:defence_penalty": "Defence penalty", "dice": "Damage formula", "attack_dr": "Own Attack DR", "defence_dr": "Printed defence DR", "range_feet": "Range (feet)", "rules": "Creature rules", "text": "Creature rules"}.get(field, field.replace("_", " ").capitalize()))

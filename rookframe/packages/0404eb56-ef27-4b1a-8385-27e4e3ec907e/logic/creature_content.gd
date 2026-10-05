@@ -597,7 +597,7 @@ const ENTRIES: Dictionary = {
 					{
 						"id": "commission",
 						"name": "Unsavory services",
-						"text": "The Bowyer may craft a bow for a wicked character who completes a task: abduct a child; cruelly murder kin; desecrate a shrine or church; sow discord; spread disease; or burn a heretic."
+						"text": "The Bowyer may craft a bow for a wicked character who completes a task: abduct a child from a nearby village and bring them to the Bowyer; cruelly murder kin; desecrate a shrine or church; sow discord; spread disease; or burn a heretic."
 					}
 				]
 			}
