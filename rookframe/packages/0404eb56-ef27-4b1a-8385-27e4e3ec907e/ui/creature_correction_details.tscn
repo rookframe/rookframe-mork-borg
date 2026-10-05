@@ -40,6 +40,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(44,44)
 size_flags_vertical = 4
 theme_type_variation = "TaskGlyphButton"
+theme_override_font_sizes/font_size = 30
 text = "×"
 accessibility_name = "Back to creature"
 [node name="Body" type="MarginContainer" parent="."]

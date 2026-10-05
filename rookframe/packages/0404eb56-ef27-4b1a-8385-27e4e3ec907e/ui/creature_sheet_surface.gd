@@ -1161,7 +1161,7 @@ func _correction_typed(field: String, text: String) -> void:
 func correction_keys(route: String) -> Array:
 	var keys: Array = []
 	var printed := PROJECTION.new().printed_routes(_data)
-	for key in _draft:
+	for key in _draft.keys():
 		var field := str(key)
 		if route == "core":
 			if not field.begins_with("attack:") and not field.begins_with("rule:") and not field.begins_with("printed:") and field != "rules":
@@ -1204,8 +1204,8 @@ func _sync_inline_fields() -> void:
 			for child in panel.get_children():
 				var form := child as CORRECTION_FORM_SCRIPT
 				if form != null:
-					for key in _draft:
-						form.sync_field(str(key), str(_draft[key]))
+					for key in _draft.keys():
+						form.sync_field(str(key), str(_draft.get(str(key), "")))
 
 func _fit_inline_core() -> void:
 	var column: Control = get_node(IDENTITY)
@@ -1217,7 +1217,8 @@ func _fit_inline_core() -> void:
 	var available := size.y - 90
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	var height := minf(510, maxf(0, available - other_height))
-	if absf(portrait.custom_minimum_size.y - height) > 0.1:
+	var difference := portrait.custom_minimum_size.y - height
+	if difference > 0.1 or difference < -0.1:
 		portrait.custom_minimum_size = Vector2(0, height)
 
 func begin_corrections() -> void:
