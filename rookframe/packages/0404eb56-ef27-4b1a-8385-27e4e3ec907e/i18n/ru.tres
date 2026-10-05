@@ -1499,5 +1499,13 @@ messages = {
 [&"", &"Resolve the response at the table."]: [&"Разрешите реакцию за столом."],
 [&"", &"Resolve protection and consequences at the table."]: [&"Разрешите защиту и последствия за столом."],
 [&"", &"Resolve consequences at the table."]: [&"Разрешите последствия за столом."],
+[&"", &"Unmodified d20 against DR%d."]: [&"d20 без модификаторов против СЛ%d."],
+[&"", &"%s: d20 %d, DR%d — %s. Raw Roll #%d."]: [&"%s: d20 %d, СЛ%d — %s. Исходный бросок №%d."],
+[&"", &"Base succeeds"]: [&"Базовый успех"],
+[&"", &"Base fails"]: [&"Базовая неудача"],
+[&"", &"Apply table modifiers and resolve consequences manually."]: [&"Примените модификаторы и определите последствия вручную за столом."],
+[&"", &"Matching Attack critical: damage doubled."]: [&"Критическая атака совпадает: урон удвоен."],
+[&"", &"Preceding Attack Raw Roll #%d."]: [&"Исходный бросок предшествующей атаки №%d."],
+[&"", &"Critical Damage exceeds supported integer capacity. Resolve it at the table."]: [&"Критический урон выходит за допустимый диапазон целых чисел. Разрешите его за столом."]
 }
 locale = "ru"

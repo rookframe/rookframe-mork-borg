@@ -1499,4 +1499,12 @@ messages = {
 [&"", &"Resolve the response at the table."]: [&"Resolve the response at the table."],
 [&"", &"Resolve protection and consequences at the table."]: [&"Resolve protection and consequences at the table."],
 [&"", &"Resolve consequences at the table."]: [&"Resolve consequences at the table."],
+[&"", &"Unmodified d20 against DR%d."]: [&"Unmodified d20 against DR%d."],
+[&"", &"%s: d20 %d, DR%d — %s. Raw Roll #%d."]: [&"%s: d20 %d, DR%d — %s. Raw Roll #%d."],
+[&"", &"Base succeeds"]: [&"Base succeeds"],
+[&"", &"Base fails"]: [&"Base fails"],
+[&"", &"Apply table modifiers and resolve consequences manually."]: [&"Apply table modifiers and resolve consequences manually."],
+[&"", &"Matching Attack critical: damage doubled."]: [&"Matching Attack critical: damage doubled."],
+[&"", &"Preceding Attack Raw Roll #%d."]: [&"Preceding Attack Raw Roll #%d."],
+[&"", &"Critical Damage exceeds supported integer capacity. Resolve it at the table."]: [&"Critical Damage exceeds supported integer capacity. Resolve it at the table."]
 }

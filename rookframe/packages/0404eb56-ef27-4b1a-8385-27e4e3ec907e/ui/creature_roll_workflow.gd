@@ -113,6 +113,13 @@ func summary() -> String:
 	var choice: Dictionary = snapshot.get("choice", {})
 	var plan: Dictionary = choice.get("plan", {})
 	var result := _locale.text("%s: %s = %d. Raw Roll #%d.") % [_locale.text(str(choice.label)), str(choice.normalized), int(snapshot.total), int(snapshot.sequence)]
+	if str(choice.part) in ["attack", "defence"]:
+		var outcome := "Fumble" if int(snapshot.total) == 1 else "Critical" if int(snapshot.total) == 20 else "Base succeeds" if int(snapshot.total) >= int(choice.difficulty) else "Base fails"
+		return _locale.text("%s: d20 %d, DR%d — %s. Raw Roll #%d.") % [_locale.text(str(choice.label)), int(snapshot.total), int(choice.difficulty), _locale.text(outcome), int(snapshot.sequence)] + "\n" + _locale.text("Apply table modifiers and resolve consequences manually.")
+	if bool(snapshot.get("critical", false)):
+		result += "\n" + _locale.text("Matching Attack critical: damage doubled.")
+	if int(snapshot.get("attack_sequence", 0)) > 0:
+		result += "\n" + _locale.text("Preceding Attack Raw Roll #%d.") % int(snapshot.attack_sequence)
 	if int(plan.faces) == 2:
 		result += "\n" + _locale.text("Physical d4 faces map 1–2 to 1 and 3–4 to 2 before the modifier.")
 	if str(choice.part) == "morale":
