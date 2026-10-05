@@ -1506,5 +1506,16 @@ messages = {
 [&"", &"Apply table modifiers and resolve consequences manually."]: [&"Apply table modifiers and resolve consequences manually."],
 [&"", &"Matching Attack critical: damage doubled."]: [&"Matching Attack critical: damage doubled."],
 [&"", &"Preceding Attack Raw Roll #%d."]: [&"Preceding Attack Raw Roll #%d."],
-[&"", &"Critical Damage exceeds supported integer capacity. Resolve it at the table."]: [&"Critical Damage exceeds supported integer capacity. Resolve it at the table."]
+[&"", &"Critical Damage exceeds supported integer capacity. Resolve it at the table."]: [&"Critical Damage exceeds supported integer capacity. Resolve it at the table."],
+[&"", &"Portrait changed. Choose it again."]: [&"Portrait changed. Choose it again."],
+[&"", &"The portrait is still arriving."]: [&"The portrait is still arriving."],
+[&"", &"This device could not display the portrait."]: [&"This device could not display the portrait."],
+[&"", &"Choose a PNG, JPEG or WebP portrait."]: [&"Choose a PNG, JPEG or WebP portrait."],
+[&"", &"This device could not open the portrait image."]: [&"This device could not open the portrait image."],
+[&"", &"Portrait selection cancelled."]: [&"Portrait selection cancelled."],
+[&"", &"Finish the current portrait upload first."]: [&"Finish the current portrait upload first."],
+[&"", &"The portrait's World Session ended."]: [&"The portrait's World Session ended."],
+[&"", &"The portrait upload could not start."]: [&"The portrait upload could not start."],
+[&"", &"The portrait transfer ended before the complete file arrived."]: [&"The portrait transfer ended before the complete file arrived."],
+[&"", &"Portrait upload cancelled."]: [&"Portrait upload cancelled."]
 }

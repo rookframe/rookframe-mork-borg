@@ -9,7 +9,7 @@ var _definition: SDK.ContentReference
 var _busy := false
 var _portrait_pending := false
 var _portrait_epoch := 0
-var _portrait_image := PackedByteArray()
+var _portrait_path := ""
 var _portrait_texture: Texture2D
 var _portrait_error := ""
 
@@ -110,22 +110,24 @@ func _portrait() -> Texture2D:
 	var saved := sdk.world_data.read()
 	var world: Dictionary = saved.value if saved.ok and typeof(saved.value) == TYPE_DICTIONARY else {}
 	var defaults: Dictionary = world.get("creature_portraits", {}) if typeof(world.get("creature_portraits", {})) == TYPE_DICTIONARY else {}
-	var id := str(_definition.local_id)
-	var value: Variant = defaults.get(id, PackedByteArray())
-	var image: PackedByteArray = value if typeof(value) == typeof(PackedByteArray()) else PackedByteArray()
-	if image != _portrait_image:
-		_portrait_image = image
+	var value: Variant = defaults.get(str(_definition.local_id), "")
+	var path: String = value if typeof(value) == TYPE_STRING else ""
+	if path != _portrait_path:
+		_portrait_path = path
 		_portrait_texture = null
 		_portrait_error = ""
-		if not image.is_empty():
-			var decoded := sdk.portraits.decode(image)
-			if decoded.ok:
-				_portrait_texture = decoded.texture
-			else:
-				_portrait_error = decoded.message
-	if image.is_empty():
+	# Acquisition can finish after the Actor reference arrives. Failed decoding
+	# retries on the ordinary World change notification; successful textures cache.
+	if not path.is_empty() and _portrait_texture == null:
+		var decoded := sdk.portraits.decode(path)
+		if decoded.ok:
+			_portrait_texture = decoded.texture
+			_portrait_error = ""
+		else:
+			_portrait_error = decoded.message
+	if path.is_empty():
 		_portrait_error = ""
-	if typeof(value) != typeof(PackedByteArray()):
+	if typeof(value) != TYPE_STRING:
 		_portrait_error = "Portrait is unavailable. Choose a replacement."
 	return _portrait_texture
 
@@ -133,6 +135,7 @@ func _choose_portrait() -> void:
 	if _busy or _definition == null or not sdk.context().is_gm:
 		return
 	var definition := _definition.local_id
+	var expected := _default_portrait_choice()
 	var epoch := _portrait_epoch
 	_portrait_pending = true
 	_busy = true
@@ -149,19 +152,20 @@ func _choose_portrait() -> void:
 		if selected.code != "cancelled":
 			get_node("Sheet").status(selected.message)
 		return
-	await _save_portrait(definition, selected.image, epoch)
+	await _save_portrait(definition, selected.path, expected, epoch)
 
 func _reset_portrait() -> void:
 	if _busy or _definition == null or not sdk.context().is_gm:
 		return
+	var expected := _default_portrait_choice()
 	_portrait_pending = true
 	_busy = true
 	_refresh()
-	await _save_portrait(_definition.local_id, PackedByteArray(), _portrait_epoch)
+	await _save_portrait(_definition.local_id, "", expected, _portrait_epoch)
 
-func _save_portrait(definition: String, image: PackedByteArray, epoch: int) -> void:
+func _save_portrait(definition: String, path: String, expected: Dictionary, epoch: int) -> void:
 	get_node("Sheet").status("Saving portrait…")
-	var result := await sdk.system_actions.submit("creature-appearance.default-portrait", {"definition": definition, "image": image})
+	var result := await sdk.system_actions.submit("creature-appearance.default-portrait", {"definition": definition, "path": path, "expected": expected.path, "expected_revision": expected.revision})
 	if epoch != _portrait_epoch or _definition == null or _definition.local_id != definition:
 		return
 	_portrait_pending = false
@@ -206,3 +210,10 @@ func _input(event: InputEvent) -> void:
 
 func _chapter_changed(_chapter: int) -> void:
 	_refresh_appearance()
+
+func _default_portrait_choice() -> Dictionary:
+	var saved := sdk.world_data.read()
+	var world: Dictionary = saved.value if saved.ok and typeof(saved.value) == TYPE_DICTIONARY else {}
+	var defaults: Dictionary = world.get("creature_portraits", {}) if typeof(world.get("creature_portraits", {})) == TYPE_DICTIONARY else {}
+	var revisions: Dictionary = world.get("creature_portrait_revisions", {}) if typeof(world.get("creature_portrait_revisions", {})) == TYPE_DICTIONARY else {}
+	return {"path": str(defaults.get(str(_definition.local_id), "")), "revision": int(revisions.get(str(_definition.local_id), 0))}

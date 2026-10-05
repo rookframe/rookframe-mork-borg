@@ -23,14 +23,25 @@ permitted mutations remain separate from complete shared World gameplay data.
 
 Appearance commits portrait choice/reset and preferred-Miniature changes
 immediately, independently of the stat-block draft. The host-owned portrait
-picker returns normalized image bytes through the public SDK; Reset restores
-the authored portrait. The existing full-viewport Miniature browser provides
+picker retains original PNG/JPEG/WebP files in the shared World and returns
+World-relative filepaths through the public SDK. Actor and Library mutations
+save only those paths; Reset restores the authored portrait. Synchronous System
+saved-data callbacks convert earlier inline portraits before Authority starts
+and admits Participants, including on dedicated Authority. Update a stopped
+World’s selection to the newly published filepath System first; the replaced
+inline-byte Package facade is not a retained gameplay compatibility API. The existing full-viewport Miniature browser provides
 name/Package search, None, preview, Cancel and Use Miniature. Existing Rooks
 keep their Miniature. Owner mutations reread the latest accepted Authority
 Actor and freeze legacy effective capabilities on the first appearance write.
 GM Library choices persist in Package-owned World data as defaults for future
 creation from that entry; creation snapshots the current Authority defaults.
 Changing defaults leaves existing Actors and published definitions unchanged.
+Each image choice captures only its prior portrait filepath and portrait revision
+before selection/upload. Authority checks both against current data and increments
+the portrait revision on every accepted choice/reset. The per-Actor field and
+per-definition World map prevent a late upload replacing a newer choice or reset,
+including an empty → choice → empty cycle. HP, loot and unrelated World changes
+do not invalidate an otherwise current portrait choice.
 
 Edit sheet retains one shared changed-fields draft for core values, explicit
 attacks, structured rules and supported printed formulas. Its core editors open

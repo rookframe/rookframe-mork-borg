@@ -32,7 +32,7 @@ func test_relative_hp_retries_preserve_latest_actor_and_apply_accepted_change_on
 	# An older client snapshot must not overwrite accepted independent operations.
 	var old := sdk.actors.read(SDK.ActorId.new("hero"))
 	host.actors.hero.data.hit_points = 23
-	host.actors.hero.data["portrait"] = PackedByteArray([1, 2, 3])
+	host.actors.hero.data["portrait"] = "portraits/saved-creature.png"
 	host.actors.hero.data["preferred_miniature"] = {"package_id": "package", "local_id": "miniature"}
 	host.actors.hero.data["inventory"] = [{"inventory_id": "saved", "name": "Accepted loot", "quantity": 7}]
 	host.actors.hero.data.rules = "Accepted rules"
@@ -50,7 +50,7 @@ func test_relative_hp_retries_preserve_latest_actor_and_apply_accepted_change_on
 	assert_int(host.commits).is_equal(1)
 	assert_int(result.actor.data.inventory[0].quantity).is_equal(7)
 	assert_str(result.actor.data.rules).is_equal("Accepted rules")
-	assert_bool(result.actor.data.portrait == PackedByteArray([1, 2, 3])).is_true()
+	assert_bool(result.actor.data.portrait == "portraits/saved-creature.png").is_true()
 	assert_str(result.actor.data.preferred_miniature.local_id).is_equal("miniature")
 	# Reopening reads newer accepted HP; acknowledging an old identity cannot rewind it.
 	host.actors.hero.data.hit_points = 11

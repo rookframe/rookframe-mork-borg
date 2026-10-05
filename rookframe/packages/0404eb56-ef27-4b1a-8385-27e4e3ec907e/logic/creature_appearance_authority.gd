@@ -24,14 +24,17 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 	# Freeze legacy effective capabilities on the first accepted appearance write.
 	data = CREATURES.new().stat_block(data)
 	if operation == "creature-appearance.portrait":
-		var portrait := _portrait(sdk, input.get("image"))
+		if typeof(input.get("expected")) != TYPE_STRING or typeof(input.get("expected_revision")) != TYPE_INT or data.get("portrait", "") != input.expected or int(data.get("portrait_revision", 0)) != input.expected_revision:
+			return _error("Portrait changed. Choose it again.")
+		var portrait := _portrait(sdk, input.get("path"))
 		if not portrait.ok:
 			return portrait
-		var image: PackedByteArray = portrait.image
-		if image.is_empty():
+		var path: String = portrait.path
+		if path.is_empty():
 			data.erase("portrait")
 		else:
-			data["portrait"] = image
+			data["portrait"] = path
+		data["portrait_revision"] = int(input.expected_revision) + 1
 	else:
 		if typeof(input.get("reference")) != TYPE_DICTIONARY:
 			return _error("Choose a Miniature.")
@@ -60,7 +63,7 @@ func _default_portrait(context: SDK.SystemActionContext, sdk: SDK, input: Dictio
 	var definition := str(input.get("definition", ""))
 	if not CREATURES.CORE_DEFINITIONS.has(definition):
 		return _error("Choose a Creature definition.")
-	var portrait := _portrait(sdk, input.get("image"))
+	var portrait := _portrait(sdk, input.get("path"))
 	if not portrait.ok:
 		return portrait
 	var saved := context.read_world_data()
@@ -69,26 +72,31 @@ func _default_portrait(context: SDK.SystemActionContext, sdk: SDK, input: Dictio
 	if saved.value != null and typeof(saved.value) != TYPE_DICTIONARY:
 		return _error("Appearance defaults are unavailable.")
 	var world: Dictionary = {} if saved.value == null else saved.value.duplicate(true)
-	if typeof(world.get("creature_portraits", {})) != TYPE_DICTIONARY:
+	if typeof(world.get("creature_portraits", {})) != TYPE_DICTIONARY or typeof(world.get("creature_portrait_revisions", {})) != TYPE_DICTIONARY:
 		return _error("Appearance defaults are unavailable.")
 	var defaults: Dictionary = world.get("creature_portraits", {}).duplicate(true)
-	var image: PackedByteArray = portrait.image
-	if image.is_empty():
+	var revisions: Dictionary = world.get("creature_portrait_revisions", {}).duplicate(true)
+	if typeof(input.get("expected")) != TYPE_STRING or typeof(input.get("expected_revision")) != TYPE_INT or defaults.get(definition, "") != input.expected or int(revisions.get(definition, 0)) != input.expected_revision:
+		return _error("Portrait changed. Choose it again.")
+	var path: String = portrait.path
+	if path.is_empty():
 		defaults.erase(definition)
 	else:
-		defaults[definition] = image
+		defaults[definition] = path
 	world["creature_portraits"] = defaults
+	revisions[definition] = int(input.expected_revision) + 1
+	world["creature_portrait_revisions"] = revisions
 	var committed := context.commit_world_data(world)
 	return {"ok": true, "state": "resolved", "message": "Library portrait saved."} if committed.ok else _error(committed.message)
 
 func _portrait(sdk: SDK, value: Variant) -> Dictionary:
-	if typeof(value) != typeof(PackedByteArray()):
+	if typeof(value) != TYPE_STRING:
 		return _error("Choose a portrait image.")
-	var image: PackedByteArray = value
-	if image.is_empty():
-		return {"ok": true, "image": image}
-	var decoded := sdk.portraits.decode(image)
-	return {"ok": true, "image": decoded.image} if decoded.ok else _error(decoded.message)
+	var path: String = value
+	if path.is_empty():
+		return {"ok": true, "path": path}
+	var decoded := sdk.portraits.decode(path)
+	return {"ok": true, "path": decoded.path} if decoded.ok else _error(decoded.message)
 
 func _error(message: String) -> Dictionary:
 	return {"ok": false, "state": "error", "message": message}

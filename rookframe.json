@@ -7,7 +7,7 @@
   "summary": "MÖRK BORG Character and Creature Actors with private sheets.",
   "sdk": {
     "edition": "2029",
-    "minimumRevision": 28
+    "minimumRevision": 29
   },
   "rookframeCompatibility": {
     "minimum": "0.1.0",

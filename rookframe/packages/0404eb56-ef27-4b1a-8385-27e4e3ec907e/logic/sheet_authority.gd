@@ -53,9 +53,14 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, name: String, payload: V
 				return {"ok": false, "message": "This Miniature is unavailable. Choose another."}
 		result = await actions.set_miniature(reference)
 	elif name == "sheet.portrait":
-		if typeof(input.get("image")) != typeof(PackedByteArray()):
+		if typeof(input.get("path")) != TYPE_STRING or typeof(input.get("expected")) != TYPE_STRING or typeof(input.get("expected_revision")) != TYPE_INT:
 			return {"ok": false, "message": "Choose a portrait image."}
-		result = await actions.set_portrait(input.image)
+		var path: String = input.path
+		if not path.is_empty():
+			var decoded := sdk.portraits.decode(path)
+			if not decoded.ok:
+				return {"ok": false, "message": decoded.message}
+		result = await actions.set_portrait(path, input.expected, input.expected_revision)
 	elif name == "sheet.add":
 		result = await actions.add_equipment(str(input.get("source", "")))
 	elif name == "sheet.custom":

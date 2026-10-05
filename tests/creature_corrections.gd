@@ -36,7 +36,7 @@ func test_changed_fields_preserve_latest_state_and_invalidate_replaced_entries()
 	await actions.add_equipment("torch")
 	host.actors.hero.data.hit_points = 23
 	host.actors.hero.data.rules = "Independently accepted additional prose"
-	host.actors.hero.data["portrait"] = PackedByteArray([1, 2, 3])
+	host.actors.hero.data["portrait"] = "portraits/saved-creature.png"
 	host.actors.hero.data["preferred_miniature"] = {"package_id": "another-package", "local_id": "miniature"}
 	var incoming: Dictionary = sdk.actors.read(SDK.ActorId.new("hero")).actor.data
 	assert_bool(draft.refresh(projection.fields(incoming), projection.identities(incoming))).is_false()
@@ -57,7 +57,7 @@ func test_changed_fields_preserve_latest_state_and_invalidate_replaced_entries()
 	assert_str(data.rules).is_equal("Independently accepted additional prose")
 	assert_str(data.rule_groups[1].entries[0].text).is_equal("Local second rule")
 	assert_int(data.inventory.size()).is_equal(1)
-	assert_bool(data.portrait == PackedByteArray([1, 2, 3])).is_true()
+	assert_bool(data.portrait == "portraits/saved-creature.png").is_true()
 	assert_str(data.preferred_miniature.local_id).is_equal("miniature")
 	assert_bool(draft.refresh(projection.fields(data), projection.identities(data))).is_true()
 	assert_bool(draft.changes().has("attack:0:dice")).is_false()

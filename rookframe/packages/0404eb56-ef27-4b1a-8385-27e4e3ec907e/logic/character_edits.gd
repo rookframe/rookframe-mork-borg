@@ -168,16 +168,19 @@ func _read() -> SDK.ActorResult:
 	return result
 
 ## Appearance commits independently of the Character-field draft.
-func set_portrait(image: PackedByteArray) -> SDK.ActorResult:
+func set_portrait(path: String, expected: String, expected_revision: int) -> SDK.ActorResult:
 	var source := _read()
 	if not source.ok:
 		return source
 	var current: Dictionary = source.actor.data
+	if current.get("portrait", "") != expected or int(current.get("portrait_revision", 0)) != expected_revision:
+		return _failure("Portrait changed. Choose it again.")
 	var data := current.duplicate(true)
-	if image.is_empty():
+	if path.is_empty():
 		data.erase("portrait")
 	else:
-		data["portrait"] = image
+		data["portrait"] = path
+	data["portrait_revision"] = expected_revision + 1
 	return await _save(data)
 
 func _save(data: Dictionary) -> SDK.ActorResult:

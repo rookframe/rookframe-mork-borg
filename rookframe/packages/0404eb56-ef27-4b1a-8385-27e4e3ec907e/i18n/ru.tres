@@ -1506,6 +1506,17 @@ messages = {
 [&"", &"Apply table modifiers and resolve consequences manually."]: [&"Примените модификаторы и определите последствия вручную за столом."],
 [&"", &"Matching Attack critical: damage doubled."]: [&"Критическая атака совпадает: урон удвоен."],
 [&"", &"Preceding Attack Raw Roll #%d."]: [&"Исходный бросок предшествующей атаки №%d."],
-[&"", &"Critical Damage exceeds supported integer capacity. Resolve it at the table."]: [&"Критический урон выходит за допустимый диапазон целых чисел. Разрешите его за столом."]
+[&"", &"Critical Damage exceeds supported integer capacity. Resolve it at the table."]: [&"Критический урон выходит за допустимый диапазон целых чисел. Разрешите его за столом."],
+[&"", &"Portrait changed. Choose it again."]: [&"Портрет изменён. Выберите его снова."],
+[&"", &"The portrait is still arriving."]: [&"Портрет ещё загружается."],
+[&"", &"This device could not display the portrait."]: [&"Это устройство не смогло отобразить портрет."],
+[&"", &"Choose a PNG, JPEG or WebP portrait."]: [&"Выберите портрет в формате PNG, JPEG или WebP."],
+[&"", &"This device could not open the portrait image."]: [&"Это устройство не смогло открыть изображение портрета."],
+[&"", &"Portrait selection cancelled."]: [&"Выбор портрета отменён."],
+[&"", &"Finish the current portrait upload first."]: [&"Сначала завершите текущую загрузку портрета."],
+[&"", &"The portrait's World Session ended."]: [&"Сессия мира этого портрета завершена."],
+[&"", &"The portrait upload could not start."]: [&"Не удалось начать загрузку портрета."],
+[&"", &"The portrait transfer ended before the complete file arrived."]: [&"Передача портрета прервалась до получения полного файла."],
+[&"", &"Portrait upload cancelled."]: [&"Загрузка портрета отменена."]
 }
 locale = "ru"

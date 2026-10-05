@@ -21,8 +21,8 @@ func spend_omen() -> SDK.ActorResult:
 func adjust_omens(delta: int) -> SDK.ActorResult:
 	return await _submit("omens", {"delta": delta})
 
-func set_portrait(image: PackedByteArray) -> SDK.ActorResult:
-	return await _submit("portrait", {"image": image})
+func set_portrait(path: String, expected: String, expected_revision: int) -> SDK.ActorResult:
+	return await _submit("portrait", {"path": path, "expected": expected, "expected_revision": expected_revision})
 
 func prepare_favorites(companions: Array[String] = []) -> SDK.ActorResult:
 	return await _submit("identify", {"companions": companions})

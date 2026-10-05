@@ -27,7 +27,7 @@ func test_context_is_immutable_identity_bound_and_consumed_only_by_matching_acce
 	var data: Dictionary = host.actors.hero.data
 	data.attacks[0].dice = "d4+1"
 	data.inventory = [{"inventory_id": "independent", "name": "Unspent loot", "quantity": 9}]
-	data.portrait = PackedByteArray([1, 2, 3])
+	data.portrait = "portraits/saved-creature.png"
 	var entry := str(data.attacks[0].id)
 	var other := str(data.attacks[1].id)
 	var sdk := SDK.new(host)

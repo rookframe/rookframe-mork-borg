@@ -19,8 +19,8 @@ func change_item(id: String, field: String, text: String) -> SDK.ActorResult:
 		return _failure("Creature loot has no equipment state.")
 	return await super.change_item(id, field, text)
 
-func set_portrait(image: PackedByteArray) -> SDK.ActorResult:
-	return await _appearance("portrait", {"image": image})
+func set_portrait(path: String, expected: String, expected_revision: int) -> SDK.ActorResult:
+	return await _appearance("portrait", {"path": path, "expected": expected, "expected_revision": expected_revision})
 
 func set_miniature(reference: Dictionary) -> SDK.ActorResult:
 	return await _appearance("miniature", {"reference": reference})

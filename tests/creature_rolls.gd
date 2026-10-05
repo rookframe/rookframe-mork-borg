@@ -23,7 +23,7 @@ func test_creature_roll_completion_is_once_immutable_and_late_abandonment_cancel
 	host.actors.hero.data.attacks[0].dice = "d20"
 	host.actors.hero.data.attacks[0].name = "New accepted attack"
 	host.actors.hero.data.inventory = [{"inventory_id": "loot", "name": "Unspent loot", "quantity": 8}]
-	host.actors.hero.data.portrait = PackedByteArray([1, 2, 3])
+	host.actors.hero.data.portrait = "portraits/saved-creature.png"
 	var before: Dictionary = host.actors.duplicate(true)
 	host.roll("accepted-once", [3, 3])
 	result = await sdk.system_actions.submit("creature-roll.advance", {"id": "accepted-once"})

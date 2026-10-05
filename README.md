@@ -489,7 +489,7 @@ See [Miniature ownership and defaults](docs/miniatures.md).
 Rookframe owns the right rail in the order Actors, Scenes, Library, Builder, Menu.
 MÖRK BORG adds no Creature catalogue window. Its imported Actor Definitions appear
 in Library under Creatures. Opening one shows a separate Full-viewport definition sheet;
-Its Appearance chapter owns World-local portrait and Miniature defaults for new Actors. The + button on its
+Its Appearance chapter owns World-local portrait and Miniature defaults for new Actors. Portraits retain original PNG/JPEG/WebP files in the shared World; Actor and Library values store World-relative filepaths. Synchronous System saved-data callbacks convert earlier inline portraits before Authority startup and Participant admission, including on dedicated Authority, preserving their existing bytes and gameplay data. An unsuccessful conversion refuses startup and keeps the failed saved value for retry. The + button on its
 Library row and Create Actor on its sheet create Actors. Dragging a
 Creature onto the tabletop creates an Actor and a linked Rook at the drop position.
 Creation is a GM operation. Failed placement cleans up its partial Actor and Rook.

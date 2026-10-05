@@ -47,8 +47,8 @@ func portrait(data: Dictionary) -> Texture2D:
 	var texture: Texture2D = preload("res://rookframe/ui/icons/character/character.svg")
 	var caption := "No portrait selected"
 	if data.has("portrait"):
-		var image: PackedByteArray = data.get("portrait")
-		var decoded := _sdk.portraits.decode(image)
+		var path: String = data.get("portrait", "") if typeof(data.get("portrait", "")) == TYPE_STRING else ""
+		var decoded := _sdk.portraits.decode(path)
 		if decoded.ok:
 			texture = decoded.texture
 			caption = "Character portrait"
@@ -71,6 +71,9 @@ func _choose_portrait() -> void:
 	if _busy or _actor == null or _actor.access_level != "Owner":
 		return
 	var actor_id := _actor.id
+	var data: Dictionary = _actor.data
+	var expected := str(data.get("portrait", ""))
+	var revision := int(data.get("portrait_revision", 0))
 	_busy = true
 	var selected := await _sdk.portraits.choose()
 	if not selected.ok:
@@ -81,13 +84,14 @@ func _choose_portrait() -> void:
 	if _actor == null or _actor.id.value != actor_id.value:
 		_busy = false
 		return
-	_result(await ACTIONS.new(_sdk, actor_id).set_portrait(selected.image))
+	_result(await ACTIONS.new(_sdk, actor_id).set_portrait(selected.path, expected, revision))
 
 func _clear_portrait() -> void:
 	if _busy or _actor == null or _actor.access_level != "Owner":
 		return
 	_busy = true
-	_result(await ACTIONS.new(_sdk, _actor.id).set_portrait(PackedByteArray()))
+	var data: Dictionary = _actor.data
+	_result(await ACTIONS.new(_sdk, _actor.id).set_portrait("", str(data.get("portrait", "")), int(data.get("portrait_revision", 0))))
 
 func _result(result: SDK.ActorResult) -> void:
 	_busy = false

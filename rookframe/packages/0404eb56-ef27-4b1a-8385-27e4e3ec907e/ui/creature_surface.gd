@@ -32,7 +32,7 @@ var _detail_pages: Dictionary = {}
 var _busy := false
 var _portrait_pending := false
 var _portrait_epoch := 0
-var _portrait_image := PackedByteArray()
+var _portrait_path := ""
 var _portrait_texture: Texture2D
 var _portrait_error := ""
 var _portrait_feedback := ""
@@ -479,20 +479,24 @@ func _clear_miniature() -> void:
 			sheet.status(result.message)
 
 func _portrait(data: Dictionary) -> Texture2D:
-	var image: PackedByteArray = data.get("portrait", PackedByteArray()) if typeof(data.get("portrait", PackedByteArray())) == typeof(PackedByteArray()) else PackedByteArray()
-	if image != _portrait_image:
-		_portrait_image = image
+	var value: Variant = data.get("portrait", "")
+	var path: String = value if typeof(value) == TYPE_STRING else ""
+	if path != _portrait_path:
+		_portrait_path = path
 		_portrait_texture = null
 		_portrait_error = ""
-		if not image.is_empty():
-			var decoded := sdk.portraits.decode(image)
-			if decoded.ok:
-				_portrait_texture = decoded.texture
-			else:
-				_portrait_error = decoded.message
-	if image.is_empty():
+	# Acquisition can finish after the Actor reference arrives. Failed decoding
+	# retries on the ordinary World change notification; successful textures cache.
+	if not path.is_empty() and _portrait_texture == null:
+		var decoded := sdk.portraits.decode(path)
+		if decoded.ok:
+			_portrait_texture = decoded.texture
+			_portrait_error = ""
+		else:
+			_portrait_error = decoded.message
+	if path.is_empty():
 		_portrait_error = ""
-	if data.has("portrait") and typeof(data.portrait) != typeof(PackedByteArray()):
+	if typeof(value) != TYPE_STRING:
 		_portrait_error = "Portrait is unavailable. Choose a replacement."
 	return _portrait_texture
 
@@ -501,6 +505,9 @@ func _choose_portrait() -> void:
 		return
 	_health_feedback = ""
 	var id := actor.id
+	var data: Dictionary = actor.data
+	var expected := str(data.get("portrait", ""))
+	var revision := int(data.get("portrait_revision", 0))
 	var epoch := _portrait_epoch
 	_portrait_pending = true
 	_portrait_feedback = ""
@@ -520,23 +527,26 @@ func _choose_portrait() -> void:
 		_refresh()
 		sheet.focus_portrait.call_deferred()
 		return
-	await _save_portrait(id, selected.image, epoch)
+	await _save_portrait(id, selected.path, expected, revision, epoch)
 
 func _reset_portrait() -> void:
 	if not owner() or _busy:
 		return
 	_health_feedback = ""
+	var data: Dictionary = actor.data
+	var expected := str(data.get("portrait", ""))
+	var revision := int(data.get("portrait_revision", 0))
 	_portrait_pending = true
 	_portrait_feedback = ""
 	_correction_feedback = ""
 	_busy = true
 	_refresh()
-	await _save_portrait(actor.id, PackedByteArray(), _portrait_epoch)
+	await _save_portrait(actor.id, "", expected, revision, _portrait_epoch)
 
-func _save_portrait(id: SDK.ActorId, image: PackedByteArray, epoch: int) -> void:
+func _save_portrait(id: SDK.ActorId, path: String, expected: String, revision: int, epoch: int) -> void:
 	_portrait_feedback = "Saving portrait…"
 	sheet.status(_portrait_feedback)
-	var result := await ITEMS.new(sdk, id).set_portrait(image)
+	var result := await ITEMS.new(sdk, id).set_portrait(path, expected, revision)
 	if epoch != _portrait_epoch or actor == null or actor.id.value != id.value:
 		return
 	_portrait_pending = false

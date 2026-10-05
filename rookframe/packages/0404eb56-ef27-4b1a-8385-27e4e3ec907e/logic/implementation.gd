@@ -34,6 +34,13 @@ const CREATURE_APPEARANCE = preload("res://rookframe/packages/0404eb56-ef27-4b1a
 var _creature_appearance := CREATURE_APPEARANCE.new()
 const SHEET_COMBAT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/sheet_combat.gd")
 var _sheet_combat := SHEET_COMBAT.new()
+const PORTRAIT_CONVERSION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/portrait_conversion.gd")
+
+func migrate_actor_data(data: Variant) -> Variant:
+	return PORTRAIT_CONVERSION.new().actor_data(sdk, data)
+
+func migrate_world_data(data: Variant) -> Variant:
+	return PORTRAIT_CONVERSION.new().world_data(sdk, data)
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
 	if name.begins_with("creature-roll."):

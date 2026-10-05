@@ -44,10 +44,10 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 		var portraits: Dictionary = world.get("creature_portraits", {})
 		if portraits.has(definition):
 			var portrait: Variant = portraits.get(definition)
-			if typeof(portrait) != typeof(PackedByteArray()):
+			if typeof(portrait) != TYPE_STRING:
 				return _error("Appearance defaults are unavailable.")
-			var image: PackedByteArray = portrait
-			choices["portrait"] = image
+			var path: String = portrait
+			choices["portrait"] = path
 		var created := context.create_actors([{"package_id": sdk.package_id(), "local_id": definition, "choices": choices}], str(identity.get("participant_id", "")))
 		if not created.ok:
 			return _error(created.message)
