@@ -61,6 +61,7 @@ var _layout_pending := false
 var _pages: Dictionary = {}
 var _encounter_keys: Dictionary = {}
 var _reference_route := ""
+var _reference_pending := false
 var _reference_pages: Dictionary = {}
 var _reference_values: Dictionary = {}
 var _focus_identity := false
@@ -126,7 +127,6 @@ func _queue_layout() -> void:
 	if _layout_pending or not is_node_ready():
 		return
 	_layout_pending = true
-	_layout.call_deferred()
 
 func _layout() -> void:
 	_layout_pending = false
@@ -172,7 +172,7 @@ func _layout() -> void:
 	_render_encounter()
 	_render_inventory()
 	_update_visibility()
-	_refresh_reference()
+	_reference_pending = true
 
 func _build_groups(metadata: Dictionary) -> void:
 	var groups: Array[Dictionary] = []
@@ -486,7 +486,8 @@ func show_source() -> void:
 	_append_reference(content, {"name": "Published source", "text": _locale.text("Published source is unavailable.") if source.is_empty() else str(source.get("title", "")) + "\n" + str(source.get("page", "")) + "\n" + str(source.get("author", ""))})
 	_append_reference(content, {"name": "Attribution", "text": "MÖRK BORG is © Ockult Örtmästare Games & Stockholm Kartell. Mechanical facts are restated; study artwork is not official book art."})
 	(get_node(WORK + "Reader/Publication") as Control).visible = not str(source.get("url", "")).is_empty()
-	get_node(WORK + "Reader/Pages").restore_state(_reference_pages.get("source", {}))
+	var page: Dictionary = _reference_pages.get("source", {})
+	get_node(WORK + "Reader/Pages").restore_state(page)
 	_reference_values = _source().duplicate(true)
 	_update_visibility()
 	get_node(WORK + "Reader/Back").grab_focus()
@@ -626,9 +627,11 @@ func capture_navigation() -> Dictionary:
 	return {"chapter": _chapter, "section": _section, "pages": pages, "encounter_pages": _pages.duplicate(true), "reference_pages": _reference_pages.duplicate(true)}
 
 func restore_navigation(state: Dictionary) -> void:
-	_pages = state.get("encounter_pages", {}).duplicate(true)
+	var encounter_pages: Dictionary = state.get("encounter_pages", {})
+	_pages = encounter_pages.duplicate(true)
 	_encounter_keys = {}
-	_reference_pages = state.get("reference_pages", {}).duplicate(true)
+	var reference_pages: Dictionary = state.get("reference_pages", {})
+	_reference_pages = reference_pages.duplicate(true)
 	_reference_route = ""
 	_focus_identity = false
 	_return_entry = ""
@@ -726,7 +729,15 @@ func focus_correction(route: String) -> bool:
 func _process(_delta: float) -> void:
 	if not is_visible_in_tree():
 		return
+	# Compose visible accepted state once per native frame. Hidden sheets wait
+	# until shown instead of scheduling a full layout for each configuration.
+	if _layout_pending:
+		_layout()
 	_fit_identity()
+	# Refresh accepted reference text once after the coalesced layout has settled.
+	if _reference_pending:
+		_reference_pending = false
+		_refresh_reference()
 	_update_decorations()
 	_fit_phone_entries()
 	_update_pager_labels()
@@ -971,15 +982,20 @@ func _fit_identity() -> void:
 	var title: Label = get_node(IDENTITY + "Name")
 	var classification: Label = get_node(IDENTITY + "Classification")
 	# Hidden labels still measure the complete text at the settled native width.
-	title.size.x = column.size.x
-	classification.size.x = column.size.x
+	title.size = Vector2(column.size.x, title.size.y)
+	classification.size = Vector2(column.size.x, classification.size.y)
+	# Shape hidden full text after a width/font change before reading its minimum.
+	title.get_line_count()
+	classification.get_line_count()
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	var opener: Button = get_node(IDENTITY + "IdentityDetails")
 	var available := size.y - (11 if _phone else 17 if _tablet else 25) - (53 if _phone else 57 if _tablet else 65)
 	var other_height := 0.0
 	for child in column.get_children():
-		if child is Control and child.visible and child not in [title, classification, portrait, opener, get_node(IDENTITY + "NameGap")]:
-			other_height += child.get_combined_minimum_size().y
+		if child is Control:
+			var control: Control = child
+			if control.visible and str(control.name) not in ["Name", "Classification", "Portrait", "IdentityDetails", "NameGap"]:
+				other_height += control.get_combined_minimum_size().y
 	var portrait_height := 148.0 if _phone else 430.0 if _tablet else 510.0
 	var name_gap := 3 if _phone else 6 if _tablet else 7
 	var full_height := title.get_combined_minimum_size().y + classification.get_combined_minimum_size().y + name_gap
@@ -993,7 +1009,7 @@ func _fit_identity() -> void:
 	get_node(IDENTITY + "IdentityDetails/Copy/Caption").text = _locale.text("Full identity") + " ›"
 	get_node(IDENTITY + "IdentityDetails/Copy/Caption").add_theme_font_size_override("font_size", 9 if _phone else 11 if _tablet else 13)
 	opener.accessibility_name = title.text + ". " + classification.text + ". " + _locale.text("Full identity")
-	opener.custom_minimum_size.y = maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y)
+	opener.custom_minimum_size = Vector2(0, maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y))
 	var identity_height := opener.custom_minimum_size.y if _identity_overflow else full_height
 	var target := minf(portrait_height, maxf(0, available - other_height - identity_height))
 	var difference := target - portrait.custom_minimum_size.y
@@ -1017,7 +1033,8 @@ func show_identity() -> void:
 	_reference_values = _identity_values()
 	_append_reference(reader_content(), {"name": "Name", "text": _reference_values.name})
 	_append_reference(reader_content(), {"name": "Classification", "text": _reference_values.classification if not str(_reference_values.classification).is_empty() else _locale.text("Not recorded")})
-	restore_reader(_reference_pages.get("identity", {}))
+	var page: Dictionary = _reference_pages.get("identity", {})
+	restore_reader(page)
 
 func _refresh_reference() -> void:
 	if not _reader or _reference_route.is_empty():

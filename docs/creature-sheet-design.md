@@ -70,9 +70,30 @@ RFG-350 through RFG-352 supply HP adjustment/death and Window Dice; the live
 adapter exposes editing_sheet(), draft_value() and change_draft() for those
 follow-ups alongside accepted current_data() and explicit action signals.
 
-Back/Escape restores the Inventory entry and its native focus. Per-Actor local
-chapter/page state lasts for the World Application session and resets on restart.
+Back/Escape restores the same stable Inventory entry and its native focus even
+when accepted entries reorder; a removed entry returns to the Inventory chapter.
+Per-Actor local chapter, phone section, independent section pages, Details pages
+and reference pages last for the World Application session and reset on restart.
+Source and full identity refresh from incoming accepted data while retaining the
+reader's page and native focus. Losing Owner access discards the local draft and
+closes obsolete mutation views; complete accepted data remains available.
 Absent values, removed entries and unavailable content retain readable states.
+
+The approved identity composition remains unchanged when complete Name and
+Classification fit with portrait and core values. Only overflowing identity uses
+a minimum-44px Full identity opener and the existing bounded article reader.
+The opener repeats an ellipsized name for context and exposes both full strings
+in its accessible name; the reader retains every accepted character across
+measured native pages. Back/Escape returns focus to that opener, or the current
+chapter if an incoming identity now fits. There is no accepted-text cap, data
+mutation or collection scrolling. This overflow state is reconciled in the HTML
+authority separately from its previously approved ordinary composition.
+
+Common composition is coalesced in the existing native process callback. A
+configuration requests layout; a visible sheet composes once per frame before
+fitting identity and refreshing changed reference text. Hidden retained surfaces
+wait until shown. Opening reads current accepted Actor data and overwrites local
+presentation before that composition; close never saves an unsaved draft.
 Actor placement remains the ordinary Actors drag-and-drop operation. Existing
 captured targeted tabletop procedures retain their separate task route.
 
