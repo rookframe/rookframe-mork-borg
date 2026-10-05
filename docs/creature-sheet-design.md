@@ -157,7 +157,13 @@ It exposes `pending`, `source`, `state`, `snapshot`, `summary()`, `start()` and
 `abandon()` to the coalesced sheet adapter. Owner/Edit/pending/accepted-health
 guards remain in that adapter and the fresh Authority boundary. Closing hides
 presentation and preserves a pending Roll; reopening its initiating Actor can
-present it again. Opening a different Actor cannot redirect that request. Back,
+present it again. Actual authored content removal/free invokes the stock Godot
+`RollWorkflow._exit_tree` hook and abandons through the existing independently
+retained `action_request` cancellation. That transport orders cancellation after
+a delayed accepted start even if its UI Node has already been freed. A host
+Actor-window content replacement therefore cancels the old action instead of
+leaving a request with no poller. Hiding/Close retains the Node and pending Roll.
+Opening a different Actor cannot redirect that request. Back,
 chapter change or another workflow abandons unfinished dice. The reader retains
 identity/portrait on phone and restores the exact named opener after layout.
 

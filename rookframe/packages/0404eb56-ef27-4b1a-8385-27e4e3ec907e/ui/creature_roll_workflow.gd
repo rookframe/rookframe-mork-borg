@@ -21,6 +21,10 @@ var _presenting := true
 var _poll := 0.0
 var _locale := I18N.new()
 
+func _exit_tree() -> void:
+	# Actual content teardown abandons; hiding/Close keeps the Node and Roll.
+	abandon()
+
 func configure(sdk: SDK, surface: Control) -> void:
 	_sdk = sdk
 	_surface = surface
