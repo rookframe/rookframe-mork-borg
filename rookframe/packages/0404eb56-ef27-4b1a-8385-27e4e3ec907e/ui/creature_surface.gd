@@ -6,6 +6,9 @@ const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
 const SHEET = preload(ROOT + "ui/creature_sheet_surface.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
+const HEALTH = preload(ROOT + "logic/creature_health.gd")
+const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
+const REQUEST = preload(ROOT + "logic/action_request.gd")
 const ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
@@ -43,7 +46,12 @@ var _correction_epoch := 0
 var _draft_refresh_pending := false
 var _render_pending := false
 var _validation: Dictionary = {}
-var _health_available := false
+var _health_available := true
+var _health_editor: HEALTH_EDITOR_SCRIPT
+var _health_pending := false
+var _health_epoch := 0
+var _health_feedback := ""
+var _health_attempt: Dictionary = {}
 var _rolls_available := false
 var _nav: Dictionary = {}
 var _catalogue_query := ""
@@ -81,6 +89,7 @@ func ready() -> void:
 
 func opened(id: SDK.ActorId) -> void:
 	_end_portrait()
+	_end_health()
 	_portrait_feedback = ""
 	_correction_epoch += 1
 	_correction_feedback = ""
@@ -149,7 +158,7 @@ func _process(_delta: float) -> void:
 			else:
 				for field in _fields:
 					field.sync_draft_value(_draft.value(field._field))
-	if _render_pending and (not _busy or _portrait_pending):
+	if _render_pending and (not _busy or _portrait_pending or _health_pending):
 		_render_pending = false
 		_render_accepted()
 	if _detail_pending and not _busy:
@@ -188,6 +197,8 @@ func _render_accepted() -> void:
 	sheet.status("Creature sheet · Owner" if owner() else "Creature sheet · Viewer")
 	if _portrait_pending:
 		sheet.status(_portrait_feedback)
+	elif not _health_feedback.is_empty():
+		sheet.status(_health_feedback)
 	elif not _correction_feedback.is_empty():
 		sheet.status(_correction_feedback)
 	elif not _portrait_error.is_empty():
@@ -246,6 +257,9 @@ func _open_detail(route: String) -> void:
 	_detail_pending = true
 
 func _render_detail() -> void:
+	if _detail == "health":
+		_render_health()
+		return
 	if _detail.begins_with("correction:"):
 		_render_correction()
 		return
@@ -372,6 +386,7 @@ func _remove_item() -> void:
 func _mutate(operation: String, arguments: Array) -> void:
 	if not owner() or _busy:
 		return
+	_health_feedback = ""
 	var id := actor.id.value
 	var actions := ITEMS.new(sdk, actor.id)
 	_busy = true
@@ -456,6 +471,7 @@ func _portrait(data: Dictionary) -> Texture2D:
 func _choose_portrait() -> void:
 	if not owner() or _busy:
 		return
+	_health_feedback = ""
 	var id := actor.id
 	var epoch := _portrait_epoch
 	_portrait_pending = true
@@ -481,6 +497,7 @@ func _choose_portrait() -> void:
 func _reset_portrait() -> void:
 	if not owner() or _busy:
 		return
+	_health_feedback = ""
 	_portrait_pending = true
 	_portrait_feedback = ""
 	_correction_feedback = ""
@@ -564,6 +581,7 @@ func restore_reconnect_state(state: Dictionary) -> void:
 
 func _closed() -> void:
 	_end_portrait()
+	_end_health()
 	_correction_epoch += 1
 	_correction_feedback = ""
 	_remember()
@@ -584,6 +602,7 @@ func _close() -> void:
 func _correct() -> void:
 	if not owner() or _busy or _draft.active:
 		return
+	_health_feedback = ""
 	_portrait_feedback = ""
 	_busy = true
 	var id := actor.id.value
@@ -607,13 +626,77 @@ func _correct() -> void:
 	_open_correction("core")
 	correction_requested.emit()
 func _health() -> void:
+	if not owner() or _busy:
+		return
 	if _draft.active:
 		_open_correction("core")
 	else:
+		_health_feedback = ""
+		_health_attempt = {}
+		_portrait_feedback = ""
+		_correction_feedback = ""
+		_health_editor = null
+		_open_detail("health")
 		health_adjustment_requested.emit()
 func _roll(part: String, id: String) -> void:
-	if not _draft.active:
+	if can_roll():
 		gameplay_roll_requested.emit(part, id)
+
+## RFG-351 shares this accepted-state guard. Draft HP never determines death.
+func is_dead() -> bool:
+	return HEALTH.new().is_dead(current_data())
+
+func can_roll() -> bool:
+	return owner() and not _busy and not _draft.active and HEALTH.new().can_roll(current_data())
+
+func _render_health() -> void:
+	if not is_instance_valid(_health_editor):
+		_health_editor = sheet.open_health_reader()
+		_health_editor.configure(locale, sheet.size.x <= 900)
+		_health_editor.adjustment_requested.connect(_adjust_health)
+		_health_editor.correction_requested.connect(_correct)
+	_health_editor.refresh(current_data(), owner(), _health_pending)
+
+func _adjust_health(operation: String, amount: String) -> void:
+	if not owner() or _busy or _draft.active or _detail != "health":
+		return
+	var id := actor.id
+	var epoch := _health_epoch
+	var actions := ITEMS.new(sdk, id)
+	var request := REQUEST.new(sdk, self)
+	if str(_health_attempt.get("operation", "")) != operation or str(_health_attempt.get("amount", "")) != amount:
+		_health_attempt = {"id": sdk.dice.new_request_id(), "operation": operation, "amount": amount}
+	var action_id := str(_health_attempt.get("id", ""))
+	_busy = true
+	_health_pending = true
+	_health_feedback = "Saving HP…"
+	_refresh()
+	_health_editor.refresh(current_data(), owner(), true)
+	var result := await actions.adjust_health(action_id, operation, amount, request)
+	if epoch != _health_epoch or actor == null or actor.id.value != id.value:
+		return
+	_busy = false
+	_health_pending = false
+	if result.ok:
+		_health_attempt = {}
+		actor = result.actor
+		_detail = ""
+		sheet.back()
+	_health_feedback = "Hit points updated." if result.ok else result.message
+	_refresh_pending = true
+	_refresh()
+	if not result.ok and is_instance_valid(_health_editor):
+		_health_editor.refresh(current_data(), owner(), false)
+		_health_editor.show_error(result.message, actions.invalid_field)
+
+func _end_health() -> void:
+	_health_epoch += 1
+	if _health_pending:
+		_busy = false
+	_health_pending = false
+	_health_editor = null
+	_health_feedback = ""
+	_health_attempt = {}
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if is_visible_in_tree() and not _busy and event.is_action_pressed("ui_cancel"):

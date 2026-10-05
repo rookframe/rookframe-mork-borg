@@ -1,5 +1,6 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd"
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
+const REQUEST = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/action_request.gd")
 
 ## Creature inventory is carried loot. Snapshot an older Actor's effective
 ## capabilities before editing its saved items through the ordinary SDK.
@@ -44,6 +45,17 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary = {}) -> SDK.ActorRe
 func _submit_corrections(operation: String, payload: Dictionary) -> SDK.ActorResult:
 	payload["actor"] = _id.value
 	var response := await _sdk.system_actions.submit("creature." + operation, payload)
+	invalid_field = ""
+	if not response.ok:
+		return _failure(response.message)
+	var result: Dictionary = response.value
+	invalid_field = str(result.get("field", ""))
+	return SDK.ActorResult.new(result)
+
+## Keep id and choices unchanged when retrying a relative adjustment.
+func adjust_health(id: String, operation: String, amount: String, transport: REQUEST = null) -> SDK.ActorResult:
+	var payload := {"id": id, "actor": _id.value, "operation": operation, "amount": amount}
+	var response: SDK.DataResult = await _sdk.system_actions.submit("creature-health.adjust", payload) if transport == null else await transport.submit("creature-health.adjust", payload)
 	invalid_field = ""
 	if not response.ok:
 		return _failure(response.message)

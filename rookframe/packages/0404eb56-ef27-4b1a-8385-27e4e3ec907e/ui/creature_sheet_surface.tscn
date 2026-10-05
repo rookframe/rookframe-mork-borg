@@ -54,6 +54,12 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 62)
 theme_type_variation = "TaskChoice"
 theme_override_font_sizes/font_size = 28
+autowrap_mode = 3
+[node name="Condition" type="Label" parent="Inset/Layout/Body/Identity"]
+layout_mode = 2
+visible = false
+autowrap_mode = 3
+
 [node name="Vitals" type="HBoxContainer" parent="Inset/Layout/Body/Identity"]
 layout_mode = 2
 theme_override_constants/separation = 8
