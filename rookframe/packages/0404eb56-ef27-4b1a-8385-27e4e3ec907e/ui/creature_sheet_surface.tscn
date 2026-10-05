@@ -26,6 +26,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_dialog.gd" id="correction_dialog"]
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_card.tres" id="correction_frame"]
 
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_focus.tres" id="roll_focus"]
 [sub_resource type="StyleBoxFlat" id="footer_action"]
 bg_color = Color(0,0,0,0)
 content_margin_left = 12.0
@@ -293,12 +294,14 @@ layout_mode = 2
 custom_minimum_size = Vector2(0,73.5)
 theme_override_constants/separation = 12
 [node name="Armor" parent="Inset/Layout/Body/Identity/Column/Vitals" instance=ExtResource("vital")]
+theme_override_styles/focus = ExtResource("roll_focus")
 layout_mode = 2
 [node name="Space" type="Control" parent="Inset/Layout/Body/Identity/Column/Vitals"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 [node name="Morale" parent="Inset/Layout/Body/Identity/Column/Vitals" instance=ExtResource("vital")]
+theme_override_styles/focus = ExtResource("roll_focus")
 layout_mode = 2
 [node name="VitalsRule" type="HSeparator" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
@@ -427,20 +430,40 @@ layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 32
 
-[node name="Primary" parent="Inset/Layout/Body/Workspace/Encounter" instance=ExtResource("pages")]
+[node name="PrimarySlot" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/Primary/Area"]
+theme_override_constants/margin_left = -2
+theme_override_constants/margin_right = -2
+[node name="Primary" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Area"]
+layout_mode = 0
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_right = 2
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Area/FocusInset"]
 layout_mode = 0
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="Secondary" parent="Inset/Layout/Body/Workspace/Encounter" instance=ExtResource("pages")]
+[node name="SecondarySlot" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/Secondary/Area"]
+theme_override_constants/margin_left = -2
+theme_override_constants/margin_right = -2
+[node name="Secondary" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot" instance=ExtResource("pages")]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Area"]
+layout_mode = 0
+theme_override_constants/margin_left = 2
+theme_override_constants/margin_right = 2
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Area/FocusInset"]
 layout_mode = 0
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
@@ -575,40 +598,44 @@ layout_mode = 0
 color = Color(0.27451,0.321569,0.337255,1)
 mouse_filter = 2
 
-[node name="Pager" parent="Inset/Layout/Body/Workspace/Encounter/Primary"]
+[node name="Pager" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary"]
+offset_left = 2.0
+offset_right = -2.0
 custom_minimum_size = Vector2(0,44)
 offset_top = -44.0
 theme_override_constants/separation = 0
-[node name="Range" parent="Inset/Layout/Body/Workspace/Encounter/Primary/Pager"]
+[node name="Range" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Pager"]
 horizontal_alignment = 0
-[node name="Previous" parent="Inset/Layout/Body/Workspace/Encounter/Primary/Pager"]
+[node name="Previous" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Pager"]
 text = "‹"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("pager_button")
 theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Previous page"
-[node name="Next" parent="Inset/Layout/Body/Workspace/Encounter/Primary/Pager"]
+[node name="Next" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Pager"]
 text = "›"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("pager_button")
 theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Next page"
-[node name="Pager" parent="Inset/Layout/Body/Workspace/Encounter/Secondary"]
+[node name="Pager" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary"]
+offset_left = 2.0
+offset_right = -2.0
 custom_minimum_size = Vector2(0,44)
 offset_top = -44.0
 theme_override_constants/separation = 0
-[node name="Range" parent="Inset/Layout/Body/Workspace/Encounter/Secondary/Pager"]
+[node name="Range" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Pager"]
 horizontal_alignment = 0
-[node name="Previous" parent="Inset/Layout/Body/Workspace/Encounter/Secondary/Pager"]
+[node name="Previous" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Pager"]
 text = "‹"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
 theme_override_styles/normal = SubResource("pager_button")
 theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Previous page"
-[node name="Next" parent="Inset/Layout/Body/Workspace/Encounter/Secondary/Pager"]
+[node name="Next" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Pager"]
 text = "›"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
@@ -656,21 +683,25 @@ theme_override_styles/normal = SubResource("pager_button")
 theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Next page"
 
-[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Encounter/Primary"]
+[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 2.0
+offset_right = -2.0
 offset_top = -44.0
 offset_bottom = -43.0
 color = Color(0.27451,0.321569,0.337255,1)
 mouse_filter = 2
 
-[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Encounter/Secondary"]
+[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 2.0
+offset_right = -2.0
 offset_top = -44.0
 offset_bottom = -43.0
 color = Color(0.27451,0.321569,0.337255,1)

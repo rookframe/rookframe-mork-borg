@@ -95,7 +95,7 @@ func _ready() -> void:
 	for path in ["IdentityEditors", "HealthEditors/Inset/Fields", "ArmorEditors/Fields"]:
 		var form: CORRECTION_FORM_SCRIPT = get_node(IDENTITY + path)
 		form.changed.connect(_correction_typed)
-	for path in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
+	for path in ["Encounter/PrimarySlot/Primary", "Encounter/SecondarySlot/Secondary", "Inventory", "Reader/Pages"]:
 		var pager: HBoxContainer = get_node(WORK + path + "/Pager")
 		# Preserve the public component and its connected controls; only their
 		# authored visual order changes to range, previous, next.
@@ -370,7 +370,7 @@ func _capture_encounter_pages() -> void:
 			continue
 		var keys: Dictionary = _encounter_keys
 		var page_key := str(keys.get(lane, ""))
-		_pages[page_key] = get_node(WORK + "Encounter/" + lane).capture_state()
+		_pages[page_key] = get_node(WORK + "Encounter/" + lane + "Slot/" + lane).capture_state()
 
 func _render_encounter() -> void:
 	var inline_key: Array = []
@@ -387,28 +387,28 @@ func _render_encounter() -> void:
 			return
 	_inline_key = inline_key.duplicate(true)
 	for lane in ["Primary", "Secondary"]:
-		var pages = get_node(WORK + "Encounter/" + lane)
+		var pages = get_node(WORK + "Encounter/" + lane + "Slot/" + lane)
 		var page_key: String = "phone:" + str(_groups[_section].title) + ":" + str(_groups[_section].get("lane", "primary")) if _phone and not _groups.is_empty() else lane
 		var state: Dictionary = _pages.get(page_key, {})
 		_encounter_keys[lane] = page_key
-		_clear(pages.get_node("Area/Content"))
+		_clear(pages.get_node("Area/FocusInset/Content"))
 		for index in range(_groups.size()):
 			var group := _groups[index]
 			if _phone and index != _section or not _phone and str(group.get("lane", "primary")) != lane.to_lower():
 				continue
 			if not _phone:
-				if pages.get_node("Area/Content").get_child_count() > 0:
+				if pages.get_node("Area/FocusInset/Content").get_child_count() > 0:
 					var gap := Control.new()
 					gap.custom_minimum_size = Vector2(gap.custom_minimum_size.x, 16 if _tablet else 22)
-					pages.get_node("Area/Content").add_child(gap)
-				_append_heading(pages.get_node("Area/Content"), str(group.title))
+					pages.get_node("Area/FocusInset/Content").add_child(gap)
+				_append_heading(pages.get_node("Area/FocusInset/Content"), str(group.title))
 			var entries: Array = group.entries
 			for raw in entries:
 				var entry: Dictionary = raw
 				if _editing and not _phone and not _tablet and entry.has("correction_route"):
 					var frame := PanelContainer.new()
 					frame.add_theme_stylebox_override("panel", correction_frame)
-					pages.get_node("Area/Content").add_child(frame)
+					pages.get_node("Area/FocusInset/Content").add_child(frame)
 					var form: CORRECTION_FORM_SCRIPT = CORRECTION_FORM.instantiate()
 					frame.add_child(form)
 					form.configure(correction_keys(str(entry.correction_route)), _draft, _locale, false, str(entry.get("correction_identity", "rules")))
@@ -430,13 +430,13 @@ func _render_encounter() -> void:
 				if _editing and entry.has("correction_route"):
 					entry = entry.duplicate(true)
 					entry["id"] = str(entry.get("correction_identity", "rules"))
-				_append(pages.get_node("Area/Content"), entry, actions)
+				_append(pages.get_node("Area/FocusInset/Content"), entry, actions)
 				if _phone:
 					var gap := Control.new()
-					gap.name = "EntryPageGap" + str(pages.get_node("Area/Content").get_child_count())
-					pages.get_node("Area/Content").add_child(gap)
+					gap.name = "EntryPageGap" + str(pages.get_node("Area/FocusInset/Content").get_child_count())
+					pages.get_node("Area/FocusInset/Content").add_child(gap)
 		pages.restore_state(state)
-	get_node(WORK + "Encounter/Secondary").visible = not _phone
+	get_node(WORK + "Encounter/SecondarySlot").visible = not _phone
 
 func _rolls_disabled() -> bool:
 	return not _can_edit or not bool(_data.get("rolls_available", false)) or not HEALTH.new().can_roll(_data) or _data.get("editing", false) or _data.get("roll_pending", false)
@@ -553,7 +553,11 @@ func _restore_return_focus() -> void:
 	elif _roll_reader:
 		_roll_reader = false
 		if _return_roll == "armor" or _return_roll == "morale":
-			get_node(IDENTITY + "Vitals/" + ("Armor" if _return_roll == "armor" else "Morale")).grab_focus()
+			var opener: Button = get_node(IDENTITY + "Vitals/" + ("Armor" if _return_roll == "armor" else "Morale"))
+			if opener.is_visible_in_tree() and not opener.disabled:
+				opener.grab_focus()
+			else:
+				get_node(WORK + "Tabs/Encounter").grab_focus()
 		elif not focus_roll(_return_entry):
 			get_node(WORK + "Tabs/Encounter").grab_focus()
 	elif _focus_source:
@@ -663,7 +667,7 @@ func capture_navigation() -> Dictionary:
 	_capture_encounter_pages()
 	_capture_reference_page()
 	var pages: Dictionary = {}
-	for key in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
+	for key in ["Encounter/PrimarySlot/Primary", "Encounter/SecondarySlot/Secondary", "Inventory", "Reader/Pages"]:
 		pages[key] = get_node(WORK + key).capture_state()
 	return {"chapter": _chapter, "section": _section, "pages": pages, "encounter_pages": _pages.duplicate(true), "reference_pages": _reference_pages.duplicate(true)}
 
@@ -682,12 +686,12 @@ func restore_navigation(state: Dictionary) -> void:
 	_section = maxi(0, int(state.get("section", 0)))
 	_reader = false
 	var pages: Dictionary = state.get("pages", {})
-	for key in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
+	for key in ["Encounter/PrimarySlot/Primary", "Encounter/SecondarySlot/Secondary", "Inventory", "Reader/Pages"]:
 		var value: Dictionary = pages.get(key, {})
 		get_node(WORK + key).restore_state(value)
 	_queue_layout()
 
-func open_reader(title: String, return_entry: String = "", correction_route: String = "") -> void:
+func open_reader(title: String, return_entry: String = "", correction_route: String = "", focus_back: bool = true) -> void:
 	_correction_reader = false
 	_capture_reference_page()
 	_reference_route = ""
@@ -703,7 +707,8 @@ func open_reader(title: String, return_entry: String = "", correction_route: Str
 	(get_node(WORK + "Reader/Publication") as Control).visible = false
 	get_node(WORK + "Reader/Pages").restore_state({})
 	_update_visibility()
-	get_node(WORK + "Reader/Back").grab_focus()
+	if focus_back:
+		get_node(WORK + "Reader/Back").grab_focus()
 
 func focus_health() -> void:
 	var opener: Button = get_node(IDENTITY + "Health")
@@ -712,15 +717,18 @@ func focus_health() -> void:
 	else:
 		get_node("Inset/Layout/Footer/Close").grab_focus()
 
-func open_roll_reader(title: String, part: String, entry: String) -> void:
-	open_reader(title, entry)
+func open_roll_reader(title: String, part: String, entry: String) -> Dictionary:
+	var continuing := _reader and _roll_reader and _return_roll == part and _return_entry == entry
+	var page: Dictionary = reader_state() if continuing else {}
+	open_reader(title, entry, "", not continuing)
 	_roll_reader = true
 	_return_roll = part
 	_update_visibility()
+	return page
 
 func focus_roll(id: String) -> bool:
 	for lane in ["Primary", "Secondary"]:
-		for child in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+		for child in get_node(WORK + "Encounter/" + lane + "Slot/" + lane + "/Area/FocusInset/Content").get_children():
 			var card := child as CARD_SCRIPT
 			if card != null and card.entry_id == id and card.restore_focus(_return_roll):
 				return true
@@ -776,7 +784,7 @@ func sync_draft_field(key: String, text: String) -> void:
 
 func focus_correction(route: String) -> bool:
 	for lane in ["Primary", "Secondary"]:
-		for child in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+		for child in get_node(WORK + "Encounter/" + lane + "Slot/" + lane + "/Area/FocusInset/Content").get_children():
 			var card := child as CARD_SCRIPT
 			if card != null and card.entry_id == route and card.restore_focus():
 				return true
@@ -832,7 +840,7 @@ func correction_pending(pending: bool) -> void:
 		var form: CORRECTION_FORM_SCRIPT = get_node(IDENTITY + path)
 		form.set_fields_pending(pending)
 	for lane in ["Primary", "Secondary"]:
-		for panel in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+		for panel in get_node(WORK + "Encounter/" + lane + "Slot/" + lane + "/Area/FocusInset/Content").get_children():
 			for child in panel.get_children():
 				var form := child as CORRECTION_FORM_SCRIPT
 				if form != null:
@@ -1029,23 +1037,23 @@ func _update_pager_labels() -> void:
 	var font_size := 10 if _phone else 12
 	var refresh_font := _pager_font_size != font_size
 	_pager_font_size = font_size
-	for path in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
+	for path in ["Encounter/PrimarySlot/Primary", "Encounter/SecondarySlot/Secondary", "Inventory", "Reader/Pages"]:
 		get_node(WORK + path + "/PagerRule").visible = get_node(WORK + path + "/Pager").visible
 		var label: Label = get_node(WORK + path + "/Pager/Range")
 		if refresh_font:
 			label.add_theme_font_size_override("font_size", font_size)
 		var state := label.text.split(" · ")[-1]
-		var context := _locale.text(str(_groups[_section].title)) if path == "Encounter/Primary" and _phone and not _groups.is_empty() else _locale.text("Inventory") if path == "Inventory" else _locale.text("Reference") if path == "Reader/Pages" else _locale.text("Encounter")
+		var context := _locale.text(str(_groups[_section].title)) if path == "Encounter/PrimarySlot/Primary" and _phone and not _groups.is_empty() else _locale.text("Inventory") if path == "Inventory" else _locale.text("Reference") if path == "Reader/Pages" else _locale.text("Encounter")
 		label.text = context + " · " + state
 
 func _fit_phone_entries() -> void:
 	if not _phone or _chapter != 0 or _reader:
 		return
-	var pages: Control = get_node(WORK + "Encounter/Primary")
+	var pages: Control = get_node(WORK + "Encounter/PrimarySlot/Primary")
 	var height := pages.size.y - 44
 	if height <= 0:
 		return
-	var content: VBoxContainer = get_node(WORK + "Encounter/Primary/Area/Content")
+	var content: VBoxContainer = get_node(WORK + "Encounter/PrimarySlot/Primary/Area/FocusInset/Content")
 	var article_height := 0.0
 	var has_article := false
 	for node in content.get_children():
@@ -1197,7 +1205,7 @@ func _configure_inline_core() -> void:
 
 func _sync_inline_fields() -> void:
 	for lane in ["Primary", "Secondary"]:
-		for panel in get_node(WORK + "Encounter/" + lane + "/Area/Content").get_children():
+		for panel in get_node(WORK + "Encounter/" + lane + "Slot/" + lane + "/Area/FocusInset/Content").get_children():
 			for child in panel.get_children():
 				var form := child as CORRECTION_FORM_SCRIPT
 				if form != null:

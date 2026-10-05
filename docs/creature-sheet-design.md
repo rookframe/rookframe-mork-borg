@@ -218,6 +218,19 @@ leaving a request with no poller. Hiding/Close retains the Node and pending Roll
 Opening a different Actor cannot redirect that request. Back,
 chapter change or another workflow abandons unfinished dice. The reader retains
 identity/portrait on phone and restores the exact named opener after layout.
+The local initiating choice is retained before Authority acknowledgement only
+for reader copy and return focus; accepted Authority snapshots still govern
+resolution. Refreshing that same reader retains its measured page and native
+focus, with the Encounter chapter as fallback when the original control is no
+longer eligible. Complete service errors stay in the bounded reader; the footer
+shows a concise localized state and otherwise the ordinary table context.
+
+Resolution values use the original Inter variable font at weight 500 with
+tabular figures. Their owned focus style draws a 2px aqua border with a 2px
+clear offset. Authored Encounter margins leave room for this outline inside the
+unchanged public pager. Rule paragraphs measure their wrapped native line count
+against the reference line height after layout; article padding also accounts
+for the bottom rule. The public UI Kit and font files remain unchanged.
 
 `logic/creature_own_tests.gd` determines separate flat own Attack/Defence tests
 from accepted rule/origin evidence. Hawk and Ancient gore-hound have explicit

@@ -1,11 +1,13 @@
 [gd_scene format=3]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_value.tres" id="value"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_focus.tres" id="focus"]
 [sub_resource type="StyleBoxEmpty" id="empty"]
 [node name="ResolutionCell" type="Button"]
 layout_mode = 2
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(44,52)
+theme_override_styles/focus = ExtResource("focus")
 theme_override_styles/normal = SubResource("empty")
 theme_override_styles/disabled = SubResource("empty")
 [node name="Inset" type="MarginContainer" parent="."]
@@ -33,7 +35,7 @@ theme_override_font_sizes/font_size = 11
 theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
 [node name="Value" type="Label" parent="Inset/Row/Copy"]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("display")
+theme_override_fonts/font = ExtResource("value")
 theme_override_font_sizes/font_size = 21
 theme_override_colors/font_color = Color(0.266667,0.913725,0.913725,1)
 [node name="Icon" type="TextureRect" parent="Inset/Row"]

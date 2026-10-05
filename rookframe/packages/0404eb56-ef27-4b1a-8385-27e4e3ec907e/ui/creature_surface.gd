@@ -9,6 +9,7 @@ const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 const REQUEST = preload(ROOT + "logic/action_request.gd")
+const ROLLS = preload(ROOT + "logic/creature_rolls.gd")
 const ROLL_WORKFLOW = preload(ROOT + "ui/creature_roll_workflow.gd")
 const ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
@@ -60,6 +61,7 @@ var _health_attempt: Dictionary = {}
 var _rolls_available := true
 var _roll_feedback := ""
 var _roll_refresh_pending := false
+var _roll_done: Button
 var _nav: Dictionary = {}
 var _catalogue_query := ""
 var _catalogue_buttons: Array[Button] = []
@@ -165,7 +167,7 @@ func _process(_delta: float) -> void:
 	_roll_workflow.display_active = is_visible_in_tree()
 	if _roll_refresh_pending:
 		_roll_refresh_pending = false
-		_roll_feedback = _roll_workflow.summary()
+		_roll_feedback = "Rolling Creature dice…" if _roll_workflow.pending else "Action ended" if _roll_workflow.state == "ended" else "Creature roll"
 		_render_pending = true
 		if actor != null and actor.id.value == _roll_workflow.source and _detail == "roll":
 			_detail_pending = true
@@ -230,7 +232,7 @@ func _render_accepted() -> void:
 	data["health_available"] = _health_available and not _roll_live()
 	sheet.configure(data, locale, false, owner() and not _busy, _portrait(data))
 	sdk.windows.set_title(str(data.get("name", "Creature")))
-	sheet.status("Creature sheet · Owner" if owner() else "Creature sheet · Viewer")
+	sheet.status("")
 	if _portrait_pending:
 		sheet.status(_portrait_feedback)
 	elif not _roll_feedback.is_empty() and _detail == "roll":
@@ -756,7 +758,7 @@ func _roll(part: String, id: String) -> void:
 	_detail_pending = true
 	_render_pending = true
 	gameplay_roll_requested.emit(part, id)
-	await _roll_workflow.start(actor.id.value, part, id)
+	await _roll_workflow.start(actor.id.value, part, id, ROLLS.new().choice(current_data(), part, id))
 
 ## Accepted HP and transient presentation guards are shared with own-test followups.
 func is_dead() -> bool:
@@ -774,8 +776,9 @@ func _roll_changed() -> void:
 func _render_roll() -> void:
 	if not _roll_workflow.has_action or actor == null or actor.id.value != _roll_workflow.source:
 		return
-	var choice: Dictionary = _roll_workflow.snapshot.get("choice", {})
-	sheet.open_roll_reader(str(choice.get("label", "Creature roll")), str(choice.get("part", "")), str(choice.get("entry", "")))
+	var choice: Dictionary = _roll_workflow.snapshot.get("choice", _roll_workflow.selection)
+	var focus_done := is_instance_valid(_roll_done) and _roll_done.has_focus()
+	var page := sheet.open_roll_reader(str(choice.get("label", "Creature roll")), str(choice.get("part", "")), str(choice.get("entry", "")))
 	_text(str(choice.get("name", "")))
 	if choice.has("formula"):
 		_text(locale.text("Formula") + ": " + str(choice.formula))
@@ -783,13 +786,16 @@ func _render_roll() -> void:
 	if _roll_workflow.pending:
 		_text("Back cancels unfinished dice. Close preserves a running Roll.")
 	else:
-		_option("Done", sheet.back, true)
+		_roll_done = _option("Done", sheet.back, true)
+		if focus_done:
+			_roll_done.grab_focus()
+	sheet.restore_reader(page)
 
 func _leave_roll() -> void:
 	var unfinished := _roll_live()
 	_roll_workflow.abandon()
 	if unfinished:
-		_roll_feedback = _roll_workflow.message
+		_roll_feedback = "Action ended"
 		sheet.status(_roll_feedback)
 
 func _render_health() -> void:

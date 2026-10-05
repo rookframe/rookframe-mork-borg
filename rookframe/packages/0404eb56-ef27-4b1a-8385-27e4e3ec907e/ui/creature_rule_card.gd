@@ -8,9 +8,24 @@ var entry_id := ""
 var _buttons := []
 var _parts: Array[String] = []
 var _tablet := false
+var _copy_line_height := 25.5
+
+func _ready() -> void:
+	get_node("Content/Copy").resized.connect(_queue_fit_copy)
+
+func _queue_fit_copy() -> void:
+	# Measure after native wrapping has accepted the current width and font.
+	_fit_copy.call_deferred()
+
+func _fit_copy() -> void:
+	var copy: Label = get_node("Content/Copy")
+	var height := copy.get_line_count() * _copy_line_height
+	if copy.custom_minimum_size.y != height:
+		copy.custom_minimum_size = Vector2(0, height)
 
 func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> void:
 	_tablet = tablet
+	_copy_line_height = 18.85 if phone else 19.5 if tablet else 25.5
 	entry_id = str(entry.get("id", ""))
 	var heading: Label = get_node("Content/Heading")
 	var copy: Label = get_node("Content/Copy")
@@ -21,7 +36,7 @@ func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> vo
 	copy.visible = not copy.text.is_empty()
 	copy.add_theme_font_size_override("font_size", 13 if phone or tablet else 17)
 	copy.add_theme_constant_override("line_spacing", 2 if phone else 3 if tablet else 4)
-	copy.custom_minimum_size = Vector2(0, 19 if phone else 20 if tablet else 26)
+	_queue_fit_copy()
 	get_node("Content/HeadingGap").visible = heading.visible and copy.visible
 	get_node("Content/HeadingGap").custom_minimum_size = Vector2(0, 4 if phone else 5 if tablet else 7)
 	get_node("Content/ResolutionGap").custom_minimum_size = Vector2(0, 7 if phone else 8 if tablet else 10)
@@ -29,7 +44,7 @@ func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> vo
 	frame.content_margin_left = 2 if phone else 3 if tablet else 7
 	frame.content_margin_right = frame.content_margin_left
 	frame.content_margin_top = 8 if phone else 10 if tablet else 14
-	frame.content_margin_bottom = frame.content_margin_top
+	frame.content_margin_bottom = frame.content_margin_top + 1
 	add_theme_stylebox_override("panel", frame)
 	get_node("Content/Resolution").visible = false
 	get_node("Content/ResolutionGap").visible = false
@@ -50,6 +65,7 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 		var value := str(action.get("dice", ""))
 		if action.has("dice"):
 			var passive := bool(action.get("reference", false))
+			# Desktop copy uses native 14px + 27px rows and 6px padding per side.
 			button.custom_minimum_size = Vector2(44, 48 if phone else 50 if _tablet else 53)
 			(button.get_node("Inset/Row/Copy/Caption") as Label).text = caption
 			(button.get_node("Inset/Row/Copy/Caption") as Label).add_theme_font_size_override("font_size", 10 if phone or _tablet else 11)

@@ -11,6 +11,7 @@ var has_action := false
 var state := "ready"
 var message := ""
 var snapshot: Dictionary = {}
+var selection: Dictionary = {}
 var display_active := false
 var _sdk: SDK
 var _surface: Control
@@ -41,11 +42,14 @@ func closed() -> void:
 	if has_action and not pending:
 		abandon()
 
-func start(actor: String, part: String, entry: String) -> void:
+func start(actor: String, part: String, entry: String, initial_choice: Dictionary = {}) -> void:
 	if pending:
 		return
 	abandon()
 	source = actor
+	selection = initial_choice.duplicate(true)
+	selection["part"] = part
+	selection["entry"] = entry
 	_closed = false
 	_presenting = true
 	var action := ACTION.new(_sdk)
@@ -113,7 +117,11 @@ func abandon() -> void:
 
 func summary() -> String:
 	if state != "resolved":
-		return _locale.text("Rolling Creature dice…" if pending else message)
+		if pending:
+			return _locale.text("Rolling Creature dice…")
+		if message.begins_with(ACTION.ENDED):
+			return _locale.text(ACTION.ENDED) + message.trim_prefix(ACTION.ENDED)
+		return _locale.text(message)
 	var choice: Dictionary = snapshot.get("choice", {})
 	var plan: Dictionary = choice.get("plan", {})
 	var result := _locale.text("%s: %s = %d. Raw Roll #%d.") % [_locale.text(str(choice.label)), str(choice.normalized), int(snapshot.total), int(snapshot.sequence)]
