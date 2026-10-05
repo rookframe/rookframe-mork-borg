@@ -82,7 +82,7 @@ func _load() -> void:
 	if not found:
 		entries.append({"id": id, "title": str(_saved.get("title", i18n.text("Saved Miniature unavailable"))), "package": "", "available": false})
 	var labels: Dictionary = {}
-	for pair in [["search", "Search by name or Package"], ["retry", "Try again"], ["unavailable", "Unavailable"], ["cancel", "Cancel"], ["choose", "Use Miniature"], ["title", "Choose a miniature"], ["previous", "Previous"], ["next", "Next"], ["selection", "Selected miniature"], ["saved_unavailable", "Saved Miniature unavailable. Choose a replacement."], ["preview_unavailable", "Miniature preview unavailable."]]:
+	for pair in [["search", "Search by name or Package"], ["retry", "Try again"], ["unavailable", "Unavailable"], ["cancel", "Cancel"], ["choose", "Use Miniature"], ["title", "Choose a miniature"], ["previous", "Previous"], ["next", "Next"], ["selection", "Selected miniature"], ["saved_unavailable", "Saved Miniature unavailable. Choose a replacement."], ["preview_unavailable", "Preview unavailable."]]:
 		labels[pair[0]] = i18n.text(pair[1])
 	labels["library"] = i18n.text("WORLD CONTENT LIBRARY")
 	labels["close"] = i18n.text("Close miniature browser")

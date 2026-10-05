@@ -1267,6 +1267,7 @@ messages = {
 [&"", &"Saved Miniature unavailable. Choose a replacement."]: [&"Сохранённая миниатюра недоступна. Выберите другую."],
 [&"", &"Could not load Miniatures. Try again."]: [&"Не удалось загрузить миниатюры. Повторите попытку."],
 [&"", &"Miniature preview unavailable."]: [&"Предпросмотр миниатюры недоступен."],
+[&"", &"Preview unavailable."]: [&"Предпросмотр\nнедоступен."],
 [&"", &"Saving Miniature…"]: [&"Сохранение миниатюры…"],
 [&"", &"Miniature saved."]: [&"Миниатюра сохранена."],
 [&"", &"Library Miniature saved."]: [&"Миниатюра записи библиотеки сохранена."],

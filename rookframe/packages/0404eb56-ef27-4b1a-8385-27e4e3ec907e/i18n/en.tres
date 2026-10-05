@@ -1267,6 +1267,7 @@ messages = {
 [&"", &"Saved Miniature unavailable. Choose a replacement."]: [&"Saved Miniature unavailable. Choose a replacement."],
 [&"", &"Could not load Miniatures. Try again."]: [&"Could not load Miniatures. Try again."],
 [&"", &"Miniature preview unavailable."]: [&"Miniature preview unavailable."],
+[&"", &"Preview unavailable."]: [&"Preview\nunavailable."],
 [&"", &"Saving Miniature…"]: [&"Saving Miniature…"],
 [&"", &"Miniature saved."]: [&"Miniature saved."],
 [&"", &"Library Miniature saved."]: [&"Library Miniature saved."],
