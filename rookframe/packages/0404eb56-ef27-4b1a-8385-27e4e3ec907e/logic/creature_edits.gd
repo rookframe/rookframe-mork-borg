@@ -2,6 +2,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/act
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 const PROJECTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_projection.gd")
 const DICE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/attack_sources.gd")
+const HEALTH = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_health.gd")
 var _context: SDK.SystemActionContext
 
 func _init(actor_id: SDK.ActorId, context: SDK.SystemActionContext) -> void:
@@ -87,9 +88,10 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary) -> SDK.ActorResult:
 
 func _correct(data: Dictionary, field: String, text: String) -> String:
 	if field in ["hit_points", "maximum_hit_points", "morale", "armor:shield_reduction", "armor:defence_penalty"]:
-		if not text.is_valid_int():
-			return "Enter a whole number."
-		var value := int(text)
+		var integer := HEALTH.new().integer(text)
+		if not integer.ok:
+			return str(integer.message)
+		var value := int(integer.value)
 		if field == "maximum_hit_points" and value < 1:
 			return "Maximum HP must be at least 1."
 		if field == "morale":
@@ -126,9 +128,12 @@ func _correct(data: Dictionary, field: String, text: String) -> String:
 				return "Use one supported dice group, optionally + a whole number."
 			entry[member] = text
 		elif member in ["range_feet", "attack_dr", "defence_dr"]:
-			if not text.is_valid_int() or int(text) < 0:
+			var integer := HEALTH.new().integer(text)
+			if not integer.ok:
+				return str(integer.message)
+			if int(integer.value) < 0:
 				return "Enter a non-negative whole number."
-			entry[member] = int(text)
+			entry[member] = int(integer.value)
 		else:
 			if member == "name" and text.strip_edges().is_empty():
 				return "Enter an entry name."

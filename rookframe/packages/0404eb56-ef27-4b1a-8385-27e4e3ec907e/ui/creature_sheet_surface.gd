@@ -7,6 +7,9 @@ const CARD = preload(ROOT + "ui/creature_rule_card.tscn")
 const CARD_SCRIPT = preload(ROOT + "ui/creature_rule_card.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
+const HEALTH = preload(ROOT + "logic/creature_health.gd")
+const HEALTH_EDITOR = preload(ROOT + "ui/creature_health_editor.tscn")
+const HEALTH_EDITOR_SCRIPT = preload(ROOT + "ui/creature_health_editor.gd")
 signal chapter_changed(chapter: int)
 signal entry_requested(id: String)
 signal inventory_add_requested
@@ -46,6 +49,7 @@ var _draft: Dictionary = {}
 var _editing := false
 var _return_correction := ""
 var _return_focus_frames := 0
+var _health_reader := false
 
 func _ready() -> void:
 	for index in range(3):
@@ -112,7 +116,12 @@ func _layout() -> void:
 	get_node(IDENTITY + "Classification").text = _locale.text(str(_draft.get("classification", "")) if _editing else str(_data.get("classification", metadata.get("classification", ""))))
 	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 10 if _phone else 12 if _tablet else 16)
 	get_node(IDENTITY + "Portrait").texture = _texture
-	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", "—")) if _library else _draft.get("hit_points", _data.get("hit_points", "—"))) + ("" if _library else " / " + str(_draft.get("maximum_hit_points", _data.get("maximum_hit_points", "—"))))
+	get_node(IDENTITY + "Health").text = _locale.text("Hit points") + "  " + str(metadata.get("hit_points_formula", _data.get("hit_points", "—")) if _library else _draft.get("hit_points", _data.get("hit_points", "—"))) + ("" if _library else " / " + str(_draft.get("maximum_hit_points", _data.get("maximum_hit_points", "—")))) + ("" if _library or not _can_edit else "  ±")
+	get_node(IDENTITY + "Health").accessibility_name = str(get_node(IDENTITY + "Health").text) + ("" if _library else ". " + _locale.text("Core values" if _editing else "Apply damage or Heal"))
+	var health := HEALTH.new()
+	get_node(IDENTITY + "Condition").visible = not _library and (health.is_dead(_data) or not health.valid(_data))
+	get_node(IDENTITY + "Condition").text = _locale.text("Dead" if health.is_dead(_data) else "HP needs correction")
+	get_node(IDENTITY + "Condition").add_theme_font_size_override("font_size", 12 if _phone else 18)
 	get_node(IDENTITY + "Health").custom_minimum_size = Vector2(0, 44 if _phone else 62)
 	get_node(IDENTITY + "Health").add_theme_font_size_override("font_size", 16 if _phone else 23 if _tablet else 28)
 	get_node(IDENTITY + "Health").disabled = _library or not _can_edit or not bool(_data.get("health_available", false))
@@ -267,7 +276,7 @@ func _render_encounter() -> void:
 	get_node(WORK + "Encounter/Secondary").visible = not _phone
 
 func _rolls_disabled() -> bool:
-	return not _can_edit or not bool(_data.get("rolls_available", false)) or int(_data.get("hit_points", 0)) <= 0 or _data.get("editing", false)
+	return not _can_edit or not bool(_data.get("rolls_available", false)) or not HEALTH.new().can_roll(_data) or _data.get("editing", false)
 
 func _render_inventory() -> void:
 	var pages = get_node(WORK + "Inventory")
@@ -300,6 +309,7 @@ func _requested(part: String, id: String, opener: CARD_SCRIPT) -> void:
 		roll_requested.emit(part, id)
 
 func show_entry(entry: Dictionary, opener: CARD_SCRIPT = null) -> void:
+	_health_reader = false
 	_return_entry = str(entry.get("inventory_id", ""))
 	_focus_card = opener
 	_focus_source = false
@@ -321,6 +331,7 @@ func _source() -> Dictionary:
 	return source
 
 func show_source() -> void:
+	_health_reader = false
 	_return_entry = ""
 	_focus_card = null
 	_focus_source = true
@@ -342,7 +353,10 @@ func back() -> void:
 	reader_closed.emit()
 
 func _restore_return_focus() -> void:
-	if _focus_source:
+	if _health_reader:
+		get_node(IDENTITY + "Health").grab_focus()
+		_health_reader = false
+	elif _focus_source:
 		get_node(WORK + "Tabs/Source").grab_focus()
 	elif _return_correction == "core" and get_node("Inset/Layout/Footer/Core").is_visible_in_tree():
 		get_node("Inset/Layout/Footer/Core").grab_focus()
@@ -358,11 +372,12 @@ func _restore_return_focus() -> void:
 func show_chapter(chapter: int) -> void:
 	_chapter = clampi(chapter, 0, 2)
 	_reader = false
+	_health_reader = false
 	_update_visibility()
 	chapter_changed.emit(_chapter)
 
 func _update_visibility() -> void:
-	(get_node(IDENTITY) as Control).visible = _editing or not (_phone and (_chapter == 2 or _reader))
+	(get_node(IDENTITY) as Control).visible = _editing or _health_reader and _reader or not (_phone and (_chapter == 2 or _reader))
 	get_node(WORK + "Tabs").visible = not _reader
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not _reader
 	get_node(WORK + "InventoryAdd").visible = _chapter == 1 and not _reader and not _library and _can_edit
@@ -438,6 +453,7 @@ func restore_navigation(state: Dictionary) -> void:
 	_queue_layout()
 
 func open_reader(title: String, return_entry: String = "", correction_route: String = "") -> void:
+	_health_reader = false
 	_focus_card = null
 	_focus_source = false
 	_return_entry = return_entry
@@ -449,6 +465,14 @@ func open_reader(title: String, return_entry: String = "", correction_route: Str
 	get_node(WORK + "Reader/Pages").restore_state({})
 	_update_visibility()
 	get_node(WORK + "Reader/Back").grab_focus()
+
+func open_health_reader() -> HEALTH_EDITOR_SCRIPT:
+	open_reader("Hit points")
+	_health_reader = true
+	var editor: HEALTH_EDITOR_SCRIPT = HEALTH_EDITOR.instantiate()
+	get_node(WORK + "Reader/Pages/Area/Content").add_child(editor)
+	_update_visibility()
+	return editor
 
 func reader_content() -> Control:
 	return get_node(WORK + "Reader/Pages/Area/Content") as Control

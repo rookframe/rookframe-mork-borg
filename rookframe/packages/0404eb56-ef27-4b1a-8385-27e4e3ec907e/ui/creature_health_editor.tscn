@@ -1,0 +1,33 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_editor.gd" id="script"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_field.tscn" id="field"]
+[node name="CreatureHealthEditor" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
+script = ExtResource("script")
+[node name="Summary" type="Label" parent="."]
+layout_mode = 2
+autowrap_mode = 3
+[node name="Amount" parent="." instance=ExtResource("field")]
+layout_mode = 2
+[node name="Actions" type="HBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Damage" type="Button" parent="Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+text = "Apply damage"
+[node name="Heal" type="Button" parent="Actions"]
+layout_mode = 2
+size_flags_horizontal = 3
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+text = "Heal"
+[node name="Correct" type="Button" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = "TaskButton"
+text = "Edit sheet"

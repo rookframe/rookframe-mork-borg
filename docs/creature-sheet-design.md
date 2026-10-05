@@ -68,3 +68,46 @@ normal join. Compare the actual authored sheet at the three canonical viewports,
 including long text/loot, English/Russian, readable focus, current Actor state,
 Owner/Viewer operations, Appearance return and durable close/reopen/rejoin.
 Do not reuse the superseded compact Actor-sheet tour or copied Package stores.
+
+## Creature HP and Dead
+
+The live HP ± control opens a bounded Apply damage / Heal reader outside Edit
+sheet. Enter the positive whole amount already resolved at the table. Authority
+reads current accepted Creature HP, applies that net subtraction/addition once,
+and commits through the public SDK. It performs no armor, attack, Roll or target
+procedure. HP may become negative or exceed maximum HP; maximum HP is not a
+healing ceiling. During Edit sheet the same control opens the shared core draft,
+with no immediate HP operation. Save/Cancel keep their existing semantics.
+
+Dead is derived only from an accepted integer HP value at zero or below. Rules,
+loot, Appearance and permitted corrections remain available. Accepted positive
+HP restores gameplay eligibility. Missing, string, fractional or boolean HP does
+not fabricate Dead: the sheet shows the saved value, indicates that HP needs
+correction, disables relative adjustment/rolls, and offers Edit sheet. There is
+no Character Broken incident, recovery timer or general condition framework.
+
+`logic/creature_health.gd` supplies `valid(data)`, `is_dead(data)` and
+`can_roll(data)` for accepted Creature data. The live adapter exposes `is_dead()`
+and `can_roll()`; the latter also checks Owner, operation pending and the shared
+draft. RFG-351 must use this predicate on Authority before starting gameplay
+rolls, and accepted `current_data()` for UI initiation. Draft HP is never input
+to the accepted condition predicate.
+
+`CreatureActions.adjust_health(id, operation, amount, transport)` submits only
+`creature-health.adjust` with Actor identity, stable request identity, `damage`
+or `heal`, and text amount. The live reader retains the same identity/choices
+through automatic transient transport retries and an unchanged retry after an
+error. Authority binds accepted identities to the initiating Participant session
+and exact choices, records acceptance before readback, and returns fresh Actor
+state on a duplicate acknowledgement without another write. These transient
+receipts have the running Authority lifetime; a new session/reopened sheet starts
+from the accepted Actor rather than resuming a private request. Close/rebind
+guards late presentation replies without rolling back an already accepted write.
+
+Creature integer corrections and amounts reject values outside stock Godot's
+signed 64-bit integer capacity before conversion. Relative arithmetic checks that
+capacity before adding/subtracting. This prevents verified wraparound and leaves
+valid signs, leading zeroes and above-maximum gameplay HP intact. Validation is
+atomic and field-local. Native rendering remains coalesced; portrait cache,
+Appearance pending behavior and correction/portrait epochs retain their separate
+boundaries.
