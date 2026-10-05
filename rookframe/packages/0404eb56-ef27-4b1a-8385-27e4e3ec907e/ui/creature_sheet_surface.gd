@@ -9,6 +9,7 @@ const LOOT_ENTRY = preload(ROOT + "ui/creature_loot_entry.tscn")
 const LOOT_ENTRY_SCRIPT = preload(ROOT + "ui/creature_loot_entry.gd")
 const SECTION_HEADING = preload(ROOT + "ui/creature_section_heading.tscn")
 const I18N = preload(ROOT + "ui/localization.gd")
+const ART = preload(ROOT + "ui/creature_sheet_art.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 const OWN = preload(ROOT + "logic/creature_own_tests.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
@@ -59,6 +60,7 @@ var _reader := false
 var _focus_card = null
 var _focus_source := false
 var _return_entry := ""
+var _appearance_texture: Texture2D
 var _texture: Texture2D
 var _groups: Array[Dictionary] = []
 var _layout_pending := false
@@ -134,13 +136,12 @@ func configure(data: Dictionary, locale: I18N, library: bool = true, can_edit: b
 	_library = library
 	_can_edit = can_edit
 	_texture = texture if texture != null else default_portrait(str(data.get("definition_id", "")))
+	_appearance_texture = texture if texture != null else ART.new().portrait(str(CONTENT.new().details(str(data.get("definition_id", ""))).get("portrait", "")), false)
 	_queue_layout()
 
 func default_portrait(definition: String) -> Texture2D:
 	var id := str(CONTENT.new().details(definition).get("portrait", ""))
-	# Authored AtlasTexture frames exclude transparent margins without cropping the subject.
-	var portraits := {"seth-goblin": preload(ROOT + "ui/portraits/seth-goblin-framed.tres"), "lich": preload(ROOT + "ui/portraits/lich-framed.tres"), "bone-bowyer": preload(ROOT + "ui/portraits/bone-bowyer-framed.tres")}
-	return portraits.get(id, preload("res://rookframe/ui/icons/character/character.svg"))
+	return ART.new().portrait(id)
 
 func _queue_layout() -> void:
 	if _layout_pending or not is_node_ready():
@@ -184,7 +185,7 @@ func _layout() -> void:
 	get_node("Inset/Layout/Footer/Close").text = _locale.text("Close")
 	get_node(WORK + "Reader/Back").text = _locale.text("Back to creature")
 	get_node(WORK + "Reader/Publication").text = _locale.text("Open publication")
-	(get_node(WORK + "Appearance") as APPEARANCE).configure(_locale, _texture, _library, _can_edit, _phone, _tablet, get_node(IDENTITY + "Name").text)
+	(get_node(WORK + "Appearance") as APPEARANCE).configure(_locale, _appearance_texture, _library, _can_edit, _phone, _tablet, get_node(IDENTITY + "Name").text)
 	for button in ["ChangePortrait", "ClearPortrait"]:
 		get_node(WORK + "Appearance/Columns/PortraitPanel/Inset/Content/PortraitButtons/" + button).disabled = not _data.get("portrait_editable", _can_edit)
 	_build_groups(metadata)
@@ -330,14 +331,14 @@ func _clear(content: Node) -> void:
 func _append(host: Node, entry: Dictionary, actions: Array = []) -> void:
 	var card: CARD_SCRIPT = CARD.instantiate()
 	host.add_child(card)
-	card.configure(entry, _locale, _phone, _tablet)
+	card.configure(entry, _locale, _phone, _tablet, str(_data.get("definition_id", "")) == "bone-bowyer")
 	card.configure_actions(actions, _locale, _phone)
 	card.requested.connect(_requested.bind(card))
 
-func _append_reference(host: Node, entry: Dictionary) -> void:
+func _append_reference(host: Node, entry: Dictionary, compact_boss: bool = false) -> void:
 	var card: CARD_SCRIPT = CARD.instantiate()
 	host.add_child(card)
-	card.configure(entry, _locale, _phone, _tablet)
+	card.configure(entry, _locale, _phone, _tablet, compact_boss)
 
 func _append_heading(host: Node, title: String) -> void:
 	var heading: PanelContainer = SECTION_HEADING.instantiate()
@@ -370,11 +371,7 @@ func _configure_heading(heading: PanelContainer, title: String, padded_group: bo
 	var icon: TextureRect = row.get_node("Icon")
 	icon.custom_minimum_size = Vector2(20, 20) if _tablet else Vector2(24, 24)
 	icon.visible = not _phone or padded_group
-	var icons := {"Attacks": preload("res://rookframe/ui/icons/character/sword.svg"), "Attacks & powers": preload("res://rookframe/ui/icons/character/sword.svg"), "Defence": preload("res://rookframe/ui/icons/character/shield.svg"), "Protection": preload("res://rookframe/ui/icons/character/shield.svg"), "Own tests": preload("res://rookframe/ui/icons/character/shield.svg"), "Inventory": preload("res://rookframe/ui/icons/character/bag.svg"), "Carried loot": preload("res://rookframe/ui/icons/character/bag.svg")}
-	if str(_data.get("definition_id", "")) == "bone-bowyer":
-		icons["Attacks"] = preload(ROOT + "ui/icons/bow.svg")
-		icons["Opening the encounter"] = preload(ROOT + "ui/icons/invisible.svg")
-	icon.texture = icons.get(title, preload("res://rookframe/ui/icons/character/quill.svg"))
+	icon.texture = ART.new().heading_icon(title, str(_data.get("definition_id", "")))
 
 func _capture_encounter_pages() -> void:
 	for lane in ["Primary", "Secondary"]:
@@ -413,7 +410,7 @@ func _render_encounter() -> void:
 			if not _phone:
 				if pages.get_node("Area/FocusInset/Content").get_child_count() > 0:
 					var gap := Control.new()
-					gap.custom_minimum_size = Vector2(gap.custom_minimum_size.x, 16 if _tablet else 22)
+					gap.custom_minimum_size = Vector2(gap.custom_minimum_size.x, 16 if _tablet else 12 if str(_data.get("definition_id", "")) == "bone-bowyer" else 22)
 					pages.get_node("Area/FocusInset/Content").add_child(gap)
 				_append_heading(pages.get_node("Area/FocusInset/Content"), str(group.title))
 			var entries: Array = group.entries
@@ -462,7 +459,7 @@ func _render_inventory() -> void:
 	_clear(content)
 	var items: Array = _data.get("inventory", [])
 	if items.is_empty():
-		_append_reference(content, {"name": "", "text": "No starting loot is authored for this creature." if _library else "No carried loot."})
+		_append_reference(content, {"name": "", "text": "No starting loot is authored for this creature." if _library else "No carried loot."}, str(_data.get("definition_id", "")) == "bone-bowyer")
 	for raw in items:
 		var item: Dictionary = raw
 		var row = LOOT_ENTRY.instantiate()
@@ -900,7 +897,7 @@ func _layout_frame() -> void:
 	get_node("Inset/Layout/Footer/BrandIcon").visible = not _phone
 	get_node("Inset/Layout/Footer/BrandGap").visible = not _phone
 	get_node("Inset/Layout/Footer").add_theme_constant_override("separation", 6 if _phone else 10)
-	get_node("Inset/Layout/Footer/Context").text = _locale.text("Published starting information" if _library else "Resolve consequences at the table.")
+	get_node("Inset/Layout/Footer/Context").text = _locale.text("Published starting information" if _library else "Creature footer: Resolve consequences at the table.")
 	get_node("Inset/Layout/Footer/Context").add_theme_font_size_override("font_size", 10 if _phone else 12)
 	var action_frame: StyleBoxFlat = footer_action_frame.duplicate()
 	action_frame.content_margin_left = 6 if _phone else 12
@@ -1009,7 +1006,7 @@ func _style_chapter(button: Button, section: bool = false) -> void:
 func _layout_chapters() -> void:
 	for title in ["Encounter", "Inventory", "Appearance"]:
 		var button: Button = get_node(WORK + "Tabs/" + title)
-		button.text = _locale.text(title)
+		button.text = _locale.text("Creature chapter: Encounter" if title == "Encounter" else title)
 		button.custom_minimum_size = Vector2(44, 40 if _phone else 44 if _tablet else 52)
 		button.add_theme_font_size_override("font_size", 13 if _phone else 14 if _tablet else 17)
 		_style_chapter(button)
@@ -1057,7 +1054,7 @@ func _update_pager_labels() -> void:
 		if refresh_font:
 			label.add_theme_font_size_override("font_size", font_size)
 		var state := label.text.split(" · ")[-1]
-		var context := _locale.text(str(_groups[_section].title)) if path == "Encounter/PrimarySlot/Primary" and _phone and not _groups.is_empty() else _locale.text("Inventory") if path == "Inventory" else _locale.text("Reference") if path == "Reader/Pages" else _locale.text("Encounter")
+		var context := _locale.text(str(_groups[_section].title)) if path == "Encounter/PrimarySlot/Primary" and _phone and not _groups.is_empty() else _locale.text("Inventory") if path == "Inventory" else _locale.text("Reference") if path == "Reader/Pages" else _locale.text("Creature chapter: Encounter")
 		label.text = context + " · " + state
 
 func _fit_phone_entries() -> void:

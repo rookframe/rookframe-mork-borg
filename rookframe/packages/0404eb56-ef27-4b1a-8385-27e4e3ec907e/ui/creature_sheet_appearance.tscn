@@ -12,8 +12,24 @@ border_width_left = 1
 border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="action_hover"]
+bg_color = Color(0.039216, 0.145098, 0.160784, 1)
+border_color = Color(0.266667, 0.913725, 0.913725, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="action_disabled"]
+bg_color = Color(0.003922, 0.047059, 0.062745, 1)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
 [node name="AppearancePanel" type="VBoxContainer"]
 script = ExtResource("script")
+action_hover = SubResource("action_hover")
+action_disabled = SubResource("action_disabled")
 size_flags_vertical = 3
 theme_override_constants/separation = 20
 [node name="TopSpace" type="Control" parent="."]
@@ -92,10 +108,11 @@ visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(0, 8)
 mouse_filter = 2
-[node name="PortraitButtons" type="HBoxContainer" parent="Columns/PortraitPanel/Inset/Content"]
+[node name="PortraitButtons" type="HFlowContainer" parent="Columns/PortraitPanel/Inset/Content"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 8
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 [node name="ChangePortrait" type="Button" parent="Columns/PortraitPanel/Inset/Content/PortraitButtons"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
@@ -206,10 +223,11 @@ theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
 layout_mode = 2
 custom_minimum_size = Vector2(0, 8)
 mouse_filter = 2
-[node name="MiniatureButtons" type="HBoxContainer" parent="Columns/MiniaturePanel/Inset/Content"]
+[node name="MiniatureButtons" type="HFlowContainer" parent="Columns/MiniaturePanel/Inset/Content"]
 layout_mode = 2
 alignment = 1
-theme_override_constants/separation = 8
+theme_override_constants/h_separation = 8
+theme_override_constants/v_separation = 8
 [node name="ChangeMiniature" type="Button" parent="Columns/MiniaturePanel/Inset/Content/MiniatureButtons"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)

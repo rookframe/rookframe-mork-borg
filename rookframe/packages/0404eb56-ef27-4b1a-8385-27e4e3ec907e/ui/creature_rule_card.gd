@@ -23,7 +23,7 @@ func _fit_copy() -> void:
 	if copy.custom_minimum_size.y != height:
 		copy.custom_minimum_size = Vector2(0, height)
 
-func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> void:
+func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool, compact_boss: bool = false) -> void:
 	_tablet = tablet
 	_copy_line_height = 18.85 if phone else 19.5 if tablet else 25.5
 	entry_id = str(entry.get("id", ""))
@@ -43,7 +43,7 @@ func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool) -> vo
 	var frame: StyleBoxFlat = article_frame.duplicate()
 	frame.content_margin_left = 2 if phone else 3 if tablet else 7
 	frame.content_margin_right = frame.content_margin_left
-	frame.content_margin_top = 8 if phone else 10 if tablet else 14
+	frame.content_margin_top = 8 if phone else 10 if tablet else 8 if compact_boss else 14
 	frame.content_margin_bottom = frame.content_margin_top + 1
 	add_theme_stylebox_override("panel", frame)
 	get_node("Content/Resolution").visible = false

@@ -5,6 +5,8 @@ signal miniature_requested
 signal miniature_clear_requested
 signal portrait_requested
 signal portrait_reset_requested
+@export var action_hover: StyleBoxFlat = StyleBoxFlat.new()
+@export var action_disabled: StyleBoxFlat = StyleBoxFlat.new()
 var _assigned := false
 const PORTRAIT := "Columns/PortraitPanel/Inset/Content/"
 const MINIATURE := "Columns/MiniaturePanel/Inset/Content/"
@@ -30,14 +32,17 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(PORTRAIT + "PortraitPreview/Image").texture = texture
 	get_node(PORTRAIT + "PortraitHeading/Title").text = locale.text("Portrait")
 	get_node(MINIATURE + "MiniatureHeading/Title").text = locale.text("Tabletop miniature")
-	get_node(PORTRAIT + "Explanation").text = locale.text("Applies only to new Actors created from this entry." if library else "Portrait changes appear immediately.")
-	get_node(MINIATURE + "Explanation").text = locale.text("Applies only to new Actors created from this entry." if library else "Existing Rooks keep their Miniature.")
+	get_node(PORTRAIT + "Explanation").text = locale.text("Applies only to new Actors created from this entry." if library else "Shown in the creature sheet.")
+	get_node(MINIATURE + "Explanation").text = locale.text("Applies only to new Actors created from this entry." if library else "Saved for this creature. Existing Rooks keep their current miniature.")
 	for base in [PORTRAIT, MINIATURE]:
 		for edge in ["left", "right", "top", "bottom"]:
 			get_node("Columns/PortraitPanel/Inset" if base == PORTRAIT else "Columns/MiniaturePanel/Inset").add_theme_constant_override("margin_" + edge, 10 if phone else 12 if tablet else 18)
 		(get_node(base + "ControlsGap") as Control).custom_minimum_size = Vector2((get_node(base + "ControlsGap") as Control).custom_minimum_size.x, 4 if phone else 16)
 		get_node(base + "Explanation").add_theme_font_size_override("font_size", 10 if phone else 11 if tablet else 12)
 		get_node(base + ("PortraitHeading/Title" if base == PORTRAIT else "MiniatureHeading/Title")).add_theme_font_size_override("font_size", 17 if phone else 18 if tablet else 22)
+	for controls in [PORTRAIT + "PortraitButtons", MINIATURE + "MiniatureButtons"]:
+		get_node(controls).add_theme_constant_override("h_separation", 6 if phone else 8)
+		get_node(controls).add_theme_constant_override("v_separation", 6 if phone else 8)
 	for path in [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait", MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]:
 		get_node(path).disabled = not can_edit
 		var frame := StyleBoxFlat.new()
@@ -48,10 +53,21 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 		frame.content_margin_right = frame.content_margin_left
 		frame.content_margin_top = 5 if phone else 6
 		frame.content_margin_bottom = frame.content_margin_top
+		var hover: StyleBoxFlat = action_hover.duplicate()
+		var disabled: StyleBoxFlat = action_disabled.duplicate()
+		for state_frame in [hover, disabled]:
+			state_frame.content_margin_left = frame.content_margin_left
+			state_frame.content_margin_right = frame.content_margin_right
+			state_frame.content_margin_top = frame.content_margin_top
+			state_frame.content_margin_bottom = frame.content_margin_bottom
+		get_node(path).add_theme_stylebox_override("disabled", disabled)
 		get_node(path).add_theme_stylebox_override("normal", frame)
 		if path.ends_with("ChangePortrait") or path.ends_with("ChangeMiniature"):
 			get_node(path).add_theme_stylebox_override("hover", frame)
 			get_node(path).add_theme_stylebox_override("pressed", frame)
+		else:
+			get_node(path).add_theme_stylebox_override("hover", hover)
+			get_node(path).add_theme_stylebox_override("pressed", hover)
 		get_node(path).add_theme_font_size_override("font_size", 11 if phone else 12 if tablet else 13)
 	for base in [PORTRAIT, MINIATURE]:
 		(get_node(base) as Control).add_theme_constant_override("separation", 0)
