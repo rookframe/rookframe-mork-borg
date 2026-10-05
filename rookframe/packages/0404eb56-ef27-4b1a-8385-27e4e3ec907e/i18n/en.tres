@@ -1424,6 +1424,7 @@ messages = {
 [&"", &"No miniature selected"]: [&"No miniature selected"],
 [&"", &"Choose miniature"]: [&"Choose miniature"],
 [&"", &"Change miniature"]: [&"Change miniature"],
+[&"", &"Clear"]: [&"Clear"],
 [&"", &"Choosing portrait…"]: [&"Choosing portrait…"],
 [&"", &"Saving portrait…"]: [&"Saving portrait…"],
 [&"", &"Appearance updated."]: [&"Appearance updated."],
