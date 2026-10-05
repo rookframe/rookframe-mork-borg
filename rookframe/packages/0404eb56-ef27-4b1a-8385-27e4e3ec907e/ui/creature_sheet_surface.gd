@@ -346,10 +346,11 @@ func _append_heading(host: Node, title: String) -> void:
 
 func _configure_heading(heading: PanelContainer, title: String, padded_group: bool = false) -> void:
 	heading.custom_minimum_size = Vector2(heading.custom_minimum_size.x, 38 if _tablet else 44)
+	var compact := _tablet or (_phone and not padded_group)
 	var frame: StyleBoxFlat = section_frame.duplicate()
-	frame.content_margin_left = 6 if _phone or _tablet else 12
+	frame.content_margin_left = 6 if compact else 12
 	frame.content_margin_right = frame.content_margin_left
-	frame.content_margin_top = 6 if _phone or _tablet else 8
+	frame.content_margin_top = 6 if compact else 8
 	frame.content_margin_bottom = frame.content_margin_top
 	var row: HBoxContainer = heading.get_node("Row/Heading/Content" if padded_group else "Row")
 	if padded_group:
@@ -362,13 +363,13 @@ func _configure_heading(heading: PanelContainer, title: String, padded_group: bo
 		var add: Button = heading.get_node("Row/Add")
 		add.custom_minimum_size = Vector2(44, 38 if _tablet else 44)
 	heading.add_theme_stylebox_override("panel", frame)
-	row.add_theme_constant_override("separation", 6 if _phone or _tablet else 10)
+	row.add_theme_constant_override("separation", 6 if compact else 10)
 	var label: Label = row.get_node("Title")
 	label.text = _locale.text(title)
-	label.add_theme_font_size_override("font_size", 13 if _phone or _tablet else 17)
+	label.add_theme_font_size_override("font_size", 13 if compact else 17)
 	var icon: TextureRect = row.get_node("Icon")
 	icon.custom_minimum_size = Vector2(20, 20) if _tablet else Vector2(24, 24)
-	icon.visible = not _phone
+	icon.visible = not _phone or padded_group
 	var icons := {"Attacks": preload("res://rookframe/ui/icons/character/sword.svg"), "Attacks & powers": preload("res://rookframe/ui/icons/character/sword.svg"), "Defence": preload("res://rookframe/ui/icons/character/shield.svg"), "Protection": preload("res://rookframe/ui/icons/character/shield.svg"), "Own tests": preload("res://rookframe/ui/icons/character/shield.svg"), "Inventory": preload("res://rookframe/ui/icons/character/bag.svg"), "Carried loot": preload("res://rookframe/ui/icons/character/bag.svg")}
 	icon.texture = icons.get(title, preload("res://rookframe/ui/icons/character/quill.svg"))
 
