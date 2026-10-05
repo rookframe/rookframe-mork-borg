@@ -567,10 +567,16 @@ func _refresh_appearance() -> void:
 	var reference: Dictionary = data.get("preferred_miniature", {})
 	var found := sdk.content.read(SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", ""))))
 	sheet.miniature(found.content_entry.localized_title if found.ok else locale.text("Saved Miniature unavailable. Choose a replacement."), found.content_entry.package_title if found.ok else "", not reference.is_empty())
-	if not reference.is_empty() and sheet.miniature_preview_target().is_visible_in_tree():
-		var result := sdk.content.preview_miniature(SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", ""))), sheet.miniature_preview_target())
+	if not reference.is_empty():
+		# Both authored targets retain the selected Miniature independently of
+		# which chapter/form factor currently displays them.
+		var content_reference := SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", "")))
+		var result := sdk.content.preview_miniature(content_reference, sheet.miniature_preview_target())
+		var summary := sdk.content.preview_miniature(content_reference, sheet.miniature_summary_preview_target())
 		if not result.ok:
 			sheet.status(result.message)
+		elif not summary.ok:
+			sheet.status(summary.message)
 
 func _publication(url: String) -> void:
 	var result := await sdk.browser.open(url)

@@ -1521,6 +1521,17 @@ messages = {
 [&"", &"The portrait transfer ended before the complete file arrived."]: [&"Передача портрета прервалась до получения полного файла."],
 [&"", &"Portrait upload cancelled."]: [&"Загрузка портрета отменена."],
 [&"", &"Details"]: [&"Подробнее"],
-[&"", &"Carried loot"]: [&"Переносимая добыча"]
+[&"", &"Carried loot"]: [&"Переносимая добыча"],
+[&"", &"Knife / shortbow"]: [&"Нож / короткий лук"],
+[&"", &"Published starting information"]: [&"Опубликованные стартовые сведения"],
+[&"", &"Current / maximum"]: [&"Текущее / максимальное"],
+[&"", &"Player defence DR%d."]: [&"Защита игрока: СЛ%d."],
+[&"", &"Not assigned"]: [&"Не назначена"],
+[&"", &"Damage & retargeting"]: [&"Урон и новая цель"],
+[&"", &"Commission"]: [&"Заказ"],
+[&"", &"World defaults for future Actors"]: [&"Мировые настройки новых персонажей"],
+[&"", &"No miniature assigned"]: [&"Миниатюра не назначена"],
+[&"", &"Choose from installed Packages."]: [&"Выберите из установленных пакетов."],
+[&"", &"How %s appears in the sheet and on the tabletop."]: [&"Как %s выглядит в листе и на игровом столе."],
 }
 locale = "ru"

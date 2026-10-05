@@ -58,7 +58,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	await get_tree().process_frame
 	var surface = sheet.get_node("Sheet")
 	assert_str(surface.get_node(surface.IDENTITY + "Name").text).is_equal("Seth")
-	assert_str(surface.get_node(surface.IDENTITY + "Health").text).contains("6")
+	assert_str(surface.get_node(surface.IDENTITY + "Health").accessibility_name).contains("6")
 	assert_bool(surface.get_node("Inset/Layout/Footer/Create").disabled).is_false()
 	assert_bool(surface.get_node(surface.IDENTITY + "Health").disabled).is_true()
 	surface.show_chapter(1)
@@ -66,7 +66,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	assert_bool(surface.get_node(surface.WORK + "Encounter").is_visible_in_tree()).is_false()
 	surface.show_chapter(2)
 	await get_tree().process_frame
-	assert_str(surface.get_node(surface.WORK + "Appearance/MiniaturePanel/Inset/Content/MiniatureCaption").text).is_equal("Goblin")
+	assert_str(surface.get_node(surface.WORK + "Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureCaption").text).is_equal("Goblin")
 	var source_button: Button = surface.get_node(surface.WORK + "Tabs/Source")
 	source_button.grab_focus()
 	surface.show_source()

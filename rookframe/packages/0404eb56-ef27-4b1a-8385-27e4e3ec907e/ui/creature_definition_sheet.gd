@@ -64,10 +64,16 @@ func _refresh_appearance() -> void:
 	var content := sdk.content.read(SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", ""))))
 	var sheet = get_node("Sheet")
 	sheet.miniature(content.content_entry.localized_title if content.ok else i18n.text("Saved Miniature unavailable. Choose a replacement."), content.content_entry.package_title if content.ok else "", not reference.is_empty())
-	if not reference.is_empty() and sheet.miniature_preview_target().is_visible_in_tree():
-		var result := sdk.content.preview_miniature(SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", ""))), sheet.miniature_preview_target())
+	if not reference.is_empty():
+		# Both authored targets retain the selected Miniature independently of
+		# which chapter/form factor currently displays them.
+		var content_reference := SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", "")))
+		var result := sdk.content.preview_miniature(content_reference, sheet.miniature_preview_target())
+		var summary := sdk.content.preview_miniature(content_reference, sheet.miniature_summary_preview_target())
 		if not result.ok:
 			sheet.status(result.message)
+		elif not summary.ok:
+			sheet.status(summary.message)
 
 func _miniature() -> Dictionary:
 	var saved := sdk.world_data.read()
@@ -147,6 +153,8 @@ func _choose_portrait() -> void:
 	if not selected.ok:
 		_portrait_pending = false
 		_busy = false
+		if selected.code == "cancelled":
+			get_node("Sheet").status("")
 		_refresh()
 		get_node("Sheet").focus_portrait.call_deferred()
 		if selected.code != "cancelled":

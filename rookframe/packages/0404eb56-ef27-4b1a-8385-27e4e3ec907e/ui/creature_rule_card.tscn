@@ -1,20 +1,48 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_rule_card.gd" id="script"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
-[node name="CreatureRule" type="VBoxContainer"]
+
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_rule_card_frame.tres" id="frame"]
+[sub_resource type="StyleBoxFlat" id="rule"]
+bg_color = Color(0,0,0,0)
+border_width_top = 1
+border_color = Color(0.27451,0.321569,0.337255,1)
+[node name="CreatureRule" type="PanelContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
+theme_override_styles/panel = ExtResource("frame")
 script = ExtResource("script")
-[node name="Heading" type="Label" parent="."]
+article_frame = ExtResource("frame")
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Heading" type="Label" parent="Content"]
 layout_mode = 2
 autowrap_mode = 3
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 22
-[node name="Copy" type="Label" parent="."]
+theme_override_colors/font_color = Color(0.941176,0.733333,0.196078,1)
+[node name="HeadingGap" type="Control" parent="Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,7)
+mouse_filter = 2
+[node name="Copy" type="Label" parent="Content"]
 layout_mode = 2
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 17
-[node name="Actions" type="HBoxContainer" parent="."]
+[node name="ResolutionGap" type="Control" parent="Content"]
 layout_mode = 2
-theme_override_constants/separation = 8
+custom_minimum_size = Vector2(0,10)
+mouse_filter = 2
+[node name="Resolution" type="VBoxContainer" parent="Content"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Rule" type="HSeparator" parent="Content/Resolution"]
+layout_mode = 2
+theme_override_constants/separation = 1
+theme_override_styles/separator = SubResource("rule")
+[node name="Actions" type="GridContainer" parent="Content/Resolution"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 14
+theme_override_constants/v_separation = 0

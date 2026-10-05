@@ -1,0 +1,243 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.gd" id="script"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="portrait"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="miniature_heading"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_action.tres" id="strong"]
+[sub_resource type="StyleBoxFlat" id="wash"]
+bg_color = Color(0.266667, 0.913725, 0.913725, 0.035294)
+border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 1
+[node name="AppearancePanel" type="VBoxContainer"]
+script = ExtResource("script")
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+[node name="TopSpace" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+visible = false
+[node name="Intro" type="VBoxContainer" parent="."]
+layout_mode = 2
+theme_override_constants/separation = 4
+[node name="Title" type="Label" parent="Intro"]
+layout_mode = 2
+text = "Appearance"
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 26
+theme_override_colors/font_color = Color(0.941176,0.733333,0.196078,1)
+[node name="Copy" type="Label" parent="Intro"]
+layout_mode = 2
+text = "World defaults for new Creatures. Existing Actors keep their appearance."
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
+[node name="Columns" type="HBoxContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_constants/separation = 20
+[node name="PortraitPanel" type="PanelContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("wash")
+[node name="Inset" type="MarginContainer" parent="Columns/PortraitPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+[node name="Content" type="VBoxContainer" parent="Columns/PortraitPanel/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="PortraitHeading" type="HBoxContainer" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="Icon" type="TextureRect" parent="Columns/PortraitPanel/Inset/Content/PortraitHeading"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("portrait")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Title" type="Label" parent="Columns/PortraitPanel/Inset/Content/PortraitHeading"]
+layout_mode = 2
+text = "Portrait"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="PortraitPreview" type="Control" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Image" type="TextureRect" parent="Columns/PortraitPanel/Inset/Content/PortraitPreview"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 12.0
+offset_right = -12.0
+offset_top = 12.0
+offset_bottom = -12.0
+expand_mode = 1
+stretch_mode = 5
+[node name="PortraitCaption" type="Label" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+text = "No portrait selected"
+theme_override_font_sizes/font_size = 16
+visible = false
+[node name="ControlsGap" type="Control" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+[node name="PortraitButtons" type="HBoxContainer" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+[node name="ChangePortrait" type="Button" parent="Columns/PortraitPanel/Inset/Content/PortraitButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Choose image"
+theme_type_variation = "TaskButton"
+theme_override_colors/font_color = Color(0.0156863,0.0666667,0.0823529,1)
+theme_override_colors/font_hover_color = Color(0.0156863,0.0666667,0.0823529,1)
+theme_override_colors/font_pressed_color = Color(0.0156863,0.0666667,0.0823529,1)
+theme_override_font_sizes/font_size = 13
+[node name="ClearPortrait" type="Button" parent="Columns/PortraitPanel/Inset/Content/PortraitButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Reset portrait"
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 13
+[node name="ExplanationGap" type="Control" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,12)
+mouse_filter = 2
+[node name="Explanation" type="Label" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+text = "Portrait changes appear immediately."
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+[node name="MiniaturePanel" type="PanelContainer" parent="Columns"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("wash")
+[node name="Inset" type="MarginContainer" parent="Columns/MiniaturePanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 18
+theme_override_constants/margin_right = 18
+theme_override_constants/margin_top = 18
+theme_override_constants/margin_bottom = 18
+[node name="Content" type="VBoxContainer" parent="Columns/MiniaturePanel/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="MiniatureHeading" type="HBoxContainer" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+[node name="Icon" type="TextureRect" parent="Columns/MiniaturePanel/Inset/Content/MiniatureHeading"]
+layout_mode = 2
+custom_minimum_size = Vector2(24, 24)
+size_flags_vertical = 4
+texture = ExtResource("miniature_heading")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Title" type="Label" parent="Columns/MiniaturePanel/Inset/Content/MiniatureHeading"]
+layout_mode = 2
+text = "Tabletop miniature"
+theme_override_font_sizes/font_size = 22
+theme_override_fonts/font = ExtResource("display")
+[node name="MiniaturePreview" type="Control" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+visible = false
+[node name="EmptyPreview" type="CenterContainer" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Content" type="VBoxContainer" parent="Columns/MiniaturePanel/Inset/Content/EmptyPreview"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Image" type="TextureRect" parent="Columns/MiniaturePanel/Inset/Content/EmptyPreview/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(100,100)
+size_flags_horizontal = 4
+texture = ExtResource("character")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.266667,0.913725,0.913725,0.4)
+[node name="Gap" type="Control" parent="Columns/MiniaturePanel/Inset/Content/EmptyPreview/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,24)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Columns/MiniaturePanel/Inset/Content/EmptyPreview/Content"]
+layout_mode = 2
+text = "No miniature assigned"
+theme_override_fonts/font = ExtResource("strong")
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+[node name="Copy" type="Label" parent="Columns/MiniaturePanel/Inset/Content/EmptyPreview/Content"]
+layout_mode = 2
+text = "Choose from installed Packages."
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
+horizontal_alignment = 1
+[node name="MiniatureCaption" type="Label" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+text = "No miniature selected"
+theme_override_fonts/font = ExtResource("strong")
+theme_override_font_sizes/font_size = 17
+horizontal_alignment = 1
+autowrap_mode = 3
+[node name="PackageCaption" type="Label" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+text = ""
+theme_override_font_sizes/font_size = 12
+horizontal_alignment = 1
+autowrap_mode = 3
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+[node name="ControlsGap" type="Control" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+[node name="MiniatureButtons" type="HBoxContainer" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 8
+[node name="ChangeMiniature" type="Button" parent="Columns/MiniaturePanel/Inset/Content/MiniatureButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Choose miniature"
+theme_type_variation = "TaskButton"
+theme_override_colors/font_color = Color(0.0156863,0.0666667,0.0823529,1)
+theme_override_colors/font_hover_color = Color(0.0156863,0.0666667,0.0823529,1)
+theme_override_colors/font_pressed_color = Color(0.0156863,0.0666667,0.0823529,1)
+theme_override_font_sizes/font_size = 13
+[node name="ClearMiniature" type="Button" parent="Columns/MiniaturePanel/Inset/Content/MiniatureButtons"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Clear"
+theme_type_variation = "TaskButton"
+theme_override_font_sizes/font_size = 13
+[node name="ExplanationGap" type="Control" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,12)
+mouse_filter = 2
+[node name="Explanation" type="Label" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+text = "Existing Rooks keep their Miniature."
+theme_override_font_sizes/font_size = 12
+autowrap_mode = 3
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+
+[node name="BottomSpace" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+visible = false

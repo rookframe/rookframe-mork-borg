@@ -1,5 +1,5 @@
 [gd_resource type="AtlasTexture" format=3]
-[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/portraits/seth-goblin.png" id="image"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/portraits/seth-goblin-sheet.png" id="image"]
 [resource]
 atlas = ExtResource("image")
 region = Rect2(115, 0, 828, 1536)

@@ -1521,5 +1521,16 @@ messages = {
 [&"", &"The portrait transfer ended before the complete file arrived."]: [&"The portrait transfer ended before the complete file arrived."],
 [&"", &"Portrait upload cancelled."]: [&"Portrait upload cancelled."],
 [&"", &"Details"]: [&"Details"],
-[&"", &"Carried loot"]: [&"Carried loot"]
+[&"", &"Carried loot"]: [&"Carried loot"],
+[&"", &"Knife / shortbow"]: [&"Knife / shortbow"],
+[&"", &"Published starting information"]: [&"Published starting information"],
+[&"", &"Current / maximum"]: [&"Current / maximum"],
+[&"", &"Player defence DR%d."]: [&"Player defence DR%d."],
+[&"", &"Not assigned"]: [&"Not assigned"],
+[&"", &"Damage & retargeting"]: [&"Damage & retargeting"],
+[&"", &"Commission"]: [&"Commission"],
+[&"", &"World defaults for future Actors"]: [&"World defaults for future Actors"],
+[&"", &"No miniature assigned"]: [&"No miniature assigned"],
+[&"", &"Choose from installed Packages."]: [&"Choose from installed Packages."],
+[&"", &"How %s appears in the sheet and on the tabletop."]: [&"How %s appears in the sheet and on the tabletop."],
 }
