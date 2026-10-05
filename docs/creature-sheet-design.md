@@ -54,17 +54,27 @@ including an empty → choice → empty cycle. HP, loot and unrelated World chan
 do not invalidate an otherwise current portrait choice.
 
 Edit sheet retains one shared changed-fields draft for core values, explicit
-attacks, structured rules and supported printed formulas. Its core editors open
-in the bounded workspace reader while identity, substantial portrait and core
-context stay visible, including on phone. Core values is accessible across
-chapters; Back retains the draft and Cancel/Escape rereads accepted values.
+attacks, structured rules and supported printed formulas. Desktop presents the
+complete core and entry fields inline where they fit; the existing native pager
+keeps complete field groups reachable. Tablet opens Core values and entry Details
+in a bounded stock Window, preserving the sheet behind it. Phone uses the full
+chapter editor with persistent identity/core hidden. This Character-pattern
+reconciliation replaces the clipped original touch edit references. Core values
+is accessible across chapters; Back and dialog close retain the draft, while
+Cancel/Escape rereads accepted values.
 Untouched fields refresh while native editors keep typed text and focus. Stable
 Actor-local correction identities protect replaced entries and printed Rolls.
 Save submits semantic field choices for Authority to merge into its latest
 Actor, preserving independent accepted loot, Appearance and additional prose.
 Known old rule aggregates track their structured edits; independent additional
 rules remain readable and editable. Gameplay roll initiation is inactive while
-editing. Only two severe-risk correction checks are retained.
+editing. The authored Creature fields retain the public TextField/TextArea
+instances and their native editors: 44px single-line, 88px multiline, 8px interior
+padding, 12px captions, 14px desktop/tablet and phone-core text, and 12px phone-entry
+text. Complete localized validation groups remain in the measured pages. Pending
+preparation/Save disables repeat actions; Actor rebind/removal invalidates late
+presentation and closes its correction Window. Only two severe-risk correction
+checks are retained.
 
 RFG-350 through RFG-352 supply HP adjustment/death and Window Dice; the live
 adapter exposes editing_sheet(), draft_value() and change_draft() for those

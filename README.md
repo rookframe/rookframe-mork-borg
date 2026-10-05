@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.27` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.29` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `e2a1e807d73c907bf360aa38a21a55b1773965e2` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -498,6 +498,8 @@ Character creation is contributed to the shared Actors window.
 ## Creature Actor sheet
 
 Live Creature inspection, Library creation and companion opening use the shared fixed Full-viewport Creature sheet. Encounter, Inventory and Appearance keep current Actor values, independent carried loot and SDK appearance operations together. Portrait image choice/reset and Miniature changes commit immediately outside stat-block Save/Cancel. Library defaults snapshot only into future Actors; existing Actors and Rooks keep their appearance. Owner loot and appearance edits preserve the current stat block; Viewers can read it. Bounded Details return to the entry and focus, and Actor-local chapter/page state lasts for the World Application session. Corrections, HP adjustments and Window Dice are enabled by their dependent rule adapters. Existing captured targeted tabletop procedures retain their separate legacy task route. Actor placement stays in the Actors drag-and-drop flow.
+
+Creature corrections use desktop inline fields, a bounded tablet Window, and a full phone chapter. One changed-fields draft retains native typing/focus and merges only changed values into current accepted data; Back keeps it, Cancel/Escape discards it, and loot/Appearance remain independent.
 
 Creature Inventory keeps a bounded carried-loot list with readable Details, a searchable core catalogue, custom item creation, independent field saves and removal. Character equipment retains its existing Attack/Equip/Cast/Use behavior. See [the review contract](docs/creature-sheet-design.md).
 

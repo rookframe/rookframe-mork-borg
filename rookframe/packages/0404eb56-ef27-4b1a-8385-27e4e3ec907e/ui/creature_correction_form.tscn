@@ -1,0 +1,8 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_form.gd" id="script"]
+[node name="CreatureCorrectionForm" type="BoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+vertical = true
+theme_override_constants/separation = 0
+script = ExtResource("script")

@@ -21,6 +21,25 @@
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface_chapter_selected.tres" id="chapter_selected"]
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_section_heading_frame.tres" id="section_frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_chapter_button.gd" id="chapter_script"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_form.tscn" id="correction_form"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_details.tscn" id="correction_details"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_dialog.gd" id="correction_dialog"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_card.tres" id="correction_frame"]
+
+[sub_resource type="StyleBoxFlat" id="footer_action"]
+bg_color = Color(0,0,0,0)
+content_margin_left = 12.0
+content_margin_right = 12.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+
+[sub_resource type="StyleBoxFlat" id="correction_panel"]
+bg_color = Color(0.015686,0.066667,0.082353,1)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="pager_button"]
 bg_color = Color(0,0,0,0)
 border_width_left = 1
@@ -48,6 +67,7 @@ content_margin_left = 4.0
 content_margin_right = 4.0
 content_margin_top = 6.0
 content_margin_bottom = 6.0
+
 [node name="CreatureSheet" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -55,6 +75,8 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 theme = ExtResource("theme")
 script = ExtResource("script")
+correction_frame = ExtResource("correction_frame")
+footer_action_frame = SubResource("footer_action")
 canvas_frame = ExtResource("outer_frame")
 identity_frame = ExtResource("identity_frame")
 section_frame = ExtResource("section_frame")
@@ -109,6 +131,10 @@ theme_override_styles/panel = ExtResource("identity_frame")
 [node name="Column" type="VBoxContainer" parent="Inset/Layout/Body/Identity"]
 layout_mode = 2
 theme_override_constants/separation = 0
+[node name="IdentityEditors" parent="Inset/Layout/Body/Identity/Column" instance=ExtResource("correction_form")]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 7
 [node name="IdentityDetails" type="Button" parent="Inset/Layout/Body/Identity/Column"]
 visible = false
 layout_mode = 2
@@ -164,6 +190,20 @@ stretch_mode = 5
 layout_mode = 2
 custom_minimum_size = Vector2(0, 14)
 mouse_filter = 2
+[node name="HealthEditors" type="PanelContainer" parent="Inset/Layout/Body/Identity/Column"]
+visible = false
+layout_mode = 2
+theme_override_styles/panel = SubResource("health_frame")
+[node name="Inset" type="MarginContainer" parent="Inset/Layout/Body/Identity/Column/HealthEditors"]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 8
+[node name="Fields" parent="Inset/Layout/Body/Identity/Column/HealthEditors/Inset" instance=ExtResource("correction_form")]
+layout_mode = 2
+vertical = false
+theme_override_constants/separation = 8
 [node name="Health" type="Button" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 66)
@@ -239,6 +279,15 @@ layout_mode = 2
 visible = false
 autowrap_mode = 3
 
+[node name="ArmorEditors" type="MarginContainer" parent="Inset/Layout/Body/Identity/Column"]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_bottom = 12
+[node name="Fields" parent="Inset/Layout/Body/Identity/Column/ArmorEditors" instance=ExtResource("correction_form")]
+layout_mode = 2
+vertical = false
+theme_override_constants/separation = 8
 [node name="Vitals" type="HBoxContainer" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 custom_minimum_size = Vector2(0,73.5)
@@ -415,6 +464,13 @@ theme_override_constants/separation = 0
 layout_mode = 2
 visible = false
 script = ExtResource("appearance_script")
+[node name="CorrectionSlot" type="VBoxContainer" parent="Inset/Layout/Body/Workspace"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+[node name="Details" parent="Inset/Layout/Body/Workspace/CorrectionSlot" instance=ExtResource("correction_details")]
+layout_mode = 2
 [node name="Reader" type="VBoxContainer" parent="Inset/Layout/Body/Workspace"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -502,7 +558,7 @@ visible = false
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Save sheet"
-theme_type_variation = "TaskPrimary"
+theme_type_variation = "TaskButton"
 visible = false
 [node name="Create" type="Button" parent="Inset/Layout/Footer"]
 layout_mode = 2
@@ -639,3 +695,29 @@ offset_top = -44.0
 offset_bottom = -43.0
 color = Color(0.27451,0.321569,0.337255,1)
 mouse_filter = 2
+
+[node name="CorrectionScrim" type="ColorRect" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0,0,0,0.666667)
+mouse_filter = 0
+[node name="CorrectionDialog" type="Window" parent="."]
+visible = false
+size = Vector2i(640,610)
+borderless = true
+transient = true
+exclusive = true
+unresizable = true
+theme = ExtResource("theme")
+script = ExtResource("correction_dialog")
+accessibility_name = "Creature corrections"
+[node name="Surface" type="PanelContainer" parent="CorrectionDialog"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_styles/panel = SubResource("correction_panel")
+[node name="Inset" type="MarginContainer" parent="CorrectionDialog/Surface"]
+layout_mode = 2

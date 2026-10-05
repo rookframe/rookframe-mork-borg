@@ -1,0 +1,92 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_details.gd" id="script"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_form.tscn" id="form"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[sub_resource type="StyleBoxFlat" id="line"]
+bg_color = Color(0,0,0,0)
+border_width_bottom = 1
+border_color = Color(0.27451,0.321569,0.337255,1)
+[node name="CorrectionDetails" type="VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/separation = 0
+script = ExtResource("script")
+[node name="Header" type="PanelContainer" parent="."]
+layout_mode = 2
+custom_minimum_size = Vector2(0,63)
+theme_override_styles/panel = SubResource("line")
+[node name="Inset" type="MarginContainer" parent="Header"]
+layout_mode = 2
+theme_override_constants/margin_left = 5
+theme_override_constants/margin_right = 7
+[node name="Row" type="HBoxContainer" parent="Header/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Back" type="Button" parent="Header/Inset/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,44)
+size_flags_vertical = 4
+theme_type_variation = "TaskButton"
+text = "‹ Back"
+[node name="Title" type="Label" parent="Header/Inset/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("display")
+autowrap_mode = 3
+[node name="Close" type="Button" parent="Header/Inset/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,44)
+size_flags_vertical = 4
+theme_type_variation = "TaskGlyphButton"
+theme_override_font_sizes/font_size = 30
+text = "×"
+accessibility_name = "Back to creature"
+[node name="Body" type="MarginContainer" parent="."]
+layout_mode = 2
+size_flags_vertical = 3
+[node name="Pages" parent="Body" instance=ExtResource("pages")]
+layout_mode = 2
+[node name="FocusInset" type="MarginContainer" parent="Body/Pages/Area"]
+layout_mode = 2
+theme_override_constants/margin_left = 3
+theme_override_constants/margin_right = 3
+theme_override_constants/margin_top = 3
+theme_override_constants/margin_bottom = 3
+[node name="Message" type="Label" parent="Body/Pages/Area/FocusInset"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+
+[node name="Form" parent="Body/Pages/Area/FocusInset" instance=ExtResource("form")]
+layout_mode = 2
+[node name="Footer" type="PanelContainer" parent="."]
+layout_mode = 2
+theme_type_variation = "TaskFooter"
+[node name="Inset" type="MarginContainer" parent="Footer"]
+layout_mode = 2
+theme_override_constants/margin_left = 14
+theme_override_constants/margin_right = 14
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_bottom = 8
+[node name="Row" type="HBoxContainer" parent="Footer/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 8
+[node name="Pager" type="HBoxContainer" parent="Footer/Inset/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+[node name="Cancel" type="Button" parent="Footer/Inset/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+custom_minimum_size = Vector2(44,44)
+theme_type_variation = "TaskButton"
+text = "Cancel"
+[node name="Save" type="Button" parent="Footer/Inset/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+custom_minimum_size = Vector2(44,44)
+theme_type_variation = "TaskPrimary"
+text = "Save sheet"
