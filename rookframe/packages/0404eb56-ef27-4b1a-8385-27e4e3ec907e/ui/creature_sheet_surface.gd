@@ -59,6 +59,12 @@ var _texture: Texture2D
 var _groups: Array[Dictionary] = []
 var _layout_pending := false
 var _pages: Dictionary = {}
+var _encounter_keys: Dictionary = {}
+var _reference_route := ""
+var _reference_pages: Dictionary = {}
+var _reference_values: Dictionary = {}
+var _focus_identity := false
+var _identity_overflow := false
 var _pager_font_size := 0
 var _draft: Dictionary = {}
 var _editing := false
@@ -93,6 +99,7 @@ func _ready() -> void:
 	get_node(IDENTITY + "Vitals/Armor").pressed.connect(_roll_armor)
 	get_node(IDENTITY + "Vitals/Morale").pressed.connect(_roll_morale)
 	get_node(IDENTITY + "MiniatureSummary").pressed.connect(show_chapter.bind(2))
+	get_node(IDENTITY + "IdentityDetails").pressed.connect(show_identity)
 	var appearance: APPEARANCE = get_node(WORK + "Appearance")
 	appearance.miniature_requested.connect(_miniature)
 	appearance.miniature_clear_requested.connect(_miniature_clear)
@@ -123,6 +130,7 @@ func _queue_layout() -> void:
 
 func _layout() -> void:
 	_layout_pending = false
+	_capture_encounter_pages()
 	_phone = size.x <= 900
 	_tablet = not _phone and size.x <= 1400
 	_layout_frame()
@@ -164,6 +172,7 @@ func _layout() -> void:
 	_render_encounter()
 	_render_inventory()
 	_update_visibility()
+	_refresh_reference()
 
 func _build_groups(metadata: Dictionary) -> void:
 	var groups: Array[Dictionary] = []
@@ -332,10 +341,22 @@ func _configure_heading(heading: PanelContainer, title: String) -> void:
 	var icons := {"Attacks": preload("res://rookframe/ui/icons/character/sword.svg"), "Attacks & powers": preload("res://rookframe/ui/icons/character/sword.svg"), "Defence": preload("res://rookframe/ui/icons/character/shield.svg"), "Protection": preload("res://rookframe/ui/icons/character/shield.svg"), "Own tests": preload("res://rookframe/ui/icons/character/shield.svg"), "Inventory": preload("res://rookframe/ui/icons/character/bag.svg"), "Carried loot": preload("res://rookframe/ui/icons/character/bag.svg")}
 	icon.texture = icons.get(title, preload("res://rookframe/ui/icons/character/quill.svg"))
 
+func _capture_encounter_pages() -> void:
+	for lane in ["Primary", "Secondary"]:
+		if not _encounter_keys.has(lane):
+			continue
+		if _phone and lane == "Secondary":
+			continue
+		var keys: Dictionary = _encounter_keys
+		var page_key := str(keys.get(lane, ""))
+		_pages[page_key] = get_node(WORK + "Encounter/" + lane).capture_state()
+
 func _render_encounter() -> void:
 	for lane in ["Primary", "Secondary"]:
 		var pages = get_node(WORK + "Encounter/" + lane)
-		var state: Dictionary = pages.capture_state()
+		var page_key: String = "phone:" + str(_groups[_section].title) + ":" + str(_groups[_section].get("lane", "primary")) if _phone and not _groups.is_empty() else lane
+		var state: Dictionary = _pages.get(page_key, {})
+		_encounter_keys[lane] = page_key
 		_clear(pages.get_node("Area/Content"))
 		for index in range(_groups.size()):
 			var group := _groups[index]
@@ -424,6 +445,9 @@ func _requested(part: String, id: String, opener: Control) -> void:
 		roll_requested.emit(part, id)
 
 func show_entry(entry: Dictionary, opener: Control = null) -> void:
+	_capture_reference_page()
+	_reference_route = ""
+	_focus_identity = false
 	_health_reader = false
 	_roll_reader = false
 	_return_entry = str(entry.get("inventory_id", ""))
@@ -447,6 +471,9 @@ func _source() -> Dictionary:
 	return source
 
 func show_source() -> void:
+	_capture_reference_page()
+	_reference_route = "source"
+	_focus_identity = false
 	_health_reader = false
 	_roll_reader = false
 	_return_entry = ""
@@ -456,21 +483,31 @@ func show_source() -> void:
 	var content = get_node(WORK + "Reader/Pages/Area/Content")
 	_clear(content)
 	var source: Dictionary = _source()
-	_append_reference(content, {"name": "Published source", "text": str(source.get("title", "")) + "\n" + str(source.get("page", "")) + "\n" + str(source.get("author", ""))})
+	_append_reference(content, {"name": "Published source", "text": _locale.text("Published source is unavailable.") if source.is_empty() else str(source.get("title", "")) + "\n" + str(source.get("page", "")) + "\n" + str(source.get("author", ""))})
 	_append_reference(content, {"name": "Attribution", "text": "MÖRK BORG is © Ockult Örtmästare Games & Stockholm Kartell. Mechanical facts are restated; study artwork is not official book art."})
 	(get_node(WORK + "Reader/Publication") as Control).visible = not str(source.get("url", "")).is_empty()
-	get_node(WORK + "Reader/Pages").restore_state({})
+	get_node(WORK + "Reader/Pages").restore_state(_reference_pages.get("source", {}))
+	_reference_values = _source().duplicate(true)
 	_update_visibility()
 	get_node(WORK + "Reader/Back").grab_focus()
 
 func back() -> void:
+	_capture_reference_page()
+	_reference_route = ""
 	_reader = false
 	_update_visibility()
 	_return_focus_frames = 2
 	reader_closed.emit()
 
 func _restore_return_focus() -> void:
-	if _roll_reader:
+	if _focus_identity:
+		_focus_identity = false
+		var opener: Control = get_node(IDENTITY + "IdentityDetails")
+		if opener.is_visible_in_tree():
+			opener.grab_focus()
+		else:
+			get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
+	elif _roll_reader:
 		_roll_reader = false
 		if _return_roll == "armor" or _return_roll == "morale":
 			get_node(IDENTITY + "Vitals/" + ("Armor" if _return_roll == "armor" else "Morale")).grab_focus()
@@ -493,6 +530,9 @@ func _restore_return_focus() -> void:
 		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
 
 func show_chapter(chapter: int) -> void:
+	_capture_reference_page()
+	_reference_route = ""
+	_focus_identity = false
 	_chapter = clampi(chapter, 0, 2)
 	_reader = false
 	_health_reader = false
@@ -556,13 +596,13 @@ func _roll_armor() -> void:
 func _roll_morale() -> void:
 	roll_requested.emit("morale", "")
 func _section_selected(index: int) -> void:
+	_capture_encounter_pages()
 	_section = index
 	var child_index := 0
 	for child in get_node(WORK + "Section").get_children():
 		var button: Button = child
 		button.set_pressed_no_signal(child_index == index)
 		child_index += 1
-	get_node(WORK + "Encounter/Primary").restore_state({})
 	_render_encounter()
 func _miniature() -> void:
 	miniature_requested.emit()
@@ -578,12 +618,22 @@ func _inventory_add() -> void:
 
 ## Local route state only; never Actor or World gameplay data.
 func capture_navigation() -> Dictionary:
+	_capture_encounter_pages()
+	_capture_reference_page()
 	var pages: Dictionary = {}
 	for key in ["Encounter/Primary", "Encounter/Secondary", "Inventory", "Reader/Pages"]:
 		pages[key] = get_node(WORK + key).capture_state()
-	return {"chapter": _chapter, "section": _section, "pages": pages}
+	return {"chapter": _chapter, "section": _section, "pages": pages, "encounter_pages": _pages.duplicate(true), "reference_pages": _reference_pages.duplicate(true)}
 
 func restore_navigation(state: Dictionary) -> void:
+	_pages = state.get("encounter_pages", {}).duplicate(true)
+	_encounter_keys = {}
+	_reference_pages = state.get("reference_pages", {}).duplicate(true)
+	_reference_route = ""
+	_focus_identity = false
+	_return_entry = ""
+	_return_correction = ""
+	_return_focus_frames = 0
 	_chapter = clampi(int(state.get("chapter", 0)), 0, 2)
 	_section = maxi(0, int(state.get("section", 0)))
 	_reader = false
@@ -594,6 +644,9 @@ func restore_navigation(state: Dictionary) -> void:
 	_queue_layout()
 
 func open_reader(title: String, return_entry: String = "", correction_route: String = "") -> void:
+	_capture_reference_page()
+	_reference_route = ""
+	_focus_identity = false
 	_health_reader = false
 	_roll_reader = false
 	_focus_card = null
@@ -907,14 +960,81 @@ func _fit_phone_entries() -> void:
 		if difference > 0.1 or difference < -0.1:
 			child.custom_minimum_size = Vector2(child.custom_minimum_size.x, gap)
 
+## Keep the approved portrait/core usable. Only overflowing identity uses the
+## Character-style full-text reader; accepted strings are never shortened.
 func _fit_identity() -> void:
 	if not get_node(IDENTITY_PANEL).is_visible_in_tree():
 		return
 	var column: Control = get_node(IDENTITY)
+	if column.size.x < 1:
+		return
+	var title: Label = get_node(IDENTITY + "Name")
+	var classification: Label = get_node(IDENTITY + "Classification")
+	# Hidden labels still measure the complete text at the settled native width.
+	title.size.x = column.size.x
+	classification.size.x = column.size.x
 	var portrait: Control = get_node(IDENTITY + "Portrait")
+	var opener: Button = get_node(IDENTITY + "IdentityDetails")
 	var available := size.y - (11 if _phone else 17 if _tablet else 25) - (53 if _phone else 57 if _tablet else 65)
-	var other_height := column.get_combined_minimum_size().y - portrait.custom_minimum_size.y
-	var target := minf(148 if _phone else 430 if _tablet else 510, maxf(0, available - other_height))
+	var other_height := 0.0
+	for child in column.get_children():
+		if child is Control and child.visible and child not in [title, classification, portrait, opener, get_node(IDENTITY + "NameGap")]:
+			other_height += child.get_combined_minimum_size().y
+	var portrait_height := 148.0 if _phone else 430.0 if _tablet else 510.0
+	var name_gap := 3 if _phone else 6 if _tablet else 7
+	var full_height := title.get_combined_minimum_size().y + classification.get_combined_minimum_size().y + name_gap
+	_identity_overflow = other_height + portrait_height + full_height > available + 1
+	title.visible = not _identity_overflow
+	classification.visible = not _identity_overflow
+	get_node(IDENTITY + "NameGap").visible = not _identity_overflow
+	opener.visible = _identity_overflow
+	get_node(IDENTITY + "IdentityDetails/Copy/Name").text = title.text
+	get_node(IDENTITY + "IdentityDetails/Copy/Name").add_theme_font_size_override("font_size", 22 if _phone else 29 if _tablet else 34)
+	get_node(IDENTITY + "IdentityDetails/Copy/Caption").text = _locale.text("Full identity") + " ›"
+	get_node(IDENTITY + "IdentityDetails/Copy/Caption").add_theme_font_size_override("font_size", 9 if _phone else 11 if _tablet else 13)
+	opener.accessibility_name = title.text + ". " + classification.text + ". " + _locale.text("Full identity")
+	opener.custom_minimum_size.y = maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y)
+	var identity_height := opener.custom_minimum_size.y if _identity_overflow else full_height
+	var target := minf(portrait_height, maxf(0, available - other_height - identity_height))
 	var difference := target - portrait.custom_minimum_size.y
 	if difference > 0.1 or difference < -0.1:
 		portrait.custom_minimum_size = Vector2(0, target)
+
+func _capture_reference_page() -> void:
+	if not _reference_route.is_empty() and _reader:
+		var state := reader_state()
+		if int(state.get("page", 0)) > 0 or _reference_pages.has(_reference_route):
+			_reference_pages[_reference_route] = state
+
+func _identity_values() -> Dictionary:
+	return {"name": str(get_node(IDENTITY + "Name").text), "classification": str(get_node(IDENTITY + "Classification").text)}
+
+func show_identity() -> void:
+	_capture_reference_page()
+	open_reader("Full identity")
+	_reference_route = "identity"
+	_focus_identity = true
+	_reference_values = _identity_values()
+	_append_reference(reader_content(), {"name": "Name", "text": _reference_values.name})
+	_append_reference(reader_content(), {"name": "Classification", "text": _reference_values.classification if not str(_reference_values.classification).is_empty() else _locale.text("Not recorded")})
+	restore_reader(_reference_pages.get("identity", {}))
+
+func _refresh_reference() -> void:
+	if not _reader or _reference_route.is_empty():
+		return
+	var values := _identity_values() if _reference_route == "identity" else _source()
+	if values == _reference_values:
+		return
+	# Only changed accepted reference text rebuilds this bounded article.
+	# The native pager remains the same Control and keeps keyboard focus.
+	var focused: Control = null
+	for path in ["Back", "Pages/Pager/Previous", "Pages/Pager/Next", "Publication"]:
+		var candidate: Control = get_node(WORK + "Reader/" + path)
+		if candidate.has_focus():
+			focused = candidate
+	if _reference_route == "identity":
+		show_identity()
+	else:
+		show_source()
+	if focused != null and is_instance_valid(focused) and focused.is_visible_in_tree():
+		focused.grab_focus()

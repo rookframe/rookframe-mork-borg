@@ -1533,4 +1533,7 @@ messages = {
 [&"", &"No miniature assigned"]: [&"No miniature assigned"],
 [&"", &"Choose from installed Packages."]: [&"Choose from installed Packages."],
 [&"", &"How %s appears in the sheet and on the tabletop."]: [&"How %s appears in the sheet and on the tabletop."],
+"Published source is unavailable.": "Published source is unavailable.",
+"Full identity": "Full identity",
+"Not recorded": "Not recorded"
 }

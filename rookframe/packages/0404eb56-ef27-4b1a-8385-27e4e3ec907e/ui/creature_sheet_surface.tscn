@@ -109,6 +109,30 @@ theme_override_styles/panel = ExtResource("identity_frame")
 [node name="Column" type="VBoxContainer" parent="Inset/Layout/Body/Identity"]
 layout_mode = 2
 theme_override_constants/separation = 0
+[node name="IdentityDetails" type="Button" parent="Inset/Layout/Body/Identity/Column"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_override_styles/normal = SubResource("source_normal")
+[node name="Copy" type="VBoxContainer" parent="Inset/Layout/Body/Identity/Column/IdentityDetails"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_constants/separation = 0
+mouse_filter = 2
+[node name="Name" type="Label" parent="Inset/Layout/Body/Identity/Column/IdentityDetails/Copy"]
+layout_mode = 2
+size_flags_horizontal = 3
+text_overrun_behavior = 3
+horizontal_alignment = 1
+theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+[node name="Caption" type="Label" parent="Inset/Layout/Body/Identity/Column/IdentityDetails/Copy"]
+layout_mode = 2
+text = "Full identity ›"
+horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
 [node name="Name" type="Label" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 autowrap_mode = 3

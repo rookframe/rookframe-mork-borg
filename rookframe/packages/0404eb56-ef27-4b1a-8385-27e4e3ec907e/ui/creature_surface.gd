@@ -230,7 +230,7 @@ func _render_accepted() -> void:
 	if not _detail.is_empty():
 		if not owner():
 			_edit_item = false
-			if _detail in ["catalogue", "custom"]:
+			if _detail in ["catalogue", "custom", "health"] or _detail.begins_with("correction:"):
 				_detail = ""
 				sheet.back()
 		if _detail.begins_with("correction:") and not _fields.is_empty() and _draft.active:

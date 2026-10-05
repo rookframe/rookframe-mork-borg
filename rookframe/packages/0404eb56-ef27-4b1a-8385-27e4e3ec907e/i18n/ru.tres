@@ -1533,5 +1533,8 @@ messages = {
 [&"", &"No miniature assigned"]: [&"Миниатюра не назначена"],
 [&"", &"Choose from installed Packages."]: [&"Выберите из установленных пакетов."],
 [&"", &"How %s appears in the sheet and on the tabletop."]: [&"Как %s выглядит в листе и на игровом столе."],
+"Published source is unavailable.": "Опубликованный источник недоступен.",
+"Full identity": "Полное имя и описание",
+"Not recorded": "Не указано"
 }
 locale = "ru"
