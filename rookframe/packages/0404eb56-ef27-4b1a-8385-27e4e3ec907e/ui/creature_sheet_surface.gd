@@ -344,19 +344,29 @@ func _append_heading(host: Node, title: String) -> void:
 	host.add_child(heading)
 	_configure_heading(heading, title)
 
-func _configure_heading(heading: PanelContainer, title: String) -> void:
+func _configure_heading(heading: PanelContainer, title: String, padded_group: bool = false) -> void:
 	heading.custom_minimum_size = Vector2(heading.custom_minimum_size.x, 38 if _tablet else 44)
 	var frame: StyleBoxFlat = section_frame.duplicate()
 	frame.content_margin_left = 6 if _phone or _tablet else 12
 	frame.content_margin_right = frame.content_margin_left
 	frame.content_margin_top = 6 if _phone or _tablet else 8
 	frame.content_margin_bottom = frame.content_margin_top
+	var row: HBoxContainer = heading.get_node("Row/Heading/Content" if padded_group else "Row")
+	if padded_group:
+		# The heading owns its padding; Add uses the full height of the frame.
+		var padding: MarginContainer = heading.get_node("Row/Heading")
+		padding.add_theme_constant_override("margin_top", int(frame.content_margin_top))
+		padding.add_theme_constant_override("margin_bottom", int(frame.content_margin_bottom))
+		frame.content_margin_top = 0
+		frame.content_margin_bottom = 0
+		var add: Button = heading.get_node("Row/Add")
+		add.custom_minimum_size = Vector2(44, 38 if _tablet else 44)
 	heading.add_theme_stylebox_override("panel", frame)
-	(heading.get_node("Row") as Control).add_theme_constant_override("separation", 6 if _phone or _tablet else 10)
-	var label: Label = heading.get_node("Row/Title")
+	row.add_theme_constant_override("separation", 6 if _phone or _tablet else 10)
+	var label: Label = row.get_node("Title")
 	label.text = _locale.text(title)
 	label.add_theme_font_size_override("font_size", 13 if _phone or _tablet else 17)
-	var icon: TextureRect = heading.get_node("Row/Icon")
+	var icon: TextureRect = row.get_node("Icon")
 	icon.custom_minimum_size = Vector2(20, 20) if _tablet else Vector2(24, 24)
 	icon.visible = not _phone
 	var icons := {"Attacks": preload("res://rookframe/ui/icons/character/sword.svg"), "Attacks & powers": preload("res://rookframe/ui/icons/character/sword.svg"), "Defence": preload("res://rookframe/ui/icons/character/shield.svg"), "Protection": preload("res://rookframe/ui/icons/character/shield.svg"), "Own tests": preload("res://rookframe/ui/icons/character/shield.svg"), "Inventory": preload("res://rookframe/ui/icons/character/bag.svg"), "Carried loot": preload("res://rookframe/ui/icons/character/bag.svg")}
@@ -897,7 +907,7 @@ func _layout_frame() -> void:
 		button.add_theme_stylebox_override("normal", action_frame)
 		button.add_theme_color_override("font_color", Color(0.603922, 0.647059, 0.65098, 1))
 	var heading: PanelContainer = get_node(WORK + "InventoryHeading")
-	_configure_heading(heading, "Inventory" if _library else "Carried loot")
+	_configure_heading(heading, "Inventory" if _library else "Carried loot", true)
 	# The fixed workspace gap belongs after the chapter rail, not every child.
 	get_node(WORK + "ChapterGap").custom_minimum_size = Vector2(get_node(WORK + "ChapterGap").custom_minimum_size.x, 0 if _phone else 14 if _tablet else 18)
 

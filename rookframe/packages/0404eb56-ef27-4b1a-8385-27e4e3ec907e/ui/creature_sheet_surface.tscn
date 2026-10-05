@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="miniature"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_vital.tscn" id="vital"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_section_heading.tscn" id="heading"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_inventory_heading.tscn" id="inventory_heading"]
 [ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_canvas_wash.svg" id="wash"]
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface_outer_frame.tres" id="outer_frame"]
@@ -474,14 +475,9 @@ layout_mode = 0
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="InventoryHeading" parent="Inset/Layout/Body/Workspace" instance=ExtResource("heading")]
+[node name="InventoryHeading" parent="Inset/Layout/Body/Workspace" instance=ExtResource("inventory_heading")]
 layout_mode = 2
 visible = false
-[node name="Add" type="Button" parent="Inset/Layout/Body/Workspace/InventoryHeading/Row"]
-layout_mode = 2
-custom_minimum_size = Vector2(44,44)
-text = "Add Item"
-theme_type_variation = "TaskButton"
 [node name="Inventory" parent="Inset/Layout/Body/Workspace" instance=ExtResource("pages")]
 layout_mode = 2
 size_flags_vertical = 3
