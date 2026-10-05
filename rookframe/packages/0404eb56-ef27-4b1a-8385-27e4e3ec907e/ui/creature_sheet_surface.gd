@@ -371,6 +371,9 @@ func _configure_heading(heading: PanelContainer, title: String, padded_group: bo
 	icon.custom_minimum_size = Vector2(20, 20) if _tablet else Vector2(24, 24)
 	icon.visible = not _phone or padded_group
 	var icons := {"Attacks": preload("res://rookframe/ui/icons/character/sword.svg"), "Attacks & powers": preload("res://rookframe/ui/icons/character/sword.svg"), "Defence": preload("res://rookframe/ui/icons/character/shield.svg"), "Protection": preload("res://rookframe/ui/icons/character/shield.svg"), "Own tests": preload("res://rookframe/ui/icons/character/shield.svg"), "Inventory": preload("res://rookframe/ui/icons/character/bag.svg"), "Carried loot": preload("res://rookframe/ui/icons/character/bag.svg")}
+	if str(_data.get("definition_id", "")) == "bone-bowyer":
+		icons["Attacks"] = preload(ROOT + "ui/icons/bow.svg")
+		icons["Opening the encounter"] = preload(ROOT + "ui/icons/invisible.svg")
 	icon.texture = icons.get(title, preload("res://rookframe/ui/icons/character/quill.svg"))
 
 func _capture_encounter_pages() -> void:
