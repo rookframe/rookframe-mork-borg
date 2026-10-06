@@ -2,6 +2,9 @@
 
 [resource]
 messages = {
+[&"", &"No saved miniature"]: [&"No saved miniature"],
+[&"", &"Find miniature"]: [&"Find miniature"],
+[&"", &"Name or Package"]: [&"Name or Package"],
 [&"", &"%s · %s"]: [&"%s · %s"],
 [&"", &"Dice"]: [&"Dice"],
 [&"", &"Ability roll"]: [&"Ability roll"],

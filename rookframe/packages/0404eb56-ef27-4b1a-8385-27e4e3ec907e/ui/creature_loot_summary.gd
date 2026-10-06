@@ -25,15 +25,15 @@ func configure(item: Dictionary, locale: I18N, phone: bool, tablet: bool) -> voi
 	get_node("Padding/Row/Identity/CompactName").text = title
 	get_node("Padding/Row/Identity/Summary").text = summary
 	get_node("Padding/Row/Details").text = locale.text("Details")
-	get_node("Padding/Row/Identity/Name").add_theme_font_size_override("font_size", 17 if phone else 18 if tablet else 22)
-	get_node("Padding/Row/Identity/CompactName").add_theme_font_size_override("font_size", 17 if phone else 18 if tablet else 22)
-	get_node("Padding/Row/Identity/Summary").add_theme_font_size_override("font_size", 13 if phone or tablet else 17)
+	get_node("Padding/Row/Identity/Name").add_theme_font_size_override("font_size", 19 if phone else 20 if tablet else 24)
+	get_node("Padding/Row/Identity/CompactName").add_theme_font_size_override("font_size", 19 if phone else 20 if tablet else 24)
+	get_node("Padding/Row/Identity/Summary").add_theme_font_size_override("font_size", 14 if phone else 16 if tablet else 18)
 	get_node("Padding/Row/Identity/Summary").add_theme_constant_override("line_spacing", 2 if phone else 3 if tablet else 4)
-	get_node("Padding/Row/Details").add_theme_font_size_override("font_size", 11 if phone else 12 if tablet else 14)
-	get_node("Padding/Row/Identity").add_theme_constant_override("separation", 4 if phone else 5 if tablet else 7)
-	var horizontal := 2 if phone else 3 if tablet else 7
+	get_node("Padding/Row/Details").add_theme_font_size_override("font_size", 16 if phone else 18 if tablet else 20)
+	get_node("Padding/Row/Identity").add_theme_constant_override("separation", 4 if phone else 6 if tablet else 8)
+	var horizontal := 6 if phone else 12 if tablet else 16
 	_horizontal_padding = horizontal
-	var vertical := 8 if phone else 10 if tablet else 14
+	var vertical := 6 if phone else 12 if tablet else 16
 	for edge in ["left", "right"]:
 		get_node("Padding").add_theme_constant_override("margin_" + edge, horizontal)
 	get_node("Padding").add_theme_constant_override("margin_top", vertical)

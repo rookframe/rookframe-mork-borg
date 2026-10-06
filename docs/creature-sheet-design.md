@@ -1,10 +1,12 @@
 # Creature sheet review contract
 
 RFG-345 replaces the older compact Creature sheet. The accepted product contract
-and approved desktop/tablet/phone monster HTML authorities live in
+and desktop/tablet/phone behavior authorities live in
 `rookframe-godot/docs/product/mork-borg-creature-sheet.md` and
 `rookframe-godot/docs/product/mockups/monster-sheets/README.md` and `SOURCES.md`. Use that repository's
-unchanged Rookframe design system and its vendored asset boundary. Review desktop
+approved 2026-10-06 Silkbound Ledger presentation in
+`docs/product/mockups/mork-borg/creature.html`, `creature.css` and `creature.js`,
+with its unchanged monster-sheet behavior source and vendored asset boundary. Review desktop
 at 1920 × 1080, tablet at 1024 × 768 and landscape phone at 844 × 390.
 
 Library and live Actor sheets share the authored Full-viewport composition:
@@ -18,7 +20,9 @@ Creature Inventory is independent carried loot. Its overview shows identity,
 quantity and kind; Details retains complete recorded rules and facts. Owner
 operations are a searchable core catalogue, custom addition, independent field
 saves and removal. Creature loot has no Equip, Attack, Cast or Use operation.
-Character equipment keeps its existing semantics. Owner/Viewer presentation and
+Creature loot forms use the same public TextField/TextArea composition and
+Silkbound input metrics as correction fields, while keeping their independent
+field saves. Character equipment keeps its existing semantics. Owner/Viewer presentation and
 permitted mutations remain separate from complete shared World gameplay data.
 
 Each ordinary loot overview entry keeps its name, quantity, kind and Details
@@ -69,9 +73,9 @@ Actor, preserving independent accepted loot, Appearance and additional prose.
 Known old rule aggregates track their structured edits; independent additional
 rules remain readable and editable. Gameplay roll initiation is inactive while
 editing. The authored Creature fields retain the public TextField/TextArea
-instances and their native editors: 44px single-line, 88px multiline, 8px interior
-padding, 12px captions, 14px desktop/tablet and phone-core text, and 12px phone-entry
-text. Complete localized validation groups remain in the measured pages. Pending
+instances and their native editors: 48px single-line, 96px multiline, 8px vertical / 12px horizontal interior
+padding, 18px desktop/tablet or 15px phone captions, 20px desktop/tablet and
+phone-core input text, and 18px phone-entry text. Complete localized validation groups remain in the measured pages. Pending
 preparation/Save disables repeat actions; Actor rebind/removal invalidates late
 presentation and closes its correction Window. Only two severe-risk correction
 checks are retained.
@@ -130,7 +134,7 @@ Do not reuse the superseded compact Actor-sheet tour or copied Package stores.
 ## Creature HP and Dead
 
 The live HP ± control opens a bounded Apply damage / Heal reader outside Edit
-sheet. Enter the positive whole amount already resolved at the table. Authority
+sheet. Its native Window owns the single black backdrop. Enter the positive whole amount already resolved at the table. Authority
 reads current accepted Creature HP, applies that net subtraction/addition once,
 and commits through the public SDK. It performs no armor, attack, Roll or target
 procedure. HP may become negative or exceed maximum HP; maximum HP is not a
@@ -230,12 +234,16 @@ than effective canvas visibility. The Host can temporarily hide the source while
 the accepted request is being claimed; that hiding must not prevent the SDK call
 which starts Window Dice and restores its source.
 
-Resolution values use the original Inter variable font at weight 500 with
-tabular figures. Their owned focus style draws a 2px aqua border with a 2px
-clear offset. Authored Encounter margins leave room for this outline inside the
-unchanged public pager. Rule paragraphs measure their wrapped native line count
+Resolution values use the approved EB Garamond variable font at weight 500
+with tabular figures. Their owned focus style uses the Silkbound focus token. Authored Encounter margins leave room for this outline inside the
+public pager. Rule paragraphs measure their wrapped native line count
 against the reference line height after layout; article padding also accounts
-for the bottom rule. The public UI Kit and font files remain unchanged.
+for the bottom rule. The public UI Kit supplies the shared Silkbound Theme, font variations, linen,
+ribbon and native Miniature list/preview composition through its exact gd-plug pin.
+The linen uses the lossless tile exported from the approved repeated background;
+native FontFile caches preserve reference glyph coverage while retaining the
+original EB Garamond data, native shaping and dynamic fallback. All fields remain
+ordinary Godot text controls.
 
 `logic/creature_own_tests.gd` determines separate flat own Attack/Defence tests
 from accepted rule/origin evidence. Hawk and Ancient gore-hound have explicit

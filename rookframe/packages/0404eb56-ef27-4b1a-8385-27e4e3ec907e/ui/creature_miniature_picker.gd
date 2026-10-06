@@ -82,9 +82,19 @@ func _load() -> void:
 	if not found:
 		entries.append({"id": id, "title": str(_saved.get("title", i18n.text("Saved Miniature unavailable"))), "package": "", "available": false})
 	var labels: Dictionary = {}
-	for pair in [["search", "Search by name or Package"], ["retry", "Try again"], ["unavailable", "Unavailable"], ["cancel", "Cancel"], ["choose", "Use Miniature"], ["title", "Choose a miniature"], ["previous", "Previous"], ["next", "Next"], ["selection", "Selected miniature"], ["saved_unavailable", "Saved Miniature unavailable. Choose a replacement."], ["preview_unavailable", "Preview unavailable."]]:
+	for pair in [["search", "Name or Package"], ["retry", "Try again"], ["unavailable", "Unavailable"], ["cancel", "Cancel"], ["choose", "Use Miniature"], ["title", "Tabletop miniature"], ["previous", "Previous"], ["next", "Next"], ["selection", "Selected miniature"], ["saved_unavailable", "Saved Miniature unavailable. Choose a replacement."], ["preview_unavailable", "Preview unavailable."]]:
 		labels[pair[0]] = i18n.text(pair[1])
-	labels["library"] = i18n.text("WORLD CONTENT LIBRARY")
+	if _actor == null:
+		var found_definition := sdk.content.read(SDK.ContentReference.new(sdk.package_id(), _definition))
+		labels["library"] = found_definition.content_entry.localized_title if found_definition.ok else ""
+	else:
+		var found_actor := sdk.actors.read(_actor)
+		var owner: SDK.Actor = found_actor.actor
+		var data: Dictionary = owner.data if found_actor.ok and owner != null else {}
+		labels["library"] = str(data.get("name", ""))
+	labels["none_copy"] = i18n.text("No saved miniature")
+	labels["find"] = i18n.text("Find miniature")
+	labels["empty_preview"] = i18n.text("No miniature assigned")
 	labels["close"] = i18n.text("Close miniature browser")
 	labels["count"] = i18n.text("%d miniatures")
 	labels["range"] = i18n.text("%d–%d of %d")
@@ -98,7 +108,7 @@ func _load() -> void:
 	labels["empty_copy"] = i18n.text("Add a Miniature Package to this World.")
 	labels["selected"] = i18n.text("Selected")
 	labels["none"] = i18n.text("None")
-	labels["hint"] = i18n.text("For new Actors only. Existing Actors and Rooks keep their appearance." if _actor == null else "Applies to this Actor. Existing Rooks keep their appearance.")
+	labels["hint"] = i18n.text("For new Actors only. Existing Actors and Rooks keep their appearance." if _actor == null else "Saved for this creature. Existing Rooks keep their current miniature.")
 	browser.configure(entries, id, labels)
 
 func _preview(entry: Dictionary, target: Control) -> void:

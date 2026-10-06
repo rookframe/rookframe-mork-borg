@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface.tscn" id="sheet"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_miniature_picker.tscn" id="miniatures"]
 [ext_resource type="Resource" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_navigation.tres" id="navigation"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_workflow.gd" id="rolls"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_editor.tscn" id="health"]
 [node name="CreatureActor" type="Control"]
@@ -52,12 +52,4 @@ custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
 text = "Close"
 
-[node name="HealthScrim" type="ColorRect" parent="."]
-visible = false
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-color = Color(0.003922,0.047059,0.062745,0.721569)
-mouse_filter = 0
 [node name="HealthDialog" parent="." instance=ExtResource("health")]

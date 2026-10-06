@@ -68,20 +68,22 @@ func restore_editor_focus() -> void:
 @export var input_style: StyleBoxFlat = StyleBoxFlat.new()
 @export var focus_style: StyleBoxFlat = StyleBoxFlat.new()
 
-func configure_density(phone: bool) -> void:
+func configure_density(phone: bool, input_size: int = 20) -> void:
 	for path in [^"Value", ^"Text"]:
 		var editor: Control = get_node(^"Text/Editor") if path == ^"Text" else get_node(^"Value/Editor")
-		editor.custom_minimum_size = Vector2(0, 88 if path == ^"Text" else 44)
-		editor.add_theme_font_size_override("font_size", 12 if phone else 14)
-		editor.add_theme_color_override("font_color", Color(0.85098, 0.831373, 0.819608, 1))
+		editor.custom_minimum_size = Vector2(0, 96 if path == ^"Text" else 48)
+		editor.add_theme_font_size_override("font_size", input_size)
+		editor.add_theme_color_override("font_color", Color(0.905882,0.905882,0.866667, 1))
 		editor.add_theme_stylebox_override("normal", input_style)
 		editor.add_theme_stylebox_override("read_only", input_style)
 		editor.add_theme_stylebox_override("focus", focus_style)
 		var caption: Label = get_node(^"Text/Label") if path == ^"Text" else get_node(^"Value/Label")
-		caption.add_theme_font_size_override("font_size", 12)
-		caption.add_theme_color_override("font_color", Color(0.603922, 0.647059, 0.65098, 1))
+		caption.add_theme_font_size_override("font_size", 15 if phone else 18)
+		caption.theme_type_variation = "SilkCreatureHealthTitlePhone" if phone else "SilkCreatureDialogSummaryPhone"
+		get_node(path).add_theme_constant_override("separation", 4 if phone else 6)
+		caption.add_theme_color_override("font_color", Color(0.682353,0.729412,0.745098, 1))
 		var error: Label = get_node(^"Text/Error") if path == ^"Text" else get_node(^"Value/Error")
-		error.add_theme_font_size_override("font_size", 12)
+		error.add_theme_font_size_override("font_size", 18)
 
 func set_editor_pending(active: bool) -> void:
 	get_node(^"Value").editable = not active

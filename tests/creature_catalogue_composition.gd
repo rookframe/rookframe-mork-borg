@@ -67,7 +67,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	surface.show_chapter(2)
 	await get_tree().process_frame
 	assert_str(surface.get_node(surface.WORK + "Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureCaption").text).is_equal("Goblin")
-	var source_button: Button = surface.get_node(surface.WORK + "Tabs/Source")
+	var source_button: Button = surface.get_node(surface.SOURCE)
 	source_button.grab_focus()
 	surface.show_source()
 	assert_bool(surface.get_node(surface.WORK + "Reader").is_visible_in_tree()).is_true()

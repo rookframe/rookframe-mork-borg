@@ -12,7 +12,7 @@ func configure(item: Dictionary, locale: I18N, phone: bool, tablet: bool) -> voi
 	entry_id = str(item.get("inventory_id", ""))
 	get_node("Summary").configure(item, locale, phone, tablet)
 	get_node("FullName").text = get_node("Summary/Padding/Row/Identity/Name").text
-	get_node("FullName").add_theme_font_size_override("font_size", 17 if phone else 18 if tablet else 22)
+	get_node("FullName").add_theme_font_size_override("font_size", 19 if phone else 20 if tablet else 24)
 
 func set_page_height(height: float) -> void:
 	get_node("Summary").set_page_height(height)

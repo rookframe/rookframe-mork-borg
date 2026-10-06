@@ -15,10 +15,9 @@ const ROLL_WORKFLOW = preload(ROOT + "ui/creature_roll_workflow.gd")
 const ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
-const FIELD = preload(ROOT + "ui/sheet_entry_field.tscn")
-const FIELD_SCRIPT = preload(ROOT + "ui/sheet_entry_field.gd")
-const BUTTON = preload(ROOT + "ui/sheet_text_button.tscn")
-const SEARCH = preload("res://rookframe/ui/components/forms/task_text_field.tscn")
+const FIELD = preload(ROOT + "ui/creature_loot_field.tscn")
+const FIELD_SCRIPT = preload(ROOT + "ui/creature_loot_field.gd")
+const SEARCH = preload("res://rookframe/ui/components/forms/text_field.tscn")
 const SEARCH_SCRIPT = preload("res://rookframe/ui/components/forms/text_field.gd")
 @export var navigation: Resource
 @onready var sheet: SHEET = get_node("Sheet")
@@ -321,7 +320,8 @@ func _render_detail() -> void:
 		var search: SEARCH_SCRIPT = SEARCH.instantiate()
 		sheet.reader_content().add_child(search)
 		search.label_text = locale.text("Search equipment")
-		search.compact = sheet.size.x <= 900
+		var caption: Label = search.get_node("Label")
+		caption.add_theme_font_size_override("font_size", 15 if sheet.size.x <= 900 else 18)
 		search.value = _catalogue_query
 		search.value_changed.connect(_filter_catalogue)
 		_option("Create custom item", _custom, owner())
@@ -358,7 +358,7 @@ func _text(text: String) -> Label:
 	var label := Label.new()
 	label.text = locale.text(text)
 	label.autowrap_mode = 3
-	label.add_theme_font_size_override("font_size", 13 if sheet.size.x <= 900 else 18)
+	label.theme_type_variation = "SilkCreatureRuleCopy" + ("Phone" if sheet.size.x <= 900 else "Tablet" if sheet.size.x <= 1300 else "Desktop")
 	sheet.reader_content().add_child(label)
 	return label
 
@@ -374,7 +374,7 @@ func _filter_catalogue(query: String) -> void:
 		_catalogue_empty.visible = count == 0
 
 func _option(title: String, action: Callable, enabled: bool) -> Button:
-	var button := BUTTON.instantiate()
+	var button := Button.new()
 	button.text = locale.text(title)
 	button.custom_minimum_size = Vector2(44, 44)
 	button.disabled = not enabled or _busy
@@ -707,7 +707,6 @@ func _health() -> void:
 		_portrait_feedback = ""
 		_correction_feedback = ""
 		_health_editor.begin(locale, current_data(), sheet.size)
-		get_node("HealthScrim").visible = true
 		health_adjustment_requested.emit()
 
 func _health_resized() -> void:
@@ -834,7 +833,6 @@ func _end_health() -> void:
 	_health_attempt = {}
 	if is_instance_valid(_health_editor):
 		_health_editor.discard()
-	get_node("HealthScrim").visible = false
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if is_visible_in_tree() and not _busy and event.is_action_pressed("ui_cancel"):

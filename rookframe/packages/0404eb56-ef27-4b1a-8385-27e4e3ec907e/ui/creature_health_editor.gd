@@ -1,6 +1,8 @@
 extends Window
 ## Table-resolved HP adjustment, presented over the unchanged Creature sheet.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const CHROME = preload(ROOT + "ui/creature_icon_actions.gd")
+var _chrome := CHROME.new()
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const CONTENT := "Panel/Inset/Layout/Content/"
@@ -64,34 +66,38 @@ func present(canvas: Vector2) -> void:
 	get_node("Panel/Inset/Layout").add_theme_constant_override("separation", 8 if _phone else 16)
 	get_node(CONTENT + "Header/Inset").add_theme_constant_override("margin_bottom", 6 if _phone else 14)
 	get_node(HEADER + "Copy").add_theme_constant_override("separation", 3 if _phone else 6)
-	get_node(HEADER + "Copy/Kicker").add_theme_font_size_override("font_size", 9 if _phone else 10)
-	get_node(HEADER + "Copy/Kicker").custom_minimum_size = Vector2(0, 14 if _phone else 15)
-	get_node(HEADER + "Copy/TitleBox/Title").add_theme_font_size_override("font_size", 20 if _phone else 25)
-	get_node(HEADER + "Copy/TitleBox").custom_minimum_size = Vector2(0, 24 if _phone else 30)
+	get_node(HEADER + "Copy/Kicker").add_theme_font_size_override("font_size", 14 if _phone else 16)
+	get_node(HEADER + "Copy/Kicker").custom_minimum_size = Vector2(0, 17 if _phone else 19)
+	get_node(HEADER + "Copy/TitleBox/Title").add_theme_font_size_override("font_size", 24 if _phone else 30)
+	get_node(HEADER + "Copy/TitleBox").custom_minimum_size = Vector2(0, 29 if _phone else 36)
 	get_node(CONTENT + "Body").add_theme_constant_override("margin_top", 8 if _phone else 16)
-	get_node(BODY + "Summary").custom_minimum_size = Vector2(0, 17 if _phone else 24)
-	for path in ["Summary", "AmountRow/Caption"]:
-		get_node(BODY + path).add_theme_font_size_override("font_size", 12 if _phone else 15)
+	get_node(BODY + "Summary").custom_minimum_size = Vector2(0, 23 if _phone else 29)
+	get_node(BODY + "Summary").add_theme_font_size_override("font_size", 18 if _phone else 21)
+	get_node(BODY + "AmountRow/Caption").add_theme_font_size_override("font_size", 20)
 	var editor: Control = get_node(AMOUNT + "/Editor")
-	editor.custom_minimum_size = Vector2(100, 50 if _phone else 55)
-	editor.add_theme_font_size_override("font_size", 23)
+	editor.custom_minimum_size = Vector2(217, 48)
+	editor.add_theme_font_size_override("font_size", 20)
 	editor.add_theme_constant_override("minimum_character_width", 1)
 	editor.add_theme_stylebox_override("normal", input_style)
 	editor.add_theme_stylebox_override("read_only", input_style)
 	editor.add_theme_stylebox_override("focus", focus_style)
-	for style in [action_style, primary_style]:
-		style.content_margin_left = 13 if _phone else 15
-		style.content_margin_right = 13 if _phone else 15
-	for action in ["Damage", "Heal", "Correct"]:
-		get_node(ACTIONS + action).add_theme_font_size_override("font_size", 12 if _phone else 13)
+	_chrome.icon_action(get_node(HEADER + "Close"), "close")
+	_chrome.icon_action(get_node(ACTIONS + "Damage"), "remove")
+	_chrome.icon_action(get_node(ACTIONS + "Heal"), "add")
+	_chrome.icon_action(get_node(ACTIONS + "Correct"), "edit")
+	var density := "Phone" if _phone else "Desktop"
+	get_node(HEADER + "Copy/Kicker").theme_type_variation = "SilkCreatureDialogKicker" + density
+	get_node(HEADER + "Copy/TitleBox/Title").theme_type_variation = "SilkCreatureAppearanceTitle" + density
+	get_node(BODY + "Summary").theme_type_variation = "SilkCreatureDialogSummary" + density
+	get_node(BODY + "AmountRow/Caption").theme_type_variation = "SilkCreatureDialogAmount" + density
 	_refresh_amount_copy()
 	_normal_layout()
 
 func refresh(data: Dictionary, enabled: bool, pending: bool) -> void:
 	var valid := HEALTH.new().valid(data)
 	var name := _locale.text(str(data.get("name", "Creature")))
-	var renamed := str(get_node(HEADER + "Copy/Kicker").text) != name.to_upper()
-	get_node(HEADER + "Copy/Kicker").text = name.to_upper()
+	var renamed := str(get_node(HEADER + "Copy/Kicker").text) != name
+	get_node(HEADER + "Copy/Kicker").text = name
 	accessibility_name = _locale.text("Hit points") + " · " + name
 	get_node(BODY + "Summary").text = str(data.get("hit_points", "—")) + " / " + str(data.get("maximum_hit_points", "—")) if valid else _locale.text("HP is unavailable. Use Edit sheet to correct it.")
 	get_node(BODY + "AmountRow").visible = valid
@@ -173,7 +179,7 @@ func _process(_delta: float) -> void:
 			source.visible = false
 			get_node(OVERFLOW + "/Area/Text/Error").visible = false
 			get_node(OVERFLOW + "/Area/Text/Feedback").visible = false
-			get_node(OVERFLOW + "/Area/Text/Name").add_theme_font_size_override("font_size", 9 if _phone else 10)
+			get_node(OVERFLOW + "/Area/Text/Name").add_theme_font_size_override("font_size", 14 if _phone else 16)
 			pages.custom_minimum_size = Vector2(0, 0)
 			pages.visible = true
 			get_node(CONTENT + "OverflowGap").visible = true
@@ -198,10 +204,6 @@ func _process(_delta: float) -> void:
 			pages.refresh()
 		panel.size = Vector2(width, height)
 		panel.position = Vector2((_canvas.x - width) / 2, (_canvas.y - height) / 2)
-		get_node("Shadow").position = panel.position
-		get_node("Shadow").size = panel.size
-		get_node("Surround").position = panel.position
-		get_node("Surround").size = panel.size
 		if before != panel.size:
 			_layout_pending = true
 
