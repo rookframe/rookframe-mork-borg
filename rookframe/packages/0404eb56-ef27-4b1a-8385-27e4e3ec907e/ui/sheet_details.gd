@@ -330,8 +330,12 @@ func _style_pager(pager: HBoxContainer) -> void:
 		button.add_theme_font_size_override("font_size", 25)
 		button.add_theme_color_override("font_color", Color(0.807843, 0.8, 0.701961, 1))
 		button.add_theme_color_override("font_disabled_color", Color(0.807843, 0.8, 0.701961, 0.35))
-		for state in ["normal", "disabled"]:
+		for state in ["normal", "hover", "pressed", "disabled"]:
 			var style: StyleBoxFlat = button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
+			style.content_margin_top = 4
+			style.content_margin_bottom = 4
+			style.content_margin_left = 8
+			style.content_margin_right = 8
 			style.bg_color = Color(0.811765, 0.721569, 0.494118, 0.0735 if state == "disabled" else 0.21)
 			style.border_color = Color(0.244353, 0.262784, 0.272745, 0.35 if state == "disabled" else 1)
 			button.add_theme_stylebox_override(state, style)
