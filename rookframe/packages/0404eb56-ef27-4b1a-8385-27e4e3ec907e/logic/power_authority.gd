@@ -2,7 +2,7 @@ extends RefCounted
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
-const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
@@ -381,7 +381,8 @@ func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.
 	var outcome := "Healing applied" if healing else ("Damage applied" if damage else "HP loss applied")
 	return _complete(context, action, changes, outcome, "%s. %sOne daily use spent. Raw Rolls #%d, #%d, #%d." % [str(power.name), details, cast_sequence, count_sequence, roll.sequence])
 
-func _protection(data: Dictionary) -> Dictionary:
+func _protection(current: Dictionary) -> Dictionary:
+	var data := CREATURES.new().stat_block(current)
 	var formula := ""
 	var shield: int = 0
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
@@ -391,7 +392,7 @@ func _protection(data: Dictionary) -> Dictionary:
 		if typeof(armor.get("reduction", "")) != TYPE_STRING:
 			return {"error": "Target armor data is malformed. Correct its sheet before casting."}
 		formula = str(armor.get("reduction", ""))
-		shield = CREATURE_ITEMS.new(null, SDK.ActorId.new("")).shield_reduction(data)
+		shield = CREATURES.new().shield_reduction(data)
 	else:
 		if typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT:
 			return {"error": "Target inventory is malformed. Correct its sheet before casting."}

@@ -5,7 +5,7 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
-const ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
 const ICON = preload("res://rookframe/ui/icons/character/psychopomp.svg")
 var _sdk: SDK
@@ -40,7 +40,7 @@ func _title(favorite: Dictionary, companions: Array[SDK.Actor]) -> String:
 		if companion.id.value != str(favorite.get("actor", "")):
 			continue
 		var data: Dictionary = companion.data
-		for raw in ITEMS.new(_sdk, companion.id).inventory(data):
+		for raw in CREATURES.new().combat_attacks(data):
 			var attack: Dictionary = raw
 			if str(attack.inventory_id) == str(favorite.get("item", "")):
 				var name := str(attack.get("name", "Attack"))

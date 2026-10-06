@@ -168,16 +168,19 @@ func _read() -> SDK.ActorResult:
 	return result
 
 ## Appearance commits independently of the Character-field draft.
-func set_portrait(image: PackedByteArray) -> SDK.ActorResult:
+func set_portrait(path: String, expected: String, expected_revision: int) -> SDK.ActorResult:
 	var source := _read()
 	if not source.ok:
 		return source
 	var current: Dictionary = source.actor.data
+	if current.get("portrait", "") != expected or int(current.get("portrait_revision", 0)) != expected_revision:
+		return _failure("Portrait changed. Choose it again.")
 	var data := current.duplicate(true)
-	if image.is_empty():
+	if path.is_empty():
 		data.erase("portrait")
 	else:
-		data["portrait"] = image
+		data["portrait"] = path
+	data["portrait_revision"] = expected_revision + 1
 	return await _save(data)
 
 func _save(data: Dictionary) -> SDK.ActorResult:
@@ -266,11 +269,7 @@ func _companion(id: String, character: Dictionary) -> SDK.ActorResult:
 		return _failure("This companion attack is unavailable.")
 	if not FAVORITES.new().needs_companion_identity(current):
 		return result
-	var data: Dictionary = current.duplicate(true)
-	var items := FAVORITES.CREATURE_ITEMS.new(null, result.actor.id).inventory(data)
-	data["inventory"] = items
-	data["inventory_serial"] = _serial(data, items)
-	data["creature_inventory"] = true
+	var data: Dictionary = FAVORITES.CREATURES.new().stat_block(current)
 	_companion_changes.append(SDK.ActorChange.new(result.actor.id, data))
 	result.actor.data = data
 	return result

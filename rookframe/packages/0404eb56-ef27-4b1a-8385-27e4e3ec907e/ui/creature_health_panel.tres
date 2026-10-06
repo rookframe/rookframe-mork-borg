@@ -1,0 +1,6 @@
+[gd_resource type="StyleBoxFlat" format=3]
+[resource]
+draw_center = false
+shadow_color = Color(0,0,0,0.266667)
+shadow_size = 75
+shadow_offset = Vector2(0,20)

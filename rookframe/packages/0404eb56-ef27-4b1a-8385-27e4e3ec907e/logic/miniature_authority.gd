@@ -21,6 +21,8 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 	if saved.value != null and typeof(saved.value) != TYPE_DICTIONARY:
 		return _error("Miniature defaults are unavailable.")
 	var world: Dictionary = {} if saved.value == null else saved.value.duplicate(true)
+	if typeof(world.get("creature_miniatures", {})) != TYPE_DICTIONARY or typeof(world.get("creature_portraits", {})) != TYPE_DICTIONARY:
+		return _error("Appearance defaults are unavailable.")
 	var defaults: Dictionary = world.get("creature_miniatures", {}).duplicate(true)
 	if operation == "miniature.default":
 		var package_id := str(input.get("package_id", ""))
@@ -28,17 +30,23 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 		var reference: Dictionary = {} if package_id.is_empty() and local_id.is_empty() else {"package_id": package_id, "local_id": local_id}
 		if not reference.is_empty() and not _available(sdk, reference):
 			return _error("This Miniature is unavailable. Choose another.")
-		if reference.is_empty():
-			defaults.erase(definition)
-		else:
-			defaults[definition] = {"package_id": str(reference.package_id), "local_id": str(reference.local_id)}
+		# Empty is an explicit None choice, distinct from an absent World override.
+		defaults[definition] = reference.duplicate(true)
 		world["creature_miniatures"] = defaults
 		var result := context.commit_world_data(world)
 		return {"state": "resolved", "message": "Library Miniature saved."} if result.ok else _error(result.message)
 	if operation == "miniature.create":
 		# Snapshot the current World default on Authority, never a client's stale copy.
 		var preferred: Dictionary = defaults.get(definition, CREATURES.new().default_miniature(definition)).duplicate(true)
-		var created := context.create_actors([{"package_id": sdk.package_id(), "local_id": definition, "choices": {"preferred_miniature": preferred}}], str(identity.get("participant_id", "")))
+		var choices := {"preferred_miniature": preferred}
+		var portraits: Dictionary = world.get("creature_portraits", {})
+		if portraits.has(definition):
+			var portrait: Variant = portraits.get(definition)
+			if typeof(portrait) != TYPE_STRING:
+				return _error("Appearance defaults are unavailable.")
+			var path: String = portrait
+			choices["portrait"] = path
+		var created := context.create_actors([{"package_id": sdk.package_id(), "local_id": definition, "choices": choices}], str(identity.get("participant_id", "")))
 		if not created.ok:
 			return _error(created.message)
 		return {"state": "resolved", "actor": created.items[0].id.value, "message": "Creature created."}

@@ -1,0 +1,9 @@
+[gd_scene format=3]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[node name="CreatureSectionButton" instance=ExtResource("tab")]
+custom_minimum_size = Vector2(44,44)
+size_flags_vertical = 0
+toggle_mode = true
+clip_text = false
+theme_override_font_sizes/font_size = 11
+theme_override_colors/font_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)

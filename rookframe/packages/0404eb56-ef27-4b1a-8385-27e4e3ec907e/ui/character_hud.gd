@@ -156,7 +156,7 @@ func _refresh() -> void:
 	get_node("Bar/Identity/Class").text = sdk.translations.text(str(data.get("class_title", "")))
 	get_node("Bar/Identity/Hp").text = "%s / %s %s" % [int(data.get("hit_points", 0)), int(data.get("maximum_hit_points", 0)), sdk.translations.text("HP")]
 	get_node("Bar/Identity/HpTrack").value = clampf(float(data.get("hit_points", 0)) / maxf(1.0, float(data.get("maximum_hit_points", 0))) * 100.0, 0.0, 100.0)
-	var portrait: PackedByteArray = data.get("portrait", PackedByteArray())
+	var portrait: String = data.get("portrait", "") if typeof(data.get("portrait", "")) == TYPE_STRING else ""
 	var texture: Texture2D = preload("res://rookframe/ui/icons/character/character.svg")
 	if not portrait.is_empty():
 		var decoded := sdk.portraits.decode(portrait)

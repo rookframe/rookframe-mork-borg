@@ -48,8 +48,7 @@ func inspect_actor(actor: SDK.ActorId) -> void:
 	if str(data.get("schema", "")) == "mork-borg-character/v1":
 		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), actor)
 		return
-	var entry: SDK.WindowButton = DESKTOP_WINDOW_BUTTON if sdk.presentation_experience().is_desktop else WINDOW_BUTTON
-	sdk.windows.open_actor(entry.window, actor)
+	sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
 
 var _reading_defences := false
 var _seen_defences: Dictionary = {}
@@ -84,8 +83,7 @@ func describe_actor_definition(definition: SDK.ContentEntry) -> SDK.ActorDefinit
 		return SDK.ActorDefinitionView.new()
 	var surface := SDK.ExtensionSurface.new()
 	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_sheet.tscn")
-	surface.initial_placement = "left"
-	surface.initial_dock_width = 0 if sdk.presentation_experience().is_phone else 440
+	surface.initial_placement = "full-viewport"
 	return SDK.ActorDefinitionView.new(sdk.translations.text("Creatures"), surface, sdk.context().is_gm)
 
 func create_actor_from_definition(definition: SDK.ContentEntry, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0)) -> void:

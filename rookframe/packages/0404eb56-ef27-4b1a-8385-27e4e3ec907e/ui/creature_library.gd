@@ -7,7 +7,7 @@ var sdk: SDK
 func _init(facade: SDK) -> void:
 	sdk = facade
 
-func create(definition: SDK.ContentReference, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0)) -> SDK.ActorResult:
+func create(definition: SDK.ContentReference, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0), open_view: bool = true) -> SDK.ActorResult:
 	if definition.package_id != sdk.package_id() or not CREATURES.CORE_DEFINITIONS.has(definition.local_id):
 		return _failure("Choose a Creature definition.")
 	var result := await sdk.system_actions.submit("miniature.create", {"definition": definition.local_id})
@@ -22,9 +22,8 @@ func create(definition: SDK.ContentReference, scene: SDK.SceneId = null, positio
 		if not placed.ok:
 			var removed := await sdk.actors.delete(actor)
 			return _failure(placed.message + (" " + removed.message if not removed.ok else ""))
-	else:
-		var entry: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_desktop.tres") if sdk.presentation_experience().is_desktop else preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
-		sdk.windows.open_actor(entry.window, actor)
+	elif open_view:
+		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
 	return sdk.actors.read(actor)
 
 func _failure(message: String) -> SDK.ActorResult:

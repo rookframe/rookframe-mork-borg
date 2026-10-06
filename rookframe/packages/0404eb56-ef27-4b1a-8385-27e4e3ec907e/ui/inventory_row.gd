@@ -8,7 +8,7 @@ const POWERS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3e
 const SPECIAL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 var equipped := false
 var item: Dictionary = {}
-func configure(value: Dictionary, catalogue: bool = false, read_only: bool = false, can_cast: bool = true) -> void:
+func configure(value: Dictionary, catalogue: bool = false, read_only: bool = false, can_cast: bool = true, loot_only: bool = false) -> void:
 	for path in [^"Actions/Attack", ^"Actions/Edit", ^"Actions/Equip", ^"Actions/Add"]:
 		get_node(path).disabled = read_only
 	item = value
@@ -38,13 +38,13 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Copy/Details").text = detail_text
 	get_node(^"Actions/Add").visible = catalogue
 	get_node(^"Actions/Edit").visible = not catalogue
-	get_node(^"Actions/Equip").visible = not catalogue and (str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre")
+	get_node(^"Actions/Equip").visible = not catalogue and not loot_only and (str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre")
 	get_node(^"Actions/Equip").set_pressed_no_signal(equipped == true)
 	_action_name("Equip", "Unequip" if equipped else "Equip")
 	_action_name("Attack", "Attack")
 	_action_name("Edit", "Edit")
 	_action_name("Add", "Add")
-	get_node(^"Actions/Attack").visible = not catalogue and equipped and str(item.get("kind", "")) == "Weapon"
+	get_node(^"Actions/Attack").visible = not catalogue and not loot_only and equipped and str(item.get("kind", "")) == "Weapon"
 	var power := POWERS.new().definition(str(item.get("source_item_id", "")))
 	if not catalogue and can_cast and not power.is_empty():
 		get_node(^"Actions/Attack").visible = true

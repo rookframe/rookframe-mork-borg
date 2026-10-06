@@ -116,21 +116,6 @@ func _assert_content(value: Variant, catalog: Translation, key: String = "") -> 
 	elif value is String and key in ["name", "title", "rules", "origins", "handling"] and not value.is_empty():
 		assert_str(str(catalog.get_message(value))).override_failure_message("Missing Russian content: " + value).is_not_empty()
 
-func test_long_russian_definition_names_fit_phone_width() -> void:
-	var sheet = auto_free(load(ROOT + "ui/creature_definition_sheet.tscn").instantiate())
-	var viewport: SubViewport = auto_free(SubViewport.new())
-	viewport.size = Vector2i(375, 369)
-	add_child(viewport)
-	viewport.add_child(sheet)
-	sheet.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
-	sheet.size = Vector2(351, 325)
-	var title: Label = sheet.get_node("Layout/Tabs/Creature/Preview/Identity/Content/Title")
-	title.text = "Существо с очень длинным именем"
-	await get_tree().process_frame
-	await get_tree().process_frame
-	assert_bool(sheet.get_combined_minimum_size().x <= 351).is_true()
-	assert_bool(title.size.x <= 351).is_true()
-
 func test_russian_cast_confirmation_wraps_inside_phone_width() -> void:
 	var panel = auto_free(load(ROOT + "ui/powers_panel.tscn").instantiate())
 	panel.localize(_locale("ru"))

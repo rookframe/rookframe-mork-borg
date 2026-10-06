@@ -25,16 +25,11 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 			return _error("Creature attack data is malformed.")
 		var attack: Dictionary = raw
 		var exact := str(input.get("item", ""))
-		var identity := str(attack.get("inventory_id", ""))
-		if identity.is_empty() and not data.get("creature_inventory", false):
-			identity = "creature:" + str(attack.get("id", ""))
+		var identity := "creature:" + str(attack.get("id", ""))
 		if (not exact.is_empty() and identity == exact) or (exact.is_empty() and str(attack.get("id", "")) == str(input.get("attack", "")) and not str(attack.get("id", "")).is_empty()):
 			selected = attack
 	if selected.is_empty() or typeof(selected.get("range_feet", 0)) != TYPE_INT:
 		return _error("Select one attack with an authored range.")
-	var quantity: int = selected.get("quantity", 1)
-	if typeof(selected.get("equipped", true)) != TYPE_BOOL or not selected.get("equipped", true) or selected.get("broken", false) or quantity < 1:
-		return _error("Choose an equipped, usable Creature attack in Inventory.")
 	var reach: int = selected.get("range_feet", 0)
 	if reach <= 0:
 		return _error("Select one attack with an authored range.")

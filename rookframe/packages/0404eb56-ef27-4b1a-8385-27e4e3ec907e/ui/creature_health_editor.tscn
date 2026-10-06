@@ -1,0 +1,247 @@
+[gd_scene format=3]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_editor.gd" id="script"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="field"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
+[ext_resource type="FontFile" path="res://rookframe/ui/assets/fonts/Inter-VariableFont_opsz,wght.ttf" id="body_font"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_panel.tres" id="panel"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_focus.tres" id="focus"]
+[sub_resource type="StyleBoxFlat" id="body_panel"]
+bg_color = Color(0.062745,0.105882,0.117647,1)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="surround"]
+bg_color = Color(0.015686,0.066667,0.082353,1)
+expand_margin_left = 5.0
+expand_margin_top = 5.0
+expand_margin_right = 5.0
+expand_margin_bottom = 5.0
+[sub_resource type="StyleBoxFlat" id="header"]
+bg_color = Color(0,0,0,0)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_bottom = 1
+[sub_resource type="StyleBoxFlat" id="input"]
+bg_color = Color(0.015686,0.066667,0.082353,1)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 9.0
+content_margin_right = 9.0
+content_margin_top = 9.0
+content_margin_bottom = 9.0
+[sub_resource type="StyleBoxFlat" id="action"]
+bg_color = Color(0,0,0,0)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 15.0
+content_margin_right = 15.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+[sub_resource type="StyleBoxFlat" id="primary"]
+bg_color = Color(0.266667,0.913725,0.913725,1)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 15.0
+content_margin_right = 15.0
+content_margin_top = 8.0
+content_margin_bottom = 8.0
+[sub_resource type="StyleBoxFlat" id="close"]
+bg_color = Color(0,0,0,0)
+border_color = Color(0.27451,0.321569,0.337255,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 0.0
+content_margin_right = 0.0
+content_margin_top = 0.0
+content_margin_bottom = 0.0
+[node name="CreatureHealthEditor" type="Window"]
+visible = false
+size = Vector2i(844,390)
+borderless = true
+transient = true
+exclusive = true
+unresizable = true
+transparent = true
+transparent_bg = true
+theme = ExtResource("theme")
+script = ExtResource("script")
+input_style = SubResource("input")
+focus_style = ExtResource("focus")
+action_style = SubResource("action")
+primary_style = SubResource("primary")
+[node name="Shadow" type="Panel" parent="."]
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("panel")
+[node name="Surround" type="Panel" parent="."]
+mouse_filter = 2
+theme_override_styles/panel = SubResource("surround")
+[node name="Panel" type="PanelContainer" parent="."]
+theme_override_styles/panel = SubResource("body_panel")
+[node name="Inset" type="MarginContainer" parent="Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 24
+theme_override_constants/margin_top = 24
+theme_override_constants/margin_right = 24
+theme_override_constants/margin_bottom = 24
+[node name="Layout" type="VBoxContainer" parent="Panel/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 16
+[node name="Content" type="VBoxContainer" parent="Panel/Inset/Layout"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 0
+[node name="Header" type="PanelContainer" parent="Panel/Inset/Layout/Content"]
+layout_mode = 2
+theme_override_styles/panel = SubResource("header")
+[node name="Inset" type="MarginContainer" parent="Panel/Inset/Layout/Content/Header"]
+layout_mode = 2
+theme_override_constants/margin_bottom = 14
+[node name="Row" type="HBoxContainer" parent="Panel/Inset/Layout/Content/Header/Inset"]
+layout_mode = 2
+theme_override_constants/separation = 20
+[node name="Copy" type="VBoxContainer" parent="Panel/Inset/Layout/Content/Header/Inset/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 6
+[node name="Kicker" type="Label" parent="Panel/Inset/Layout/Content/Header/Inset/Row/Copy"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,15)
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
+autowrap_mode = 3
+text = "SETH"
+[node name="TitleBox" type="Control" parent="Panel/Inset/Layout/Content/Header/Inset/Row/Copy"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,30)
+mouse_filter = 2
+[node name="Title" type="Label" parent="Panel/Inset/Layout/Content/Header/Inset/Row/Copy/TitleBox"]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("display")
+theme_override_font_sizes/font_size = 25
+theme_override_constants/line_spacing = 3
+text = "Hit points"
+[node name="Close" type="Button" parent="Panel/Inset/Layout/Content/Header/Inset/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,44)
+size_flags_vertical = 0
+theme_type_variation = "TaskGlyphButton"
+theme_override_styles/normal = SubResource("close")
+theme_override_font_sizes/font_size = 26
+text = "×"
+[node name="Body" type="MarginContainer" parent="Panel/Inset/Layout/Content"]
+layout_mode = 2
+theme_override_constants/margin_top = 16
+[node name="Rows" type="VBoxContainer" parent="Panel/Inset/Layout/Content/Body"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="Summary" type="Label" parent="Panel/Inset/Layout/Content/Body/Rows"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,24)
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+text = "6 / 6"
+[node name="AmountRow" type="HBoxContainer" parent="Panel/Inset/Layout/Content/Body/Rows"]
+layout_mode = 2
+theme_override_constants/separation = 15
+[node name="Caption" type="Label" parent="Panel/Inset/Layout/Content/Body/Rows/AmountRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+text = "Amount"
+[node name="Amount" parent="Panel/Inset/Layout/Content/Body/Rows/AmountRow" instance=ExtResource("field")]
+layout_mode = 2
+custom_minimum_size = Vector2(100,0)
+size_flags_horizontal = 0
+label_text = "Amount"
+value = "1"
+[node name="Error" type="Label" parent="Panel/Inset/Layout/Content/Body/Rows"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.937255,0.356863,0.329412,1)
+autowrap_mode = 3
+[node name="Feedback" type="Label" parent="Panel/Inset/Layout/Content/Body/Rows"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.941176,0.733333,0.196078,1)
+autowrap_mode = 3
+[node name="OverflowGap" type="Control" parent="Panel/Inset/Layout/Content"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(0,8)
+mouse_filter = 2
+[node name="Overflow" parent="Panel/Inset/Layout/Content" instance=ExtResource("pages")]
+visible = false
+layout_mode = 2
+[node name="Text" type="VBoxContainer" parent="Panel/Inset/Layout/Content/Overflow/Area"]
+layout_mode = 0
+theme_override_constants/separation = 8
+[node name="Name" type="Label" parent="Panel/Inset/Layout/Content/Overflow/Area/Text"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(0.603922,0.647059,0.65098,1)
+autowrap_mode = 3
+[node name="Error" type="Label" parent="Panel/Inset/Layout/Content/Overflow/Area/Text"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.937255,0.356863,0.329412,1)
+autowrap_mode = 3
+[node name="Feedback" type="Label" parent="Panel/Inset/Layout/Content/Overflow/Area/Text"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.941176,0.733333,0.196078,1)
+autowrap_mode = 3
+[node name="Actions" type="HBoxContainer" parent="Panel/Inset/Layout"]
+layout_mode = 2
+alignment = 2
+theme_override_constants/separation = 10
+[node name="Pager" type="HBoxContainer" parent="Panel/Inset/Layout/Actions"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+[node name="Damage" type="Button" parent="Panel/Inset/Layout/Actions"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,44)
+theme_type_variation = "TaskButton"
+theme_override_styles/normal = SubResource("action")
+theme_override_styles/disabled = SubResource("action")
+theme_override_fonts/font = ExtResource("body_font")
+theme_override_font_sizes/font_size = 13
+text = "Apply damage"
+[node name="Heal" type="Button" parent="Panel/Inset/Layout/Actions"]
+layout_mode = 2
+custom_minimum_size = Vector2(44,44)
+theme_type_variation = "TaskPrimary"
+theme_override_styles/normal = SubResource("primary")
+theme_override_styles/hover = SubResource("primary")
+theme_override_styles/pressed = SubResource("primary")
+theme_override_styles/disabled = SubResource("primary")
+theme_override_fonts/font = ExtResource("body_font")
+theme_override_font_sizes/font_size = 13
+text = "Heal"
+[node name="Correct" type="Button" parent="Panel/Inset/Layout/Actions"]
+visible = false
+layout_mode = 2
+custom_minimum_size = Vector2(44,44)
+theme_type_variation = "TaskButton"
+text = "Edit sheet"

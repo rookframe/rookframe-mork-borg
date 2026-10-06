@@ -183,7 +183,7 @@ func _select_actor(actor: SDK.Actor) -> void:
 func _render_actor() -> void:
 	if _selected_actor == null:
 		return
-	var actor_data: Dictionary = _selected_actor.data
+	var actor_data: Dictionary = CREATURES.new().stat_block(_selected_actor.data)
 	var private_name: String = actor_data.get("name", "Creature")
 	var hit_points: int = actor_data.get("hit_points", 0)
 	var maximum_hit_points: int = actor_data.get("maximum_hit_points", hit_points)
@@ -275,13 +275,13 @@ func _render_inventory() -> void:
 		_creature_item_view = item_view
 		_connect_creature_inventory(item_view)
 		if _route == "creature-custom":
-			item_view.configure({}, [])
+			item_view.configure({}, [], true)
 			return
 		var items: Array = data.inventory
 		for raw in items:
 			var item: Dictionary = raw
 			if str(item.inventory_id) == _creature_item_id:
-				item_view.configure(item, [])
+				item_view.configure(item, [], true)
 				return
 		item_view.show_missing()
 		return
@@ -303,14 +303,6 @@ func _connect_creature_inventory(view: Control) -> void:
 
 func _navigate_creature_inventory(route: String, id: String) -> void:
 	if _busy or _selected_actor == null:
-		return
-	if route == "attack":
-		var data: Dictionary = _selected_actor.data
-		var items := CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
-		for raw in items:
-			var item: Dictionary = raw
-			if str(item.inventory_id) == id:
-				_open_creature_attack(str(item.get("source_attack_id", id)))
 		return
 	if route in ["catalogue", "item", "custom"] and _selected_actor.access_level != "Owner":
 		return
@@ -484,7 +476,7 @@ func _save_creature() -> void:
 		_set_status(source.message if not source.ok else "Private Creature data is unavailable.", true)
 		return
 	var original_data: Dictionary = source.actor.data
-	var data: Dictionary = original_data.duplicate(true)
+	var data: Dictionary = CREATURES.new().stat_block(original_data)
 	var original_label: String = source.actor.public_label
 	data["name"] = str(_private_name.get("value")).strip_edges()
 	data["hit_points"] = int(_hit_points.get("value"))
@@ -621,7 +613,7 @@ func _present_creature_attack(id: String) -> void:
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
 	view.visible = true
 	var combat_data := data.duplicate(true)
-	combat_data["inventory"] = CREATURE_ITEMS.new(sdk, _selected_actor.id).inventory(data)
+	combat_data["inventory"] = CREATURES.new().combat_attacks(data)
 	view.configure(combat_data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet, "ammunition": _creature_attack.get("ammunition", ""), "natural": _creature_attack.get("natural", false)}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "ready", "")
 	view.get_node(^"Metrics/Strength").visible = true
 	view.get_node(^"Context").text = str(data.get("name", "Creature")) + _t(" · Selected attack")

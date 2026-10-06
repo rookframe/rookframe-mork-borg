@@ -4,7 +4,7 @@ extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
-const CREATURE_ITEMS = preload(ROOT + "logic/creature_actions.gd")
+const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")
 const ATTACKS = preload(ROOT + "logic/attack_sources.gd")
@@ -26,7 +26,7 @@ func needs_identity(data: Dictionary) -> bool:
 	return false
 
 func needs_companion_identity(data: Dictionary) -> bool:
-	return not data.get("creature_inventory", false) or needs_identity(data)
+	return not data.get("creature_stat_block", false)
 
 func item_entry(item: Dictionary) -> Dictionary:
 	var source := str(item.get("source_item_id", ""))
@@ -51,14 +51,14 @@ func uses_literal_name(source: Dictionary, data: Dictionary = {}) -> bool:
 	var id := str(source.get("source_item_id", source.get("source", "")))
 	var original: Dictionary = {} if id.is_empty() else ITEMS.EQUIPMENT.new().item(id)
 	if original.is_empty():
-		var profile: Dictionary = CREATURE_ITEMS.CREATURES.CORE_DEFINITIONS.get(str(data.get("definition_id", "")), {})
+		var profile: Dictionary = CREATURES.CORE_DEFINITIONS.get(str(data.get("definition_id", "")), {})
 		for raw in profile.get("attacks", []):
 			var attack: Dictionary = raw
-			if str(attack.get("id", "")) == str(source.get("source_attack_id", "")):
+			if str(attack.get("id", "")) == str(source.get("source_attack_id", source.get("id", ""))):
 				original = attack
 				break
 	if original.is_empty():
-		return not str(source.get("source_attack_id", "")).is_empty()
+		return not str(source.get("source_attack_id", source.get("id", ""))).is_empty()
 	return str(source.get("name", "")) != str(original.get("name", ""))
 
 func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = []) -> Array[Dictionary]:
@@ -90,7 +90,7 @@ func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = 
 		var other: Dictionary = companion.data
 		if companion.access_level != "Owner" or str(other.get("schema", "")) != "mork-borg-adversary/v1" or not is_companion(data, actor_id, other):
 			continue
-		var attacks := CREATURE_ITEMS.new(null, companion.id).inventory(other)
+		var attacks := CREATURES.new().combat_attacks(other)
 		for raw in attacks:
 			var attack: Dictionary = raw
 			if str(attack.get("kind", "")) != "Weapon" or str(attack.get("damage", "")).is_empty():
