@@ -9,6 +9,17 @@ approved 2026-10-06 Silkbound Ledger presentation in
 with its unchanged monster-sheet behavior source and vendored asset boundary. Review desktop
 at 1920 × 1080, tablet at 1024 × 768 and landscape phone at 844 × 390.
 
+Review the live Development World at a native 1920 × 1080 Game resolution.
+The author project records that launch size. Squeezing the host's 1920 canvas
+into Godot's default 1152 × 648 view can discard one-pixel separator and input
+borders; that scaled preview is not a reference-resolution visual check.
+Before handing off a review, inspect the vitals, attack and Reference rules,
+the Inventory add button, and every catalogue/custom-item page in the actual
+application. Focus a text field to check its Silkbound caret and selection,
+clear the catalogue search to restore its entries, and save a custom item with
+`1d4` damage. Both `d4` and `1d4` are accepted; formula fields include examples
+and unsupported formulas list the supported choices beside the field.
+
 Library and live Actor sheets share the authored Full-viewport composition:
 identity, Encounter / Inventory / Appearance, bounded native UI Kit pages,
 readable Details and Source. A live sheet reads the current SDK Actor state;

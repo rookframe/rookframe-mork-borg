@@ -324,7 +324,8 @@ func _render_detail() -> void:
 		caption.add_theme_font_size_override("font_size", 15 if sheet.size.x <= 900 else 18)
 		search.value = _catalogue_query
 		search.value_changed.connect(_filter_catalogue)
-		_option("Create custom item", _custom, owner())
+		var create := _option("Create custom item", _custom, owner())
+		create.size_flags_horizontal = 0
 		_catalogue_buttons.clear()
 		_catalogue_names.clear()
 		for item in EQUIPMENT.new().entries():
@@ -336,7 +337,10 @@ func _render_detail() -> void:
 		_text("Custom loot")
 		for key in ["name", "kind", "quantity", "uses", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 			_item_field(str(key), str(_new_item.get(key, "Equipment" if key == "kind" else "1" if key == "quantity" else "0" if key in ["uses", "range_feet", "armor_tier"] else "")), false)
-		_option("Add custom item", _add_custom, owner())
+		var add := _option("Add custom item", _add_custom, owner())
+		add.theme_type_variation = "TaskPrimary"
+		add.custom_minimum_size = Vector2(254, 52)
+		add.size_flags_horizontal = 8
 	elif _detail.begins_with("item:"):
 		var item := _item(return_entry)
 		if item.is_empty():
@@ -367,7 +371,7 @@ func _filter_catalogue(query: String) -> void:
 	var count := 0
 	for index in range(_catalogue_buttons.size()):
 		var button := _catalogue_buttons[index]
-		button.visible = query.to_lower() in _catalogue_names[index].to_lower() or query.to_lower() in button.text.to_lower()
+		button.visible = query.is_empty() or query.to_lower() in _catalogue_names[index].to_lower() or query.to_lower() in button.text.to_lower()
 		if button.visible:
 			count += 1
 	if is_instance_valid(_catalogue_empty):
@@ -376,7 +380,8 @@ func _filter_catalogue(query: String) -> void:
 func _option(title: String, action: Callable, enabled: bool) -> Button:
 	var button := Button.new()
 	button.text = locale.text(title)
-	button.custom_minimum_size = Vector2(44, 44)
+	button.theme_type_variation = "TaskButton"
+	button.custom_minimum_size = Vector2(100, 52)
 	button.disabled = not enabled or _busy
 	button.pressed.connect(action)
 	sheet.reader_content().add_child(button)
@@ -387,6 +392,9 @@ func _item_field(key: String, value: String, independent: bool, title: String = 
 	sheet.reader_content().add_child(field)
 	field.configure(key, locale.text(title if not title.is_empty() else key.replace("_", " ").capitalize()), value, multiline or key == "rules", independent)
 	field.configure_layout(sheet.size.x <= 900)
+	if key in ["damage", "reduction"]:
+		field.get_node("Value").placeholder = "1d4"
+		field.get_node("Value").help_text = locale.text("Examples: 1d4, 2d6, d4+1. Leave blank if unused.")
 	field.get_node("Save").text = locale.text("Save") + " " + locale.text(key.capitalize())
 	field.submitted.connect(_save_field)
 	field.changed.connect(_custom_typed)

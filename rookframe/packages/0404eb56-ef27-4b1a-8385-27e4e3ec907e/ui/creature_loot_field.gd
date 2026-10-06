@@ -76,6 +76,8 @@ func configure_layout(phone: bool) -> void:
 		label.theme_type_variation = "SilkCreatureHealthTitlePhone" if phone else "SilkCreatureDialogSummaryPhone"
 		label.add_theme_font_size_override("font_size", 15 if phone else 18)
 		label.add_theme_color_override("font_color", Color(0.682353,0.729412,0.745098,1))
+	for caption in [^"Value/Help", ^"Value/Error", ^"Text/Help", ^"Text/Error"]:
+		get_node(caption).add_theme_font_size_override("font_size", 15 if phone else 18)
 
 func has_editor_focus() -> bool:
 	return get_node(^"Text").is_editor_focused() if _multiline else get_node(^"Value").is_editor_focused()

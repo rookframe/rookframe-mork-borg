@@ -150,8 +150,12 @@ func _edit_item(item: Dictionary, field: String, text: String) -> String:
 			return "Enter an item name."
 		if field == "kind" and not text in ["Equipment", "Weapon", "Armor", "Shield"]:
 			return "Choose Equipment, Weapon, Armor or Shield."
-		if field in ["damage", "reduction"] and not text in ["", "d2", "d4", "d6", "d8", "d10", "d12", "2d6", "2d8", "d4+1"]:
-			return "Use a supported damage or reduction formula."
+		if field in ["damage", "reduction"]:
+			text = text.strip_edges().to_lower().replace(" ", "")
+			if text.begins_with("1d"):
+				text = text.trim_prefix("1")
+			if not text in ["", "d2", "d4", "d6", "d8", "d10", "d12", "2d6", "2d8", "d4+1"]:
+				return "Enter d2, d4, d6, d8, d10, d12, 2d6, 2d8 or d4+1. A leading 1 is optional. Leave blank if unused."
 		item[field] = text.strip_edges()
 		if field == "kind" and text == "Equipment":
 			item["equipped"] = false
