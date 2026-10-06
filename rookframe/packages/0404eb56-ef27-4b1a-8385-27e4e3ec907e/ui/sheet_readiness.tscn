@@ -8,7 +8,7 @@ icon_alignment = 0
 expand_icon = true
 theme_override_constants/icon_max_width = 26
 theme_type_variation = "TaskButton"
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Inset" type="MarginContainer" parent="."]
 layout_mode = 1
 anchor_right = 1.0
@@ -19,6 +19,7 @@ theme_override_constants/margin_right = 8
 theme_override_constants/margin_top = 3
 theme_override_constants/margin_bottom = 3
 [node name="Copy" type="VBoxContainer" parent="Inset"]
+size_flags_vertical = 4
 layout_mode = 2
 mouse_filter = 2
 theme_override_constants/separation = 0
@@ -27,10 +28,20 @@ layout_mode = 2
 mouse_filter = 2
 clip_text = true
 theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Inset/Copy"]
 layout_mode = 2
 mouse_filter = 2
 clip_text = true
 text_overrun_behavior = 3
 theme_override_font_sizes/font_size = 16
+
+[node name="Arrow" type="Label" parent="."]
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -14.0
+offset_right = -4.0
+vertical_alignment = 1
+text = "›"
+mouse_filter = 2

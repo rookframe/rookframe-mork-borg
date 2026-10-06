@@ -1,10 +1,10 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_silkbound_layout.gd"
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
 var _favorites := FAVORITES.new()
 var _favorite_busy := false
-@onready var _favorite_button = get_node(^"Margin/Layout/Body/Chapter/Detail/HeaderFrame/Inset/DetailHeader/Favorite")
+@onready var _favorite_button = get_node(^"Margin/Layout/Body/Chapter/Page/Content/Detail/HeaderFrame/Inset/DetailHeader/Favorite")
 const ACTIONS = preload(ROOT + "logic/character_actions.gd")
 const PROJECTION = preload(ROOT + "ui/sheet_projection.gd")
 const DRAFT = preload(ROOT + "ui/sheet_draft.gd")
@@ -23,13 +23,13 @@ const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _core_ui = get_node(^"Margin/Layout/Body/Core")
 @onready var _chapter_ui = get_node(^"Margin/Layout/Body/Chapter")
-@onready var _detail_ui = get_node(^"Margin/Layout/Body/Chapter/Detail")
-@onready var _appearance_ui = get_node(^"Margin/Layout/Body/Chapter/AppearancePanel")
+@onready var _detail_ui = get_node(^"Margin/Layout/Body/Chapter/Page/Content/Detail")
+@onready var _appearance_ui = get_node(^"Margin/Layout/Body/Chapter/Page/Content/AppearancePanel")
 @onready var _header = get_node(^"Margin/Layout/Header")
-@onready var _quick_omens = _chapter_ui.get_node(^"QuickResources/QuickOmens")
-@onready var _quick_omens_edit = _chapter_ui.get_node(^"QuickResources/QuickOmensEditField/Editor")
-@onready var _quick_silver = _chapter_ui.get_node(^"QuickResources/QuickSilver")
-@onready var _quick_silver_edit = _chapter_ui.get_node(^"QuickResources/QuickSilverEditField/Editor")
+@onready var _quick_omens = _chapter_ui.get_node(^"Page/Content/QuickResources/QuickOmens")
+@onready var _quick_omens_edit = _chapter_ui.get_node(^"Page/Content/QuickResources/QuickOmensEditField/Editor")
+@onready var _quick_silver = _chapter_ui.get_node(^"Page/Content/QuickResources/QuickSilver")
+@onready var _quick_silver_edit = _chapter_ui.get_node(^"Page/Content/QuickResources/QuickSilverEditField/Editor")
 @onready var _core_condition_reminder = _core_ui.get_node(^"ConditionReminder")
 @onready var _core_dodge = _core_ui.get_node(^"Dodge")
 @onready var _core_portrait = _core_ui.get_node(^"Likeness/Portrait")
@@ -47,19 +47,14 @@ const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _core_weapon = _core_ui.get_node(^"Weapon")
 @onready var _core_attack = _core_ui.get_node(^"WeaponActions/Attack")
 @onready var _core_damage = _core_ui.get_node(^"WeaponActions/Damage")
-@onready var _chapter_caption = _chapter_ui.get_node(^"ChapterCaption")
-@onready var _chapter_personal_notes = _chapter_ui.get_node(^"ChapterCaption/PersonalNotes")
-@onready var _chapter_collections = _chapter_ui.get_node(^"Collections")
-@onready var _chapter_primary = _chapter_ui.get_node(^"Collections/Primary")
-@onready var _chapter_secondary = _chapter_ui.get_node(^"Collections/Secondary")
-@onready var _chapter_companions = _chapter_ui.get_node(^"Collections/Secondary/Companions")
-@onready var _chapter_resources = _chapter_ui.get_node(^"Collections/Secondary/Resources")
-@onready var _condition_ui = _chapter_ui.get_node(^"Condition")
-@onready var _chapter_journal_panel = _chapter_ui.get_node(^"JournalPanel")
-@onready var _chapter_notes = _chapter_ui.get_node(^"JournalPanel/Notes")
-@onready var _chapter_story = _chapter_ui.get_node(^"JournalPanel/Story")
-@onready var _section = _chapter_ui.get_node(^"Section")
-@onready var _chapter_tabs = _chapter_ui.get_node(^"Tabs")
+@onready var _chapter_personal_notes = _chapter_ui.get_node(^"Page/Content/ChapterCaption/PersonalNotes")
+@onready var _chapter_primary = _chapter_ui.get_node(^"Page/Content/Collections/Primary")
+@onready var _chapter_companions = _chapter_ui.get_node(^"Page/Content/Collections/Secondary/Content/Companions")
+@onready var _chapter_resources = _chapter_ui.get_node(^"Page/Content/Collections/Secondary/Content/Resources")
+@onready var _condition_ui = _chapter_ui.get_node(^"Page/Content/Condition")
+@onready var _chapter_notes = _chapter_ui.get_node(^"Page/Content/JournalPanel/Notes")
+@onready var _chapter_story = _chapter_ui.get_node(^"Page/Content/JournalPanel/Story")
+@onready var _section = _chapter_ui.get_node(^"Page/Content/Section")
 @onready var _chapter_tab_appearance = _chapter_ui.get_node(^"Tabs/TabAppearance")
 @onready var _chapter_tab_character = _chapter_ui.get_node(^"Tabs/TabCharacter")
 @onready var _chapter_tab_inventory = _chapter_ui.get_node(^"Tabs/TabInventory")
@@ -79,19 +74,16 @@ const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _header_cancel_sheet = get_node(^"Margin/Layout/Header/CancelSheet")
 @onready var _header_close = get_node(^"Margin/Layout/Header/Close")
 @onready var _header_edit = get_node(^"Margin/Layout/Header/Edit")
-@onready var _header_editing_status = get_node(^"Margin/Layout/Header/EditingStatus")
 @onready var _header_improve = get_node(^"Margin/Layout/Header/Improve")
 @onready var _header_name = get_node(^"Margin/Layout/Header/Name")
 @onready var _header_name_edit = get_node(^"Margin/Layout/Header/NameEditField/Editor")
 @onready var _header_rest = get_node(^"Margin/Layout/Header/Rest")
 @onready var _header_save_sheet = get_node(^"Margin/Layout/Header/SaveSheet")
-@onready var _header_spacer = get_node(^"Margin/Layout/Header/Spacer")
-@onready var _header_system = get_node(^"Margin/Layout/Header/System")
-@onready var _quick = _chapter_ui.get_node(^"QuickResources")
+@onready var _quick = _chapter_ui.get_node(^"Page/Content/QuickResources")
 @onready var _appearance_change_miniature = _appearance_ui.get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
-@onready var _quick_parent = _chapter_ui
+@onready var _quick_parent = _chapter_ui.get_node(^"Page/Content")
 @onready var _workflow_ui = get_node(^"Margin/Layout/Workflow")
-@onready var _detail_parent = _chapter_ui
+@onready var _detail_parent = _chapter_ui.get_node(^"Page/Content")
 @onready var _actions_parent = _detail_ui.get_node(^"FooterFrame/FooterInset")
 var _combat_options: Dictionary = {"difficulty": 0, "modifier": 0, "fumble": "break"}
 var _scroll_choices: Array[String] = []
@@ -131,6 +123,7 @@ var _new_item: Dictionary = {}
 var _busy := false
 var _refresh_pending := false
 var _action_pending := false
+var _route_pending := false
 var _detail_pending := false
 var _back_pending := false
 var _elapsed := 0.0
@@ -141,6 +134,11 @@ var _rendered_chapter := -1
 var _locale := I18N.new()
 
 func ready() -> void:
+	for button in [_quick_omens, _quick_silver]:
+		button.add_theme_font_size_override("font_size", 15)
+		button.add_theme_stylebox_override("normal", preload("res://rookframe/ui/theme/silkbound_plain.tres"))
+		button.add_theme_constant_override("icon_max_width", 20)
+	_quick_omens.icon = preload("res://rookframe/ui/icons/character/dice.svg")
 	if sdk == null:
 		return
 	_favorites.sdk = sdk
@@ -164,10 +162,10 @@ func ready() -> void:
 	_chapter_personal_notes.pressed.connect(_open_detail.bind("journal:notes"))
 	_chapter_ui.resource_requested.connect(_open_detail)
 	_chapter_ui.resource_changed.connect(_draft_typed)
-	_chapter_ui.get_node(^"ReferenceBack").pressed.connect(_return_condition)
-	_chapter_ui.get_node(^"Collections/Secondary/ResourceEditors").changed.connect(_draft_typed)
+	_chapter_ui.get_node(^"Page/Content/ReferenceBack").pressed.connect(_return_condition)
+	_chapter_ui.get_node(^"Page/Content/Collections/Secondary/Content/ResourceEditors").changed.connect(_draft_typed)
 	for index in range(4):
-		var path: NodePath = [^"ChapterCaption/InventoryFilters/All", ^"ChapterCaption/InventoryFilters/Arms", ^"ChapterCaption/InventoryFilters/Supplies", ^"ChapterCaption/InventoryFilters/Ready"][index]
+		var path: NodePath = [^"Page/Content/ChapterCaption/InventoryFilters/All", ^"Page/Content/ChapterCaption/InventoryFilters/Arms", ^"Page/Content/ChapterCaption/InventoryFilters/Supplies", ^"Page/Content/ChapterCaption/InventoryFilters/Ready"][index]
 		_chapter_ui.get_node(path).pressed.connect(_inventory_filter.bind(index))
 	_header_save_sheet.pressed.connect(_save_sheet)
 	_header_cancel_sheet.pressed.connect(_cancel_edit)
@@ -187,12 +185,13 @@ func ready() -> void:
 	_quick_silver.pressed.connect(_open_detail.bind("resource:silver"))
 	_core_ready_weapon.pressed.connect(_open_detail.bind("ready_weapon"))
 	_core_weapon.item_selected.connect(_weapon_selected)
-	_core_attack.pressed.connect(_roll_combat.bind("attack"))
+	_core_attack.pressed.connect(_open_detail.bind("ready_weapon"))
 	_core_damage.pressed.connect(_roll_combat.bind("damage"))
 	_core_manage_equipment.pressed.connect(_chapter.bind(2))
 	_core_protection.pressed.connect(_open_detail.bind("protection"))
-	_core_dodge.pressed.connect(_direct_ability.bind("Agility"))
+	_core_dodge.pressed.connect(_open_detail.bind("protection"))
 	_chapter_primary.selected.connect(_open_detail)
+	_chapter_primary.action_requested.connect(_inventory_action)
 	_chapter_resources.selected.connect(_open_detail)
 	_chapter_companions.selected.connect(_open_detail)
 	_section.item_selected.connect(_section_selected)
@@ -306,6 +305,13 @@ func _process(delta: float) -> void:
 			_focus_detail_action = false
 			_primary_button.grab_focus()
 
+	if _route_pending:
+		_route_pending = false
+		_show_route()
+
+func _request_route() -> void:
+	_route_pending = true
+
 func _request_detail() -> void:
 	_detail_pending = true
 
@@ -324,7 +330,7 @@ func _refresh() -> void:
 	_core(data)
 	_collections(data)
 	_render_condition(data)
-	_show_route()
+	_request_route()
 	if not _detail.is_empty():
 		_refresh_detail()
 		_sync_favorite()
@@ -332,28 +338,15 @@ func _refresh() -> void:
 
 func _core(data: Dictionary) -> void:
 	_setting = true
-	_header_name.visible = not _draft.active
-	_header_name_edit.visible = _draft.active
-	_header_name_edit.text = _draft.value("name") if _draft.active else str(data.get("name", ""))
-	_header_name.text = str(data.get("name", "Character"))
-	_header_editing_status.visible = _draft.active
-	_header_spacer.visible = false
-	_header_system.visible = not _phone and not _draft.active
-	get_node(^"Margin").add_theme_constant_override("margin_top", (4 if _draft.active else 10) if _phone else 16)
+	_header.configure(data, _draft.values() if _draft.active else {}, _owner(), _action_live(), BROKEN.new().is_dead(data))
 	_quick_omens_edit.visible = _phone and _draft.active
 	_quick_omens_edit.text = _draft.value("omens") if _draft.active else str(data.get("omens", 0))
 	_quick_omens.visible = not _draft.active
 	_quick_omens.text = "%d Omens" % int(data.get("omens", 0))
 	_quick_silver.text = "%d Silver" % int(data.get("silver", 0))
-	_quick_silver.visible = not _draft.active
+	_quick_silver.visible = not _draft.active and int(_nav.get("chapter", 0)) == 2
 	_quick_silver_edit.visible = _draft.active
 	_quick_silver_edit.text = _draft.value("silver") if _draft.active else str(data.get("silver", 0))
-	_header_edit.disabled = not _owner() or _action_live()
-	_header_rest.disabled = not _owner() or _draft.active or _action_live() or BROKEN.new().is_dead(data)
-	_header_improve.disabled = not _owner() or _draft.active or _action_live()
-	_header_edit.visible = not _draft.active
-	_header_save_sheet.visible = _draft.active
-	_header_cancel_sheet.visible = _draft.active
 	var state: Dictionary = _core_ui.configure(data, _projection.fields(data), _draft.values() if _draft.active else {}, _items, str(_nav.get("weapon", "")), _owner(), _action_live())
 	_weapons = state.weapons
 	_nav["weapon"] = state.weapon
@@ -370,13 +363,15 @@ func _collections(data: Dictionary) -> void:
 	_favorites.append_missing(rows, _actor, chapter)
 	var heading := str(rows.heading)
 	_chapter_primary.configure(primary, "", heading, str(primary.size()))
-	_chapter_resources.configure(resources, "", "RESOURCES" if chapter == 0 else "DECOCTIONS & RESOURCES", str(resources.size()))
-	_chapter_companions.configure(companions, "", "COMPANIONS", str(companions.size()))
+	_chapter_resources.configure(resources, "", "Resources" if chapter == 0 else "Decoctions & resources", str(resources.size()))
+	_chapter_companions.configure(companions, "", "Companions", str(companions.size()))
 	var story: Array[Dictionary] = []
 	var notes: Array[Dictionary] = []
 	if chapter == 3:
 		story = primary
 		notes = resources
+		if not notes.is_empty():
+			notes[0].value = str(_detail_ui.word_count(str(_nav.get("notes", ""))))
 	_chapter_ui.configure_journal(story, notes)
 	_rendered_chapter = chapter
 	_restore_pages()
@@ -396,7 +391,7 @@ func _show_route() -> void:
 	get_node(^"Margin/Layout").place_status(_phone and not details)
 	var task := _detail in ["workflow:rest", "workflow:improve"]
 	var modal := details and not _phone and not task
-	var detail_parent = _workflow_slot if task else get_node(^"EntryDialog/Surface/Inset") if modal else _chapter_ui
+	var detail_parent = _workflow_slot if task else get_node(^"EntryDialog/Surface/Inset") if modal else _chapter_ui.get_node(^"Page/Content")
 	var actions_parent = _workflow_footer if task else _detail_ui.get_node(^"FooterFrame/FooterInset")
 	if _actions_parent != actions_parent:
 		_actions_parent.remove_child(_actions_ui)
@@ -407,28 +402,24 @@ func _show_route() -> void:
 		detail_parent.add_child(_detail_ui)
 		_detail_parent = detail_parent
 	_workflow_ui.visible = task
-	var tablet := get_viewport_rect().size.x <= 1150 and not _phone
+	var tablet := get_viewport_rect().size.x <= 1300 and not _phone
 	_detail_ui.configure_layout(_phone, tablet, task, _draft.active, _detail_tab == 1)
-	for edge in ["left", "right"]:
-		get_node(^"Margin").add_theme_constant_override("margin_" + edge, (12 if _phone else 20 if tablet else 30) if task else (17 if _phone else 16 if tablet else 44))
-	get_node(^"Margin").add_theme_constant_override("margin_top", (4 if _phone else 12 if tablet else 20) if task else ((4 if _draft.active else 10) if _phone else 16))
-	get_node(^"Margin").add_theme_constant_override("margin_bottom", (6 if _phone else 12 if tablet else 20) if task else (10 if _phone else 16))
 	get_node(^"Margin/Layout/Body").visible = not task and not get_node(^"Margin/Layout/Picker").visible
 	_header.visible = not task and (not _phone or _draft.active or details)
 	_detail_header.visible = not task
 	if _phone and details and not _draft.active:
 		_header_name.add_theme_font_size_override("font_size", 18)
 		_header_name.custom_minimum_size = Vector2(140, _header_name.custom_minimum_size.y)
-	_header_rest.visible = not _phone and not _draft.active
-	_header_improve.visible = not _phone and not _draft.active
+	_header_rest.visible = false
+	_header_improve.visible = false
 	var obscured := details and not modal
 	_core_ui.visible = not (_phone and (details or chapter == 4))
 	_appearance_ui.visible = not obscured and chapter == 4
 	_detail_ui.visible = details and _detail != "workflow:rest"
 	(_actions_ui.get_node(^"Utility/PagerSlot") as Control).visible = _detail_ui.visible
 	_chapter_ui.configure_route({"chapter": chapter, "phone": _phone, "tablet": tablet, "details": details, "modal": modal, "condition_reference": _condition_reference, "editing": _draft.active}, _actor.data, _draft.values(), _nav)
-	var resource_editor = _chapter_ui.get_node(^"Collections/Secondary/ResourceEditors")
-	var footer = _chapter_ui
+	var resource_editor = _chapter_ui.get_node(^"Page/Content/Collections/Secondary/Content/ResourceEditors")
+	var footer = _chapter_ui.get_node(^"Page/Content")
 	if _phone and not details and chapter in [0, 1, 2] and not _condition_ui.visible:
 		footer = _chapter_primary.get_footer_slot() if chapter == 2 or _section.selected == 0 else resource_editor.get_footer_slot() if _section.selected == 1 and chapter == 0 and _draft.active else _chapter_resources.get_footer_slot() if _section.selected == 1 else _chapter_companions.get_footer_slot()
 	elif _phone and not details and chapter == 3:
@@ -437,12 +428,15 @@ func _show_route() -> void:
 		_quick_parent.remove_child(_quick)
 		footer.add_child(_quick)
 		_quick_parent = footer
+	_quick_silver.visible = not _draft.active and chapter == 2
 	for index in range(CHAPTERS.size()):
-		_chapters[index].set_pressed_no_signal(index == chapter)
+		_chapters[index].set_selected(index == chapter)
 	if chapter == 4:
 		_appearance()
+	get_node(^"Margin/Layout/Body/CoreDivider").visible = _core_ui.visible
+	get_node(^"Ornament").configure(_phone, tablet, task)
 	get_node(^"EntryScrim").visible = modal
-	get_node(^"EntryDialog").present(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), get_viewport_rect().size, "note" if _detail == "journal:notes" else "entry")
+	get_node(^"EntryDialog").present(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), get_viewport_rect().size, "note" if _detail == "journal:notes" and _detail_tab == 2 else "entry")
 
 func _chapter(index: int) -> void:
 	_condition_reference = false
@@ -452,7 +446,7 @@ func _chapter(index: int) -> void:
 	_nav["chapter"] = index
 	_nav["section"] = 0
 	_collections(_actor.data)
-	_show_route()
+	_request_route()
 	_remember()
 	_chapters[index].grab_focus()
 
@@ -461,18 +455,19 @@ func _section_selected(index: int) -> void:
 		_inventory_filter(index)
 		return
 	_nav["section"] = index
-	_show_route()
+	_request_route()
 	_remember()
 
 func _inventory_filter(index: int) -> void:
 	_nav["inventory_filter"] = index
 	_collections(_actor.data)
-	_show_route()
+	_request_route()
 	_remember()
 
 func _weapon_selected(index: int) -> void:
 	if not _setting and index < _weapons.size():
 		_nav["weapon"] = str(_weapons[index].inventory_id)
+		_core(_actor.data)
 		_remember()
 
 func _remember() -> void:
@@ -525,7 +520,7 @@ func _save_sheet() -> void:
 		if not corrections.invalid_field.is_empty():
 			_detail = _detail_ui.correction_route(corrections.invalid_field)
 			_detail_tab = 1
-			_show_route()
+			_request_route()
 			_validation_error = {"entry": _detail, "field": corrections.invalid_field, "message": result.message}
 			_request_detail()
 
@@ -578,16 +573,18 @@ func _open_detail(id: String) -> void:
 		_remember_opener(id)
 	_detail_ui.reset_navigation()
 	_detail = id
-	_detail_tab = 0
+	if id == "journal:notes":
+		_detail_ui.journal_draft = str(_nav.get("notes", ""))
+	_detail_tab = 1 if id.begins_with("journal:") else 0
 	_item_edit = false
 	_new_item = {}
 	_request_detail()
-	_show_route()
+	_request_route()
 	_detail_back.grab_focus()
 
 func _detail_tab_selected(index: int) -> void:
 	_detail_tab = index
-	_show_route()
+	_request_route()
 	_request_detail()
 
 func _clear_detail() -> void:
@@ -628,7 +625,12 @@ func _render_detail() -> void:
 			if _detail == "class" and str(data.get("class_id", "")) == "gutterborn-scum":
 				_character_field("scum_specialty:0", "First specialty · 1–6")
 				_character_field("scum_specialty:1", "Second specialty · 0–6")
-		if _phone and _detail == "profile" and _detail_tab == 0:
+		if _detail == "profile" and _detail_tab == 0:
+			_option("Edit sheet", _edit_from_profile, _owner() and not _action_live())
+			_option("Appearance", _chapter.bind(4))
+			_option("Add equipment", _open_detail.bind("catalogue"), _owner())
+			_option("Add custom item", _open_detail.bind("custom"), _owner())
+			_option("Close sheet", _close)
 			_option("Rest", _workflow.bind("rest", ""), _owner() and not _draft.active and not _action_live() and not BROKEN.new().is_dead(data))
 			_option("Level up", _workflow.bind("improve", ""), _owner() and not _draft.active and not _action_live())
 		if _phone and _detail == "profile" and not _projection.condition(data).is_empty():
@@ -659,8 +661,10 @@ func _render_detail() -> void:
 		if _detail_tab == 1:
 			_character_field(key, key + " modifier · −3…+6")
 		else:
-			_detail_ui.append_facts([["Roll", "d20"], ["Modifier", "%+d" % int(_projection.fields(data).get(key, 0))]])
-			_text("Compare with the difficulty agreed at the table.")
+			var modifier := int(_projection.fields(data).get(key, 0))
+			_detail_ui.append_summary("Ability test", {"Strength":"Physical force and melee attacks.", "Agility":"Defend, balance, swim and flee.", "Presence":"Perceive, aim, charm and use Powers.", "Toughness":"Resist poison, cold, heat and hardship."}.get(key, ""))
+			_detail_ui.append_facts([["Modifier", ("%+d" % modifier).replace("-", "−")], ["Test", "1d20 %s %d" % ["−" if modifier < 0 else "+", maxi(modifier, -modifier)]], ["Difficulty", "Set at the table"]])
+			_secondary("Inspect weapons")
 			_primary("Test " + key, _can_act())
 	elif _detail.begins_with("trait:") or _detail.begins_with("companion:") or _detail.begins_with("injury:"):
 		var parts := _detail.split(":")
@@ -696,16 +700,7 @@ func _render_detail() -> void:
 	elif _detail.begins_with("item:"):
 		_item_detail(_item(_detail.trim_prefix("item:")))
 	elif _detail.begins_with("journal:"):
-		_detail_title.text = "Personal notes" if _detail == "journal:notes" else "The road ahead"
-		_text("Local placeholder. This chapter does not save World data.")
-		if _detail == "journal:notes":
-			var notes = preload("res://rookframe/ui/components/forms/task_text_area.tscn").instantiate()
-			_detail_content.add_child(notes)
-			notes.label_text = "Personal notes · placeholder"
-			notes.compact = _phone
-			notes.value = ""
-		else:
-			_text("The places and words you carry. Add your table's story here when Journal storage is supported.")
+		_primary(_detail_ui.compose_journal(data, _nav, _detail == "journal:story", _detail_tab, _phone), true)
 	elif _detail == "catalogue":
 		_detail_title.text = "EQUIPMENT CATALOGUE"
 		for item in EQUIPMENT.new().entries():
@@ -726,6 +721,9 @@ func _render_detail() -> void:
 			_combat_preparation()
 		_primary("Attack", _can_act() and not _weapons.is_empty())
 		_secondary("Damage", _owner() and not _draft.active and not _weapons.is_empty())
+		for intrinsic in _favorites.entries(_actor):
+			if intrinsic.get("present", false) and str(intrinsic.get("key", "")).begins_with("intrinsic:"):
+				_option(str(intrinsic.name), _open_detail.bind("favorite:" + str(intrinsic.key)))
 	elif _detail == "protection":
 		_detail_title.text = "Protection & reactions"
 		for raw in _items:
@@ -831,6 +829,10 @@ func _can_act() -> bool:
 	return _owner() and not _draft.active and BROKEN.new().can_act(_actor.data)
 
 func _back() -> void:
+	if _detail == "journal:notes" and _detail_tab == 2:
+		_detail_ui.journal_draft = str(_nav.get("notes", ""))
+		_detail_tab_selected(1)
+		return
 	if _detail == "workflow:improve" and _action_live():
 		_ending_improvement = true
 		_request_detail()
@@ -848,13 +850,13 @@ func _finish_back() -> void:
 		_detail_tab = int(previous.tab)
 		_request_detail()
 		_detail_ui.restore_paging(previous.page)
-		_show_route()
+		_request_route()
 		return
 	var parent := _return_detail if _detail.begins_with("workflow:") else ""
 	_leave_workflow()
 	_detail = parent
 	_return_detail = ""
-	_show_route()
+	_request_route()
 	if not parent.is_empty():
 		_focus_detail_action = true
 		_request_detail()
@@ -873,7 +875,7 @@ func _core_opener():
 	var ability = _core_ui.focused_entry()
 	if ability != null:
 		return ability
-	for button in [_chapter_ui.get_node(^"ChapterCaption/Resource"), _chapter_personal_notes, _core_phone_name, _core_ready_weapon, _header_name, _header_rest, _header_improve, _core_origin, _core_hit_points, _core_power_uses, _core_omens, _core_protection, _core_dodge, _core_attack, _core_damage, _quick_omens, _quick_silver]:
+	for button in [_chapter_ui.get_node(^"Page/Content/ChapterCaption/Resource"), _chapter_personal_notes, _core_phone_name, _core_ready_weapon, _header_name, _header_rest, _header_improve, _core_origin, _core_hit_points, _core_power_uses, _core_omens, _core_protection, _core_dodge, _core_attack, _core_damage, _quick_omens, _quick_silver]:
 		if button.has_focus():
 			return button
 	return null
@@ -947,7 +949,7 @@ func _workflow(kind: String, entry: String) -> void:
 	_detail_tab = 0
 	_end_action()
 	_request_detail()
-	_show_route()
+	_request_route()
 	if kind in ["rest", "improve"]:
 		_workflow_ui.focus_back()
 	else:
@@ -1129,7 +1131,17 @@ func _primary_action() -> void:
 			return
 	if _busy:
 		return
-	if _detail == "workflow:rest" and _workflow_ui.is_daily():
+	if _detail == "journal:notes":
+		if _detail_tab != 2:
+			_detail_tab_selected(2)
+		else:
+			_nav["notes"] = _detail_ui.journal_draft
+			_detail_tab_selected(1)
+			_collections(_data())
+	elif _detail == "journal:story":
+		_open_detail("journal:notes")
+		_detail_tab_selected(2)
+	elif _detail == "workflow:rest" and _workflow_ui.is_daily():
 		if _action_live():
 			return
 		_leave_workflow()
@@ -1286,6 +1298,10 @@ func _secondary_action() -> void:
 		return
 	if _detail == "ready_weapon":
 		await _roll_combat("damage")
+	elif _detail.begins_with("ability:"):
+		_back()
+		_nav.inventory_filter = 1
+		_chapter(2)
 	elif _detail in ["class", "profile"]:
 		for raw in _items:
 			var item: Dictionary = raw
@@ -1409,19 +1425,23 @@ func _close() -> void:
 func _status(message: String) -> void:
 	get_node(^"Margin/Layout").show_status(_locale.text(message))
 	if int(_nav.get("chapter", 0)) == 4:
-		_chapter_ui.get_node(^"AppearanceStatus").text = _locale.text(message)
+		_chapter_ui.get_node(^"Page/Content/AppearanceStatus").text = _locale.text(message)
 
 func _density() -> void:
+	# Window composition reparents the sheet; resized can fire during that move.
+	if not is_inside_tree() or not get_node(^"Ledger").is_inside_tree():
+		return
 	var canvas := get_viewport_rect().size
-	_phone = canvas.y <= 560
-	var tablet := canvas.x <= 1150 and not _phone
+	_phone = canvas.x <= 900
+	var tablet := canvas.x <= 1300 and not _phone
 	get_node(^"Margin/Layout").configure_density(_phone, tablet)
 	_core_ui.configure_layout(_phone, tablet)
 	_chapter_ui.configure_layout(_phone, tablet)
+	apply_sheet_layout(_phone, tablet)
 	if _actor != null:
 		_core(_actor.data)
 		_render_condition(_actor.data)
-		_show_route()
+		_request_route()
 
 func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and event.is_action_pressed("ui_cancel"):
@@ -1434,7 +1454,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if key == null or not key.pressed or key.echo:
 			return
 		if key.keycode in [KEY_Q, KEY_E]:
-			_chapter((int(_nav.get("chapter", 0)) + (CHAPTERS.size() - 1 if key.keycode == KEY_Q else 1)) % CHAPTERS.size())
+			_chapter((int(_nav.get("chapter", 0)) + (3 if key.keycode == KEY_Q else 1)) % 4)
 			accept_event()
 
 func _roll_combat(part: String) -> void:
@@ -1482,7 +1502,7 @@ func _dismiss_detail() -> void:
 	_history.clear()
 	if _draft.active:
 		_detail = ""
-		_show_route()
+		_request_route()
 		_edit_focus()
 	else:
 		_back()
@@ -1504,3 +1524,20 @@ func _favorite_changed(key: String, starred: bool) -> void:
 	else:
 		_status(result.message)
 	_sync_favorite()
+
+func _edit_from_profile() -> void:
+	_detail = ""
+	_history.clear()
+	_edit()
+
+func _inventory_action(id: String) -> void:
+	if not _owner() or _draft.active or _action_live() or _busy or not id.begins_with("item:"):
+		return
+	var item := _item(id.trim_prefix("item:"))
+	if item.is_empty():
+		return
+	if str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"] or str(item.get("source_item_id", "")) == "stolen-mitre":
+		_busy = true
+		_mutation_result(await ACTIONS.new(sdk, _actor.id).change_item(id.trim_prefix("item:"), "equipped", "false" if item.get("equipped", false) else "true"))
+	else:
+		_workflow("use", id.trim_prefix("item:"))

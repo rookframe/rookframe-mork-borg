@@ -1,0 +1,93 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_silkbound_tab.gd" id="script"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="medium"]
+
+[sub_resource type="StyleBoxFlat" id="Tab"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.137255,0.156863,0.168627,1)
+border_width_left = 1
+border_width_right = 1
+border_width_top = 1
+border_width_bottom = 0
+border_color = Color(0.358353,0.384235,0.395686,1)
+
+[sub_resource type="StyleBoxFlat" id="TabHover"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.203922,0.239216,0.254902,1)
+border_width_bottom = 1
+border_color = Color(0.815686, 0.745098, 0.556863, 1)
+
+[sub_resource type="StyleBoxFlat" id="TabSelected"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.905882,0.905882,0.866667,1)
+border_width_bottom = 0
+border_color = Color(0.905882, 0.905882, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonFocus"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.905882, 0.905882, 0.866667, 1)
+
+[sub_resource type="StyleBoxFlat" id="ButtonDisabled"]
+content_margin_left = 8.0
+content_margin_top = 6.0
+content_margin_right = 8.0
+content_margin_bottom = 4.0
+bg_color = Color(0.043137, 0.066667, 0.078431, 0.55)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(0.27451, 0.321569, 0.337255, 0.55)
+
+[node name="SheetTabButton" type="Button"]
+script = ExtResource("script")
+custom_minimum_size = Vector2(0, 32)
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeTabButton"
+clip_text = true
+theme_override_font_sizes/font_size = 14
+theme_override_colors/font_pressed_color = Color(0.082353,0.090196,0.098039,1)
+theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
+theme_override_colors/icon_hover_color = Color(0.815686, 0.745098, 0.556863, 1)
+theme_override_colors/icon_pressed_color = Color(0.082353,0.090196,0.098039,1)
+theme_override_styles/normal = SubResource("Tab")
+theme_override_styles/hover = SubResource("TabHover")
+theme_override_styles/pressed = SubResource("TabSelected")
+theme_override_styles/focus = SubResource("ButtonFocus")
+theme_override_styles/disabled = SubResource("ButtonDisabled")
+
+[node name="Center" type="CenterContainer" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Content" type="HBoxContainer" parent="Center"]
+mouse_filter = 2
+theme_override_constants/separation = 10
+[node name="Icon" type="TextureRect" parent="Center/Content"]
+custom_minimum_size = Vector2(30,30)
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+[node name="Title" type="Label" parent="Center/Content"]
+mouse_filter = 2
+theme_override_fonts/font = ExtResource("medium")
+theme_override_font_sizes/font_size = 23

@@ -90,9 +90,13 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 	var primary: Array[Dictionary] = []
 	var resources: Array[Dictionary] = []
 	var companions: Array[Dictionary] = []
-	var heading := "FEATURES & TRAITS"
+	var heading := "Features & traits"
 	if chapter == 0:
-		primary.append(row("class", str(data.get("class_title", "Class")), "Class feature"))
+		var class_entry := row("class", str(data.get("class_title", "Class")), "Class feature")
+		class_entry.phone_subtitle = text(data.get("class_rules", []))
+		class_entry.phone_value = "Class feature"
+		class_entry.phone_value_meta = true
+		primary.append(class_entry)
 		var traits: Array = data.get("traits", [])
 		for index in range(traits.size()):
 			var trait_entry: Dictionary = traits[index]
@@ -101,9 +105,14 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 		for index in range(injuries.size()):
 			var injury: Dictionary = injuries[index]
 			primary.append(row("injury:%d" % index, str(injury.get("name", "Injury")), "Retained injury"))
-		for key in ["hit_points", "omens", "power_uses", "silver"]:
+		for key in ["hit_points", "omens", "power_uses"]:
 			var title: String = {"hit_points": "Hit points", "omens": "Omens", "power_uses": "Power uses", "silver": "Silver"}.get(str(key), "Resource")
-			resources.append(row("resource:" + str(key), title, "remaining", str(data.get(str(key), 0)), HEART if key == "hit_points" else MAGIC if key == "power_uses" else SILVER if key == "silver" else DICE))
+			var amount := str(data.get(str(key), 0))
+			if key == "hit_points":
+				amount += " / " + str(data.get("maximum_hit_points", 1))
+			elif key == "power_uses" and data.has("power_uses_total"):
+				amount += " / " + str(data.power_uses_total)
+			resources.append(row("resource:" + str(key), title, "hit points" if key == "hit_points" else "remaining", amount, HEART if key == "hit_points" else MAGIC if key == "power_uses" else DICE))
 		var descriptions: Array = data.get("companion_sheets", [])
 		for index in range(descriptions.size()):
 			var companion: Dictionary = descriptions[index]
@@ -114,9 +123,9 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 				var other: Dictionary = actor.data
 				var starting := not str(data.get("creation_id", "")).is_empty() and str(other.get("creation_id", "")) == str(data.get("creation_id", ""))
 				if str(other.get("schema", "")) == "mork-borg-adversary/v1" and (starting or str(other.get("summoner_actor", "")) == actor_id):
-					companions.append(row("actor:" + actor.id.value, str(other.get("name", "Creature")), "Separate Actor", "%d HP" % int(other.get("hit_points", 0))))
+					companions.append(row("actor:" + actor.id.value, str(other.get("name", "Creature")), "Companion", "%d HP" % int(other.get("hit_points", 0)), preload("res://rookframe/ui/icons/character/psychopomp.svg")))
 	elif chapter == 1:
-		heading = "POWERS"
+		heading = "Powers"
 		for raw in items:
 			var item: Dictionary = raw
 			var power := POWERS.new().definition(str(item.get("source_item_id", "")))
@@ -128,22 +137,29 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 			if str(item.get("kind", "")) == "Decoction" or str(item.get("source_item_id", "")) == "portable-laboratory":
 				resources.append(row("item:" + str(item.inventory_id), str(item.get("name", "Decoction")), "Shared laboratory doses" if item.has("dose_pool") else "Portable laboratory", str(remaining_uses(data, item))))
 	elif chapter == 2:
-		heading = "INVENTORY"
-		if owner:
-			primary.append(row("catalogue", "Add equipment", "Browse the equipment catalogue"))
-			primary.append(row("custom", "Add custom item", "Current supported item fields"))
+		heading = "Carried equipment"
 		for raw in items:
 			var item: Dictionary = raw
 			var arms := str(item.get("kind", "")) in ["Weapon", "Armor", "Shield"]
 			if filter == 1 and not arms or filter == 2 and arms or filter == 3 and not item.get("equipped", false):
 				continue
-			primary.append(row("item:" + str(item.inventory_id), str(item.get("name", "Item")), "Broken" if item.get("broken", false) else "Ready" if item.get("equipped", false) else str(item.get("kind", "Equipment")), "×%d" % int(item.get("quantity", 0))))
+			var entry := row("item:" + str(item.inventory_id), str(item.get("name", "Item")), inventory_caption(item), "", inventory_icon(item))
+			if arms or str(item.get("source_item_id", "")) == "stolen-mitre":
+				entry.action = ("Equipped · Unequip " if item.get("equipped", false) else "Carried · Equip ") + str(item.get("name", "item"))
+				entry.action_icon = equipment_state_icon(item)
+				entry.action_pressed = item.get("equipped", false)
+				entry.action_disabled = not owner or item.get("broken", false) or int(item.get("quantity", 0)) <= 0
+			elif not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd").new().definition(str(item.get("source_item_id", ""))).is_empty():
+				entry.action = "Use"
+				entry.action_text = "Use one"
+				entry.action_disabled = not owner or int(item.get("quantity", 0)) <= 0
+			primary.append(entry)
 		resources.append(row("resource:silver", "Silver", "coins", str(data.get("silver", 0))))
 		resources.append(row("profile", "Pack & description", str(data.get("pack", ""))))
 	elif chapter == 3:
-		heading = "STORY"
-		primary.append(row("journal:story", "The road ahead", "Local placeholder · Story", "", BOOK))
-		resources.append(row("journal:notes", "Personal notes", "Local placeholder · Notes", "", BOOK))
+		heading = "Story"
+		primary.append(row("journal:story", "The road ahead", "origin", "", BOOK))
+		resources.append(row("journal:notes", "In your own words", "words", "0", preload("res://rookframe/ui/icons/character/quill.svg")))
 	return {"primary": primary, "resources": resources, "companions": companions, "heading": heading}
 
 func item_facts(data: Dictionary, item: Dictionary) -> Array:
@@ -164,3 +180,27 @@ func remaining_uses(data: Dictionary, item: Dictionary) -> int:
 		if str(resource.get("source_item_id", "")) == str(item.get("dose_pool", "")):
 			return int(resource.get("uses", 0))
 	return 0
+
+func inventory_icon(item: Dictionary) -> Texture2D:
+	return load("res://rookframe/ui/icons/character/" + {"Weapon":"sword", "Armor":"armor", "Shield":"shield", "Decoction":"elixir", "Scroll":"book"}.get(str(item.get("kind", "")), "bag") + ".svg")
+
+func inventory_caption(item: Dictionary) -> String:
+	if item.get("broken", false):
+		return "Broken"
+	var parts: Array[String] = []
+	if item.has("damage"):
+		parts.append(str(item.damage))
+	elif item.has("reduction"):
+		parts.append(str(item.reduction))
+	else:
+		parts.append(str(item.get("kind", "Equipment")))
+	if int(item.get("quantity", 1)) != 1:
+		parts.append("×%d" % int(item.get("quantity", 0)))
+	return text(parts).replace("\n", " · ")
+
+func equipment_state_icon(item: Dictionary) -> Texture2D:
+	if not item.get("equipped", false):
+		return BAG
+	if str(item.get("kind", "")) == "Armor":
+		return preload("res://rookframe/ui/icons/character/armor.svg")
+	return preload("res://rookframe/ui/icons/character/equipped.svg")

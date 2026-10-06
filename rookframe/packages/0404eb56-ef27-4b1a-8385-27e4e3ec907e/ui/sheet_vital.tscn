@@ -2,11 +2,13 @@
 
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_vital.gd" id="script"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_row.tres" id="row"]
 [sub_resource type="StyleBoxFlat" id="empty"]
 bg_color = Color(0, 0, 0, 0)
 [sub_resource type="StyleBoxFlat" id="health"]
-bg_color = Color(0.490196, 0.85098, 0.537255, 1)
+bg_color = Color(0.682353, 0.729412, 0.745098, 1)
+
 
 [node name="SheetVital" type="Button"]
 script = ExtResource("script")
@@ -14,10 +16,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(44, 62)
 theme_type_variation = &"TaskChoice"
+theme_override_styles/normal = ExtResource("row")
+theme_override_styles/disabled = ExtResource("row")
 icon_alignment = 0
 expand_icon = true
 theme_override_constants/icon_max_width = 32
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 
 [node name="Inset" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -38,7 +42,7 @@ mouse_filter = 2
 [node name="Caption" type="Label" parent="Inset/Copy"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 mouse_filter = 2
 
 [node name="Number" type="HBoxContainer" parent="Inset/Copy"]
@@ -50,7 +54,7 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 28
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882,0.905882,0.866667,1)
 mouse_filter = 2
 
 [node name="HealthValue" type="Label" parent="Inset/Copy/Number"]
@@ -58,7 +62,7 @@ layout_mode = 2
 visible = false
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 28
-theme_override_colors/font_color = Color(0.490196, 0.85098, 0.537255, 1)
+theme_override_colors/font_color = Color(0.905882,0.905882,0.866667,1)
 mouse_filter = 2
 
 [node name="DeadValue" type="Label" parent="Inset/Copy/Number"]
@@ -66,14 +70,14 @@ layout_mode = 2
 visible = false
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 28
-theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 mouse_filter = 2
 
 [node name="Extra" type="Label" parent="Inset/Copy/Number"]
 layout_mode = 2
 size_flags_vertical = 8
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 mouse_filter = 2
 
 [node name="Health" type="ProgressBar" parent="."]
@@ -98,6 +102,6 @@ offset_bottom = 16.0
 expand_mode = 1
 stretch_mode = 5
 texture = ExtResource("heart")
-self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+self_modulate = Color(1, 0.505882, 0.478431, 1)
 visible = false
 mouse_filter = 2

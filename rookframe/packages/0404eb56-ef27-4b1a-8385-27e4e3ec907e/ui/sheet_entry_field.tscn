@@ -11,6 +11,7 @@ theme_override_constants/separation = 4
 script = ExtResource("script")
 
 [node name="Value" parent="." instance=ExtResource("textfield")]
+theme = null
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
@@ -18,6 +19,7 @@ label_text = ""
 compact = true
 
 [node name="Text" parent="." instance=ExtResource("textarea")]
+theme = null
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3

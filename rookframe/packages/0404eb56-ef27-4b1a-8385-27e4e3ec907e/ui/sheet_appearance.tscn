@@ -1,11 +1,11 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.gd" id="script"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="portrait"]
 [sub_resource type="StyleBoxFlat" id="wash"]
 bg_color = Color(0.266667, 0.913725, 0.913725, 0.035294)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
@@ -38,7 +38,7 @@ size_flags_vertical = 4
 texture = ExtResource("portrait")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="PortraitPanel/Inset/Content/PortraitHeading"]
 layout_mode = 2
 text = "Portrait"
@@ -114,7 +114,7 @@ size_flags_vertical = 4
 texture = ExtResource("character")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="MiniaturePanel/Inset/Content/MiniatureHeading"]
 layout_mode = 2
 text = "Tabletop miniature"

@@ -1,24 +1,24 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition.gd" id="script"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="death"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [sub_resource type="StyleBoxFlat" id="frame"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+bg_color = Color(0.137255, 0.156863, 0.168627, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="pip"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
-border_color = Color(0.937255, 0.356863, 0.329412, 1)
+bg_color = Color(0.137255, 0.156863, 0.168627, 1)
+border_color = Color(1, 0.505882, 0.478431, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="results"]
 bg_color = Color(0.058824, 0.101961, 0.109804, 1)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
@@ -37,7 +37,7 @@ theme_override_constants/separation = 0
 layout_mode = 2
 custom_minimum_size = Vector2(0, 3)
 mouse_filter = 2
-color = Color(0.937255, 0.356863, 0.329412, 1)
+color = Color(1, 0.505882, 0.478431, 1)
 [node name="Inset" type="MarginContainer" parent="Main/Frame"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -51,12 +51,12 @@ theme_override_constants/separation = 12
 layout_mode = 2
 text = "Broken · unresolved"
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Header"]
 layout_mode = 2
 text = "Broken"
 theme_override_font_sizes/font_size = 48
-theme_override_colors/font_color = Color(0.937255, 0.356863, 0.329412, 1)
+theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Header"]
 layout_mode = 2
@@ -77,7 +77,7 @@ layout_mode = 2
 text = "1"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome1"]
 layout_mode = 2
@@ -93,7 +93,7 @@ layout_mode = 2
 text = "d4 rounds → d4 HP"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Outcome2" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -103,7 +103,7 @@ layout_mode = 2
 text = "2"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome2"]
 layout_mode = 2
@@ -119,7 +119,7 @@ layout_mode = 2
 text = "d6 injury · d4 rounds → d4 HP"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Outcome3" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -129,7 +129,7 @@ layout_mode = 2
 text = "3"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome3"]
 layout_mode = 2
@@ -145,7 +145,7 @@ layout_mode = 2
 text = "Treat within d2 hours"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Outcome4" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -155,7 +155,7 @@ layout_mode = 2
 text = "4"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome4"]
 layout_mode = 2
@@ -171,7 +171,7 @@ layout_mode = 2
 text = "No further roll"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="TopSpacer" type="Control" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -191,14 +191,14 @@ theme_override_constants/separation = 0
 layout_mode = 2
 text = "4"
 theme_override_font_sizes/font_size = 96
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Hours" type="Label" parent="Main/Frame/Inset/Content/Counter/Value/Amount"]
 layout_mode = 2
 text = "h"
 vertical_alignment = 2
 theme_override_font_sizes/font_size = 40
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Units" type="Label" parent="Main/Frame/Inset/Content/Counter/Value"]
 layout_mode = 2
@@ -386,7 +386,7 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "First hour"
 theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/First"]
 layout_mode = 2
 text = "All tests DR16"
@@ -398,7 +398,7 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "Last hour"
 theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/Last"]
 layout_mode = 2
 text = "All tests DR18"
@@ -425,7 +425,7 @@ custom_minimum_size = Vector2(130, 150)
 texture = ExtResource("death")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+self_modulate = Color(1, 0.505882, 0.478431, 1)
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Death"]
 layout_mode = 2
 text = "Your story ends here."
@@ -441,7 +441,7 @@ layout_mode = 2
 text = "Hemorrhage stopped"
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 30
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Treated"]
 layout_mode = 2
 text = "Keep the resolved treatment. Update HP when healing changes it."
@@ -462,7 +462,7 @@ theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Broken" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Roll Broken d4"
@@ -503,7 +503,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Broken"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Results/Inset/Values/Broken"]
 layout_mode = 2
 text = ""
@@ -515,7 +515,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Injury"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Results/Inset/Values/Injury"]
 layout_mode = 2
 text = ""
@@ -527,7 +527,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Duration"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Results/Inset/Values/Duration"]
 layout_mode = 2
 text = ""
@@ -539,7 +539,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Recovery"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Results/Inset/Values/Recovery"]
 layout_mode = 2
 text = ""
@@ -551,7 +551,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Elapsed"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Results/Inset/Values/Elapsed"]
 layout_mode = 2
 text = ""
