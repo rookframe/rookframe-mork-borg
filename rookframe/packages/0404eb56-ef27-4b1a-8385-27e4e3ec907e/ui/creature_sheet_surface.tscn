@@ -361,13 +361,16 @@ theme_override_constants/separation = 3
 mouse_filter = 2
 [node name="Caption" type="Label" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row/Copy"]
 layout_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 text = "Tabletop miniature"
 theme_override_font_sizes/font_size = 11
 theme_override_colors/font_color = Color(0.682353,0.729412,0.745098, 1)
 [node name="Value" type="Label" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row/Copy"]
 layout_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 text = "Not assigned"
-autowrap_mode = 3
 theme_override_font_sizes/font_size = 14
 [node name="Action" type="Label" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row"]
 layout_mode = 2

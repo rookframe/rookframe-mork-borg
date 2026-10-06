@@ -634,6 +634,7 @@ func miniature(title: String, package: String, assigned: bool) -> void:
 	(get_node(WORK + "Appearance") as APPEARANCE).miniature(_locale, title, package, assigned)
 	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Value").text = title if assigned else _locale.text("Not assigned")
 	get_node(IDENTITY + "MiniatureSummary").tooltip_text = title + (" · " + package if not package.is_empty() else "")
+	get_node(IDENTITY + "MiniatureSummary").accessibility_name = title if assigned else _locale.text("Not assigned")
 
 func miniature_summary_preview_target() -> Control:
 	return get_node(IDENTITY + "MiniatureSummary/Row/Preview")
