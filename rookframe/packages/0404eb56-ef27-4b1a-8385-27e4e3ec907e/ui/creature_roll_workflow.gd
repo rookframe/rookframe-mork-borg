@@ -13,7 +13,6 @@ var state := "ready"
 var message := ""
 var snapshot: Dictionary = {}
 var selection: Dictionary = {}
-var display_active := false
 var _sdk: SDK
 var _surface: Control
 var _action: ACTION
@@ -77,7 +76,9 @@ func _process(delta: float) -> void:
 	if _action != null and pending and _poll >= 0.25:
 		_poll = 0.0
 		_action.refresh()
-	if _action != null and pending and not _closed and _presenting and display_active:
+	# Host may temporarily hide this surface before the requested Roll is claimed.
+	# Only explicit Close/Actor changes stop its Window Dice presentation.
+	if _action != null and pending and not _closed and _presenting:
 		_present()
 
 func _accept() -> void:

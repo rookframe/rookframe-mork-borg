@@ -161,7 +161,6 @@ func _world_changed() -> void:
 	_refresh_pending = true
 
 func _process(_delta: float) -> void:
-	_roll_workflow.display_active = is_visible_in_tree()
 	if _roll_refresh_pending:
 		_roll_refresh_pending = false
 		_roll_feedback = "Rolling Creature dice…" if _roll_workflow.pending else "Action ended" if _roll_workflow.state == "ended" else "Creature roll"

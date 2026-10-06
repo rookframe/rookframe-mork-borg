@@ -7,6 +7,64 @@ const ACTION = preload(ROOT + "logic/melee_action.gd")
 const WORKFLOW = preload(ROOT + "ui/creature_roll_workflow.gd")
 const BOUNDARY = preload("res://tests/melee_sdk_boundary.gd")
 
+class PresentationBoundary extends BOUNDARY:
+	var presented: Array[String] = []
+	var presented_source: Control
+
+	func PresentRequestedRoll(id: String, surface: Control) -> Dictionary:
+		presented.append(id)
+		presented_source = surface
+		return {"ok": true}
+
+func test_pending_window_roll_starts_through_temporary_host_hiding_but_not_explicit_close_or_retarget() -> void:
+	var host := PresentationBoundary.new()
+	host.handler = auto_free(SYSTEM.new())
+	add_child(host.handler)
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	var before: Dictionary = host.actors.duplicate(true)
+	var parent: Control = auto_free(Control.new())
+	add_child(parent)
+	var surface := Control.new()
+	parent.add_child(surface)
+	var workflow := WORKFLOW.new()
+	surface.add_child(workflow)
+	workflow.configure(SDK.new(host), surface)
+	workflow.opened("hero")
+	host.defer_reply = true
+	workflow.start("hero", "damage", str(host.actors.hero.data.attacks[0].id))
+	var request := host.last_request
+	# Host's requested-Throw fallback temporarily hides the ancestor before the
+	# accepted start reply. That is not the user's Close or another Actor opening.
+	parent.hide()
+	assert_bool(surface.is_visible_in_tree()).is_false()
+	host.complete_reply()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(host.presented).contains(request)
+	assert_object(host.presented_source).is_same(surface)
+	assert_int(host.requests.size()).is_equal(1)
+	host.presented.clear()
+	workflow.closed()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(host.presented).is_empty()
+	assert_str(host.requests[request].result.status).is_equal("pending")
+	workflow.opened("enemy")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(host.presented).is_empty()
+	workflow.opened("hero")
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(host.presented).contains(request)
+	workflow.abandon()
+	host.presented.clear()
+	await get_tree().process_frame
+	await get_tree().process_frame
+	assert_array(host.presented).is_empty()
+	assert_str(host.requests[request].result.status).is_equal("cancelled")
+	assert_dict(host.actors).is_equal(before)
+
 func test_creature_roll_completion_is_once_immutable_and_late_abandonment_cancels() -> void:
 	var host := BOUNDARY.new()
 	host.handler = auto_free(SYSTEM.new())

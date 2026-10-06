@@ -225,6 +225,11 @@ focus, with the Encounter chapter as fallback when the original control is no
 longer eligible. Complete service errors stay in the bounded reader; the footer
 shows a concise localized state and otherwise the ordinary table context.
 
+Pending Window Dice presentation follows these explicit workflow guards rather
+than effective canvas visibility. The Host can temporarily hide the source while
+the accepted request is being claimed; that hiding must not prevent the SDK call
+which starts Window Dice and restores its source.
+
 Resolution values use the original Inter variable font at weight 500 with
 tabular figures. Their owned focus style draws a 2px aqua border with a 2px
 clear offset. Authored Encounter margins leave room for this outline inside the
