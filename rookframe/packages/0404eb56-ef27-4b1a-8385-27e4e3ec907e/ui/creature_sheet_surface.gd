@@ -356,9 +356,6 @@ func _configure_heading(heading: PanelContainer, title: String, padded_group: bo
 		frame.border_width_bottom = 0
 		frame.content_margin_top = 0
 		frame.content_margin_bottom = 0
-		var padding: MarginContainer = heading.get_node("Row/Heading")
-		padding.add_theme_constant_override("margin_top", 6)
-		padding.add_theme_constant_override("margin_bottom", 7)
 		(heading.get_node("Row/Add") as Button).custom_minimum_size = Vector2(44,44)
 	heading.add_theme_stylebox_override("panel", frame)
 	row.add_theme_constant_override("separation", 12)

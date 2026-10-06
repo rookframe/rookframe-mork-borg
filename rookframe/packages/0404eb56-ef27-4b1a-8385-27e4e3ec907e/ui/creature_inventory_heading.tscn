@@ -11,14 +11,13 @@ theme_override_styles/panel = ExtResource("frame")
 mouse_filter = 2
 [node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_constants/separation = 12
 mouse_filter = 2
-[node name="Heading" type="MarginContainer" parent="Row"]
+[node name="Heading" type="PanelContainer" parent="Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
-theme_override_constants/margin_top = 8
-theme_override_constants/margin_bottom = 8
+theme_override_styles/panel = ExtResource("frame")
 [node name="Content" type="HBoxContainer" parent="Row/Heading"]
 layout_mode = 2
 theme_override_constants/separation = 10
