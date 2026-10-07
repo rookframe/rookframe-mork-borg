@@ -104,6 +104,8 @@ func entries() -> Array[Dictionary]:
 	return result
 
 func item(id: String) -> Dictionary:
+	if id.is_empty():
+		return {}
 	for class_id in ["fanged-deserter", "gutterborn-scum", "esoteric-hermit", "wretched-royalty", "heretical-priest", "occult-herbmaster"]:
 		var profile := CLASSES.new().profile(class_id)
 		var features: Array = profile.get("features", [])

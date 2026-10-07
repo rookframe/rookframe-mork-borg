@@ -1,10 +1,10 @@
 [gd_scene format=3]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="brand_icon"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="context_icon"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface.gd" id="script"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
-[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="silk_theme"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="brand_icon"]
+
+[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.tscn" id="appearance"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.gd" id="appearance_script"]
@@ -13,7 +13,7 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_vital.tscn" id="vital"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_section_heading.tscn" id="heading"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_inventory_heading.tscn" id="inventory_heading"]
-[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_canvas_wash.svg" id="wash"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/linen.png" id="wash"]
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface_outer_frame.tres" id="outer_frame"]
 
@@ -21,13 +21,24 @@
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface_chapter_normal.tres" id="chapter_normal"]
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface_chapter_selected.tres" id="chapter_selected"]
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_section_heading_frame.tres" id="section_frame"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_chapter_button.gd" id="chapter_script"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_form.tscn" id="correction_form"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_details.tscn" id="correction_details"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_dialog.gd" id="correction_dialog"]
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_card.tres" id="correction_frame"]
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_focus.tres" id="roll_focus"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/ribbon.svg" id="ribbon"]
+[sub_resource type="StyleBoxFlat" id="chapter_panel"]
+bg_color = Color(0.082353,0.090196,0.098039,0.78)
+border_color = Color(0.356863,0.384314,0.396078,1)
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+content_margin_left = 25.0
+content_margin_top = 21.0
+content_margin_right = 25.0
+content_margin_bottom = 21.0
 [sub_resource type="StyleBoxFlat" id="footer_action"]
 bg_color = Color(0,0,0,0)
 content_margin_left = 12.0
@@ -36,31 +47,28 @@ content_margin_top = 0.0
 content_margin_bottom = 0.0
 
 [sub_resource type="StyleBoxFlat" id="correction_panel"]
-bg_color = Color(0.015686,0.066667,0.082353,1)
-border_color = Color(0.27451,0.321569,0.337255,1)
+bg_color = Color(0.137255,0.156863,0.168627,1)
+border_color = Color(0.243137,0.262745,0.274510,1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-[sub_resource type="StyleBoxFlat" id="pager_button"]
-bg_color = Color(0,0,0,0)
-border_width_left = 1
-border_color = Color(0.27451,0.321569,0.337255,1)
+
 [sub_resource type="StyleBoxFlat" id="health_frame"]
 bg_color = Color(0,0,0,0)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
 border_width_bottom = 1
-border_color = Color(0.27451,0.321569,0.337255,1)
+border_color = Color(0.243137,0.262745,0.274510,1)
 [sub_resource type="StyleBoxFlat" id="summary_frame"]
 bg_color = Color(0,0,0,0)
 border_width_bottom = 1
-border_color = Color(0.27451,0.321569,0.337255,1)
+border_color = Color(0.243137,0.262745,0.274510,1)
 [sub_resource type="StyleBoxFlat" id="line"]
 bg_color = Color(0,0,0,0)
 border_width_top = 1
-border_color = Color(0.27451,0.321569,0.337255,1)
+border_color = Color(0.243137,0.262745,0.274510,1)
 
 
 [sub_resource type="StyleBoxFlat" id="source_normal"]
@@ -75,10 +83,12 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+texture_filter = 4
 theme = ExtResource("theme")
 script = ExtResource("script")
 correction_frame = ExtResource("correction_frame")
 footer_action_frame = SubResource("footer_action")
+chapter_frame = SubResource("chapter_panel")
 canvas_frame = ExtResource("outer_frame")
 identity_frame = ExtResource("identity_frame")
 section_frame = ExtResource("section_frame")
@@ -88,20 +98,12 @@ desktop_source_icon_alignment = 0
 touch_source_icon_alignment = 2
 source_frame = SubResource("source_normal")
 [node name="Background" type="ColorRect" parent="."]
+visible = false
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.0156863,0.0666667,0.0823529,1)
-mouse_filter = 2
-[node name="Wash" type="TextureRect" parent="."]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-texture = ExtResource("wash")
-texture_filter = 2
-expand_mode = 1
 mouse_filter = 2
 [node name="Canvas" type="Panel" parent="."]
 layout_mode = 1
@@ -109,6 +111,16 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_styles/panel = ExtResource("outer_frame")
+mouse_filter = 2
+[node name="Wash" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("wash")
+texture_filter = 1
+stretch_mode = 1
+expand_mode = 1
 mouse_filter = 2
 [node name="Inset" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -134,6 +146,7 @@ theme_override_styles/panel = ExtResource("identity_frame")
 layout_mode = 2
 theme_override_constants/separation = 0
 [node name="IdentityEditors" parent="Inset/Layout/Body/Identity/Column" instance=ExtResource("correction_form")]
+theme = ExtResource("silk_theme")
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 7
@@ -153,21 +166,19 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text_overrun_behavior = 3
-horizontal_alignment = 1
-theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.905882,0.905882,0.866667, 1)
 [node name="Caption" type="Label" parent="Inset/Layout/Body/Identity/Column/IdentityDetails/Copy"]
 layout_mode = 2
 text = "Full identity ›"
-horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+horizontal_alignment = 0
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098, 1)
 [node name="Name" type="Label" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 autowrap_mode = 3
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 34
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.905882,0.905882,0.866667, 1)
+horizontal_alignment = 0
 [node name="NameGap" type="Control" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 7)
@@ -176,8 +187,8 @@ mouse_filter = 2
 layout_mode = 2
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
-horizontal_alignment = 1
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098, 1)
+horizontal_alignment = 0
 [node name="PortraitGap" type="Control" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 22)
@@ -186,6 +197,7 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 510)
+texture_filter = 4
 expand_mode = 1
 stretch_mode = 5
 [node name="HealthGap" type="Control" parent="Inset/Layout/Body/Identity/Column"]
@@ -203,6 +215,7 @@ theme_override_constants/margin_right = 12
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_bottom = 8
 [node name="Fields" parent="Inset/Layout/Body/Identity/Column/HealthEditors/Inset" instance=ExtResource("correction_form")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 vertical = false
 theme_override_constants/separation = 8
@@ -232,7 +245,7 @@ size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
 texture = ExtResource("heart")
-self_modulate = Color(0.937255, 0.356863, 0.329412, 1)
+self_modulate = Color(1,0.505882,0.478431, 1)
 mouse_filter = 2
 [node name="Captions" type="VBoxContainer" parent="Inset/Layout/Body/Identity/Column/Health/Inset/Row"]
 layout_mode = 2
@@ -248,23 +261,22 @@ theme_override_font_sizes/font_size = 13
 layout_mode = 2
 text = "Published starting information"
 theme_override_font_sizes/font_size = 10
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098, 1)
 [node name="Value" type="Label" parent="Inset/Layout/Body/Identity/Column/Health/Inset/Row"]
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 30
 text = "6"
 [node name="Maximum" type="Label" parent="Inset/Layout/Body/Identity/Column/Health/Inset/Row"]
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098, 1)
 text = "/ 6"
 [node name="Adjust" type="Label" parent="Inset/Layout/Body/Identity/Column/Health/Inset/Row"]
 layout_mode = 2
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882,0.905882,0.866667, 1)
 theme_override_font_sizes/font_size = 20
 text = "±"
 [node name="Indicator" type="ColorRect" parent="Inset/Layout/Body/Identity/Column/Health"]
@@ -273,7 +285,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -3.0
-color = Color(0.937255, 0.356863, 0.329412, 1)
+color = Color(1,0.505882,0.478431, 1)
 mouse_filter = 2
 
 [node name="Condition" type="Label" parent="Inset/Layout/Body/Identity/Column"]
@@ -287,6 +299,7 @@ layout_mode = 2
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_bottom = 12
 [node name="Fields" parent="Inset/Layout/Body/Identity/Column/ArmorEditors" instance=ExtResource("correction_form")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 vertical = false
 theme_override_constants/separation = 8
@@ -295,6 +308,7 @@ layout_mode = 2
 custom_minimum_size = Vector2(0,73.5)
 theme_override_constants/separation = 12
 [node name="Armor" parent="Inset/Layout/Body/Identity/Column/Vitals" instance=ExtResource("vital")]
+theme = ExtResource("silk_theme")
 theme_override_styles/focus = ExtResource("roll_focus")
 layout_mode = 2
 [node name="Space" type="Control" parent="Inset/Layout/Body/Identity/Column/Vitals"]
@@ -302,6 +316,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 [node name="Morale" parent="Inset/Layout/Body/Identity/Column/Vitals" instance=ExtResource("vital")]
+theme = ExtResource("silk_theme")
 theme_override_styles/focus = ExtResource("roll_focus")
 layout_mode = 2
 [node name="VitalsRule" type="HSeparator" parent="Inset/Layout/Body/Identity/Column"]
@@ -310,7 +325,7 @@ theme_override_constants/separation = 0
 theme_override_styles/separator = SubResource("line")
 [node name="MiniatureSpace" type="Control" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
-size_flags_vertical = 3
+custom_minimum_size = Vector2(0,24)
 mouse_filter = 2
 [node name="MiniatureSummary" type="Button" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
@@ -336,7 +351,7 @@ size_flags_vertical = 4
 texture = ExtResource("miniature")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686,0.745098,0.556863, 1)
 mouse_filter = 2
 [node name="Copy" type="VBoxContainer" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row"]
 layout_mode = 2
@@ -346,20 +361,23 @@ theme_override_constants/separation = 3
 mouse_filter = 2
 [node name="Caption" type="Label" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row/Copy"]
 layout_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 text = "Tabletop miniature"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098, 1)
 [node name="Value" type="Label" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row/Copy"]
 layout_mode = 2
+clip_text = true
+text_overrun_behavior = 3
 text = "Not assigned"
-autowrap_mode = 3
 theme_override_font_sizes/font_size = 14
 [node name="Action" type="Label" parent="Inset/Layout/Body/Identity/Column/MiniatureSummary/Row"]
 layout_mode = 2
 size_flags_vertical = 4
 text = "Appearance →"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882,0.905882,0.866667, 1)
 [node name="Workspace" type="VBoxContainer" parent="Inset/Layout/Body"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -369,149 +387,163 @@ theme_override_constants/separation = 12
 layout_mode = 2
 theme_override_constants/separation = 0
 
-[node name="Encounter" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
-script = ExtResource("chapter_script")
+[node name="Encounter" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)
-size_flags_horizontal = 1
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
-theme_override_colors/icon_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_pressed_color = Color(0.815686,0.745098,0.556863, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.815686,0.745098,0.556863, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0.815686,0.745098,0.556863, 1)
 theme_override_styles/normal = ExtResource("chapter_normal")
 theme_override_styles/pressed = ExtResource("chapter_selected")
 text = "Encounter"
 toggle_mode = true
 
-[node name="Inventory" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
-script = ExtResource("chapter_script")
+[node name="Inventory" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)
-size_flags_horizontal = 1
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
-theme_override_colors/icon_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_pressed_color = Color(0.815686,0.745098,0.556863, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.815686,0.745098,0.556863, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0.815686,0.745098,0.556863, 1)
 theme_override_styles/normal = ExtResource("chapter_normal")
 theme_override_styles/pressed = ExtResource("chapter_selected")
 text = "Inventory"
 toggle_mode = true
 
-[node name="Appearance" parent="Inset/Layout/Body/Workspace/Tabs" instance=ExtResource("tab")]
-script = ExtResource("chapter_script")
+[node name="Appearance" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)
-size_flags_horizontal = 1
+size_flags_horizontal = 3
 theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
-theme_override_colors/icon_hover_pressed_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_pressed_color = Color(0.815686,0.745098,0.556863, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.815686,0.745098,0.556863, 1)
+theme_override_colors/icon_hover_pressed_color = Color(0.815686,0.745098,0.556863, 1)
 theme_override_styles/normal = ExtResource("chapter_normal")
 theme_override_styles/pressed = ExtResource("chapter_selected")
 text = "Appearance"
 toggle_mode = true
 
-[node name="SourceSpace" type="Control" parent="Inset/Layout/Body/Workspace/Tabs"]
+[node name="Edit" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
 layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-[node name="Source" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
-script = ExtResource("chapter_script")
-layout_mode = 2
-custom_minimum_size = Vector2(44, 48)
-text = "Source"
+custom_minimum_size = Vector2(44, 44)
+text = "Edit sheet"
 theme_type_variation = "TaskButton"
-theme_override_styles/normal = SubResource("source_normal")
-alignment = 2
-[node name="ChapterGap" type="Control" parent="Inset/Layout/Body/Workspace"]
+visible = false
+[node name="Chapter" type="PanelContainer" parent="Inset/Layout/Body/Workspace"]
+layout_mode = 2
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("chapter_panel")
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter"]
+layout_mode = 2
+theme_override_constants/separation = 0
+[node name="ChapterGap" type="Control" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0,18)
 mouse_filter = 2
-[node name="Section" type="HBoxContainer" parent="Inset/Layout/Body/Workspace"]
+[node name="Section" type="HBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
 layout_mode = 2
-custom_minimum_size = Vector2(0,45)
+custom_minimum_size = Vector2(0,44)
 theme_override_constants/separation = 0
 visible = false
-[node name="Encounter" type="HBoxContainer" parent="Inset/Layout/Body/Workspace"]
+[node name="SectionRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0,1)
+color = Color(0.243137,0.262745,0.274510,1)
+mouse_filter = 2
+visible = false
+[node name="Encounter" type="HBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
 layout_mode = 2
 size_flags_vertical = 3
 theme_override_constants/separation = 32
 
-[node name="PrimarySlot" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter"]
+[node name="PrimarySlot" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/margin_left = -2
 theme_override_constants/margin_right = -2
-[node name="Primary" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot" instance=ExtResource("pages")]
+[node name="Primary" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot" instance=ExtResource("pages")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-[node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Area"]
+[node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary/Area"]
 layout_mode = 0
 theme_override_constants/margin_left = 2
 theme_override_constants/margin_right = 2
-[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Area/FocusInset"]
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary/Area/FocusInset"]
 layout_mode = 0
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="SecondarySlot" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter"]
+[node name="SecondarySlot" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/margin_left = -2
 theme_override_constants/margin_right = -2
-[node name="Secondary" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot" instance=ExtResource("pages")]
+[node name="Secondary" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot" instance=ExtResource("pages")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-[node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Area"]
+[node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary/Area"]
 layout_mode = 0
 theme_override_constants/margin_left = 2
 theme_override_constants/margin_right = 2
-[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Area/FocusInset"]
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary/Area/FocusInset"]
 layout_mode = 0
 size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
-[node name="InventoryHeading" parent="Inset/Layout/Body/Workspace" instance=ExtResource("inventory_heading")]
+[node name="InventoryHeading" parent="Inset/Layout/Body/Workspace/Chapter/Content" instance=ExtResource("inventory_heading")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 visible = false
-[node name="Inventory" parent="Inset/Layout/Body/Workspace" instance=ExtResource("pages")]
+[node name="Inventory" parent="Inset/Layout/Body/Workspace/Chapter/Content" instance=ExtResource("pages")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_vertical = 3
 visible = false
-[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Inventory/Area"]
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Inventory/Area"]
 layout_mode = 0
 theme_override_constants/separation = 0
-[node name="Appearance" parent="Inset/Layout/Body/Workspace" instance=ExtResource("appearance")]
+[node name="Appearance" parent="Inset/Layout/Body/Workspace/Chapter/Content" instance=ExtResource("appearance")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 visible = false
 script = ExtResource("appearance_script")
-[node name="CorrectionSlot" type="VBoxContainer" parent="Inset/Layout/Body/Workspace"]
+[node name="CorrectionSlot" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-[node name="Details" parent="Inset/Layout/Body/Workspace/CorrectionSlot" instance=ExtResource("correction_details")]
+[node name="Details" parent="Inset/Layout/Body/Workspace/Chapter/Content/CorrectionSlot" instance=ExtResource("correction_details")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
-[node name="Reader" type="VBoxContainer" parent="Inset/Layout/Body/Workspace"]
+[node name="Reader" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
 layout_mode = 2
 size_flags_vertical = 3
 visible = false
-[node name="Back" type="Button" parent="Inset/Layout/Body/Workspace/Reader"]
+[node name="Back" type="Button" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Back to creature"
 theme_type_variation = "TaskButton"
-[node name="Pages" parent="Inset/Layout/Body/Workspace/Reader" instance=ExtResource("pages")]
+[node name="Pages" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader" instance=ExtResource("pages")]
+theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_vertical = 3
-[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Reader/Pages/Area"]
+[node name="Content" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages/Area"]
 layout_mode = 0
 theme_override_constants/separation = 16
-[node name="Publication" type="Button" parent="Inset/Layout/Body/Workspace/Reader"]
+[node name="Publication" type="Button" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Open publication"
@@ -519,64 +551,42 @@ theme_type_variation = "TaskButton"
 [node name="Footer" type="HBoxContainer" parent="Inset/Layout"]
 layout_mode = 2
 theme_override_constants/separation = 12
-[node name="BrandIcon" type="TextureRect" parent="Inset/Layout/Footer"]
+[node name="Cancel" type="Button" parent="Inset/Layout/Footer"]
 layout_mode = 2
-custom_minimum_size = Vector2(20,20)
-size_flags_vertical = 4
-expand_mode = 1
-stretch_mode = 5
-texture = ExtResource("brand_icon")
-self_modulate = Color(0.941176,0.733333,0.196078,1)
-mouse_filter = 2
-[node name="Brand" type="Label" parent="Inset/Layout/Footer"]
-layout_mode = 2
-text = "MÖRK BORG"
-theme_override_fonts/font = ExtResource("display")
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-theme_override_font_sizes/font_size = 10
-[node name="BrandGap" type="Control" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(8,0)
-mouse_filter = 2
-[node name="ContextIcon" type="TextureRect" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(18,18)
-size_flags_vertical = 4
-expand_mode = 1
-stretch_mode = 5
-texture = ExtResource("context_icon")
-self_modulate = Color(0.266667,0.913725,0.913725,1)
-mouse_filter = 2
-[node name="Context" type="Label" parent="Inset/Layout/Footer"]
-layout_mode = 2
-text = "Published starting information"
-theme_override_font_sizes/font_size = 12
+custom_minimum_size = Vector2(44, 44)
+text = "Cancel"
+theme_type_variation = "TaskButton"
+visible = false
 [node name="Status" type="Label" parent="Inset/Layout/Footer"]
 layout_mode = 2
 size_flags_horizontal = 3
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 12
+[node name="SourceNote" type="HBoxContainer" parent="Inset/Layout/Footer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 0
+[node name="Source" type="Button" parent="Inset/Layout/Footer/SourceNote"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 48)
+text = "Source"
+theme_type_variation = "TaskButton"
+alignment = 2
+[node name="Citation" type="Label" parent="Inset/Layout/Footer/SourceNote"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098,1)
+theme_override_font_sizes/font_size = 16
+text = "MÖRK BORG Bare Bones Edition · p. 58"
 [node name="Close" type="Button" parent="Inset/Layout/Footer"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Close"
 theme_type_variation = "TaskButton"
-[node name="Edit" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Edit sheet"
-theme_type_variation = "TaskButton"
-visible = false
 [node name="Core" type="Button" parent="Inset/Layout/Footer"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Core values"
-theme_type_variation = "TaskButton"
-visible = false
-[node name="Cancel" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Cancel"
 theme_type_variation = "TaskButton"
 visible = false
 [node name="Save" type="Button" parent="Inset/Layout/Footer"]
@@ -593,140 +603,124 @@ theme_type_variation = "TaskButton"
 
 [node name="FooterRule" type="ColorRect" parent="."]
 layout_mode = 0
-color = Color(0.27451,0.321569,0.337255,1)
+color = Color(0.243137,0.262745,0.274510,1)
 mouse_filter = 2
 [node name="ChapterRule" type="ColorRect" parent="."]
 layout_mode = 0
-color = Color(0.27451,0.321569,0.337255,1)
+color = Color(0.243137,0.262745,0.274510,1)
 mouse_filter = 2
 
-[node name="Pager" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary"]
+[node name="Pager" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary"]
 offset_left = 2.0
 offset_right = -2.0
 custom_minimum_size = Vector2(0,44)
 offset_top = -44.0
 theme_override_constants/separation = 0
-[node name="Range" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Pager"]
+[node name="Range" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary/Pager"]
 horizontal_alignment = 0
-[node name="Previous" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Pager"]
+[node name="Previous" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary/Pager"]
 text = "‹"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Previous page"
-[node name="Next" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary/Pager"]
+[node name="Next" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary/Pager"]
 text = "›"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Next page"
-[node name="Pager" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary"]
+[node name="Pager" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary"]
 offset_left = 2.0
 offset_right = -2.0
 custom_minimum_size = Vector2(0,44)
 offset_top = -44.0
 theme_override_constants/separation = 0
-[node name="Range" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Pager"]
+[node name="Range" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary/Pager"]
 horizontal_alignment = 0
-[node name="Previous" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Pager"]
+[node name="Previous" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary/Pager"]
 text = "‹"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Previous page"
-[node name="Next" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary/Pager"]
+[node name="Next" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary/Pager"]
 text = "›"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Next page"
-[node name="Pager" parent="Inset/Layout/Body/Workspace/Inventory"]
+[node name="Pager" parent="Inset/Layout/Body/Workspace/Chapter/Content/Inventory"]
 custom_minimum_size = Vector2(0,44)
 offset_top = -44.0
 theme_override_constants/separation = 0
-[node name="Range" parent="Inset/Layout/Body/Workspace/Inventory/Pager"]
+[node name="Range" parent="Inset/Layout/Body/Workspace/Chapter/Content/Inventory/Pager"]
 horizontal_alignment = 0
-[node name="Previous" parent="Inset/Layout/Body/Workspace/Inventory/Pager"]
+[node name="Previous" parent="Inset/Layout/Body/Workspace/Chapter/Content/Inventory/Pager"]
 text = "‹"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Previous page"
-[node name="Next" parent="Inset/Layout/Body/Workspace/Inventory/Pager"]
+[node name="Next" parent="Inset/Layout/Body/Workspace/Chapter/Content/Inventory/Pager"]
 text = "›"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Next page"
-[node name="Pager" parent="Inset/Layout/Body/Workspace/Reader/Pages"]
+[node name="Pager" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages"]
 custom_minimum_size = Vector2(0,44)
 offset_top = -44.0
 theme_override_constants/separation = 0
-[node name="Range" parent="Inset/Layout/Body/Workspace/Reader/Pages/Pager"]
+[node name="Range" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages/Pager"]
 horizontal_alignment = 0
-[node name="Previous" parent="Inset/Layout/Body/Workspace/Reader/Pages/Pager"]
+[node name="Previous" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages/Pager"]
 text = "‹"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Previous page"
-[node name="Next" parent="Inset/Layout/Body/Workspace/Reader/Pages/Pager"]
+[node name="Next" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages/Pager"]
 text = "›"
 custom_minimum_size = Vector2(44,44)
 theme_override_font_sizes/font_size = 24
-theme_override_styles/normal = SubResource("pager_button")
-theme_override_styles/disabled = SubResource("pager_button")
 accessibility_name = "Next page"
 
-[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Encounter/PrimarySlot/Primary"]
+[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot/Primary"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 2.0
 offset_right = -2.0
-offset_top = -44.0
-offset_bottom = -43.0
-color = Color(0.27451,0.321569,0.337255,1)
+offset_top = -46.0
+offset_bottom = -45.0
+color = Color(0.243137,0.262745,0.274510,1)
 mouse_filter = 2
 
-[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Encounter/SecondarySlot/Secondary"]
+[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot/Secondary"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_left = 2.0
 offset_right = -2.0
-offset_top = -44.0
-offset_bottom = -43.0
-color = Color(0.27451,0.321569,0.337255,1)
+offset_top = -46.0
+offset_bottom = -45.0
+color = Color(0.243137,0.262745,0.274510,1)
 mouse_filter = 2
 
-[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Inventory"]
+[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Chapter/Content/Inventory"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -44.0
-offset_bottom = -43.0
-color = Color(0.27451,0.321569,0.337255,1)
+offset_top = -46.0
+offset_bottom = -45.0
+color = Color(0.243137,0.262745,0.274510,1)
 mouse_filter = 2
 
-[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Reader/Pages"]
+[node name="PagerRule" type="ColorRect" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages"]
 layout_mode = 1
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = -44.0
-offset_bottom = -43.0
-color = Color(0.27451,0.321569,0.337255,1)
+offset_top = -46.0
+offset_bottom = -45.0
+color = Color(0.243137,0.262745,0.274510,1)
 mouse_filter = 2
 
 [node name="CorrectionScrim" type="ColorRect" parent="."]
@@ -754,3 +748,72 @@ anchor_bottom = 1.0
 theme_override_styles/panel = SubResource("correction_panel")
 [node name="Inset" type="MarginContainer" parent="CorrectionDialog/Surface"]
 layout_mode = 2
+
+[node name="Ribbon" type="TextureRect" parent="."]
+layout_mode = 0
+texture = ExtResource("ribbon")
+expand_mode = 1
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="Inset/Layout/Body/Workspace/Tabs/Encounter"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Inset/Layout/Body/Workspace/Tabs/Encounter/Center"]
+layout_mode = 2
+theme_override_constants/separation = 12
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Inset/Layout/Body/Workspace/Tabs/Encounter/Center/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+[node name="Title" type="Label" parent="Inset/Layout/Body/Workspace/Tabs/Encounter/Center/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="Inset/Layout/Body/Workspace/Tabs/Inventory"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Inset/Layout/Body/Workspace/Tabs/Inventory/Center"]
+layout_mode = 2
+theme_override_constants/separation = 12
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Inset/Layout/Body/Workspace/Tabs/Inventory/Center/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+[node name="Title" type="Label" parent="Inset/Layout/Body/Workspace/Tabs/Inventory/Center/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2
+
+[node name="Center" type="CenterContainer" parent="Inset/Layout/Body/Workspace/Tabs/Appearance"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+[node name="Row" type="HBoxContainer" parent="Inset/Layout/Body/Workspace/Tabs/Appearance/Center"]
+layout_mode = 2
+theme_override_constants/separation = 12
+mouse_filter = 2
+[node name="Icon" type="TextureRect" parent="Inset/Layout/Body/Workspace/Tabs/Appearance/Center/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
+[node name="Title" type="Label" parent="Inset/Layout/Body/Workspace/Tabs/Appearance/Center/Row"]
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 2

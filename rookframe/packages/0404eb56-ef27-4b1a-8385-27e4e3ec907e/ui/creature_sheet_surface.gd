@@ -1,4 +1,4 @@
-extends Control
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_chrome.gd"
 ## Shared authored Full-viewport composition. Domain adapters own mutations/rolls.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
@@ -8,7 +8,6 @@ const CARD_SCRIPT = preload(ROOT + "ui/creature_rule_card.gd")
 const LOOT_ENTRY = preload(ROOT + "ui/creature_loot_entry.tscn")
 const LOOT_ENTRY_SCRIPT = preload(ROOT + "ui/creature_loot_entry.gd")
 const SECTION_HEADING = preload(ROOT + "ui/creature_section_heading.tscn")
-const I18N = preload(ROOT + "ui/localization.gd")
 const ART = preload(ROOT + "ui/creature_sheet_art.gd")
 const APPEARANCE = preload(ROOT + "ui/creature_sheet_appearance.gd")
 const OWN = preload(ROOT + "logic/creature_own_tests.gd")
@@ -21,11 +20,8 @@ const CORRECTION_DETAILS = preload(ROOT + "ui/creature_correction_details.gd")
 @export var canvas_frame: StyleBoxFlat
 @export var identity_frame: StyleBoxFlat
 @export var section_frame: StyleBoxFlat
-@export var chapter_normal: StyleBoxFlat
-@export var chapter_selected: StyleBoxFlat
 @export var desktop_source_icon_alignment: HorizontalAlignment
 @export var touch_source_icon_alignment: HorizontalAlignment
-@export var source_frame: StyleBoxFlat
 signal correction_changed(field: String, text: String)
 signal chapter_changed(chapter: int)
 signal entry_requested(id: String)
@@ -44,16 +40,13 @@ signal portrait_reset_requested
 signal publication_requested(url: String)
 signal roll_requested(part: String, id: String)
 signal health_requested
-const WORK := "Inset/Layout/Body/Workspace/"
+const WORK := "Inset/Layout/Body/Workspace/Chapter/Content/"
 const IDENTITY := "Inset/Layout/Body/Identity/Column/"
 const IDENTITY_PANEL := "Inset/Layout/Body/Identity"
 const SECTION_BUTTON = preload(ROOT + "ui/creature_section_button.tscn")
 var _data: Dictionary = {}
-var _locale: I18N = I18N.new()
 var _library := true
 var _can_edit := false
-var _phone := false
-var _tablet := false
 var _chapter := 0
 var _section := 0
 var _reader := false
@@ -106,14 +99,14 @@ func _ready() -> void:
 			pager.remove_child(button)
 			pager.add_child(button)
 	for index in range(3):
-		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).pressed.connect(show_chapter.bind(index))
-	get_node(WORK + "Tabs/Source").pressed.connect(show_source)
+		get_node(NAV + ["Encounter", "Inventory", "Appearance"][index]).pressed.connect(show_chapter.bind(index))
+	get_node(SOURCE).pressed.connect(show_source)
 	get_node(WORK + "InventoryHeading/Row/Add").pressed.connect(_inventory_add)
 	get_node(WORK + "Reader/Back").pressed.connect(back)
 	get_node(WORK + "Reader/Publication").pressed.connect(_publication)
 	get_node("Inset/Layout/Footer/Close").pressed.connect(_close)
 	get_node("Inset/Layout/Footer/Create").pressed.connect(_create)
-	get_node("Inset/Layout/Footer/Edit").pressed.connect(_edit)
+	get_node("Inset/Layout/Body/Workspace/Tabs/Edit").pressed.connect(_edit)
 	get_node("Inset/Layout/Footer/Save").pressed.connect(_save_corrections)
 	get_node("Inset/Layout/Footer/Core").pressed.connect(_core_corrections)
 	get_node("Inset/Layout/Footer/Cancel").pressed.connect(_cancel_corrections)
@@ -152,28 +145,30 @@ func _layout() -> void:
 	_layout_pending = false
 	_capture_encounter_pages()
 	_phone = size.x <= 900
-	_tablet = not _phone and size.x <= 1400
+	_tablet = not _phone and size.x <= 1300
 	_layout_frame()
 	var name := str(_data.get("name", "Creature"))
 	var metadata := CONTENT.new().details(str(_data.get("definition_id", "")))
 	if _library and name.contains(","):
 		name = name.split(",")[0]
 	get_node(IDENTITY + "Name").text = _locale.text(str(_draft.get("name", name)) if _editing else name)
-	get_node(IDENTITY + "Name").add_theme_font_size_override("font_size", 22 if _phone else 29 if _tablet else 34)
+	get_node(IDENTITY + "Name").add_theme_font_size_override("font_size", 23 if _phone else 29 if _tablet else 40)
 	var classification: String = _data.get("classification", metadata.get("classification", ""))
 	if _editing:
 		classification = str(_draft.get("classification", ""))
 	get_node(IDENTITY + "Classification").text = _locale.text(classification)
-	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 9 if _phone else 11 if _tablet else 13)
+	get_node(IDENTITY + "Classification").add_theme_font_size_override("font_size", 14 if _phone else 16 if _tablet else 20)
+	_label_style(get_node(IDENTITY + "Name"), "Name")
+	_label_style(get_node(IDENTITY + "Classification"), "Classification")
 	get_node(IDENTITY + "Portrait").texture = _texture
 	_layout_identity(metadata)
 	_layout_chapters()
 	get_node("Inset/Layout/Footer/Create").visible = _library
 	get_node("Inset/Layout/Footer/Create").disabled = not _can_edit
 	get_node("Inset/Layout/Footer/Create").text = _locale.text("Create Actor")
-	get_node("Inset/Layout/Footer/Edit").visible = not _library and _can_edit and not _editing
-	get_node("Inset/Layout/Footer/Edit").text = _locale.text("Edit sheet")
-	get_node("Inset/Layout/Footer/Edit").disabled = not bool(_data.get("corrections_available", false))
+	get_node("Inset/Layout/Body/Workspace/Tabs/Edit").visible = not _library and _can_edit and not _editing
+	get_node("Inset/Layout/Body/Workspace/Tabs/Edit").text = _locale.text("Edit sheet")
+	get_node("Inset/Layout/Body/Workspace/Tabs/Edit").disabled = not bool(_data.get("corrections_available", false))
 	for action in ["Save", "Cancel", "Core"]:
 		get_node("Inset/Layout/Footer/" + action).visible = _editing
 		get_node("Inset/Layout/Footer/" + action).disabled = not _can_edit
@@ -185,6 +180,13 @@ func _layout() -> void:
 	get_node("Inset/Layout/Footer/Close").text = _locale.text("Close")
 	get_node(WORK + "Reader/Back").text = _locale.text("Back to creature")
 	get_node(WORK + "Reader/Publication").text = _locale.text("Open publication")
+	for action in ["Create", "Save", "Cancel", "Core"]:
+		_chrome.icon_action(get_node("Inset/Layout/Footer/" + action), {"Create":"person-add", "Save":"check", "Cancel":"close", "Core":"edit"}[action], action in ["Create", "Save"])
+	_chrome.icon_action(get_node(NAV + "Edit"), "edit")
+	_chrome.icon_action(get_node(WORK + "InventoryHeading/Row/Add"), "add")
+	_chrome.icon_action(get_node(WORK + "Reader/Back"), "back")
+	get_node("Inset/Layout/Footer/Close").visible = false
+
 	(get_node(WORK + "Appearance") as APPEARANCE).configure(_locale, _appearance_texture, _library, _can_edit, _phone, _tablet, get_node(IDENTITY + "Name").text)
 	for button in ["ChangePortrait", "ClearPortrait"]:
 		get_node(WORK + "Appearance/Columns/PortraitPanel/Inset/Content/PortraitButtons/" + button).disabled = not _data.get("portrait_editable", _can_edit)
@@ -317,7 +319,8 @@ func _build_groups(metadata: Dictionary) -> void:
 		selector.add_child(button)
 		button.text = _locale.text(str(_groups[index].title))
 		button.custom_minimum_size = Vector2(44, 44)
-		button.add_theme_font_size_override("font_size", 11)
+		button.add_theme_font_size_override("font_size", 16)
+		button.add_theme_color_override("font_color", Color(0.905882,0.905882,0.866667,1))
 		_style_chapter(button, true)
 		button.toggle_mode = true
 		button.set_pressed_no_signal(index == _section)
@@ -346,32 +349,25 @@ func _append_heading(host: Node, title: String) -> void:
 	_configure_heading(heading, title)
 
 func _configure_heading(heading: PanelContainer, title: String, padded_group: bool = false) -> void:
-	heading.custom_minimum_size = Vector2(heading.custom_minimum_size.x, 38 if _tablet else 44)
-	var compact := _tablet or (_phone and not padded_group)
+	heading.custom_minimum_size = Vector2(0,44)
 	var frame: StyleBoxFlat = section_frame.duplicate()
-	frame.content_margin_left = 6 if compact else 12
-	frame.content_margin_right = frame.content_margin_left
-	frame.content_margin_top = 6 if compact else 8
-	frame.content_margin_bottom = frame.content_margin_top
 	var row: HBoxContainer = heading.get_node("Row/Heading/Content" if padded_group else "Row")
 	if padded_group:
-		# The heading owns its padding; Add uses the full height of the frame.
-		var padding: MarginContainer = heading.get_node("Row/Heading")
-		padding.add_theme_constant_override("margin_top", int(frame.content_margin_top))
-		padding.add_theme_constant_override("margin_bottom", int(frame.content_margin_bottom))
+		frame.border_width_bottom = 0
 		frame.content_margin_top = 0
 		frame.content_margin_bottom = 0
-		var add: Button = heading.get_node("Row/Add")
-		add.custom_minimum_size = Vector2(44, 38 if _tablet else 44)
+		(heading.get_node("Row/Add") as Button).custom_minimum_size = Vector2(44,44)
 	heading.add_theme_stylebox_override("panel", frame)
-	row.add_theme_constant_override("separation", 6 if compact else 10)
+	row.add_theme_constant_override("separation", 12)
 	var label: Label = row.get_node("Title")
 	label.text = _locale.text(title)
-	label.add_theme_font_size_override("font_size", 13 if compact else 17)
+	label.add_theme_font_size_override("font_size", 20 if _phone or _tablet else 24)
 	var icon: TextureRect = row.get_node("Icon")
-	icon.custom_minimum_size = Vector2(20, 20) if _tablet else Vector2(24, 24)
-	icon.visible = not _phone or padded_group
+	var extent := 22 if _phone else 23 if _tablet else 26
+	icon.custom_minimum_size = Vector2(extent, extent)
+	icon.visible = true
 	icon.texture = ART.new().heading_icon(title, str(_data.get("definition_id", "")))
+	_label_style(label, "Section")
 
 func _capture_encounter_pages() -> void:
 	for lane in ["Primary", "Secondary"]:
@@ -410,7 +406,7 @@ func _render_encounter() -> void:
 			if not _phone:
 				if pages.get_node("Area/FocusInset/Content").get_child_count() > 0:
 					var gap := Control.new()
-					gap.custom_minimum_size = Vector2(gap.custom_minimum_size.x, 16 if _tablet else 12 if str(_data.get("definition_id", "")) == "bone-bowyer" else 22)
+					gap.custom_minimum_size = Vector2(gap.custom_minimum_size.x, 16 if _tablet else 24)
 					pages.get_node("Area/FocusInset/Content").add_child(gap)
 				_append_heading(pages.get_node("Area/FocusInset/Content"), str(group.title))
 			var entries: Array = group.entries
@@ -560,7 +556,7 @@ func _restore_return_focus() -> void:
 		if opener.is_visible_in_tree():
 			opener.grab_focus()
 		else:
-			get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
+			get_node(NAV + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
 	elif _roll_reader:
 		_roll_reader = false
 		if _return_roll == "armor" or _return_roll == "morale":
@@ -568,11 +564,11 @@ func _restore_return_focus() -> void:
 			if opener.is_visible_in_tree() and not opener.disabled:
 				opener.grab_focus()
 			else:
-				get_node(WORK + "Tabs/Encounter").grab_focus()
+				get_node(NAV + "Encounter").grab_focus()
 		elif not focus_roll(_return_entry):
-			get_node(WORK + "Tabs/Encounter").grab_focus()
+			get_node(NAV + "Encounter").grab_focus()
 	elif _focus_source:
-		get_node(WORK + "Tabs/Source").grab_focus()
+		get_node(SOURCE).grab_focus()
 	elif _return_correction == "core" and get_node("Inset/Layout/Footer/Core").is_visible_in_tree():
 		get_node("Inset/Layout/Footer/Core").grab_focus()
 	elif is_instance_valid(_focus_card) and _focus_card.restore_focus():
@@ -582,7 +578,7 @@ func _restore_return_focus() -> void:
 	elif not _return_entry.is_empty() and focus_entry(_return_entry):
 		pass
 	else:
-		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
+		get_node(NAV + ["Encounter", "Inventory", "Appearance"][_chapter]).grab_focus()
 
 func show_chapter(chapter: int) -> void:
 	_correction_reader = false
@@ -596,12 +592,14 @@ func show_chapter(chapter: int) -> void:
 	chapter_changed.emit(_chapter)
 
 func _update_visibility() -> void:
+	_set_chapter_frame(_phone and _correction_reader)
 	_update_correction_host()
 	var obscured := _reader and not (_correction_reader and not _phone)
 	(get_node(IDENTITY_PANEL) as Control).visible = not (_phone and _correction_reader) and (_editing or _roll_reader and _reader or not (_phone and (_chapter == 2 or _reader)))
-	get_node(WORK + "Tabs").visible = not obscured
-	get_node(WORK + "ChapterGap").visible = not obscured
+	get_node("Inset/Layout/Body/Workspace/Tabs").visible = not obscured
+	get_node(WORK + "ChapterGap").visible = false
 	get_node(WORK + "Section").visible = _phone and _chapter == 0 and not obscured
+	get_node(WORK + "SectionRule").visible = _phone and _chapter == 0 and not obscured
 	get_node(WORK + "InventoryHeading").visible = _chapter == 1 and not obscured
 	get_node(WORK + "InventoryHeading/Row/Add").visible = _chapter == 1 and not obscured and not _library and _can_edit
 	get_node(WORK + "Encounter").visible = _chapter == 0 and not obscured
@@ -609,7 +607,12 @@ func _update_visibility() -> void:
 	get_node(WORK + "Appearance").visible = _chapter == 2 and not obscured
 	get_node(WORK + "Reader").visible = _reader and not _correction_reader
 	for index in range(3):
-		get_node(WORK + "Tabs/" + ["Encounter", "Inventory", "Appearance"][index]).set_pressed_no_signal(index == _chapter)
+		var button: Button = get_node(NAV + ["Encounter", "Inventory", "Appearance"][index])
+		button.set_pressed_no_signal(index == _chapter)
+		var label: Label = button.get_node("Center/Row/Title")
+		label.theme_type_variation = "SilkCreatureTab" + ("Selected" if index == _chapter else "") + ("Phone" if _phone else "Tablet" if _tablet else "Desktop")
+		label.add_theme_color_override("font_color", Color(0.082353,0.090196,0.098039,1) if index == _chapter else Color(0.682353,0.729412,0.745098,1))
+		(button.get_node("Center/Row/Icon") as TextureRect).self_modulate = Color(0.082353,0.090196,0.098039,1) if index == _chapter else Color(0.815686,0.745098,0.556863,1)
 
 func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and event.is_action_pressed("ui_cancel") and (_reader or _editing):
@@ -621,8 +624,6 @@ func _input(event: InputEvent) -> void:
 
 func status(message: String) -> void:
 	get_node("Inset/Layout/Footer/Status").text = _locale.text(message)
-	get_node("Inset/Layout/Footer/Context").visible = message.is_empty()
-	get_node("Inset/Layout/Footer/ContextIcon").visible = message.is_empty()
 
 func miniature(title: String, package: String, assigned: bool) -> void:
 	get_node(IDENTITY + "MiniatureSummary/Row/Preview").visible = assigned
@@ -630,6 +631,7 @@ func miniature(title: String, package: String, assigned: bool) -> void:
 	(get_node(WORK + "Appearance") as APPEARANCE).miniature(_locale, title, package, assigned)
 	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Value").text = title if assigned else _locale.text("Not assigned")
 	get_node(IDENTITY + "MiniatureSummary").tooltip_text = title + (" · " + package if not package.is_empty() else "")
+	get_node(IDENTITY + "MiniatureSummary").accessibility_name = title if assigned else _locale.text("Not assigned")
 
 func miniature_summary_preview_target() -> Control:
 	return get_node(IDENTITY + "MiniatureSummary/Row/Preview")
@@ -779,7 +781,7 @@ func configure_draft(values: Dictionary, active: bool) -> void:
 	_editing = active
 	if not active:
 		_correction_reader = false
-		get_node("CorrectionDialog").hide()
+		get_node("CorrectionDialog").visible = false
 	if changed_mode:
 		_inline_key = []
 	_queue_layout()
@@ -826,8 +828,8 @@ func _process(_delta: float) -> void:
 				_correction_details.focus_first()
 			else:
 				(get_node(IDENTITY + "IdentityEditors") as CORRECTION_FORM_SCRIPT).restore_focus()
-		elif _correction_focus == "edit" and get_node("Inset/Layout/Footer/Edit").is_visible_in_tree():
-			get_node("Inset/Layout/Footer/Edit").grab_focus()
+		elif _correction_focus == "edit" and get_node("Inset/Layout/Body/Workspace/Tabs/Edit").is_visible_in_tree():
+			get_node("Inset/Layout/Body/Workspace/Tabs/Edit").grab_focus()
 		_correction_focus = ""
 	if _return_focus_frames > 0:
 		_return_focus_frames -= 1
@@ -845,7 +847,7 @@ func _core_corrections() -> void:
 
 func correction_pending(pending: bool) -> void:
 	_correction_busy = pending
-	get_node("Inset/Layout/Footer/Edit").disabled = pending or not bool(_data.get("corrections_available", false))
+	get_node("Inset/Layout/Body/Workspace/Tabs/Edit").disabled = pending or not bool(_data.get("corrections_available", false))
 	_correction_details.set_details_pending(pending)
 	for path in ["IdentityEditors", "HealthEditors/Inset/Fields", "ArmorEditors/Fields"]:
 		var form: CORRECTION_FORM_SCRIPT = get_node(IDENTITY + path)
@@ -874,72 +876,77 @@ func _default_seth_attacks(attacks: Array) -> bool:
 	return true
 
 func _layout_frame() -> void:
-	var border := 3 if _phone else 1
-	var horizontal := 10 if _phone else 18 if _tablet else 32
-	get_node("Inset").add_theme_constant_override("margin_left", horizontal + border)
-	get_node("Inset").add_theme_constant_override("margin_right", horizontal + border)
-	get_node("Inset").add_theme_constant_override("margin_top", (8 if _phone else 16 if _tablet else 24) + border)
-	get_node("Inset").add_theme_constant_override("margin_bottom", border)
-	get_node("Inset/Layout").add_theme_constant_override("separation", 6 if _phone else 12 if _tablet else 20)
-	get_node("Inset/Layout/Body").add_theme_constant_override("separation", 14 if _phone else 20 if _tablet else 32)
-	var frame: StyleBoxFlat = canvas_frame.duplicate()
-	frame.set_border_width_all(border)
-	get_node("Canvas").add_theme_stylebox_override("panel", frame)
+	var outer := 8 if _phone else 16 if _tablet else 32
+	var left := 12 if _phone else 18 if _tablet else 32
+	var right := 12 if _phone else 58 if _tablet else 80
+	var top := 8 if _phone else 16 if _tablet else 24
+	var bottom := 4 if _phone else 8 if _tablet else 12
+	for path in ["Canvas", "Wash"]:
+		var control: Control = get_node(path)
+		control.offset_left = outer
+		control.offset_top = outer + (6 if path == "Wash" else 0)
+		control.offset_right = -outer
+		control.offset_bottom = -outer - (6 if path == "Wash" else 0)
+	get_node("Inset").add_theme_constant_override("margin_left", outer + left)
+	get_node("Inset").add_theme_constant_override("margin_right", outer + right)
+	get_node("Inset").add_theme_constant_override("margin_top", outer + 6 + top)
+	get_node("Inset").add_theme_constant_override("margin_bottom", outer + 6 + bottom)
+	get_node("Inset/Layout").add_theme_constant_override("separation", 4 if _phone else 12 if _tablet else 16)
+	get_node("Inset/Layout/Body").add_theme_constant_override("separation", 16 if _phone else 18 if _tablet else 32)
+	var width := size.x - 2 * outer - left - right
 	var identity: Control = get_node(IDENTITY_PANEL)
-	identity.custom_minimum_size = Vector2(202 if _phone else 340 if _tablet else int((size.x - 98) / 3.0), identity.custom_minimum_size.y)
+	identity.custom_minimum_size = Vector2(218 if _phone else 264 if _tablet else width * 0.29, 0)
 	var divider: StyleBoxFlat = identity_frame.duplicate()
-	divider.content_margin_right = 13 if _phone else 19 if _tablet else 29
+	divider.content_margin_right = 13 if _phone else 15 if _tablet else 29
 	identity.add_theme_stylebox_override("panel", divider)
-	(get_node(WORK) as Control).add_theme_constant_override("separation", 0)
+	get_node("Inset/Layout/Body/Workspace").add_theme_constant_override("separation", 0)
 	get_node(WORK + "Encounter").add_theme_constant_override("separation", 18 if _tablet else 28)
-	get_node("Inset/Layout/Footer").custom_minimum_size = Vector2(get_node("Inset/Layout/Footer").custom_minimum_size.x, 44)
-	get_node("Inset/Layout/Footer/Brand").visible = not _phone
-	get_node("Inset/Layout/Footer/BrandIcon").visible = not _phone
-	get_node("Inset/Layout/Footer/BrandGap").visible = not _phone
-	get_node("Inset/Layout/Footer").add_theme_constant_override("separation", 6 if _phone else 10)
-	get_node("Inset/Layout/Footer/Context").text = _locale.text("Published starting information" if _library else "Creature footer: Resolve consequences at the table.")
-	get_node("Inset/Layout/Footer/Context").add_theme_font_size_override("font_size", 10 if _phone else 12)
-	var action_frame: StyleBoxFlat = footer_action_frame.duplicate()
-	action_frame.content_margin_left = 6 if _phone else 12
-	action_frame.content_margin_right = 6 if _phone else 12
-	for action in ["Close", "Edit", "Create", "Save", "Cancel", "Core"]:
-		var button: Button = get_node("Inset/Layout/Footer/" + action)
-		button.add_theme_font_size_override("font_size", 10 if _phone else 11)
-		button.add_theme_stylebox_override("normal", action_frame)
-		button.add_theme_color_override("font_color", Color(0.603922, 0.647059, 0.65098, 1))
-	var heading: PanelContainer = get_node(WORK + "InventoryHeading")
-	_configure_heading(heading, "Inventory" if _library else "Carried loot", true)
-	# The fixed workspace gap belongs after the chapter rail, not every child.
-	get_node(WORK + "ChapterGap").custom_minimum_size = Vector2(get_node(WORK + "ChapterGap").custom_minimum_size.x, 0 if _phone else 14 if _tablet else 18)
+	get_node("Inset/Layout/Footer").custom_minimum_size = Vector2(0, 44 if _phone else 48 if _tablet else 56)
+	get_node("Inset/Layout/Footer").add_theme_constant_override("separation", 8 if _phone or _tablet else 12)
+	var source := _source()
+	var citation := _locale.text(str(source.get("title", "")))
+	var locator := str(source.get("page", ""))
+	if locator.begins_with("p.") or locator.begins_with("pp."):
+		citation += "  ·  " + _locale.text(locator)
+	get_node("Inset/Layout/Footer/SourceNote/Citation").text = citation
+	get_node("Inset/Layout/Footer/SourceNote/Citation").add_theme_font_size_override("font_size", 16)
+	get_node("Inset/Layout/Footer/Status").add_theme_font_size_override("font_size", 14 if _phone else 15 if _tablet else 17)
+	get_node("Ribbon").visible = not _phone
+	get_node("Ribbon").position = Vector2(size.x - outer - (40 if _tablet else 60), outer)
+	get_node("Ribbon").size = Vector2(20,68) if _tablet else Vector2(28,100)
+	_configure_heading(get_node(WORK + "InventoryHeading"), "Inventory" if _library else "Carried loot", true)
+	get_node(WORK + "ChapterGap").visible = false
+	get_node(WORK + "Section").add_theme_constant_override("separation", 4)
 
 func _layout_identity(metadata: Dictionary) -> void:
-	get_node(IDENTITY + "NameGap").custom_minimum_size = Vector2(get_node(IDENTITY + "NameGap").custom_minimum_size.x, 3 if _phone else 6 if _tablet else 7)
-	get_node(IDENTITY + "PortraitGap").custom_minimum_size = Vector2(get_node(IDENTITY + "PortraitGap").custom_minimum_size.x, 3 if _phone else 15 if _tablet else 23)
-	get_node(IDENTITY + "HealthGap").custom_minimum_size = Vector2(get_node(IDENTITY + "HealthGap").custom_minimum_size.x, 4 if _phone else 10 if _tablet else 14)
-	get_node(IDENTITY + "Portrait").custom_minimum_size = Vector2(get_node(IDENTITY + "Portrait").custom_minimum_size.x, 148 if _phone else 430 if _tablet else 510)
+	get_node(IDENTITY + "NameGap").custom_minimum_size = Vector2(get_node(IDENTITY + "NameGap").custom_minimum_size.x, 2 if _phone else 4 if _tablet else 6)
+	get_node(IDENTITY + "PortraitGap").custom_minimum_size = Vector2(get_node(IDENTITY + "PortraitGap").custom_minimum_size.x, 4 if _phone else 16 if _tablet else 20)
+	get_node(IDENTITY + "HealthGap").custom_minimum_size = Vector2(get_node(IDENTITY + "HealthGap").custom_minimum_size.x, 4 if _phone else 8 if _tablet else 12)
+	get_node(IDENTITY + "Portrait").custom_minimum_size = Vector2(get_node(IDENTITY + "Portrait").custom_minimum_size.x, 0)
 	var hp: Button = get_node(IDENTITY + "Health")
-	hp.custom_minimum_size = Vector2(hp.custom_minimum_size.x, 48 if _phone else 60 if _tablet else 66)
+	hp.custom_minimum_size = Vector2(hp.custom_minimum_size.x, 48 if _phone else 66 if _tablet else 76)
 	hp.disabled = _library or not _can_edit or not bool(_data.get("health_available", false))
 	var value := str(metadata.get("hit_points_formula", _data.get("hit_points", "—")) if _library else _draft.get("hit_points", _data.get("hit_points", "—")))
 	var maximum := str(_draft.get("maximum_hit_points", _data.get("maximum_hit_points", "—")))
 	hp.accessibility_name = _locale.text("Hit points") + " " + value + ("" if _library else " / " + maximum + ". " + _locale.text("Core values" if _editing else "Apply damage or Heal"))
 	var row := (hp.get_node("Inset/Row") as HBoxContainer)
-	row.add_theme_constant_override("separation", 4 if _phone else 10)
+	row.add_theme_constant_override("separation", 4 if _phone else 8 if _tablet else 12)
+	(row.get_node("Icon") as TextureRect).custom_minimum_size = Vector2(24,24) if _tablet else Vector2(28,28)
 	(row.get_node("Icon") as TextureRect).visible = not _phone
 	(row.get_node("Captions/Title") as Label).text = _locale.text("Hit points")
 	(row.get_node("Captions/Subtitle") as Label).text = _locale.text("Published starting information" if _library else "Current / maximum")
-	(row.get_node("Captions/Title") as Label).add_theme_font_size_override("font_size", 10 if _phone else 12 if _tablet else 13)
-	(row.get_node("Captions/Subtitle") as Label).add_theme_font_size_override("font_size", 8 if _phone else 10)
+	(row.get_node("Captions/Title") as Label).add_theme_font_size_override("font_size", 15 if _phone else 17 if _tablet else 20)
+	(row.get_node("Captions/Subtitle") as Label).add_theme_font_size_override("font_size", 12 if _phone else 14 if _tablet else 16)
 	(row.get_node("Value") as Label).text = value
-	(row.get_node("Value") as Label).add_theme_font_size_override("font_size", 24 if _phone else 28 if _tablet else 30)
+	(row.get_node("Value") as Label).add_theme_font_size_override("font_size", 25 if _phone else 28 if _tablet else 34)
 	(row.get_node("Maximum") as Label).text = "/ " + maximum
 	(row.get_node("Maximum") as Label).visible = not _library
-	(row.get_node("Maximum") as Label).add_theme_font_size_override("font_size", 10 if _phone else 13)
-	(row.get_node("Adjust") as Label).visible = not _library and _can_edit and not _phone
+	(row.get_node("Maximum") as Label).add_theme_font_size_override("font_size", 14 if _phone else 16 if _tablet else 18)
+	(row.get_node("Adjust") as Label).visible = not _library and _can_edit
 	for edge in ["left", "right"]:
-		(hp.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_" + edge, 7 if _phone else 12)
+		(hp.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_" + edge, 7 if _phone else 9 if _tablet else 13)
 	for edge in ["top", "bottom"]:
-		(hp.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_" + edge, 4 if _phone else 8)
+		(hp.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_" + edge, 5 if _phone else 9 if _tablet else 11)
 	var health := HEALTH.new()
 	var fraction := 1.0
 	if not _library:
@@ -963,16 +970,25 @@ func _layout_identity(metadata: Dictionary) -> void:
 	var morale: Dictionary = _data.get("morale", {})
 	get_node(IDENTITY + "Vitals/Morale").visible = str(morale.get("kind", "")) != "none" and not morale.is_empty()
 	_layout_vital("Morale", _locale.text("Morale"), str(_draft.get("morale", morale.get("value", 0))) if str(morale.get("kind", "")) == "fixed" else _locale.text("Special"), preload("res://rookframe/ui/icons/character/presence.svg"), _library or _rolls_disabled() or str(morale.get("kind", "")) != "fixed")
-	get_node(IDENTITY + "Vitals").custom_minimum_size = Vector2(get_node(IDENTITY + "Vitals").custom_minimum_size.x, 52 if _phone else 65 if _tablet else 73.5)
-	get_node(IDENTITY + "Vitals/Space").visible = not _phone
+	get_node(IDENTITY + "Vitals").custom_minimum_size = Vector2(get_node(IDENTITY + "Vitals").custom_minimum_size.x, 63.3 if _phone else 97.5 if _tablet else 96.1)
+	get_node(IDENTITY + "Vitals/Space").visible = false
 	get_node(IDENTITY + "VitalsRule").visible = not _phone
 	get_node(IDENTITY + "MiniatureSummary").visible = not _phone
-	get_node(IDENTITY + "MiniatureSummary").custom_minimum_size = Vector2(get_node(IDENTITY + "MiniatureSummary").custom_minimum_size.x, 54 if _tablet else 56)
+	get_node(IDENTITY + "MiniatureSpace").visible = not _phone
+	get_node(IDENTITY + "MiniatureSpace").custom_minimum_size = Vector2(0, 8 if _tablet else 24)
+	get_node(IDENTITY + "MiniatureSummary").custom_minimum_size = Vector2(get_node(IDENTITY + "MiniatureSummary").custom_minimum_size.x, 63.5 if _tablet else 71)
 	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Caption").text = _locale.text("Tabletop miniature")
-	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Caption").add_theme_font_size_override("font_size", 10 if _tablet else 11)
-	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Value").add_theme_font_size_override("font_size", 12 if _tablet else 14)
+	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Caption").add_theme_font_size_override("font_size", 14 if _tablet else 16)
+	get_node(IDENTITY + "MiniatureSummary/Row/Copy/Value").add_theme_font_size_override("font_size", 17 if _tablet else 20)
 	get_node(IDENTITY + "MiniatureSummary/Row/Action").text = _locale.text("Appearance") + " →"
-	get_node(IDENTITY + "MiniatureSummary/Row/Action").add_theme_font_size_override("font_size", 10 if _tablet else 12)
+	get_node(IDENTITY + "MiniatureSummary/Row/Action").add_theme_font_size_override("font_size", 14 if _tablet else 16)
+	get_node(IDENTITY + "MiniatureSummary/Row").offset_left = 12
+	get_node(IDENTITY + "MiniatureSummary/Row").offset_right = -12
+	get_node(IDENTITY + "MiniatureSummary/Row").add_theme_constant_override("separation", 8 if _tablet else 12)
+	get_node(IDENTITY + "MiniatureSummary/Row/Action").add_theme_color_override("font_color", Color(0.682353,0.729412,0.745098,1))
+	_label_style(row.get_node("Captions/Title"), "HealthTitle")
+	_label_style(row.get_node("Captions/Subtitle"), "HealthCaption")
+	_label_style(row.get_node("Value"), "HealthValue")
 
 func _layout_vital(key: String, caption: String, value: String, icon: Texture2D, disabled: bool) -> void:
 	var button: Button = get_node(IDENTITY + "Vitals/" + key)
@@ -980,56 +996,26 @@ func _layout_vital(key: String, caption: String, value: String, icon: Texture2D,
 	button.accessibility_name = caption + ": " + value
 	(button.get_node("Row/Icon") as TextureRect).visible = not _phone
 	(button.get_node("Row/Icon") as TextureRect).texture = icon
-	(button.get_node("Row/Icon") as TextureRect).custom_minimum_size = Vector2(20, 20) if _tablet else Vector2(22, 22)
-	(button.get_node("Row/Arrow") as Label).visible = not _library
-	(button.get_node("Row/Copy/Caption") as Label).text = caption
+	(button.get_node("Row/Icon") as TextureRect).custom_minimum_size = Vector2(22, 22) if _tablet else Vector2(26, 26)
+	(button.get_node("Row/Arrow") as Label).visible = not _library and not _phone
+	(button.get_node("Row/Copy/Caption") as Label).text = caption + (" ↗" if _phone and not _library else "")
 	(button.get_node("Row/Copy/Value") as Label).text = value
-	(button.get_node("Row/Copy/Caption") as Label).add_theme_font_size_override("font_size", 9 if _phone else 10 if _tablet else 12)
-	(button.get_node("Row/Copy/Value") as Label).add_theme_font_size_override("font_size", 16 if _phone else 21 if _tablet else 24)
-	(button.get_node("Row") as HBoxContainer).add_theme_constant_override("separation", 3 if _phone else 5 if _tablet else 8)
-	button.size_flags_horizontal = 3 if _phone else 1
-	button.custom_minimum_size = Vector2(44 if _phone else (button.get_node("Row") as HBoxContainer).get_combined_minimum_size().x, button.custom_minimum_size.y)
-
-func _style_chapter(button: Button, section: bool = false) -> void:
-	button.clip_text = false
-	var normal: StyleBoxFlat = chapter_normal.duplicate()
-	var selected: StyleBoxFlat = chapter_selected.duplicate()
-	for style in [normal, selected]:
-		style.content_margin_left = 3 if section else 8 if _phone or _tablet else 16
-		style.content_margin_right = style.content_margin_left
-		style.content_margin_top = 3 if _phone else 5 if _tablet else 6
-		style.content_margin_bottom = style.content_margin_top
-	button.add_theme_stylebox_override("normal", normal)
-	button.add_theme_stylebox_override("pressed", selected)
-	button.add_theme_color_override("font_pressed_color", Color(0.266667, 0.913725, 0.913725, 1))
-
-func _layout_chapters() -> void:
-	for title in ["Encounter", "Inventory", "Appearance"]:
-		var button: Button = get_node(WORK + "Tabs/" + title)
-		button.text = _locale.text("Creature chapter: Encounter" if title == "Encounter" else title)
-		button.custom_minimum_size = Vector2(44, 40 if _phone else 44 if _tablet else 52)
-		button.add_theme_font_size_override("font_size", 13 if _phone else 14 if _tablet else 17)
-		_style_chapter(button)
-	var appearance: Button = get_node(WORK + "Tabs/Appearance")
-	appearance.icon = preload("res://rookframe/ui/icons/character/character.svg")
-	appearance.add_theme_constant_override("h_separation", 8)
-	appearance.add_theme_constant_override("icon_max_width", 18 if _phone else 20 if _tablet else 24)
-	appearance.add_theme_color_override("icon_normal_color", Color(0.266667, 0.913725, 0.913725, 1))
-	appearance.add_theme_color_override("icon_pressed_color", Color(0.266667, 0.913725, 0.913725, 1))
-	var source: Button = get_node(WORK + "Tabs/Source")
-	source.text = "" if _phone or _tablet else _locale.text("Source")
-	source.icon_alignment = touch_source_icon_alignment if _phone or _tablet else desktop_source_icon_alignment
-	var frame: StyleBoxFlat = source_frame.duplicate()
-	frame.content_margin_bottom = 8 if _phone or _tablet else 6
-	source.add_theme_stylebox_override("normal", frame)
-	source.icon = preload("res://rookframe/ui/icons/character/book.svg")
-	source.accessibility_name = _locale.text("Published source")
-	source.tooltip_text = _locale.text("Published source")
-	source.custom_minimum_size = Vector2(44, 40 if _phone else 44 if _tablet else 52)
-	source.add_theme_constant_override("h_separation", 8)
-	source.add_theme_constant_override("icon_max_width", 20)
-	source.add_theme_color_override("icon_normal_color", Color(0.266667, 0.913725, 0.913725, 1))
-	source.add_theme_font_size_override("font_size", 12)
+	(button.get_node("Row/Copy/Caption") as Label).add_theme_font_size_override("font_size", 14 if _phone else 15 if _tablet else 18)
+	(button.get_node("Row/Copy/Value") as Label).add_theme_font_size_override("font_size", 21 if _phone else 23 if _tablet else 28)
+	(button.get_node("Row") as HBoxContainer).add_theme_constant_override("separation", 4 if _phone else 6 if _tablet else 12)
+	var row: HBoxContainer = button.get_node("Row")
+	row.offset_left = 12
+	row.offset_right = -12
+	row.offset_top = 10 if _phone else 16 if _tablet else 20
+	row.offset_bottom = -10 if _phone else -16 if _tablet else -20
+	(button.get_node("Row/Copy") as Control).size_flags_horizontal = 3 if _phone or _tablet else 0
+	(button.get_node("Row/Copy/Caption") as Label).autowrap_mode = 3 if _phone or _tablet else 0
+	_label_style(button.get_node("Row/Copy/Caption"), "VitalCaption")
+	_label_style(button.get_node("Row/Copy/Value"), "VitalValue")
+	(button.get_node("Row/Arrow") as Label).add_theme_font_size_override("font_size", 14 if _phone else 18)
+	(button.get_node("Row/Arrow") as Label).add_theme_color_override("font_color", Color(0.682353,0.729412,0.745098,1))
+	button.size_flags_horizontal = 3
+	button.custom_minimum_size = Vector2(44, button.custom_minimum_size.y)
 
 func _update_decorations() -> void:
 	var footer: Control = get_node("Inset/Layout/Footer")
@@ -1038,14 +1024,14 @@ func _update_decorations() -> void:
 	get_node("FooterRule").visible = footer.is_visible_in_tree()
 	get_node("FooterRule").position = Vector2(footer_rect.position.x - sheet_rect.position.x, footer_rect.position.y - sheet_rect.position.y)
 	get_node("FooterRule").size = Vector2(footer.size.x, 1)
-	var tabs: Control = get_node(WORK + "Tabs")
+	var tabs: Control = get_node("Inset/Layout/Body/Workspace/Tabs")
 	var tabs_rect: Rect2 = tabs.get_global_rect()
-	get_node("ChapterRule").visible = tabs.is_visible_in_tree()
+	get_node("ChapterRule").visible = false
 	get_node("ChapterRule").position = Vector2(tabs_rect.position.x - sheet_rect.position.x, tabs_rect.position.y - sheet_rect.position.y + tabs.size.y - 1)
 	get_node("ChapterRule").size = Vector2(tabs.size.x, 1)
 
 func _update_pager_labels() -> void:
-	var font_size := 10 if _phone else 12
+	var font_size := 14 if _phone else 17
 	var refresh_font := _pager_font_size != font_size
 	_pager_font_size = font_size
 	for path in ["Encounter/PrimarySlot/Primary", "Encounter/SecondarySlot/Secondary", "Inventory", "Reader/Pages"]:
@@ -1053,15 +1039,22 @@ func _update_pager_labels() -> void:
 		var label: Label = get_node(WORK + path + "/Pager/Range")
 		if refresh_font:
 			label.add_theme_font_size_override("font_size", font_size)
+		var pager: HBoxContainer = get_node(WORK + path + "/Pager")
+		pager.custom_minimum_size = Vector2(0,46)
+		pager.offset_top = -46
+		pager.add_theme_constant_override("separation", 4 if _phone else 8)
+		for action in ["Previous", "Next"]:
+			var button: Button = pager.get_node(action)
+			_chrome.icon_action(button, "chevron-left" if action == "Previous" else "chevron-right")
 		var state := label.text.split(" · ")[-1]
 		var context := _locale.text(str(_groups[_section].title)) if path == "Encounter/PrimarySlot/Primary" and _phone and not _groups.is_empty() else _locale.text("Inventory") if path == "Inventory" else _locale.text("Reference") if path == "Reader/Pages" else _locale.text("Creature chapter: Encounter")
-		label.text = context + " · " + state
+		label.text = context + " · " + state if _phone else state
 
 func _fit_phone_entries() -> void:
 	if not _phone or _chapter != 0 or _reader:
 		return
 	var pages: Control = get_node(WORK + "Encounter/PrimarySlot/Primary")
-	var height := pages.size.y - 44
+	var height := pages.size.y - 46
 	if height <= 0:
 		return
 	var content: VBoxContainer = get_node(WORK + "Encounter/PrimarySlot/Primary/Area/FocusInset/Content")
@@ -1104,15 +1097,15 @@ func _fit_identity() -> void:
 	classification.get_line_count()
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	var opener: Button = get_node(IDENTITY + "IdentityDetails")
-	var available := size.y - (11 if _phone else 17 if _tablet else 25) - (53 if _phone else 57 if _tablet else 65)
+	var available: float = size.y - (88 if _phone else 128 if _tablet else 184)
 	var other_height := 0.0
 	for child in column.get_children():
 		if child is Control:
 			var control: Control = child
 			if control.visible and str(control.name) not in ["Name", "Classification", "Portrait", "IdentityDetails", "NameGap"]:
-				other_height += control.get_combined_minimum_size().y
-	var portrait_height := 148.0 if _phone else 430.0 if _tablet else 510.0
-	var name_gap := 3 if _phone else 6 if _tablet else 7
+				other_height += ceili(control.get_combined_minimum_size().y)
+	var portrait_height := 60.0 if _phone else 160.0
+	var name_gap := 2 if _phone else 4 if _tablet else 6
 	var full_height := title.get_combined_minimum_size().y + classification.get_combined_minimum_size().y + name_gap
 	_identity_overflow = other_height + portrait_height + full_height > available + 1
 	title.visible = not _identity_overflow
@@ -1120,13 +1113,13 @@ func _fit_identity() -> void:
 	get_node(IDENTITY + "NameGap").visible = not _identity_overflow
 	opener.visible = _identity_overflow
 	get_node(IDENTITY + "IdentityDetails/Copy/Name").text = title.text
-	get_node(IDENTITY + "IdentityDetails/Copy/Name").add_theme_font_size_override("font_size", 22 if _phone else 29 if _tablet else 34)
+	get_node(IDENTITY + "IdentityDetails/Copy/Name").add_theme_font_size_override("font_size", 23 if _phone else 29 if _tablet else 40)
 	get_node(IDENTITY + "IdentityDetails/Copy/Caption").text = _locale.text("Full identity") + " ›"
-	get_node(IDENTITY + "IdentityDetails/Copy/Caption").add_theme_font_size_override("font_size", 9 if _phone else 11 if _tablet else 13)
+	get_node(IDENTITY + "IdentityDetails/Copy/Caption").add_theme_font_size_override("font_size", 14 if _phone else 16 if _tablet else 20)
 	opener.accessibility_name = title.text + ". " + classification.text + ". " + _locale.text("Full identity")
 	opener.custom_minimum_size = Vector2(0, maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y))
 	var identity_height := opener.custom_minimum_size.y if _identity_overflow else full_height
-	var target := minf(portrait_height, maxf(0, available - other_height - identity_height))
+	var target := int(maxf(0, available - other_height - identity_height))
 	var difference := target - portrait.custom_minimum_size.y
 	if difference > 0.1 or difference < -0.1:
 		portrait.custom_minimum_size = Vector2(0, target)
@@ -1229,8 +1222,8 @@ func _fit_inline_core() -> void:
 	for child in column.get_children():
 		var control: Control = child
 		if control.visible and str(control.name) != "Portrait":
-			other_height += control.get_combined_minimum_size().y
-	var available := size.y - 90
+			other_height += ceili(control.get_combined_minimum_size().y)
+	var available: float = size.y - (88 if _phone else 128 if _tablet else 184)
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	var height := minf(510, maxf(0, available - other_height))
 	var difference := portrait.custom_minimum_size.y - height
@@ -1239,7 +1232,7 @@ func _fit_inline_core() -> void:
 
 func begin_corrections() -> void:
 	_return_focus_frames = 0
-	if size.x > 1400:
+	if size.x > 1300:
 		_correction_focus = "first"
 	else:
 		correction_entry_requested.emit("core")
@@ -1281,3 +1274,6 @@ func finish_corrections() -> void:
 	_return_focus_frames = 0
 	_correction_focus = "edit"
 	_update_visibility()
+
+func _label_style(label: Label, role: String) -> void:
+	label.theme_type_variation = "SilkCreature" + role + ("Phone" if _phone else "Tablet" if _tablet else "Desktop")

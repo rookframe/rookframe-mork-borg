@@ -60,7 +60,7 @@ func restore_focus(key: String = "") -> bool:
 			return true
 	return false
 
-func configure_density(phone: bool) -> void:
+func configure_density(phone: bool, input_size: int = 20) -> void:
 	for child in get_children():
 		var field := child as FIELD_SCRIPT
-		field.configure_density(phone)
+		field.configure_density(phone, input_size)
