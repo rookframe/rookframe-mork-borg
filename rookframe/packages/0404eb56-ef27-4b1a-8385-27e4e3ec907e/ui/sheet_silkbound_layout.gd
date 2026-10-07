@@ -50,7 +50,7 @@ func apply_sheet_layout(phone: bool, tablet: bool, detail: bool = false, task: b
 	var secondary: MarginContainer = get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary")
 	secondary.add_theme_constant_override("margin_left", 0 if phone else 11 if tablet else 21)
 	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content").add_theme_constant_override("separation", 12 if tablet else 24)
-	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Resources").size_flags_stretch_ratio = 1.0
+	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Resources").size_flags_vertical = 3 if phone else 1
 	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Companions").size_flags_stretch_ratio = 0.65
 	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Companions").divider_top = not phone
 	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Companions").custom_minimum_size = Vector2(get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Companions").custom_minimum_size.x, 0 if phone or tablet else 300)

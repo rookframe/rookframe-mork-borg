@@ -1,7 +1,7 @@
 extends Button
 ## The character core keeps the resource caption separate from its value.
 func configure(caption: String, current: int, suffix: String, maximum: int = 0, phone: bool = false, tablet: bool = false) -> void:
-	custom_minimum_size = Vector2(44, 44 if phone or tablet else 54)
+	custom_minimum_size = Vector2(44, 48 if phone or tablet else 72)
 	get_node(^"Inset/Copy/Caption").text = caption
 	get_node(^"Inset/Copy/Caption").add_theme_font_size_override("font_size", 14 if phone or tablet else 17)
 	for path in [^"Inset/Copy/Number/Value", ^"Inset/Copy/Number/HealthValue", ^"Inset/Copy/Number/DeadValue"]:
@@ -9,9 +9,9 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 		get_node(path).add_theme_font_size_override("font_size", 24 if phone or tablet else 32)
 	get_node(^"Inset/Copy/Number/Extra").text = suffix
 	get_node(^"Inset/Copy/Number/Extra").add_theme_font_size_override("font_size", 14 if phone or tablet else 17)
-	get_node(^"Inset").add_theme_constant_override("margin_left", 28 if phone else 28 if tablet else 52)
-	get_node(^"Inset").add_theme_constant_override("margin_top", 1 if phone or tablet else 5)
-	get_node(^"Inset").add_theme_constant_override("margin_bottom", 1 if phone or tablet else 5)
+	get_node(^"Inset").add_theme_constant_override("margin_left", 36 if phone or tablet else 52)
+	get_node(^"Inset").add_theme_constant_override("margin_top", 4 if phone or tablet else 6)
+	get_node(^"Inset").add_theme_constant_override("margin_bottom", 4 if phone or tablet else 6)
 	add_theme_constant_override("icon_max_width", 22 if phone or tablet else 28)
 	get_node(^"Health").visible = maximum > 0
 	get_node(^"Health").max_value = maxi(1, maximum)
@@ -26,3 +26,21 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 	get_node(^"DangerIcon").offset_bottom = 12.5 if phone else 10 if tablet else 14
 	get_node(^"DangerIcon").offset_right = 22 if phone or tablet else 28
 	accessibility_name = "%s. %d %s" % [caption, current, suffix]
+
+	get_node(^"Inset").add_theme_constant_override("margin_right", 8)
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var frame: StyleBox = get_theme_stylebox(state).duplicate()
+		frame.content_margin_left = 8
+		frame.content_margin_right = 8
+		add_theme_stylebox_override(state, frame)
+	for path in [^"Inset/Copy/Caption", ^"Inset/Copy/Number/Extra", ^"Inset/Copy/Number/Value", ^"Inset/Copy/Number/HealthValue", ^"Inset/Copy/Number/DeadValue"]:
+		var label: Label = get_node(path)
+		var font: FontVariation = preload("res://rookframe/ui/theme/silkbound_medium.tres").duplicate()
+		if path == ^"Inset/Copy/Caption" or path == ^"Inset/Copy/Number/Extra":
+			font = preload("res://rookframe/ui/theme/silkbound_regular.tres").duplicate()
+		font.spacing_top = -2 if phone or tablet else -4
+		font.spacing_bottom = -3 if phone or tablet else -4
+		label.add_theme_font_override("font", font)
+	get_node(^"DangerIcon").offset_left = 8
+	get_node(^"DangerIcon").offset_right = 30 if phone or tablet else 36
+	custom_minimum_size = Vector2(44, maxf(custom_minimum_size.y, get_node(^"Inset").get_combined_minimum_size().y))

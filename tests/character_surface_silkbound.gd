@@ -31,7 +31,7 @@ func test_chapters_and_details_stay_inside_reference_canvas(width: int, height: 
 	var fixture := _open(Vector2i(width,height))
 	var sheet: Control = fixture.sheet
 	await _settle()
-	for chapter in 4:
+	for chapter in 5:
 		sheet._chapter(chapter)
 		await _settle()
 		var tabs: Control = sheet.get_node(CHAPTER).get_node(^"Tabs")
@@ -41,7 +41,7 @@ func test_chapters_and_details_stay_inside_reference_canvas(width: int, height: 
 			if tab.visible:
 				count += 1
 				assert_bool(tab.size.x >= 44 and tab.size.y >= 44).is_true()
-		assert_int(count).is_equal(4)
+		assert_int(count).is_equal(5)
 		_assert_buttons_bounded(sheet, sheet.get_global_rect())
 		if chapter < 3:
 			var collection: Control = sheet.get_node(CHAPTER).get_node(^"Page/Content/Collections/Primary")
@@ -53,6 +53,21 @@ func test_chapters_and_details_stay_inside_reference_canvas(width: int, height: 
 	sheet._back()
 	await _settle()
 	assert_str(sheet._detail).is_empty()
+
+func test_reading_controls_have_padding_and_visible_window_actions(width: int, height: int, _test_parameters := [[1920,1080],[1024,768],[844,390]]) -> void:
+	var fixture := _open(Vector2i(width,height))
+	var sheet = fixture.sheet
+	await _settle()
+	assert_bool((sheet._core_ui.get_node("PhoneHeader/PhoneClose") if width <= 900 else sheet._header_close).is_visible_in_tree()).is_true()
+	assert_bool((sheet._core_phone_edit if width <= 900 else sheet._header_edit).is_visible_in_tree()).is_true()
+	assert_bool(sheet._chapter_tab_appearance.is_visible_in_tree()).is_true()
+	for button in [sheet._core_hit_points, sheet._core_power_uses]:
+		var copy: Control = button.get_node("Inset/Copy")
+		assert_bool(button.get_global_rect().grow(-4).encloses(copy.get_global_rect())).override_failure_message("Resource content must have padding within its button: " + str(copy.get_global_rect()) + " / " + str(button.get_global_rect())).is_true()
+		assert_float(button.get_theme_stylebox("normal").content_margin_left).is_greater_equal(6.0)
+	for path in ["StrengthRow/Strength", "AgilityRow/Agility", "PresenceRow/Presence", "ToughnessRow/Toughness"]:
+		var ability: Button = sheet._core_ui.get_node("Abilities/" + path)
+		assert_float(ability.get_theme_stylebox("normal").content_margin_left).is_greater_equal(6.0)
 
 func _assert_buttons_bounded(node: Node, bounds: Rect2) -> void:
 	if node is Button and node.is_visible_in_tree():
@@ -158,3 +173,36 @@ func test_cancel_note_editing_returns_to_saved_reading_page() -> void:
 	assert_str(sheet._detail_ui.journal_draft).is_equal("Saved words.")
 	assert_str(sheet._detail).is_equal("journal:notes")
 	assert_int(sheet._detail_tab).is_equal(1)
+
+func test_header_edit_and_appearance_actions_are_reachable() -> void:
+	var fixture := _open(Vector2i(1920,1080))
+	var sheet = fixture.sheet
+	await _settle()
+	sheet._header_edit.pressed.emit()
+	await _settle()
+	assert_bool(sheet._draft.active).is_true()
+	assert_bool(sheet._header_save_sheet.is_visible_in_tree()).is_true()
+	sheet._header_cancel_sheet.pressed.emit()
+	await _settle()
+	assert_bool(sheet._draft.active).is_false()
+	sheet._chapter_tab_appearance.pressed.emit()
+	await _settle()
+	assert_bool(sheet._appearance_ui.is_visible_in_tree()).is_true()
+	assert_bool(sheet._appearance_ui.get_node("Columns/PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait").disabled).is_false()
+	sheet._appearance_change_miniature.pressed.emit()
+	await _settle()
+	assert_bool(sheet.get_node("Margin/Layout/Picker").visible).is_true()
+	sheet._picker_closed(false)
+	await _settle()
+	assert_bool(sheet._appearance_change_miniature.has_focus()).is_true()
+
+func test_note_footer_has_compact_primary_action_and_icon_back() -> void:
+	var fixture := _open(Vector2i(1920,1080))
+	var sheet = fixture.sheet
+	await _settle()
+	sheet._open_detail("journal:notes")
+	await _settle()
+	assert_bool(sheet._detail_back.get_node("Copy/Caption").visible).is_false()
+	assert_float(sheet._primary_button.size.x).is_less(250.0)
+	assert_float(sheet._primary_button.get_global_rect().end.x).is_greater(sheet._detail_ui.get_global_rect().get_center().x)
+	assert_float(sheet._detail_ui.get_node("FooterFrame").size.y).is_less_equal(70.0)

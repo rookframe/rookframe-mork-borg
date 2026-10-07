@@ -80,7 +80,7 @@ const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _header_rest = get_node(^"Margin/Layout/Header/Rest")
 @onready var _header_save_sheet = get_node(^"Margin/Layout/Header/SaveSheet")
 @onready var _quick = _chapter_ui.get_node(^"Page/Content/QuickResources")
-@onready var _appearance_change_miniature = _appearance_ui.get_node(^"MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
+@onready var _appearance_change_miniature = _appearance_ui.get_node(^"Columns/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature")
 @onready var _quick_parent = _chapter_ui.get_node(^"Page/Content")
 @onready var _workflow_ui = get_node(^"Margin/Layout/Workflow")
 @onready var _detail_parent = _chapter_ui.get_node(^"Page/Content")
@@ -157,6 +157,7 @@ func ready() -> void:
 		_chapters[index].pressed.connect(_chapter.bind(index))
 	_header_edit.pressed.connect(_edit)
 	_core_phone_edit.pressed.connect(_edit)
+	_core_ui.get_node(^"PhoneHeader/PhoneClose").pressed.connect(_close)
 	_core_phone_name.pressed.connect(_name_pressed)
 	_quick_silver_edit.text_changed.connect(_core_typed.bind("silver"))
 	_chapter_personal_notes.pressed.connect(_open_detail.bind("journal:notes"))
@@ -405,7 +406,7 @@ func _show_route() -> void:
 	var tablet := get_viewport_rect().size.x <= 1300 and not _phone
 	_detail_ui.configure_layout(_phone, tablet, task, _draft.active, _detail_tab == 1)
 	get_node(^"Margin/Layout/Body").visible = not task and not get_node(^"Margin/Layout/Picker").visible
-	_header.visible = not task and (not _phone or _draft.active or details)
+	_header.visible = not task and (not _phone or _draft.active or details or chapter == 4)
 	_detail_header.visible = not task
 	if _phone and details and not _draft.active:
 		_header_name.add_theme_font_size_override("font_size", 18)
@@ -1382,7 +1383,7 @@ func _incident(operation: String) -> void:
 	_refresh_pending = true
 
 func _appearance() -> void:
-	_appearance_ui.configure(sdk, _actor)
+	_appearance_ui.configure_actor(sdk, _actor)
 	_render_portrait(_actor.data)
 
 func _choose_miniature() -> void:
@@ -1397,7 +1398,7 @@ func _picker_closed(_saved: bool) -> void:
 	_appearance_change_miniature.grab_focus()
 
 func _render_portrait(data: Dictionary) -> void:
-	_appearance_ui.configure(sdk, _actor)
+	_appearance_ui.configure_actor(sdk, _actor)
 	_portrait_texture = _appearance_ui.portrait(data)
 	_core_condition_frame.visible = not _projection.condition(data).is_empty()
 	_core_condition_badge.visible = not _projection.condition(data).is_empty()
@@ -1454,7 +1455,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 		if key == null or not key.pressed or key.echo:
 			return
 		if key.keycode in [KEY_Q, KEY_E]:
-			_chapter((int(_nav.get("chapter", 0)) + (3 if key.keycode == KEY_Q else 1)) % 4)
+			_chapter((int(_nav.get("chapter", 0)) + (CHAPTERS.size() - 1 if key.keycode == KEY_Q else 1)) % CHAPTERS.size())
 			accept_event()
 
 func _roll_combat(part: String) -> void:

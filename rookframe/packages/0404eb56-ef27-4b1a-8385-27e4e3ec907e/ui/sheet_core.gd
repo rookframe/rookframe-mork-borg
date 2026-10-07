@@ -77,7 +77,7 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"Origin").visible = false
 	get_node(^"ManageEquipment").visible = false
 	get_node(^"WeaponActions/Damage").visible = false
-	get_node(^"PhoneHeader/PhoneEdit").visible = false
+	get_node(^"PhoneHeader/PhoneEdit").visible = true
 	var phone_font: FontVariation = preload("res://rookframe/ui/theme/silkbound_medium.tres").duplicate()
 	phone_font.spacing_top = -2
 	phone_font.spacing_bottom = -3
@@ -206,6 +206,10 @@ func configure_condition(data: Dictionary, condition: Dictionary, phone: bool) -
 	get_node(^"ProtectionHeading").visible = combat and not phone
 	get_node(^"Protection").visible = combat and phone
 	get_node(^"ProtectionItems").visible = combat and not phone
+	get_node(^"ProtectionItems").visible = combat and not phone and get_node(^"ProtectionItems").get_child_count() > 0
+	var defence_rule: StyleBoxFlat = get_node(^"Dodge").get_theme_stylebox("normal").duplicate() as StyleBoxFlat
+	defence_rule.border_width_top = 0
+	get_node(^"Dodge").add_theme_stylebox_override("normal", defence_rule)
 	get_node(^"Dodge").visible = combat and not phone
 	get_node(^"ConditionReminder").visible = not combat
 	get_node(^"ConditionReminder").configure(data, condition, phone)

@@ -84,9 +84,9 @@ func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, readin
 	get_node(^"HeaderFrame/Inset").add_theme_constant_override("margin_left", 5)
 	get_node(^"HeaderFrame/Inset").add_theme_constant_override("margin_right", 7)
 	var back: Button = get_node(^"HeaderFrame/Inset/DetailHeader/Back")
-	back.custom_minimum_size = Vector2(44 if phone else 62, 44)
+	back.custom_minimum_size = Vector2(44, 44)
 	back.text = ""
-	(back.get_node(^"Copy/Caption") as Control).visible = not phone
+	(back.get_node(^"Copy/Caption") as Control).visible = false
 	for path in [^"FooterFrame/FooterInset/DetailActions/PrimaryAction", ^"FooterFrame/FooterInset/DetailActions/Utility/SecondaryAction"]:
 		var button: Button = get_node(path)
 		button.add_theme_font_size_override("font_size", 16 if button == _primary_action else 14)
@@ -107,14 +107,15 @@ func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, readin
 	for edge in ["left", "right", "top", "bottom"]:
 		get_node(^"Body").add_theme_constant_override("margin_" + edge, 0 if task else horizontal if edge in ["left", "right"] else vertical)
 	get_node(^"Body/DetailPages/Area/DetailContent").add_theme_constant_override("separation", 12 if phone else 16 if draft else 22)
-	_actions.vertical = not phone and not draft and not task
+	_actions.vertical = false
 	_actions.add_theme_constant_override("separation", 16 if phone else 7)
 	(_draft_actions as Control).visible = draft and not task
 	(_primary_action as Control).custom_minimum_size = Vector2(44, 44 if phone or draft or task else 48)
-	(_primary_action as Control).size_flags_horizontal = 1 if task or draft else 3
+	(_primary_action as Control).size_flags_horizontal = 0
+	(_primary_action as Control).size_flags_vertical = 4
 	get_node(^"FooterFrame").visible = not task
 	get_node(^"FooterFrame").theme_type_variation = "TaskFooterPhone" if phone else "TaskFooter"
-	get_node(^"FooterFrame/FooterInset").custom_minimum_size = Vector2(0, 60 if phone else 68 if draft else 118 if (_primary_action as Control).visible else 60)
+	get_node(^"FooterFrame/FooterInset").custom_minimum_size = Vector2(0, 60 if phone else 68)
 	get_node(^"FooterFrame/FooterInset").add_theme_constant_override("margin_top", 7 if phone else 8)
 	get_node(^"FooterFrame/FooterInset").add_theme_constant_override("margin_bottom", 7 if phone else 8)
 	_pager_visibility_changed()

@@ -39,6 +39,8 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 		var button = get_node(path)
 		button.custom_minimum_size = Vector2(44, 44 if phone else 48 if tablet else 54)
 		button.configure_layout(18 if phone else 19 if tablet else 23, 22 if phone else 23 if tablet else 30, 6 if phone or tablet else 10)
+		button.get_node(^"Center/Content/Title").visible = not (phone and path.ends_with("TabAppearance"))
+		button.tooltip_text = "Appearance" if path.ends_with("TabAppearance") else ""
 		button.icon_alignment = 0
 		button.vertical_icon_alignment = 1
 		button.add_theme_constant_override("icon_max_width", 22 if phone else 23 if tablet else 30)
@@ -63,29 +65,7 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"Page/Content/ChapterCaption/Resource").icon = null
 	get_node(^"Page/Content/ChapterCaption/PersonalNotes").add_theme_stylebox_override("normal", preload("res://rookframe/ui/theme/silkbound_plain.tres"))
 	get_node(^"Page/Content/ChapterCaption/PersonalNotes").add_theme_font_size_override("font_size", 17 if tablet else 20)
-	for path in ["Page/Content/AppearancePanel/PortraitPanel/Inset", "Page/Content/AppearancePanel/MiniaturePanel/Inset"]:
-		for edge in ["left", "right", "top", "bottom"]:
-			get_node(path).add_theme_constant_override("margin_" + edge, 10 if phone else 12 if tablet else 18)
-	get_node("Page/Content/AppearancePanel").add_theme_constant_override("separation", 12 if phone or tablet else 20)
-	for path in ["Page/Content/AppearancePanel/PortraitPanel/Inset/Content/PortraitHeading", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureHeading"]:
-		(get_node(path + "/Title") as Control).add_theme_font_size_override("font_size", 17 if phone else 18 if tablet else 22)
-		(get_node(path + "/Icon") as Control).custom_minimum_size = Vector2(20, 20) if phone else Vector2(24, 24)
-	for path in ["Page/Content/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons/ChangePortrait", "Page/Content/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons/ClearPortrait", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons/ClearMiniature"]:
-		get_node(path).add_theme_font_size_override("font_size", 11 if phone else 12 if tablet else 13)
-	for path in ["Page/Content/AppearancePanel/PortraitPanel/Inset/Content/Explanation", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/Explanation", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/PackageCaption"]:
-		get_node(path).add_theme_font_size_override("font_size", 10 if phone else 11 if tablet else 12)
-
-	get_node("Page/Content/AppearanceIntro/Title").add_theme_font_size_override("font_size", 23 if tablet else 26)
-	get_node("Page/Content/AppearanceIntro/Copy").add_theme_font_size_override("font_size", 12 if tablet else 13)
-	get_node("Page/Content/AppearanceStatus").custom_minimum_size = Vector2(get_node("Page/Content/AppearanceStatus").custom_minimum_size.x, 24 if phone else 28)
-	get_node("Page/Content/AppearanceStatus").add_theme_font_size_override("font_size", 10 if phone else 12)
-	get_node("Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureCaption").add_theme_font_size_override("font_size", 12 if phone else 17)
-	get_node("Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/EmptyPreview/Image").custom_minimum_size = Vector2(34, 34) if phone else Vector2(100, 100)
-	for path in ["Page/Content/AppearancePanel/PortraitPanel/Inset/Content", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content"]:
-		get_node(path).add_theme_constant_override("separation", 4 if phone else 8)
-		(get_node(path + "/ControlsGap") as Control).custom_minimum_size = Vector2((get_node(path + "/ControlsGap") as Control).custom_minimum_size.x, 0 if phone else 8)
-	for path in ["Page/Content/AppearancePanel/PortraitPanel/Inset/Content/PortraitButtons", "Page/Content/AppearancePanel/MiniaturePanel/Inset/Content/MiniatureButtons"]:
-		get_node(path).add_theme_constant_override("separation", 6 if phone else 8)
+	get_node(^"Page/Content/AppearancePanel").configure_layout(phone, tablet)
 
 func configure_caption(chapter: int, phone: bool, filter: int, data: Dictionary, draft: Dictionary, section: int) -> void:
 	get_node("Page/Content/Collections/Primary").columns = 2 if chapter == 2 or chapter == 1 and not phone else 1
@@ -172,7 +152,7 @@ func configure_route(view: Dictionary, data: Dictionary, draft: Dictionary, navi
 	_chapter_tabs.visible = not obscured
 	_chapter_collections.visible = not obscured and chapter in [0, 1, 2]
 	_chapter_journal_panel.visible = not obscured and chapter == 3
-	get_node(^"Page/Content/AppearanceIntro").visible = not obscured and chapter == 4 and not phone
+	get_node(^"Page/Content/AppearanceIntro").visible = false
 	get_node(^"Page/Content/AppearanceStatus").visible = not obscured and chapter == 4
 	_condition_ui.visible = not obscured and chapter == 0 and not condition_reference and not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd").new().condition(data).is_empty()
 	_section.visible = phone and not details and chapter in [0, 1, 2, 3]

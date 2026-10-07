@@ -339,6 +339,11 @@ accessibility_name = "Close character sheet"
 theme_type_variation = &"TaskButton"
 text = "×"
 
+[node name="RibbonSpace" type="Control" parent="Margin/Layout/Header"]
+layout_mode = 2
+custom_minimum_size = Vector2(56, 0)
+mouse_filter = 2
+
 [node name="Body" type="HBoxContainer" parent="Margin/Layout" unique_id=2034042610]
 unique_name_in_owner = true
 layout_mode = 2
@@ -384,6 +389,15 @@ theme_override_constants/icon_max_width = 22
 icon = ExtResource("quill")
 clip_text = true
 expand_icon = true
+
+[node name="PhoneClose" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+theme_type_variation = &"TaskGlyphButton"
+text = "×"
+theme_override_font_sizes/font_size = 28
+accessibility_name = "Close character sheet"
+tooltip_text = "Close character sheet"
 
 [node name="Class" type="Label" parent="Margin/Layout/Body/Core" unique_id=1573180520]
 unique_name_in_owner = true
@@ -1160,7 +1174,6 @@ expand_icon = true
 
 [node name="TabAppearance" parent="Margin/Layout/Body/Chapter/Tabs" unique_id=1902721543 instance=ExtResource("tab")]
 unique_name_in_owner = true
-visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 theme_type_variation = &"TaskButton"
