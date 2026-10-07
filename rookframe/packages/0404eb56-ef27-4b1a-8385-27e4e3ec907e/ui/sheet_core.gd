@@ -177,6 +177,7 @@ func configure(data: Dictionary, values: Dictionary, draft: Dictionary, items: A
 			(button.get_node(^"Content") as BoxContainer).offset_top = 10 if tablet else 0
 			(button.get_node(^"Content") as BoxContainer).offset_bottom = -10 if tablet else 0
 			(button.get_node(^"Content/Amount") as Label).clip_text = tablet
+			button.configure_hint(str(item.get("name", "Protection")) + " · Protection", "While ready, the shield reduces incoming damage by 1." if item.get("kind") == "Shield" else "Armor is passive protection. Roll the amount to subtract from damage.", not phone)
 			button.pressed.connect(_protection_pressed.bind(str(item.inventory_id)))
 			get_node(^"ProtectionItems").add_child(button)
 	get_node(^"Protection").configure("Protection & defence", "None" if protection.is_empty() else PROJECTION.new().text(protection).replace("\n", " · "), phone)
@@ -188,6 +189,8 @@ func configure(data: Dictionary, values: Dictionary, draft: Dictionary, items: A
 	get_node(^"WeaponActions/Attack/Summary/Test/Value").text = ("%+d" % modifier).replace("-", "−")
 	get_node(^"WeaponActions/Attack/Summary/Damage/Value").text = str(weapon.get("damage", "—"))
 	get_node(^"Dodge/Summary/Test/Value").text = "1d20 %+d" % int(values.get("Agility", 0))
+	get_node(^"WeaponActions/Attack").configure_hint(str(weapon.get("name", "Weapon")) + (" · Shoot" if ranged else " · Cut"), "Ranged attack using Presence." if ranged else "Melee attack using Strength.", not phone and not weapons.is_empty())
+	get_node(^"Dodge").configure_hint("Defence", "Test Agility to avoid an incoming attack. The usual difficulty is DR12.", not phone)
 	var playable := owner and draft.is_empty() and not action_live and BROKEN.new().can_act(data)
 	get_node(^"WeaponActions/Attack").disabled = not playable or weapons.is_empty()
 	get_node(^"WeaponActions/Damage").disabled = not owner or not draft.is_empty() or action_live or weapons.is_empty()

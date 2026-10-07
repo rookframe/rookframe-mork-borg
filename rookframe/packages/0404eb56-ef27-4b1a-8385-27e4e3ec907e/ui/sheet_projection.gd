@@ -151,7 +151,7 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 				entry.action_disabled = not owner or item.get("broken", false) or int(item.get("quantity", 0)) <= 0
 			elif not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd").new().definition(str(item.get("source_item_id", ""))).is_empty():
 				entry.action = "Use " + str(item.get("name", "item"))
-				entry.action_icon = preload("res://rookframe/ui/icons/character/use.svg")
+				entry.action_icon = preload("res://rookframe/ui/icons/bolt.svg")
 				entry.action_disabled = not owner or int(item.get("quantity", 0)) <= 0
 			primary.append(entry)
 		resources.append(row("resource:silver", "Silver", "coins", str(data.get("silver", 0))))
@@ -160,6 +160,9 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 		heading = "Story"
 		primary.append(row("journal:story", "The road ahead", "origin", "", BOOK))
 		resources.append(row("journal:notes", "In your own words", "words", "0", preload("res://rookframe/ui/icons/character/quill.svg")))
+	for entries in [primary, resources, companions]:
+		for entry in entries:
+			entry.hint = hint(str(entry.id), data, items)
 	return {"primary": primary, "resources": resources, "companions": companions, "heading": heading}
 
 func item_facts(data: Dictionary, item: Dictionary) -> Array:
@@ -204,3 +207,35 @@ func equipment_state_icon(item: Dictionary) -> Texture2D:
 	if str(item.get("kind", "")) == "Armor":
 		return preload("res://rookframe/ui/icons/character/armor.svg")
 	return preload("res://rookframe/ui/icons/character/equipped.svg")
+
+func hint(id: String, data: Dictionary, items: Array) -> String:
+	if id == "class":
+		return text(data.get("class_rules", []))
+	if id.begins_with("resource:"):
+		return {"resource:hit_points":"Track wounds and recovery.", "resource:omens":"Resolve an Omen’s benefit, then mark it spent.", "resource:power_uses":"Uses available for casting Powers.", "resource:silver":"Coins carried with your belongings."}.get(id, "")
+	if id.begins_with("item:"):
+		for raw in items:
+			var item: Dictionary = raw
+			if "item:" + str(item.get("inventory_id", "")) != id:
+				continue
+			var power := POWERS.new().definition(str(item.get("source_item_id", "")))
+			if not power.is_empty():
+				return text(power.get("rules", ""))
+			var rules := text(item.get("rules", ""))
+			if not rules.is_empty():
+				return rules
+			return {"Weapon":"Inspect attack modes, damage and equipment state.", "Armor":"Armor is passive protection. Roll the amount to subtract from damage.", "Shield":"While ready, the shield reduces incoming damage by 1.", "Decoction":"Resolve the effect, then mark one dose used."}.get(str(item.get("kind", "")), "Inspect this belonging and its available actions.")
+	for pair in [["trait:", "traits"], ["injury:", "broken_injuries"], ["companion:", "companion_sheets"]]:
+		if id.begins_with(str(pair[0])):
+			var entries: Array = data.get(str(pair[1]), [])
+			var index := int(id.trim_prefix(str(pair[0])))
+			if index >= 0 and index < entries.size():
+				var entry: Dictionary = entries[index]
+				return text(entry.get("rules", entry.get("description", "Inspect this record and its details.")))
+	if id.begins_with("actor:"):
+		return "A companion travelling with you. Inspect its character sheet."
+	if id == "journal:story":
+		return str(data.get("origin", "")).strip_edges() if not str(data.get("origin", "")).strip_edges().is_empty() else "Your origin and the road ahead."
+	if id == "journal:notes":
+		return "Your personal record of the journey."
+	return "Inspect your pack and description." if id == "profile" else ""

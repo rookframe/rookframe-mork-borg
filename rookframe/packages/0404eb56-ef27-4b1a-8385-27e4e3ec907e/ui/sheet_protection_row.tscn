@@ -1,11 +1,14 @@
-[gd_scene load_steps=5 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_row.tres" id="row"]
 [ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_row_hover.tres" id="hover"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="medium"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_regular.tres" id="regular"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd" id="hint"]
+
 
 [node name="ProtectionRow" type="Button"]
+script = ExtResource("hint")
 custom_minimum_size = Vector2(0, 40)
 theme_override_styles/normal = ExtResource("row")
 theme_override_styles/hover = ExtResource("hover")

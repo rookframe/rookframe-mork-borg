@@ -17,8 +17,8 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.40` | `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9cb673ba892fb88398f256b5e007ebece0eebdf6` | `rookframe/ui/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.41` | `addons/rookframe_sdk/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9a124f5b5ebcf03a064b314771a303f3ca11d83f` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
@@ -74,6 +74,9 @@ Its authored Godot Controls use the public UI Kit theme, fonts, icons and
 `SilkboundCollection`. Character data supplies the content; the reference's
 portrait and illustrative equipment are not shipped as gameplay data.
 Journal notes are local to the current World application visit.
+Desktop hover hints show a title, rules summary and inspection prompt for
+attributes, resources, combat, protection and collection entries. Inventory
+actions remain icon-only, with item-specific accessible labels.
 
 Iterate using the SDK's Rookframe → Development dock and a complete compiled
 Development Mode runtime bundle. Save Package scenes and scripts in the editor

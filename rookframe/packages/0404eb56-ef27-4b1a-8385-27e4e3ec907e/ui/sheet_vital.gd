@@ -1,4 +1,4 @@
-extends Button
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd"
 ## The character core keeps the resource caption separate from its value.
 func configure(caption: String, current: int, suffix: String, maximum: int = 0, phone: bool = false, tablet: bool = false) -> void:
 	custom_minimum_size = Vector2(44, 48 if phone or tablet else 72)
@@ -25,6 +25,7 @@ func configure(caption: String, current: int, suffix: String, maximum: int = 0, 
 	get_node(^"DangerIcon").offset_top = -12.5 if phone else -10 if tablet else -14
 	get_node(^"DangerIcon").offset_bottom = 12.5 if phone else 10 if tablet else 14
 	get_node(^"DangerIcon").offset_right = 22 if phone or tablet else 28
+	configure_hint(caption, {"Hit points":"Track wounds and recovery.", "Omens":"Resolve an Omen’s benefit, then mark it spent.", "Power uses":"Uses available for casting Powers."}.get(caption, "Inspect this resource."), not phone)
 	accessibility_name = "%s. %d %s" % [caption, current, suffix]
 
 	get_node(^"Inset").add_theme_constant_override("margin_right", 8)

@@ -267,3 +267,30 @@ func test_single_page_details_hide_pager_and_long_notes_keep_navigation() -> voi
 	await _settle()
 	assert_bool(details.get_node("Body/DetailPages").get_pager().is_visible_in_tree()).is_false()
 	assert_bool(details.get_node("Body/NoteEditor").get_pager().is_visible_in_tree()).is_false()
+
+func test_hover_hints_cover_core_and_chapters_and_follow_weapon_selection() -> void:
+	var fixture := _open(Vector2i(1920,1080))
+	fixture.host.actors.hero.data.inventory.append({"inventory_id":"armor", "name":"Light armor", "kind":"Armor", "reduction":"-d2", "equipped":true,"quantity":1})
+	var sheet = fixture.sheet
+	sheet.opened(SDK.ActorId.new("hero"))
+	await _settle()
+	var core = sheet._core_ui
+	var strength = core.get_node("Abilities/StrengthRow/Strength")
+	assert_str(strength.tooltip_text).contains("Physical force and melee attacks.")
+	var armor = core.get_node("ProtectionItems").get_child(1)
+	var tooltip = auto_free(armor._make_custom_tooltip(armor.tooltip_text))
+	assert_str(tooltip.get_node("Title").text).is_equal("Light armor · Protection")
+	assert_str(tooltip.get_node("Summary").text).is_equal("Armor is passive protection. Roll the amount to subtract from damage.")
+	assert_str(core.get_node("Dodge").tooltip_text).contains("Test Agility")
+	var attack = core.get_node("WeaponActions/Attack")
+	assert_str(attack.tooltip_text).contains("Melee attack using Strength.")
+	sheet._weapon_selected(1)
+	assert_str(attack.tooltip_text).contains("Shortbow · Shoot")
+	assert_str(attack.tooltip_text).contains("Ranged attack using Presence.")
+	for chapter in 4:
+		sheet._chapter(chapter)
+		await _settle()
+		for group in ["Primary", "Secondary/Content/Resources"]:
+			var rows = sheet.get_node(CHAPTER).get_node("Page/Content/Collections/" + group + "/Content/Area/Rows")
+			for row in rows.get_children():
+				assert_str(row.get_node("Details").tooltip_text).is_not_empty()
