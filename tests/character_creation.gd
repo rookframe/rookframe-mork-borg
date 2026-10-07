@@ -936,9 +936,9 @@ func before_test() -> void:
 
 func _choose_miniature(creator: Node) -> void:
 	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
-	var picker = creator.get_node(^"MiniaturePicker/Picker")
-	picker.get_node(^"Inset/Layout/Body/Columns/List/Area/Rows").get_child(0).pressed.emit()
-	picker.get_node(^"Inset/Layout/Footer/Choose").pressed.emit()
+	var picker = creator.get_node(^"MiniaturePicker/Margin/Layout/Picker")
+	picker.get_node(^"Browser/Results/Rows").get_child(0).pressed.emit()
+	picker.get_node(^"Actions/Apply").pressed.emit()
 
 func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 	var host = _host_for("gutterborn-scum", 2)
@@ -952,17 +952,17 @@ func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 	var name_field = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name")
 	name_field.value = "Varg"
 	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
-	var picker = creator.get_node(^"MiniaturePicker/Picker")
-	_check(picker.get_node(^"Inset/Layout/Body/Columns/List/Area/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
-	picker.get_node(^"Inset/Layout/Footer/Cancel").pressed.emit()
+	var picker = creator.get_node(^"MiniaturePicker/Margin/Layout/Picker")
+	_check(picker.get_node(^"Browser/Results/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
+	picker.get_node(^"Actions/Back").pressed.emit()
 	_check(name_field.value == "Varg" and stage == 5, "Back returns to the same identity draft.")
 	_check(host.actors.is_empty(), "Browsing never creates an Actor.")
 	_choose_miniature(creator)
 	_check(not creator.get_node(^"MiniaturePicker").visible, "Use Miniature returns to the wizard.")
 	_check(name_field.value == "Varg", "Selecting preserves the name.")
 	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
-	_check(picker.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
-	picker.get_node(^"Inset/Layout/Footer/Cancel").pressed.emit()
+	_check(picker.browser.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
+	picker.get_node(^"Actions/Back").pressed.emit()
 	creator.primary()
 	creator.primary()
 	await get_tree().process_frame

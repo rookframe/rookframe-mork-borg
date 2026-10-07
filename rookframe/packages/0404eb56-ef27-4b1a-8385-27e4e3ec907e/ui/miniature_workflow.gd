@@ -37,18 +37,22 @@ func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, sav
 	browser.focus_search()
 
 func open_choice(facade: SDK, locale: I18N, saved: Dictionary) -> void:
-	open(facade, locale, null, "", saved, true)
+	open(facade, locale, null, "", saved, true, "Character")
+	get_node(^"Title").visible = true
 	get_node(^"Title").text = _t("Choose Miniature")
 
 func _load() -> void:
 	browser.set_state("loading", _t("Loading Miniatures…"))
 	get_node(^"Actions/Apply").disabled = true
-	get_node(^"Status").text = ""
+	_set_status("")
 	var result := sdk.content.list(SDK.ContentKind.Value.MINIATURE)
 	if not result.ok:
 		browser.set_state("error", _t("Could not load Miniatures. Try again."))
 		return
 	var entries: Array[Dictionary] = [{"id": "none", "title": _t("None"), "package": "", "package_id": "", "local_id": "", "available": true}]
+	# Creation requires an explicit available Miniature; existing Actors may clear it.
+	if _selection_only:
+		entries.clear()
 	for entry in result.items:
 		entries.append({"id": entry.reference.package_id + "/" + entry.reference.local_id,
 			"title": entry.localized_title, "package": entry.package_title,
@@ -56,11 +60,6 @@ func _load() -> void:
 	var id := str(_saved.get("package_id", "")) + "/" + str(_saved.get("local_id", ""))
 	if _saved.is_empty():
 		id = "none"
-	if _selection_only and _saved.is_empty():
-		for entry in entries:
-			if entry.available:
-				id = str(entry.id)
-				break
 	if not _saved.is_empty():
 		var current := sdk.content.read(SDK.ContentReference.new(str(_saved.get("package_id", "")), str(_saved.get("local_id", ""))))
 		if current.ok:
@@ -68,14 +67,14 @@ func _load() -> void:
 	browser.configure(entries, id, {"search": _t("Search Miniatures"), "retry": _t("Try again"), "unavailable": _t("Unavailable"), "empty": _t("Add a Miniature Package to this World."), "no_match": _t("No matching Miniatures."), "preview_unavailable": _t("Miniature preview unavailable."), "selected": _t("Selected")})
 	_selected(browser.selection())
 	if not _saved.is_empty() and browser.selection().is_empty():
-		get_node(^"Status").text = _t("Saved Miniature unavailable. Choose a replacement.")
+		_set_status(_t("Saved Miniature unavailable. Choose a replacement."))
 
 func _preview(entry: Dictionary, target: Control) -> void:
 	if str(entry.get("id", "")) == "none":
 		return
 	var result := sdk.content.preview_miniature(SDK.ContentReference.new(str(entry.package_id), str(entry.local_id)), target)
 	if not result.ok:
-		get_node(^"Status").text = _t("Miniature preview unavailable.")
+		_set_status(_t("Miniature preview unavailable."))
 
 func _selected(entry: Dictionary) -> void:
 	get_node(^"Actions/Apply").disabled = _busy or entry.is_empty()
@@ -92,7 +91,7 @@ func _apply() -> void:
 	_busy = true
 	get_node(^"Actions/Apply").disabled = true
 	get_node(^"Actions/Back").disabled = true
-	get_node(^"Status").text = _t("Saving Miniature…")
+	_set_status(_t("Saving Miniature…"))
 	var message := ""
 	if _actor == null:
 		var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition, "package_id": reference.get("package_id", ""), "local_id": reference.get("local_id", "")})
@@ -108,7 +107,7 @@ func _apply() -> void:
 	get_node(^"Actions/Back").disabled = false
 	_selected(browser.selection())
 	if not message.is_empty():
-		get_node(^"Status").text = _t(message)
+		_set_status(_t(message))
 		return
 	visible = false
 	closed.emit(true)
@@ -125,3 +124,7 @@ func _unhandled_key_input(event: InputEvent) -> void:
 
 func _t(source: String) -> String:
 	return i18n.text(source)
+
+func _set_status(message: String) -> void:
+	get_node(^"Status").text = message
+	get_node(^"Status").visible = not message.is_empty()

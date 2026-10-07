@@ -736,7 +736,7 @@ func _choose_preferred_miniature() -> void:
 	if not result.ok:
 		_set_status(result.message, true)
 		return
-	picker.open(sdk, i18n, _character_draft.get("preferred_miniature", {}))
+	picker.open(sdk, i18n, _character_draft.get("preferred_miniature", {}), str(_character_draft.get("name", "")))
 
 
 func _miniature_selected(reference: Dictionary) -> void:
