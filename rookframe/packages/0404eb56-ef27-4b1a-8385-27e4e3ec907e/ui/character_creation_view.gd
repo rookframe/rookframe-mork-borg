@@ -176,7 +176,7 @@ func _fit() -> void:
 	get_node(DETAIL + "/ClassBody/FactsColumn/Facts").theme_type_variation = "WizardFactsCompact" if phone else "WizardFactsTablet" if tablet else "WizardFacts"
 	_text(DETAIL + "/NoteRow/Note",14 if tablet else 17,1.3)
 	for name in ["Spacer","NoteRule","NoteRow"]:
-		get_node(DETAIL + "/" + name).visible = not phone and (name != "Spacer" or not tablet) and (_route in ["create-class","create-identity"] or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
+		get_node(DETAIL + "/" + name).visible = not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route in ["create-class","create-identity"] or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
 	get_node(DETAIL + "/Appearance/Preview").custom_minimum_size = Vector2(80,100) if phone else Vector2(110,138)
 	get_node(DETAIL + "/Appearance").vertical = tablet
 	get_node(DETAIL + "/Appearance").add_theme_constant_override("separation",16 if phone else 12 if tablet else 20)
@@ -278,7 +278,7 @@ func present_primary(text: String, disabled: bool) -> void:
 	var roll := index in [1, 2, 3] and index + 1 == int(_draft.get("furthest_step", 1)) and (bool(_draft.get("roll_pending", false)) or bool(_draft.get("equipment_roll_pending", false)))
 	roll = roll and not bool(_draft.get("pack_choice_pending", false)) and str(_draft.get("scroll_choice_slot", "")).is_empty()
 	var symbol: Texture2D = _icon("dice") if roll else preload("res://rookframe/ui/icons/check.svg") if index == 5 else preload("res://rookframe/ui/icons/chevron-right.svg")
-	set_primary(_t(text), disabled, symbol, roll)
+	set_primary(_t(text), disabled, symbol)
 
 func set_status(message: String, error: bool = false) -> void:
 	var name_error := error and _route == "create-identity" and message == "Enter a Character name before continuing."

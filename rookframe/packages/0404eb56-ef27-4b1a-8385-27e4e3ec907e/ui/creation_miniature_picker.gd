@@ -50,6 +50,11 @@ func _load() -> void:
 	var labels: Dictionary = {}
 	for pair in [["search", "Search by name or Package"], ["retry", "Try again"], ["unavailable", "Unavailable"], ["cancel", "Cancel"], ["choose", "Choose"], ["title", "Choose a miniature"], ["previous", "Previous"], ["next", "Next"], ["selection", "Selected miniature"]]:
 		labels[pair[0]] = i18n.text(pair[1])
+	labels["find"] = i18n.text("Find miniature")
+	labels["library"] = i18n.text("Character creation")
+	labels["empty_preview"] = i18n.text("No miniature assigned")
+	labels["no_match"] = i18n.text("No matching Miniatures.")
+	labels["empty"] = i18n.text("No Miniatures in this World.")
 	browser.configure(entries, id, labels)
 
 func _preview(entry: Dictionary, target: Control) -> void:
