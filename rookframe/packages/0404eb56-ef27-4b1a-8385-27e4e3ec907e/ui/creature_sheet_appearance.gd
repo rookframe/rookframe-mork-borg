@@ -53,6 +53,10 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 		button.add_theme_font_size_override("font_size", 14 if phone else 16 if tablet else 18)
 	if miniature_only:
 		get_node("Columns/MiniaturePanel").add_theme_stylebox_override("panel", get_node("Columns/PortraitPanel").get_theme_stylebox("panel"))
+		get_node(MINIATURE + "MiniatureHeading/Title").add_theme_font_size_override("font_size", 24 if phone else 26 if tablet else 30)
+		get_node(MINIATURE + "HeadingGap").custom_minimum_size = Vector2(0, 8 if phone else 12 if tablet else 16)
+	get_node(MINIATURE + "Explanation").visible = not miniature_only
+	get_node(MINIATURE + "ExplanationGap").visible = not miniature_only
 	for base in [PORTRAIT, MINIATURE]:
 		(get_node(base) as Control).add_theme_constant_override("separation", 0)
 		(get_node(base + "ExplanationGap") as Control).custom_minimum_size = Vector2(0, 4 if phone else 8 if tablet else 10)

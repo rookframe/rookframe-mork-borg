@@ -182,7 +182,6 @@ func _fit() -> void:
 		get_node(DETAIL + "/" + name).visible = _route != "create-identity" and not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route == "create-class" or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
 	get_node(DETAIL + "/Heading").visible = _route != "create-identity"
 	get_node(DETAIL + "/Appearance").configure(i18n, null, false, true, phone, tablet)
-	get_node(MINIATURE + "Explanation").text = _t("Your character portrait and tabletop miniature can be different.")
 	get_node(DETAIL + "/PackChoices/Options").columns = 3 if phone else 2
 	get_node(DETAIL + "/PackChoices/Options").add_theme_constant_override("v_separation",6 if phone else 8)
 	get_node(DETAIL + "/PackChoices/Prompt").visible = not phone
