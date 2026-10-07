@@ -3,6 +3,8 @@ extends GdUnitTestSuite
 # Deterministic rule cases use the real authored creator and generated public
 # SDK. Only the host's randomness/storage boundary is substituted here; the
 # application Package Services suite owns persistence, authority and replication.
+# Native views receive a desktop-sized allocation; this Node test parent does not
+# provide the bounded Control layout that the real host supplies.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const CREATOR = preload(ROOT + "ui/character_creator.tscn")
@@ -531,6 +533,7 @@ func test_fanged_hound() -> void:
 	stages.clear()
 	var creator = CREATOR.instantiate()
 	add_child(auto_free(creator))
+	creator.size = Vector2(1920, 1080)
 	if not _check(creator.has_method("select_class"), "The System creation action must offer Fanged Deserter selection."):
 		creator.free()
 		return
@@ -571,6 +574,7 @@ func test_fanged_hound() -> void:
 func test_fanged_scrolls() -> void:
 	var creator = CREATOR.instantiate()
 	add_child(auto_free(creator))
+	creator.size = Vector2(1920, 1080)
 	if not _check(creator.has_method("choose_scroll_disposition"), "Illiteracy requires an explicit choice for each starting scroll."):
 		creator.free()
 		return
@@ -611,6 +615,7 @@ func test_gutterborn_fingersmith() -> void:
 	}
 	var creator = CREATOR.instantiate()
 	add_child(auto_free(creator))
+	creator.size = Vector2(1920, 1080)
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("gutterborn-scum-character", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
@@ -641,6 +646,7 @@ func test_hermit_hawk() -> void:
 	}
 	var creator = CREATOR.instantiate()
 	add_child(auto_free(creator))
+	creator.size = Vector2(1920, 1080)
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("esoteric-hermit-character", "actor_definition"), _entry("hawk-as-weapon", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
@@ -873,6 +879,7 @@ func _host_for(class_id: String, feature_roll: int):
 func _creator_for(host, class_id: String):
 	var creator = CREATOR.instantiate()
 	add_child(auto_free(creator))
+	creator.size = Vector2(1920, 1080)
 	var entries: Array[SDK.ContentEntry] = []
 	for id in ["classless-character", "fanged-deserter-character", "gutterborn-scum-character", "esoteric-hermit-character", "wretched-royalty-character", "heretical-priest-character", "occult-herbmaster-character", "ancient-gore-hound", "hawk-as-weapon", "dog-small-but-vicious", "monkey"]:
 		entries.append(_entry(id, "actor_definition"))

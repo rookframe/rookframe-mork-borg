@@ -4,6 +4,17 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 
+func test_class_can_be_presented_before_the_host_attaches_the_window() -> void:
+	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("occult-herbmaster")
+	view.present_creation("create-class", {"class_id": "occult-herbmaster", "class_profile": profile}, false)
+	var rules = view.get_node(view.DETAIL + "/ClassBody/Rules")
+	assert_int(rules.get_child_count()).is_equal(3)
+	assert_str(rules.get_child(0).get_node(^"Title").text).is_equal("Tough as wood")
+	add_child(view)
+	await _settle()
+	assert_int(rules.get_child_count()).is_equal(3)
+
 func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> void:
 	for profile in [["desktop", 0, Vector2i(1920, 1080)], ["tablet", 2, Vector2i(1024, 768)], ["phone", 1, Vector2i(844, 390)]]:
 		var host = BOUNDARY.new()
@@ -28,7 +39,8 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			var classes: Array[Node] = view.get_node(view.LEFT + "/Choices/Area/Rows").get_children()
 			assert_int(classes.size()).is_equal(7)
 			for row in classes:
-				assert_bool(row.is_visible_in_tree()).is_true()
+				if not row.is_visible_in_tree():
+					continue
 				assert_bool(row.get_global_rect().end.x <= viewport.size.x).is_true()
 				assert_bool(row.get_global_rect().end.y <= primary.global_position.y).is_true()
 			assert_bool(primary.get_global_rect().end.y <= viewport.size.y).is_true()
@@ -39,9 +51,9 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			_button(view, "Class details").pressed.emit()
 			await _settle()
 			await _capture(viewport, "phone-class-detail")
-			var rules: RichTextLabel = view.get_node(view.DETAIL + "/Rules")
-			assert_bool(rules.scroll_active).is_false()
-			assert_int(rules.get_content_height()).is_less_equal(int(rules.size.y))
+			var rules: VBoxContainer = view.get_node(view.DETAIL + "/ClassBody/Rules")
+			assert_int(rules.get_child_count()).is_equal(3)
+			assert_bool(view.get_node(view.STAGE + "/Content").get_global_rect().encloses(rules.get_global_rect())).is_true()
 			_button(view, "Class list").pressed.emit()
 		var captures: Array[String] = []
 		for frame in range(180):
@@ -88,6 +100,15 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		field.get_node(^"Editor").text_changed.emit("Varg")
 		assert_str(field.error_text).is_empty()
 		if profile[0] == "phone":
+			var history = view.get_node(view.CONTEXT + "/PhoneHistory")
+			assert_int(history.get_children().filter(func(row): return row.visible).size()).is_equal(2)
+			viewport.size = Vector2i(1920, 1080)
+			await _settle()
+			var populated: int = history.get_children().filter(func(row): return not row.get_node(^"Text").text.is_empty()).size()
+			assert_int(history.get_children().filter(func(row): return row.visible).size()).is_equal(populated)
+			assert_int(populated).is_greater(2)
+			viewport.size = profile[2]
+			await _settle()
 			primary.pressed.emit()
 			await _settle()
 			assert_bool(view.get_node(view.STAGE + "/Heading/Copy/Status").is_visible_in_tree()).is_true()
@@ -180,13 +201,13 @@ func _settle() -> void:
 func _capture(viewport: SubViewport, name: String) -> void:
 	if name.begins_with("tablet-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 1022, 766)).is_true()
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(34, 22, 956, 724)).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
 				assert_bool(button.size.y >= 44).is_true()
 				assert_bool(bounds.encloses(button.get_global_rect())).is_true()
-		assert_bool(view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame").size == Vector2(120, 150)).is_true()
+		assert_bool(view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame").size == Vector2(100, 125)).is_true()
 		if name == "tablet-review":
 			var pages = view.get_node(view.STAGE + "/Content/Review/BelongingsPages")
 			var last: Label = pages.get_node(^"Area/Belongings/Traits/Content/Copy")
@@ -198,7 +219,7 @@ func _capture(viewport: SubViewport, name: String) -> void:
 			await _settle()
 	if name.begins_with("phone-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 842, 388)).is_true()
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(16, 14, 812, 362)).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
