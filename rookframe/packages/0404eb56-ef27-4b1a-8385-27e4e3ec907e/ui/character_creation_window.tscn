@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_window.gd" id="script"]
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creator.tscn" id="creator"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/overlays/dialog.tscn" id="dialog"]
 
 [node name="CharacterCreation" type="Control"]
 layout_mode = 1
@@ -12,6 +13,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("script")
+
+[node name="RestartDialog" parent="." instance=ExtResource("dialog")]
+tone = 2
+eyebrow = ""
+heading = "Start over"
+description = "Discard this unfinished Character and start again?"
+confirm_label = "Start over"
 
 [node name="CharacterCreator" parent="." instance=ExtResource("creator")]
 layout_mode = 1

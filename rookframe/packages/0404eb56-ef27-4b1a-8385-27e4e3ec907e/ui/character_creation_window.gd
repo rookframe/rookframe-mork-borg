@@ -1,11 +1,11 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-var _restart_requested := false
 var _created_actor_id := ""
 var _created_actor_data: Dictionary = {}
 @onready var _creator := get_node(^"CharacterCreator")
 @onready var _view := get_node(^"CharacterCreator/View")
+@onready var _restart_dialog := get_node(^"RestartDialog")
 
 func ready() -> void:
 	if sdk == null:
@@ -17,7 +17,7 @@ func ready() -> void:
 	_view.back_requested.connect(_creator.back)
 	_view.restart_requested.connect(_restart)
 	_view.close_requested.connect(_close)
-	sdk.feedback.action_selected.connect(_restart_answered)
+	_restart_dialog.confirmed.connect(_creator.start_over)
 	visibility_changed.connect(_reopened)
 	var definitions := sdk.content.list(SDK.ContentKind.Value.ACTOR_DEFINITION)
 	if not definitions.ok:
@@ -61,25 +61,13 @@ func restore_reconnect_state(state: Dictionary) -> void:
 	_view.set_back_enabled(false)
 
 func _restart() -> void:
-	if _restart_requested or not _creator.is_active():
+	if _restart_dialog.visible or not _creator.is_active():
 		return
-	_restart_requested = true
-	var message := SDK.FeedbackMessage.new()
-	message.title = sdk.translations.text("Start over")
-	message.message = sdk.translations.text("Discard this unfinished Character and start again?")
-	for option in [["restart-character", "Start over"], ["keep-character", "Cancel"]]:
-		var action := SDK.FeedbackAction.new()
-		action.id = option[0]
-		action.title = sdk.translations.text(option[1])
-		message.actions.append(action)
-	sdk.feedback.confirm(message)
-
-func _restart_answered(action: String) -> void:
-	if not _restart_requested or not action in ["restart-character", "keep-character"]:
-		return
-	_restart_requested = false
-	if action == "restart-character":
-		_creator.start_over()
+	_restart_dialog.heading = sdk.translations.text("Start over")
+	_restart_dialog.description = sdk.translations.text("Discard this unfinished Character and start again?")
+	_restart_dialog.confirm_label = sdk.translations.text("Start over")
+	_restart_dialog.cancel_label = sdk.translations.text("Cancel")
+	_restart_dialog.open_dialog()
 
 func _created(actor: SDK.Actor) -> void:
 	_created_actor_id = actor.id.value

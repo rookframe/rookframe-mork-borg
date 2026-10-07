@@ -24,6 +24,7 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		var viewport: SubViewport = auto_free(SubViewport.new())
 		viewport.size = profile[2]
 		viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		viewport.gui_embed_subwindows = true
 		add_child(viewport)
 		var surface = load(ROOT + "ui/character_creation_window.tscn").instantiate()
 		host.window = surface
@@ -173,11 +174,31 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
 		var restart: Button = surface.get_node(^"CharacterCreator/View/Layout/Footer/Row/Restart")
 		restart.pressed.emit()
-		assert_str(host.feedback_request.severity).is_equal("confirmation")
-		host.FeedbackActionSelected.emit(71, "keep-character")
+		var dialog: Window = surface.get_node(^"RestartDialog")
+		await _settle()
+		assert_bool(dialog.visible).is_true()
+		assert_bool(Rect2i(Vector2i.ZERO, viewport.size).encloses(Rect2i(dialog.position, dialog.size))).is_true()
+		var cancel: Button = dialog.get_node(^"Shell/Content/Footer/Actions/Cancel")
+		var confirm: Button = dialog.get_node(^"Shell/Content/Footer/Actions/Confirm")
+		assert_bool(cancel.has_focus()).is_true()
+		assert_str(str(confirm.theme_type_variation)).is_equal("RookframeDangerButton")
+		assert_float(cancel.position.x).is_less(confirm.position.x)
+		assert_float(cancel.get_global_rect().get_center().y).is_equal_approx(confirm.get_global_rect().get_center().y, 1.0)
+		await _capture(viewport, str(profile[0]) + "-restart-dialog")
+		cancel.pressed.emit()
+		assert_bool(dialog.visible).is_false()
 		assert_str(field.value).is_equal("Varg")
 		restart.pressed.emit()
-		host.FeedbackActionSelected.emit(71, "restart-character")
+		await _settle()
+		var escape := InputEventKey.new()
+		escape.keycode = KEY_ESCAPE
+		escape.pressed = true
+		dialog.push_input(escape)
+		await _settle()
+		assert_bool(dialog.visible).is_false()
+		assert_str(field.value).is_equal("Varg")
+		restart.pressed.emit()
+		dialog.get_node(^"Shell/Content/Footer/Actions/Confirm").pressed.emit()
 		assert_str(creator.capture_reconnect_state().stage).is_equal("create-class")
 		assert_bool(creator.is_active()).is_true()
 		await _settle()
@@ -194,6 +215,7 @@ func test_phone_long_origin_detail_stays_above_fixed_actions() -> void:
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(844, 390)
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
 	viewport.add_child(view)
@@ -296,6 +318,7 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(1024, 768)
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
 	viewport.add_child(view)
