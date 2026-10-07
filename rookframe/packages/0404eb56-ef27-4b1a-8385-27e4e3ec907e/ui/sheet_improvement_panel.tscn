@@ -1,28 +1,28 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_improvement_panel.gd" id="script"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/strength.svg" id="strength"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/agility.svg" id="agility"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/toughness.svg" id="toughness"]
 [sub_resource type="StyleBoxFlat" id="frame"]
 bg_color = Color(0.003922, 0.047059, 0.062745, 1)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_left = 1
 border_width_right = 1
 border_width_top = 1
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="heading"]
 bg_color = Color(0.062745, 0.109804, 0.121569, 1)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="result"]
 bg_color = Color(0.062745, 0.109804, 0.121569, 1)
-border_color = Color(0.266667, 0.913725, 0.913725, 1)
+border_color = Color(0.815686, 0.745098, 0.556863, 1)
 border_width_left = 3
 [sub_resource type="StyleBoxFlat" id="context"]
 bg_color = Color(0, 0, 0, 0)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_right = 1
 [node name="Improvement" type="VBoxContainer"]
 script = ExtResource("script")
@@ -41,7 +41,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Body" type="MarginContainer" parent="."]
 layout_mode = 2
@@ -62,7 +62,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Steps" type="BoxContainer" parent="Body/Content"]
 layout_mode = 2
 vertical = true
@@ -76,7 +76,7 @@ layout_mode = 2
 text = "01"
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 26
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Copy" type="VBoxContainer" parent="Body/Content/Steps/Step1"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -99,7 +99,7 @@ layout_mode = 2
 text = "02"
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 26
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Copy" type="VBoxContainer" parent="Body/Content/Steps/Step2"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -122,7 +122,7 @@ layout_mode = 2
 text = "03"
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 26
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Copy" type="VBoxContainer" parent="Body/Content/Steps/Step3"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -210,13 +210,13 @@ layout_mode = 2
 text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Value" type="Label" parent="Body/Content/Result/Inset/Content"]
 layout_mode = 2
 text = ""
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 42
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_fonts/font = ExtResource("display")
 [node name="Copy" type="Label" parent="Body/Content/Result/Inset/Content"]
 layout_mode = 2
@@ -242,7 +242,7 @@ texture = ExtResource("strength")
 expand_mode = 1
 stretch_mode = 5
 size_flags_vertical = 4
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Name" type="Label" parent="Body/Content/Abilities/Strength"]
 layout_mode = 2
 text = "Strength"
@@ -254,7 +254,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Strength"]
 layout_mode = 2
 mouse_filter = 2
@@ -263,7 +263,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Strength"]
 layout_mode = 2
 mouse_filter = 2
@@ -280,7 +280,7 @@ texture = ExtResource("agility")
 expand_mode = 1
 stretch_mode = 5
 size_flags_vertical = 4
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Name" type="Label" parent="Body/Content/Abilities/Agility"]
 layout_mode = 2
 text = "Agility"
@@ -292,7 +292,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Agility"]
 layout_mode = 2
 mouse_filter = 2
@@ -301,7 +301,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Agility"]
 layout_mode = 2
 mouse_filter = 2
@@ -318,7 +318,7 @@ texture = ExtResource("presence")
 expand_mode = 1
 stretch_mode = 5
 size_flags_vertical = 4
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Name" type="Label" parent="Body/Content/Abilities/Presence"]
 layout_mode = 2
 text = "Presence"
@@ -330,7 +330,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Presence"]
 layout_mode = 2
 mouse_filter = 2
@@ -339,7 +339,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Presence"]
 layout_mode = 2
 mouse_filter = 2
@@ -356,7 +356,7 @@ texture = ExtResource("toughness")
 expand_mode = 1
 stretch_mode = 5
 size_flags_vertical = 4
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Name" type="Label" parent="Body/Content/Abilities/Toughness"]
 layout_mode = 2
 text = "Toughness"
@@ -368,7 +368,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 [node name="Spacer" type="Control" parent="Body/Content/Abilities/Toughness"]
 layout_mode = 2
 mouse_filter = 2
@@ -377,7 +377,7 @@ layout_mode = 2
 text = ""
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="EndSpacer" type="Control" parent="Body/Content/Abilities/Toughness"]
 layout_mode = 2
 mouse_filter = 2

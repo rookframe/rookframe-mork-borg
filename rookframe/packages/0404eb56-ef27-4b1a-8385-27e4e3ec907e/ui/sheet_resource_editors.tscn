@@ -7,8 +7,8 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
 [sub_resource type="StyleBoxFlat" id="InlineEditor"]
-bg_color = Color(0.027451, 0.062745, 0.082353, 1)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+bg_color = Color(0.137255, 0.156863, 0.168627, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -19,8 +19,8 @@ content_margin_top = 17.0
 content_margin_bottom = 3.0
 
 [sub_resource type="StyleBoxFlat" id="InlineFocus"]
-bg_color = Color(0.027451, 0.062745, 0.082353, 1)
-border_color = Color(0.509804, 0.972549, 0.956863, 1)
+bg_color = Color(0.137255, 0.156863, 0.168627, 1)
+border_color = Color(0.905882, 0.905882, 0.866667, 1)
 border_width_left = 2
 border_width_top = 2
 border_width_right = 2
@@ -40,8 +40,9 @@ text = "RESOURCES"
 theme_override_font_sizes/font_size = 16
 custom_minimum_size = Vector2(0, 39)
 vertical_alignment = 1
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 [node name="Pages" parent="." instance=ExtResource("pages")]
+theme = null
 layout_mode = 2
 size_flags_vertical = 3
 [node name="Rows" type="VBoxContainer" parent="Pages/Area"]
@@ -64,7 +65,7 @@ size_flags_vertical = 4
 texture = ExtResource("heart")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/HP/Row"]
 layout_mode = 2
 text = "Hit points"
@@ -86,7 +87,7 @@ size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Hit points"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/hit_points/Editor"]
 layout_mode = 0
@@ -113,7 +114,7 @@ size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Hit points maximum"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/maximum_hit_points/Editor"]
 layout_mode = 0
@@ -146,7 +147,7 @@ size_flags_vertical = 4
 texture = ExtResource("dice")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/Omens/Row"]
 layout_mode = 2
 text = "Omens"
@@ -168,7 +169,7 @@ size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Omens"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Omens/Row/Editors/omens/Editor"]
 layout_mode = 0
@@ -201,7 +202,7 @@ size_flags_vertical = 4
 texture = ExtResource("palms")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/Powers/Row"]
 layout_mode = 2
 text = "Power uses"
@@ -223,7 +224,7 @@ size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Power uses"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Powers/Row/Editors/power_uses/Editor"]
 layout_mode = 0
@@ -256,7 +257,7 @@ size_flags_vertical = 4
 texture = ExtResource("silver")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.266667, 0.913725, 0.913725, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/Silver/Row"]
 layout_mode = 2
 text = "Silver"
@@ -278,7 +279,7 @@ size_flags_horizontal = 3
 theme_override_styles/normal = SubResource("InlineEditor")
 theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Silver"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Silver/Row/Editors/silver/Editor"]
 layout_mode = 0

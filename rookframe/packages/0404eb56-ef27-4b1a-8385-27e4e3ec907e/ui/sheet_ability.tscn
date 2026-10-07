@@ -1,6 +1,8 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ability.gd" id="script"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
+
+[ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_row.tres" id="row"]
 
 [node name="SheetAbility" type="Button"]
 script = ExtResource("script")
@@ -8,10 +10,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 custom_minimum_size = Vector2(44, 56)
 theme_type_variation = &"TaskChoice"
+theme_override_styles/normal = ExtResource("row")
+theme_override_styles/disabled = ExtResource("row")
 icon_alignment = 0
 expand_icon = true
 theme_override_constants/icon_max_width = 24
-theme_override_colors/icon_normal_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 
 [node name="Inset" type="MarginContainer" parent="."]
 layout_mode = 1
@@ -36,5 +40,5 @@ mouse_filter = 2
 layout_mode = 2
 theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 24
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.807843,0.8,0.701961,1)
 mouse_filter = 2

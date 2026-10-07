@@ -17,8 +17,8 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.30` | `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `e2a1e807d73c907bf360aa38a21a55b1773965e2` | `rookframe/ui/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.42` | `addons/rookframe_sdk/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9a124f5b5ebcf03a064b314771a303f3ca11d83f` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
@@ -61,12 +61,33 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.90)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.138)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
 
 ## Character and inventory checks
+
+The full-screen Character sheet follows the approved Silkbound Ledger
+`character-game/sheet.html` reference at 1920 × 1080, 1024 × 768 and 844 × 390.
+Its authored Godot Controls use the public UI Kit theme, fonts, icons and
+`SilkboundCollection`. Character data supplies the content; the reference's
+portrait and illustrative equipment are not shipped as gameplay data.
+Journal notes are local to the current World application visit.
+Desktop hover hints show a title, rules summary and inspection prompt for
+attributes, resources, combat, protection and collection entries. Inventory
+actions remain icon-only, with item-specific accessible labels.
+
+Iterate using the SDK's Rookframe → Development dock and a complete compiled
+Development Mode runtime bundle. Save Package scenes and scripts in the editor
+to update the retained World. Host managed-code changes require rebuilding the
+stock Godot export and runtime bundle before preparing the project again.
+
+Run the sheet's native geometry and interaction checks with a display:
+
+```sh
+godot --path . --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests/character_surface_silkbound.gd -c
+```
 
 Run the focused Godot suite with the installed public dependencies:
 

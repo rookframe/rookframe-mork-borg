@@ -7,8 +7,10 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("1")
 [node name="Field" parent="." instance=ExtResource("2")]
+theme = null
 layout_mode = 2
 [node name="Multiline" parent="." instance=ExtResource("3")]
+theme = null
 layout_mode = 2
 visible = false
 [node name="Actions" type="HBoxContainer" parent="."]

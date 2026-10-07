@@ -1,15 +1,18 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_plain.tres" id="plain"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_favorite.tscn" id="favorite"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/linen.png" id="linen"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/paginated_text_area.tscn" id="notepad"]
 [sub_resource type="StyleBoxFlat" id="line"]
 bg_color = Color(0, 0, 0, 0)
-border_color = Color(0.27451, 0.321569, 0.337255, 1)
+border_color = Color(0.358353, 0.384235, 0.395686, 1)
 border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="selected"]
 bg_color = Color(0, 0, 0, 0)
-border_color = Color(0.941176, 0.733333, 0.196078, 1)
+border_color = Color(0.905882, 0.905882, 0.866667, 1)
 border_width_bottom = 2
 content_margin_left = 16.0
 content_margin_right = 16.0
@@ -25,6 +28,13 @@ theme_override_constants/separation = 0
 [node name="HeaderFrame" type="PanelContainer" parent="."]
 layout_mode = 2
 theme_override_styles/panel = SubResource("line")
+[node name="Linen" type="TextureRect" parent="HeaderFrame"]
+layout_mode = 2
+texture = ExtResource("linen")
+texture_filter = 1
+stretch_mode = 1
+expand_mode = 1
+mouse_filter = 2
 [node name="Inset" type="MarginContainer" parent="HeaderFrame"]
 layout_mode = 2
 [node name="DetailHeader" type="HBoxContainer" parent="HeaderFrame/Inset"]
@@ -35,6 +45,31 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "‹ Back"
 theme_type_variation = "TaskButton"
+theme_override_styles/normal = ExtResource("plain")
+theme_override_styles/disabled = ExtResource("plain")
+accessibility_name = "Back"
+[node name="Copy" type="VBoxContainer" parent="HeaderFrame/Inset/DetailHeader/Back"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+alignment = 1
+theme_override_constants/separation = -6
+[node name="Arrow" type="Label" parent="HeaderFrame/Inset/DetailHeader/Back/Copy"]
+layout_mode = 2
+text = "‹"
+horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/font_size = 25
+theme_override_colors/font_color = Color(0.807843, 0.8, 0.701961, 1)
+[node name="Caption" type="Label" parent="HeaderFrame/Inset/DetailHeader/Back/Copy"]
+layout_mode = 2
+text = "Back"
+horizontal_alignment = 1
+mouse_filter = 2
+theme_override_font_sizes/font_size = 13
+theme_override_colors/font_color = Color(0.807843, 0.8, 0.701961, 1)
 [node name="DetailTitle" type="Label" parent="HeaderFrame/Inset/DetailHeader"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -74,10 +109,10 @@ theme_override_styles/pressed = SubResource("selected")
 theme_override_styles/hover = SubResource("tab_normal")
 theme_override_styles/hover_pressed = SubResource("selected")
 theme_override_styles/disabled = SubResource("tab_normal")
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-theme_override_colors/font_hover_color = Color(0.568627, 0.6, 0.603922, 1)
-theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_hover_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_pressed_color = Color(0.905882, 0.905882, 0.866667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.905882, 0.905882, 0.866667, 1)
 [node name="Details" type="Button" parent="TabsFrame/Inset/DetailTabs"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -90,14 +125,15 @@ theme_override_styles/pressed = SubResource("selected")
 theme_override_styles/hover = SubResource("tab_normal")
 theme_override_styles/hover_pressed = SubResource("selected")
 theme_override_styles/disabled = SubResource("tab_normal")
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-theme_override_colors/font_hover_color = Color(0.568627, 0.6, 0.603922, 1)
-theme_override_colors/font_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
-theme_override_colors/font_hover_pressed_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_hover_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_pressed_color = Color(0.905882, 0.905882, 0.866667, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.905882, 0.905882, 0.866667, 1)
 [node name="Body" type="MarginContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
 [node name="DetailPages" parent="Body" instance=ExtResource("pages")]
+theme = null
 layout_mode = 2
 [node name="DetailContent" type="VBoxContainer" parent="Body/DetailPages/Area"]
 layout_mode = 2
@@ -105,6 +141,9 @@ theme_override_constants/separation = 16
 [node name="FullTitle" type="Label" parent="Body/DetailPages/Area/DetailContent"]
 layout_mode = 2
 autowrap_mode = 3
+[node name="NoteEditor" parent="Body" instance=ExtResource("notepad")]
+visible = false
+layout_mode = 2
 [node name="FooterFrame" type="PanelContainer" parent="."]
 layout_mode = 2
 theme_type_variation = "TaskFooter"
@@ -124,6 +163,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 16
 [node name="SecondaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions/Utility"]
 layout_mode = 2
+size_flags_horizontal = 3
 visible = false
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "TaskButton"
