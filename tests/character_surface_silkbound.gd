@@ -242,6 +242,13 @@ func test_sheet_actions_use_icons_and_appearance_controls_have_consistent_spacin
 		assert_str(choose.text).is_not_empty()
 		assert_bool(choose.get_theme_color("font_focus_color") == choose.get_theme_color("font_color")).is_true()
 		assert_float(content.get_node("HeadingGap").size.y).is_greater_equal(8)
+		var preview: Control = content.get_node("PortraitPreview" if panel == "Portrait" else "EmptyPreview")
+		var group: Rect2 = choose.get_global_rect()
+		if buttons.get_child(1).visible:
+			group = group.merge(buttons.get_child(1).get_global_rect())
+		assert_float(absf(group.get_center().x - preview.get_global_rect().get_center().x)).is_less_equal(1.0)
+		assert_float(appearance.get_node("Columns/" + panel + "Panel").get_theme_stylebox("panel").bg_color.a).is_equal(0.0)
+	assert_bool(sheet._chapter_ui.get_node(^"Page/Content/AppearanceStatus").visible).is_false()
 
 func test_single_page_details_hide_pager_and_long_notes_keep_navigation() -> void:
 	var fixture := _open(Vector2i(1920,1080))

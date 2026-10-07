@@ -935,7 +935,7 @@ func before_test() -> void:
 	disabled = false
 
 func _choose_miniature(creator: Node) -> void:
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").pressed.emit()
 	var picker = creator.get_node(^"MiniaturePicker/Margin/Layout/Picker")
 	picker.get_node(^"Browser/Results/Rows").get_child(0).pressed.emit()
 	picker.get_node(^"Actions/Apply").pressed.emit()
@@ -951,7 +951,7 @@ func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 			creator.primary()
 	var name_field = creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity/Name")
 	name_field.value = "Varg"
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").pressed.emit()
 	var picker = creator.get_node(^"MiniaturePicker/Margin/Layout/Picker")
 	_check(picker.get_node(^"Browser/Results/Rows").get_child_count() == 1, "The UI Kit browser shows available Miniatures.")
 	picker.get_node(^"Actions/Back").pressed.emit()
@@ -960,7 +960,7 @@ func test_miniature_browser_cancel_and_return_preserve_identity() -> void:
 	_choose_miniature(creator)
 	_check(not creator.get_node(^"MiniaturePicker").visible, "Use Miniature returns to the wizard.")
 	_check(name_field.value == "Varg", "Selecting preserves the name.")
-	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+	creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").pressed.emit()
 	_check(picker.browser.selection().local_id == "creature-token", "Reopening highlights the saved selection.")
 	picker.get_node(^"Actions/Back").pressed.emit()
 	creator.primary()

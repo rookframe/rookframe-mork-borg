@@ -21,10 +21,12 @@ const STAGE := "Layout/Body/StageSlot/Stage"
 const CONTEXT := "Layout/Body/ContextSlot/Context"
 const LEFT := "Layout/Body/StageSlot/Stage/Content/Split/Left"
 const DETAIL := "Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"
+const MINIATURE := DETAIL + "/Appearance/Columns/MiniaturePanel/Inset/Content/"
 signal class_selected(class_id: String)
 signal scroll_selected(slot: String, disposition: String)
 signal pack_selected(pack: String)
 signal miniature_requested
+signal miniature_reset_requested
 var i18n := I18N.new()
 var facade: SDK
 var _draft: Dictionary = {}
@@ -41,7 +43,8 @@ var _detail_key := ""
 func _ready() -> void:
 	super._ready()
 	get_node(LEFT + "/Choices").selected.connect(_selected_row)
-	get_node(DETAIL + "/Appearance/Copy/PreferredMiniature").pressed.connect(_request_miniature)
+	get_node(DETAIL + "/Appearance").miniature_requested.connect(_request_miniature)
+	get_node(DETAIL + "/Appearance").miniature_clear_requested.connect(_reset_miniature)
 	for index in range(DEFINITION.PACK_CHOICES.size()):
 		get_node(DETAIL + PACK_BUTTONS[index]).pressed.connect(_request_pack.bind(DEFINITION.PACK_CHOICES[index]))
 	get_node(DETAIL + "/ScrollChoice/Reroll").pressed.connect(_request_scroll.bind("reroll"))
@@ -176,14 +179,10 @@ func _fit() -> void:
 	get_node(DETAIL + "/ClassBody/FactsColumn/Facts").theme_type_variation = "WizardFactsCompact" if phone else "WizardFactsTablet" if tablet else "WizardFacts"
 	_text(DETAIL + "/NoteRow/Note",14 if tablet else 17,1.3)
 	for name in ["Spacer","NoteRule","NoteRow"]:
-		get_node(DETAIL + "/" + name).visible = not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route in ["create-class","create-identity"] or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
-	get_node(DETAIL + "/Appearance/Preview").custom_minimum_size = Vector2(80,100) if phone else Vector2(110,138)
-	get_node(DETAIL + "/Appearance").vertical = tablet
-	get_node(DETAIL + "/Appearance").add_theme_constant_override("separation",16 if phone else 12 if tablet else 20)
-	get_node(DETAIL + "/Appearance/Copy").add_theme_constant_override("separation",8 if phone else 12 if tablet else 16)
-	_text(DETAIL + "/Appearance/Copy/Name",21 if phone else 22 if tablet else 24)
-	_text(DETAIL + "/Appearance/Copy/Description",17 if phone or tablet else 19)
-	_text(DETAIL + "/Appearance/Copy/PreferredMiniature",17 if phone else 18 if tablet else 20)
+		get_node(DETAIL + "/" + name).visible = _route != "create-identity" and not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route == "create-class" or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
+	get_node(DETAIL + "/Heading").visible = _route != "create-identity"
+	get_node(DETAIL + "/Appearance").configure(i18n, null, false, true, phone, tablet)
+	get_node(MINIATURE + "Explanation").text = _t("Your character portrait and tabletop miniature can be different.")
 	get_node(DETAIL + "/PackChoices/Options").columns = 3 if phone else 2
 	get_node(DETAIL + "/PackChoices/Options").add_theme_constant_override("v_separation",6 if phone else 8)
 	get_node(DETAIL + "/PackChoices/Prompt").visible = not phone
@@ -291,7 +290,7 @@ func set_status(message: String, error: bool = false) -> void:
 		if name_error:
 			get_node(LEFT + "/Identity/Name/Editor").grab_focus()
 		else:
-			get_node(DETAIL + "/Appearance/Copy/PreferredMiniature").grab_focus()
+			get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").grab_focus()
 
 func present_creation(route: String, draft: Dictionary, _compact: bool) -> void:
 	var next_route := "create-abilities" if route == "create-rolling" else route
@@ -553,22 +552,23 @@ func _present_class_rules() -> void:
 		_style_text(copy,15 if phone else 16 if tablet else 19,1.15 if phone else 1.3)
 
 func _present_identity() -> void:
-	var detail := _reset_detail()
-	get_node(DETAIL + "/NoteRow/Icon").texture = _icon("character")
-	get_node(DETAIL + "/Heading/Icon").visible = false
-	get_node(DETAIL + "/Heading/Copy/Kicker").text = _t("On the tabletop")
-	get_node(DETAIL + "/Heading/Copy/Title").text = _t("Preferred miniature")
-	get_node(DETAIL + "/Appearance").visible = true
+	_reset_detail()
+	var appearance := get_node(DETAIL + "/Appearance")
+	appearance.visible = true
 	var miniature: Dictionary = _draft.get("preferred_miniature", {})
-	get_node(DETAIL + "/Appearance/Copy/Name").text = str(miniature.get("title", _t("None")))
-	get_node(DETAIL + "/Appearance/Copy/PreferredMiniature").text = _t("Choose miniature" if miniature.is_empty() else "Change miniature")
-	get_node(DETAIL + "/NoteRow/Note").text = _t("Your character portrait and tabletop miniature can be different.")
+	var title := str(miniature.get("title", ""))
+	var package := ""
+	if not miniature.is_empty() and facade != null:
+		var entry := facade.content.read(SDK.ContentReference.new(str(miniature.package_id), str(miniature.local_id)))
+		if entry.ok:
+			title = entry.content_entry.localized_title
+			package = entry.content_entry.package_title
+	appearance.miniature(i18n, title, package, not miniature.is_empty())
 	var key := str(miniature.get("package_id", "")) + "/" + str(miniature.get("local_id", ""))
-	get_node(DETAIL + "/Appearance/Preview").visible = not miniature.is_empty()
 	if key != _preview_key and facade != null:
 		_preview_key = key
 		if not miniature.is_empty():
-			facade.content.preview_miniature(SDK.ContentReference.new(str(miniature.package_id), str(miniature.local_id)), get_node(DETAIL + "/Appearance/Preview"))
+			facade.content.preview_miniature(SDK.ContentReference.new(str(miniature.package_id), str(miniature.local_id)), get_node(MINIATURE + "MiniaturePreview"))
 
 func _present_context() -> void:
 	var context := get_node(CONTEXT)
@@ -764,6 +764,9 @@ func _t(source: String) -> String:
 
 func _request_miniature() -> void:
 	miniature_requested.emit()
+
+func _reset_miniature() -> void:
+	miniature_reset_requested.emit()
 
 func _request_pack(pack: String) -> void:
 	pack_selected.emit(pack)

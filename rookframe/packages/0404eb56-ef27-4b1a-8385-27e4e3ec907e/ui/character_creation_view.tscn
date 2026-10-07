@@ -40,6 +40,8 @@
 
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/rook.svg" id="rook"]
 
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.tscn" id="appearance"]
+
 [sub_resource type="StyleBoxFlat" id="Portrait"]
 bg_color = Color(0, 0, 0, 0)
 border_color = Color(0.243137, 0.262745, 0.274510, 1)
@@ -927,43 +929,11 @@ text = "Use as toilet paper"
 custom_minimum_size = Vector2(44, 44)
 theme_type_variation = "WizardButton"
 
-[node name="Appearance" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
+[node name="Appearance" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content" instance=ExtResource("appearance")]
 layout_mode = 2
+size_flags_vertical = 3
 visible = false
-theme_override_constants/separation = 20
-
-[node name="Preview" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance"]
-layout_mode = 2
-custom_minimum_size = Vector2(110, 138)
-mouse_filter = 2
-
-[node name="Copy" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 16
-
-[node name="Name" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy"]
-layout_mode = 2
-text = "None"
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
-autowrap_mode = 2
-
-[node name="Description" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy"]
-layout_mode = 2
-text = "Preferred appearance for this character’s Rooks."
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
-autowrap_mode = 2
-
-[node name="PreferredMiniature" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy"]
-size_flags_horizontal = 0
-layout_mode = 2
-text = "Choose miniature"
-icon = ExtResource("rook")
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "WizardButton"
+miniature_only = true
 
 [node name="Spacer" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2

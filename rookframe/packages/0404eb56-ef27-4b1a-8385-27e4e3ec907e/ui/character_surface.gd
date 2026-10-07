@@ -1427,6 +1427,7 @@ func _status(message: String) -> void:
 	get_node(^"Margin/Layout").show_status(_locale.text(message))
 	if int(_nav.get("chapter", 0)) == 4:
 		_chapter_ui.get_node(^"Page/Content/AppearanceStatus").text = _locale.text(message)
+		_chapter_ui.get_node(^"Page/Content/AppearanceStatus").visible = not message.is_empty()
 
 func _density() -> void:
 	# Window composition reparents the sheet; resized can fire during that move.

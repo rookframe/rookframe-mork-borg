@@ -180,6 +180,7 @@ func _ready() -> void:
 	_source_definition = CHARACTER_DEFINITION.new()
 	_view.pack_selected.connect(_on_pack_selected)
 	_view.miniature_requested.connect(_choose_preferred_miniature)
+	_view.miniature_reset_requested.connect(_reset_preferred_miniature)
 	get_node(^"MiniaturePicker").selected.connect(_miniature_selected)
 	get_node(^"MiniaturePicker").closed.connect(_miniature_picker_closed)
 
@@ -742,6 +743,12 @@ func _choose_preferred_miniature() -> void:
 func _miniature_selected(reference: Dictionary) -> void:
 	if _creation_active and _character_stage == "create-identity":
 		_character_draft["preferred_miniature"] = reference.duplicate(true)
+
+func _reset_preferred_miniature() -> void:
+	if _creation_active and _character_stage == "create-identity":
+		_sync_identity_fields()
+		_character_draft["preferred_miniature"] = {}
+		_show_creation_route(_character_stage)
 
 
 func _miniature_picker_closed() -> void:
