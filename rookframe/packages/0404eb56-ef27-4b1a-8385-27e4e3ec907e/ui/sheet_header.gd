@@ -35,11 +35,12 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"Close").add_theme_font_size_override("font_size", 28)
 	get_node(^"Close").tooltip_text = "Close character sheet"
 	get_node(^"Edit").tooltip_text = "Edit sheet"
-	get_node(^"Edit").text = "" if phone else "Edit sheet"
+	get_node(^"Edit").text = ""
 
 	for path in [^"Close", ^"Edit"]:
 		var button: Button = get_node(path)
 		button.custom_minimum_size = Vector2(44, 44)
+		button.add_theme_color_override("icon_focus_color", Color(0.815686, 0.745098, 0.556863, 1))
 		for state in ["normal", "hover", "pressed", "disabled"]:
 			var frame: StyleBox = button.get_theme_stylebox(state).duplicate()
 			frame.content_margin_top = 2

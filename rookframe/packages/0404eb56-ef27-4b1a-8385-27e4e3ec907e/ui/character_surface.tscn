@@ -30,7 +30,8 @@
 [ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_plain.tres" id="plain"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="psychopomp"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="quill"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/edit.svg" id="edit_icon"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close_icon"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_readiness.tscn" id="readiness"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.tscn" id="resource_editors"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/ribbon.svg" id="ribbon"]
@@ -273,12 +274,14 @@ custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
 accessibility_name = "Edit sheet"
-theme_type_variation = &"TaskButton"
+theme_type_variation = &"SilkIcon"
 theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_constants/icon_max_width = 24
-text = "Edit sheet"
-icon = ExtResource("quill")
+text = ""
+icon = ExtResource("edit_icon")
+icon_alignment = 1
+vertical_icon_alignment = 1
 
 [node name="Rest" type="Button" parent="Margin/Layout/Header" unique_id=723642292]
 unique_name_in_owner = true
@@ -336,8 +339,10 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 accessibility_name = "Close character sheet"
-theme_type_variation = &"TaskButton"
-text = "×"
+theme_type_variation = &"SilkIcon"
+icon = ExtResource("close_icon")
+icon_alignment = 1
+vertical_icon_alignment = 1
 
 [node name="RibbonSpace" type="Control" parent="Margin/Layout/Header"]
 layout_mode = 2
@@ -383,21 +388,25 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 accessibility_name = "Edit sheet"
-theme_type_variation = &"TaskButton"
+theme_type_variation = &"SilkIcon"
 theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_constants/icon_max_width = 22
-icon = ExtResource("quill")
+icon = ExtResource("edit_icon")
 clip_text = true
 expand_icon = true
+icon_alignment = 1
+vertical_icon_alignment = 1
 
 [node name="PhoneClose" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"TaskGlyphButton"
-text = "×"
+theme_type_variation = &"SilkIcon"
+icon = ExtResource("close_icon")
 theme_override_font_sizes/font_size = 28
 accessibility_name = "Close character sheet"
 tooltip_text = "Close character sheet"
+icon_alignment = 1
+vertical_icon_alignment = 1
 
 [node name="Class" type="Label" parent="Margin/Layout/Body/Core" unique_id=1573180520]
 unique_name_in_owner = true

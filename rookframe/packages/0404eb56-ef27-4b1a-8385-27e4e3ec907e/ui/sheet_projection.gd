@@ -150,8 +150,8 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 				entry.action_pressed = item.get("equipped", false)
 				entry.action_disabled = not owner or item.get("broken", false) or int(item.get("quantity", 0)) <= 0
 			elif not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd").new().definition(str(item.get("source_item_id", ""))).is_empty():
-				entry.action = "Use"
-				entry.action_text = "Use one"
+				entry.action = "Use " + str(item.get("name", "item"))
+				entry.action_icon = preload("res://rookframe/ui/icons/character/use.svg")
 				entry.action_disabled = not owner or int(item.get("quantity", 0)) <= 0
 			primary.append(entry)
 		resources.append(row("resource:silver", "Silver", "coins", str(data.get("silver", 0))))

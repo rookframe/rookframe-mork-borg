@@ -206,3 +206,64 @@ func test_note_footer_has_compact_primary_action_and_icon_back() -> void:
 	assert_float(sheet._primary_button.size.x).is_less(250.0)
 	assert_float(sheet._primary_button.get_global_rect().end.x).is_greater(sheet._detail_ui.get_global_rect().get_center().x)
 	assert_float(sheet._detail_ui.get_node("FooterFrame").size.y).is_less_equal(70.0)
+
+func test_sheet_actions_use_icons_and_appearance_controls_have_consistent_spacing() -> void:
+	var fixture := _open(Vector2i(1920,1080))
+	var sheet = fixture.sheet
+	await _settle()
+	assert_str(sheet._header_edit.text).is_empty()
+	assert_str(sheet._header_edit.icon.resource_path).is_equal("res://rookframe/ui/icons/edit.svg")
+	assert_str(sheet._header_close.text).is_empty()
+	assert_str(sheet._header_close.icon.resource_path).is_equal("res://rookframe/ui/icons/close.svg")
+	fixture.host.actors.hero.data.inventory.append({"inventory_id":"food", "source_item_id":"dried-food", "name":"Dried food", "kind":"Equipment", "quantity":3})
+	sheet.opened(SDK.ActorId.new("hero"))
+	sheet._chapter(2)
+	await _settle()
+	var records: Dictionary = sheet._projection.collections(sheet._actor.data,sheet._items,2,"hero",sheet.sdk,0,true)
+	var used := false
+	for entry in records.primary:
+		if entry.has("action"):
+			assert_str(str(entry.get("action_text", ""))).is_empty()
+			assert_object(entry.action_icon).is_not_null()
+			if entry.id == "item:food":
+				used = true
+				assert_str(entry.action).is_equal("Use Dried food")
+	assert_bool(used).is_true()
+	sheet._chapter(4)
+	await _settle()
+	var appearance = sheet._appearance_ui
+	for panel in ["Portrait", "Miniature"]:
+		var content: Control = appearance.get_node("Columns/" + panel + "Panel/Inset/Content")
+		var buttons = content.get_node(panel + "Buttons")
+		var choose: Button = buttons.get_child(0)
+		assert_int(buttons.get_theme_constant("h_separation")).is_equal(12)
+		assert_str(buttons.get_child(1).text).is_equal("Reset")
+		assert_bool(choose.get_theme_color("font_focus_color") == choose.get_theme_color("font_color")).is_true()
+		assert_float(content.get_node("HeadingGap").size.y).is_greater_equal(8)
+
+func test_single_page_details_hide_pager_and_long_notes_keep_navigation() -> void:
+	var fixture := _open(Vector2i(1920,1080))
+	var sheet = fixture.sheet
+	await _settle()
+	sheet._open_detail("journal:notes")
+	await _settle()
+	var details = sheet._detail_ui
+	assert_bool(details.get_node("Body/DetailPages").get_pager().is_visible_in_tree()).is_false()
+	assert_bool(details.get_node("Body/NoteEditor").get_pager().is_visible_in_tree()).is_false()
+	await sheet._primary_action()
+	await _settle()
+	assert_bool(details.get_node("Body/DetailPages").get_pager().is_visible_in_tree()).is_false()
+	assert_bool(details.get_node("Body/NoteEditor").get_pager().is_visible_in_tree()).is_false()
+	var editor = details.get_node("Body/NoteEditor")
+	editor.value = "The forest remembers every footstep.\n".repeat(100)
+	await _settle()
+	assert_bool(editor.get_pager().is_visible_in_tree()).is_true()
+	var pager = editor.get_pager()
+	assert_bool(pager.get_node("Next").disabled).is_false()
+	pager.get_node("Next").pressed.emit()
+	await _settle()
+	assert_bool(pager.get_node("Previous").disabled).is_false()
+	sheet._back()
+	await _settle()
+	assert_bool(details.get_node("Body/DetailPages").get_pager().is_visible_in_tree()).is_false()
+	assert_bool(details.get_node("Body/NoteEditor").get_pager().is_visible_in_tree()).is_false()

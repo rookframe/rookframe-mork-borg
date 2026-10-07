@@ -37,8 +37,6 @@ func _ready() -> void:
 	pager.size_flags_horizontal = 3
 	_style_pager(pager)
 	_pager_slot.add_child(pager)
-	_pager_slot.visible = pager.visible
-	pager.visibility_changed.connect(_pager_visibility_changed)
 	var note_pager = get_node(^"Body/NoteEditor").get_pager()
 	_style_pager(note_pager)
 	_pager_slot.add_child(note_pager)
@@ -68,7 +66,7 @@ func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, readin
 	_task = task
 	_draft = draft
 	_reading = reading
-	get_node(^"Body/DetailPages").always_show_pager = reading
+	get_node(^"Body/DetailPages").always_show_pager = false
 	get_node(^"Body/NoteEditor").compact = phone
 	get_node(^"Body/NoteEditor").visible = _note_editing
 	get_node(^"Body/DetailPages").visible = not _note_editing
@@ -118,7 +116,6 @@ func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, readin
 	get_node(^"FooterFrame/FooterInset").custom_minimum_size = Vector2(0, 60 if phone else 68)
 	get_node(^"FooterFrame/FooterInset").add_theme_constant_override("margin_top", 7 if phone else 8)
 	get_node(^"FooterFrame/FooterInset").add_theme_constant_override("margin_bottom", 7 if phone else 8)
-	_pager_visibility_changed()
 
 func append_draft_field(field: String, title: String, value: String, phone: bool) -> ENTRY_FIELD:
 	var control = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_field.tscn").instantiate()
@@ -282,12 +279,6 @@ func append_item_field(field: String, value: String, phone: bool, independent: b
 	register_field(control)
 	control.configure(field, field.replace("_", " ").capitalize(), value, field == "rules", independent)
 	return control
-
-func _pager_visibility_changed() -> void:
-	var pager = get_node(^"Body/DetailPages").get_pager()
-	pager.visible = not _note_editing and (pager.visible or _reading)
-	get_node(^"Body/NoteEditor").get_pager().visible = _note_editing
-	_pager_slot.visible = _note_editing or pager.visible
 
 ## The mock's visit-local writing flow. Durable Actor data remains separate.
 var journal_draft := ""

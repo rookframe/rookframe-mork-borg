@@ -34,6 +34,7 @@ func configure_actor(facade: SDK, actor: SDK.Actor) -> void:
 	(get_node(^"Columns/MiniaturePanel/Inset/Content/PackageCaption") as Label).text = ""
 	(get_node(^"Columns/MiniaturePanel/Inset/Content/MiniatureCaption") as Label).text = "No miniature selected"
 	miniature(_locale, "", "", not reference.is_empty())
+	get_node(MINIATURE + "PreviewCaptionGap").visible = not reference.is_empty()
 	if reference.is_empty() or not is_visible_in_tree():
 		return
 	var entry := SDK.ContentReference.new(str(reference.get("package_id", "")), str(reference.get("local_id", "")))
@@ -117,15 +118,19 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 		wash.border_color = Color(0.356863, 0.384314, 0.396078, 1)
 		panel.add_theme_stylebox_override("panel", wash)
 		var buttons: HFlowContainer = get_node(base + ("PortraitButtons" if base == PORTRAIT else "MiniatureButtons"))
+		buttons.add_theme_constant_override("h_separation", 12)
+		buttons.add_theme_constant_override("v_separation", 8)
 		for child in buttons.get_children():
 			var button := child as Button
 			var primary := str(button.name).begins_with("Change")
+			if not primary:
+				button.text = "Reset"
 			button.add_theme_font_size_override("font_size", 14 if phone else 16 if tablet else 18)
 			for state in ["normal", "hover", "pressed", "disabled"]:
 				var frame: StyleBoxFlat = button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
 				frame.bg_color = Color(0.807843, 0.8, 0.701961, 1) if primary else Color(0.137255, 0.156863, 0.168627, 1)
 				frame.border_color = Color(0.356863, 0.384314, 0.396078, 1)
 				button.add_theme_stylebox_override(state, frame)
-			for state in ["font_color", "font_hover_color", "font_pressed_color"]:
+			for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
 				button.add_theme_color_override(state, Color(0.082353, 0.090196, 0.098039, 1) if primary else Color(0.905882, 0.905882, 0.866667, 1))
 	get_node(MINIATURE + "EmptyPreview/Content/Image").self_modulate = Color(0.815686, 0.745098, 0.556863, 0.4)
