@@ -64,6 +64,18 @@ func portrait(data: Dictionary) -> Texture2D:
 func _choose_miniature() -> void:
 	miniature_requested.emit()
 
+func _present_actions() -> void:
+	for base in [PORTRAIT, MINIATURE]:
+		var buttons: HFlowContainer = get_node(base + ("PortraitButtons" if base == PORTRAIT else "MiniatureButtons"))
+		for child in buttons.get_children():
+			var button := child as Button
+			button.icon = null
+			button.theme_type_variation = ""
+			if not str(button.name).begins_with("Change"):
+				button.text = "Reset"
+			button.accessibility_name = button.text
+			button.tooltip_text = button.text
+
 func _clear_miniature() -> void:
 	if _busy or _actor == null or _actor.access_level != "Owner":
 		return

@@ -238,6 +238,8 @@ func test_sheet_actions_use_icons_and_appearance_controls_have_consistent_spacin
 		var choose: Button = buttons.get_child(0)
 		assert_int(buttons.get_theme_constant("h_separation")).is_equal(12)
 		assert_str(buttons.get_child(1).text).is_equal("Reset")
+		assert_object(choose.icon).is_null()
+		assert_str(choose.text).is_not_empty()
 		assert_bool(choose.get_theme_color("font_focus_color") == choose.get_theme_color("font_color")).is_true()
 		assert_float(content.get_node("HeadingGap").size.y).is_greater_equal(8)
 
