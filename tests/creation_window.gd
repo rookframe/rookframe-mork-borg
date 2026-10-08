@@ -180,16 +180,24 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_bool(Rect2i(Vector2i.ZERO, viewport.size).encloses(Rect2i(dialog.position, dialog.size))).is_true()
 		var cancel: Button = dialog.get_node(^"Shell/Content/Footer/Actions/Cancel")
 		var confirm: Button = dialog.get_node(^"Shell/Content/Footer/Actions/Confirm")
+		assert_object(dialog.gui_get_focus_owner()).is_null()
+		await _capture(viewport, str(profile[0]) + "-restart-dialog")
+		await _dialog_key(dialog, KEY_ENTER)
+		assert_bool(dialog.visible).is_true()
+		assert_str(field.value).is_equal("Varg")
+		await _dialog_key(dialog, KEY_TAB)
 		assert_bool(cancel.has_focus()).is_true()
+		await _dialog_key(dialog, KEY_TAB)
+		assert_bool(confirm.has_focus()).is_true()
 		assert_str(str(confirm.theme_type_variation)).is_equal("RookframeDangerButton")
 		assert_float(cancel.position.x).is_less(confirm.position.x)
 		assert_float(cancel.get_global_rect().get_center().y).is_equal_approx(confirm.get_global_rect().get_center().y, 1.0)
-		await _capture(viewport, str(profile[0]) + "-restart-dialog")
 		cancel.pressed.emit()
 		assert_bool(dialog.visible).is_false()
 		assert_str(field.value).is_equal("Varg")
 		restart.pressed.emit()
 		await _settle()
+		assert_object(dialog.gui_get_focus_owner()).is_null()
 		var escape := InputEventKey.new()
 		escape.keycode = KEY_ESCAPE
 		escape.pressed = true
@@ -350,3 +358,13 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 	assert_int(view.capture_state().belongings_page).is_equal(1)
 	assert_dict(draft).is_equal(unchanged)
 	viewport.free()
+
+func _dialog_key(dialog: Window, key: Key) -> void:
+	var event := InputEventKey.new()
+	event.keycode = key
+	event.pressed = true
+	dialog.push_input(event)
+	event = event.duplicate()
+	event.pressed = false
+	dialog.push_input(event)
+	await _settle()
