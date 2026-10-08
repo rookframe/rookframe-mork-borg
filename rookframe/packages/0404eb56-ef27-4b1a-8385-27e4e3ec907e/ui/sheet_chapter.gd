@@ -153,7 +153,7 @@ func configure_route(view: Dictionary, data: Dictionary, draft: Dictionary, navi
 	_chapter_collections.visible = not obscured and chapter in [0, 1, 2]
 	_chapter_journal_panel.visible = not obscured and chapter == 3
 	get_node(^"Page/Content/AppearanceIntro").visible = false
-	get_node(^"Page/Content/AppearanceStatus").visible = not obscured and chapter == 4
+	get_node(^"Page/Content/AppearanceStatus").visible = not obscured and chapter == 4 and not get_node(^"Page/Content/AppearanceStatus").text.is_empty()
 	_condition_ui.visible = not obscured and chapter == 0 and not condition_reference and not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd").new().condition(data).is_empty()
 	_section.visible = phone and not details and chapter in [0, 1, 2, 3]
 	_quick.visible = phone and not details and chapter != 4 and not _condition_ui.visible

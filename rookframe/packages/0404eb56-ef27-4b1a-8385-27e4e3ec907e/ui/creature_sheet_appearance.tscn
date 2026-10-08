@@ -12,28 +12,12 @@ border_width_left = 0
 border_width_right = 0
 border_width_top = 0
 border_width_bottom = 0
-[sub_resource type="StyleBoxFlat" id="action_hover"]
-bg_color = Color(0.039216, 0.145098, 0.160784, 1)
-border_color = Color(0.815686,0.745098,0.556863, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
-[sub_resource type="StyleBoxFlat" id="action_disabled"]
-bg_color = Color(0.003922, 0.047059, 0.062745, 1)
-border_color = Color(0.243137,0.262745,0.274510, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
 [sub_resource type="StyleBoxFlat" id="divider"]
 bg_color = Color(0,0,0,0)
 border_width_left = 1
 border_color = Color(0.243137,0.262745,0.274510,1)
 [node name="AppearancePanel" type="VBoxContainer"]
 script = ExtResource("script")
-action_hover = SubResource("action_hover")
-action_disabled = SubResource("action_disabled")
 size_flags_vertical = 3
 theme_override_constants/separation = 20
 [node name="TopSpace" type="Control" parent="."]
@@ -87,6 +71,10 @@ self_modulate = Color(0.815686,0.745098,0.556863, 1)
 layout_mode = 2
 text = "Portrait"
 theme_override_font_sizes/font_size = 22
+[node name="HeadingGap" type="Control" parent="Columns/PortraitPanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
 [node name="PortraitPreview" type="Control" parent="Columns/PortraitPanel/Inset/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -113,7 +101,7 @@ custom_minimum_size = Vector2(0, 8)
 mouse_filter = 2
 [node name="PortraitButtons" type="HFlowContainer" parent="Columns/PortraitPanel/Inset/Content"]
 layout_mode = 2
-alignment = 0
+alignment = 1
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 [node name="ChangePortrait" type="Button" parent="Columns/PortraitPanel/Inset/Content/PortraitButtons"]
@@ -121,9 +109,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Choose image"
 theme_type_variation = "TaskButton"
-theme_override_colors/font_color = Color(0.0156863,0.0666667,0.0823529,1)
-theme_override_colors/font_hover_color = Color(0.0156863,0.0666667,0.0823529,1)
-theme_override_colors/font_pressed_color = Color(0.0156863,0.0666667,0.0823529,1)
 theme_override_font_sizes/font_size = 13
 [node name="ClearPortrait" type="Button" parent="Columns/PortraitPanel/Inset/Content/PortraitButtons"]
 layout_mode = 2
@@ -171,6 +156,10 @@ self_modulate = Color(0.815686,0.745098,0.556863, 1)
 layout_mode = 2
 text = "Tabletop miniature"
 theme_override_font_sizes/font_size = 22
+[node name="HeadingGap" type="Control" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
 [node name="MiniaturePreview" type="Control" parent="Columns/MiniaturePanel/Inset/Content"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -206,6 +195,11 @@ text = "Choose from installed Packages."
 theme_override_font_sizes/font_size = 12
 theme_override_colors/font_color = Color(0.682353,0.729412,0.745098,1)
 horizontal_alignment = 1
+[node name="PreviewCaptionGap" type="Control" parent="Columns/MiniaturePanel/Inset/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 8)
+mouse_filter = 2
+visible = false
 [node name="MiniatureCaption" type="Label" parent="Columns/MiniaturePanel/Inset/Content"]
 layout_mode = 2
 text = "No miniature selected"
@@ -225,7 +219,7 @@ custom_minimum_size = Vector2(0, 8)
 mouse_filter = 2
 [node name="MiniatureButtons" type="HFlowContainer" parent="Columns/MiniaturePanel/Inset/Content"]
 layout_mode = 2
-alignment = 0
+alignment = 1
 theme_override_constants/h_separation = 8
 theme_override_constants/v_separation = 8
 [node name="ChangeMiniature" type="Button" parent="Columns/MiniaturePanel/Inset/Content/MiniatureButtons"]
@@ -233,9 +227,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Choose miniature"
 theme_type_variation = "TaskButton"
-theme_override_colors/font_color = Color(0.0156863,0.0666667,0.0823529,1)
-theme_override_colors/font_hover_color = Color(0.0156863,0.0666667,0.0823529,1)
-theme_override_colors/font_pressed_color = Color(0.0156863,0.0666667,0.0823529,1)
 theme_override_font_sizes/font_size = 13
 [node name="ClearMiniature" type="Button" parent="Columns/MiniaturePanel/Inset/Content/MiniatureButtons"]
 layout_mode = 2

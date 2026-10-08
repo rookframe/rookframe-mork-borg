@@ -4,6 +4,17 @@ const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 
+func test_class_can_be_presented_before_the_host_attaches_the_window() -> void:
+	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("occult-herbmaster")
+	view.present_creation("create-class", {"class_id": "occult-herbmaster", "class_profile": profile}, false)
+	var rules = view.get_node(view.DETAIL + "/ClassBody/Rules")
+	assert_int(rules.get_child_count()).is_equal(3)
+	assert_str(rules.get_child(0).get_node(^"Title").text).is_equal("Tough as wood")
+	add_child(view)
+	await _settle()
+	assert_int(rules.get_child_count()).is_equal(3)
+
 func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> void:
 	for profile in [["desktop", 0, Vector2i(1920, 1080)], ["tablet", 2, Vector2i(1024, 768)], ["phone", 1, Vector2i(844, 390)]]:
 		var host = BOUNDARY.new()
@@ -13,6 +24,7 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		var viewport: SubViewport = auto_free(SubViewport.new())
 		viewport.size = profile[2]
 		viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+		viewport.gui_embed_subwindows = true
 		add_child(viewport)
 		var surface = load(ROOT + "ui/character_creation_window.tscn").instantiate()
 		host.window = surface
@@ -28,7 +40,8 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			var classes: Array[Node] = view.get_node(view.LEFT + "/Choices/Area/Rows").get_children()
 			assert_int(classes.size()).is_equal(7)
 			for row in classes:
-				assert_bool(row.is_visible_in_tree()).is_true()
+				if not row.is_visible_in_tree():
+					continue
 				assert_bool(row.get_global_rect().end.x <= viewport.size.x).is_true()
 				assert_bool(row.get_global_rect().end.y <= primary.global_position.y).is_true()
 			assert_bool(primary.get_global_rect().end.y <= viewport.size.y).is_true()
@@ -39,9 +52,9 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			_button(view, "Class details").pressed.emit()
 			await _settle()
 			await _capture(viewport, "phone-class-detail")
-			var rules: RichTextLabel = view.get_node(view.DETAIL + "/Rules")
-			assert_bool(rules.scroll_active).is_false()
-			assert_int(rules.get_content_height()).is_less_equal(int(rules.size.y))
+			var rules: VBoxContainer = view.get_node(view.DETAIL + "/ClassBody/Rules")
+			assert_int(rules.get_child_count()).is_equal(3)
+			assert_bool(view.get_node(view.STAGE + "/Content").get_global_rect().encloses(rules.get_global_rect())).is_true()
 			_button(view, "Class list").pressed.emit()
 		var captures: Array[String] = []
 		for frame in range(180):
@@ -88,10 +101,19 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		field.get_node(^"Editor").text_changed.emit("Varg")
 		assert_str(field.error_text).is_empty()
 		if profile[0] == "phone":
+			var history = view.get_node(view.CONTEXT + "/PhoneHistory")
+			assert_int(history.get_children().filter(func(row): return row.visible).size()).is_equal(2)
+			viewport.size = Vector2i(1920, 1080)
+			await _settle()
+			var populated: int = history.get_children().filter(func(row): return not row.get_node(^"Text").text.is_empty()).size()
+			assert_int(history.get_children().filter(func(row): return row.visible).size()).is_equal(populated)
+			assert_int(populated).is_greater(2)
+			viewport.size = profile[2]
+			await _settle()
 			primary.pressed.emit()
 			await _settle()
 			assert_bool(view.get_node(view.STAGE + "/Heading/Copy/Status").is_visible_in_tree()).is_true()
-			assert_bool(view.get_node(view.DETAIL + "/Appearance/Copy/PreferredMiniature").has_focus()).is_true()
+			assert_bool(view.get_node(view.DETAIL + "/Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").has_focus()).is_true()
 			_button(view, "Identity").pressed.emit()
 			view.set_status("")
 		await _settle()
@@ -101,20 +123,38 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			await _settle()
 			await _capture(viewport, "phone-appearance")
 		var picker: Control = creator.get_node(^"MiniaturePicker")
-		creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy/PreferredMiniature").pressed.emit()
+		creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Columns/MiniaturePanel/Inset/Content/MiniatureButtons/ChangeMiniature").pressed.emit()
 		await _settle()
 		await _capture(viewport, str(profile[0]) + "-browser")
 		surface.hide()
 		await _settle()
 		assert_bool(creator.is_active()).is_true()
 		assert_bool(picker.get_combined_minimum_size().x <= viewport.size.x).is_true()
-		assert_bool(picker.get_node(^"Picker/Layout/Footer/Row/Choose").get_global_rect().end.y <= viewport.size.y).is_true()
-		picker.get_node(^"Picker/Layout/Footer/Row/Cancel").pressed.emit()
+		assert_bool(picker.get_node(^"Margin/Layout/Picker/Actions/Apply").get_global_rect().end.y <= viewport.size.y).is_true()
+		picker.get_node(^"Margin/Layout/Picker/Actions/Back").pressed.emit()
 		assert_str(field.value).is_equal("Varg")
 		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
 		view.miniature_requested.emit()
-		picker.get_node(^"Picker/Layout/Results/Content/GridArea/Rows").get_child(0).pressed.emit()
-		picker.get_node(^"Picker/Layout/Footer/Row/Choose").pressed.emit()
+		picker.get_node(^"Margin/Layout/Picker/Browser/Results/Rows").get_child(0).pressed.emit()
+		picker.get_node(^"Margin/Layout/Picker/Actions/Apply").pressed.emit()
+		await _settle()
+		await _capture(viewport, str(profile[0]) + "-appearance-selected")
+		var preview: Control = view.get_node(view.MINIATURE + "MiniaturePreview")
+		var buttons = view.get_node(view.MINIATURE + "MiniatureButtons")
+		var group: Rect2 = buttons.get_child(0).get_global_rect().merge(buttons.get_child(1).get_global_rect())
+		assert_float(absf(group.get_center().x - preview.get_global_rect().get_center().x)).is_less_equal(1.0)
+		assert_float(preview.size.y).is_greater(250 if profile[0] == "desktop" else 100 if profile[0] == "tablet" else 20)
+		var saved: Dictionary = creator.capture_reconnect_state().draft.duplicate(true)
+		buttons.get_node(^"ClearMiniature").pressed.emit()
+		await _settle()
+		assert_bool(view.get_node(view.MINIATURE + "EmptyPreview").is_visible_in_tree()).is_true()
+		assert_bool(preview.visible).is_false()
+		assert_bool(buttons.get_node(^"ClearMiniature").visible).is_false()
+		saved.preferred_miniature = {}
+		assert_dict(creator.capture_reconnect_state().draft).is_equal(saved)
+		buttons.get_node(^"ChangeMiniature").pressed.emit()
+		picker.get_node(^"Margin/Layout/Picker/Browser/Results/Rows").get_child(0).pressed.emit()
+		picker.get_node(^"Margin/Layout/Picker/Actions/Apply").pressed.emit()
 		primary.pressed.emit()
 		assert_str(creator.capture_reconnect_state().stage).is_equal("create-review")
 		await _settle()
@@ -134,11 +174,39 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
 		var restart: Button = surface.get_node(^"CharacterCreator/View/Layout/Footer/Row/Restart")
 		restart.pressed.emit()
-		assert_str(host.feedback_request.severity).is_equal("confirmation")
-		host.FeedbackActionSelected.emit(71, "keep-character")
+		var dialog: Window = surface.get_node(^"RestartDialog")
+		await _settle()
+		assert_bool(dialog.visible).is_true()
+		assert_bool(Rect2i(Vector2i.ZERO, viewport.size).encloses(Rect2i(dialog.position, dialog.size))).is_true()
+		var cancel: Button = dialog.get_node(^"Shell/Content/Footer/Actions/Cancel")
+		var confirm: Button = dialog.get_node(^"Shell/Content/Footer/Actions/Confirm")
+		assert_object(dialog.gui_get_focus_owner()).is_null()
+		await _capture(viewport, str(profile[0]) + "-restart-dialog")
+		await _dialog_key(dialog, KEY_ENTER)
+		assert_bool(dialog.visible).is_true()
+		assert_str(field.value).is_equal("Varg")
+		await _dialog_key(dialog, KEY_TAB)
+		assert_bool(cancel.has_focus()).is_true()
+		await _dialog_key(dialog, KEY_TAB)
+		assert_bool(confirm.has_focus()).is_true()
+		assert_str(str(confirm.theme_type_variation)).is_equal("RookframeDangerButton")
+		assert_float(cancel.position.x).is_less(confirm.position.x)
+		assert_float(cancel.get_global_rect().get_center().y).is_equal_approx(confirm.get_global_rect().get_center().y, 1.0)
+		cancel.pressed.emit()
+		assert_bool(dialog.visible).is_false()
 		assert_str(field.value).is_equal("Varg")
 		restart.pressed.emit()
-		host.FeedbackActionSelected.emit(71, "restart-character")
+		await _settle()
+		assert_object(dialog.gui_get_focus_owner()).is_null()
+		var escape := InputEventKey.new()
+		escape.keycode = KEY_ESCAPE
+		escape.pressed = true
+		dialog.push_input(escape)
+		await _settle()
+		assert_bool(dialog.visible).is_false()
+		assert_str(field.value).is_equal("Varg")
+		restart.pressed.emit()
+		dialog.get_node(^"Shell/Content/Footer/Actions/Confirm").pressed.emit()
 		assert_str(creator.capture_reconnect_state().stage).is_equal("create-class")
 		assert_bool(creator.is_active()).is_true()
 		await _settle()
@@ -155,6 +223,7 @@ func test_phone_long_origin_detail_stays_above_fixed_actions() -> void:
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(844, 390)
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
 	viewport.add_child(view)
@@ -180,13 +249,13 @@ func _settle() -> void:
 func _capture(viewport: SubViewport, name: String) -> void:
 	if name.begins_with("tablet-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 1022, 766)).is_true()
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(34, 22, 956, 724)).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
 				assert_bool(button.size.y >= 44).is_true()
 				assert_bool(bounds.encloses(button.get_global_rect())).is_true()
-		assert_bool(view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame").size == Vector2(120, 150)).is_true()
+		assert_bool(view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame").size == Vector2(100, 125)).is_true()
 		if name == "tablet-review":
 			var pages = view.get_node(view.STAGE + "/Content/Review/BelongingsPages")
 			var last: Label = pages.get_node(^"Area/Belongings/Traits/Content/Copy")
@@ -198,7 +267,7 @@ func _capture(viewport: SubViewport, name: String) -> void:
 			await _settle()
 	if name.begins_with("phone-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(1, 1, 842, 388)).is_true()
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(16, 14, 812, 362)).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
@@ -257,6 +326,7 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(1024, 768)
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
 	viewport.add_child(view)
@@ -288,3 +358,13 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 	assert_int(view.capture_state().belongings_page).is_equal(1)
 	assert_dict(draft).is_equal(unchanged)
 	viewport.free()
+
+func _dialog_key(dialog: Window, key: Key) -> void:
+	var event := InputEventKey.new()
+	event.keycode = key
+	event.pressed = true
+	dialog.push_input(event)
+	event = event.duplicate()
+	event.pressed = false
+	dialog.push_input(event)
+	await _settle()

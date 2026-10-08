@@ -3,18 +3,3 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_appearance.gd" id="script"]
 [node name="AppearancePanel" instance=ExtResource("appearance")]
 script = ExtResource("script")
-
-[node name="HeadingGap" type="Control" parent="Columns/PortraitPanel/Inset/Content" index=1]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 8)
-mouse_filter = 2
-
-[node name="HeadingGap" type="Control" parent="Columns/MiniaturePanel/Inset/Content" index=1]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 8)
-mouse_filter = 2
-
-[node name="PreviewCaptionGap" type="Control" parent="Columns/MiniaturePanel/Inset/Content" index=4]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 8)
-mouse_filter = 2

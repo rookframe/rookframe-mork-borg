@@ -64,18 +64,6 @@ func portrait(data: Dictionary) -> Texture2D:
 func _choose_miniature() -> void:
 	miniature_requested.emit()
 
-func _present_actions() -> void:
-	for base in [PORTRAIT, MINIATURE]:
-		var buttons: HFlowContainer = get_node(base + ("PortraitButtons" if base == PORTRAIT else "MiniatureButtons"))
-		for child in buttons.get_children():
-			var button := child as Button
-			button.icon = null
-			button.theme_type_variation = ""
-			if not str(button.name).begins_with("Change"):
-				button.text = "Reset"
-			button.accessibility_name = button.text
-			button.tooltip_text = button.text
-
 func _clear_miniature() -> void:
 	if _busy or _actor == null or _actor.access_level != "Owner":
 		return
@@ -118,31 +106,3 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	super.configure(_locale, _texture, false, _actor != null and _actor.access_level == "Owner" and not _busy, phone, tablet, str(data.get("name", "Character")))
 	get_node(PORTRAIT + "Explanation").text = "Shown in the character sheet."
 	get_node(MINIATURE + "Explanation").text = "Saved for this character. Existing Rooks keep their current miniature."
-	get_node(^"Intro/Title").add_theme_color_override("font_color", Color(0.905882, 0.905882, 0.866667, 1))
-	for path in [^"Intro/Title", ^"Columns/PortraitPanel/Inset/Content/PortraitHeading/Title", ^"Columns/MiniaturePanel/Inset/Content/MiniatureHeading/Title", ^"Columns/MiniaturePanel/Inset/Content/EmptyPreview/Content/Title", ^"Columns/MiniaturePanel/Inset/Content/MiniatureCaption"]:
-		get_node(path).add_theme_font_override("font", preload("res://rookframe/ui/theme/silkbound_medium.tres"))
-	for base in [PORTRAIT, MINIATURE]:
-		var heading: Control = get_node(base + ("PortraitHeading" if base == PORTRAIT else "MiniatureHeading"))
-		(heading.get_node(^"Icon") as TextureRect).self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
-		var panel: PanelContainer = get_node(^"Columns/PortraitPanel" if base == PORTRAIT else ^"Columns/MiniaturePanel")
-		var wash: StyleBoxFlat = panel.get_theme_stylebox("panel").duplicate() as StyleBoxFlat
-		wash.bg_color = Color(0.137255, 0.156863, 0.168627, 0.45)
-		wash.border_color = Color(0.356863, 0.384314, 0.396078, 1)
-		panel.add_theme_stylebox_override("panel", wash)
-		var buttons: HFlowContainer = get_node(base + ("PortraitButtons" if base == PORTRAIT else "MiniatureButtons"))
-		buttons.add_theme_constant_override("h_separation", 12)
-		buttons.add_theme_constant_override("v_separation", 8)
-		for child in buttons.get_children():
-			var button := child as Button
-			var primary := str(button.name).begins_with("Change")
-			if not primary:
-				button.text = "Reset"
-			button.add_theme_font_size_override("font_size", 14 if phone else 16 if tablet else 18)
-			for state in ["normal", "hover", "pressed", "disabled"]:
-				var frame: StyleBoxFlat = button.get_theme_stylebox(state).duplicate() as StyleBoxFlat
-				frame.bg_color = Color(0.807843, 0.8, 0.701961, 1) if primary else Color(0.137255, 0.156863, 0.168627, 1)
-				frame.border_color = Color(0.356863, 0.384314, 0.396078, 1)
-				button.add_theme_stylebox_override(state, frame)
-			for state in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color"]:
-				button.add_theme_color_override(state, Color(0.082353, 0.090196, 0.098039, 1) if primary else Color(0.905882, 0.905882, 0.866667, 1))
-	get_node(MINIATURE + "EmptyPreview/Content/Image").self_modulate = Color(0.815686, 0.745098, 0.556863, 0.4)

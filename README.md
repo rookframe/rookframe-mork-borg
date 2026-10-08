@@ -17,8 +17,8 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.42` | `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `9a124f5b5ebcf03a064b314771a303f3ca11d83f` | `rookframe/ui/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.43` | `addons/rookframe_sdk/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `604b5fd443c59f2edc9099fa81899897fca417ab` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.138)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.139)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
@@ -514,7 +514,11 @@ Its Appearance chapter owns World-local portrait and Miniature defaults for new 
 Library row and Create Actor on its sheet create Actors. Dragging a
 Creature onto the tabletop creates an Actor and a linked Rook at the drop position.
 Creation is a GM operation. Failed placement cleans up its partial Actor and Rook.
-Character creation is contributed to the shared Actors window.
+Character creation is contributed to the shared Actors window and opens the full-screen
+Silkbound Ledger wizard. Its six steps use the approved desktop, tablet and
+landscape-phone mockup: linen cover and preview, one ink content pane, shared
+EB Garamond typography, brass icons and measured pagination. Draft retention,
+roll dependencies, class rules and atomic Actor creation keep their existing behavior.
 
 ## Creature Actor sheet
 

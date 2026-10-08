@@ -1438,7 +1438,6 @@ custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
 theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
 theme_override_font_sizes/font_size = 12
-text = "Changes apply immediately. Existing Rooks keep their Miniature."
 text_overrun_behavior = 3
 max_lines_visible = 1
 

@@ -1,8 +1,8 @@
 [gd_scene format=3]
 
-[ext_resource type="Theme" path="res://rookframe/ui/theme/fullscreen_task_theme.tres" id="theme"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/task_display.tres" id="display"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/fullscreen_wizard.tscn" id="frame"]
 
@@ -38,21 +38,25 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/rook.svg" id="rook"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.tscn" id="appearance"]
+
 [sub_resource type="StyleBoxFlat" id="Portrait"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
-border_color = Color(0.133333, 0.196078, 0.215686, 1)
-border_width_top = 1
-border_width_bottom = 1
-border_width_left = 1
-border_width_right = 1
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.243137, 0.262745, 0.274510, 1)
+
+
+
+
 content_margin_left = 0.0
 content_margin_right = 0.0
 content_margin_top = 0.0
 content_margin_bottom = 0.0
 
 [sub_resource type="StyleBoxFlat" id="Summary"]
-bg_color = Color(0.015686, 0.066667, 0.082353, 1)
-border_color = Color(0.133333, 0.196078, 0.215686, 1)
+bg_color = Color(0, 0, 0, 0)
+border_color = Color(0.243137, 0.262745, 0.274510, 1)
 border_width_top = 1
 border_width_bottom = 1
 border_width_left = 0
@@ -77,17 +81,16 @@ layout_mode = 2
 
 [node name="Title" type="Label" parent="Layout/Body/ContextSlot/Context/Heading"]
 layout_mode = 2
-text = "YOUR CHARACTER"
+text = "Your character"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("display")
 
 [node name="State" type="Label" parent="Layout/Body/ContextSlot/Context/Heading"]
 layout_mode = 2
 text = "In the making"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="PortraitVitals" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
@@ -104,7 +107,7 @@ theme_override_styles/panel = SubResource("Portrait")
 layout_mode = 2
 custom_minimum_size = Vector2(180, 225)
 texture = ExtResource("character")
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 expand_mode = 1
 stretch_mode = 5
 mouse_filter = 2
@@ -129,21 +132,21 @@ size_flags_vertical = 4
 texture = ExtResource("heart")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/HitPoints/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 27
-theme_override_colors/font_color = Color(0.55, 0.83, 0.59, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/HitPoints"]
 layout_mode = 2
 text = "Hit Points"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Omens" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals"]
 layout_mode = 2
@@ -160,21 +163,21 @@ size_flags_vertical = 4
 texture = ExtResource("psychopomp")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Omens/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 27
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Omens"]
 layout_mode = 2
 text = "Omens"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Silver" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals"]
 layout_mode = 2
@@ -191,21 +194,21 @@ size_flags_vertical = 4
 texture = ExtResource("silver")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Silver/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 27
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/PortraitVitals/Vitals/Silver"]
 layout_mode = 2
 text = "Silver"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Name" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
@@ -215,7 +218,7 @@ theme_override_constants/separation = 4
 layout_mode = 2
 text = "Unnamed soul"
 theme_override_font_sizes/font_size = 27
-theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 text_overrun_behavior = 3
 
@@ -223,7 +226,7 @@ text_overrun_behavior = 3
 layout_mode = 2
 text = "No Class"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 
 [node name="Attributes" type="GridContainer" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
@@ -237,7 +240,7 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_type_variation = &"TaskAttribute"
+theme_type_variation = &"WizardAttribute"
 
 
 [node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Agility"]
@@ -251,21 +254,21 @@ size_flags_vertical = 4
 texture = ExtResource("agility")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Agility/Row"]
 layout_mode = 2
 text = "AGI"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 size_flags_horizontal = 3
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Agility/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Presence" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
@@ -274,7 +277,7 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_type_variation = &"TaskAttribute"
+theme_type_variation = &"WizardAttribute"
 
 
 [node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Presence"]
@@ -288,21 +291,21 @@ size_flags_vertical = 4
 texture = ExtResource("presence")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Presence/Row"]
 layout_mode = 2
 text = "PRE"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 size_flags_horizontal = 3
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Presence/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Strength" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
@@ -311,7 +314,7 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_type_variation = &"TaskAttribute"
+theme_type_variation = &"WizardAttribute"
 
 
 [node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Strength"]
@@ -325,21 +328,21 @@ size_flags_vertical = 4
 texture = ExtResource("strength")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Strength/Row"]
 layout_mode = 2
 text = "STR"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 size_flags_horizontal = 3
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Strength/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Toughness" type="PanelContainer" parent="Layout/Body/ContextSlot/Context/Attributes"]
@@ -348,7 +351,7 @@ size_flags_horizontal = 3
 custom_minimum_size = Vector2(0, 48)
 theme_override_constants/separation = 7
 
-theme_type_variation = &"TaskAttribute"
+theme_type_variation = &"WizardAttribute"
 
 
 [node name="Row" type="BoxContainer" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness"]
@@ -362,34 +365,34 @@ size_flags_vertical = 4
 texture = ExtResource("toughness")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Label" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness/Row"]
 layout_mode = 2
 text = "TOU"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 size_flags_horizontal = 3
 
 [node name="Value" type="Label" parent="Layout/Body/ContextSlot/Context/Attributes/Toughness/Row"]
 layout_mode = 2
 text = "—"
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="HistoryRule" type="ColorRect" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 1)
-color = Color(0.133333, 0.196078, 0.215686, 1)
+color = Color(0.243137, 0.262745, 0.274510, 1)
 mouse_filter = 2
 
 [node name="History" type="Label" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
 text = "Your history, traits and belongings will appear as you create your character."
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 autowrap_mode = 2
 
 [node name="PhoneHistory" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context"]
@@ -406,14 +409,14 @@ layout_mode = 2
 custom_minimum_size = Vector2(16, 16)
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Text" type="Label" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line0"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 text_overrun_behavior = 3
 
 [node name="Line1" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
@@ -425,14 +428,14 @@ layout_mode = 2
 custom_minimum_size = Vector2(16, 16)
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Text" type="Label" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line1"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 text_overrun_behavior = 3
 
 [node name="Line2" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
@@ -444,14 +447,14 @@ layout_mode = 2
 custom_minimum_size = Vector2(16, 16)
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Text" type="Label" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line2"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 text_overrun_behavior = 3
 
 [node name="Line3" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
@@ -463,14 +466,14 @@ layout_mode = 2
 custom_minimum_size = Vector2(16, 16)
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.568627, 0.6, 0.603922, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Text" type="Label" parent="Layout/Body/ContextSlot/Context/PhoneHistory/Line3"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 text_overrun_behavior = 3
 
 [node name="Spacer" type="Control" parent="Layout/Body/ContextSlot/Context"]
@@ -489,14 +492,14 @@ custom_minimum_size = Vector2(24, 24)
 texture = ExtResource("dice")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Hint" type="Label" parent="Layout/Body/ContextSlot/Context/HintRow"]
 layout_mode = 2
 text = "One life. Let the dice decide."
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 size_flags_horizontal = 3
 size_flags_vertical = 4
@@ -519,21 +522,20 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "STEP 01 / 06"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = "Choose your class"
 theme_override_font_sizes/font_size = 30
-theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
 [node name="Subtitle" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = "A beginning, not a destiny."
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Status" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
@@ -547,7 +549,7 @@ autowrap_mode = 2
 layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 theme_override_font_sizes/font_size = 11
 toggle_mode = true
 text = "Class details"
@@ -560,7 +562,7 @@ theme_override_constants/separation = 4
 [node name="Character" type="Button" parent="Layout/Body/StageSlot/Stage/Heading/ReviewTabs"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskSection"
+theme_type_variation = "WizardSection"
 theme_override_font_sizes/font_size = 11
 toggle_mode = true
 text = "Character"
@@ -568,7 +570,7 @@ text = "Character"
 [node name="Gear" type="Button" parent="Layout/Body/StageSlot/Stage/Heading/ReviewTabs"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskSection"
+theme_type_variation = "WizardSection"
 theme_override_font_sizes/font_size = 11
 toggle_mode = true
 text = "Gear"
@@ -576,7 +578,7 @@ text = "Gear"
 [node name="Traits" type="Button" parent="Layout/Body/StageSlot/Stage/Heading/ReviewTabs"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskSection"
+theme_type_variation = "WizardSection"
 theme_override_font_sizes/font_size = 11
 toggle_mode = true
 text = "Traits"
@@ -601,6 +603,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
 [node name="Choices" parent="Layout/Body/StageSlot/Stage/Content/Split/Left" instance=ExtResource("choices")]
+silkbound = true
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -613,22 +616,28 @@ theme_override_constants/separation = 26
 [node name="TopInset" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 1)
-color = Color(0.133333, 0.196078, 0.215686, 1)
+color = Color(0.243137, 0.262745, 0.274510, 1)
+mouse_filter = 2
+
+[node name="FieldGap" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
 mouse_filter = 2
 
 [node name="Name" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("field")]
+silkbound = true
 layout_mode = 2
 label_text = "Name"
 help_text = "Required"
 placeholder = ""
 
-[node name="FieldGap" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity"]
+[node name="DescriptionGap" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity"]
 layout_mode = 2
-visible = false
-custom_minimum_size = Vector2(0, 20)
+custom_minimum_size = Vector2(0, 12)
 mouse_filter = 2
 
 [node name="Description" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("textarea")]
+silkbound = true
 layout_mode = 2
 label_text = "Description"
 help_text = "Optional · a few words to remember them by"
@@ -636,9 +645,11 @@ help_text = "Optional · a few words to remember them by"
 [node name="Detail" type="Panel" parent="Layout/Body/StageSlot/Stage/Content/Split"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TaskDetailPanel"
+theme_type_variation = &"WizardDivider"
 
 [node name="Pages" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail" instance=ExtResource("pages")]
+theme = ExtResource("theme")
+silkbound = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -654,6 +665,12 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_constants/separation = 26
 
+[node name="TopRule" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 1)
+color = Color(0.243137, 0.262745, 0.274510, 1)
+mouse_filter = 2
+
 [node name="Heading" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2
 theme_override_constants/separation = 20
@@ -664,7 +681,7 @@ custom_minimum_size = Vector2(80, 80)
 size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Copy" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Heading"]
@@ -677,14 +694,13 @@ theme_override_constants/separation = 5
 layout_mode = 2
 text = "STARTING CLASS"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Heading/Copy"]
 layout_mode = 2
 text = "No Class"
 theme_override_font_sizes/font_size = 36
-theme_override_colors/font_color = Color(0.85098, 0.831373, 0.819608, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 autowrap_mode = 2
 
@@ -693,99 +709,116 @@ layout_mode = 2
 vertical = true
 theme_override_constants/separation = 26
 
-[node name="Formula" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollInfo"]
+[node name="FormulaRow" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollInfo"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = ""
-theme_override_font_sizes/font_size = 38
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_type_variation = &"WizardFormulaBox"
+[node name="Row" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollInfo/FormulaRow"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollInfo/FormulaRow/Row"]
+layout_mode = 2
 theme_override_fonts/font = ExtResource("display")
-theme_type_variation = &"TaskFormula"
+[node name="Caption" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollInfo/FormulaRow/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 8
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Flavor" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollInfo"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = ""
 theme_override_font_sizes/font_size = 16
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 autowrap_mode = 2
 
 theme_override_constants/line_spacing = 10
 
-[node name="Facts" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
+[node name="ClassBody" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
+layout_mode = 2
+vertical = true
+theme_override_constants/separation = 20
+
+[node name="FactsColumn" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 20
+
+[node name="Flavor" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn"]
+layout_mode = 2
+autowrap_mode = 2
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+
+[node name="Facts" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-theme_type_variation = &"TaskFacts"
+theme_type_variation = &"WizardFacts"
 
 
-[node name="Row" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts"]
+[node name="Row" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts"]
 layout_mode = 2
 theme_override_constants/separation = 12
 
-[node name="HitPoints" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row"]
+[node name="HitPoints" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row/HitPoints"]
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row/HitPoints"]
 layout_mode = 2
 text = "HitPoints"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
-[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row/HitPoints"]
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row/HitPoints"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 23
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
-[node name="Silver" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row"]
+[node name="Silver" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row/Silver"]
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row/Silver"]
 layout_mode = 2
 text = "Silver"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
-[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row/Silver"]
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row/Silver"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 23
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
-[node name="Omens" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row"]
+[node name="Omens" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 6
 
-[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row/Omens"]
+[node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row/Omens"]
 layout_mode = 2
 text = "Omens"
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
-[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Facts/Row/Omens"]
+[node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn/Facts/Row/Omens"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 23
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
 
-[node name="Rules" type="RichTextLabel" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
+[node name="Rules" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody"]
+size_flags_horizontal = 3
 layout_mode = 2
-bbcode_enabled = true
-fit_content = true
-scroll_active = false
-theme_override_font_sizes/normal_font_size = 14
-
-theme_override_colors/default_color = Color(0.568627, 0.6, 0.603922, 1)
-theme_override_constants/line_separation = 6
 
 [node name="RollOutcome" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2
@@ -795,7 +828,7 @@ theme_override_constants/separation = 26
 [node name="Result" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TaskResult"
+theme_type_variation = &"WizardResult"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome/Result"]
 layout_mode = 2
@@ -805,19 +838,13 @@ theme_override_constants/separation = 5
 layout_mode = 2
 text = "RECORDED RESULT"
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 
 [node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome/Result/Content"]
 layout_mode = 2
 theme_override_font_sizes/font_size = 22
-theme_override_colors/font_color = Color(0.266667, 0.913725, 0.913725, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_fonts/font = ExtResource("display")
-autowrap_mode = 2
-
-[node name="Raw" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome/Result/Content"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
 autowrap_mode = 2
 
 [node name="ResultCopy" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome"]
@@ -825,7 +852,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = ""
 theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 autowrap_mode = 2
 
 [node name="PackChoices" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
@@ -837,7 +864,7 @@ theme_override_constants/separation = 8
 layout_mode = 2
 text = "Choose one pack:"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
+theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 
 [node name="Options" type="GridContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/PackChoices"]
 layout_mode = 2
@@ -849,7 +876,7 @@ theme_override_constants/v_separation = 6
 layout_mode = 2
 text = "Nothing"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 toggle_mode = true
 size_flags_horizontal = 3
 
@@ -857,7 +884,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Backpack"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 toggle_mode = true
 size_flags_horizontal = 3
 
@@ -865,7 +892,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Sack"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 toggle_mode = true
 size_flags_horizontal = 3
 
@@ -873,7 +900,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Small wagon"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 toggle_mode = true
 size_flags_horizontal = 3
 
@@ -881,7 +908,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Donkey"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 toggle_mode = true
 size_flags_horizontal = 3
 
@@ -894,56 +921,25 @@ visible = false
 layout_mode = 2
 text = "Reroll"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 
 [node name="Eat" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ScrollChoice"]
 layout_mode = 2
 text = "Eat it"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 
 [node name="Paper" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ScrollChoice"]
 layout_mode = 2
 text = "Use as toilet paper"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = "WizardButton"
 
-[node name="Appearance" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
+[node name="Appearance" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content" instance=ExtResource("appearance")]
 layout_mode = 2
+size_flags_vertical = 3
 visible = false
-theme_override_constants/separation = 20
-
-[node name="Preview" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance"]
-layout_mode = 2
-custom_minimum_size = Vector2(110, 138)
-mouse_filter = 2
-
-[node name="Copy" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 16
-
-[node name="Name" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy"]
-layout_mode = 2
-text = "None"
-theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.941176, 0.733333, 0.196078, 1)
-theme_override_fonts/font = ExtResource("display")
-autowrap_mode = 2
-
-[node name="Description" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy"]
-layout_mode = 2
-text = "Preferred appearance for this character’s Rooks."
-theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
-autowrap_mode = 2
-
-[node name="PreferredMiniature" type="Button" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Appearance/Copy"]
-size_flags_horizontal = 0
-layout_mode = 2
-text = "Choose miniature"
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+miniature_only = true
 
 [node name="Spacer" type="Control" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2
@@ -954,7 +950,7 @@ mouse_filter = 2
 [node name="NoteRule" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 1)
-color = Color(0.133333, 0.196078, 0.215686, 1)
+color = Color(0.243137, 0.262745, 0.274510, 1)
 mouse_filter = 2
 
 [node name="NoteRow" type="HBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
@@ -967,14 +963,14 @@ custom_minimum_size = Vector2(24, 24)
 texture = ExtResource("dice")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.941176, 0.733333, 0.196078, 1)
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 mouse_filter = 2
 
 [node name="Note" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/NoteRow"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
-theme_override_colors/font_color = Color(0.568627, 0.6, 0.603922, 1)
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 autowrap_mode = 2
 
 size_flags_horizontal = 3
@@ -989,10 +985,14 @@ visible = false
 theme_override_constants/separation = 24
 
 [node name="CharacterPages" parent="Layout/Body/StageSlot/Stage/Content/Review" instance=ExtResource("pages")]
+theme = ExtResource("theme")
+silkbound = true
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="BelongingsPages" parent="Layout/Body/StageSlot/Stage/Content/Review" instance=ExtResource("pages")]
+theme = ExtResource("theme")
+silkbound = true
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -1007,20 +1007,17 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 30
 
 [node name="Identity" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character" instance=ExtResource("summary")]
+silkbound = true
 layout_mode = 2
 
 [node name="Abilities" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character" instance=ExtResource("summary")]
+silkbound = true
 layout_mode = 2
 
 [node name="Equipment" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area/Belongings" instance=ExtResource("summary")]
+silkbound = true
 layout_mode = 2
 
 [node name="Traits" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area/Belongings" instance=ExtResource("summary")]
+silkbound = true
 layout_mode = 2
-
-[node name="TopRule" type="ColorRect" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail"]
-layout_mode = 1
-anchor_right = 1.0
-offset_bottom = 2.0
-color = Color(0.941176, 0.733333, 0.196078, 1)
-mouse_filter = 2

@@ -1,12 +1,112 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creation_miniature_picker.gd" id="1"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/content/fullscreen_miniature_browser.tscn" id="2"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creation_miniature_picker.gd" id="script"]
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="picker"]
+[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ledger.tres" id="ledger"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ornament.gd" id="ornament"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/linen.png" id="linen"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/ribbon.svg" id="ribbon"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
+[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
+[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 
-[node name="CreationMiniaturePicker" type="MarginContainer"]
+[node name="CreationMiniaturePicker" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 size_flags_horizontal = 3
 size_flags_vertical = 3
-script = ExtResource("1")
+texture_filter = 4
+script = ExtResource("script")
 
-[node name="Picker" parent="." instance=ExtResource("2")]
+[node name="Ledger" type="Panel" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("ledger")
+
+[node name="Linen" type="TextureRect" parent="Ledger"]
+texture_filter = 1
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 6.0
+offset_bottom = -6.0
+mouse_filter = 2
+texture = ExtResource("linen")
+expand_mode = 1
+stretch_mode = 1
+
+[node name="Ribbon" type="TextureRect" parent="Ledger"]
+layout_mode = 1
+anchor_left = 1.0
+anchor_right = 1.0
+mouse_filter = 2
+texture = ExtResource("ribbon")
+expand_mode = 1
+
+[node name="Ornament" type="Control" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource("ornament")
+
+[node name="Margin" type="MarginContainer" parent="."]
+layout_mode = 1
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme = ExtResource("theme")
+
+[node name="Layout" type="VBoxContainer" parent="Margin"]
+layout_mode = 2
+
+[node name="Header" type="HBoxContainer" parent="Margin/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Name" type="MarginContainer" parent="Margin/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+custom_minimum_size = Vector2(0, 60)
+theme_override_constants/margin_left = 10
+theme_override_constants/margin_right = 10
+
+[node name="Row" type="HBoxContainer" parent="Margin/Layout/Header/Name"]
+layout_mode = 2
+theme_override_constants/separation = 11
+
+[node name="Icon" type="TextureRect" parent="Margin/Layout/Header/Name/Row"]
+layout_mode = 2
+custom_minimum_size = Vector2(26, 26)
+size_flags_vertical = 4
+texture = ExtResource("character")
+expand_mode = 1
+stretch_mode = 5
+self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
+
+[node name="Text" type="Label" parent="Margin/Layout/Header/Name/Row"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_fonts/font = ExtResource("display")
+text = "Character creation"
+text_overrun_behavior = 3
+
+[node name="Close" type="Button" parent="Margin/Layout/Header"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+size_flags_vertical = 4
+theme_type_variation = "SilkIcon"
+icon = ExtResource("close")
+icon_alignment = 1
+
+[node name="RibbonSpace" type="Control" parent="Margin/Layout/Header"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Picker" parent="Margin/Layout" instance=ExtResource("picker")]
 layout_mode = 2

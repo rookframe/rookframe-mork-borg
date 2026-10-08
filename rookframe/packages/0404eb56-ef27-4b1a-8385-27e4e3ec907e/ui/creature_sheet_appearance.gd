@@ -5,8 +5,7 @@ signal miniature_requested
 signal miniature_clear_requested
 signal portrait_requested
 signal portrait_reset_requested
-@export var action_hover: StyleBoxFlat = StyleBoxFlat.new()
-@export var action_disabled: StyleBoxFlat = StyleBoxFlat.new()
+@export var miniature_only := false
 var _assigned := false
 const PORTRAIT := "Columns/PortraitPanel/Inset/Content/"
 const MINIATURE := "Columns/MiniaturePanel/Inset/Content/"
@@ -17,10 +16,11 @@ func _ready() -> void:
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").pressed.connect(_miniature_clear)
 
 func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, phone: bool, tablet: bool, name: String = "") -> void:
-	get_node("Intro").visible = not phone
+	get_node("Intro").visible = not phone and not miniature_only
+	get_node("Columns/PortraitPanel").visible = not miniature_only
 	get_node("Intro").custom_minimum_size = Vector2(0, 54 if tablet else 64)
-	get_node("TopSpace").visible = phone
-	get_node("BottomSpace").visible = phone
+	get_node("TopSpace").visible = phone and not miniature_only
+	get_node("BottomSpace").visible = phone and not miniature_only
 	get_node("TopSpace").custom_minimum_size = Vector2(0, 0)
 	get_node("BottomSpace").custom_minimum_size = Vector2(0, 0)
 	get_node("Intro/Title").text = locale.text("Appearance")
@@ -36,20 +36,27 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(MINIATURE + "Explanation").text = locale.text("Applies only to new Actors created from this entry." if library else "Saved for this creature. Existing Rooks keep their current miniature.")
 	for base in [PORTRAIT, MINIATURE]:
 		for edge in ["left", "right", "top", "bottom"]:
-			get_node("Columns/PortraitPanel/Inset" if base == PORTRAIT else "Columns/MiniaturePanel/Inset").add_theme_constant_override("margin_" + edge, 0 if base == PORTRAIT or edge != "left" else 16 if phone or tablet else 20)
+			get_node("Columns/PortraitPanel/Inset" if base == PORTRAIT else "Columns/MiniaturePanel/Inset").add_theme_constant_override("margin_" + edge, 0 if miniature_only or base == PORTRAIT or edge != "left" else 16 if phone or tablet else 20)
+		get_node(base + "HeadingGap").custom_minimum_size = Vector2(0, 4 if phone else 8)
 		(get_node(base + "ControlsGap") as Control).custom_minimum_size = Vector2((get_node(base + "ControlsGap") as Control).custom_minimum_size.x, 4 if phone else 16)
 		get_node(base + "Explanation").add_theme_font_size_override("font_size", 14 if phone else 15 if tablet else 17)
 		get_node(base + ("PortraitHeading/Title" if base == PORTRAIT else "MiniatureHeading/Title")).add_theme_font_size_override("font_size", 20 if phone else 21 if tablet else 24)
 	for controls in [PORTRAIT + "PortraitButtons", MINIATURE + "MiniatureButtons"]:
-		get_node(controls).add_theme_constant_override("h_separation", 6 if phone else 8)
+		get_node(controls).add_theme_constant_override("h_separation", 6 if phone else 12)
 		get_node(controls).add_theme_constant_override("v_separation", 6 if phone else 8)
 	for path in [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait", MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]:
 		var button: Button = get_node(path)
 		button.disabled = not can_edit
-		button.theme_type_variation = "SilkPrimaryIcon" if "Change" in path else "SilkIcon"
+		button.theme_type_variation = "WizardPrimary" if "Change" in path else "WizardButton"
 		button.custom_minimum_size = Vector2(44,44)
-		button.icon_alignment = 1
-		button.icon = preload("res://rookframe/ui/icons/upload.svg") if path.ends_with("ChangePortrait") else preload("res://rookframe/ui/icons/retry.svg") if path.ends_with("ClearPortrait") else preload("res://rookframe/ui/icons/rook.svg") if path.ends_with("ChangeMiniature") else preload("res://rookframe/ui/icons/clear.svg")
+		button.icon = null
+		button.add_theme_font_size_override("font_size", 14 if phone else 16 if tablet else 18)
+	if miniature_only:
+		get_node("Columns/MiniaturePanel").add_theme_stylebox_override("panel", get_node("Columns/PortraitPanel").get_theme_stylebox("panel"))
+		get_node(MINIATURE + "MiniatureHeading/Title").add_theme_font_size_override("font_size", 24 if phone else 26 if tablet else 30)
+		get_node(MINIATURE + "HeadingGap").custom_minimum_size = Vector2(0, 8 if phone else 12 if tablet else 16)
+	get_node(MINIATURE + "Explanation").visible = not miniature_only
+	get_node(MINIATURE + "ExplanationGap").visible = not miniature_only
 	for base in [PORTRAIT, MINIATURE]:
 		(get_node(base) as Control).add_theme_constant_override("separation", 0)
 		(get_node(base + "ExplanationGap") as Control).custom_minimum_size = Vector2(0, 4 if phone else 8 if tablet else 10)
@@ -63,9 +70,10 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(MINIATURE + "MiniatureCaption").add_theme_font_size_override("font_size", 18 if phone else 19 if tablet else 23)
 	get_node(MINIATURE + "PackageCaption").add_theme_font_size_override("font_size", 14 if phone else 15 if tablet else 17)
 	get_node(PORTRAIT + "PortraitButtons/ChangePortrait").text = locale.text("Choose image")
-	get_node(PORTRAIT + "PortraitButtons/ClearPortrait").text = locale.text("Reset portrait")
+	get_node(PORTRAIT + "PortraitButtons/ClearPortrait").text = locale.text("Reset")
 	get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").text = locale.text("Change miniature" if _assigned else "Choose miniature")
-	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").text = locale.text("Clear")
+	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").text = locale.text("Reset")
+	get_node(MINIATURE + "PreviewCaptionGap").custom_minimum_size = Vector2(0, 4 if phone else 8)
 	get_node(MINIATURE + "EmptyPreview/Content/Image").custom_minimum_size = Vector2(34, 34) if phone else Vector2(100, 100)
 	var density := "Phone" if phone else "Tablet" if tablet else "Desktop"
 	get_node("Intro/Title").theme_type_variation = "SilkCreatureAppearanceTitle" + density
@@ -84,6 +92,7 @@ func miniature(locale: I18N, title: String, package: String, assigned: bool) -> 
 	get_node(MINIATURE + "PackageCaption").text = package
 	get_node(MINIATURE + "MiniatureCaption").visible = assigned
 	get_node(MINIATURE + "PackageCaption").visible = assigned
+	get_node(MINIATURE + "PreviewCaptionGap").visible = assigned
 	get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").text = locale.text("Change miniature" if assigned else "Choose miniature")
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").visible = assigned
 	get_node(MINIATURE + "EmptyPreview").visible = not assigned
@@ -96,7 +105,6 @@ func _present_actions() -> void:
 		if not button.text.is_empty():
 			button.accessibility_name = button.text
 			button.tooltip_text = button.text
-		button.text = ""
 
 func _portrait() -> void:
 	portrait_requested.emit()
