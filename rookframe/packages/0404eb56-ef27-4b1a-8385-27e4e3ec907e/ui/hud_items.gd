@@ -37,6 +37,7 @@ func entries(actor: SDK.Actor, category: String = "Items") -> Array[ENTRY]:
 		var presentation := _presentation(actor, source)
 		entry.detail = presentation.detail
 		entry.value = presentation.value
+		entry.value_is_action = presentation.value_is_action
 		entry.icon = presentation.icon
 		entry.favorite = source.get("starred", false)
 		entry.available = responsible and source.get("available", false)
@@ -111,4 +112,4 @@ func _presentation(actor: SDK.Actor, source: Dictionary) -> Dictionary:
 		icon = LAB_ICON
 	elif kind in ["lantern-oil", "waterskin", "life-elixir", "poison-red", "poison-black"]:
 		icon = ELIXIR_ICON
-	return {"detail": detail, "value": _sdk.translations.text(value), "icon": icon}
+	return {"detail": detail, "value": _sdk.translations.text(value), "value_is_action": value == "Use", "icon": icon}

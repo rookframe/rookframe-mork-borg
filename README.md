@@ -17,7 +17,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.43` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.44` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `604b5fd443c59f2edc9099fa81899897fca417ab` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -61,7 +61,7 @@ the authoring lock and regenerated facade. Do not commit installed dependencies.
 
 [GitHub releases](https://github.com/rookframe/rookframe-mork-borg/releases)
 publish the Package archive and public HTTPS Manifest. The
-[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.139)
+[public Catalogue](https://catalogue.prancing-dreadnaught.com/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/1.0.140)
 provides discovery. Application setup and QA use normal Manifest installation
 and automatic World-join acquisition; local archive imports and copied Package
 stores are not part of this workflow.
@@ -535,10 +535,18 @@ floating windows and below docks and full-viewport tasks. Its Owner context uses
 an owned selected Rook or a Player's sole owned Actor; GM and multiple-Actor
 Players require selection, and available Prop controls take precedence.
 
-The approved revision-8 bar uses live portrait/HP, native Dice Tray and completed
-sheet entry points, and all four existing Ability Requested Throws. Starting a
-Throw retains its Actor across later HUD selection changes. Desktop, tablet and
-landscape phone share categories, anchored panels and bounded paging; phone uses
-More and the four-Ability grid. Other categories remain empty until their own
-RFG-338–342 slices supply real entries and domain handoffs. Favorites are not
-seeded or persisted by this presentation slice.
+The Silkbound Ledger bar follows the current design-system HUD authority, using
+the shared UI Kit theme, fonts and linen. It shows live portrait/HP, opens the
+native Dice Tray and Character sheet, and launches all four Ability Requested
+Throws. Starting an action retains its initiating Actor across selection changes.
+Attacks, Powers, Items, Features, Companions and Recovery use their existing
+domain projectors and action handoffs; favorites remain shared Actor data.
+Desktop, tablet and landscape phone use the reference geometry, anchored panels
+and bounded paging. Phone keeps four primary categories, More and the four-Ability
+grid. Long names have a bounded, paged reading view with a return to the list.
+
+Run the native HUD geometry, access, paging and localization checks with a display:
+
+```sh
+godot --path . --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests/character_hud_silkbound.gd -c
+```

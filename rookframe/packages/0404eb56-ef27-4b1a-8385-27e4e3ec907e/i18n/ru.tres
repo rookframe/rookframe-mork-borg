@@ -1565,6 +1565,17 @@ messages = {
 "Published source is unavailable.": "Опубликованный источник недоступен.",
 "Full identity": "Полное имя и описание",
 "Not recorded": "Не указано",
-"Heal Creature HP": "Вылечить"
+"Heal Creature HP": "Вылечить",
+[&"", &"Full name"]: [&"Полное название"],
+[&"", &"No favorites"]: [&"Нет избранного"],
+[&"", &"No attacks"]: [&"Нет атак"],
+[&"", &"No scrolls"]: [&"Нет свитков"],
+[&"", &"No usable items"]: [&"Нет доступных предметов"],
+[&"", &"No active features"]: [&"Нет активных особенностей"],
+[&"", &"No companion attacks"]: [&"Нет атак спутников"],
+[&"", &"Close character actions"]: [&"Закрыть действия персонажа"],
+[&"", &"Back to actions"]: [&"Назад к действиям"],
+[&"", &"Previous page"]: [&"Предыдущая страница"],
+[&"", &"Next page"]: [&"Следующая страница"]
 }
 locale = "ru"

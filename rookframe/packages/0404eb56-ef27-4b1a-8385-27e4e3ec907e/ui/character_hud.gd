@@ -1,6 +1,5 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_layout.gd"
 
-const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const ROW = preload(ROOT + "ui/hud_row.tscn")
 const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
@@ -9,13 +8,7 @@ const POWERS = preload(ROOT + "ui/hud_powers.gd")
 const ITEMS = preload(ROOT + "ui/hud_items.gd")
 const COMPANIONS = preload(ROOT + "ui/hud_companions.gd")
 const RECOVERY = preload(ROOT + "ui/hud_recovery.gd")
-const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
-const TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_palette.gd")
-const GOLD := Color(0.88627450980392153, 0.7686274509803922, 0.42745098039215684, 1.0)
-const ROW_COPY_GAP := 3 # Authored Launch/Content/Copy VBox separation in hud_row.tscn.
-const CATEGORIES := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery"]
-const BUTTONS := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery", "More"]
 const CATEGORY_ICONS := {
 	"Abilities": preload(ROOT + "ui/hud_art/abilities.svg"),
 	"Attacks": preload(ROOT + "ui/hud_art/attacks.svg"),
@@ -41,19 +34,10 @@ var _recovery := RECOVERY.new()
 var _can_morning := false
 var _pending_favorites: Dictionary = {}
 var _actor: SDK.ActorId
-var _category := ""
 var _page := 0
 var _entries: Dictionary = {}
 var _show_all: Dictionary = {}
-var _phone := false
-var _tablet := false
-var _rows: Array[ROW_SCRIPT] = []
 var _page_entries: Array[ENTRY] = []
-var _panel_anchor: Button
-@onready var _bar: Control = get_node("Bar")
-@onready var _panel: Control = get_node("Panel")
-@onready var _list: GridContainer = get_node("Panel/List")
-@onready var _more: GridContainer = get_node("Panel/More")
 @onready var _launcher = get_node("Launcher")
 
 func ready() -> void:
@@ -67,13 +51,15 @@ func ready() -> void:
 		_list.add_child(row)
 		_rows.append(row)
 		row.get_node("Launch").pressed.connect(_launch_row.bind(index))
+		row.get_node("Use").pressed.connect(_launch_row.bind(index))
 		row.get_node("Favorite").toggled.connect(_favorite_row.bind(index))
 		row.get_node("FullName").pressed.connect(_full_name_row.bind(index))
+		row.get_node("Launch/Content/Copy/Title").resized.connect(_schedule_name_check)
 	for category in ["Features", "Companions", "Recovery"]:
 		get_node("Panel/More/" + category).pressed.connect(_open_category.bind(category))
 		get_node("Panel/More/" + category + "/Title").text = sdk.translations.text(category)
 		get_node("Panel/More/" + category + "/Icon").texture = CATEGORY_ICONS.get(category)
-		get_node("Panel/More/" + category + "/Icon").modulate = GOLD
+		get_node("Panel/More/" + category + "/Icon").modulate = PICTOGRAM
 	_favorites.sdk = sdk
 	favorite_requested.connect(_change_favorite)
 	_attacks.bind(sdk)
@@ -90,10 +76,10 @@ func ready() -> void:
 	resized.connect(_layout)
 	get_node("Bar/Dice").pressed.connect(_open_dice)
 	get_node("Bar/Dice").accessibility_name = sdk.translations.text("Dice")
-	get_node("Bar/Dice/Title").text = sdk.translations.text("Dice").to_upper()
 	get_node("Bar/Identity").pressed.connect(_open_sheet)
-	get_node("Panel/Empty/Sheet").pressed.connect(_open_sheet)
-	get_node("Panel/Header/Close").pressed.connect(_back_or_close)
+	get_node("Panel/Empty/Sheet").pressed.connect(_empty_action)
+	get_node("Panel/Header/Close").pressed.connect(_close_panel)
+	get_node("Panel/Back").pressed.connect(_back_or_close)
 	get_node("Panel/Header/ShowAll").toggled.connect(_toggle_all)
 	get_node("Panel/Header/Morning").pressed.connect(_morning)
 	get_node("Panel/Header/Morning").text = sdk.translations.text("Morning")
@@ -107,10 +93,13 @@ func ready() -> void:
 		button.accessibility_name = sdk.translations.text(category)
 		if category != "More":
 			get_node("Bar/Categories/" + category + "/Icon").texture = CATEGORY_ICONS.get(category)
-		get_node("Bar/Categories/" + category + "/Icon").modulate = GOLD
+		get_node("Bar/Categories/" + category + "/Icon").modulate = PICTOGRAM
 	get_node("Panel/Empty/Title").text = sdk.translations.text("No entries")
 	get_node("Panel/Empty/Sheet").text = sdk.translations.text("Character sheet")
 	get_node("Panel/Header/ShowAll").text = sdk.translations.text("Show all")
+	for path in ["Panel/Header/Close", "Panel/Back", "Panel/Footer/Previous", "Panel/Footer/Next"]:
+		var control: Button = get_node(path)
+		control.accessibility_name = sdk.translations.text(control.accessibility_name)
 	_style()
 	_layout()
 	_refresh()
@@ -163,6 +152,8 @@ func _refresh() -> void:
 		if decoded.ok:
 			texture = decoded.texture
 	get_node("Bar/Identity/PortraitFrame/Portrait").texture = texture
+	_layout_portrait()
+	_layout_health()
 	var entries: Array[ENTRY] = []
 	var abilities: Dictionary = data.get("abilities", {})
 	var can_roll: bool = _launcher.can_roll(source.actor)
@@ -267,6 +258,7 @@ func _open_category(category: String) -> void:
 	get_node("Panel/Detail").visible = false
 	_panel.visible = true
 	_render_panel()
+	_panel.grab_focus()
 	if category in ["Attacks", "Powers", "Items", "Features", "Companions"] and _actor != null:
 		var initiating_actor := _actor
 		var result := await _favorites.prepare(initiating_actor)
@@ -283,13 +275,16 @@ func _back_or_close() -> void:
 	_close_panel()
 
 func _close_panel() -> void:
+	if _panel.visible and _panel_anchor != null and _panel_anchor.is_visible_in_tree():
+		_panel_anchor.grab_focus()
 	get_node("Panel/Detail").visible = false
+	get_node("Panel/Back").visible = false
 	_category = ""
 	_panel.visible = false
 	for category in BUTTONS:
 		var button: Button = get_node("Bar/Categories/" + category)
 		button.set_pressed_no_signal(false)
-		get_node("Bar/Categories/" + category + "/Title").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT)
+		_category_colors(button, false)
 
 func _morning() -> void:
 	var initiating_actor := _actor
@@ -303,6 +298,10 @@ func _toggle_all(enabled: bool) -> void:
 	_render_panel()
 
 func _change_page(direction: int) -> void:
+	if get_node("Panel/Detail").visible:
+		_detail_page += direction
+		_layout_panel()
+		return
 	_page += direction
 	_render_panel()
 
@@ -316,14 +315,15 @@ func _visible_entries() -> Array[ENTRY]:
 func _render_panel() -> void:
 	var fixed := _category in ["Abilities", "Recovery", "More"]
 	get_node("Panel/Header/Title").text = sdk.translations.text(_category)
-	get_node("Panel/Header/ShowAll").visible = not fixed
+	get_node("Panel/Header/ShowAll").visible = not fixed and not _entries.get(_category, []).is_empty()
+	get_node("Panel/Back").visible = false
 	get_node("Panel/Header/Morning").visible = _category == "Powers"
 	get_node("Panel/Header/Morning").disabled = not _can_morning
 	get_node("Panel/Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
 	for category in BUTTONS:
 		var button: Button = get_node("Bar/Categories/" + category)
 		button.set_pressed_no_signal(button == _panel_anchor)
-		get_node("Bar/Categories/" + category + "/Title").add_theme_color_override("font_color", GOLD if button == _panel_anchor else TOKENS.COLOR_CONTENT)
+		_category_colors(button, button == _panel_anchor)
 	var entries := _visible_entries()
 	var page_size := 4 if not _phone or _category == "Abilities" else 2
 	var pages := maxi(1, ceili(float(entries.size()) / page_size))
@@ -332,6 +332,10 @@ func _render_panel() -> void:
 	_list.visible = not entries.is_empty() and _category != "More"
 	_more.visible = _category == "More"
 	get_node("Panel/Empty").visible = entries.is_empty() and _category != "More"
+	var has_entries: bool = not _entries.get(_category, []).is_empty()
+	var empty_titles := {"Attacks":"No attacks", "Powers":"No scrolls", "Items":"No usable items", "Features":"No active features", "Companions":"No companion attacks"}
+	get_node("Panel/Empty/Title").text = sdk.translations.text("No favorites" if has_entries else empty_titles.get(_category, "No entries"))
+	get_node("Panel/Empty/Sheet").text = sdk.translations.text("Show all" if has_entries else "Character sheet")
 	get_node("Panel/Footer").visible = pages > 1
 	get_node("Panel/Footer/Page").text = "%s / %s" % [_page+1, pages]
 	get_node("Panel/Footer/Previous").disabled = _page == 0
@@ -345,57 +349,79 @@ func _render_panel() -> void:
 		if row.visible:
 			_add_row(row, _page_entries[index], fixed)
 			row.separator = index < _page_entries.size()-1 and not (_phone and _category == "Abilities")
+			row.add_theme_constant_override("separation", 0)
 			row.column_divider = _phone and _category == "Abilities" and index % 2 == 0
 			row.queue_redraw()
 	_layout_panel()
-	_check_names.call_deferred()
+	_schedule_name_check()
 
 func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
-	row.custom_minimum_size = Vector2(0, 44 if _phone and _category == "Abilities" else 48 if _phone else 52 if _tablet else 64)
+	var ability_grid := _phone and _category == "Abilities"
+	var height := 50 if ability_grid else 58 if _phone else 64 if _tablet else 76
+	row.custom_minimum_size = Vector2(0, height)
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var launch: Button = row.get_node("Launch")
 	launch.disabled = not entry.available
 	launch.accessibility_name = entry.title
-	var content: HBoxContainer = row.get_node("Launch/Content")
-	content.add_theme_constant_override("separation", 8 if _phone else 14)
+	_button_style(launch)
+	var content: HBoxContainer = launch.get_node("Content")
+	content.add_theme_constant_override("separation", 8 if ability_grid else 10 if _phone else 12 if _tablet else 16)
+	content.offset_left = 8 if _phone else 10 if _tablet else 12
+	content.offset_right = -content.offset_left
+	content.offset_top = 6 if _phone else 8 if _tablet else 10
+	content.offset_bottom = -content.offset_top
 	var icon: TextureRect = content.get_node("Icon")
 	icon.texture = entry.icon
-	var icon_size := 18 if _phone and _category == "Abilities" else 20 if _phone else 27
+	var icon_size := 20 if ability_grid else 24 if _phone else 26 if _tablet else 30
 	icon.custom_minimum_size = Vector2(icon_size, icon_size)
-	icon.modulate = TOKENS.COLOR_CONTENT_MUTED
-	var title: Label = content.get_node("Copy/Title")
+	icon.modulate = PICTOGRAM if entry.available else MUTED
+	var copy: VBoxContainer = content.get_node("Copy")
+	copy.add_theme_constant_override("separation", 2 if _phone else 4)
+	var title: Label = copy.get_node("Title")
 	title.text = entry.title
-	title.add_theme_font_size_override("font_size", 13 if _phone else 16)
-	var detail: Label = content.get_node("Copy/Detail")
+	_type(title, 18 if _phone else 20 if _tablet else 22, 1.25 if _phone else 1.35)
+	var detail: Label = copy.get_node("Detail")
 	detail.text = entry.detail
 	detail.visible = not entry.detail.is_empty()
-	detail.add_theme_font_size_override("font_size", 11 if _phone else 12)
-	detail.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
-	var copy_height := row.custom_minimum_size.y - content.offset_top + content.offset_bottom
-	if detail.visible:
-		copy_height -= detail.get_minimum_size().y + ROW_COPY_GAP
-	title.max_lines_visible = 1
-	title.max_lines_visible = clampi(int(copy_height / maxf(1, title.get_minimum_size().y)), 1, 2)
+	_type(detail, 14 if _phone else 15 if _tablet else 17, 1.2)
+	detail.add_theme_color_override("font_color", MUTED)
+	title.max_lines_visible = 2
+	row.get_node("FullName").visible = false
 	var value: Label = content.get_node("Value")
 	value.text = entry.value
-	value.visible = not entry.value.is_empty()
-	value.add_theme_font_size_override("font_size", 13 if _phone else 16)
-	value.add_theme_color_override("font_color", TOKENS.COLOR_ACCENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
-	title.add_theme_color_override("font_color", TOKENS.COLOR_CONTENT if entry.available else TOKENS.COLOR_CONTENT_MUTED)
-	row.get_node("Favorite").visible = not fixed
-	row.get_node("Favorite").disabled = _pending_favorites.has(_favorite_request_key(_actor, str(entry.id)))
-	row.get_node("Favorite").set_pressed_no_signal(bool(entry.favorite))
-	row.get_node("Favorite").text = "★" if entry.favorite else "☆"
-	row.get_node("Favorite").add_theme_font_size_override("font_size", 21 if _phone else 24)
-	row.get_node("Favorite").accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
-	row.get_node("FullName").accessibility_name = sdk.translations.text("Show full name")
-	row.get_node("Favorite").add_theme_color_override("font_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
-	row.get_node("Favorite").add_theme_color_override("font_hover_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
-	row.get_node("Favorite").add_theme_color_override("font_pressed_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
-	row.get_node("Favorite").add_theme_color_override("font_hover_pressed_color", GOLD if entry.favorite else TOKENS.COLOR_CONTENT_MUTED)
-	if _phone:
-		content.offset_left = 2
-		content.offset_right = -2
+	value.visible = not entry.value.is_empty() and not entry.value_is_action
+	_type(value, 18 if _phone else 17 if _tablet else 21, 1.25)
+	value.add_theme_color_override("font_color", CONTENT if entry.available else MUTED)
+	value.custom_minimum_size = Vector2(value.get_minimum_size().x+8, 0)
+	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.add_theme_color_override("font_color", CONTENT if entry.available else MUTED)
+	var use: Button = row.get_node("Use")
+	use.visible = entry.value_is_action
+	use.text = entry.value
+	use.disabled = not entry.available
+	use.accessibility_name = entry.value + " " + entry.title
+	_button_style(use, false, 8 if _phone else 12)
+	_type(use, 18 if _phone else 17 if _tablet else 21, 1.25)
+	var star: Button = row.get_node("Favorite")
+	star.visible = not fixed
+	star.disabled = _pending_favorites.has(_favorite_request_key(_actor, str(entry.id)))
+	star.set_pressed_no_signal(bool(entry.favorite))
+	star.text = "★" if entry.favorite else "☆"
+	_button_style(star)
+	_type(star, 22, 1.25)
+	star.accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
+		star.add_theme_color_override(state, NEUTRAL if entry.favorite else MUTED)
+	var full_name: Button = row.get_node("FullName")
+	full_name.accessibility_name = sdk.translations.text("Show full name")
+	_button_style(full_name)
+	_type(full_name, 18, 1.25)
+
+func _empty_action() -> void:
+	if not _entries.get(_category, []).is_empty():
+		_toggle_all(true)
+	else:
+		_open_sheet()
 
 func _launch_row(index: int) -> void:
 	if index >= _page_entries.size():
@@ -418,7 +444,11 @@ func _full_name_row(index: int) -> void:
 		_full_name(_page_entries[index].title)
 
 func _full_name(title: String) -> void:
-	get_node("Panel/Detail").text = title
+	_detail_page = 0
+	get_node("Panel/Header/Title").text = sdk.translations.text("Full name")
+	get_node("Panel/Back").visible = true
+	get_node("Panel/Empty").visible = false
+	get_node("Panel/Detail/Text").text = title
 	get_node("Panel/Detail").visible = true
 	_list.visible = false
 	_more.visible = false
@@ -427,168 +457,30 @@ func _full_name(title: String) -> void:
 	get_node("Panel/Header/Morning").visible = false
 	_layout_panel()
 
-func _check_names() -> void:
-	for row in _rows:
-		var title: Label = row.get_node("Launch/Content/Copy/Title")
-		row.get_node("FullName").visible = title.get_line_count() > title.max_lines_visible
-	_layout_panel()
-
-func _rect(control: Control, x: float, y: float, w: float, h: float) -> void:
-	control.position = Vector2(x, y)
-	control.size = Vector2(w, h)
-
-func _layout() -> void:
-	if not is_node_ready():
-		return
-	var inset := 172 if _phone else 128 if _tablet else 256
-	var height := 48 if _phone else 68 if _tablet else 124
-	var bottom := 8 if _phone else 16 if _tablet else 24
-	_rect(_bar, inset, size.y-bottom-height, maxf(0, size.x-inset*2), height)
-	var padding := 6 if _phone or _tablet else 12
-	var dice_width := 76 if _phone else 104 if _tablet else 176
-	var dice_height := 76 if _phone else 96 if _tablet else 148
-	var gap := 8 if _phone or _tablet else 20
-	var dice_y := height-(2 if _phone else padding)-dice_height
-	_rect(get_node("Bar/Dice"), padding, dice_y, dice_width, dice_height)
-	get_node("Bar/Dice/Frame").texture = load(ROOT + "ui/hud_art/dice-" + ("phone" if _phone else "tablet" if _tablet else "desktop") + ".svg")
-	var emblem := Vector2(58, 62) if _phone else Vector2(76, 80) if _tablet else Vector2(100, 104)
-	_rect(get_node("Bar/Dice/Emblem"), (dice_width-emblem.x)/2, 5 if _phone or _tablet else 8, emblem.x, emblem.y)
-	_rect(get_node("Bar/Dice/Face"), (dice_width-emblem.x)/2, get_node("Bar/Dice/Emblem").position.y+emblem.y*.40, emblem.x, emblem.y*.23)
-	get_node("Bar/Dice/Face").add_theme_font_size_override("font_size", int(emblem.x/64*10 + 0.5))
-	get_node("Bar/Dice/Face").add_theme_color_override("font_color", Color(1, 0.90196078431372551, 0.6588235294117647, 1.0))
-	get_node("Bar/Dice/Title").visible = not _phone and not _tablet
-	_rect(get_node("Bar/Dice/Title"), 0, 115, dice_width, 20)
-	var identity_width := 140 if _phone else 172 if _tablet else 340
-	_rect(get_node("Bar/Identity"), padding+dice_width+gap, 2 if _phone else padding, identity_width, height-(4 if _phone else padding*2))
-	var portrait := Vector2(34, 38) if _phone else Vector2(50, 50) if _tablet else Vector2(94, 94)
-	_rect(get_node("Bar/Identity/PortraitFrame"), 0, (get_node("Bar/Identity").size.y-portrait.y)/2, portrait.x, portrait.y)
-	var text_x := portrait.x + (7 if _phone else 8 if _tablet else 18)
-	var text_width := identity_width-text_x-(8 if _phone or _tablet else 20)
-	_rect(get_node("Bar/Identity/Name"), text_x, 2 if _phone else 5 if _tablet else 8, text_width, 20 if _phone or _tablet else 32)
-	_rect(get_node("Bar/Identity/Class"), text_x, 46, text_width, 20)
-	get_node("Bar/Identity/Class").visible = not _phone and not _tablet
-	_rect(get_node("Bar/Identity/Hp"), text_x, 21 if _phone else 30 if _tablet else 73, text_width, 18)
-	_rect(get_node("Bar/Identity/HpTrack"), text_x, 33 if _tablet else 77, maxf(24, text_width-(68 if _tablet else 85)), 10)
-	get_node("Bar/Identity/HpTrack").visible = not _phone
-	get_node("Bar/Identity/Hp").horizontal_alignment = 0 if _phone else 2
-	_rect(get_node("Bar/Identity/Divider"), identity_width-1, 0, 1, get_node("Bar/Identity").size.y)
-	var category_x := padding+dice_width+gap+identity_width+gap
-	_rect(get_node("Bar/Categories"), category_x, 2 if _phone else padding, _bar.size.x-category_x-padding, height-(4 if _phone else padding*2))
-	var buttons: Array = ["Abilities", "Attacks", "Powers", "Items", "More"] if _phone else CATEGORIES
-	var category_gap := 4 if _phone or _tablet else 14
-	var button_width: float = (get_node("Bar/Categories").size.x-category_gap*(buttons.size()-1))/buttons.size()
-	for category in BUTTONS:
-		var button: Button = get_node("Bar/Categories/" + category)
-		button.visible = category in buttons
-		if button.visible:
-			_rect(button, buttons.find(category)*(button_width+category_gap), 0, button_width, get_node("Bar/Categories").size.y)
-			_layout_category(button, button_width, button.size.y)
-	get_node("Bar/Identity/Name").add_theme_font_size_override("font_size", 13 if _phone else 16 if _tablet else 25)
-	get_node("Bar/Identity/Class").add_theme_font_size_override("font_size", 15)
-	get_node("Bar/Identity/Hp").add_theme_font_size_override("font_size", 11 if _phone else 12 if _tablet else 14)
-	_layout_panel()
-
-func _layout_category(button: Button, width: float, height: float) -> void:
-	var icon_control: TextureRect = button.get_node("Icon")
-	var title_control: Label = button.get_node("Title")
-	var icon := 20 if _phone else 24 if _tablet else 30
-	var gap := 2 if _phone else 5 if _tablet else 10
-	var label_height := 16 if _phone or _tablet else 22
-	var top: float = (height-icon-gap-label_height)/2
-	_rect(icon_control, (width-icon)/2, top, icon, icon)
-	_rect(title_control, 0, top+icon+gap, width, label_height)
-	title_control.add_theme_font_size_override("font_size", 11 if _phone or _tablet else 15)
+func _category_colors(button: Button, active: bool) -> void:
+	var title: Label = button.get_node("Title")
+	title.add_theme_color_override("font_color", INK if active else CONTENT)
+	var icon: TextureRect = button.get_node("Icon")
+	icon.modulate = INK if active else PICTOGRAM
 	if button.name == "More":
-		icon_control.visible = false
-		title_control.text = "•••\n" + sdk.translations.text("More")
-		_rect(title_control, 0, top, width, icon+gap+label_height)
+		var glyph: Label = button.get_node("Glyph")
+		glyph.add_theme_color_override("font_color", INK if active else CONTENT)
 
-func _layout_panel() -> void:
-	if _panel_anchor == null or not _panel.visible:
+func _input(event: InputEvent) -> void:
+	if not is_visible_in_tree() or not _panel.visible:
 		return
-	var width := 360 if _phone else 400 if _tablet else 460
-	var pad := 8 if _phone else 12
-	var top := 4 if _phone else 8
-	var header := 44 if _phone else 48
-	var body: float = 68 if _more.visible else _list.get_combined_minimum_size().y if _list.visible else 52 if _phone else 64
-	if get_node("Panel/Detail").visible:
-		body = maxf(44, get_node("Panel/Detail").get_minimum_size().y + 16)
-	var height: float = top+header+body+(44 if get_node("Panel/Footer").visible else 0)+(6 if _phone else 12)
-	var anchor: float = _panel_anchor.position.x + get_node("Bar/Categories").position.x + _panel_anchor.size.x/2
-	var left: float = clampf(anchor-width/2, 0, _bar.size.x-width)
-	_rect(_panel, _bar.position.x+left, _bar.position.y-(10 if _phone else 12)-height, width, height)
-	get_node("Panel/Frame").cut = 5 if _phone else 10
-	get_node("Panel/Frame").pointer = clampf(anchor-left, 12, width-12)
-	get_node("Panel/Frame").queue_redraw()
-	_rect(get_node("Panel/Header"), pad, top, width-pad*2, header)
-	var morning: Button = get_node("Panel/Header/Morning")
-	var show_all: CheckBox = get_node("Panel/Header/ShowAll")
-	var morning_width: float = maxf(72, morning.get_combined_minimum_size().x) if morning.visible else 0.0
-	var all_width := maxf(88 if morning_width > 0 else 120, show_all.get_combined_minimum_size().x)
-	var all_left := width-pad*2-44-morning_width-all_width
-	_rect(get_node("Panel/Header/Title"), 0, 0, all_left if get_node("Panel/Header/ShowAll").visible else width-pad*2-44-morning_width, header)
-	get_node("Panel/Header/Title").add_theme_font_size_override("font_size", 17 if _phone else 22)
-	_rect(get_node("Panel/Header/ShowAll"), all_left, 0, all_width, header)
-	_rect(get_node("Panel/Header/Morning"), width-pad*2-44-morning_width, 0, morning_width, header)
-	_rect(get_node("Panel/Header/Close"), width-pad*2-44, 0, 44, header)
-	_rect(get_node("Panel/Header/Rule"), 0, header-1, width-pad*2, 1)
-	_rect(_list, pad, top+header, width-pad*2, body)
-	_rect(_more, pad, top+header, width-pad*2, body)
-	_rect(get_node("Panel/Empty"), pad+4, top+header, width-pad*2-8, body)
-	_rect(get_node("Panel/Detail"), pad+4, top+header+8, width-pad*2-8, body-16)
-	_rect(get_node("Panel/Footer"), pad, top+header+body, width-pad*2, 44)
-	if _category == "More":
-		for category in ["Features", "Companions", "Recovery"]:
-			var button: Button = get_node("Panel/More/" + category)
-			_layout_category(button, button.size.x, 68)
-
-func _style() -> void:
-	get_node("Bar/Identity/Name").add_theme_color_override("font_color", GOLD)
-	get_node("Bar/Identity/Class").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
-	get_node("Panel/Header/Title").add_theme_color_override("font_color", GOLD)
-	get_node("Panel/Empty/Title").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
-	get_node("Panel/Empty/Sheet").add_theme_color_override("font_color", TOKENS.COLOR_ACCENT)
-	get_node("Panel/Empty/Sheet").add_theme_font_size_override("font_size", 13)
-	get_node("Panel/Empty/Title").add_theme_font_size_override("font_size", 13 if _phone else 14)
-	get_node("Panel/Header/Close").add_theme_font_size_override("font_size", 26)
-	get_node("Panel/Header/ShowAll").add_theme_font_size_override("font_size", 12 if _phone else 13)
-	get_node("Panel/Header/Morning").add_theme_font_size_override("font_size", 12 if _phone else 13)
-	get_node("Panel/Header/Morning").add_theme_color_override("font_color", TOKENS.COLOR_CONTENT_MUTED)
-	get_node("Panel/Detail").add_theme_font_size_override("font_size", 13 if _phone else 16)
-	get_node("Bar/Dice/Title").add_theme_font_size_override("font_size", 13)
-	get_node("Bar/Dice/Title").add_theme_color_override("font_color", Color(0.94117647058823528, 0.85098039215686272, 0.55686274509803924, 1.0))
-	var portrait := StyleBoxFlat.new()
-	portrait.bg_color = TOKENS.COLOR_SURFACE_SUNKEN
-	portrait.border_color = TOKENS.COLOR_EDGE
-	portrait.set_border_width_all(1)
-	portrait.set_corner_radius_all(3)
-	portrait.content_margin_left = 2
-	portrait.content_margin_right = 2
-	portrait.content_margin_top = 2
-	portrait.content_margin_bottom = 2
-	get_node("Bar/Identity/PortraitFrame").add_theme_stylebox_override("panel", portrait)
-	var track := StyleBoxFlat.new()
-	track.bg_color = TOKENS.COLOR_SURFACE_SUNKEN
-	track.border_color = TOKENS.COLOR_EDGE
-	track.set_border_width_all(1)
-	track.set_corner_radius_all(3)
-	get_node("Bar/Identity/HpTrack").add_theme_stylebox_override("background", track)
-	var fill := StyleBoxFlat.new()
-	fill.bg_color = TOKENS.COLOR_SUCCESS
-	fill.set_corner_radius_all(2)
-	get_node("Bar/Identity/HpTrack").add_theme_stylebox_override("fill", fill)
-	for category in BUTTONS:
-		var button: Button = get_node("Bar/Categories/" + category)
-		var normal := StyleBoxFlat.new()
-		normal.bg_color = Color(0, 0, 0, 0)
-		normal.border_color = TOKENS.COLOR_EDGE
-		normal.set_border_width_all(0 if _phone else 1)
-		normal.set_corner_radius_all(3 if _phone else 5)
-		button.add_theme_stylebox_override("normal", normal)
-		var active: StyleBoxFlat = normal.duplicate()
-		active.bg_color = TOKENS.COLOR_SURFACE_RAISED
-		active.border_color = GOLD
-		if _phone:
-			active.border_width_bottom = 2
-		button.add_theme_stylebox_override("pressed", active)
-		button.add_theme_stylebox_override("hover_pressed", active)
+	if event.is_action_pressed("ui_cancel"):
+		_close_panel()
+		accept_event()
+		return
+	var point := Vector2(0, 0)
+	var mouse := event as InputEventMouseButton
+	var touch := event as InputEventScreenTouch
+	if mouse != null and mouse.pressed:
+		point = mouse.position
+	elif touch != null and touch.pressed:
+		point = touch.position
+	else:
+		return
+	if not _bar.get_global_rect().has_point(point) and not _panel.get_global_rect().has_point(point):
+		_close_panel()
