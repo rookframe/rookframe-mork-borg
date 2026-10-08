@@ -116,7 +116,8 @@ func _fit() -> void:
 		get_node(path + "/Row/Label").horizontal_alignment = 1 if phone else 0
 		get_node(path + "/Row/Value").horizontal_alignment = 1 if phone else 0
 	get_node(STAGE).add_theme_constant_override("separation",4 if phone else 6 if tablet and size.y <= 740 else 10 if tablet else 24)
-	get_node(STAGE + "/Content/Split").add_theme_constant_override("separation",0 if phone else 18 if tablet else 32)
+	var column_gap := 0 if phone else 16 if tablet else 24
+	get_node(STAGE + "/Content/Split").add_theme_constant_override("separation",column_gap)
 	get_node(LEFT).size_flags_stretch_ratio = 0.9 if tablet else 1.0
 	get_node(STAGE + "/Content/Split/Detail").size_flags_stretch_ratio = 1.1 if tablet else 1.0
 	get_node(STAGE + "/Content/Split/Detail").theme_type_variation = "WizardPlain" if phone else "WizardDivider"
@@ -141,7 +142,7 @@ func _fit() -> void:
 	var pages := get_node(STAGE + "/Content/Split/Detail/Pages")
 	pages.enabled = true
 	for edge in ["left","top","right","bottom"]:
-		pages.set("offset_" + edge, (17 if tablet else 25) if edge == "left" and not phone else 0)
+		pages.set("offset_" + edge, column_gap + 1 if edge == "left" and not phone else 0)
 	detail.add_theme_constant_override("separation",6 if tablet and _route == "create-class" else 8 if phone or tablet else 20)
 	get_node(DETAIL + "/Heading").add_theme_constant_override("separation",12 if phone else 10 if tablet else 16)
 	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = Vector2(32,32) if phone else Vector2(36,36) if tablet else Vector2(56,56)
