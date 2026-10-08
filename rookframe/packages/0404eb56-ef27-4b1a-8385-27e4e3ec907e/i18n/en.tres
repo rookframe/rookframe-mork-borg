@@ -1565,5 +1565,16 @@ messages = {
 "Published source is unavailable.": "Published source is unavailable.",
 "Full identity": "Full identity",
 "Not recorded": "Not recorded",
-"Heal Creature HP": "Heal"
+"Heal Creature HP": "Heal",
+[&"", &"Full name"]: [&"Full name"],
+[&"", &"No favorites"]: [&"No favorites"],
+[&"", &"No attacks"]: [&"No attacks"],
+[&"", &"No scrolls"]: [&"No scrolls"],
+[&"", &"No usable items"]: [&"No usable items"],
+[&"", &"No active features"]: [&"No active features"],
+[&"", &"No companion attacks"]: [&"No companion attacks"],
+[&"", &"Close character actions"]: [&"Close character actions"],
+[&"", &"Back to actions"]: [&"Back to actions"],
+[&"", &"Previous page"]: [&"Previous page"],
+[&"", &"Next page"]: [&"Next page"]
 }

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://5pepiaux4qd3"
-path="res://.godot/imported/dice-phone.svg-521447ccab858c976fb09be7292d376a.ctex"
+uid="uid://cqwyuxopsjv40"
+path="res://.godot/imported/unchecked.svg-e436b3bdf9e963d18e92e2236bf08c26.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/dice-phone.svg"
-dest_files=["res://.godot/imported/dice-phone.svg-521447ccab858c976fb09be7292d376a.ctex"]
+source_file="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/unchecked.svg"
+dest_files=["res://.godot/imported/unchecked.svg-e436b3bdf9e963d18e92e2236bf08c26.ctex"]
 
 [params]
 

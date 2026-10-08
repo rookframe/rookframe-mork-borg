@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://bnpnxsb3t5ia3"
-path="res://.godot/imported/dice-emblem.svg-88da42ef940a551b89fbea416df10d5b.ctex"
+uid="uid://b7rubsadu4muf"
+path="res://.godot/imported/d20.svg-88e5bd8dddcbdd5d437d9323a77fc284.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/dice-emblem.svg"
-dest_files=["res://.godot/imported/dice-emblem.svg-88da42ef940a551b89fbea416df10d5b.ctex"]
+source_file="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/d20.svg"
+dest_files=["res://.godot/imported/d20.svg-88e5bd8dddcbdd5d437d9323a77fc284.ctex"]
 
 [params]
 

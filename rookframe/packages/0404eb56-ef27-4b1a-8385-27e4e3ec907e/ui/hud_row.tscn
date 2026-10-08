@@ -3,21 +3,21 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_row.gd" id="script"]
 
 [node name="Row" type="HBoxContainer"]
-theme_override_constants/separation = 2
+theme_override_constants/separation = 0
 script = ExtResource("script")
 
 [node name="Launch" type="Button" parent="."]
 size_flags_horizontal = 3
-flat = true
+size_flags_vertical = 1
 
 [node name="Content" type="HBoxContainer" parent="Launch"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 6.0
-offset_top = 4.0
-offset_right = -6.0
-offset_bottom = -4.0
+offset_left = 12.0
+offset_top = 10.0
+offset_right = -12.0
+offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
@@ -34,7 +34,7 @@ stretch_mode = 5
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 4
 
 [node name="Title" type="Label" parent="Launch/Content/Copy"]
 mouse_filter = 2
@@ -52,15 +52,20 @@ text_overrun_behavior = 3
 mouse_filter = 2
 size_flags_vertical = 4
 
+[node name="Use" type="Button" parent="."]
+visible = false
+custom_minimum_size = Vector2(60, 44)
+size_flags_vertical = 1
+text = "Use"
+
 [node name="FullName" type="Button" parent="."]
 visible = false
 custom_minimum_size = Vector2(44, 44)
+size_flags_vertical = 1
 text = "ⓘ"
-flat = true
 
 [node name="Favorite" type="Button" parent="."]
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskGlyphButton"
+size_flags_vertical = 1
 text = "☆"
 toggle_mode = true
-flat = true
