@@ -9,4 +9,4 @@ func _plugging() -> void:
 	# GdUnit4 v6.2.1: development dependency, excluded from exported Packages.
 	plug("godot-gdunit-labs/gdUnit4", {"commit": "08ffc7c65b61b1b2edd545616061a99973c13ce1", "include": ["addons/gdUnit4"]})
 	plug("rookframe/rookframe-sdk", {"tag": "v0.32.45", "include": ["addons/rookframe_sdk"]})
-	plug("rookframe/rookframe-ui-kit", {"commit": "604b5fd443c59f2edc9099fa81899897fca417ab", "include": ["rookframe/ui/"]})
+	plug("rookframe/rookframe-ui-kit", {"commit": "69a3035b78c1f17892430b2546d1855a5dd03290", "include": ["rookframe/ui/"]})
