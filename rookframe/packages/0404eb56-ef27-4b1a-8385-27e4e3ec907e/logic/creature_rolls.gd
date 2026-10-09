@@ -5,6 +5,10 @@ const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const OWN = preload(ROOT + "logic/creature_own_tests.gd")
 
 func choice(data: Dictionary, part: String, entry: String) -> Dictionary:
+	if part in ["test", "reaction", "initiative"]:
+		var label: String = {"test": "Creature test", "reaction": "Reaction", "initiative": "Side initiative"}.get(part)
+		var formula: String = {"test": "d20", "reaction": "2d6", "initiative": "d6"}.get(part)
+		return _choice(label, label, formula, part, "", part)
 	if part in ["damage", "attack"]:
 		if typeof(data.get("attacks", [])) != TYPE_ARRAY:
 			return {}

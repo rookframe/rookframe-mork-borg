@@ -37,6 +37,8 @@ func amount(text: String) -> Dictionary:
 func adjusted(data: Dictionary, operation: String, value: int) -> Dictionary:
 	if not valid(data):
 		return {"ok": false, "message": "HP is unavailable. Use Edit sheet to correct it."}
+	if operation == "set":
+		return {"ok": true, "value": value}
 	var current: int = data.hit_points
 	if operation == "heal":
 		if current > MAX_VALUE - value:
@@ -46,4 +48,4 @@ func adjusted(data: Dictionary, operation: String, value: int) -> Dictionary:
 		if current < MIN_VALUE + value:
 			return {"ok": false, "message": "That adjustment exceeds supported HP capacity."}
 		return {"ok": true, "value": current - value}
-	return {"ok": false, "message": "Choose Apply damage or Heal."}
+	return {"ok": false, "message": "Choose Damage, Heal or Set HP."}

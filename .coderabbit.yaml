@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+reviews:
+  auto_review:
+    enabled: false
+  path_filters:
+    # Generated facade boilerplate is reviewed at its source in rookframe-godot.
+    # Keep the local selection API and the facade's revision declaration in scope.
+    - "!rookframe/packages/*/sdk/!(rooks|package_sdk_facade).gd"

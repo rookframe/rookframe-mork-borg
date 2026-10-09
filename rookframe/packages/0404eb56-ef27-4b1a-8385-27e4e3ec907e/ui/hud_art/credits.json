@@ -6,5 +6,21 @@
     "license": "CC BY 3.0",
     "licenseUrl": "https://creativecommons.org/licenses/by/3.0/",
     "changes": "None; approved reference SVG, tinted by the UI."
+  },
+  "dice.svg": {
+    "title": "dice-5",
+    "author": "Tabler Icons contributors",
+    "source": "https://github.com/tabler/tabler-icons/tree/8ac7d81b72ece11072ef25ea9fd92e80c6f3c9fc",
+    "license": "MIT",
+    "licenseFile": "LICENSE-TABLER.json",
+    "changes": "Unchanged Rookframe UI Kit geometry; white stroke tinted by the UI."
+  },
+  "people.svg": {
+    "title": "users",
+    "author": "Tabler Icons contributors",
+    "source": "https://github.com/tabler/tabler-icons/tree/8ac7d81b72ece11072ef25ea9fd92e80c6f3c9fc",
+    "license": "MIT",
+    "licenseFile": "LICENSE-TABLER.json",
+    "changes": "Unchanged Rookframe UI Kit geometry; white stroke tinted by the UI."
   }
 }
