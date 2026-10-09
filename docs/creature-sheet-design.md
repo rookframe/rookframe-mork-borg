@@ -293,3 +293,33 @@ critical identity/consumption and independent data preservation; ordinary guards
 localization and authored focus
 are disposable checks. RFG-354 still owns actual native dice, accepted logs,
 public Manifest acquisition and application persistence proof.
+
+## Creature HUD
+
+The System mounts one Actor HUD and chooses the Character or Creature view from
+its owned HUD context. Creature views reuse the approved fixed Ledger geometry
+at desktop, tablet and phone sizes. Attacks open the existing captured-Actor
+combat task. Checks request named physical Creature, Morale, Reaction or side
+initiative dice; consequences remain table-resolved. The portrait opens the
+complete Creature sheet.
+
+Special exposes only the accepted Lich Scroll theft and Bone Bowyer Ambush
+entries. Clicking announces “{Actor name} uses {rule name}” through an
+Authority-validated Action Log commit. It does not request dice, choose targets,
+spend resources or change any Actor. Retries retain the initiating identity and
+publish once during the Authority session. Passive rules remain in the sheet.
+
+HP previews Damage, Heal and Set HP from current accepted data. Like the full
+Creature sheet, it preserves signed, uncapped HP; the mockup’s clamp was
+explicitly rejected. Damage and Heal require positive integer amounts; Set HP
+accepts any supported signed integer. Selection changes never redirect pending
+HP edits or Rolls.
+
+Scene lists controlled Creature Rooks in the current Scene, with actual names,
+and HP, without location labels or coordinates. Search and measured pagination
+are local presentation. Choosing a row changes local selection and smoothly flies the
+camera to the chosen Rook through SDK Edition 2029 revision 30 and leaves
+targeting and World data untouched. Attack favorites are local per Creature
+definition, saved in the Package’s user files; they never alter shared Actors.
+The HTML study’s adjective names and location labels are sample data, not a name
+generator or additional World fields.

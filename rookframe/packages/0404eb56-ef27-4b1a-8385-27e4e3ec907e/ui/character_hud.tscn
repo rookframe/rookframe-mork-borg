@@ -1,6 +1,5 @@
 [gd_scene format=3 uid="uid://duueivqppfjle"]
 
-[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/checked.svg" id="checked"]
 [ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/d20.svg" id="dice"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_action_launcher.gd" id="launcher"]
@@ -8,7 +7,10 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="portrait"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
-[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/unchecked.svg" id="unchecked"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_show_all.tscn" id="show_all"]
+
+[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_divider.tscn" id="divider"]
 
 [sub_resource type="StyleBoxFlat" id="Ledger"]
 content_margin_left = 0.0
@@ -112,10 +114,7 @@ layout_mode = 0
 mouse_filter = 2
 show_percentage = false
 
-[node name="Divider" type="ColorRect" parent="Bar/Identity" unique_id=721450294]
-layout_mode = 0
-mouse_filter = 2
-color = Color(0.244353, 0.262784, 0.272745, 1)
+[node name="Divider" parent="Bar/Identity" instance=ExtResource("divider")]
 
 [node name="Categories" type="Control" parent="Bar" unique_id=1557663948]
 anchors_preset = 0
@@ -285,11 +284,8 @@ vertical_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="ShowAll" type="CheckBox" parent="Panel/Header" unique_id=740087950]
+[node name="ShowAll" parent="Panel/Header" instance=ExtResource("show_all")]
 layout_mode = 0
-theme_override_icons/checked = ExtResource("checked")
-theme_override_icons/unchecked = ExtResource("unchecked")
-text = "Show all"
 
 [node name="Morning" type="Button" parent="Panel/Header" unique_id=2141346985]
 visible = false

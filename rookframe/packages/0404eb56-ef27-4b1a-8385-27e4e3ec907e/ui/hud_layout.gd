@@ -284,10 +284,6 @@ func _style() -> void:
 	_type(get_node("Panel/Back"), 28, 1.0)
 	var size_header := 16 if _phone else 17 if _tablet else 18
 	_type(get_node("Panel/Header/ShowAll"), size_header, 1.25)
-	_button_style(get_node("Panel/Header/ShowAll"), false, 8)
-	get_node("Panel/Header/ShowAll").add_theme_constant_override("h_separation", 8)
-	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
-		get_node("Panel/Header/ShowAll").add_theme_color_override(state, MUTED)
 	_type(get_node("Panel/Header/Morning"), size_header, 1.25)
 	var allowance_edge := StyleBoxFlat.new()
 	allowance_edge.bg_color = Color(0, 0, 0, 0)

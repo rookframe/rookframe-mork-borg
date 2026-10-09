@@ -50,7 +50,7 @@ func handle(context: SDK.SystemActionContext, name: String, payload: Variant) ->
 	if str(current.get("schema", "")) != "mork-borg-adversary/v1":
 		return _error("Creature data is unavailable.")
 	var health := HEALTH.new()
-	var amount := health.amount(str(input.amount))
+	var amount := health.integer(str(input.amount)) if str(input.operation) == "set" else health.amount(str(input.amount))
 	if not amount.ok:
 		return _error(str(amount.message), "amount")
 	var change := health.adjusted(current, str(input.operation), int(amount.value))

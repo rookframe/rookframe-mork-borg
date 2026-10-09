@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/checked.svg" id="checked"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/unchecked.svg" id="unchecked"]
+
+[sub_resource type="StyleBoxFlat" id="Plain"]
+content_margin_left = 8.0
+content_margin_top = 0.0
+content_margin_right = 8.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
+
+[sub_resource type="StyleBoxFlat" id="Hover"]
+content_margin_left = 8.0
+content_margin_top = 0.0
+content_margin_right = 8.0
+content_margin_bottom = 0.0
+bg_color = Color(0.137255, 0.156863, 0.168627, 1)
+
+[sub_resource type="StyleBoxFlat" id="Focus"]
+content_margin_left = 8.0
+content_margin_top = 0.0
+content_margin_right = 8.0
+content_margin_bottom = 0.0
+bg_color = Color(0, 0, 0, 0)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.905882, 0.905882, 0.866667, 1)
+expand_margin_left = 3.0
+expand_margin_top = 3.0
+expand_margin_right = 3.0
+expand_margin_bottom = 3.0
+
+[node name="ShowAll" type="CheckBox"]
+custom_minimum_size = Vector2(44, 44)
+theme_override_icons/checked = ExtResource("checked")
+theme_override_icons/unchecked = ExtResource("unchecked")
+text = "Show all"
+theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_hover_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_pressed_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_hover_pressed_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_focus_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_colors/font_disabled_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_override_constants/h_separation = 8
+theme_override_styles/normal = SubResource("Plain")
+theme_override_styles/pressed = SubResource("Plain")
+theme_override_styles/disabled = SubResource("Plain")
+theme_override_styles/hover = SubResource("Hover")
+theme_override_styles/hover_pressed = SubResource("Hover")
+theme_override_styles/focus = SubResource("Focus")

@@ -2,6 +2,29 @@
 
 [resource]
 messages = {
+[&"", &"Checks"]: [&"Checks"],
+[&"", &"Scene"]: [&"Scene"],
+[&"", &"Creature test"]: [&"Creature test"],
+[&"", &"Side initiative"]: [&"Side initiative"],
+[&"", &"Find a creature…"]: [&"Find a creature…"],
+[&"", &"Set HP"]: [&"Set HP"],
+[&"", &"Decrease amount"]: [&"Decrease amount"],
+[&"", &"Increase amount"]: [&"Increase amount"],
+[&"", &"Close creature actions"]: [&"Close creature actions"],
+[&"", &"No special actions"]: [&"No special actions"],
+[&"", &"No matching creatures"]: [&"No matching creatures"],
+[&"", &"No favorites · enable Show all"]: [&"No favorites · enable Show all"],
+[&"", &"Damage unavailable"]: [&"Damage unavailable"],
+[&"", &"No morale test"]: [&"No morale test"],
+[&"", &"Unmodified · choose DR at the table"]: [&"Unmodified · choose DR at the table"],
+[&"", &"Roll in progress"]: [&"Roll in progress"],
+[&"", &"Morale %d"]: [&"Morale %d"],
+[&"", &"%s HP"]: [&"%s HP"],
+[&"", &"Choose Damage, Heal or Set HP."]: [&"Choose Damage, Heal or Set HP."],
+[&"", &"Creature action is unavailable."]: [&"Creature action is unavailable."],
+[&"", &"This Creature action is no longer available."]: [&"This Creature action is no longer available."],
+[&"", &"Owner access is required to use this Creature."]: [&"Owner access is required to use this Creature."],
+[&"", &"This action already has different choices."]: [&"This action already has different choices."],
 [&"", &"No saved miniature"]: [&"No saved miniature"],
 [&"", &"Find miniature"]: [&"Find miniature"],
 [&"", &"Name or Package"]: [&"Name or Package"],
@@ -1576,5 +1599,6 @@ messages = {
 [&"", &"Close character actions"]: [&"Close character actions"],
 [&"", &"Back to actions"]: [&"Back to actions"],
 [&"", &"Previous page"]: [&"Previous page"],
-[&"", &"Next page"]: [&"Next page"]
+[&"", &"Next page"]: [&"Next page"],
+[&"", &"%s → %s HP"]: [&"%s → %s HP"]
 }

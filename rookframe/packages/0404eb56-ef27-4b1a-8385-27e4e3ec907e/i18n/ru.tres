@@ -2,6 +2,29 @@
 
 [resource]
 messages = {
+[&"", &"Checks"]: [&"Проверки"],
+[&"", &"Scene"]: [&"Сцена"],
+[&"", &"Creature test"]: [&"Проверка существа"],
+[&"", &"Side initiative"]: [&"Инициатива стороны"],
+[&"", &"Find a creature…"]: [&"Найти существо…"],
+[&"", &"Set HP"]: [&"Задать ОЗ"],
+[&"", &"Decrease amount"]: [&"Уменьшить число"],
+[&"", &"Increase amount"]: [&"Увеличить число"],
+[&"", &"Close creature actions"]: [&"Закрыть действия существа"],
+[&"", &"No special actions"]: [&"Нет особых действий"],
+[&"", &"No matching creatures"]: [&"Существа не найдены"],
+[&"", &"No favorites · enable Show all"]: [&"Нет избранного · включите «Показать всё»"],
+[&"", &"Damage unavailable"]: [&"Урон недоступен"],
+[&"", &"No morale test"]: [&"Без проверки морали"],
+[&"", &"Unmodified · choose DR at the table"]: [&"Без модификатора · СЛ выбирается за столом"],
+[&"", &"Roll in progress"]: [&"Бросок выполняется"],
+[&"", &"Morale %d"]: [&"Мораль %d"],
+[&"", &"%s HP"]: [&"%s ОЗ"],
+[&"", &"Choose Damage, Heal or Set HP."]: [&"Выберите урон, лечение или задание ОЗ."],
+[&"", &"Creature action is unavailable."]: [&"Действие существа недоступно."],
+[&"", &"This Creature action is no longer available."]: [&"Это действие существа больше недоступно."],
+[&"", &"Owner access is required to use this Creature."]: [&"Для использования существа нужен доступ владельца."],
+[&"", &"This action already has different choices."]: [&"У этого действия уже заданы другие параметры."],
 [&"", &"No saved miniature"]: [&"Нет сохранённой миниатюры"],
 [&"", &"Find miniature"]: [&"Найти миниатюру"],
 [&"", &"Name or Package"]: [&"Имя или пакет"],
@@ -1576,6 +1599,7 @@ messages = {
 [&"", &"Close character actions"]: [&"Закрыть действия персонажа"],
 [&"", &"Back to actions"]: [&"Назад к действиям"],
 [&"", &"Previous page"]: [&"Предыдущая страница"],
-[&"", &"Next page"]: [&"Следующая страница"]
+[&"", &"Next page"]: [&"Следующая страница"],
+[&"", &"%s → %s HP"]: [&"%s → %s ОЗ"]
 }
 locale = "ru"

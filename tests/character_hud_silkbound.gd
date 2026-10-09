@@ -274,3 +274,21 @@ func test_use_action_keeps_its_entry_and_favorite_separate() -> void:
 	assert_int(requested.size()).is_equal(1)
 	assert_str(requested[0][1]).is_equal("Items")
 	assert_str(requested[0][2]).is_equal("owned-waterskin")
+
+func test_show_all_shared_scene_keeps_padding_and_colors_in_every_state() -> void:
+	var fixture := _open(Vector2i(844,390))
+	var hud = fixture.hud
+	await _settle()
+	hud._open_category("Attacks")
+	await _settle()
+	var all: CheckBox = hud.get_node("Panel/Header/ShowAll")
+	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
+		assert_bool(all.get_theme_color(state).is_equal_approx(hud.MUTED)).is_true()
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+		var box: StyleBox = all.get_theme_stylebox(state)
+		assert_float(box.get_content_margin(SIDE_LEFT)).is_equal(8.0)
+		assert_float(box.get_content_margin(SIDE_RIGHT)).is_equal(8.0)
+	all.set_pressed(true)
+	await _settle()
+	assert_bool(all.button_pressed).is_true()
+	assert_bool(all.size.x >= 44 and all.size.y >= 44).is_true()

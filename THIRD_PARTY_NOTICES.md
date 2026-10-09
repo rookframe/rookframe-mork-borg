@@ -28,3 +28,12 @@ Dice twenty faces twenty by Delapouite,
 licensed [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/).
 The approved design-system SVG is used unchanged; Godot applies its UI tint.
 Attribution is also shipped in `ui/hud_art/credits.json`.
+
+## Creature HUD category icons
+
+`ui/hud_art/dice.svg` and `people.svg` are the Tabler Icons `dice-5` and
+`users` geometry from version 3.46.0, commit
+`8ac7d81b72ece11072ef25ea9fd92e80c6f3c9fc`, as vendored by Rookframe UI Kit.
+They retain the UI Kit's white stroke for runtime tinting. The MIT copyright
+and license text ship in `ui/hud_art/LICENSE-TABLER.json`, with provenance in
+`credits.json` beside the icons.

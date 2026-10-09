@@ -20,7 +20,7 @@ func compose() -> void:
 	creation.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/actor_creation.tscn")
 	sdk.slots.actor_creation.push(creation)
 	var hud := SDK.Contribution.new()
-	hud.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.tscn")
+	hud.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/actor_hud.tscn")
 	sdk.character_hud.mount(hud)
 	if sdk.context().is_gm:
 		var combat_button := SDK.WindowButton.new()
