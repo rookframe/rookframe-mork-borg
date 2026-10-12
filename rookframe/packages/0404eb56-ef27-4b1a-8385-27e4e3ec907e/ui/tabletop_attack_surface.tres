@@ -5,4 +5,5 @@
 script = ExtResource("surface")
 scene = ExtResource("scene")
 initial_placement = "right"
-initial_dock_width = 420.0
+content_sized = true
+hide_rails = true

@@ -15,6 +15,9 @@ func test_ability_throw() -> void:
 	await action.refresh()
 	assert_bool(not action.pending and host.reports.size() == 1).override_failure_message("Settled result finishes and reports once.").is_true()
 	assert_bool(host.reports[0].result == "16" and host.reports[0].dice == [{"sides": 20, "value": 17}]).override_failure_message("Interpretation retains raw 17 and applies Strength -1.").is_true()
+	assert_int(host.announcements.size()).is_equal(1)
+	assert_array(host.announcements[0].results).is_equal([16])
+	assert_int(host.announcements[0].logSequence).is_equal(43)
 	await action.refresh()
 	await action.cancel()
 	assert_bool(host.reports.size() == 1).override_failure_message("Refresh and closure after completion do not duplicate or undo.").is_true()
@@ -25,6 +28,7 @@ func test_ability_throw() -> void:
 	host.human_results[cancelled_id] = {"status": "rolled", "sequence": 43, "terms": [{"name": "Strength", "faces": 20, "results": [20]}]}
 	await cancelled.refresh()
 	assert_bool(host.reports.size() == 2 and host.reports[1].result == "ENDED").override_failure_message("Cancellation rejects late interpreted consequences.").is_true()
+	assert_int(host.announcements.size()).override_failure_message("Cancellation is local feedback and recorded history, not another announcement").is_equal(1)
 	var disconnected = ACTION.new(SDK.new(host), SDK.ActorId.new("character"))
 	await disconnected.start("Strength")
 	host.human_results[disconnected.request_id].status = "cancelled"

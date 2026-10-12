@@ -1,4 +1,5 @@
 extends RefCounted
+## Dice consequences are recorded history; manual no-roll uses explicitly announce below. Pending decisions and corrective feedback stay in the action window.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
@@ -444,9 +445,6 @@ func _target(context: SDK.SystemActionContext, caller: Dictionary, input: Dictio
 			outside += ("\n" if not outside.is_empty() else "") + "target %s not in range" % label
 		selected = {"actor": actor.actor.id.value, "rook": id, "label": label}
 	if not outside.is_empty():
-		var report := SDK.ActionLogMessage.new("Item out of range")
-		report.text = [SDK.ActionLogText.new(outside)]
-		BROKEN.new().commit(context, [], report)
 		return {"error": outside}
 	if target_count != 1:
 		return {"error": "Choose exactly one recipient within %d ft, or choose Self." % reach}
@@ -538,8 +536,11 @@ func _manual(context: SDK.SystemActionContext, action: Dictionary, values: Array
 		text += " Raw Roll #%d." % sequence
 	var report := SDK.ActionLogMessage.new("Use item")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report).ok:
+	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(source.actor.id, data)], report)
+	if not saved.ok:
 		return _end(context, action)
+	if sequence == 0:
+		_announce_use(context, action, data, saved.sequence)
 	action["state"] = "resolved"
 	action["message"] = text
 	return _public(action)
@@ -793,8 +794,14 @@ func _choose_scrolls(context: SDK.SystemActionContext, action: Dictionary, input
 func _resolve(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], text: String) -> Dictionary:
 	var report := SDK.ActionLogMessage.new("Use item")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not BROKEN.new().commit(context, changes, report).ok:
+	var saved := BROKEN.new().commit(context, changes, report)
+	if not saved.ok:
 		return _end(context, action)
+	var rule: Dictionary = action.rule
+	if rule.get("supply", false):
+		var source := context.read_actor(SDK.ActorId.new(str(action.source)))
+		if source.ok:
+			_announce_use(context, action, source.actor.data, saved.sequence)
 	action["state"] = "resolved"
 	action["message"] = text
 	return _public(action)
@@ -1151,3 +1158,22 @@ func _sheet_target_result(context: SDK.SystemActionContext, action: Dictionary, 
 		var total := raw + bonus
 		text = "Morale %d %+d = %d vs %d. %s Resolve target movement with the table. Raw Roll #%d." % [raw, bonus, total, int(action.morale), "Bows and kindly removes itself." if total > int(action.morale) else "Does not bow or leave.", sequence]
 	return _resolve(context, action, [SDK.ActorChange.new(source.actor.id, data)], text)
+
+func _announce_use(context: SDK.SystemActionContext, action: Dictionary, data: Dictionary, sequence: int) -> void:
+	var item := RULES.new().owned(data, str(action.item))
+	var notice := SDK.Announcement.new(_announcement_text(str(data.get("name", "Character")), 128), _announcement_text("Uses " + str(item.get("name", action.kind)), 256), "item")
+	notice.log_sequence = sequence
+	context.announce(notice)
+
+func _announcement_text(text: String, limit: int) -> String:
+	var result := ""
+	var units := 0
+	for raw in text.split(""):
+		var character := str(raw)
+		if character < " " or character >= "\u007f" and character <= "\u009f":
+			continue
+		units += 2 if character > "\uffff" else 1
+		if units > limit:
+			break
+		result += character
+	return result if not result.is_empty() else "Character"

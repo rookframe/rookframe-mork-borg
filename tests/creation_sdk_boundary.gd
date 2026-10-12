@@ -212,4 +212,11 @@ func SystemIntentCommit(_token: String, changes: Array, _report: Dictionary) -> 
 		for actor in actors:
 			if actor.id == change.id:
 				actor.data = change.data.duplicate(true)
+	return {"ok": true, "value": {"sequence": reports.size() if not _report.is_empty() else 0}}
+
+var announcements: Array[Dictionary] = []
+func Announce(message: Dictionary) -> Dictionary:
+	announcements.append(message.duplicate(true))
 	return {"ok": true}
+func SystemIntentAnnounce(_token: String, message: Dictionary) -> Dictionary:
+	return Announce(message)

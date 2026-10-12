@@ -6,7 +6,7 @@ const REQUEST = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 signal changed
 var _operation := "melee"
-var _active_states := ["pending"]
+var _active_states := ["pending", "fumble"]
 var snapshot: Dictionary = {}
 var state := "ready"
 var message := ""

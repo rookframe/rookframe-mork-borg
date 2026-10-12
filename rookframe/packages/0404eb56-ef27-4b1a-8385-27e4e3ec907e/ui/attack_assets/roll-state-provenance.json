@@ -1,0 +1,24 @@
+{
+  "tool": "OpenAI imagegen",
+  "date": "2026-10-11",
+  "reference": "User-approved D20 button, codex-clipboard-50f84583-9760-4bef-b6d7-da82a0b44616.png",
+  "intent": "Matching interaction states for the existing illustrated roll button. The normal and disabled state retain ai-generated-approved-art-sprites.png.",
+  "invariants": [
+    "One square bone/parchment tile",
+    "Warm brass and cream",
+    "Same frontal D20 composition and 20 engraving",
+    "No extra text, icons or scene",
+    "Transparent exterior; original alpha retained"
+  ],
+  "variants": {
+    "ai-generated-roll-hover.png": {
+      "source": "exec-46b7cab0-b89a-4326-81d7-de14b2dfec1a.png",
+      "direction": "Lighter ivory, narrow perimeter highlight, slightly lifted shadow."
+    },
+    "ai-generated-roll-pressed.png": {
+      "source": "exec-5ec7312d-8dfd-4d66-9481-1f8c92f7f1ef.png",
+      "direction": "Inset upper-left shadow, darker brass, compressed bevel, die settled down."
+    }
+  },
+  "integration": "These generated variants are retired and are not referenced by the attack card. All native Button states now share the original ai-generated-approved-art-sprites.png AtlasTexture at the same size and filtering. StyleBoxTexture modulation supplies hover lighting and pressed shading; pressed drawing shifts down two pixels. No generated pixels edited."
+}

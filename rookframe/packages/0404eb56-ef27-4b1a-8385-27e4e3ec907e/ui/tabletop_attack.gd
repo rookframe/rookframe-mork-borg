@@ -1,319 +1,412 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
-## A docked native action; no selection observer can replace its Actor or source.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const I18N = preload(ROOT + "ui/localization.gd")
+var _locale := I18N.new()
+const CARD = preload(ROOT + "ui/attack_card.gd")
+const ACTION = preload(ROOT + "logic/tabletop_action.gd")
+const HEALTH = preload(ROOT + "logic/health_action.gd")
+const BROKEN = preload(ROOT + "logic/broken_incident.gd")
 const SOURCES = preload(ROOT + "logic/attack_sources.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
-const ACTION = preload(ROOT + "logic/melee_action.gd")
-const COMPANION_ACTION = preload(ROOT + "logic/companion_action.gd")
-const DEFENCE_FLOW = preload(ROOT + "ui/creature_defence_flow.gd")
-const VIEW = preload(ROOT + "ui/melee_attack.gd")
-const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
-const TARGETS = preload(ROOT + "ui/attack_targets.gd")
-const I18N = preload(ROOT + "ui/localization.gd")
-const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
+const ROOKS = preload(ROOT + "logic/source_rooks.gd")
+const AMMO = preload(ROOT + "logic/ammunition.gd")
+@onready var card: CARD = get_node("Card")
 var _actor: SDK.ActorId
-var _task: Dictionary = {}
-var _item: Dictionary = {}
-var _action: ACTION
-var _options := {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}
-var _weapons: Array[Dictionary] = []
-var _rooks: Array[SDK.RookId] = []
 var _rook: SDK.RookId
-var _refreshing := false
-var _refresh_pending := false
-var _closed := false
-var _prepared := false
-var _target_summary := ""
-var _started_data: Dictionary = {}
-var _started_item: Dictionary = {}
-var _defending := false
-@onready var _view: VIEW = get_node("Margin/Content/Scroll/Body/Attack")
-@onready var _defence: DEFENCE_FLOW = get_node("Margin/Content/Scroll/Body/Defence")
-@onready var _start_button: Button = get_node("Margin/Content/Actions/Start")
+var _task: Dictionary = {}
+var _options: Dictionary = {}
+var _item: Dictionary = {}
+var _data: Dictionary = {}
+var _action: ACTION
+var _health: HEALTH
+var _dirty := false
+var _reading := false
+var _closed := true
+var _valid_target := false
+var _defence_target := false
+var _elapsed := 0.0
+var _choices_key := ""
+var _queued: Array[Dictionary] = []
+var _incoming := false
+var _range_key := ""
 
 func ready() -> void:
-	if sdk == null:
-		return
-	var locale := I18N.new()
-	locale.bind(sdk)
-	_view.localize(locale)
-	get_node("Margin/Content/Scroll/Body/Weapon/Title").text = sdk.translations.text("Coward’s jab · choose a light one-handed weapon")
-	get_node("Margin/Content/Scroll/Body/Improvised/Object").placeholder_text = sdk.translations.text("Improvised object")
-	var mode: OptionButton = get_node("Margin/Content/Scroll/Body/Improvised/Mode")
-	mode.clear()
-	mode.add_item(sdk.translations.text("Melee · Strength · 5 ft"))
-	mode.add_item(sdk.translations.text("Ranged · Presence · 30 ft"))
-	_defence.localize(locale)
-	_defence.changed.connect(_defence_changed)
-	_defence.resolved.connect(_changed)
-	_defence.access_lost.connect(_close)
-	_view.targets_requested.connect(_choose_targets)
-	get_node("Margin/Content/Actions/Close").pressed.connect(_close)
-	_start_button.pressed.connect(_start)
-	get_node("Margin/Content/Scroll/Body/Weapon/Choice").item_selected.connect(_weapon_selected)
-	get_node("Margin/Content/Scroll/Body/Source/Choice").item_selected.connect(_rook_selected)
-	get_node("Margin/Content/Scroll/Body/Improvised/Mode").item_selected.connect(_mode_selected)
+	_locale.bind(sdk)
+	card.localize(_locale)
+	card.prepare.connect(_prepare)
+	card.close_requested.connect(_close)
+	card.target_requested.connect(_choose_target)
+	card.decision.connect(_decision)
 	closed.connect(_cancel)
-	sdk.world_changed.connect(_changed)
-	sdk.targeting.changed.connect(_targets_changed)
+	if sdk != null:
+		sdk.world_changed.connect(_changed)
+		sdk.targeting.changed.connect(_targets_changed)
 
 func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
-	# Retained windows cannot replace an already opened action silently.
-	if _actor != null and not _closed:
+	if not _closed:
+		if bool(task.get("incoming", false)):
+			var incoming: Dictionary = task.outcome
+			if _action != null and str(_action.snapshot.get("id", "")) == str(incoming.id):
+				return
+			for queued in _queued:
+				var queued_task: Dictionary = queued.get("task", {})
+				var queued_outcome: Dictionary = queued_task.get("outcome", {})
+				if str(queued_outcome.get("id", "")) == str(incoming.id):
+					return
+			_queued.append({"actor": actor.value, "task": task.duplicate(true)})
 		return
+	_closed = false
+	visible = true
+	_incoming = bool(task.get("incoming", false))
+	_choices_key = ""
+	card.message("")
 	_actor = actor
 	_task = task.duplicate(true)
-	_closed = false
-	_prepared = false
-	_started_data = {}
-	_started_item = {}
-	_defending = false
-	_target_summary = ""
-	get_node("Margin/Content/Scroll/Body/Improvised/Object").text = ""
-	get_node("Margin/Content/Scroll/Body/Improvised/Mode").select(0)
-	_options = {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}
-	_options["mode"] = str(task.get("mode", "attack"))
-	_options["entry"] = str(task.get("entry", ""))
-	_options["improvised_mode"] = "melee"
-	_options["object"] = ""
-	_options["tabletop"] = true
-	_resolve_rooks()
-	_refresh_pending = true
+	_options = {"mode": str(task.get("mode", "attack")), "entry": str(task.get("entry", "")), "improvised_mode": "melee", "tabletop": true}
+	var resolver := ROOKS.new()
+	var selected := sdk.rooks.selected()
+	_rook = resolver.resolve(resolver.candidates(sdk, actor), selected.value if selected != null else "")
+	if bool(task.get("incoming", false)):
+		_new_action()
+		_action.adopt(task.outcome)
+	_dirty = true
 
-func _process(_delta: float) -> void:
-	if _refresh_pending and not _refreshing and not _closed:
-		_refresh_pending = false
+func _process(delta: float) -> void:
+	if _closed or sdk == null:
+		return
+	_elapsed += delta
+	if _elapsed >= 0.5:
+		_elapsed = 0.0
+		_dirty = true
+	if _dirty and not _reading:
+		_dirty = false
 		_refresh()
 
-func _inventory(actor: SDK.Actor) -> Array:
-	return CREATURES.new().combat_attacks(actor.data) if str(actor.data.get("schema", "")) == "mork-borg-adversary/v1" else ITEMS.new(sdk, actor.id).inventory(actor.data)
-
 func _refresh() -> void:
-	if _actor == null or _closed:
-		return
-	_refreshing = true
-	var current := sdk.actors.read(_actor)
-	if not current.ok or current.actor.access_level != "Owner":
-		_close()
-		_refreshing = false
-		return
-	if _prepared and (_action == null or _action.state == "error"):
-		var edited: Dictionary = _view.options()
-		if not edited.is_empty():
-			_capture_options(edited)
-	if _action != null:
-		await _action.refresh()
-		if _closed:
-			_refreshing = false
-			return
-	var items := _inventory(current.actor)
-	var data: Dictionary = current.actor.data.duplicate(true)
-	data["inventory"] = items
-	if str(_task.get("mode", "")) == "jab" and (_action == null or _action.state == "error"):
-		_weapons = SOURCES.new().jab_weapons(items)
-		var choice: OptionButton = get_node("Margin/Content/Scroll/Body/Weapon/Choice")
-		choice.clear()
-		choice.add_item(sdk.translations.text("Choose a weapon"))
-		for index in range(_weapons.size()):
-			var weapon: Dictionary = _weapons[index]
-			choice.add_item(str(weapon.name))
-			if str(weapon.inventory_id) == str(_task.get("item", "")):
-				choice.select(index + 1)
-	get_node("Margin/Content/Scroll/Body/Weapon").visible = str(_task.get("mode", "")) == "jab" and (_action == null or _action.state == "error")
-	_item = SOURCES.new().intrinsic(data, str(_task.get("item", "")), _options)
-	if _item.is_empty():
-		for raw in items:
-			var item: Dictionary = raw
-			if str(item.get("inventory_id", "")) == str(_task.get("item", "")):
-				_item = item
-	var improvised := str(_task.get("item", "")) == "intrinsic:improvised"
-	var state := _action.state if _action != null else "ready"
-	var editable := _action == null or state == "error"
-	get_node("Margin/Content/Scroll/Body/Improvised").visible = improvised and editable
-	get_node("Margin/Content/Scroll/Body/Source").visible = editable and _rooks.size() > 1
-	if not editable and not _started_data.is_empty():
-		data = _started_data
-		_item = _started_item
-	var display_item := _item.duplicate(true)
-	if not display_item.is_empty():
-		display_item["literal_name"] = FAVORITES.new().uses_literal_name(_item, data)
-	if str(_task.get("mode", "")) == "jab" and not display_item.is_empty():
-		display_item["attack_ability"] = "Agility"
-		display_item["damage"] = str(display_item.get("damage", "")) + "+3"
-	var message := _action.message if _action != null else ""
-	_view.configure(data, display_item, _options, state, message)
-	_view.get_node("Outcome").visible = not message.is_empty()
-	if not editable:
-		_view.get_node("Rules").visible = false
-	if _item.get("natural", false):
-		var source_name := str(_item.get("name", "Attack"))
-		var named_object := str(_item.get("source_item_id", "")) == "improvised" and not str(_options.get("object", "")).strip_edges().is_empty()
-		var display_name := source_name if FAVORITES.new().uses_literal_name(_item, data) or named_object else sdk.translations.text(source_name)
-		_view.get_node("Context").text = sdk.translations.text("%s · %s") % [str(data.get("name", "Actor")), display_name]
-	_view.get_node("SourceRules").text = sdk.translations.text(str(_item.get("rules", "")))
-	_view.get_node("SourceRules").visible = not str(_item.get("rules", "")).is_empty()
-	_view.get_node("Target/Change").disabled = not editable
-	_prepared = true
-	if str(_task.get("mode", "")) == "jab":
-		_view.get_node("Rules/Jab").set_pressed_no_signal(true)
-		_view.get_node("Rules/Jab").disabled = true
-	_start_button.visible = _action == null or state == "error"
-	_start_button.disabled = _item.is_empty() or not SOURCES.new().usable(_item, str(data.get("schema", "")) == "mork-borg-adversary/v1")
-	get_node("Margin/Content/Actions/Close").text = sdk.translations.text("Cancel" if _action == null or _action.pending else "Done")
-	_present_defence()
-	_present_owners()
-	var snapshot := await sdk.targeting.snapshot()
-	if not _closed and editable:
-		var targeted: bool = snapshot.ok and not snapshot.snapshot.rooks.is_empty()
-		_target_summary = await TARGETS.new().describe(sdk, _rook, float(_item.get("range_feet", 0))) if targeted else sdk.translations.text("No target · resolve at the table")
-		_view.set_targets(_target_summary)
-		_view.get_node("Rules/Hint").text = sdk.translations.text("Blank difficulty uses the Creature’s printed rule. Choose overrides with the table. Distance uses committed Rook centers." if targeted else "Attack and damage are rolled in sequence. Resolve the results at the table.")
-	_refreshing = false
-
-func _resolve_rooks() -> void:
-	var resolver := SOURCE_ROOKS.new()
-	_rooks = resolver.candidates(sdk, _actor)
-	var chosen := sdk.rooks.selected()
-	_rook = resolver.resolve(_rooks, chosen.value if chosen != null else "")
-	var choice: OptionButton = get_node("Margin/Content/Scroll/Body/Source/Choice")
-	choice.clear()
-	choice.add_item(sdk.translations.text("Choose the source Rook"))
-	for index in range(_rooks.size()):
-		choice.add_item(sdk.translations.text("Rook %d") % (index + 1))
-		if _rook != null and _rook.value == _rooks[index].value:
-			choice.select(index + 1)
-
-func _start() -> void:
-	if _defending:
-		await _defence.roll()
-		return
-	if _closed or (_action != null and _action.pending):
-		return
-	var options: Dictionary = _view.options()
-	if options.is_empty():
-		return
-	options["tabletop"] = true
-	options["entry"] = str(_task.get("entry", ""))
-	options["object"] = get_node("Margin/Content/Scroll/Body/Improvised/Object").text
-	options["improvised_mode"] = str(_options.get("improvised_mode", "melee"))
-	_options = options
-	var input := options.duplicate(true)
-	input["source"] = _actor.value
-	input["rook"] = _rook.value if _rook != null else ""
-	input["item"] = str(_task.get("item", ""))
-	if _task.get("companion", false):
-		input["character"] = str(_task.get("character", ""))
-		input["owner"] = str(_task.get("owner", ""))
-	if _action != null:
-		await _action.retire()
-	if _closed:
-		return
+	_reading = true
+	if _action != null and str(_action.snapshot.get("defender", "")) == sdk.context().participant_id:
+		_actor = SDK.ActorId.new(str(_action.snapshot.target))
 	var source := sdk.actors.read(_actor)
 	if not source.ok or source.actor.access_level != "Owner":
+		_reading = false
+		_close()
 		return
-	_started_data = source.actor.data.duplicate(true)
-	_started_data["inventory"] = _inventory(source.actor)
-	_started_item = _item.duplicate(true)
-	var intrinsic := SOURCES.new().intrinsic(_started_data, str(_task.get("item", "")), options)
-	if not intrinsic.is_empty():
-		_started_item = intrinsic
-	var action: ACTION = COMPANION_ACTION.new(sdk) if _task.get("companion", false) else ACTION.new(sdk)
-	add_child(action)
-	_action = action
-	action.changed.connect(_changed)
-	await action.start(input)
-	_refresh_pending = true
-
-func _weapon_selected(index: int) -> void:
-	if index > 0 and index <= _weapons.size():
-		_task["item"] = str(_weapons[index - 1].inventory_id)
-		_refresh_pending = true
-
-func _rook_selected(index: int) -> void:
-	_rook = _rooks[index - 1] if index > 0 and index <= _rooks.size() else null
-	_refresh_pending = true
-
-func _mode_selected(index: int) -> void:
-	_options["improvised_mode"] = "ranged" if index == 1 else "melee"
-	_refresh_pending = true
-
-func _choose_targets() -> void:
-	if _action != null and _action.state != "error":
+	_data = source.actor.data
+	var device := sdk.presentation_experience()
+	card.responsive("phone" if device.is_phone else "tablet" if device.is_tablet else "desktop")
+	if _health != null:
+		if _health.state == "resolved":
+			_reading = false
+			_close()
+			return
+		card.identity(str(_data.get("name", "")), "Broken", "")
+		card.message(_health.message)
+		card.consequence("Done" if not _health.pending else "", "")
+		visible = not _health.pending
+		_reading = false
 		return
-	var options: Dictionary = _view.options()
-	if not options.is_empty():
-		_capture_options(options)
+	var outcome: Dictionary = _action.snapshot if _action != null else {}
+	if _action != null and _action.state not in ["ready", "error"] or not str(outcome.get("defender", "")).is_empty():
+		_present_outcome(outcome)
+		visible = not _closed and (_action.state != "pending")
+		_reading = false
+		return
+	var creature := str(_data.get("schema", "")) == "mork-borg-adversary/v1"
+	var items: Array = CREATURES.new().combat_attacks(_data) if creature else ITEMS.new(sdk, _actor).inventory(_data)
+	_item = SOURCES.new().intrinsic(_data, str(_task.get("item", "")), _options)
+	for raw in items:
+		var item: Dictionary = raw
+		if str(item.get("inventory_id", "")) == str(_task.get("item", "")):
+			_item = item
+	var reach := float(_item.get("range_feet", 0))
+	var range_key := (_rook.value + ":" + str(reach)) if _rook != null and reach > 0 else ""
+	if range_key != _range_key:
+		if range_key.is_empty():
+			sdk.targeting.end_range()
+			_range_key = ""
+		elif sdk.targeting.begin_range(_rook, reach * 0.3048, _locale.text("%d ft") % int(reach)).ok:
+			_range_key = range_key
+
+	var ability_name := "Agility" if str(_task.get("mode", "")) == "jab" else str(_item.get("attack_ability", "Strength"))
+	var abilities: Dictionary = _data.get("abilities", {})
+	var ability: Dictionary = abilities.get(ability_name, {})
+	var modifier := int(ability.get("modifier", 0))
+	card.identity(str(_data.get("name", "")), str(_item.get("name", "Choose weapon")), (_locale.text("%s · %d ft") % [_locale.text(ability_name), int(reach)]) if not creature else _locale.text("%d ft") % int(reach))
+	await _target(reach, creature)
+	if _closed:
+		_reading = false
+		return
+	var available := SOURCES.new().usable(_item, creature)
+	var ammo_kind := str(_item.get("ammunition", ""))
+	if not ammo_kind.is_empty():
+		var candidates := AMMO.new().available(items, ammo_kind)
+		_options["ammunition"] = str(candidates[0].inventory_id) if not candidates.is_empty() else ""
+		available = available and not candidates.is_empty()
+	(card.body.get_node("Decision") as Control).visible = false
+	card.combat("1d20" + (" %+d" % modifier if modifier != 0 else ""), str(_item.get("damage", "")), available and _valid_target)
+	if creature and _defence_target:
+		card.combat("", str(_item.get("damage", "")), available and _valid_target, "Defence")
+		card.request_defence(available and _valid_target)
+	card.message(_action.message if _action != null else "", _action != null and _action.state == "error")
+	_choices(items)
+	_reading = false
+
+func _target(reach: float, creature: bool) -> void:
+	_valid_target = false
+	_defence_target = creature
+	var result := await sdk.targeting.snapshot()
+	if not result.ok or result.snapshot.rooks.size() != 1 or _rook == null:
+		card.target("Choose a target", "", false, true)
+		return
+	var target: SDK.RookId = result.snapshot.rooks[0]
+	var identity := sdk.public_identities.read(target)
+	var distance := sdk.scenes.distance(_rook, target)
+	var rook := sdk.rooks.read(target)
+	var schema := ""
+	if rook.ok and rook.rook.actor != null:
+		var actor := sdk.actors.read(rook.rook.actor)
+		if actor.ok:
+			schema = str(actor.actor.data.get("schema", ""))
+			_defence_target = schema == "mork-borg-character/v1"
+			if creature and schema == "mork-borg-adversary/v1":
+				var access := sdk.actors.access(actor.actor.id)
+				if access.ok:
+					for entry in access.items:
+						_defence_target = _defence_target or entry.access_level == "Owner"
+	_valid_target = distance.ok and distance.distance <= reach * 0.3048 + 0.000001 and target.value != _rook.value and (schema == "mork-borg-adversary/v1" or creature and schema == "mork-borg-character/v1")
+	var name := identity.public_identity.label if identity.ok else "Creature"
+	card.target(name, _locale.text("%.1f ft") % (distance.distance / 0.3048) if distance.ok else "", _valid_target, true)
+
+func _choices(items: Array) -> void:
+	var owners: Array = _action.snapshot.get("owners", []) if _action != null else []
+	var key := str(_task.get("item", "")) + ":" + str(_rook.value if _rook != null else "") + str(owners)
+	if key == _choices_key:
+		return
+	_choices_key = key
+	var choices: VBoxContainer = card.body.get_node("Choices")
+	for child in choices.get_children():
+		choices.remove_child(child)
+		child.queue_free()
+	if not owners.is_empty():
+		var owner_picker := OptionButton.new()
+		owner_picker.theme_type_variation = "RookframeActionSelect"
+		owner_picker.custom_minimum_size = Vector2(0, 44)
+		owner_picker.add_item(_locale.text("Choose defending Player"))
+		for index in range(owners.size()):
+			var owner: Dictionary = owners[index]
+			owner_picker.add_item(str(owner.name))
+		owner_picker.item_selected.connect(_owner_selected.bind(owners))
+		choices.add_child(owner_picker)
+	var rooks := ROOKS.new().candidates(sdk, _actor)
+	if _rook == null and rooks.size() > 1:
+		var picker := OptionButton.new()
+		picker.theme_type_variation = "RookframeActionSelect"
+		picker.custom_minimum_size = Vector2(0, 44)
+		picker.add_item(_locale.text("Choose source Rook"))
+		for index in range(rooks.size()):
+			picker.add_item("Rook %d" % (index + 1))
+		picker.item_selected.connect(_source_selected.bind(rooks))
+		choices.add_child(picker)
+	if str(_task.get("mode", "")) == "jab":
+		var weapons := SOURCES.new().jab_weapons(items)
+		var picker := OptionButton.new()
+		picker.theme_type_variation = "RookframeActionSelect"
+		picker.custom_minimum_size = Vector2(0, 44)
+		picker.add_item(_locale.text("Choose a light weapon"))
+		for index in range(weapons.size()):
+			picker.add_item(str(weapons[index].name))
+			if str(weapons[index].inventory_id) == str(_task.get("item", "")):
+				picker.select(index + 1)
+		picker.item_selected.connect(_weapon_selected.bind(weapons))
+		choices.add_child(picker)
+	if str(_task.get("item", "")) == "intrinsic:improvised":
+		var object_name := LineEdit.new()
+		object_name.theme_type_variation = "RookframeActionTextField"
+		object_name.accessibility_name = _locale.text("Improvised object")
+		object_name.placeholder_text = _locale.text("Improvised object")
+		object_name.custom_minimum_size = Vector2(0, 44)
+		object_name.text_changed.connect(_object_changed)
+		choices.add_child(object_name)
+		var mode := OptionButton.new()
+		mode.theme_type_variation = "RookframeActionSelect"
+		mode.custom_minimum_size = Vector2(0, 44)
+		mode.add_item(_locale.text("Melee"))
+		mode.add_item(_locale.text("Ranged"))
+		mode.item_selected.connect(_mode_selected)
+		choices.add_child(mode)
+	var special := str(_item.get("source_item_id", ""))
+	if str(_task.get("mode", "")) == "jab" or special in ["shoe-of-deaths-horse", "sacred-shepherds-crook", "eurekia"]:
+		_check(choices, "Requirements confirmed", "eligible")
+	if special == "shoe-of-deaths-horse":
+		_check(choices, "Small or medium target", "small_medium")
+	if special == "sacred-shepherds-crook":
+		_check(choices, "Faithless human", "faithless_human")
+	choices.visible = choices.get_child_count() > 0
+
+func _check(parent: VBoxContainer, text: String, key: String) -> void:
+	var button := CheckBox.new()
+	button.text = _locale.text(text)
+	button.custom_minimum_size = Vector2(0, 44)
+	button.button_pressed = bool(_options.get(key, false))
+	button.toggled.connect(_option_toggled.bind(key))
+	parent.add_child(button)
+
+func _prepare() -> void:
+	if _action != null and not str(_action.snapshot.get("defender", "")).is_empty():
+		await _action.roll({})
+		return
+	if _reading or _closed or not _valid_target:
+		return
+	if _action != null:
+		await _action.retire()
+	_new_action()
+	var input := _options.duplicate(true)
+	input["item"] = str(_task.get("item", ""))
+	input["source"] = _actor.value
+	input["rook"] = _rook.value if _rook != null else ""
+	sdk.targeting.end_range()
+	_range_key = ""
+	await _action.attack(input, str(_data.get("schema", "")) == "mork-borg-adversary/v1")
+	_dirty = true
+
+func _present_outcome(outcome: Dictionary) -> void:
+	if not _incoming:
+		sdk.targeting.end_range()
+		_range_key = ""
+	(card.body.get_node("Choices") as Control).visible = false
+	(card.body.get_node("Decision") as Control).visible = false
+	var state := str(outcome.get("state", "pending"))
+	var defender := str(outcome.get("defender", "")) == sdk.context().participant_id
+	if state == "resolved":
+		# Results are already committed to the Action Log. Only retain a required roll.
+		if _needs_broken():
+			card.identity(str(_data.get("name", "")), "Broken", "")
+			card.message("")
+			card.consequence("Roll Broken", "")
+		else:
+			_close()
+	elif state == "ready" and defender:
+		card.identity(str(outcome.get("character", "")), "Defend", str(outcome.get("attacker", "")), true)
+		var modifier := int(outcome.get("agility", 0))
+		if bool(outcome.get("automatic_hit", false)):
+			card.consequence("Roll damage", "")
+		else:
+			card.combat("1d20" + (" %+d" % modifier if modifier != 0 else ""), str(outcome.get("damage", "")), true, "Defence", true)
+		card.show_target(false)
+		card.message("")
+	elif state == "shield":
+		card.identity(str(outcome.get("character", "")), "Shield", str(outcome.get("attack", "")), true)
+		card.message("Break your shield to prevent all damage from this attack." if defender else "Waiting for the defending Player")
+		card.consequence((_locale.text("Take %d damage") % int(outcome.get("loss", 0))) if defender else "", "Break shield")
+		(card.body.get_node("Decision/Second") as Control).theme_type_variation = "RookframePrimaryButton"
+	elif state == "fumble":
+		card.identity(str(outcome.get("character", "")), "Fumble", str(outcome.get("weapon", "")))
+		card.message("" if sdk.context().is_gm else "Waiting for the GM")
+		card.consequence("Broken" if sdk.context().is_gm else "", "Lost")
+	else:
+		card.message("Waiting for the defending Player" if state == "ready" else str(outcome.get("message", "")))
+		card.consequence("Done" if state == "ended" else "", "")
+
+func _needs_broken() -> bool:
+	if str(_data.get("schema", "")) != "mork-borg-character/v1" or int(_data.get("hit_points", 1)) != 0:
+		return false
+	var broken := BROKEN.new()
+	var incident: Dictionary = _data.get("broken_incident", {})
+	return not broken.is_dead(_data) and (int(incident.get("outcome", 0)) == 0 or broken.can_complete_followup(_data))
+
+func _decision(index: int) -> void:
+	if _action == null or _action.state in ["ready", "error"]:
+		await _prepare()
+		return
+	if _action != null and _action.state == "shield":
+		await _action.choose("take" if index == 0 else "break")
+	elif _action != null and _action.state == "fumble":
+		await _action.choose("break" if index == 0 else "lose")
+	elif _health == null and _needs_broken():
+		var health := HEALTH.new(sdk)
+		add_child(health)
+		health.changed.connect(_changed)
+		_health = health
+		await _health.start({"source": _actor.value, "kind": "broken"})
+	else:
+		_close()
+	_dirty = true
+
+func _choose_target() -> void:
 	sdk.targeting.choose()
 
 func _targets_changed(_snapshot: SDK.TargetSnapshot) -> void:
-	_refresh_pending = true
+	_dirty = true
 
 func _changed() -> void:
-	_refresh_pending = true
+	# Keep the authored surface folded throughout the Throw and its authority
+	# acknowledgement. Only a real decision should bring it back onto the table.
+	if (_action != null and _action.state == "pending") or (_health != null and _health.pending):
+		visible = false
+	_dirty = true
 
 func _close() -> void:
+	var surface := "tabletop_consequence_surface.tres" if _incoming else "tabletop_attack_surface.tres"
+	var queued := _queued
+	_queued = []
 	_cancel()
-	sdk.windows.close(load(ROOT + "ui/tabletop_attack_surface.tres"))
+	if not queued.is_empty():
+		var next: Dictionary = queued[0]
+		queued.remove_at(0)
+		_queued = queued
+		var next_task: Dictionary = next.get("task", {})
+		opened_task(SDK.ActorId.new(str(next.actor)), next_task)
+	else:
+		sdk.windows.close(load(ROOT + "ui/" + surface))
 
 func _cancel() -> void:
 	_closed = true
-	_actor = null
-	_defending = false
-	if _defence != null:
-		_defence.close()
+	for queued in _queued:
+		var queued_task: Dictionary = queued.get("task", {})
+		var outcome: Dictionary = queued_task.get("outcome", {})
+		sdk.system_actions.submit(str(outcome.get("operation", "defence")) + ".cancel", {"id": str(outcome.id)})
+	_queued.clear()
+	if sdk != null and not _incoming:
+		sdk.targeting.end_range()
+	_range_key = ""
 	if _action != null:
 		_action.retire()
 		_action = null
+	if _health != null:
+		_health.retire()
+		_health = null
 
 func _exit_tree() -> void:
 	_cancel()
 
+func _new_action() -> void:
+	var action := ACTION.new(sdk)
+	add_child(action)
+	action.changed.connect(_changed)
+	_action = action
 
-func _capture_options(options: Dictionary) -> void:
-	for key in ["mode", "eligible", "small_medium", "faithless_human", "ammunition", "difficulty", "modifier", "fumble", "piercing"]:
-		if options.has(str(key)):
-			_options[str(key)] = options.get(str(key))
+func _owner_selected(index: int, owners: Array) -> void:
+	var owner: Dictionary = owners[index - 1] if index > 0 else {}
+	_options["owner"] = str(owner.get("id", ""))
+	_dirty = true
 
-func _present_defence() -> void:
-	var outcome: Dictionary = _action.snapshot if _action != null else {}
-	_defending = _action != null and outcome.has("defender") and str(outcome.get("defender", "")) == sdk.context().participant_id and str(outcome.get("state", "")) != "error"
-	_view.visible = not _defending
-	_defence.visible = _defending
-	if _defending:
-		_defence.present(sdk, outcome)
-		_start_button.visible = _action.state == "ready"
-		_start_button.disabled = false
-		_start_button.text = sdk.translations.text("Roll damage" if outcome.get("automatic_hit", false) else "Roll defence")
-	elif _action != null and outcome.has("defender") and _action.state in ["ready", "shield"]:
-		_view.get_node("Outcome").visible = true
-		_view.get_node("Outcome").text = sdk.translations.text("Waiting for the defending Player.")
-	else:
-		_start_button.text = sdk.translations.text("Roll attack")
+func _source_selected(index: int, rooks: Array[SDK.RookId]) -> void:
+	_rook = rooks[index - 1] if index > 0 else null
+	_dirty = true
 
-func _defence_changed(state: String, can_roll: bool, automatic_hit: bool) -> void:
-	if not _defending:
-		return
-	_start_button.visible = can_roll
-	_start_button.text = sdk.translations.text("Roll damage" if automatic_hit else "Roll defence")
-	get_node("Margin/Content/Actions/Close").text = sdk.translations.text("Done" if state in ["resolved", "ended"] else "Cancel")
+func _weapon_selected(index: int, weapons: Array) -> void:
+	if index > 0:
+		var weapon: Dictionary = weapons[index - 1]
+		_task["item"] = str(weapon.inventory_id)
+		_dirty = true
 
-func _present_owners() -> void:
-	var owners: VBoxContainer = get_node("Margin/Content/Scroll/Body/Owners")
-	for child in owners.get_children():
-		owners.remove_child(child)
-		child.queue_free()
-	var choices: Array = _action.snapshot.get("owners", []) if _action != null else []
-	owners.visible = not choices.is_empty()
-	for raw in choices:
-		var choice: Dictionary = raw
-		var button := Button.new()
-		button.text = str(choice.get("name", "Player"))
-		button.custom_minimum_size = Vector2(0, 44)
-		button.theme_type_variation = "RookframeSecondaryButton"
-		button.pressed.connect(_owner_selected.bind(str(choice.id)))
-		owners.add_child(button)
+func _object_changed(value: String) -> void:
+	_options["object"] = value
 
-func _owner_selected(participant: String) -> void:
-	_task["owner"] = participant
-	await _start()
+func _mode_selected(index: int) -> void:
+	_options["improvised_mode"] = "ranged" if index == 1 else "melee"
+	_dirty = true
+
+func _option_toggled(value: bool, key: String) -> void:
+	_options[key] = value

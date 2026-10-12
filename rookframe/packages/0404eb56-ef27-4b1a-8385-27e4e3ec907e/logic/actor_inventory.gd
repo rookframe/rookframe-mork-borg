@@ -46,6 +46,8 @@ func inventory(data: Dictionary) -> Array:
 		for key in ["name", "kind", "rules", "price", "source", "damage", "reduction", "attack_ability", "ammunition", "resource_field"]:
 			if defaults.has(key) and not entry.has(key):
 				entry[key] = str(defaults.get(key, ""))
+		if defaults.has("piercing") and not entry.has("piercing"):
+			entry["piercing"] = bool(defaults.piercing)
 		for key in ["quantity", "range_feet", "armor_tier", "uses", "attack_dr", "defence_dr"]:
 			if defaults.has(key) and not entry.has(key):
 				var number: int = defaults.get(key, 0)

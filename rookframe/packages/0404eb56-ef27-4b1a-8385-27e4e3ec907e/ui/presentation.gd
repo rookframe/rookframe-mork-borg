@@ -58,6 +58,22 @@ func _check_defences() -> void:
 		return
 	_reading_defences = true
 	var result: SDK.DataResult = await sdk.system_actions.submit("defence.inbox", {})
+	if sdk.context().is_gm:
+		var fumbles: SDK.DataResult = await sdk.system_actions.submit("melee.inbox", {})
+		if fumbles.ok and typeof(fumbles.value) == TYPE_ARRAY:
+			var fumble_entries: Array = fumbles.value
+			for raw_fumble in fumble_entries:
+				var fumble: Dictionary = raw_fumble
+				var fumble_id := str(fumble.id)
+				if not _seen_defences.has(fumble_id):
+					if str(fumble.get("initiator", "")) == sdk.context().participant_id:
+						_seen_defences[fumble_id] = true
+						continue
+					fumble["operation"] = "melee"
+					var opened := sdk.windows.open_actor_task(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_consequence_surface.tres"), SDK.ActorId.new(str(fumble.source)), {"outcome": fumble, "incoming": true})
+					if opened.ok:
+						_seen_defences[fumble_id] = true
+					break
 	_reading_defences = false
 	if not result.ok or typeof(result.value) != TYPE_ARRAY:
 		return
@@ -66,13 +82,12 @@ func _check_defences() -> void:
 		var outcome: Dictionary = raw
 		var id := str(outcome.id)
 		if not _seen_defences.has(id) and str(outcome.state) in ["ready", "shield"]:
-			_seen_defences[id] = true
 			if str(outcome.initiator) == sdk.context().participant_id:
+				_seen_defences[id] = true
 				continue
-			# The existing defence view consumes this inbox in Window.opened.
-			# Ordinary inspection continues to open the completed full sheet.
-			var entry: SDK.WindowButton = DESKTOP_WINDOW_BUTTON if sdk.presentation_experience().is_desktop else WINDOW_BUTTON
-			sdk.windows.open_actor(entry.window, SDK.ActorId.new(str(outcome.target)))
+			var opened := sdk.windows.open_actor_task(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_consequence_surface.tres"), SDK.ActorId.new(str(outcome.target)), {"outcome": outcome, "incoming": true})
+			if opened.ok:
+				_seen_defences[id] = true
 			return
 
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")

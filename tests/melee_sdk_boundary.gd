@@ -20,6 +20,7 @@ var distance := 1.2192
 var distances: Dictionary = {}
 var requests: Dictionary = {}
 var reports: Array = []
+var report_steps: Dictionary = {}
 var request_serial := 0
 var session := "player-session"
 var participant := "player"
@@ -77,7 +78,7 @@ func SystemIntentRequestThrow(token: String, id: String, target: String, terms: 
   if not term.faces in [4, 6, 8, 10, 12, 20]:
    return {"ok": false, "message": "Unsupported physical die"}
  if not requests.has(id):
-  requests[id] = {"participant": target, "terms": terms.duplicate(true), "result": {"request_id": id, "participant_id": target, "status": "pending", "plan": terms.duplicate(true), "terms": [], "sequence": 0}}
+  requests[id] = {"participant": target, "terms": terms.duplicate(true), "result": {"request_id": id, "participant_id": target, "status": "pending", "plan": terms.duplicate(true), "terms": [], "sequence": 0, "base_modifier": 0, "allow_modifier": false, "modifier": 0}}
  last_request = id
  return SystemIntentReadThrow(token, id)
 func SystemIntentCancelThrow(token: String, id: String) -> Dictionary:
@@ -93,7 +94,7 @@ func SystemIntentCommit(_token: String, changes: Array, report: Dictionary) -> D
   actors[change.id].data = change.data.duplicate(true)
  if not report.is_empty():
   reports.append(report.duplicate(true))
- return {"ok": true}
+ return {"ok": true, "value": {"sequence": reports.size() if not report.is_empty() else 0}}
 func roll(id: String, values: Array) -> void:
  var request: Dictionary = requests[id]
  var terms: Array = []
@@ -107,6 +108,15 @@ func roll(id: String, values: Array) -> void:
  request.result.terms = terms
  request.result.status = "rolled"
  request.result.sequence = requests.size()
+ var sequence := int(request.get("log_sequence", 0))
+ if sequence > 0:
+  var faces: Array = []
+  var total := int(request.result.modifier)
+  for term in terms:
+   for value in term.results:
+    faces.append({"sides": term.faces, "value": value})
+    total += int(value)
+  SystemIntentCommitLog("active", [], {"title": "Rolled dice", "text": [], "dice": faces, "result": str(total), "tone": "roll"}, sequence)
 
 func SystemIntentParticipantSessions(_token: String) -> Dictionary:
  return {"ok": active, "value": sessions.duplicate(true)}
@@ -138,3 +148,35 @@ func UpdateActor(id: String, data: Dictionary) -> Dictionary:
 
 func Translate(message: String, _domain: String) -> String:
  return message
+
+func SystemIntentRequestModifiedThrow(token: String, id: String, target: String, terms: Array, base_modifier: int, allow_modifier: bool) -> Dictionary:
+ var result := SystemIntentRequestThrow(token, id, target, terms)
+ if result.ok:
+  requests[id].result["base_modifier"] = base_modifier
+  requests[id].result["allow_modifier"] = allow_modifier
+  requests[id].result["modifier"] = base_modifier
+ return SystemIntentReadThrow(token, id)
+
+var announcements: Array[Dictionary] = []
+func Announce(message: Dictionary) -> Dictionary:
+ announcements.append(message.duplicate(true))
+ return {"ok": true}
+func SystemIntentAnnounce(_token: String, message: Dictionary) -> Dictionary:
+ return Announce(message)
+
+func SystemIntentCommitLog(token: String, changes: Array, report: Dictionary, sequence: int) -> Dictionary:
+ if sequence < 1 or sequence > reports.size():
+  return {"ok": false, "message": "Missing log record"}
+ var saved := SystemIntentCommit(token, changes, {})
+ if not saved.ok:
+  return saved
+ if not report_steps.has(sequence):
+  report_steps[sequence] = [reports[sequence - 1].duplicate(true)]
+ report_steps[sequence].append(report.duplicate(true))
+ reports[sequence - 1] = report.duplicate(true)
+ return {"ok": true, "value": {"sequence": sequence}}
+func SystemIntentRequestLoggedThrow(token: String, id: String, target: String, terms: Array, base_modifier: int, allow_modifier: bool, sequence: int) -> Dictionary:
+ var result := SystemIntentRequestModifiedThrow(token, id, target, terms, base_modifier, allow_modifier)
+ if result.ok:
+  requests[id]["log_sequence"] = sequence
+ return result

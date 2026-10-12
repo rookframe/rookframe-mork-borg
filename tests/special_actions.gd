@@ -189,6 +189,10 @@ func test_class_parameters_and_manual_benefits(key: String, feature: bool, value
 		host.roll("use", values)
 		result = await sdk.system_actions.submit("special.advance", {"id": "use"})
 	assert_str(result.value.state).is_equal("resolved")
+	assert_int(host.announcements.size()).is_equal(1 if values.is_empty() else 0)
+	if values.is_empty():
+		assert_int(host.announcements[0].logSequence).is_equal(host.reports.size())
+		assert_array(host.announcements[0].results).is_empty()
 	assert_str(result.value.message).contains(expected)
 	assert_int(host.actors.hero.data.hit_points).is_equal(7)
 	if key == "speaker-of-truths":

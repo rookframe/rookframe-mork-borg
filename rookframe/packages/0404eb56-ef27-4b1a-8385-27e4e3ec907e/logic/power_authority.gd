@@ -1,4 +1,5 @@
 extends RefCounted
+## Casting consequences are recorded history. Parameter requests, targeting and manual instructions stay in the action window; physical Rolls announce through Rookframe.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
@@ -325,7 +326,7 @@ func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.
 	var count: int = action.count
 	var selected := _targets(context, {"targets": action.target_rooks}, action.rook, SDK.ActorId.new(action.source), power, count)
 	if selected.state == "error":
-		return _end(context, action)
+		return _end(context, action, str(selected.message))
 	var checked: Array = selected.targets
 	for index in range(targets.size()):
 		var target: Dictionary = targets[index]
@@ -453,9 +454,9 @@ func _complete(context: SDK.SystemActionContext, action: Dictionary, changes: Ar
 	action["outcome"] = outcome
 	return _public(action)
 
-func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
+func _end(context: SDK.SystemActionContext, action: Dictionary, reason: String = "") -> Dictionary:
 	action["state"] = "ended"
-	action["message"] = ENDED
+	action["message"] = (reason + "\n" if not reason.is_empty() else "") + ENDED
 	context.cancel_throw(action.request)
 	var report := SDK.ActionLogMessage.new("Power action ended")
 	report.result = "ENDED"
@@ -589,11 +590,6 @@ func _targets(context: SDK.SystemActionContext, caller: Dictionary, source_rook:
 		targets.append({"actor": actor_id, "rook": id, "schema": schema, "label": label, "protection": protection})
 		labels += (", " if not labels.is_empty() else "") + label
 	if not outside.is_empty():
-		var report := SDK.ActionLogMessage.new("Power out of range")
-		report.result = "Stopped"
-		for line in outside.split("\n"):
-			report.text.append(SDK.ActionLogText.new(line))
-		BROKEN.new().commit(context, [], report)
 		return _error(outside)
 	if not invalid.is_empty():
 		return _error(invalid)

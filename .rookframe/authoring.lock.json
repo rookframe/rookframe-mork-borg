@@ -1,9 +1,9 @@
 {
   "sdkEdition": "2029",
-  "sdkAuthoringKitVersion": "0.32.45",
-  "minimumRevision": 30,
+  "sdkAuthoringKitVersion": "0.34.0",
+  "minimumRevision": 34,
   "uiKit": {
     "version": "v1.0.0-rc.1",
-    "commit": "65b29750d7fc26a32172e6da8c1cf9aeb10678e3"
+    "commit": "64c727b89fbf05834e8c7b4f34740d984b48b007"
   }
 }

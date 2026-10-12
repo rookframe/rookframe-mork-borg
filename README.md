@@ -183,23 +183,24 @@ The Companions category projects only authorized companion Creature attacks.
 Each favorite identifies the Creature Actor and its exact stat-block attack;
 descriptive-only companions supply no invented combat action. Launch opens the
 same captured native task bound to that Creature, using its flat test, damage
-and matching Rook. Untargeted play uses the common attack/damage sequence;
-supplied targets use the existing attack or defending Player workflow.
-Remote defence requests open the existing defence-capable window, while
+and matching Rook. A target is required. Remote defence and fumble requests use
+a separate compact consequence window, retaining the outgoing attack while
 ordinary Character inspection still opens the completed full-viewport sheet.
 
-Select the Character’s linked Rook, open its equipped weapon in Inventory, and
-choose one Creature through tabletop targeting. Done restores the same managed
-window and keyboard focus. Difficulty defaults to the source Creature rule;
-the table can supply a difficulty or situational modifier and choose the printed
-break/loss fumble alternative. Piercing is an explicit attack choice for the
-skeleton’s printed DR. No Omen benefit or ongoing effect is automated.
+Select the Character’s linked Rook and open an equipped weapon. The compact
+attack card stays visible while an animated range circle grows around the Rook.
+Choose a Creature inside the circle; an out-of-range preselection disables
+preparation. The card adapts to desktop, tablet and phone without filling the
+vertical rail. Prepare sends the fixed pool and ability modifier to the Dice
+Tray; the tray alone owns situation adjustments. Difficulty comes from the
+target and remains hidden in the attack card. Piercing comes from the weapon’s
+authored property, including creature attacks. There are no manual difficulty,
+piercing or preselected fumble controls. No Omen or ongoing effect is automated.
 
 The World Authority snapshots the prescribed attack and protection, validates
 Owner access and the committed target set, and runs the human attack and damage
 Throws through the native Dice Tray. Natural 20 doubles damage before protection
-and lowers armor one tier after the hit; natural 1 applies the chosen equipment
-consequence. Source Creature DRs and the skeleton’s destruction threshold come
+and lowers armor one tier after the hit; natural 1 opens a GM decision to break or lose the weapon after the roll. Source Creature DRs and the skeleton’s destruction threshold come
 from Bare Bones pages 58–62. Ordinary melee comes from pages 28–29. The Bevy
 weapon-attack-rules and weapon-attack-executor at 61ea4098 provide reuse evidence.
 
@@ -244,16 +245,17 @@ attack resolution and class special actions remain owned by RFG-291 and RFG-292.
 ## Player defence
 
 A GM selects an equipped Creature attack and one Character target. The connected
-Player owner receives an Agility defence in their existing sheet; multiple owners
+Player owner receives an Agility defence in the compact consequence card; multiple owners
 require an explicit choice. A Character with no Player owner is handled by the
 initiating GM. Creatures do not roll an ordinary attack. Printed automatic-hit
 attacks request damage directly. Medium/heavy armor adds its printed defence
-penalty. The table may agree a difficulty or situational modifier.
+penalty. Situation modifiers are entered only in the Dice Tray; Players cannot
+adjust difficulty.
 
 On a failed defence the defender throws damage and armor protection. Natural 20
 reports a free attack for ordinary weapon selection; natural 1 doubles damage
 before protection and reduces armor one tier, retaining its penalties. Shield
-reduction applies before a compact 368 × 224 decision offers the current HP
+reduction applies before the compact shield decision offers the current HP
 consequence or destruction of one shield to ignore that attack’s damage. Closing
 the decision terminates the action; already rolled dice and accepted armor damage
 remain. Participant disconnect, loss of ownership, and closure cannot resume the

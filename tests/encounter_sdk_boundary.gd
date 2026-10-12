@@ -14,7 +14,7 @@ func SystemIntentCommitWorldData(_token: String, value: Variant, report: Diction
 	if not report.is_empty():
 		reports.append(report.duplicate(true))
 	WorldChanged.emit()
-	return {"ok": true}
+	return {"ok": true, "value": {"sequence": reports.size() if not report.is_empty() else 0}}
 
 func ListActors() -> Dictionary:
 	return {"ok": true, "value": actors.values().duplicate(true)}

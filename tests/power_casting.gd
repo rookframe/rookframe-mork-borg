@@ -238,7 +238,7 @@ func test_hp_targets_revalidate_the_entire_confirmed_set_before_commit() -> void
 	host.roll(host.last_request, [4, 5])
 	var result := await sdk.system_actions.submit("power.advance", {"id": "cast"})
 	assert_str(result.value.state).is_equal("ended")
-	assert_str(str(host.reports)).contains("target Hooded stranger not in range")
+	assert_str(result.value.message).contains("target Hooded stranger not in range")
 	assert_int(host.actors.hero.data.hit_points).is_equal(7)
 
 	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
@@ -430,10 +430,10 @@ func test_every_target_is_validated_at_authored_range_without_private_data() -> 
 	assert_str(result.value.state).is_equal("error")
 	assert_str(result.value.message).is_equal("target Hooded stranger not in range\ntarget Hooded stranger not in range")
 	assert_bool(host.requests.is_empty()).is_true()
-	assert_int(host.reports.size()).is_equal(1)
+	assert_int(host.reports.size()).is_equal(0)
 	assert_str(str(host.reports)).not_contains("Seth")
 	await SDK.new(host).system_actions.submit("power.start", _cast_input())
-	assert_int(host.reports.size()).is_equal(1)
+	assert_int(host.reports.size()).is_equal(0)
 	host.targets = PackedStringArray(["enemy-rook"])
 	host.distances = {"enemy-rook": 9.144}
 	result = await SDK.new(host).system_actions.submit("power.start", _cast_input("edge"))
