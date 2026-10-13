@@ -1,5 +1,17 @@
 # MÖRK BORG System Extension
 
+## Current artwork release: 1.0.142
+
+Install from the public [1.0.142 Manifest](https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.142/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.142.json).
+The [checked archive](https://github.com/rookframe/rookframe-mork-borg/releases/download/v1.0.142/0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.142.rookpackage) belongs to the same release.
+For source, check out tag `v1.0.142` and open this authoring project.
+Run `godot --headless --path . --script plug.gd install` to acquire SDK 0.34.0
+and the retained UI Kit pin, then use the SDK Package check/build commands.
+The output archive name for publication is `0404eb56-ef27-4b1a-8385-27e4e3ec907e-1.0.142.rookpackage`.
+This release adds artwork using Manifest format 2 and requires a Rookframe
+runtime with format-2 support. Earlier version examples below describe their
+original releases; use the links and tag above for the artwork update.
+
 This public repository is the sole source of the MÖRK BORG System Extension
 Package for Rookframe. System rules, authored scenes, content and Package
 releases belong here. Rookframe application capabilities belong in
@@ -17,7 +29,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.32.45` | `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.34.0` | `addons/rookframe_sdk/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `604b5fd443c59f2edc9099fa81899897fca417ab` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
@@ -550,3 +562,7 @@ Run the native HUD geometry, access, paging and localization checks with a displ
 ```sh
 godot --path . --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests/character_hud_silkbound.gd -c
 ```
+
+## Release 1.0.142: Package artwork
+
+This update adds a cover to the existing 1.0.141 content. It uses Manifest format 2 and requires a Rookframe runtime with format-2 support. The authoring kit is SDK 0.34.0; the existing SDK Edition, minimum revision, and UI Kit pin are retained. Source media provenance is recorded in `source/media-provenance.json`.
