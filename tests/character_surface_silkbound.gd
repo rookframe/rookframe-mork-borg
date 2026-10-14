@@ -58,8 +58,8 @@ func test_reading_controls_have_padding_and_visible_window_actions(width: int, h
 	var fixture := _open(Vector2i(width,height))
 	var sheet = fixture.sheet
 	await _settle()
-	assert_bool((sheet._core_ui.get_node("PhoneHeader/PhoneClose") if width <= 900 else sheet._header_close).is_visible_in_tree()).is_true()
-	assert_bool((sheet._core_phone_edit if width <= 900 else sheet._header_edit).is_visible_in_tree()).is_true()
+	assert_bool(sheet._header_close.is_visible_in_tree()).is_true()
+	assert_bool(sheet._header_edit.is_visible_in_tree()).is_true()
 	assert_bool(sheet._chapter_tab_appearance.is_visible_in_tree()).is_true()
 	for button in [sheet._core_hit_points, sheet._core_power_uses]:
 		var copy: Control = button.get_node("Inset/Copy")
@@ -212,7 +212,7 @@ func test_sheet_actions_use_icons_and_appearance_controls_have_consistent_spacin
 	var sheet = fixture.sheet
 	await _settle()
 	assert_str(sheet._header_edit.text).is_empty()
-	assert_str(sheet._header_edit.icon.resource_path).is_equal("res://rookframe/ui/icons/edit.svg")
+	assert_str(sheet._header_edit.icon.resource_path).is_equal("res://rookframe/ui/icons/character/quill.svg")
 	assert_str(sheet._header_close.text).is_empty()
 	assert_str(sheet._header_close.icon.resource_path).is_equal("res://rookframe/ui/icons/close.svg")
 	fixture.host.actors.hero.data.inventory.append({"inventory_id":"food", "source_item_id":"dried-food", "name":"Dried food", "kind":"Equipment", "quantity":3})
@@ -291,6 +291,7 @@ func test_hover_hints_cover_core_and_chapters_and_follow_weapon_selection() -> v
 	assert_str(tooltip.get_node("Title").text).is_equal("Light armor · Protection")
 	assert_str(tooltip.get_node("Summary").text).is_equal("Armor is passive protection. Roll the amount to subtract from damage.")
 	assert_str(core.get_node("Dodge").tooltip_text).contains("Test Agility")
+	sheet._weapon_selected(0)
 	var attack = core.get_node("WeaponActions/Attack")
 	assert_str(attack.tooltip_text).contains("Melee attack using Strength.")
 	sheet._weapon_selected(1)

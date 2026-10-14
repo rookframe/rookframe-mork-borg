@@ -57,7 +57,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var surface = sheet.get_node("Sheet")
-	assert_str(surface.get_node(surface.IDENTITY + "Name").text).is_equal("Seth")
+	assert_str(surface.get_node(surface.IDENTITY + "Name").text).is_equal("Seth, Goblin")
 	assert_str(surface.get_node(surface.IDENTITY + "Health").accessibility_name).contains("6")
 	assert_bool(surface.get_node("Inset/Layout/Footer/Create").disabled).is_false()
 	assert_bool(surface.get_node(surface.IDENTITY + "Health").disabled).is_true()

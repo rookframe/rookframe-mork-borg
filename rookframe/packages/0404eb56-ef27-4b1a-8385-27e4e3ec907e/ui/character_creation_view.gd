@@ -64,7 +64,7 @@ func _fit() -> void:
 	var phone := is_compact()
 	var tablet := is_tablet()
 	var context := get_node(CONTEXT)
-	context.add_theme_constant_override("separation", 5 if phone else 12 if tablet else 20)
+	context.add_theme_constant_override("separation", 1 if phone else 12 if tablet else 20)
 	for name in ["Heading", "HintRow", "Spacer"]:
 		get_node(CONTEXT + "/" + name).visible = not phone and (name == "Heading" or not tablet)
 	_text(CONTEXT + "/Heading/Title", 14 if tablet else 18,1.3)
@@ -72,23 +72,23 @@ func _fit() -> void:
 	_text(CONTEXT + "/HintRow/Hint", 17)
 	get_node(CONTEXT + "/PortraitVitals").add_theme_constant_override("separation", 12 if phone else 16 if tablet else 20)
 	for path in ["/PortraitVitals/PortraitFrame", "/PortraitVitals/PortraitFrame/Portrait"]:
-		get_node(CONTEXT + path).custom_minimum_size = Vector2(80,100) if phone else Vector2(100,125) if tablet else Vector2(152,190)
+		get_node(CONTEXT + path).custom_minimum_size = Vector2(80,90) if phone else Vector2(100,125) if tablet else Vector2(152,190)
 	get_node(CONTEXT + "/PortraitVitals/Vitals").add_theme_constant_override("separation", 2 if phone else 8 if tablet else 16)
 	for vital in ["HitPoints", "Omens", "Silver"]:
 		var path: String = CONTEXT + "/PortraitVitals/Vitals/" + vital
 		get_node(path).add_theme_constant_override("separation", 0)
 		get_node(path + "/Row").add_theme_constant_override("separation", 6 if phone or tablet else 8)
 		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(18,18) if phone else Vector2(20,20) if tablet else Vector2(24,24)
-		get_node(path + "/Row/Icon").self_modulate = Color(1, 0.505882, 0.478431, 1) if vital == "HitPoints" else Color(0.815686, 0.745098, 0.556863, 1)
-		_text(path + "/Row/Value", 20 if phone else 24 if tablet else 30, 1.0 if phone else 1.05)
-		_text(path + "/Label", 13 if phone else 14 if tablet else 16, 1.1 if phone else 1.2)
-	_text(CONTEXT + "/Name/Title",24 if phone else 29 if tablet else 40,1.1)
-	_text(CONTEXT + "/Name/Class",16 if phone else 18 if tablet else 20,1.2 if phone else 1.4)
+		get_node(path + "/Row/Icon").self_modulate = Color(0.643137, 0.776471, 0.717647, 1) if vital == "HitPoints" else Color(0.815686, 0.745098, 0.556863, 1)
+		_text(path + "/Row/Value", 18 if phone else 24 if tablet else 30, 1.0 if phone else 1.05)
+		_text(path + "/Label", 11 if phone else 14 if tablet else 16, 1.1 if phone else 1.2)
+	_text(CONTEXT + "/Name/Title",22 if phone else 29 if tablet else 40,1.1)
+	_text(CONTEXT + "/Name/Class",14 if phone else 18 if tablet else 20,1.2 if phone else 1.4)
 	get_node(CONTEXT + "/Name").add_theme_constant_override("separation",0 if phone else 4)
 	var has_history := not str(_draft.get("origin", "")).is_empty()
 	get_node(CONTEXT + "/PhoneHistory").visible = has_history
 	get_node(CONTEXT + "/History").visible = not has_history and not phone
-	get_node(CONTEXT + "/PhoneHistory").add_theme_constant_override("separation",3 if phone else 8 if tablet else 12)
+	get_node(CONTEXT + "/PhoneHistory").add_theme_constant_override("separation",2 if phone else 8 if tablet else 12)
 	_text(CONTEXT + "/History",16 if tablet else 18)
 	var history_count := 0
 	for row in get_node(CONTEXT + "/PhoneHistory").get_children():
@@ -97,15 +97,15 @@ func _fit() -> void:
 	for name in ["Line0", "Line1", "Line2", "Line3"]:
 		var index: int = ["Line0", "Line1", "Line2", "Line3"].find(name)
 		var path: String = CONTEXT + "/PhoneHistory/" + name
-		_text(path + "/Text",15 if phone else 17 if tablet else 19)
-		get_node(path + "/Icon").custom_minimum_size = Vector2(18,18) if phone else Vector2(24,24)
+		_text(path + "/Text",13 if phone else 17 if tablet else 19)
+		get_node(path + "/Icon").custom_minimum_size = Vector2(16,16) if phone else Vector2(24,24)
 		get_node(path).visible = not (get_node(path + "/Text") as Label).text.is_empty() and (not phone or index >= maxi(0, history_count - 2))
 	get_node(CONTEXT + "/Attributes").columns = 4 if phone else 2
 	get_node(CONTEXT + "/Attributes").add_theme_constant_override("h_separation",6 if phone else 16)
 	get_node(CONTEXT + "/Attributes").add_theme_constant_override("v_separation",0)
 	for ability in ["Agility","Presence","Strength","Toughness"]:
 		var path: String = CONTEXT + "/Attributes/" + ability
-		get_node(path).custom_minimum_size = Vector2(0,38 if phone else 44 if tablet else 48)
+		get_node(path).custom_minimum_size = Vector2(0,34 if phone else 44 if tablet else 48)
 		get_node(path).theme_type_variation = "WizardAttributeCompact" if phone else "WizardAttribute"
 		get_node(path + "/Row").vertical = phone
 		get_node(path + "/Row").add_theme_constant_override("separation",0 if phone else 5 if tablet else 8)
@@ -132,10 +132,17 @@ func _fit() -> void:
 	_text(STAGE + "/Heading/Details",17)
 	for section in ["Character","Gear","Traits"]:
 		_text(STAGE + "/Heading/ReviewTabs/" + section,17)
+		get_node(STAGE + "/Heading/ReviewTabs/" + section).clip_text = false
+		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
+			var button: Button = get_node(STAGE + "/Heading/ReviewTabs/" + section)
+			var frame := button.get_theme_stylebox(state).duplicate()
+			frame.content_margin_left = 10
+			frame.content_margin_right = 10
+			button.add_theme_stylebox_override(state, frame)
 	get_node(LEFT + "/Choices").columns = 2 if phone and _route == "create-class" and size.x > 600 else 1
 	get_node(LEFT + "/Identity").add_theme_constant_override("separation",0)
-	get_node(LEFT + "/Identity/FieldGap").custom_minimum_size = Vector2(0, 8 if phone else 20)
-	get_node(LEFT + "/Identity/DescriptionGap").custom_minimum_size = Vector2(0, 8 if phone else 12)
+	get_node(LEFT + "/Identity/FieldGap").custom_minimum_size = Vector2(0, 0 if phone else 20)
+	get_node(LEFT + "/Identity/DescriptionGap").custom_minimum_size = Vector2(0, 0 if phone else 12)
 	for field in [get_name_field(),get_description_field()]:
 		field.compact = phone
 	var detail := get_node(DETAIL)
@@ -143,12 +150,12 @@ func _fit() -> void:
 	pages.enabled = true
 	for edge in ["left","top","right","bottom"]:
 		pages.set("offset_" + edge, column_gap + 1 if edge == "left" and not phone else 0)
-	detail.add_theme_constant_override("separation",6 if tablet and _route == "create-class" else 8 if phone or tablet else 20)
+	detail.add_theme_constant_override("separation",6 if tablet and _route == "create-class" else 2 if phone else 8 if tablet else 20)
 	get_node(DETAIL + "/Heading").add_theme_constant_override("separation",12 if phone else 10 if tablet else 16)
 	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = Vector2(32,32) if phone else Vector2(36,36) if tablet else Vector2(56,56)
 	get_node(DETAIL + "/Heading/Copy").add_theme_constant_override("separation",0)
-	_text(DETAIL + "/Heading/Copy/Title",24 if phone else 26 if tablet else 32,1.1 if phone else 1.15)
-	_text(DETAIL + "/Heading/Copy/Kicker",14 if phone else 15 if tablet else 18,1.3)
+	_text(DETAIL + "/Heading/Copy/Title",21 if phone else 26 if tablet else 32,1.1 if phone else 1.15)
+	_text(DETAIL + "/Heading/Copy/Kicker",11 if phone else 15 if tablet else 18,1.3)
 	get_node(DETAIL + "/RollInfo").vertical = not phone
 	get_node(DETAIL + "/RollOutcome").vertical = not phone
 	get_node(DETAIL + "/RollInfo").visible = not _route in ["create-class","create-identity"]
@@ -157,7 +164,7 @@ func _fit() -> void:
 		get_node(DETAIL + "/" + group).add_theme_constant_override("separation",16 if phone else 8 if tablet else 20)
 	_text(DETAIL + "/RollInfo/FormulaRow/Row/Value",28 if phone else 30 if tablet else 40)
 	_text(DETAIL + "/RollInfo/FormulaRow/Row/Caption",15 if phone else 16 if tablet else 18,1.3)
-	_text(DETAIL + "/RollInfo/Flavor",17 if phone else 18 if tablet else 21,1.2 if phone else 1.25 if tablet else 1.35)
+	_text(DETAIL + "/RollInfo/Flavor",14 if phone else 18 if tablet else 21,1.2 if phone else 1.25 if tablet else 1.35)
 	_text(DETAIL + "/RollOutcome/ResultCopy",17 if phone else 18 if tablet else 21,1.2 if phone else 1.25 if tablet else 1.35)
 	_text(DETAIL + "/RollOutcome/Result/Content/Value",22 if phone else 23 if tablet else 28)
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").max_lines_visible = 2 if phone else -1
@@ -207,10 +214,12 @@ func _style_text(node: Control, font_size: int, line_height: float) -> void:
 func _toggle_details() -> void:
 	_details = not _details
 	_sync_navigation()
+	reveal_stage.call_deferred()
 
 func _select_review(section: String) -> void:
 	_review_section = section
 	_sync_navigation()
+	reveal_stage.call_deferred()
 
 func _sync_navigation() -> void:
 	var phone := is_compact()

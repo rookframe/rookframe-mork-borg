@@ -30,7 +30,7 @@
 [ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_plain.tres" id="plain"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="psychopomp"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/edit.svg" id="edit_icon"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="edit_icon"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close_icon"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_readiness.tscn" id="readiness"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.tscn" id="resource_editors"]
@@ -47,6 +47,8 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_vital.tscn" id="vital"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.tscn" id="workflow_scene"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd" id="hint_button"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="evolved_frame"]
 
 [sub_resource type="StyleBoxEmpty" id="NamePlain"]
 content_margin_left = 10.0
@@ -135,6 +137,8 @@ grow_vertical = 2
 theme = ExtResource("theme")
 script = ExtResource("script")
 navigation = ExtResource("navigation")
+
+[node name="Frame" parent="." instance=ExtResource("evolved_frame")]
 
 [node name="Ledger" type="Panel" parent="." unique_id=65817984]
 layout_mode = 0
@@ -1567,6 +1571,8 @@ borderless = true
 accessibility_name = "Entry details"
 theme = ExtResource("theme")
 script = ExtResource("entry_dialog")
+
+[node name="Frame" parent="EntryDialog" instance=ExtResource("evolved_frame")]
 
 [node name="Surface" type="PanelContainer" parent="EntryDialog" unique_id=1003536638]
 anchors_preset = 15

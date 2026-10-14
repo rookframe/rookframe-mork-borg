@@ -25,6 +25,7 @@ var _phone := false
 var _overflowing := false
 
 func _ready() -> void:
+	get_node("Panel").item_rect_changed.connect(_fit_material)
 	get_node(ACTIONS + "Pager").add_child(get_node(OVERFLOW).get_pager())
 	get_node(ACTIONS + "Damage").pressed.connect(_adjust.bind("damage"))
 	get_node(ACTIONS + "Heal").pressed.connect(_adjust.bind("heal"))
@@ -228,3 +229,7 @@ func _adjust(operation: String) -> void:
 func _correct() -> void:
 	discard()
 	correction_requested.emit()
+
+func _fit_material() -> void:
+	var panel: Control = get_node("Panel")
+	get_node("Frame").set_sections(Rect2(), Rect2(panel.position.x, panel.position.y, panel.size.x, panel.size.y))

@@ -3,7 +3,7 @@ const ACTION_ICONS := {
 	"remove": preload("res://rookframe/ui/icons/remove.svg"),
 	"check": preload("res://rookframe/ui/icons/check.svg"),
 	"close": preload("res://rookframe/ui/icons/close.svg"),
-	"edit": preload("res://rookframe/ui/icons/edit.svg"),
+	"edit": preload("res://rookframe/ui/icons/character/quill.svg"),
 	"person-add": preload("res://rookframe/ui/icons/person-add.svg"),
 	"add": preload("res://rookframe/ui/icons/add.svg"),
 	"back": preload("res://rookframe/ui/icons/back.svg"),

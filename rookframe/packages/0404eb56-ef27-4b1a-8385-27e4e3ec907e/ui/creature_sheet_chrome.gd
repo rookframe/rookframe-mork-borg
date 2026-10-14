@@ -18,27 +18,27 @@ func _style_chapter(button: Button, section: bool = false) -> void:
 	var normal: StyleBoxFlat = chapter_normal.duplicate()
 	var selected: StyleBoxFlat = chapter_selected.duplicate()
 	for style in [normal, selected]:
-		style.set_border_width_all(1)
+		style.set_border_width_all(0)
 		style.border_width_bottom = 0
 		style.content_margin_left = 12 if section else 8 if _phone or _tablet else 12
 		style.content_margin_right = style.content_margin_left
 		style.content_margin_top = 5 if _tablet else 8
 		style.content_margin_bottom = style.content_margin_top
-	if section:
-		normal.bg_color = Color(0,0,0,0)
-		normal.set_border_width_all(0)
-		normal.border_width_bottom = 0
-		selected.bg_color = Color(0.203922,0.239216,0.254902,1)
-		selected.set_border_width_all(0)
-		selected.border_width_bottom = 2
+	normal.bg_color = Color(0,0,0,0)
+	normal.set_border_width_all(0)
+	normal.border_width_bottom = 0
+	selected.bg_color = Color(0.737255, 0.572549, 0.466667, 0.109804)
+	selected.border_color = Color(0.737255, 0.572549, 0.466667, 1)
+	selected.set_border_width_all(0)
+	selected.border_width_bottom = 2
 	button.add_theme_stylebox_override("normal", normal)
 	button.add_theme_stylebox_override("pressed", selected)
 	var hover: StyleBoxFlat = normal.duplicate()
-	hover.bg_color = Color(0.203922,0.239216,0.254902,1)
+	hover.bg_color = Color(0.737255, 0.572549, 0.466667, 0.090196)
 	button.add_theme_stylebox_override("hover", hover)
 	button.add_theme_stylebox_override("hover_pressed", selected)
 	for item in ["font_pressed_color", "font_hover_pressed_color", "icon_pressed_color", "icon_hover_pressed_color"]:
-		button.add_theme_color_override(item, Color(0.905882,0.905882,0.866667,1) if section else Color(0.082353,0.090196,0.098039,1))
+		button.add_theme_color_override(item, Color(0.905882, 0.905882, 0.866667, 1))
 	button.add_theme_color_override("font_color", Color(0.905882,0.905882,0.866667,1) if section else Color(0.682353,0.729412,0.745098,1))
 	button.add_theme_color_override("icon_normal_color", Color(0.815686,0.745098,0.556863,1))
 
@@ -82,6 +82,12 @@ func _set_chapter_frame(clear: bool) -> void:
 	frame.content_margin_right = frame.content_margin_left
 	frame.content_margin_top = 7 if _phone else 13 if _tablet else 21
 	frame.content_margin_bottom = frame.content_margin_top
+	frame.bg_color = Color(0, 0, 0, 0)
+	frame.set_border_width_all(0)
+	frame.content_margin_left = 4 if _phone else 6
+	frame.content_margin_right = frame.content_margin_left
+	frame.content_margin_top = 4
+	frame.content_margin_bottom = 0
 	if clear:
 		frame.bg_color = Color(0,0,0,0)
 		frame.set_border_width_all(0)

@@ -51,9 +51,9 @@ func _field_typed(text: String, field: String) -> void:
 	field_changed.emit(text, field)
 
 func configure_layout(phone: bool, tablet: bool) -> void:
-	add_theme_constant_override("separation", 5 if phone else 6 if tablet else 10)
+	add_theme_constant_override("separation", 3 if phone else 6 if tablet else 10)
 	get_node(^"Likeness").size_flags_vertical = 1
-	get_node(^"Likeness").custom_minimum_size = Vector2(get_node(^"Likeness").custom_minimum_size.x, 108 if phone else 132 if tablet else 170)
+	get_node(^"Likeness").custom_minimum_size = Vector2(get_node(^"Likeness").custom_minimum_size.x, 104 if phone else 132 if tablet else 170)
 	get_node(^"Likeness/Vitals").add_theme_constant_override("separation", 0 if phone or tablet else 4)
 	get_node(^"Likeness").add_theme_constant_override("separation", 10 if phone else 12 if tablet else 22)
 	get_node(^"Likeness/Portrait").custom_minimum_size = Vector2(66, 98) if phone else Vector2(88, 118) if tablet else Vector2(136, 170)
@@ -68,8 +68,8 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	for state in ["normal", "hover", "pressed", "disabled"]:
 		var style: StyleBox = get_node(^"Weapon").get_theme_stylebox(state).duplicate()
 		if style is StyleBoxFlat:
-			(style as StyleBoxFlat).bg_color = Color(0.203922, 0.239216, 0.254902, 1) if state in ["hover", "pressed"] else Color(0.137255, 0.156863, 0.168627, 1)
-			(style as StyleBoxFlat).border_color = Color(0.356863, 0.384314, 0.396078, 1)
+			(style as StyleBoxFlat).bg_color = Color(0.737255, 0.572549, 0.466667, 0.12) if state in ["hover", "pressed"] else Color(0.031373, 0.043137, 0.039216, 0.4)
+			(style as StyleBoxFlat).border_color = Color(0.737255, 0.572549, 0.466667, 0.38)
 		style.content_margin_top = 3
 		style.content_margin_bottom = 3
 		style.content_margin_left = 8 if tablet else 12
@@ -85,7 +85,7 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"ReadyWeapon").size_flags_vertical = 3 if phone else 1
 	get_node(^"Protection").size_flags_vertical = 3 if phone else 1
 	get_node(^"ProtectionItems").columns = 3 if tablet else 1
-	get_node(^"Likeness/Vitals/PhoneClass").add_theme_font_size_override("font_size", 14)
+	get_node(^"Likeness/Vitals/PhoneClass").add_theme_font_size_override("font_size", 12)
 	for path in [^"WeaponHeading/Actions/Center/Row", ^"ProtectionHeading/Center/Row"]:
 		(get_node(path).get_node(^"Title") as Label).add_theme_font_size_override("font_size", 19 if tablet else 23)
 		(get_node(path).get_node(^"Icon") as TextureRect).self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
@@ -112,7 +112,7 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 func configure(data: Dictionary, values: Dictionary, draft: Dictionary, items: Array, selected_weapon: String, owner: bool, action_live: bool) -> Dictionary:
 	var phone := get_viewport_rect().size.x <= 900
 	var tablet := get_viewport_rect().size.x <= 1300 and not phone
-	get_node(^"PhoneHeader").visible = phone and draft.is_empty()
+	get_node(^"PhoneHeader").visible = false
 	get_node(^"PhoneHeader/PhoneName").text = str(data.get("name", "Character"))
 	get_node(^"PhoneHeader/PhoneEdit").disabled = not owner or action_live
 	get_node(^"Class").visible = not phone

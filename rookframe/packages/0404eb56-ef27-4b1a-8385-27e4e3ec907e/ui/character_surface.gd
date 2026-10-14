@@ -208,6 +208,9 @@ func ready() -> void:
 	_condition_ui.event_requested.connect(_incident)
 	_condition_ui.edit_hp_requested.connect(_edit_hit_points)
 	get_node(^"Margin/Layout/Picker").closed.connect(_picker_closed)
+	get_node(^"Margin/Layout/Picker/Actions").item_rect_changed.connect(_sync_frame)
+	for path in [^"Margin/Layout/Header", ^"Margin/Layout/Body", ^"Margin/Layout/Picker"]:
+		get_node(path).item_rect_changed.connect(_sync_frame)
 	_appearance_ui.miniature_requested.connect(_choose_miniature)
 	_appearance_ui.changed.connect(_world_changed)
 	_appearance_ui.message.connect(_status)
@@ -406,7 +409,7 @@ func _show_route() -> void:
 	var tablet := get_viewport_rect().size.x <= 1300 and not _phone
 	_detail_ui.configure_layout(_phone, tablet, task, _draft.active, _detail_tab == 1)
 	get_node(^"Margin/Layout/Body").visible = not task and not get_node(^"Margin/Layout/Picker").visible
-	_header.visible = not task and (not _phone or _draft.active or details or chapter == 4)
+	_header.visible = not task
 	_detail_header.visible = not task
 	if _phone and details and not _draft.active:
 		_header_name.add_theme_font_size_override("font_size", 18)
@@ -435,7 +438,8 @@ func _show_route() -> void:
 	if chapter == 4:
 		_appearance()
 	get_node(^"Margin/Layout/Body/CoreDivider").visible = _core_ui.visible
-	get_node(^"Ornament").configure(_phone, tablet, task)
+	get_node(^"Ornament").visible = false
+	_sync_frame.call_deferred()
 	get_node(^"EntryScrim").visible = modal
 	get_node(^"EntryDialog").present(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), get_viewport_rect().size, "note" if _detail == "journal:notes" and _detail_tab == 2 else "entry")
 
@@ -450,6 +454,7 @@ func _chapter(index: int) -> void:
 	_request_route()
 	_remember()
 	_chapters[index].grab_focus()
+	_reveal_chapter.call_deferred()
 
 func _section_selected(index: int) -> void:
 	if int(_nav.get("chapter", 0)) == 2:
@@ -458,12 +463,14 @@ func _section_selected(index: int) -> void:
 	_nav["section"] = index
 	_request_route()
 	_remember()
+	_reveal_chapter.call_deferred()
 
 func _inventory_filter(index: int) -> void:
 	_nav["inventory_filter"] = index
 	_collections(_actor.data)
 	_request_route()
 	_remember()
+	_reveal_chapter.call_deferred()
 
 func _weapon_selected(index: int) -> void:
 	if not _setting and index < _weapons.size():
@@ -587,6 +594,7 @@ func _detail_tab_selected(index: int) -> void:
 	_detail_tab = index
 	_request_route()
 	_request_detail()
+	_reveal_chapter.call_deferred()
 
 func _clear_detail() -> void:
 	_fields = []
@@ -1387,13 +1395,10 @@ func _appearance() -> void:
 	_render_portrait(_actor.data)
 
 func _choose_miniature() -> void:
-	get_node(^"Margin/Layout/Body").visible = false
-	get_node(^"Margin/Layout/Picker").visible = true
-	get_node(^"Margin/Layout/Picker").open(sdk, _locale, _actor.id, "", _data().get("preferred_miniature", {}), false, "Character")
+	_open_miniature_picker(sdk, _locale, _actor.id, _data().get("preferred_miniature", {}))
 
 func _picker_closed(_saved: bool) -> void:
-	get_node(^"Margin/Layout/Picker").visible = false
-	get_node(^"Margin/Layout/Body").visible = true
+	_close_miniature_picker()
 	_refresh_pending = true
 	_appearance_change_miniature.grab_focus()
 
@@ -1543,3 +1548,6 @@ func _inventory_action(id: String) -> void:
 		_mutation_result(await ACTIONS.new(sdk, _actor.id).change_item(id.trim_prefix("item:"), "equipped", "false" if item.get("equipped", false) else "true"))
 	else:
 		_workflow("use", id.trim_prefix("item:"))
+
+func _reveal_chapter() -> void:
+	if is_inside_tree(): get_node(^"Frame").reveal(_detail_ui if _detail_ui.is_visible_in_tree() else _chapter_ui.get_node(^"Page/Content"))

@@ -20,6 +20,11 @@ func _ready() -> void:
 	browser.retry_requested.connect(_load)
 	get_node(^"Actions/Back").pressed.connect(_cancel)
 	get_node(^"Actions/Apply").pressed.connect(_apply)
+	get_node(^"Actions").custom_minimum_size = Vector2(0, 60)
+	add_theme_constant_override("separation", 20)
+	get_node(^"Actions/Apply").icon = preload("res://rookframe/ui/icons/check.svg")
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		get_node(^"Actions/Apply").add_theme_color_override("icon_" + state + "_color", Color(0.082353, 0.090196, 0.098039, 1))
 
 func open(facade: SDK, locale: I18N, actor: SDK.ActorId, definition: String, saved: Dictionary, selection_only: bool = false, subject: String = "Creature") -> void:
 	_selection_only = selection_only
@@ -64,7 +69,7 @@ func _load() -> void:
 		var current := sdk.content.read(SDK.ContentReference.new(str(_saved.get("package_id", "")), str(_saved.get("local_id", ""))))
 		if current.ok:
 			id = current.content_entry.reference.package_id + "/" + current.content_entry.reference.local_id
-	browser.configure(entries, id, {"search": _t("Search Miniatures"), "retry": _t("Try again"), "unavailable": _t("Unavailable"), "empty": _t("Add a Miniature Package to this World."), "no_match": _t("No matching Miniatures."), "preview_unavailable": _t("Miniature preview unavailable."), "selected": _t("Selected")})
+	browser.configure(entries, id, {"search": _t("Search Miniatures"), "retry": _t("Try again"), "unavailable": _t("Unavailable"), "empty": _t("Add a Miniature Package to this World."), "no_match": _t("No matching Miniatures."), "preview_unavailable": _t("Miniature preview unavailable."), "selected": _t("Selected"), "previous": _t("Previous"), "next": _t("Next")})
 	_selected(browser.selection())
 	if not _saved.is_empty() and browser.selection().is_empty():
 		_set_status(_t("Saved Miniature unavailable. Choose a replacement."))
@@ -77,6 +82,7 @@ func _preview(entry: Dictionary, target: Control) -> void:
 		_set_status(_t("Miniature preview unavailable."))
 
 func _selected(entry: Dictionary) -> void:
+	get_node(^"Actions/Selection").text = str(entry.get("title", "None"))
 	get_node(^"Actions/Apply").disabled = _busy or entry.is_empty()
 
 func _apply() -> void:

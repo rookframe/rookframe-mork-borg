@@ -28,9 +28,11 @@
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_focus.tres" id="roll_focus"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/ribbon.svg" id="ribbon"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="evolved_frame"]
+
 [sub_resource type="StyleBoxFlat" id="chapter_panel"]
 bg_color = Color(0.082353,0.090196,0.098039,0.78)
-border_color = Color(0.356863,0.384314,0.396078,1)
+border_color = Color(0.737255,0.572549,0.466667,0.38)
 border_width_left = 1
 border_width_top = 1
 border_width_right = 1
@@ -47,7 +49,7 @@ content_margin_top = 0.0
 content_margin_bottom = 0.0
 
 [sub_resource type="StyleBoxFlat" id="correction_panel"]
-bg_color = Color(0.137255,0.156863,0.168627,1)
+bg_color = Color(0.031373,0.043137,0.039216,0.4)
 border_color = Color(0.243137,0.262745,0.274510,1)
 border_width_left = 1
 border_width_top = 1
@@ -97,6 +99,8 @@ chapter_selected = ExtResource("chapter_selected")
 desktop_source_icon_alignment = 0
 touch_source_icon_alignment = 2
 source_frame = SubResource("source_normal")
+[node name="Frame" parent="." instance=ExtResource("evolved_frame")]
+
 [node name="Background" type="ColorRect" parent="."]
 visible = false
 layout_mode = 1
@@ -134,6 +138,82 @@ theme_override_constants/margin_bottom = 16
 [node name="Layout" type="VBoxContainer" parent="Inset"]
 layout_mode = 2
 theme_override_constants/separation = 12
+[node name="Footer" type="HBoxContainer" parent="Inset/Layout"]
+layout_mode = 2
+theme_override_constants/separation = 12
+[node name="Icon" type="TextureRect" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(26,26)
+size_flags_vertical = 4
+texture = ExtResource("miniature")
+expand_mode = 1
+stretch_mode = 5
+[node name="Name" type="Label" parent="Inset/Layout/Footer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_fonts/font = ExtResource("display")
+text = "Creature"
+[node name="SourceNote" type="HBoxContainer" parent="Inset/Layout/Footer"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_constants/separation = 0
+[node name="Citation" type="Label" parent="Inset/Layout/Footer/SourceNote"]
+layout_mode = 2
+size_flags_vertical = 4
+theme_override_colors/font_color = Color(0.682353,0.729412,0.745098,1)
+theme_override_font_sizes/font_size = 16
+text = "MÖRK BORG Bare Bones Edition · p. 58"
+[node name="Source" type="Button" parent="Inset/Layout/Footer/SourceNote"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 48)
+text = "Source"
+theme_type_variation = "TaskButton"
+alignment = 2
+[node name="Status" type="Label" parent="Inset/Layout/Footer"]
+layout_mode = 2
+size_flags_horizontal = 3
+autowrap_mode = 3
+theme_override_font_sizes/font_size = 12
+[node name="Cancel" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Cancel"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Core" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Core values"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Save" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Save sheet"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Create" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Create Actor"
+theme_type_variation = "TaskButton"
+
+[node name="Edit" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Edit sheet"
+theme_type_variation = "TaskButton"
+visible = false
+[node name="Close" type="Button" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(44, 44)
+text = "Close"
+theme_type_variation = "TaskButton"
+[node name="Gutter" type="Control" parent="Inset/Layout/Footer"]
+layout_mode = 2
+custom_minimum_size = Vector2(24,0)
+mouse_filter = 2
+
 [node name="Body" type="HBoxContainer" parent="Inset/Layout"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -245,7 +325,7 @@ size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
 texture = ExtResource("heart")
-self_modulate = Color(1,0.505882,0.478431, 1)
+self_modulate = Color(0.643137,0.776471,0.717647,1)
 mouse_filter = 2
 [node name="Captions" type="VBoxContainer" parent="Inset/Layout/Body/Identity/Column/Health/Inset/Row"]
 layout_mode = 2
@@ -285,7 +365,7 @@ anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
 offset_top = -3.0
-color = Color(1,0.505882,0.478431, 1)
+color = Color(0.643137,0.776471,0.717647,1)
 mouse_filter = 2
 
 [node name="Condition" type="Label" parent="Inset/Layout/Body/Identity/Column"]
@@ -429,12 +509,6 @@ theme_override_styles/pressed = ExtResource("chapter_selected")
 text = "Appearance"
 toggle_mode = true
 
-[node name="Edit" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Edit sheet"
-theme_type_variation = "TaskButton"
-visible = false
 [node name="Chapter" type="PanelContainer" parent="Inset/Layout/Body/Workspace"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -548,59 +622,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
 text = "Open publication"
 theme_type_variation = "TaskButton"
-[node name="Footer" type="HBoxContainer" parent="Inset/Layout"]
-layout_mode = 2
-theme_override_constants/separation = 12
-[node name="Cancel" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Cancel"
-theme_type_variation = "TaskButton"
-visible = false
-[node name="Status" type="Label" parent="Inset/Layout/Footer"]
-layout_mode = 2
-size_flags_horizontal = 3
-autowrap_mode = 3
-theme_override_font_sizes/font_size = 12
-[node name="SourceNote" type="HBoxContainer" parent="Inset/Layout/Footer"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_constants/separation = 0
-[node name="Source" type="Button" parent="Inset/Layout/Footer/SourceNote"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 48)
-text = "Source"
-theme_type_variation = "TaskButton"
-alignment = 2
-[node name="Citation" type="Label" parent="Inset/Layout/Footer/SourceNote"]
-layout_mode = 2
-size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.682353,0.729412,0.745098,1)
-theme_override_font_sizes/font_size = 16
-text = "MÖRK BORG Bare Bones Edition · p. 58"
-[node name="Close" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Close"
-theme_type_variation = "TaskButton"
-[node name="Core" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Core values"
-theme_type_variation = "TaskButton"
-visible = false
-[node name="Save" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Save sheet"
-theme_type_variation = "TaskButton"
-visible = false
-[node name="Create" type="Button" parent="Inset/Layout/Footer"]
-layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Create Actor"
-theme_type_variation = "TaskButton"
-
 [node name="FooterRule" type="ColorRect" parent="."]
 layout_mode = 0
 color = Color(0.243137,0.262745,0.274510,1)
@@ -741,6 +762,8 @@ unresizable = true
 theme = ExtResource("theme")
 script = ExtResource("correction_dialog")
 accessibility_name = "Creature corrections"
+[node name="Frame" parent="CorrectionDialog" instance=ExtResource("evolved_frame")]
+
 [node name="Surface" type="PanelContainer" parent="CorrectionDialog"]
 anchors_preset = 15
 anchor_right = 1.0

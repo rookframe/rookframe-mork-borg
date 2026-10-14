@@ -13,6 +13,7 @@ theme_type_variation = &"RookframeHeading"
 [node name="Browser" parent="." instance=ExtResource("2")]
 layout_mode = 2
 size_flags_vertical = 3
+paginated = true
 [node name="Status" type="Label" parent="."]
 layout_mode = 2
 autowrap_mode = 2
@@ -24,12 +25,20 @@ theme_override_constants/separation = 12
 [node name="Back" type="Button" parent="Actions"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 0
+size_flags_vertical = 4
 theme_type_variation = &"RookframeSecondaryButton"
 text = "Back"
+[node name="Selection" type="Label" parent="Actions"]
+size_flags_horizontal = 3
+text = "None"
 [node name="Apply" type="Button" parent="Actions"]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 0
+size_flags_vertical = 4
 theme_type_variation = &"RookframePrimaryButton"
 text = "Use Miniature"
+
+[node name="Gutter" type="Control" parent="Actions"]
+custom_minimum_size = Vector2(16,0)

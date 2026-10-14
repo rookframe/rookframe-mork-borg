@@ -53,7 +53,9 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 		child.add_theme_font_size_override("font_size", 17 if tablet else 20)
 		for state in ["normal", "pressed", "hover", "hover_pressed"]:
 			var style := StyleBoxFlat.new()
-			style.bg_color = Color(0, 0, 0, 0) if state == "normal" else Color(0.203922, 0.239216, 0.254902, 1)
+			style.bg_color = Color(0, 0, 0, 0) if state == "normal" else Color(0.737255, 0.572549, 0.466667, 0.094118)
+			style.border_width_bottom = 2 if state in ["pressed", "hover_pressed"] else 0
+			style.border_color = Color(0.737255, 0.572549, 0.466667, 1)
 			style.content_margin_left = 12
 			style.content_margin_right = 12
 			style.content_margin_top = 6

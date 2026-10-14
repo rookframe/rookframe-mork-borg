@@ -19,5 +19,5 @@ func set_selected(selected: bool) -> void:
 	_selected(selected)
 
 func _selected(selected: bool) -> void:
-	get_node(^"Center/Content/Title").add_theme_color_override("font_color", Color(0.082353, 0.090196, 0.098039, 1) if selected else Color(0.682353, 0.729412, 0.745098, 1))
-	get_node(^"Center/Content/Icon").self_modulate = Color(0.082353, 0.090196, 0.098039, 1) if selected else Color(0.815686, 0.745098, 0.556863, 1)
+	get_node(^"Center/Content/Title").add_theme_color_override("font_color", Color(0.905882, 0.905882, 0.866667, 1) if selected else Color(0.682353, 0.729412, 0.745098, 1))
+	get_node(^"Center/Content/Icon").self_modulate = Color(0.905882, 0.905882, 0.866667, 1) if selected else Color(0.815686, 0.745098, 0.556863, 1)

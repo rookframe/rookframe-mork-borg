@@ -1,17 +1,17 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd"
 ## The character core keeps the resource caption separate from its value.
 func configure(caption: String, current: int, suffix: String, maximum: int = 0, phone: bool = false, tablet: bool = false) -> void:
-	custom_minimum_size = Vector2(44, 48 if phone or tablet else 72)
+	custom_minimum_size = Vector2(44, 44 if phone else 48 if tablet else 72)
 	get_node(^"Inset/Copy/Caption").text = caption
-	get_node(^"Inset/Copy/Caption").add_theme_font_size_override("font_size", 14 if phone or tablet else 17)
+	get_node(^"Inset/Copy/Caption").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 17)
 	for path in [^"Inset/Copy/Number/Value", ^"Inset/Copy/Number/HealthValue", ^"Inset/Copy/Number/DeadValue"]:
 		get_node(path).text = str(current)
-		get_node(path).add_theme_font_size_override("font_size", 24 if phone or tablet else 32)
+		get_node(path).add_theme_font_size_override("font_size", 21 if phone else 24 if tablet else 32)
 	get_node(^"Inset/Copy/Number/Extra").text = suffix
-	get_node(^"Inset/Copy/Number/Extra").add_theme_font_size_override("font_size", 14 if phone or tablet else 17)
+	get_node(^"Inset/Copy/Number/Extra").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 17)
 	get_node(^"Inset").add_theme_constant_override("margin_left", 36 if phone or tablet else 52)
-	get_node(^"Inset").add_theme_constant_override("margin_top", 4 if phone or tablet else 6)
-	get_node(^"Inset").add_theme_constant_override("margin_bottom", 4 if phone or tablet else 6)
+	get_node(^"Inset").add_theme_constant_override("margin_top", 2 if phone else 4 if tablet else 6)
+	get_node(^"Inset").add_theme_constant_override("margin_bottom", 2 if phone else 4 if tablet else 6)
 	add_theme_constant_override("icon_max_width", 22 if phone or tablet else 28)
 	get_node(^"Health").visible = maximum > 0
 	get_node(^"Health").max_value = maxi(1, maximum)

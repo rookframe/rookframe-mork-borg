@@ -23,14 +23,14 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"NameEditField/Editor/Caption").add_theme_font_size_override("font_size", 9 if phone or tablet else 11)
 	for button in [get_node(^"Name"), get_node(^"Edit"), get_node(^"Rest"), get_node(^"Improve"), get_node(^"SaveSheet"), get_node(^"CancelSheet")]:
 		button.add_theme_font_size_override("font_size", 12 if phone else 16)
-	get_node(^"Name").custom_minimum_size = Vector2(get_node(^"Name").custom_minimum_size.x, 26 if phone else 52 if tablet else 60)
-	get_node(^"Name").add_theme_font_size_override("font_size", 23 if phone else 29 if tablet else 40)
+	get_node(^"Name").custom_minimum_size = Vector2(get_node(^"Name").custom_minimum_size.x, 44 if phone else 56 if tablet else 64)
+	get_node(^"Name").add_theme_font_size_override("font_size", 23 if phone else 29 if tablet else 32)
 
 	get_node(^"Name").add_theme_constant_override("icon_max_width", 26)
 	get_node(^"Name").add_theme_constant_override("h_separation", 11)
 
-	get_node(^"RibbonSpace").visible = not phone
-	get_node(^"RibbonSpace").custom_minimum_size = Vector2(40 if tablet else 56, 0)
+	get_node(^"RibbonSpace").visible = true
+	get_node(^"RibbonSpace").custom_minimum_size = Vector2(24, 0)
 	get_node(^"Close").size_flags_vertical = 4
 	get_node(^"Close").add_theme_font_size_override("font_size", 28)
 	get_node(^"Close").tooltip_text = "Close character sheet"

@@ -61,6 +61,13 @@ func _cancel() -> void:
 	cancel_requested.emit()
 
 func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, reading: bool) -> void:
+	get_node(^"HeaderFrame/Linen").visible = false
+	for panel in [^"HeaderFrame", ^"TabsFrame", ^"FooterFrame"]:
+		var box := get_node(panel).get_theme_stylebox("panel").duplicate() as StyleBoxFlat
+		if box != null:
+			box.bg_color = Color(0, 0, 0, 0)
+			box.border_color = Color(0.737255, 0.572549, 0.466667, 0.278431)
+			get_node(panel).add_theme_stylebox_override("panel", box)
 	_phone = phone
 	_tablet = tablet
 	_task = task

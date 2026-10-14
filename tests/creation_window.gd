@@ -54,7 +54,13 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 			await _capture(viewport, "phone-class-detail")
 			var rules: VBoxContainer = view.get_node(view.DETAIL + "/ClassBody/Rules")
 			assert_int(rules.get_child_count()).is_equal(3)
-			assert_bool(view.get_node(view.STAGE + "/Content").get_global_rect().encloses(rules.get_global_rect())).is_true()
+			var pages = view.get_node(view.STAGE + "/Content/Split/Detail/Pages")
+			for detail_page in 30:
+				if pages.get_node(^"Pager/Next").disabled: break
+				pages.get_node(^"Pager/Next").pressed.emit()
+				await _settle()
+			var last = rules.get_child(rules.get_child_count() - 1)
+			assert_bool(last.get_global_rect().end.y <= pages.get_node(^"Area").get_global_rect().end.y + 1).is_true()
 			_button(view, "Class list").pressed.emit()
 		var captures: Array[String] = []
 		for frame in range(180):
@@ -247,9 +253,10 @@ func _settle() -> void:
 		await get_tree().process_frame
 
 func _capture(viewport: SubViewport, name: String) -> void:
+	await get_tree().create_timer(0.45).timeout
 	if name.begins_with("tablet-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(34, 22, 956, 724)).is_true()
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(28, 22, 968, 722)).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
@@ -259,7 +266,8 @@ func _capture(viewport: SubViewport, name: String) -> void:
 		if name == "tablet-review":
 			var pages = view.get_node(view.STAGE + "/Content/Review/BelongingsPages")
 			var last: Label = pages.get_node(^"Area/Belongings/Traits/Content/Copy")
-			while not pages.get_node(^"Pager/Next").disabled:
+			for detail_page in 30:
+				if pages.get_node(^"Pager/Next").disabled: break
 				pages.get_node(^"Pager/Next").pressed.emit()
 			await _settle()
 			assert_bool(pages.get_node(^"Area").get_global_rect().encloses(last.get_global_rect())).is_true()
@@ -267,15 +275,20 @@ func _capture(viewport: SubViewport, name: String) -> void:
 			await _settle()
 	if name.begins_with("phone-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(16, 14, 812, 362)).is_true()
+		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(24, 18, 796, 352)).override_failure_message(name + " " + str(view.get_node(^"Layout").get_global_rect())).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
 				assert_bool(button.size.y >= 44).is_true()
 				assert_bool(bounds.encloses(button.get_global_rect())).is_true()
+		if view.get_node(view.LEFT + "/Identity").is_visible_in_tree():
+			var content_bounds: Rect2 = view.get_node(view.STAGE + "/Content").get_global_rect()
+			for field in ["Name", "Description"]:
+				assert_bool(content_bounds.encloses(view.get_node(view.LEFT + "/Identity/" + field + "/Editor").get_global_rect())).override_failure_message(field + " editor clipped").is_true()
 		var portrait = view.get_node(view.CONTEXT + "/PortraitVitals/PortraitFrame")
-		assert_bool(portrait.size == Vector2(80, 100)).is_true()
+		assert_bool(portrait.size == Vector2(80, 90)).is_true()
 	if DisplayServer.get_name() != "headless":
+		await get_tree().create_timer(0.45).timeout
 		var directory := OS.get_environment("RFG_EVIDENCE_DIR")
 		if directory.is_empty():
 			directory = OS.get_user_data_dir().path_join("creation-evidence")
