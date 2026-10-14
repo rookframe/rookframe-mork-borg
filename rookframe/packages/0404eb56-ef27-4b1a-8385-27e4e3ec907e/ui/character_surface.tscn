@@ -227,7 +227,8 @@ expand_icon = true
 
 [node name="NameEditField" type="VBoxContainer" parent="Margin/Layout/Header" unique_id=1919580092]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_horizontal = 0
+size_flags_vertical = 4
 theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 

@@ -65,11 +65,10 @@ func _fit() -> void:
 	var tablet := is_tablet()
 	var context := get_node(CONTEXT)
 	context.add_theme_constant_override("separation", 1 if phone else 12 if tablet else 20)
-	for name in ["Heading", "HintRow", "Spacer"]:
+	for name in ["Heading", "Spacer"]:
 		get_node(CONTEXT + "/" + name).visible = not phone and (name == "Heading" or not tablet)
 	_text(CONTEXT + "/Heading/Title", 14 if tablet else 18,1.3)
 	_text(CONTEXT + "/Heading/State", 14 if tablet else 16,1.4)
-	_text(CONTEXT + "/HintRow/Hint", 17)
 	get_node(CONTEXT + "/PortraitVitals").add_theme_constant_override("separation", 12 if phone else 16 if tablet else 20)
 	for path in ["/PortraitVitals/PortraitFrame", "/PortraitVitals/PortraitFrame/Portrait"]:
 		get_node(CONTEXT + path).custom_minimum_size = Vector2(80,90) if phone else Vector2(100,125) if tablet else Vector2(152,190)
@@ -187,7 +186,7 @@ func _fit() -> void:
 	get_node(DETAIL + "/ClassBody/FactsColumn/Facts").theme_type_variation = "WizardFactsCompact" if phone else "WizardFactsTablet" if tablet else "WizardFacts"
 	_text(DETAIL + "/NoteRow/Note",14 if tablet else 17,1.3)
 	for name in ["Spacer","NoteRule","NoteRow"]:
-		get_node(DETAIL + "/" + name).visible = _route != "create-identity" and not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route == "create-class" or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
+		get_node(DETAIL + "/" + name).visible = not get_node(DETAIL + "/NoteRow/Note").text.is_empty() and _route != "create-identity" and not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route == "create-class" or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
 	get_node(DETAIL + "/Heading").visible = _route != "create-identity"
 	get_node(DETAIL + "/Appearance").configure(i18n, null, false, true, phone, tablet)
 	get_node(DETAIL + "/PackChoices/Options").columns = 3 if phone else 2
@@ -461,7 +460,7 @@ func _reset_detail() -> Control:
 		get_node(DETAIL + "/" + name).visible = false
 	get_node(DETAIL + "/Heading/Icon").visible = true
 	get_node(DETAIL + "/RollInfo/Flavor").text = ""
-	get_node(DETAIL + "/NoteRow/Note").text = _t("Results stay with you when you go back.")
+	get_node(DETAIL + "/NoteRow/Note").text = ""
 	get_node(DETAIL + "/NoteRow/Icon").texture = _icon("dice")
 	return detail
 

@@ -141,7 +141,9 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		assert_str(field.value).is_equal("Varg")
 		assert_bool(creator.get_node(^"View/Layout/Body/StageSlot/Stage/Content/Split/Left/Identity").visible).is_true()
 		view.miniature_requested.emit()
-		picker.get_node(^"Margin/Layout/Picker/Browser/Results/Rows").get_child(0).pressed.emit()
+		await _settle()
+		await _click_miniature(viewport, picker)
+		assert_bool(picker.get_node(^"Margin/Layout/Picker/Actions/Apply").disabled).is_false()
 		picker.get_node(^"Margin/Layout/Picker/Actions/Apply").pressed.emit()
 		await _settle()
 		await _capture(viewport, str(profile[0]) + "-appearance-selected")
@@ -159,7 +161,9 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		saved.preferred_miniature = {}
 		assert_dict(creator.capture_reconnect_state().draft).is_equal(saved)
 		buttons.get_node(^"ChangeMiniature").pressed.emit()
-		picker.get_node(^"Margin/Layout/Picker/Browser/Results/Rows").get_child(0).pressed.emit()
+		await _settle()
+		await _click_miniature(viewport, picker)
+		assert_bool(picker.get_node(^"Margin/Layout/Picker/Actions/Apply").disabled).is_false()
 		picker.get_node(^"Margin/Layout/Picker/Actions/Apply").pressed.emit()
 		primary.pressed.emit()
 		assert_str(creator.capture_reconnect_state().stage).is_equal("create-review")
@@ -381,3 +385,18 @@ func _dialog_key(dialog: Window, key: Key) -> void:
 	event.pressed = false
 	dialog.push_input(event)
 	await _settle()
+
+
+func _click_miniature(viewport: SubViewport, picker: Control) -> void:
+	var card: Button = picker.get_node(^"Margin/Layout/Picker/Browser/Results/Rows").get_child(0)
+	var point := card.get_global_rect().get_center()
+	var motion := InputEventMouseMotion.new()
+	motion.position = point
+	viewport.push_input(motion, true)
+	for pressed in [true, false]:
+		var click := InputEventMouseButton.new()
+		click.position = point
+		click.button_index = MOUSE_BUTTON_LEFT
+		click.pressed = pressed
+		viewport.push_input(click, true)
+		await get_tree().process_frame

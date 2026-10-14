@@ -13,6 +13,8 @@ func test_pending_roll_indicator_keeps_moving() -> void:
 
 func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	view.size = Vector2(1024, 768)
 	add_child(view)
 	view.present_creation("create-equipment", {
 		"equipment_roll_pending": true, "roll_ready": true, "active_roll": "Equipment first",
@@ -27,6 +29,8 @@ func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 
 func test_fixed_pack_does_not_offer_a_choice_button() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	view.size = Vector2(1024, 768)
 	add_child(view)
 	view.present_creation("create-equipment", {
 		"pack": "Backpack", "equipment_rolls": {"Equipment pack": 3},
@@ -46,6 +50,8 @@ func _copy(root: Node) -> String:
 
 func test_completed_conditional_results_remain_selectable_with_raw_faces() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	view.size = Vector2(1024, 768)
 	add_child(view)
 	var draft := {"class_id": "esoteric-hermit", "equipment_rolls": {"Equipment first": 11, "Equipment second": 3, "Hermit scroll family": 1, "Hermit scroll": 2, "Red poison doses": 3, "Dog hit points": 4}, "roll_faces": {"Hermit scroll": [2], "Red poison doses": [3], "Dog hit points": [4]}, "roll_formulas": {"Hermit scroll": "1d10", "Red poison doses": "1d4", "Dog hit points": "1d6"}}
 	view.present_creation("create-equipment", draft, false)
@@ -63,6 +69,8 @@ func test_completed_conditional_results_remain_selectable_with_raw_faces() -> vo
 
 func test_origin_detail_contains_only_the_selected_resolved_trait() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	view.size = Vector2(1024, 768)
 	add_child(view)
 	view.present_creation("create-origin", {"class_id": "occult-herbmaster", "first_decoction_roll": 1, "second_decoction_roll": 4, "roll_faces": {"First decoction": [1], "Second decoction": [4]}}, false)
 	view.get_node(view.LEFT + "/Choices").selected.emit("First decoction")

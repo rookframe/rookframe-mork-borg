@@ -14,9 +14,12 @@ func present(active: bool, canvas: Vector2, presentation: String = "entry") -> v
 		return
 	var height := 790 if presentation == "note" else 410 if presentation == "number" else 610
 	var extent := Vector2i(int(minf(640, canvas.x - 80)), int(minf(height, canvas.y - 70)))
-	if not visible or size != extent:
+	var opening := not visible
+	if opening or size != extent:
 		size = extent
 		popup_centered()
+	if opening:
+		_reveal.call_deferred()
 
 func _input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
@@ -33,3 +36,8 @@ func _fit_material() -> void:
 	frame.set_border_width_all(0)
 	for side in range(4): frame.set_content_margin(side, 12)
 	get_node("Surface").add_theme_stylebox_override("panel", frame)
+
+
+func _reveal() -> void:
+	if visible:
+		get_node("Frame").reveal(get_node("Surface/Inset"))

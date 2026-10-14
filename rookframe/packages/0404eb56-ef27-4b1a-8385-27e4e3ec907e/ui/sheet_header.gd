@@ -8,7 +8,7 @@ func configure(data: Dictionary, draft: Dictionary, owner: bool, action_live: bo
 	get_node(^"NameEditField/Editor").text = str(draft.get("name", data.get("name", "")))
 	get_node(^"Close").visible = true
 	get_node(^"EditingStatus").visible = editing
-	get_node(^"Spacer").visible = false
+	get_node(^"Spacer").visible = editing
 	get_node(^"System").visible = false
 	get_node(^"Edit").disabled = not owner or action_live
 	get_node(^"Edit").visible = not editing

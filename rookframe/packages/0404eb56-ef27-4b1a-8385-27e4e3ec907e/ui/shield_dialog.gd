@@ -7,6 +7,8 @@ signal cancelled
 
 func _ready() -> void:
 	close_requested.connect(_cancel)
+	get_node("Shell").item_rect_changed.connect(_fit_material)
+	_fit_material()
 	get_node(^"Shell/Content/Header/Close").pressed.connect(_cancel)
 	get_node(^"Shell/Content/Actions/Take").pressed.connect(_choose.bind("take"))
 	get_node(^"Shell/Content/Actions/Break").pressed.connect(_choose.bind("break"))
@@ -18,6 +20,7 @@ func present(outcome: Dictionary) -> void:
 	get_node(^"Shell/Content/Actions/Take").text = _t("Take %d damage") % loss
 	if not visible:
 		popup_centered()
+		_reveal.call_deferred()
 		get_node(^"Shell/Content/Actions/Take").grab_focus()
 
 func set_pending(value: bool) -> void:
@@ -56,3 +59,11 @@ func localize(locale: I18N) -> void:
 	get_node(^"Shell/Content/Actions/Take").text = _t("Take 2 damage")
 	get_node(^"Shell/Content/Header/Close").accessibility_name = _t("Close shield decision and end action")
 	get_node(^"Shell/Content/Header/Title").text = _t("Break shield?")
+
+func _fit_material() -> void:
+	get_node("Frame").set_sections(Rect2(), get_node("Shell").get_global_rect())
+
+
+func _reveal() -> void:
+	if visible:
+		get_node("Frame").reveal(get_node("Shell/Content"))

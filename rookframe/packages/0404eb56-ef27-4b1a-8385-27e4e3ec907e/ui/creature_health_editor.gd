@@ -58,9 +58,12 @@ func present(canvas: Vector2) -> void:
 	_canvas = canvas
 	_phone = canvas.y <= 500
 	var extent := Vector2i(int(canvas.x), int(canvas.y))
-	if not visible or size != extent:
+	var opening := not visible
+	if opening or size != extent:
 		size = extent
 		popup_centered()
+	if opening:
+		_reveal.call_deferred()
 	var inset := 12 if _phone else 24
 	for edge in ["left", "top", "right", "bottom"]:
 		get_node("Panel/Inset").add_theme_constant_override("margin_" + edge, inset)
@@ -233,3 +236,8 @@ func _correct() -> void:
 func _fit_material() -> void:
 	var panel: Control = get_node("Panel")
 	get_node("Frame").set_sections(Rect2(), Rect2(panel.position.x, panel.position.y, panel.size.x, panel.size.y))
+
+
+func _reveal() -> void:
+	if visible:
+		get_node("Frame").reveal(get_node("Panel/Inset"))

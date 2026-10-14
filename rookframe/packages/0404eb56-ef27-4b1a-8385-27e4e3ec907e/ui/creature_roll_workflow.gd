@@ -67,6 +67,11 @@ func start(actor: String, part: String, entry: String, initial_choice: Dictionar
 
 func _changed() -> void:
 	_dirty = true
+	# Claim the retained sheet's dice as soon as the accepted request arrives.
+	# Waiting for _process lets the host open its tabletop fallback first.
+	if _action != null and _action.pending and not _closed and _presenting:
+		var request := str(_action.snapshot.get("request", ""))
+		if not request.is_empty(): _present(request)
 
 func _process(delta: float) -> void:
 	if _dirty:
@@ -96,8 +101,8 @@ func _accept() -> void:
 	elif next != previous:
 		changed.emit()
 
-func _present() -> void:
-	var request := str(snapshot.get("request", ""))
+func _present(request: String = "") -> void:
+	if request.is_empty(): request = str(snapshot.get("request", ""))
 	if not request.is_empty():
 		var result := _sdk.dice.roll_requested(request, _surface)
 		if not result.ok and result.code != "not_ready" and message != result.message:
@@ -139,6 +144,4 @@ func summary() -> String:
 	if str(choice.part) == "morale":
 		result += "\n" + _locale.text("Morale %d: %s.") % [int(choice.morale), _locale.text("holds" if int(snapshot.total) <= int(choice.morale) else "fails")]
 		result += "\n" + _locale.text("Resolve the response at the table.")
-	else:
-		result += "\n" + _locale.text("Resolve protection and consequences at the table." if str(choice.part) == "damage" else "Resolve consequences at the table.")
 	return result

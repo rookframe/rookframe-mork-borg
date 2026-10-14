@@ -38,6 +38,7 @@ func test_pending_window_roll_starts_through_temporary_host_hiding_but_not_expli
 	parent.hide()
 	assert_bool(surface.is_visible_in_tree()).is_false()
 	host.complete_reply()
+	assert_array(host.presented).override_failure_message("Claim Window Dice in the reply callback, before the host can show its tabletop fallback.").contains(request)
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_array(host.presented).contains(request)
@@ -66,7 +67,7 @@ func test_pending_window_roll_starts_through_temporary_host_hiding_but_not_expli
 	assert_dict(host.actors).is_equal(before)
 
 func test_creature_roll_completion_is_once_immutable_and_late_abandonment_cancels() -> void:
-	var host := BOUNDARY.new()
+	var host := PresentationBoundary.new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
 	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})

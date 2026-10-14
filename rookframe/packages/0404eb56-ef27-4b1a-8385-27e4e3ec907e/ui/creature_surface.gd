@@ -162,7 +162,7 @@ func _world_changed() -> void:
 func _process(_delta: float) -> void:
 	if _roll_refresh_pending:
 		_roll_refresh_pending = false
-		_roll_feedback = "Rolling Creature dice…" if _roll_workflow.pending else "Action ended" if _roll_workflow.state == "ended" else "Creature roll"
+		_roll_feedback = "Rolling Creature dice…" if _roll_workflow.pending else "Action ended" if _roll_workflow.state == "ended" else ""
 		_render_pending = true
 		if actor != null and actor.id.value == _roll_workflow.source and _detail == "roll":
 			_detail_pending = true
@@ -380,6 +380,7 @@ func _filter_catalogue(query: String) -> void:
 func _option(title: String, action: Callable, enabled: bool) -> Button:
 	var button := Button.new()
 	button.text = locale.text(title)
+	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
 	button.theme_type_variation = "TaskButton"
 	button.custom_minimum_size = Vector2(100, 52)
 	button.disabled = not enabled or _busy
