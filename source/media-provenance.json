@@ -1,0 +1,11 @@
+[
+  {
+    "role": "cover",
+    "source": "rookframe-godot/docs/product/mockups/main-menu-redesign/assets/system-mork.png",
+    "sha256": "92fb19ca2c558ee63ba5819b3595a6cd05313972348bb2e583d6d10b464d41a8",
+    "caption": "Original artwork for the Rookframe MÖRK BORG implementation; not official publisher artwork.",
+    "generator": "OpenAI built-in image_gen; original illustration",
+    "prompt": "Wide landscape 3:2 original dark fantasy RPG illustration. Acid yellow field, rough black ink medieval skeleton crowned with broken antlers on right, torn-paper collage and irreverent punk zine screenprint texture, small slash of hot magenta, angular ruined cathedral silhouettes at bottom. Provocative graphic art, heavy contrast, NOT a reproduction of an existing book cover. Flat full bleed artwork only, no text, no lettering, no logos or UI. An original illustrative media fixture for a MÖRK BORG implementation product page; no claim of official publisher artwork.",
+    "note": "Existing Rookframe mockup artwork reused unchanged for this implementation. No claim of official MÖRK BORG publisher artwork."
+  }
+]
