@@ -1,4 +1,5 @@
 extends RefCounted
+## Record full roll arithmetic separately from the compact numeric announcement.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
@@ -110,9 +111,13 @@ func _complete(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.H
 	report.tone = "roll"
 	for face in roll.terms[0].results:
 		report.dice.append(SDK.ActionLogDie.new(roll.terms[0].faces, face))
-	var saved := context.commit([], report)
+	var saved := context.write_action_log(report)
 	if not saved.ok:
 		return _end(context, action, saved.message)
+	var notice := SDK.Announcement.new(_short(str(action.actor_name), 128), _short(str(choice.name) + " · " + str(choice.label), 256), "dice")
+	notice.results = [value]
+	notice.log_sequence = saved.sequence
+	context.announce(notice)
 	action["total"] = value
 	action["sequence"] = roll.sequence
 	action["message"] = text

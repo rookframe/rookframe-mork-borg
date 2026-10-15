@@ -1,4 +1,5 @@
 extends RefCounted
+## Write the full ability explanation to history, then explicitly announce its numeric total. Cancellation remains history and local action feedback.
 
 ## One live modifier action. No draft or reconnect state is retained by the System.
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
@@ -112,11 +113,16 @@ func _accept(result: SDK.HumanThrowResult) -> void:
 	report.dice = [SDK.ActionLogDie.new(20, raw)]
 	report.result = str(total)
 	_finish("%s: %d. Compare with the agreed DR." % [ability, total], false)
-	var published: SDK.ActionLogResult = await _sdk.action_log.publish(report)
+	var published: SDK.ActionLogResult = await _sdk.action_log.write(report)
 	if not published.ok:
 		message = "The raw Roll remains. The interpreted report could not be published: " + published.message
 		failed = true
 		changed.emit()
+	else:
+		var notice := SDK.Announcement.new(_name, ability + " · 1d20 %+d" % _modifier, "dice")
+		notice.results = [total]
+		notice.log_sequence = published.sequence
+		await _sdk.announcements.announce(notice)
 
 func _finish(text: String, error: bool) -> void:
 	pending = false
@@ -130,4 +136,4 @@ func _report_ended() -> void:
 	report.text = [SDK.ActionLogText.new("Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing.")]
 	report.result = "ENDED"
 	report.tone = "attention"
-	await _sdk.action_log.publish(report)
+	await _sdk.action_log.write(report)

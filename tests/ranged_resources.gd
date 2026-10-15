@@ -29,6 +29,11 @@ func test_crossbow_critical_and_fumble_spend_bolts_once() -> void:
 			assert_int(host.actors.enemy.data.hit_points).is_equal(6)
 			assert_str(host.actors.enemy.data.armor.reduction).is_equal("")
 		else:
+			host.access_entries = [{"participant_id": "player", "display_name": "Player", "session_id": "player-session", "access_level": "Owner", "is_connected": true}]
+			host.game_master = true
+			host.participant = "gm"
+			host.session = "gm-session"
+			await sdk.system_actions.submit("melee.choose", {"id": "shot", "choice": "break"})
 			assert_bool(host.actors.hero.data.inventory[0].broken).is_true()
 			assert_bool(host.actors.hero.data.inventory[0].equipped).is_false()
 			assert_int(host.actors.enemy.data.hit_points).is_equal(20)

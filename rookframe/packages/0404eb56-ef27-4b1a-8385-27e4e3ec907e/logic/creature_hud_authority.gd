@@ -1,6 +1,6 @@
 extends RefCounted
 ## An announced special has no automated gameplay effects. Authority validates
-## the exact Actor and existing rule, then accepts one ordinary Action Log entry.
+## the exact Actor and existing rule, then records and explicitly announces the use.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
 const ACTIONS = preload(ROOT + "logic/creature_hud_actions.gd")
@@ -47,9 +47,12 @@ func handle(context: SDK.SystemActionContext, payload: Variant) -> Dictionary:
 			continue
 		var report := SDK.ActionLogMessage.new("Creature action")
 		report.text = [SDK.ActionLogText.new(_short(str(data.get("name", "Creature")), 200) + " uses " + _short(str(entry.get("name", "Special")), 200))]
-		var result := context.commit([], report)
+		var result := context.write_action_log(report)
 		if not result.ok:
 			return _error(result.message)
+		var notice := SDK.Announcement.new(_short(source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", 128), _short("Uses " + str(entry.get("name", "Special")), 256), "power")
+		notice.log_sequence = result.sequence
+		context.announce(notice)
 		_accepted[key] = [input.actor, input.entry]
 		return {"ok": true}
 	return _error("This Creature action is no longer available.")

@@ -60,14 +60,9 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 		if distance.distance > float(reach) * 0.3048 + 0.000001:
 			outside.append("target %s not in range" % (target.actor.public_label if not target.actor.public_label.is_empty() else "Creature"))
 	if not outside.is_empty():
-		var report := SDK.ActionLogMessage.new("Attack out of range")
 		var message := ""
 		for line in outside:
-			report.text.append(SDK.ActionLogText.new(line))
 			message += ("\n" if not message.is_empty() else "") + line
-		report.result = "Stopped"
-		report.tone = "attention"
-		context.commit([], report)
 		return _error(message)
 	if target_count != 1:
 		return _error("Choose exactly one target. Nothing has been rolled.")

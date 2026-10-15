@@ -33,7 +33,14 @@ func test_melee_attack() -> void:
 	assert_bool(host.actors.enemy.data.hit_points == 12 and host.actors.enemy.data.armor.reduction == "").override_failure_message("Critical doubles damage before protection and reduces protection one tier.").is_true()
 	await sdk.system_actions.submit("melee.start", _attack_input("fumble"))
 	host.roll("fumble", [1])
-	await sdk.system_actions.submit("melee.advance", {"id": "fumble"})
+	var pending_fumble: SDK.DataResult = await sdk.system_actions.submit("melee.advance", {"id": "fumble"})
+	assert_str(pending_fumble.value.state).is_equal("fumble")
+	assert_bool(host.actors.hero.data.inventory[0].get("broken", false)).is_false()
+	var refused: SDK.DataResult = await sdk.system_actions.submit("melee.choose", {"id": "fumble", "choice": "break"})
+	assert_str(refused.value.state).is_equal("error")
+	host.game_master = true
+	await sdk.system_actions.submit("melee.choose", {"id": "fumble", "choice": "break"})
+	host.game_master = false
 	assert_bool(host.actors.hero.data.inventory[0].broken and not host.actors.hero.data.inventory[0].equipped).override_failure_message("Fumble preserves the chosen broken weapon consequence.").is_true()
 	var after_fumble: int = host.reports.size()
 	await sdk.system_actions.submit("melee.cancel", {"id": "fumble"})
@@ -137,6 +144,8 @@ func test_boundaries() -> void:
 	await sdk.system_actions.submit("melee.start", loss)
 	host.roll("loss", [1])
 	await sdk.system_actions.submit("melee.advance", {"id": "loss"})
+	host.game_master = true
+	await sdk.system_actions.submit("melee.choose", {"id": "loss", "choice": "lose"})
 	assert_bool(host.actors.hero.data.inventory.is_empty()).override_failure_message("Loss fumble removes the only held weapon.").is_true()
 	system.free()
 

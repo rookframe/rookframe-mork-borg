@@ -2,7 +2,6 @@
 
 [ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/d20.svg" id="dice"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/linen.png" id="linen"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="portrait"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_hud.gd" id="script"]
 [ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
@@ -15,33 +14,11 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_divider.tscn" id="divider"]
 
-[sub_resource type="StyleBoxFlat" id="Ledger"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.082353, 0.090196, 0.098039, 0.94)
-border_width_top = 6
-border_width_bottom = 6
-border_color = Color(0.737255, 0.572549, 0.466667, 1)
-shadow_color = Color(0, 0, 0, 0.333333)
-shadow_size = 10
-shadow_offset = Vector2(0, 6)
-
-[sub_resource type="StyleBoxFlat" id="Popover"]
-content_margin_left = 0.0
-content_margin_top = 0.0
-content_margin_right = 0.0
-content_margin_bottom = 0.0
-bg_color = Color(0.082353, 0.090196, 0.098039, 0.94)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-shadow_color = Color(0, 0, 0, 0.333333)
-shadow_size = 10
-shadow_offset = Vector2(0, 6)
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/hinged_leaf/hinged_leaf.tscn" id="leaf"]
+[ext_resource type="StyleBoxTexture" path="res://rookframe/ui/assets/action-panel/body.tres" id="leather"]
+[ext_resource type="StyleBoxTexture" path="res://rookframe/ui/assets/action-panel/hud_identity.tres" id="identity_skin"]
+[ext_resource type="StyleBoxTexture" path="res://rookframe/ui/assets/action-panel/hud_badge.tres" id="badge_skin"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/hinged_leaf/binding_pair.tscn" id="bindings"]
 
 [node name="CreatureHud" type="Control"]
 texture_filter = 4
@@ -55,25 +32,20 @@ mouse_filter = 2
 theme = ExtResource("theme")
 script = ExtResource("script")
 
-[node name="Bar" type="Panel" parent="."]
+[node name="Bar" type="Control" parent="."]
 layout_mode = 0
-theme_override_styles/panel = SubResource("Ledger")
-
-[node name="Linen" type="TextureRect" parent="Bar"]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 6.0
-offset_bottom = -6.0
-grow_horizontal = 2
-grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("linen")
-expand_mode = 1
-stretch_mode = 1
 
 [node name="Dice" type="Button" parent="Bar"]
 layout_mode = 0
+
+[node name="Skin" type="Panel" parent="Bar/Dice"]
+show_behind_parent = true
+anchor_right = 2.5
+anchor_bottom = 2.5
+scale = Vector2(0.4, 0.4)
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("badge_skin")
 
 [node name="Emblem" type="TextureRect" parent="Bar/Dice"]
 layout_mode = 0
@@ -84,6 +56,14 @@ stretch_mode = 5
 
 [node name="Identity" type="Button" parent="Bar"]
 layout_mode = 0
+
+[node name="Skin" type="Panel" parent="Bar/Identity"]
+show_behind_parent = true
+anchor_right = 2.5
+anchor_bottom = 2.5
+scale = Vector2(0.4, 0.4)
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("identity_skin")
 
 [node name="PortraitFrame" type="Control" parent="Bar/Identity"]
 clip_contents = true
@@ -107,10 +87,19 @@ layout_mode = 0
 text_overrun_behavior = 3
 
 [node name="Divider" parent="Bar/Identity" instance=ExtResource("divider")]
+visible = false
 
 [node name="Categories" type="Control" parent="Bar"]
 anchors_preset = 0
 mouse_filter = 2
+
+[node name="Skin" type="Panel" parent="Bar/Categories"]
+show_behind_parent = true
+anchor_right = 2.5
+anchor_bottom = 2.5
+scale = Vector2(0.4, 0.4)
+mouse_filter = 2
+theme_override_styles/panel = ExtResource("leather")
 
 [node name="Attacks" type="Button" parent="Bar/Categories"]
 layout_mode = 0
@@ -123,30 +112,33 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="Bar/Categories/Attacks"]
+vertical_alignment = 1
 layout_mode = 0
 text = "Attacks"
 horizontal_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="Panel" type="Panel" parent="."]
-visible = false
-layout_mode = 0
-focus_mode = 2
-theme_override_styles/panel = SubResource("Popover")
+[node name="Rule" parent="Bar/Categories" instance=ExtResource("divider")]
 
-[node name="Header" type="Control" parent="Panel"]
+[node name="LeftBindings" parent="Bar" instance=ExtResource("bindings")]
+
+[node name="RightBindings" parent="Bar" instance=ExtResource("bindings")]
+
+[node name="Panel" parent="." instance=ExtResource("leaf")]
+
+[node name="Header" type="Control" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="Title" type="Label" parent="Panel/Header"]
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Header"]
 layout_mode = 0
 theme_override_fonts/font = ExtResource("display")
 vertical_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="CurrentHP" type="Label" parent="Panel/Header"]
+[node name="CurrentHP" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Header"]
 visible = false
 mouse_filter = 2
 horizontal_alignment = 2
@@ -154,65 +146,65 @@ vertical_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="ShowAll" parent="Panel/Header" instance=ExtResource("show_all")]
+[node name="ShowAll" parent="Panel/Surface/Viewport/Root/Ink/Content/Header" instance=ExtResource("show_all")]
 layout_mode = 0
 
-[node name="Close" type="Button" parent="Panel/Header"]
+[node name="Close" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Header"]
 layout_mode = 0
 accessibility_name = "Close creature actions"
 text = "×"
 
-[node name="Rule" type="ColorRect" parent="Panel/Header"]
+[node name="Rule" type="ColorRect" parent="Panel/Surface/Viewport/Root/Ink/Content/Header"]
 layout_mode = 0
 mouse_filter = 2
 color = Color(0.244353, 0.262784, 0.272745, 1)
 
-[node name="List" type="GridContainer" parent="Panel"]
+[node name="List" type="GridContainer" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 layout_mode = 0
 theme_override_constants/h_separation = 0
 theme_override_constants/v_separation = 0
 
-[node name="Footer" type="HBoxContainer" parent="Panel"]
+[node name="Footer" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 layout_mode = 0
 theme_override_constants/separation = 12
 alignment = 1
 
-[node name="Previous" type="Button" parent="Panel/Footer"]
+[node name="Previous" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Footer"]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 accessibility_name = "Previous page"
 text = "‹"
 
-[node name="Page" type="Label" parent="Panel/Footer"]
+[node name="Page" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Footer"]
 layout_mode = 2
 vertical_alignment = 1
 
-[node name="Next" type="Button" parent="Panel/Footer"]
+[node name="Next" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Footer"]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 accessibility_name = "Next page"
 text = "›"
 
-[node name="Empty" type="HBoxContainer" parent="Panel"]
+[node name="Empty" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 layout_mode = 0
 
-[node name="Title" type="Label" parent="Panel/Empty"]
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Empty"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "No entries"
 vertical_alignment = 1
 
-[node name="Detail" type="Control" parent="Panel"]
+[node name="Detail" type="Control" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 visible = false
 clip_contents = true
 anchors_preset = 0
 mouse_filter = 2
 
-[node name="Text" type="Label" parent="Panel/Detail"]
+[node name="Text" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Detail"]
 layout_mode = 0
 autowrap_mode = 3
 
-[node name="More" type="GridContainer" parent="Panel"]
+[node name="More" type="GridContainer" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 visible = false
 layout_mode = 0
 theme_override_constants/h_separation = 8
@@ -229,6 +221,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="Bar/Categories/Special"]
+vertical_alignment = 1
 layout_mode = 0
 text = "Special"
 horizontal_alignment = 1
@@ -246,6 +239,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="Bar/Categories/Checks"]
+vertical_alignment = 1
 layout_mode = 0
 text = "Checks"
 horizontal_alignment = 1
@@ -263,6 +257,7 @@ expand_mode = 1
 stretch_mode = 5
 
 [node name="Title" type="Label" parent="Bar/Categories/Scene"]
+vertical_alignment = 1
 layout_mode = 0
 text = "Scene"
 horizontal_alignment = 1
@@ -274,6 +269,7 @@ text_overrun_behavior = 3
 toggle_mode = true
 
 [node name="Value" type="Label" parent="Bar/Health"]
+vertical_alignment = 1
 clip_text = true
 text_overrun_behavior = 3
 mouse_filter = 2
@@ -284,98 +280,99 @@ mouse_filter = 2
 show_percentage = false
 
 [node name="Divider" parent="Bar/Health" instance=ExtResource("divider")]
+visible = false
 
-[node name="Search" type="LineEdit" parent="Panel"]
+[node name="Search" type="LineEdit" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 visible = false
 placeholder_text = "Find a creature…"
 
-[node name="Health" type="Control" parent="Panel"]
+[node name="Health" type="Control" parent="Panel/Surface/Viewport/Root/Ink/Content"]
 visible = false
 mouse_filter = 2
 
-[node name="StepperFrame" type="Panel" parent="Panel/Health"]
+[node name="StepperFrame" type="Panel" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 mouse_filter = 2
 
-[node name="AmountLabel" type="Label" parent="Panel/Health"]
+[node name="AmountLabel" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 text = "Amount"
 mouse_filter = 2
 vertical_alignment = 1
 
-[node name="Amount" type="LineEdit" parent="Panel/Health"]
+[node name="Amount" type="LineEdit" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 theme_override_constants/minimum_character_width = 1
 text = "1"
 alignment = 1
 virtual_keyboard_type = 3
 
-[node name="Minus" type="Button" parent="Panel/Health"]
+[node name="Minus" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 text = "−"
 accessibility_name = "Decrease amount"
 
-[node name="Plus" type="Button" parent="Panel/Health"]
+[node name="Plus" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 text = "+"
 accessibility_name = "Increase amount"
 
-[node name="Error" type="Label" parent="Panel/Health"]
+[node name="Error" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 visible = false
 autowrap_mode = 3
 mouse_filter = 2
 theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 
-[node name="damage" type="Button" parent="Panel/Health"]
+[node name="damage" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 
 
-[node name="Icon" type="TextureRect" parent="Panel/Health/damage"]
+[node name="Icon" type="TextureRect" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/damage"]
 mouse_filter = 2
 texture = ExtResource("damage_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Title" type="Label" parent="Panel/Health/damage"]
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/damage"]
 text = "Damage"
 horizontal_alignment = 1
 mouse_filter = 2
 
-[node name="Preview" type="Label" parent="Panel/Health/damage"]
+[node name="Preview" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/damage"]
 clip_text = true
 text_overrun_behavior = 3
 horizontal_alignment = 1
 mouse_filter = 2
 
-[node name="heal" type="Button" parent="Panel/Health"]
+[node name="heal" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 
 
-[node name="Icon" type="TextureRect" parent="Panel/Health/heal"]
+[node name="Icon" type="TextureRect" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/heal"]
 mouse_filter = 2
 texture = ExtResource("heal_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Title" type="Label" parent="Panel/Health/heal"]
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/heal"]
 text = "Heal"
 horizontal_alignment = 1
 mouse_filter = 2
 
-[node name="Preview" type="Label" parent="Panel/Health/heal"]
+[node name="Preview" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/heal"]
 clip_text = true
 text_overrun_behavior = 3
 horizontal_alignment = 1
 mouse_filter = 2
 
-[node name="set" type="Button" parent="Panel/Health"]
+[node name="set" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Health"]
 
 
-[node name="Icon" type="TextureRect" parent="Panel/Health/set"]
+[node name="Icon" type="TextureRect" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/set"]
 mouse_filter = 2
 texture = ExtResource("set_icon")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Title" type="Label" parent="Panel/Health/set"]
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/set"]
 text = "Set HP"
 horizontal_alignment = 1
 mouse_filter = 2
 
-[node name="Preview" type="Label" parent="Panel/Health/set"]
+[node name="Preview" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Health/set"]
 clip_text = true
 text_overrun_behavior = 3
 horizontal_alignment = 1

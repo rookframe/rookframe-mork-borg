@@ -1,4 +1,5 @@
 extends RefCounted
+## Attack consequences, ammunition, and cancellation are recorded history. Physical Rolls announce through Rookframe; choices and errors stay in the action window.
 const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
 
 ## One live System action per supplied UUID, resolved on World Authority.
@@ -12,6 +13,14 @@ const TARGETING = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _actions: Dictionary = {}
+
+func _record(context: SDK.SystemActionContext, action: Dictionary, text: String, result: String = "") -> SDK.ActionLogResult:
+	var report := SDK.ActionLogMessage.new("%s · %s attack" % [str(action.name), str(action.weapon)])
+	report.text = [SDK.ActionLogText.new(text)]
+	report.result = result
+	var sequence := int(action.get("log_sequence", 0))
+	return context.update_action_log(sequence, report) if sequence > 0 else context.write_action_log(report)
+
 
 func handle_system_intent(context: SDK.SystemActionContext, name: String, payload: Variant) -> Variant:
 	if typeof(payload) != TYPE_DICTIONARY:
@@ -27,6 +36,16 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 	if not caller_result.ok:
 		return _error(caller_result.message)
 	var caller: Dictionary = caller_result.value
+	if name == "melee.inbox":
+		var inbox: Array = []
+		for key in _actions.keys():
+			var pending_action: Dictionary = _actions.get(str(key), {})
+			if pending_action.state == "fumble":
+				if _alive(context, pending_action):
+					inbox.append(_public(pending_action))
+				else:
+					_end(context, pending_action)
+		return inbox
 	var id: String = str(input.get("id", ""))
 	if id.is_empty() or id.length() > 64:
 		return _error("Choose a new action identity.")
@@ -45,6 +64,24 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 	if not _actions.has(id):
 		return {"state": "ended", "message": ENDED}
 	var action: Dictionary = _actions.get(id, {})
+	if action.state == "fumble" and not _alive(context, action):
+		return _end(context, action)
+	if name == "melee.advance" and caller.is_gm and action.state in ["fumble", "resolved", "ended"]:
+		return _public(action)
+	if name == "melee.cancel" and caller.is_gm and action.state == "fumble":
+		return _end(context, action)
+	if name == "melee.choose":
+		if not caller.is_gm:
+			return _error("The GM resolves a fumble.")
+		if action.state != "fumble":
+			return _public(action)
+		if not str(input.get("choice", "")) in ["break", "lose"]:
+			return _error("Choose broken or lost.")
+		var source := context.read_actor(SDK.ActorId.new(str(action.source)))
+		if not source.ok or source.actor.access_level != "Owner":
+			return _end(context, action)
+		action.fumble = str(input.choice)
+		return _fumble(context, action, source.actor)
 	if action.participant != caller.participant_id or action.session != caller.session_id:
 		return _error("This action belongs to another Participant session.")
 	if name == "melee.cancel":
@@ -65,10 +102,9 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if not BROKEN.new().can_act(data):
 		return _error("This Actor cannot act. Rules references remain available.")
 	var creature_source := str(data.get("schema", "")) == "mork-borg-adversary/v1"
-	var untargeted: bool = input.get("tabletop", false) and caller.targets.is_empty()
 	var rook_id := SDK.RookId.new(str(input.get("rook", "")))
 	var rook := context.read_rook(rook_id)
-	if (not untargeted or not rook_id.value.is_empty()) and (not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.actor.id.value):
+	if not rook.ok or rook.rook.actor == null or rook.rook.actor.value != source.actor.id.value:
 		return _error("Select this Actor’s source Rook in the current Scene.")
 	var items := _inventory(source.actor.id, data)
 	var weapon := _weapon(items, str(input.get("item", "")))
@@ -123,11 +159,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var ability_name := str(weapon.get("attack_ability", "Strength"))
 	if not ability_name in ["Strength", "Presence", "Agility"]:
 		return _error("Choose a supported attack ability.")
-	var difficulty: int = input.get("difficulty", 0)
-	var modifier: int = input.get("modifier", 0)
-	var fumble := str(input.get("fumble", "break"))
-	if difficulty < 0 or difficulty > 30 or modifier < -20 or modifier > 20 or not fumble in ["break", "lose"]:
-		return _error("Choose source difficulty (0) or an override 1–30, a modifier from −20 to +20, and a fumble choice.")
+	# Target and equipment own these rules; action inputs cannot override them.
+	var difficulty := 0
 	var target_ids: PackedStringArray = caller.targets
 	var targets: Array[SDK.Actor] = []
 	var outside: Array[String] = []
@@ -156,18 +189,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			outside.append("target %s not in range" % _public_name(target.actor))
 		targets.append(target.actor)
 	if not outside.is_empty():
-		var weapon_name: String = str(weapon.name)
-		var report := SDK.ActionLogMessage.new("%s attack" % _short_name(weapon_name, 16))
-		for line in outside:
-			report.text.append(SDK.ActionLogText.new(line))
-		report.result = "Stopped"
-		report.tone = "attention"
-		BROKEN.new().commit(context, [], report)
 		var text := ""
 		for line in outside:
 			text += ("\n" if not text.is_empty() else "") + line
 		return _error(text)
-	if not untargeted and targets.size() != 1:
+	if targets.size() != 1:
 		return _error("Choose exactly one Creature target. Nothing has been rolled.")
 	var owner := str(caller.participant_id)
 	var owner_session := str(caller.session_id)
@@ -187,67 +213,84 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 				return _error("This Character’s Player is not connected.")
 			owner = owners[0].participant_id
 			owner_session = owners[0].session_id
-	var target_data: Dictionary = {} if untargeted else CREATURES.new().stat_block(targets[0].data)
+	var target_data: Dictionary = CREATURES.new().stat_block(targets[0].data)
 	var definition: Dictionary = CREATURES.CORE_DEFINITIONS.get(str(target_data.get("definition_id", "")), {})
 	if difficulty == 0:
-		difficulty = 12 if untargeted else CREATURES.new().target_attack_difficulty(target_data, input.get("piercing", false))
+		difficulty = CREATURES.new().target_attack_difficulty(target_data, weapon.get("piercing", false))
 		if creature_source:
 			difficulty += CREATURES.new().attack_test_difficulty(profile) - 12
 	if difficulty == 0:
 		return _error("Attack difficulty is unavailable.")
-	var specified_dr: int = input.get("difficulty", 0)
-	if not creature_source and specified_dr == 0:
+	if not creature_source:
 		var weapon_dr: int = weapon.get("attack_dr", 12)
 		difficulty += weapon_dr - 12
 	if not creature_source and ability_name == "Presence" and str(data.get("class_id", "")) == "gutterborn-scum":
 		var presence_difficulty: int = difficulty
 		difficulty = presence_difficulty - 2
 	var armor: Dictionary = target_data.get("armor", {})
-	var protection_text := "" if untargeted else str(armor.get("reduction", ""))
+	var protection_text := str(armor.get("reduction", ""))
 	if not protection_text in ["", "d2", "d4", "d6"]:
 		return _error("This Creature's protection requires a table ruling.")
 	var abilities: Dictionary = data.get("abilities", {})
 	var ability: Dictionary = abilities.get(ability_name, {})
 	var ability_modifier: int = 0 if creature_source else ability.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "rook": rook_id.value, "target_rook": captured_target_rook, "untargeted": untargeted, "target": "" if untargeted else targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": "" if untargeted else _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier + modifier, "difficulty": difficulty, "fumble": fumble, "jab": jab, "natural": weapon.get("natural", false) or bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": 0 if untargeted else CREATURES.new().shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "rook": rook_id.value, "target_rook": captured_target_rook, "reach": float(reach) * 0.3048, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier, "difficulty": difficulty, "fumble": "", "jab": jab, "natural": weapon.get("natural", false) or bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": CREATURES.new().shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var initial_terms: Array[SDK.DiceTerm] = [SDK.DiceTerm.new("Attack", 20)]
 	if bite or special == "eurekia":
 		initial_terms.append(SDK.DiceTerm.new("Free attack chance" if bite else "Eurekia consequence", 6))
-	if action.automatic_hit and not untargeted:
+	if action.automatic_hit:
 		action.phase = "damage"
 		action.message = "This attack always hits. Waiting for damage and protection in the Dice Tray."
 		initial_terms = [damage]
 		if not protection_text.is_empty():
 			initial_terms.append(_dice(protection_text, "Protection"))
-	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.id, owner, initial_terms))
+	var started := _record(context, action, "%s attacks %s with %s." % [str(action.name), str(action.label), str(action.weapon)], "In progress")
+	if not started.ok:
+		return _error(started.message)
+	action["log_sequence"] = started.sequence
+	var request := SDK.HumanThrowRequest.new(action.id, owner, initial_terms)
+	request.log_sequence = started.sequence
+	if action.phase == "attack":
+		request.base_modifier = ability_modifier
+		request.allow_modifier = true
+	var requested := context.request_throw(request)
 	if not requested.ok:
+		_record(context, action, requested.message, "Ended")
 		return _error(requested.message)
 	_actions[action.id] = action
 	return _public(action)
 
-func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String) -> Dictionary:
-	var action: Dictionary = _actions.get(id, {})
-	if action.participant != caller.participant_id or action.session != caller.session_id:
-		return _error("This action belongs to another Participant session.")
-	if action.state != "pending":
-		return _public(action)
+func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 	var sessions := context.participant_sessions()
 	var present := false
+	var initiator_is_gm := false
 	if sessions.ok:
 		var entries: Array = sessions.value
 		for raw in entries:
 			var entry: Dictionary = raw
 			if entry.participant_id == action.participant and entry.session_id == action.session:
 				present = true
+				initiator_is_gm = bool(entry.get("is_gm", false))
 	if not present:
-		return _end(context, action)
+		return false
 	var source := context.read_actor(SDK.ActorId.new(action.source))
-	if not source.ok or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
-		return _end(context, action)
+	if not source.ok or typeof(source.actor.data) != TYPE_DICTIONARY:
+		return false
+	if not initiator_is_gm:
+		var caller := context.caller()
+		var current: Dictionary = caller.value if caller.ok else {}
+		var owns := caller.ok and str(current.get("participant_id", "")) == str(action.participant) and source.actor.access_level == "Owner"
+		if not owns:
+			var grants := context.actor_access(source.actor.id)
+			if grants.ok:
+				for entry in grants.items:
+					owns = owns or entry.participant_id == action.participant and entry.access_level == "Owner"
+		if not owns:
+			return false
 	var current_source: Dictionary = source.actor.data
 	if not _valid_source(current_source) or not BROKEN.new().can_act(current_source):
-		return _end(context, action)
+		return false
 	if action.owner != action.participant:
 		var access := context.actor_access(source.actor.id)
 		var connected := false
@@ -256,12 +299,22 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 				if entry.participant_id == action.owner and entry.access_level == "Owner" and entry.is_connected and entry.session_id == action.owner_session:
 					connected = true
 		if not connected:
-			return _end(context, action)
+			return false
 	# A captured spatial action cannot complete after its Scene is left.
-	if not action.get("untargeted", false):
-		var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(action.target_rook)))
-		if not spatial.ok:
-			return _end(context, action)
+	var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(action.target_rook)))
+	if not spatial.ok or spatial.distance > float(action.reach) + 0.000001:
+		return false
+	return true
+
+func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String) -> Dictionary:
+	var action: Dictionary = _actions.get(id, {})
+	if action.participant != caller.participant_id or action.session != caller.session_id:
+		return _error("This action belongs to another Participant session.")
+	if action.state != "pending":
+		return _public(action)
+	if not _alive(context, action):
+		return _end(context, action)
+	var source := context.read_actor(SDK.ActorId.new(str(action.source)))
 	var result := context.read_throw(action.request)
 	if not result.ok or result.status == "cancelled":
 		return _end(context, action)
@@ -270,13 +323,9 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 	if action.phase == "attack":
 		action.raw = result.terms[0].results[0]
 		action.sequence = result.sequence
+		action.modifier = result.modifier
 		if not _spend_ammunition(context, action, source.actor):
 			return _end(context, action)
-		if action.get("untargeted", false):
-			if str(action.special) == "eurekia" and not _draw_eurekia(context, action, source.actor):
-				return _end(context, action)
-			action["attack_consequence"] = {"name": result.terms[1].name, "face": result.terms[1].results[0]} if result.terms.size() > 1 else {}
-			return _request_tabletop_damage(context, action)
 		if str(action.special) == "bite":
 			action["free_attack"] = result.terms[1].results[0] <= 2
 		if str(action.special) == "eurekia" and not _eurekia(context, action, source.actor, result.terms[1].results[0]):
@@ -284,13 +333,17 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 		if action.raw == 1 and action.get("vanished", false):
 			return _complete(context, action, [], "Fumble", "Eurekia vanishes; the attack misses.")
 		if action.raw == 1 and not action.jab:
-			return _fumble(context, action, source.actor)
+			if action.natural or creature_source_data(source.actor.data):
+				return _fumble(context, action, source.actor)
+			action.state = "fumble"
+			action.message = "Waiting for the GM to resolve the fumble."
+			_record(context, action, action.message, "Fumble")
+			return _public(action)
 		var raw_face: int = action.raw
 		var modifier: int = action.modifier
 		var difficulty: int = action.difficulty
-		var sequence: int = action.sequence
 		if raw_face != 20 and raw_face + modifier < difficulty:
-			return _complete(context, action, [], "Miss", "%s misses %s. d20 %d %+d. Raw Roll #%d." % [str(action.name), str(action.label), raw_face, modifier, sequence] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
+			return _complete(context, action, [], "Miss", "%s misses %s." % [str(action.name), str(action.label)] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
 		var terms: Array[SDK.DiceTerm] = [_dice(action.damage, "Damage")]
 		if not str(action.protection).is_empty():
 			terms.append(_dice(action.protection, "Protection"))
@@ -298,7 +351,10 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 			terms.append(SDK.DiceTerm.new("Special consequence", 6))
 		action.phase = "damage"
 		action.request = context.new_request_id()
-		var damage_request := context.request_throw(SDK.HumanThrowRequest.new(action.request, action.owner, terms))
+		_record(context, action, "%s hits %s." % [str(action.name), str(action.label)], "Hit")
+		var request := SDK.HumanThrowRequest.new(action.request, action.owner, terms)
+		request.log_sequence = int(action.log_sequence)
+		var damage_request := context.request_throw(request)
 		if not damage_request.ok:
 			return _end(context, action)
 		action.message = "Hit. Waiting for damage and protection in the Dice Tray."
@@ -310,8 +366,6 @@ func _existing(context: SDK.SystemActionContext, caller: Dictionary, id: String)
 	return _damage(context, action, result)
 
 func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.HumanThrowResult) -> Dictionary:
-	if action.get("untargeted", false):
-		return _tabletop_damage(context, action, result)
 	var target := context.read_actor(SDK.ActorId.new(action.target))
 	if not target.ok or typeof(target.actor.data) != TYPE_DICTIONARY:
 		return _end(context, action)
@@ -350,8 +404,7 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 		data["hit_points"] = 0
 	if action.raw == 20 and not action.jab:
 		data = CREATURES.new().damage_protection(data)
-	var sequence: int = action.sequence
-	var text := "%s hits %s for %d damage after protection. Raw Rolls #%d and #%d." % [str(action.name), str(action.label), lost, sequence, result.sequence]
+	var text := "%s hits %s for %d damage after protection. " % [str(action.name), str(action.label), lost]
 	if action.get("free_attack", false):
 		text += " The enemy gains a free attack; resolve it from its sheet."
 	if str(action.special) == "sacred-shepherds-crook" and action.faithless_human:
@@ -363,7 +416,7 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	if poisoned:
 		text += " The snake-skin gift: damage die 1; the target dies immediately from poison."
 	if action.automatic_hit:
-		text = "%s hits %s for %d damage after protection. This attack always hits. Raw Roll #%d." % [str(action.name), str(action.label), lost, result.sequence]
+		text = "%s hits %s for %d damage after protection. This attack always hits. " % [str(action.name), str(action.label), lost]
 	if str(action.damage).ends_with("d2") or str(action.protection).ends_with("d2"):
 		text += " d2 uses each physical d4 halved, rounded up."
 	if action.raw == 20 and not action.jab:
@@ -373,8 +426,7 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 func _fumble(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor) -> Dictionary:
 	var current: Dictionary = source.data
 	if action.natural or str(current.get("schema", "")) == "mork-borg-adversary/v1":
-		var roll_sequence: int = action.sequence
-		return _complete(context, action, [], "Fumble", "%s: fumble. The GM determines the consequence. Natural 1; Raw Roll #%d." % [str(action.name), roll_sequence] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
+		return _complete(context, action, [], "Fumble", "%s: fumble. The GM determines the consequence. Natural 1." % [str(action.name)] + (" The enemy gains a free attack; resolve it from its sheet." if action.get("free_attack", false) else ""))
 	var data: Dictionary = current.duplicate(true)
 	var items := _inventory(source.id, data)
 	var item := _weapon(items, action.item)
@@ -393,22 +445,24 @@ func _fumble(context: SDK.SystemActionContext, action: Dictionary, source: SDK.A
 		item["broken"] = true
 		item["equipped"] = false
 	data["inventory"] = items
-	var sequence: int = action.sequence
-	return _complete(context, action, [SDK.ActorChange.new(source.id, data)], "Fumble", "%s: %s %s. Natural 1; Raw Roll #%d." % [str(action.name), str(action.weapon), "lost" if action.fumble == "lose" else "broken", sequence])
+	return _complete(context, action, [SDK.ActorChange.new(source.id, data)], "Fumble", "%s: %s %s. Natural 1." % [str(action.name), str(action.weapon), "lost" if action.fumble == "lose" else "broken"])
 
 func _complete(context: SDK.SystemActionContext, action: Dictionary, changes: Array[SDK.ActorChange], outcome: String, text: String) -> Dictionary:
 	var report := SDK.ActionLogMessage.new("%s · %s attack" % [str(action.name), str(action.weapon)])
 	report.text = [SDK.ActionLogText.new(text)]
 	report.result = outcome
-	var saved := BROKEN.new().commit(context, changes, report)
+	var saved := BROKEN.new().commit(context, changes, report, int(action.get("log_sequence", 0)))
 	if not saved.ok:
 		return _end(context, action)
 	action.state = "resolved"
 	action.message = text
 	return _public(action)
 
+func creature_source_data(data: Dictionary) -> bool:
+	return str(data.get("schema", "")) == "mork-borg-adversary/v1"
+
 func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
-	if action.state != "pending":
+	if not action.state in ["pending", "fumble"]:
 		return _public(action)
 	action.state = "ended"
 	action.message = ENDED
@@ -417,11 +471,11 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	report.text = [SDK.ActionLogText.new(ENDED)]
 	report.result = "ENDED"
 	report.tone = "attention"
-	BROKEN.new().commit(context, [], report)
+	BROKEN.new().commit(context, [], report, int(action.get("log_sequence", 0)))
 	return _public(action)
 
 func _public(action: Dictionary) -> Dictionary:
-	return {"state": action.state, "message": action.message, "request": action.request}
+	return {"initiator": str(action.get("participant", "")), "id": str(action.get("id", "")), "source": str(action.get("source", "")), "weapon": str(action.get("weapon", "")), "character": str(action.get("name", "")), "state": action.state, "message": action.message, "request": action.request}
 
 func _error(message: String) -> Dictionary:
 	return {"state": "error", "message": message}
@@ -526,10 +580,9 @@ func _spend_ammunition(context: SDK.SystemActionContext, action: Dictionary, sou
 		resource["quantity"] = remaining - 1
 	data["inventory"] = items
 	var report := SDK.ActionLogMessage.new("Ammunition used")
-	var sequence: int = action.sequence
-	report.text = [SDK.ActionLogText.new("%s fired one %s. Raw Roll #%d." % [str(action.name), str(action.ammunition_kind), sequence])]
+	report.text = [SDK.ActionLogText.new("%s fired one %s." % [str(action.name), str(action.ammunition_kind)])]
 	report.result = "1 spent"
-	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report)
+	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report, int(action.get("log_sequence", 0)))
 	if not saved.ok:
 		return false
 	action.resource_spent = true
@@ -572,69 +625,7 @@ func _eurekia(context: SDK.SystemActionContext, action: Dictionary, source: SDK.
 	data["inventory"] = items
 	var report := SDK.ActionLogMessage.new("Eurekia")
 	report.text = [SDK.ActionLogText.new(text)]
-	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report).ok:
-		return false
-	source.data = data
-	return true
-
-
-## A recipient-free tabletop action always requests damage after its attack.
-## Raw rolls and source ammunition remain ordinary authority-owned operations;
-## all hit, fumble, protection and recipient adjudication stays with the table.
-func _request_tabletop_damage(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
-	var terms: Array[SDK.DiceTerm] = [_dice(str(action.damage), "Damage")]
-	if str(action.special) in ["brown-scimitar-of-galgenbeck", "shoe-of-deaths-horse"]:
-		terms.append(SDK.DiceTerm.new("Special consequence", 6))
-	action.phase = "damage"
-	action.request = context.new_request_id()
-	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.request, action.owner, terms))
-	if not requested.ok:
-		return _end(context, action)
-	action.message = "Attack rolled. Waiting for damage in the Dice Tray."
-	return _public(action)
-
-func _tabletop_damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.HumanThrowResult) -> Dictionary:
-	var damage := 0
-	for value in result.terms[0].results:
-		damage += _face_value(str(action.damage), value)
-	if str(action.damage).contains("+"):
-		damage += int(str(action.damage).split("+")[1])
-	if action.jab:
-		damage += 3
-	var text := "%s · %s: d20 %d %+d = %d; damage %s = %d. Raw Rolls #%d and #%d. Resolve the attack and damage at the table." % [str(action.name), str(action.weapon), int(action.raw), int(action.modifier), int(action.raw) + int(action.modifier), str(action.damage), damage, int(action.sequence), result.sequence]
-	if int(action.raw) == 1:
-		text += " Natural 1: determine the fumble with the table."
-	elif int(action.raw) == 20:
-		text += " Natural 20: determine critical damage with the table."
-	if str(action.damage).ends_with("d2"):
-		text += " d2 uses each physical d4 halved, rounded up."
-	var attack_consequence: Dictionary = action.get("attack_consequence", {})
-	if not attack_consequence.is_empty():
-		text += " %s: %d." % [str(attack_consequence.name), int(attack_consequence.face)]
-	if result.terms.size() > 1:
-		text += " Special consequence: %d." % result.terms[-1].results[0]
-	return _complete(context, action, [], "Attack and damage", text)
-
-
-## Drawing is the source's once-per-combat resource; its consequence die remains
-## a table ruling when there is no recipient. A drawn sword stays usable.
-func _draw_eurekia(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor) -> bool:
-	var current: Dictionary = source.data
-	var data := CREATURES.new().stat_block(current)
-	var items := _inventory(source.id, data)
-	var item := _weapon(items, str(action.item))
-	if item.is_empty():
-		return false
-	if item.get("drawn", false):
-		return true
-	if int(item.get("uses", 0)) < 1:
-		return false
-	item["uses"] = int(item.uses) - 1
-	item["drawn"] = true
-	data["inventory"] = items
-	var report := SDK.ActionLogMessage.new("Eurekia")
-	report.text = [SDK.ActionLogText.new("Eurekia drawn for this combat. Reset its remaining draw manually for a later combat.")]
-	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report).ok:
+	if not BROKEN.new().commit(context, [SDK.ActorChange.new(source.id, data)], report, int(action.get("log_sequence", 0))).ok:
 		return false
 	source.data = data
 	return true

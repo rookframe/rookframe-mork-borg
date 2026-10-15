@@ -49,25 +49,27 @@ func ready() -> void:
 	sdk.character_hud.context_changed.connect(_refresh)
 	sdk.world_changed.connect(_refresh)
 	resized.connect(_resized)
+	_panel.reaction_changed.connect(_leaf_reaction)
+	_panel.settled.connect(_panel_settled)
 	get_node("Bar/Dice").pressed.connect(_open_dice)
 	get_node("Bar/Dice").accessibility_name = sdk.translations.text("Dice")
 	get_node("Bar/Identity").pressed.connect(_open_sheet)
 	get_node("Bar/Health").pressed.connect(_open_category.bind("Hit points"))
-	get_node("Panel/Header/Close").pressed.connect(_close_panel)
-	get_node("Panel/Header/ShowAll").toggled.connect(_toggle_all)
-	get_node("Panel/Header/ShowAll").text = sdk.translations.text("Show all")
-	get_node("Panel/Footer/Previous").pressed.connect(_change_page.bind(-1))
-	get_node("Panel/Footer/Next").pressed.connect(_change_page.bind(1))
-	get_node("Panel/Search").text_changed.connect(_search_changed)
-	get_node("Panel/Search").placeholder_text = sdk.translations.text("Find a creature…")
-	get_node("Panel/Search").accessibility_name = sdk.translations.text("Find a creature…")
-	get_node("Panel/Health/Amount").text_changed.connect(_amount_changed)
-	get_node("Panel/Health/Amount").accessibility_name = sdk.translations.text("Amount")
-	get_node("Panel/Health/AmountLabel").text = sdk.translations.text("Amount")
-	get_node("Panel/Health/Minus").pressed.connect(_step_amount.bind(-1))
-	get_node("Panel/Health/Plus").pressed.connect(_step_amount.bind(1))
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Close").pressed.connect(_close_panel)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").toggled.connect(_toggle_all)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").text = sdk.translations.text("Show all")
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Previous").pressed.connect(_change_page.bind(-1))
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Next").pressed.connect(_change_page.bind(1))
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").text_changed.connect(_search_changed)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").placeholder_text = sdk.translations.text("Find a creature…")
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").accessibility_name = sdk.translations.text("Find a creature…")
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text_changed.connect(_amount_changed)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").accessibility_name = sdk.translations.text("Amount")
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/AmountLabel").text = sdk.translations.text("Amount")
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Minus").pressed.connect(_step_amount.bind(-1))
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Plus").pressed.connect(_step_amount.bind(1))
 	for operation in ["damage", "heal", "set"]:
-		var button: Button = get_node("Panel/Health/" + operation)
+		var button: Button = get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/" + operation)
 		button.pressed.connect(_adjust_hp.bind(operation))
 		var label: String = {"damage": "Damage", "heal": "Heal", "set": "Set HP"}.get(operation)
 		(button.get_node("Title") as Label).text = sdk.translations.text(label)
@@ -78,7 +80,7 @@ func ready() -> void:
 		(button.get_node("Title") as Label).text = sdk.translations.text(category)
 		(button.get_node("Icon") as TextureRect).texture = MODEL.ICONS.get(category)
 		(button.get_node("Icon") as TextureRect).modulate = PICTOGRAM
-	for path in ["Panel/Header/Close", "Panel/Footer/Previous", "Panel/Footer/Next", "Panel/Health/Minus", "Panel/Health/Plus"]:
+	for path in ["Panel/Surface/Viewport/Root/Ink/Content/Header/Close", "Panel/Surface/Viewport/Root/Ink/Content/Footer/Previous", "Panel/Surface/Viewport/Root/Ink/Content/Footer/Next", "Panel/Surface/Viewport/Root/Ink/Content/Health/Minus", "Panel/Surface/Viewport/Root/Ink/Content/Health/Plus"]:
 		var button: Button = get_node(path)
 		button.accessibility_name = sdk.translations.text(button.accessibility_name)
 	_style()
@@ -126,9 +128,16 @@ func _refresh() -> void:
 	get_node("Bar/Health").tooltip_text = _model.hp(_data)
 	get_node("Bar/Health/Track").value = clampf(float(_data.get("hit_points", 0)) / maxf(1.0, float(_data.get("maximum_hit_points", 0))) * 100.0, 0.0, 100.0)
 	visible = true
+	_layout()
 	_queue_render()
 
 func _resized() -> void:
+	if sdk != null:
+		var experience := sdk.presentation_experience()
+		if _phone != experience.is_phone or _tablet != experience.is_tablet:
+			_phone = experience.is_phone
+			_tablet = experience.is_tablet
+			_style()
 	_layout()
 	_queue_render()
 
@@ -138,26 +147,32 @@ func _queue_render() -> void:
 		_render_panel.call_deferred()
 
 func _open_category(category: String) -> void:
-	if _category == category and _panel.visible:
+	if _category == category and _panel.is_open:
 		_close_panel()
 		return
 	_category = category
 	_page = 0
 	_panel_anchor = get_node("Bar/Health") if category == "Hit points" else get_node("Bar/Categories/" + category)
-	_panel.visible = true
-	get_node("Panel/Search").text = ""
+	_panel.set_open(true)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").text = ""
 	_render_panel()
-	_panel.grab_focus()
-	if category == "Hit points":
-		get_node("Panel/Health/Amount").grab_focus()
-	elif category == "Scene":
-		get_node("Panel/Search").grab_focus()
+
+func _panel_settled(open: bool) -> void:
+	if open:
+		_focus_panel.call_deferred()
+
+func _focus_panel() -> void:
+	if not _panel.is_open: return
+	if _category == "Hit points":
+		get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").grab_focus()
+	elif _category == "Scene":
+		get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").grab_focus()
 
 func _close_panel() -> void:
-	if _panel.visible and _panel_anchor != null and _panel_anchor.is_visible_in_tree():
+	if _panel.is_open and _panel_anchor != null and _panel_anchor.is_visible_in_tree():
 		_panel_anchor.grab_focus()
 	_category = ""
-	_panel.visible = false
+	_panel.set_open(false)
 	get_node("Bar/Health").set_pressed_no_signal(false)
 	for category in CREATURE_CATEGORIES:
 		var button: Button = get_node("Bar/Categories/" + category)
@@ -179,26 +194,26 @@ func _change_page(direction: int) -> void:
 
 func _render_panel() -> void:
 	_render_queued = false
-	if not _panel.visible or _actor == null:
+	if not _panel.is_open or _actor == null:
 		return
 	var hp := _category == "Hit points"
 	get_node("Bar/Health").set_pressed_no_signal(hp)
 	var scene := _category == "Scene"
 	var attacks := _category == "Attacks"
-	get_node("Panel/Header/Title").text = sdk.translations.text(_category)
-	get_node("Panel/Header/ShowAll").visible = attacks
-	get_node("Panel/Header/CurrentHP").visible = hp
-	get_node("Panel/Header/CurrentHP").text = _model.hp(_data)
-	get_node("Panel/Header/ShowAll").set_pressed_no_signal(_show_all)
-	get_node("Panel/Search").visible = scene
-	get_node("Panel/Health").visible = hp
-	get_node("Panel/Detail").visible = false
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Title").text = sdk.translations.text(_category)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").visible = attacks
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/CurrentHP").visible = hp
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/CurrentHP").text = _model.hp(_data)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").set_pressed_no_signal(_show_all)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").visible = scene
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health").visible = hp
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible = false
 	_more.visible = false
 	for category in CREATURE_CATEGORIES:
 		var button: Button = get_node("Bar/Categories/" + category)
 		button.set_pressed_no_signal(category == _category)
 		_category_colors(button, category == _category)
-	var entries: Array[ENTRY] = _model.roster(_rook, get_node("Panel/Search").text) if scene else _model.entries(_data, _category, _roll.pending)
+	var entries: Array[ENTRY] = _model.roster(_rook, get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").text) if scene else _model.entries(_data, _category, _roll.pending)
 	var filtered: Array[ENTRY] = []
 	for entry in entries:
 		if not attacks or _show_all or entry.favorite:
@@ -207,7 +222,7 @@ func _render_panel() -> void:
 	var used := 0.0
 	var maximum := 2 if _phone else 4
 	# Measure real font wrapping before pagination, reserving the navigation row.
-	var available: float = _bar.position.y - (44 if _phone else 52 if _tablet else 64) - (52 if scene else 0) - 44 - 38
+	var available: float = _bar.position.y - (52 if _phone else 60 if _tablet else 68) - (52 if scene else 0) - 44 - 38
 	for entry in filtered:
 		var height := _entry_height(entry, attacks, scene)
 		if not pages[-1].is_empty() and (pages[-1].size() >= maximum or used + height > available):
@@ -221,13 +236,13 @@ func _render_panel() -> void:
 	for entry in current_page:
 		_page_entries.append(entry)
 	_list.visible = not hp and not filtered.is_empty()
-	get_node("Panel/Empty").visible = not hp and filtered.is_empty()
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty").visible = not hp and filtered.is_empty()
 	var empty: String = {"Attacks": "No attacks", "Special": "No special actions", "Scene": "No matching creatures"}.get(_category, "No entries")
-	get_node("Panel/Empty/Title").text = sdk.translations.text("No favorites · enable Show all" if attacks and not entries.is_empty() else empty)
-	get_node("Panel/Footer").visible = not hp and pages.size() > 1
-	get_node("Panel/Footer/Page").text = "%s / %s" % [_page+1, pages.size()]
-	get_node("Panel/Footer/Previous").disabled = _page == 0
-	get_node("Panel/Footer/Next").disabled = _page == pages.size()-1
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty/Title").text = sdk.translations.text("No favorites · enable Show all" if attacks and not entries.is_empty() else empty)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer").visible = not hp and pages.size() > 1
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Page").text = "%s / %s" % [_page+1, pages.size()]
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Previous").disabled = _page == 0
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Next").disabled = _page == pages.size()-1
 	for index in range(_rows.size()):
 		var row = _rows[index]
 		row.visible = not hp and index < _page_entries.size()
@@ -239,7 +254,6 @@ func _render_panel() -> void:
 		row.custom_minimum_size = Vector2(0, height)
 		row.get_node("Launch").custom_minimum_size = Vector2(0, height)
 		row.get_node("Launch").tooltip_text = entry.title
-		row.get_node("Launch/Content/Copy/Title").max_lines_visible = 3 if scene else 2
 		if scene:
 			row.get_node("Launch/Content/Icon").modulate = Color(1, 1, 1, 1)
 		row.separator = index < _page_entries.size()-1
@@ -252,22 +266,22 @@ func _render_panel() -> void:
 
 func _entry_height(entry: ENTRY, attacks: bool, scene: bool) -> float:
 	var width := (380 if _phone else 430 if _tablet else 510) - (26 if _phone else 34 if _tablet else 42)
-	var title_size := 18 if _phone else 20 if _tablet else 22
-	var value_size := 18 if _phone else 17 if _tablet else 21
+	var title_size := 18 if _phone else 22 if _tablet else 26
+	var value_size := 18 if _phone else 21 if _tablet else 26
 	var measure_value: Label = get_node("MeasureValue")
 	_type(measure_value, value_size, 1.25)
 	measure_value.text = entry.value
 	var value_width := measure_value.get_minimum_size().x + (8 if not entry.value.is_empty() else 0)
-	var text_width: float = width - (16 if _phone else 20 if _tablet else 24) - (24 if _phone else 26 if _tablet else 30) - (20 if _phone else 24 if _tablet else 32) - value_width - (44 if attacks else 0)
+	var text_width: float = width - (16 if _phone else 20 if _tablet else 24) - (24 if _phone else 26 if _tablet else 34) - (20 if _phone else 24 if _tablet else 32) - value_width - (44 if attacks else 0)
 	var measure_title: Label = get_node("MeasureTitle")
-	_type(measure_title, title_size, 1.25 if _phone else 1.35)
+	_type(measure_title, title_size, 1.25 if _phone else 1.15)
 	measure_title.size = Vector2(maxf(40, text_width), 0)
 	measure_title.text = entry.title
 	var lines := measure_title.get_line_count()
 	var height: float = minf(lines, 3 if scene else 2) * (23 if _phone else 27 if _tablet else 30)
 	if not entry.detail.is_empty():
-		height += 19 if _phone else 22 if _tablet else 24
-	return maxf(58 if _phone else 64 if _tablet else 76, height + (12 if _phone else 16 if _tablet else 20)) + 1
+		height += 19 if _phone else 24 if _tablet else 27
+	return maxf(58 if _phone else 64 if _tablet else 70, height + (12 if _phone else 16)) + 1
 
 func _favorite_row(enabled: bool, index: int) -> void:
 	if index >= _page_entries.size() or _actor == null:
@@ -316,26 +330,26 @@ func _amount_changed(_text: String) -> void:
 	_layout_panel()
 
 func _step_amount(direction: int) -> void:
-	var parsed := HEALTH.new().integer(get_node("Panel/Health/Amount").text)
+	var parsed := HEALTH.new().integer(get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text)
 	var value: int = int(parsed.get("value", 0))
 	if direction > 0 and value == HEALTH.MAX_VALUE or direction < 0 and value == HEALTH.MIN_VALUE:
 		return
-	get_node("Panel/Health/Amount").text = str(value + direction)
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text = str(value + direction)
 	_amount_changed("")
 
 func _hp_result(operation: String) -> Dictionary:
-	var text: String = get_node("Panel/Health/Amount").text
+	var text: String = get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text
 	var amount := HEALTH.new().integer(text) if operation == "set" else HEALTH.new().amount(text)
 	return HEALTH.new().adjusted(_data, operation, int(amount.value)) if amount.ok else amount
 
 func _preview_hp() -> void:
-	var signed := HEALTH.new().integer(get_node("Panel/Health/Amount").text)
-	var error: Label = get_node("Panel/Health/Error")
+	var signed := HEALTH.new().integer(get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text)
+	var error: Label = get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Error")
 	error.visible = not signed.ok
 	error.text = sdk.translations.text(str(signed.get("message", "")))
 	for operation in ["damage", "heal", "set"]:
 		var result := _hp_result(operation)
-		var button: Button = get_node("Panel/Health/" + operation)
+		var button: Button = get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/" + operation)
 		button.disabled = _hp_pending or not result.ok or result.get("value") == _data.get("hit_points")
 		var preview := sdk.translations.text("%s → %s HP") % [str(_data.get("hit_points", 0)), str(result.value)] if result.ok else "—"
 		var preview_label: Label = button.get_node("Preview")
@@ -347,14 +361,14 @@ func _preview_hp() -> void:
 		icon.modulate = MUTED if button.disabled else PICTOGRAM
 		button.tooltip_text = sdk.translations.text(str(result.get("message", "")))
 		button.accessibility_name = (button.get_node("Title") as Label).text + " · " + preview
-	get_node("Panel/Health/Minus").disabled = _hp_pending
-	get_node("Panel/Health/Plus").disabled = _hp_pending
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Minus").disabled = _hp_pending
+	get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Plus").disabled = _hp_pending
 
 func _adjust_hp(operation: String) -> void:
 	if _actor == null or _hp_pending or not _hp_result(operation).ok:
 		return
 	var actor := _actor
-	var amount: String = get_node("Panel/Health/Amount").text
+	var amount: String = get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text
 	if _hp_request.get("actor", "") != actor.value or _hp_request.get("operation", "") != operation or _hp_request.get("amount", "") != amount:
 		_hp_request = {"id": sdk.dice.new_request_id(), "actor": actor.value, "operation": operation, "amount": amount}
 	var request := _hp_request.duplicate(true)
@@ -390,7 +404,7 @@ func _error(message: String) -> void:
 	sdk.feedback.error(feedback)
 
 func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree() or not _panel.visible:
+	if not is_visible_in_tree() or not _panel.is_open:
 		return
 	if event.is_action_pressed("ui_cancel"):
 		_close_panel()

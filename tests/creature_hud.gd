@@ -27,6 +27,7 @@ func _open(canvas: Vector2i) -> Dictionary:
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	hud.get_node("Panel").reduced_motion = true
 	return {"host": host, "hud": hud, "viewport": viewport}
 
 func _settle() -> void:
@@ -45,7 +46,7 @@ func test_native_hud_keeps_fixed_geometry_and_bounded_panels(width: int, height:
 	var fixture := _open(Vector2i(width, height))
 	var hud = fixture.hud
 	await _settle()
-	var expected := Rect2(56,293,732,68) if width == 844 else Rect2(48,656,928,88) if width == 1024 else Rect2(256,936,1408,120)
+	var expected := Rect2(150,274,544,98) if width == 844 else Rect2(167,630,690,114) if width == 1024 else Rect2(510,920,900,136)
 	assert_bool(hud.visible).is_true()
 	assert_vector(hud.get_node("Bar").position).is_equal(expected.position)
 	assert_vector(hud.get_node("Bar").size).is_equal(expected.size)
@@ -57,6 +58,7 @@ func test_native_hud_keeps_fixed_geometry_and_bounded_panels(width: int, height:
 		await _capture(fixture, "%d-%s" % [width, category.replace(" ", "-")])
 		assert_vector(hud.get_node("Bar").size).is_equal(expected.size)
 	for button: Control in hud.get_node("Bar/Categories").get_children():
+		if not button is Button: continue
 		assert_bool(button.size.x >= 44 and button.size.y >= 44).is_true()
 	hud._close_panel()
 	assert_bool(hud.get_node("Bar/Health").has_focus()).is_true()
@@ -72,10 +74,10 @@ func test_hp_composition_and_show_all_states_match_design(width: int, height: in
 	var health: Button = hud.get_node("Bar/Health")
 	assert_bool(health.button_pressed).is_false()
 	var divider: Control = health.get_node("Divider")
-	assert_bool(divider.is_visible_in_tree()).is_true()
-	assert_vector(divider.position).is_equal(Vector2(health.size.x-1, 0))
-	assert_vector(divider.size).is_equal(Vector2(1, health.size.y))
-	var all: CheckBox = hud.get_node("Panel/Header/ShowAll")
+	assert_bool(divider.is_visible_in_tree()).is_false()
+	assert_bool(hud.get_node("Bar/Identity").get_global_rect().encloses(health.get_global_rect())).is_true()
+	assert_float(health.size.y).is_greater_equal(44.0)
+	var all: CheckBox = hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll")
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
 		assert_bool(all.get_theme_color(state).is_equal_approx(hud.MUTED)).override_failure_message("Show all %s must use secondary text" % state).is_true()
 	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
@@ -88,42 +90,65 @@ func test_hp_composition_and_show_all_states_match_design(width: int, height: in
 	hud._open_category("Hit points")
 	await _settle()
 	assert_bool(health.button_pressed).is_true()
-	assert_bool((health.get_theme_stylebox("pressed") as StyleBoxFlat).bg_color.is_equal_approx(hud.RAISED)).is_true()
-	var current: Label = hud.get_node("Panel/Header/CurrentHP")
+	assert_float((health.get_theme_stylebox("pressed") as StyleBoxFlat).bg_color.a).is_less_equal(0.25)
+	var current: Label = hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/CurrentHP")
 	assert_bool(current.is_visible_in_tree()).is_true()
 	assert_str(current.text).is_equal("15 / 15 HP")
 	assert_float(current.size.x).is_greater_equal(65.0)
-	assert_bool(hud.get_node("Panel/Header").get_global_rect().encloses(current.get_global_rect())).is_true()
-	assert_float(hud.get_node("Panel/Health/Amount").size.x).is_equal(80.0 if width == 844 else 96.0)
+	assert_bool(hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Header").get_global_rect().encloses(current.get_global_rect())).is_true()
+	assert_float(hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").size.x).is_equal(80.0 if width == 844 else 96.0)
 	for operation in ["damage", "heal", "set"]:
-		var button: Button = hud.get_node("Panel/Health/" + operation)
+		var button: Button = hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/" + operation)
 		assert_bool(button.has_node("Icon")).override_failure_message("HP action must include its approved pictogram").is_true()
 		assert_str(button.get_node("Preview").text).contains("15 → ")
 	await _capture(fixture, "%d-health-design" % width)
 	hud._close_panel()
 	assert_bool(health.button_pressed).is_false()
 
-func test_hp_divider_remains_visible_at_development_window_scale() -> void:
-	if DisplayServer.get_name() == "headless":
-		return
-	var fixture := _open(Vector2i(1920, 1080))
-	var hud = fixture.hud
-	fixture.viewport.size = Vector2i(1742, 979)
-	fixture.viewport.size_2d_override = Vector2i(1921, 1080)
-	fixture.viewport.size_2d_override_stretch = true
+func test_health_action_stays_clear_of_the_stepped_edge(width: int, height: int, _test_parameters := [[1920,1080],[1024,768],[844,390]]) -> void:
+	var fixture := _open(Vector2i(width,height))
 	await _settle()
-	RenderingServer.force_draw(false)
-	var rendered: Image = fixture.viewport.get_texture().get_image()
-	var hp: Rect2 = hud.get_node("Bar/Health").get_global_rect()
-	var stretch := Vector2(1742.0/1921.0, 979.0/1080.0)
-	hp = Rect2(hp.position * stretch, hp.size * stretch)
-	# Check the rendered rule, including the fractional scale used by the Game tab.
-	for y in range(int(hp.position.y)+12, int(hp.end.y)-12):
-		var brightest := 0.0
-		for x in range(int(hp.end.x)-2, int(hp.end.x)+1):
-			brightest = maxf(brightest, rendered.get_pixel(x, y).g)
-		assert_float(brightest).override_failure_message("HP divider is missing at rendered row %d" % y).is_greater(0.20)
-	await _capture(fixture, "1742-hp-divider")
+	var identity: Control = fixture.hud.get_node("Bar/Identity")
+	var health: Control = fixture.hud.get_node("Bar/Health")
+	assert_bool(identity.get_global_rect().encloses(health.get_global_rect())).is_true()
+	assert_float(identity.get_global_rect().end.x-health.get_global_rect().end.x).is_greater_equal(38.0)
+	assert_float(identity.get_global_rect().end.y-health.get_global_rect().end.y).is_greater_equal(6.0)
+	await _capture(fixture, "%d-closed" % width)
+
+func test_leaf_focus_reaches_native_health_and_search_fields(reduced: bool, _test_parameters := [[false],[true]]) -> void:
+	var fixture := _open(Vector2i(1024,768))
+	var hud = fixture.hud
+	var panel = hud.get_node("Panel")
+	panel.reduced_motion = reduced
+	await _settle()
+	for category in ["Hit points", "Scene"]:
+		hud._open_category(category)
+		await get_tree().create_timer(1.0).timeout
+		var field: LineEdit = panel.get_content().get_node("Health/Amount" if category == "Hit points" else "Search")
+		assert_object(field.get_viewport().gui_get_focus_owner()).is_same(field)
+		var event := InputEventKey.new()
+		event.keycode = KEY_2
+		event.unicode = 50
+		event.pressed = true
+		fixture.viewport.push_input(event, true)
+		await _settle()
+		assert_str(field.text).contains("2")
+		hud._close_panel()
+		await _settle()
+		assert_bool(panel.get_node("Bindings").is_visible_in_tree()).is_true()
+
+func test_resizing_preserves_creature_panel_and_refreshes_experience() -> void:
+	var fixture := _open(Vector2i(1920,1080))
+	await _settle()
+	fixture.hud._open_category("Scene")
+	for canvas in [Vector2i(844,390),Vector2i(1024,768),Vector2i(1920,1080)]:
+		fixture.host.device = 2 if canvas.x == 844 else 1 if canvas.x == 1024 else 0
+		fixture.viewport.size = canvas
+		await _settle()
+		assert_bool(fixture.hud._phone).is_equal(canvas.x == 844)
+		assert_bool(fixture.hud._tablet).is_equal(canvas.x == 1024)
+		assert_bool(fixture.hud.get_node("Panel").is_open).is_true()
+		assert_bool(fixture.hud.get_global_rect().encloses(fixture.hud.get_node("Panel").get_global_rect())).is_true()
 
 func test_special_announces_once_without_rule_effects_and_validates_current_actor() -> void:
 	var host := _host()
@@ -133,9 +158,14 @@ func test_special_announces_once_without_rule_effects_and_validates_current_acto
 	var result := await sdk.system_actions.submit("creature-hud.special", request)
 	assert_bool(result.value.ok).is_true()
 	assert_int(host.reports.size()).is_equal(1)
+	assert_int(host.announcements.size()).is_equal(1)
 	assert_str(host.reports[0].text[0].text).is_equal("The Lich, Tired uses Scroll theft")
 	await sdk.system_actions.submit("creature-hud.special", request)
 	assert_int(host.reports.size()).is_equal(1)
+	assert_int(host.announcements.size()).is_equal(1)
+	assert_str(host.announcements[0].caption).is_equal("Uses Scroll theft")
+	assert_int(host.announcements[0].logSequence).is_equal(1)
+	assert_array(host.announcements[0].results).is_empty()
 	assert_dict(host.actors).is_equal(before)
 	assert_dict(host.requests).is_empty()
 	request.id = "special-two"
@@ -155,6 +185,7 @@ func test_special_announces_once_without_rule_effects_and_validates_current_acto
 	result = await sdk.system_actions.submit("creature-hud.special", request)
 	assert_bool(result.value.ok).is_false()
 	assert_int(host.reports.size()).is_equal(1)
+	assert_int(host.announcements.size()).is_equal(1)
 
 func test_hp_set_keeps_signed_uncapped_values_and_retries_do_not_rewind_newer_hp() -> void:
 	var host := _host()
@@ -195,7 +226,7 @@ func test_scene_selection_and_local_favorites_preserve_actor_target_and_action_i
 	hud._open_category("Scene")
 	for entry in hud._page_entries:
 		assert_bool(entry.detail in ["", "Selected"]).override_failure_message("Scene rows must not include locations or coordinates").is_true()
-	hud.get_node("Panel/Search").text = "Bowyer"
+	hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Search").text = "Bowyer"
 	hud._search_changed("Bowyer")
 	assert_int(hud._page_entries.size()).is_equal(1)
 	hud._launch_row(0)
@@ -208,10 +239,10 @@ func test_scene_selection_and_local_favorites_preserve_actor_target_and_action_i
 	await _settle()
 	assert_str(host.reports[0].text[0].text).is_equal("The Bone Bowyer uses Ambush")
 	hud._open_category("Hit points")
-	hud.get_node("Panel/Health/Amount").text = "-3"
+	hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/Amount").text = "-3"
 	hud._amount_changed("-3")
-	assert_bool(hud.get_node("Panel/Health/damage").disabled).is_true()
-	assert_bool(hud.get_node("Panel/Health/set").disabled).is_false()
+	assert_bool(hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/damage").disabled).is_true()
+	assert_bool(hud.get_node("Panel/Surface/Viewport/Root/Ink/Content/Health/set").disabled).is_false()
 	host.defer_reply = true
 	hud._adjust_hp("set")
 	host.SelectRook("hero-rook")
@@ -260,3 +291,34 @@ func test_shared_hud_switches_between_creature_character_and_no_selection() -> v
 	host.emit_signal("CharacterHudContextChanged")
 	await _settle()
 	assert_bool(hud.visible and creature.visible and not hero.visible).is_true()
+
+func test_scene_names_use_measured_three_line_rows_on_every_page(width: int, height: int, _test_parameters := [[1920,1080],[1024,768],[844,390]]) -> void:
+	var fixture := _open(Vector2i(width,height))
+	for index in range(12):
+		var id := "roster-%02d" % index
+		var data: Dictionary = load(ROOT+"content/bone-bowyer.tres").create_data({"name": "Bone Bowyer %02d, guardian of the northern catacombs" % index})
+		fixture.host.actors[id] = {"id": id, "access_level": "Owner", "public_label": "", "data": data}
+		fixture.host.rooks[id+"-rook"] = id
+	await _settle()
+	fixture.hud._open_category("Checks")
+	fixture.hud._launch_row(0)
+	await _settle()
+	assert_bool(fixture.hud._roll.pending).is_true()
+	fixture.hud._open_category("Scene")
+	for page in range(3):
+		await _settle()
+		var layout_errors: Array[String] = []
+		# A pending check refreshes the HUD every quarter second. Names must remain
+		# fully laid out between refreshes, not flicker or cross their separator.
+		for sample in range(10):
+			await get_tree().create_timer(0.05).timeout
+			for row in fixture.hud._rows:
+				if not row.visible: continue
+				var title: Label = row.get_node("Launch/Content/Copy/Title")
+				if title.get_visible_line_count() != mini(3,title.get_line_count()) or not row.get_global_rect().encloses(title.get_global_rect()):
+					if not title.text in layout_errors: layout_errors.append(title.text)
+		assert_array(layout_errors).override_failure_message("Page %d names must stay readable inside their rows during a pending roll: %s" % [page,layout_errors]).is_empty()
+		await _capture(fixture, "%d-long-scene-%d" % [width,page])
+		fixture.hud._change_page(1)
+	await fixture.hud._roll._action.cancel()
+	await _settle()

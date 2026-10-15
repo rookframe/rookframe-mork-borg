@@ -99,7 +99,7 @@ func test_eurekia_destroys_sword_and_records_hamfund_death_on_one_even_on_miss()
 	assert_str(result.value.state).is_equal("resolved")
 	assert_int(host.actors.hero.data.inventory[0].quantity).is_equal(0)
 	assert_bool(host.actors.hero.data.companion_sheets[0].slain).is_true()
-	assert_str(str(host.reports)).contains("Hamfund").contains("vanishes")
+	assert_str(str(host.report_steps)).contains("Hamfund").contains("vanishes")
 
 func test_eurekia_vanish_on_fumble_does_not_restore_sword_from_stale_snapshot() -> void:
 	var host := BOUNDARY.new()

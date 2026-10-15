@@ -1,4 +1,5 @@
 extends RefCounted
+## Encounter updates are recorded history; the encounter UI presents the current turn. Do not replace a recent dice announcement on every turn change.
 
 ## Encounter guidance is current World data. No action, effect or time processing.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"

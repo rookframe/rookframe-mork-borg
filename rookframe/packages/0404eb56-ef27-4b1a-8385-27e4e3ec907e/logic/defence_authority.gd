@@ -1,4 +1,5 @@
 extends RefCounted
+## Defence consequences and cancellation are recorded history. Shield decisions stay in the action window; accepted physical Rolls announce through Rookframe.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
@@ -51,18 +52,13 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 		if not defender:
 			return _error("The defending Player chooses and rolls their defence.")
 		if action.state == "ready":
-			if typeof(input.get("difficulty", 0)) != TYPE_INT or typeof(input.get("modifier", 0)) != TYPE_INT:
-				return _retry(action, "Enter whole numbers for difficulty and modifier.")
-			var override_dr: int = input.get("difficulty", 0)
-			var modifier: int = input.get("modifier", 0)
-			if override_dr < 0 or override_dr > 30 or modifier < -20 or modifier > 20:
-				return _retry(action, "Choose source difficulty (0) or 1–30, and a modifier from −20 to +20.")
-			if override_dr > 0:
-				action["difficulty"] = override_dr
-			action["modifier"] = modifier
 			if action.automatic_hit:
 				return _request_damage(context, action)
-			var requested := context.request_throw(SDK.HumanThrowRequest.new(id, action.owner, [SDK.DiceTerm.new("Defence", 20)]))
+			var request := SDK.HumanThrowRequest.new(id, action.owner, [SDK.DiceTerm.new("Defence", 20)])
+			request.base_modifier = int(action.agility)
+			request.allow_modifier = true
+			request.log_sequence = int(action.log_sequence)
+			var requested := context.request_throw(request)
 			if not requested.ok:
 				return _end(context, action)
 			action["state"] = "pending"
@@ -76,18 +72,16 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 			if action.phase == "damage":
 				return _damage_rolled(context, action, result)
 			var raw: int = result.terms[0].results[0]
-			var modifier: int = action.modifier
-			var agility: int = action.agility
-			agility += modifier
+			var agility: int = result.modifier
 			var difficulty: int = action.difficulty
 			if raw != 1 and (raw == 20 or raw + agility >= difficulty):
 				var report := SDK.ActionLogMessage.new("Defence")
 				report.result = "Free attack" if raw == 20 else "Defended"
-				var text := "%s defends against %s. d20 %d %+d. Raw Roll #%d." % [str(action.character), str(action.attacker), raw, agility, result.sequence]
+				var text := "%s defends against %s." % [str(action.character), str(action.attacker)]
 				if raw == 20:
 					text += " Natural 20: gain a free attack. Choose an equipped weapon in Inventory."
 				report.text = [SDK.ActionLogText.new(text)]
-				var saved := BROKEN.new().commit(context, [], report)
+				var saved := BROKEN.new().commit(context, [], report, int(action.get("log_sequence", 0)))
 				if not saved.ok:
 					return _end(context, action)
 				action["state"] = "resolved"
@@ -159,10 +153,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var captured_target_rook := ""
 	for target_rook_id in target_rooks:
 		captured_target_rook = str(target_rook_id)
-	var action := {"id": input.id, "source": input.source, "rook": str(input.get("rook", "")), "target_rook": captured_target_rook, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new().attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	var action := {"id": input.id, "source": input.source, "rook": str(input.get("rook", "")), "target_rook": captured_target_rook, "reach": float(attack.range_feet) * 0.3048, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new().attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
 	if creature_target:
 		var source_dr: int = action.difficulty
-		action["difficulty"] = source_dr + CREATURES.new().defence_test_difficulty(data, input.get("piercing", false)) - 12
+		action["difficulty"] = source_dr + CREATURES.new().defence_test_difficulty(data, attack.get("piercing", false)) - 12
 	if not creature_target:
 		var base_dr := 12
 		for raw_item in _inventory(target.actor.id, data):
@@ -199,6 +193,13 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			action["shield"] = str(item.inventory_id)
 	if _dice(action.damage, "Damage") == null or (not str(action.protection).is_empty() and _dice(action.protection, "Protection") == null):
 		return _error("The attack or protection dice are unsupported.")
+	var report := SDK.ActionLogMessage.new("Creature attack · Defence")
+	report.text = [SDK.ActionLogText.new("%s attacks %s with %s." % [str(action.attacker), str(action.character), str(action.attack)])]
+	report.result = "In progress"
+	var logged := context.write_action_log(report)
+	if not logged.ok:
+		return _error(logged.message)
+	action["log_sequence"] = logged.sequence
 	_actions.append(action)
 	return _public(action)
 
@@ -241,7 +242,7 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 		var report := SDK.ActionLogMessage.new("Defence fumble")
 		report.result = "Protection reduced"
 		report.text = [SDK.ActionLogText.new("Natural 1: double damage; recorded protection reduced one tier.")]
-		var saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], report)
+		var saved := context.commit([SDK.ActorChange.new(target.actor.id, data)], report, int(action.get("log_sequence", 0)))
 		if saved.ok:
 			action["armor_damaged"] = true
 		return saved.ok
@@ -264,7 +265,7 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 		var report := SDK.ActionLogMessage.new("Defence fumble")
 		report.result = "Armor damaged"
 		report.text = [SDK.ActionLogText.new("Natural 1: double damage; armor reduced one tier. Strength and Agility penalties remain. Armor below tier 1 is ruined and cannot be repaired.")]
-		var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], report)
+		var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], report, int(action.get("log_sequence", 0)))
 		if saved.ok:
 			action["armor_damaged"] = true
 		return saved.ok
@@ -313,17 +314,15 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 	report.result = "Shield broken" if break_shield else "%d damage" % loss
 	var sequence: int = action.sequence
 	var damage_sequence: int = action.damage_sequence
-	var text := "%s takes %d damage from %s. Raw Roll #%d." % [str(action.character), loss, str(action.attacker), damage_sequence]
+	var text := "%s takes %d damage from %s." % [str(action.character), loss, str(action.attacker)]
 	if action.automatic_hit:
 		text += " This source attack always hits; no defence test."
-	else:
-		text += " Defence Raw Roll #%d." % sequence
 	if break_shield:
 		text += " Shield destroyed; attack damage ignored."
 	if str(action.damage).ends_with("d2") or str(action.protection).ends_with("d2"):
 		text += " d2 uses each physical d4 halved, rounded up."
 	report.text = [SDK.ActionLogText.new(text)]
-	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], report)
+	var saved := BROKEN.new().commit(context, [SDK.ActorChange.new(target.actor.id, data)], report, int(action.get("log_sequence", 0)))
 	if not saved.ok:
 		return _end(context, action)
 	action["state"] = "resolved"
@@ -355,7 +354,7 @@ func _end(context: SDK.SystemActionContext, action: Dictionary) -> Dictionary:
 	report.result = "ENDED"
 	report.tone = "attention"
 	report.text = [SDK.ActionLogText.new(ENDED)]
-	BROKEN.new().commit(context, [], report)
+	BROKEN.new().commit(context, [], report, int(action.get("log_sequence", 0)))
 	return _public(action)
 
 func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
@@ -379,7 +378,7 @@ func _alive(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 		return false
 	# Use the Authority's active-Scene distance, never local selection.
 	var spatial := context.distance(SDK.RookId.new(str(action.rook)), SDK.RookId.new(str(action.target_rook)))
-	if not spatial.ok:
+	if not spatial.ok or spatial.distance > float(action.reach) + 0.000001:
 		return false
 	var source := context.read_actor(SDK.ActorId.new(action.source))
 	var target := context.read_actor(SDK.ActorId.new(action.target))
@@ -410,7 +409,13 @@ func _request_damage(context: SDK.SystemActionContext, action: Dictionary) -> Di
 	if not str(action.protection).is_empty():
 		terms.append(_dice(action.protection, "Protection"))
 	action["request"] = context.new_request_id()
-	var requested := context.request_throw(SDK.HumanThrowRequest.new(action.request, action.owner, terms))
+	var report := SDK.ActionLogMessage.new("Defence")
+	report.result = "Hit"
+	report.text = [SDK.ActionLogText.new("%s hits %s." % [str(action.attacker), str(action.character)])]
+	context.update_action_log(int(action.log_sequence), report)
+	var request := SDK.HumanThrowRequest.new(action.request, action.owner, terms)
+	request.log_sequence = int(action.log_sequence)
+	var requested := context.request_throw(request)
 	if not requested.ok:
 		return _end(context, action)
 	action["state"] = "pending"

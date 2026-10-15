@@ -144,6 +144,8 @@ func _entry(row: Array) -> Dictionary:
 	var tier: int = row[8]
 	var reduction: String = row[9]
 	var uses: int = row[10]
+	if str(entry.kind) == "Weapon":
+		entry["piercing"] = str(entry.source_item_id) in ["shortsword", "knife", "spear", "bow", "shortbow", "crossbow"]
 	if not damage.is_empty():
 		entry["damage"] = damage
 	if weapon_range >= 0:

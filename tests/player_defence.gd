@@ -258,7 +258,7 @@ func test_breaking_one_shield_preserves_spares_and_refuses_overlapping_defence()
 	assert_bool(host.actors.hero.data.inventory[2].broken).is_true()
 	assert_int(host.actors.hero.data.hit_points).is_equal(7)
 
-func test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_current() -> void:
+func test_dr_input_cannot_override_target_rules_and_hp_preview_stays_current() -> void:
 	var host := BOUNDARY.new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
@@ -267,9 +267,9 @@ func test_invalid_options_can_be_corrected_or_cancelled_and_hp_preview_stays_cur
 	await sdk.system_actions.submit("defence.start", _attack("editable"))
 	host.as_player()
 	var invalid: SDK.DataResult = await sdk.system_actions.submit("defence.roll", {"id": "editable", "difficulty": 31})
-	assert_str(invalid.value.state).is_equal("ready")
-	assert_str(invalid.value.message).contains("1–30")
-	assert_bool(host.requests.is_empty()).is_true()
+	assert_str(invalid.value.state).is_equal("pending")
+	assert_int(invalid.value.difficulty).is_equal(14)
+	assert_bool(host.requests["editable"].result.allow_modifier).is_true()
 	await sdk.system_actions.submit("defence.roll", {"id": "editable", "difficulty": 0})
 	host.roll("editable", [2])
 	await sdk.system_actions.submit("defence.advance", {"id": "editable"})

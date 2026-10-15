@@ -60,7 +60,7 @@ func can_complete_followup(data: Dictionary) -> bool:
 		return not incident.get("treated", false)
 	return outcome in [1, 2] and int(data.get("hit_points", 1)) == 0 and not incident.get("recovered", false)
 
-func commit(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], report: SDK.ActionLogMessage = null) -> SDK.OperationResult:
+func commit(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], report: SDK.ActionLogMessage = null, log_sequence: int = 0) -> SDK.ActionLogResult:
 	var prepared: Array[SDK.ActorChange] = []
 	for change in changes:
 		if typeof(change.data) != TYPE_DICTIONARY:
@@ -71,7 +71,7 @@ func commit(context: SDK.SystemActionContext, changes: Array[SDK.ActorChange], r
 			prepared.append(SDK.ActorChange.new(change.actor, sync(source.actor.data, change.data)))
 		else:
 			prepared.append(change)
-	return context.commit(prepared, report)
+	return context.commit(prepared, report, log_sequence)
 
 func advance(current: Dictionary, operation: String) -> Dictionary:
 	var data := current.duplicate(true)

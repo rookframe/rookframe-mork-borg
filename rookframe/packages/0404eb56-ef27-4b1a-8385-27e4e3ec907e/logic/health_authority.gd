@@ -1,4 +1,5 @@
 extends RefCounted
+## Recovery, improvement and Broken consequences are recorded history. Required choices remain in the action window; physical Rolls announce through Rookframe.
 
 ## Bare Bones pp. 29, 31, 33, 49. Eligibility and delayed consequences stay at the table.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"

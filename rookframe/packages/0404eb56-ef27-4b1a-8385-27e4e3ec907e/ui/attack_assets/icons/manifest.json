@@ -1,0 +1,97 @@
+{
+  "changes": "Removed solid square background path. Original icon paths retained; colors and sizing applied using CSS masks.",
+  "icons": [
+    {
+      "license": "CC BY 3.0",
+      "sha256": "6d0ce27044a61e10f7289e9a5c545a3da5b44324e241274fcc5511722de6b1e4",
+      "file": "weapon",
+      "author": "lorc",
+      "icon": "broadsword",
+      "source": "https://game-icons.net/1x1/lorc/broadsword.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "4e0bc7e72fceacac9a2626963a8dd64ed82d6f1d58eaa4a87e31ddf7129198c6",
+      "file": "shield",
+      "author": "lorc",
+      "icon": "bordered-shield",
+      "source": "https://game-icons.net/1x1/lorc/bordered-shield.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "44aa88fdfd5507e2e7e992e8662be2aaa7348adaef967c5e190a6d618930f6b4",
+      "file": "target",
+      "author": "delapouite",
+      "icon": "crosshair",
+      "source": "https://game-icons.net/1x1/delapouite/crosshair.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "35a81a965f8529cba9d0a1972fe94c97477fd58f8ed9b0d7ae2f9754ea9f0ade",
+      "file": "retarget",
+      "author": "lorc",
+      "icon": "cycle",
+      "source": "https://game-icons.net/1x1/lorc/cycle.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "9439dfc494aa5b7ba7d6f5efd84a078656a158948f7f5c144fa49b06d7eff5d5",
+      "file": "close",
+      "author": "sbed",
+      "icon": "cancel",
+      "source": "https://game-icons.net/1x1/sbed/cancel.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "1707c9c9a5f0eedb454676da72f1557b801df03b2cbaa55aaecb2f026b3fbcbc",
+      "file": "d4",
+      "author": "skoll",
+      "icon": "d4",
+      "source": "https://game-icons.net/1x1/skoll/d4.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "c94068bfb14a1f966cd292653c49a8b6dddabbeaf5f4c1b70257b9380d55370d",
+      "file": "d6",
+      "author": "delapouite",
+      "icon": "dice-six-faces-six",
+      "source": "https://game-icons.net/1x1/delapouite/dice-six-faces-six.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "66d5135578b24df9002c61a42e1a63d067599f58fee4d9e2dfed9929481ea798",
+      "file": "d8",
+      "author": "delapouite",
+      "icon": "dice-eight-faces-eight",
+      "source": "https://game-icons.net/1x1/delapouite/dice-eight-faces-eight.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "a881978cab8f3a37ac69478bba325e40205129ecbbb6fe66f7c059572e32e502",
+      "file": "d10",
+      "author": "skoll",
+      "icon": "d10",
+      "source": "https://game-icons.net/1x1/skoll/d10.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "5508fa20737126eb736618cac9be877adc6d484666ff358e72a84361d8585137",
+      "file": "d12",
+      "author": "skoll",
+      "icon": "d12",
+      "source": "https://game-icons.net/1x1/skoll/d12.html"
+    },
+    {
+      "license": "CC BY 3.0",
+      "sha256": "7d68d53d6dbc9585998ab0c348587591fb5cc9d6b171d21ef1be725c8ada6216",
+      "file": "d20",
+      "author": "delapouite",
+      "icon": "dice-twenty-faces-twenty",
+      "source": "https://game-icons.net/1x1/delapouite/dice-twenty-faces-twenty.html"
+    }
+  ],
+  "license": "https://creativecommons.org/licenses/by/3.0/",
+  "sourceRepository": "https://github.com/game-icons/icons",
+  "revision": "82d948812bfe3f269ef8f731dcdb07b08160edc4",
+  "license_url": "https://creativecommons.org/licenses/by/3.0/"
+}
