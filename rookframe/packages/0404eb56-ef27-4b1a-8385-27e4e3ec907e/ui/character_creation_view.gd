@@ -483,7 +483,6 @@ func _present_detail() -> void:
 		_set_fact("Omens", "Omens", "1d%d" % int(profile.get("omen_faces", 2)))
 		get_node(DETAIL + "/ClassBody/FactsColumn/Flavor").text = get_node(DETAIL + "/RollInfo/Flavor").text
 		_present_class_rules()
-		get_node(DETAIL + "/NoteRow/Note").text = _t("Next: roll your four abilities, then Hit Points. Your class modifies the rolls automatically.")
 		return
 	var row := _record(_choice)
 	if row.is_empty():

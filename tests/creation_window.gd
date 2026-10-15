@@ -358,7 +358,7 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 			pages.get_node(^"Pager/Next").pressed.emit()
 			await _settle()
 		var note = view.get_node(view.DETAIL + "/NoteRow/Note")
-		assert_bool(pages.get_node(^"Area").get_global_rect().encloses(note.get_global_rect())).is_true()
+		assert_bool(note.is_visible_in_tree()).is_false()
 	var draft := {"name": "Varg", "description": "Every word of the character's long history remains available. ".repeat(60), "inventory": [{"name": "Carried item", "quantity": 15}], "traits": [{"name": "Long trait", "rules": "Retain these rules in full. ".repeat(60)}]}
 	var unchanged := draft.duplicate(true)
 	view.present_creation("create-review", draft, true)

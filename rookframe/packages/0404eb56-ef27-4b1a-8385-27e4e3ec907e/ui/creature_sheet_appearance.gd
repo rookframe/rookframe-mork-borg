@@ -36,7 +36,7 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(MINIATURE + "Explanation").text = locale.text("Applies only to new Actors created from this entry." if library else "Saved for this creature. Existing Rooks keep their current miniature.")
 	for base in [PORTRAIT, MINIATURE]:
 		for edge in ["left", "right", "top", "bottom"]:
-			get_node("Columns/PortraitPanel/Inset" if base == PORTRAIT else "Columns/MiniaturePanel/Inset").add_theme_constant_override("margin_" + edge, 0 if miniature_only or base == PORTRAIT or edge != "left" else 16 if phone or tablet else 20)
+			get_node("Columns/PortraitPanel/Inset" if base == PORTRAIT else "Columns/MiniaturePanel/Inset").add_theme_constant_override("margin_" + edge, ((8 if edge == "bottom" else 0) if phone else 12 if tablet else 16) if miniature_only else 0 if base == PORTRAIT or edge != "left" else 16 if phone or tablet else 20)
 		get_node(base + "HeadingGap").custom_minimum_size = Vector2(0, 4 if phone else 8)
 		(get_node(base + "ControlsGap") as Control).custom_minimum_size = Vector2((get_node(base + "ControlsGap") as Control).custom_minimum_size.x, 4 if phone else 16)
 		get_node(base + "Explanation").add_theme_font_size_override("font_size", 14 if phone else 15 if tablet else 17)
@@ -54,7 +54,7 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	if miniature_only:
 		get_node("Columns/MiniaturePanel").add_theme_stylebox_override("panel", get_node("Columns/PortraitPanel").get_theme_stylebox("panel"))
 		get_node(MINIATURE + "MiniatureHeading/Title").add_theme_font_size_override("font_size", 24 if phone else 26 if tablet else 30)
-		get_node(MINIATURE + "HeadingGap").custom_minimum_size = Vector2(0, 8 if phone else 12 if tablet else 16)
+		get_node(MINIATURE + "HeadingGap").custom_minimum_size = Vector2(0, 4 if phone else 12 if tablet else 16)
 	get_node(MINIATURE + "Explanation").visible = not miniature_only
 	get_node(MINIATURE + "ExplanationGap").visible = not miniature_only
 	for base in [PORTRAIT, MINIATURE]:

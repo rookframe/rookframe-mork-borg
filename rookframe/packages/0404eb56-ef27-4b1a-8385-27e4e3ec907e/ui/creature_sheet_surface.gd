@@ -507,7 +507,7 @@ func show_entry(entry: Dictionary, opener: Control = null) -> void:
 	_focus_card = opener
 	_focus_source = false
 	_reader = true
-	var content = get_node(WORK + "Reader/Pages/Area/Content")
+	var content = get_node(WORK + "Reader/Pages/Area/FocusInset/Content")
 	_clear(content)
 	_append_reference(content, {"name": str(entry.get("name", "Item")), "text": str(entry.get("rules", ""))})
 	for key in ["kind", "quantity", "damage", "range_feet", "armor_tier", "reduction", "defence_penalty", "uses", "weight", "price", "source"]:
@@ -532,7 +532,7 @@ func show_source() -> void:
 	_focus_card = null
 	_focus_source = true
 	_reader = true
-	var content = get_node(WORK + "Reader/Pages/Area/Content")
+	var content = get_node(WORK + "Reader/Pages/Area/FocusInset/Content")
 	_clear(content)
 	var source: Dictionary = _source()
 	_append_reference(content, {"name": "Published source", "text": _locale.text("Published source is unavailable.") if source.is_empty() else str(source.get("title", "")) + "\n" + str(source.get("page", "")) + "\n" + str(source.get("author", ""))})
@@ -754,7 +754,7 @@ func focus_roll(id: String) -> bool:
 	return false
 
 func reader_content() -> Control:
-	return get_node(WORK + "Reader/Pages/Area/Content") as Control
+	return get_node(WORK + "Reader/Pages/Area/FocusInset/Content") as Control
 
 func reader_state() -> Dictionary:
 	if _correction_reader:
@@ -897,7 +897,10 @@ func _layout_frame() -> void:
 	identity.custom_minimum_size = Vector2(218 if _phone else 300 if _tablet else (size.x - 80) * 0.3, 0)
 	var divider: StyleBoxFlat = identity_frame.duplicate()
 	divider.bg_color = Color(0, 0, 0, 0)
+	divider.content_margin_left = 8 if _phone else 12 if _tablet else 16
 	divider.content_margin_right = 12
+	divider.content_margin_top = 8 if _phone else 12 if _tablet else 16
+	divider.content_margin_bottom = 8 if _phone else 12 if _tablet else 16
 	identity.add_theme_stylebox_override("panel", divider)
 	get_node("Inset/Layout/Body/Workspace").add_theme_constant_override("separation", 0)
 	get_node(WORK + "Encounter").add_theme_constant_override("separation", 18 if _tablet else 28)
@@ -1085,7 +1088,7 @@ func _fit_identity() -> void:
 	classification.get_line_count()
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	var opener: Button = get_node(IDENTITY + "IdentityDetails")
-	var available: float = size.y - (88 if _phone else 128 if _tablet else 184)
+	var available: float = size.y - (104 if _phone else 152 if _tablet else 216)
 	var other_height := 0.0
 	for child in column.get_children():
 		if child is Control:
@@ -1211,7 +1214,7 @@ func _fit_inline_core() -> void:
 		var control: Control = child
 		if control.visible and str(control.name) != "Portrait":
 			other_height += ceili(control.get_combined_minimum_size().y)
-	var available: float = size.y - (88 if _phone else 128 if _tablet else 184)
+	var available: float = size.y - (104 if _phone else 152 if _tablet else 216)
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	var height := minf(510, maxf(0, available - other_height))
 	var difference := portrait.custom_minimum_size.y - height
