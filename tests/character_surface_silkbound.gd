@@ -361,6 +361,7 @@ func test_roll_hides_dialog_and_scrim_together_on_every_attempt(width: int, heig
 		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).override_failure_message("Rolling over the sheet must not leave a tint after its dialog hides.").is_false()
 		fixture.host.human_results[sheet._ability.request_id] = {"status":"rolled", "sequence":attempt+1, "terms":[{"name":"Strength", "faces":20, "results":[12]}]}
 		fixture.host.WorldChanged.emit()
+		await assert_func(sheet._ability, "get", ["pending"]).wait_until(2000).is_false()
 		await _settle()
 		assert_bool(sheet.get_node("EntryDialog").visible).is_true()
 		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).is_true()
@@ -381,6 +382,7 @@ func test_sheet_action_roll_has_no_scrim_until_results() -> void:
 		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).is_false()
 		fixture.host.roll(fixture.host.last_request, [3])
 		fixture.host.WorldChanged.emit()
+		await assert_func(sheet._action, "get", ["state"]).wait_until(2000).is_equal("resolved")
 		await _settle()
 		assert_str(sheet._action.state).is_equal("resolved")
 		assert_bool(sheet.get_node("EntryDialog").visible).is_true()
