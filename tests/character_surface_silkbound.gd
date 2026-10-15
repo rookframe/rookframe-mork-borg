@@ -5,8 +5,24 @@ const BOUNDARY = preload("res://tests/miniature_boundary.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const CHAPTER := ^"Margin/Layout/Body/Chapter"
 
-func _open(canvas: Vector2i) -> Dictionary:
-	var host := BOUNDARY.new()
+class RollBoundary extends BOUNDARY:
+	var human_results: Dictionary = {}
+	func RequestSessionThrow(id: String, participant_id: String, terms: Array) -> Dictionary:
+		if not human_results.has(id):
+			human_results[id] = {"status":"pending", "terms":[], "sequence":0}
+		var value: Dictionary = human_results[id].duplicate(true)
+		value.merge({"request_id":id, "participant_id":participant_id, "plan":terms})
+		return {"ok":true, "value":value}
+	func PresentRequestedRoll(_id: String, _surface: Control) -> Dictionary:
+		return {"ok":true}
+	func CancelHumanThrow(id: String) -> Dictionary:
+		human_results[id].status = "cancelled"
+		return {"ok":true, "value":human_results[id]}
+	func PublishActionLog(report: Dictionary) -> Dictionary:
+		reports.append(report.duplicate(true))
+		return {"ok":true, "value":{"sequence":reports.size()}}
+
+func _open(canvas: Vector2i, host: BOUNDARY = BOUNDARY.new()) -> Dictionary:
 	host.game_master = true
 	host.actors.hero.data.merge({"name":"Graveworm", "class_id":"occult-herbmaster", "class_title":"Occult Herbmaster", "class_rules":["Prepare decoctions and recognise the herbs of Sarkash."], "hit_points":7, "maximum_hit_points":9, "power_uses":2, "power_uses_total":3, "omens":2, "silver":34, "abilities":{"Strength":{"modifier":-1},"Agility":{"modifier":0},"Presence":{"modifier":1},"Toughness":{"modifier":2}},"traits":[],"inventory":[{"inventory_id":"sword","source_item_id":"sword","name":"Sword","kind":"Weapon","damage":"d6","attack_ability":"Strength","range_feet":5,"equipped":true,"quantity":1},{"inventory_id":"bow","source_item_id":"shortbow","name":"Shortbow","kind":"Weapon","damage":"d6","attack_ability":"Presence","range_feet":60,"equipped":true,"quantity":1},{"inventory_id":"shield","name":"Shield","kind":"Shield","reduction":"-1","equipped":true,"quantity":1}]}, true)
 	host.handler = auto_free(SYSTEM.new())
@@ -304,3 +320,70 @@ func test_hover_hints_cover_core_and_chapters_and_follow_weapon_selection() -> v
 			var rows = sheet.get_node(CHAPTER).get_node("Page/Content/Collections/" + group + "/Content/Area/Rows")
 			for row in rows.get_children():
 				assert_str(row.get_node("Details").tooltip_text).is_not_empty()
+
+func test_sheet_body_keeps_content_inside_leaf_insets(width: int, height: int, _test_parameters := [[1920,1080],[1024,768],[844,390]]) -> void:
+	var fixture := _open(Vector2i(width,height))
+	var sheet = fixture.sheet
+	await _settle()
+	for chapter in 5:
+		sheet._chapter(chapter)
+		await _settle()
+		var leaf: Control = sheet.get_node("Frame").get_child(1)
+		var inset := 8 if width < 900 else 12 if width <= 1300 else 16
+		var bounds := leaf.get_global_rect().grow(-inset)
+		assert_bool(sheet.get_global_rect().encloses(sheet.get_node("Margin").get_global_rect())).override_failure_message("The complete sheet layout must fit without shifting the header or clipping the footer.").is_true()
+		for path in ["Margin/Layout/Body/Core", "Margin/Layout/Body/Chapter"]:
+			var content: Control = sheet.get_node(path)
+			if content.is_visible_in_tree():
+				assert_bool(bounds.grow(1).encloses(content.get_global_rect())).override_failure_message("Sheet content lacks leaf inset: %s (%s in %s)" % [path, content.get_global_rect(), bounds]).is_true()
+	sheet._choose_miniature()
+	await _settle()
+	var picker: Control = sheet.get_node("Margin/Layout/Picker")
+	var body: Control = sheet.get_node("Frame").get_child(1)
+	var footer: Control = sheet.get_node("Frame").get_child(2)
+	assert_bool(body.get_global_rect().grow(-8).encloses(picker.get_node("Browser").get_global_rect())).override_failure_message("Miniature search and page controls need an inset on every edge.").is_true()
+	for action in ["Back", "Apply"]:
+		assert_bool(footer.get_global_rect().grow(-8).encloses(picker.get_node("Actions/" + action).get_global_rect())).is_true()
+
+func test_roll_hides_dialog_and_scrim_together_on_every_attempt(width: int, height: int, _test_parameters := [[1920,1080],[1024,768]]) -> void:
+	var fixture := _open(Vector2i(width,height), RollBoundary.new())
+	var sheet = fixture.sheet
+	await _settle()
+	for attempt in 2:
+		sheet._workflow("ability", "Strength")
+		await _settle()
+		assert_bool(sheet.get_node("EntryDialog").visible).is_true()
+		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).is_true()
+		await sheet._start_workflow()
+		await _settle()
+		assert_bool(sheet._ability.pending).is_true()
+		assert_bool(sheet.get_node("EntryDialog").visible).is_false()
+		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).override_failure_message("Rolling over the sheet must not leave a tint after its dialog hides.").is_false()
+		fixture.host.human_results[sheet._ability.request_id] = {"status":"rolled", "sequence":attempt+1, "terms":[{"name":"Strength", "faces":20, "results":[12]}]}
+		fixture.host.WorldChanged.emit()
+		await _settle()
+		assert_bool(sheet.get_node("EntryDialog").visible).is_true()
+		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).is_true()
+		sheet._back()
+		await _settle()
+
+func test_sheet_action_roll_has_no_scrim_until_results() -> void:
+	var fixture := _open(Vector2i(1920,1080), RollBoundary.new())
+	var sheet = fixture.sheet
+	await _settle()
+	for attempt in 2:
+		sheet._workflow("damage", "")
+		await _settle()
+		await sheet._start_workflow()
+		await _settle()
+		assert_str(sheet._action.state).is_equal("pending")
+		assert_bool(sheet.get_node("EntryDialog").visible).is_false()
+		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).is_false()
+		fixture.host.roll(fixture.host.last_request, [3])
+		fixture.host.WorldChanged.emit()
+		await _settle()
+		assert_str(sheet._action.state).is_equal("resolved")
+		assert_bool(sheet.get_node("EntryDialog").visible).is_true()
+		assert_bool(sheet.get_node("EntryScrim").is_visible_in_tree()).is_true()
+		sheet._back()
+		await _settle()

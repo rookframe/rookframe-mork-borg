@@ -440,8 +440,7 @@ func _show_route() -> void:
 	get_node(^"Margin/Layout/Body/CoreDivider").visible = _core_ui.visible
 	get_node(^"Ornament").visible = false
 	_sync_frame.call_deferred()
-	get_node(^"EntryScrim").visible = modal
-	get_node(^"EntryDialog").present(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), get_viewport_rect().size, "note" if _detail == "journal:notes" and _detail_tab == 2 else "entry")
+	present_entry_dialog(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), "note" if _detail == "journal:notes" and _detail_tab == 2 else "entry")
 
 func _chapter(index: int) -> void:
 	_condition_reference = false

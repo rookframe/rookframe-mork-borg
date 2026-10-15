@@ -51,7 +51,7 @@ func _field_typed(text: String, field: String) -> void:
 	field_changed.emit(text, field)
 
 func configure_layout(phone: bool, tablet: bool) -> void:
-	add_theme_constant_override("separation", 3 if phone else 6 if tablet else 10)
+	add_theme_constant_override("separation", 2 if phone else 6 if tablet else 10)
 	get_node(^"Likeness").size_flags_vertical = 1
 	get_node(^"Likeness").custom_minimum_size = Vector2(get_node(^"Likeness").custom_minimum_size.x, 104 if phone else 132 if tablet else 170)
 	get_node(^"Likeness/Vitals").add_theme_constant_override("separation", 0 if phone or tablet else 4)
@@ -85,7 +85,14 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"ReadyWeapon").size_flags_vertical = 3 if phone else 1
 	get_node(^"Protection").size_flags_vertical = 3 if phone else 1
 	get_node(^"ProtectionItems").columns = 3 if tablet else 1
+	get_node(^"Likeness/Vitals/PhoneClass").custom_minimum_size = Vector2(0, 16)
 	get_node(^"Likeness/Vitals/PhoneClass").add_theme_font_size_override("font_size", 12)
+	get_node(^"Likeness/Vitals/PhoneClass").add_theme_font_override("font", phone_font)
+	var outline: Control = get_node(^"Likeness/Portrait/Outline")
+	outline.offset_left = 4 if phone else 0
+	outline.offset_top = 4 if phone else 0
+	outline.offset_right = -4 if phone else 0
+	outline.offset_bottom = -4 if phone else 0
 	for path in [^"WeaponHeading/Actions/Center/Row", ^"ProtectionHeading/Center/Row"]:
 		(get_node(path).get_node(^"Title") as Label).add_theme_font_size_override("font_size", 19 if tablet else 23)
 		(get_node(path).get_node(^"Icon") as TextureRect).self_modulate = Color(0.815686, 0.745098, 0.556863, 1)

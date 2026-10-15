@@ -6,13 +6,15 @@ func apply_sheet_layout(phone: bool, tablet: bool, detail: bool = false, task: b
 	get_node(^"Ornament").visible = false
 	get_node(^"Ledger").visible = false
 	var outer := 8 if phone else 16 if tablet else 28
+	var inset := _leaf_inset()
+	get_node(^"Margin/Layout/Picker").add_theme_constant_override("separation", inset + 20)
 	var margin: MarginContainer = get_node(^"Margin")
 	for edge in ["left", "right"]:
-		margin.add_theme_constant_override("margin_" + edge, outer + 12)
+		margin.add_theme_constant_override("margin_" + edge, outer + inset)
 	margin.add_theme_constant_override("margin_top", outer + 6)
-	margin.add_theme_constant_override("margin_bottom", outer + 12)
+	margin.add_theme_constant_override("margin_bottom", outer + inset)
 	var layout: VBoxContainer = get_node(^"Margin/Layout")
-	layout.add_theme_constant_override("separation", 22 if phone else 24)
+	layout.add_theme_constant_override("separation", (22 if phone else 24) + inset - 8)
 	var header: Control = get_node(^"Margin/Layout/Header")
 	header.custom_minimum_size = Vector2(0, 44 if phone else 56 if tablet else 64)
 	_sync_frame.call_deferred()
@@ -48,19 +50,27 @@ func apply_sheet_layout(phone: bool, tablet: bool, detail: bool = false, task: b
 	get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Companions").custom_minimum_size = Vector2(get_node(^"Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content/Companions").custom_minimum_size.x, 0 if phone or tablet else 300)
 
 
+func _leaf_inset() -> int:
+	var width := get_viewport_rect().size.x
+	return 12 if width <= 900 else 20 if width <= 1300 else 24
+
+func present_entry_dialog(shown: bool, mode: String) -> void:
+	get_node(^"EntryDialog").present(shown, get_viewport_rect().size, mode)
+	get_node(^"EntryScrim").visible = shown
+
 func _sync_frame() -> void:
 	if not is_inside_tree(): return
 	var header: Control = get_node(^"Margin/Layout/Header")
 	var outer := 8 if get_viewport_rect().size.x <= 900 else 16 if get_viewport_rect().size.x <= 1300 else 28
 	var h := Rect2(outer, outer, size.x - outer * 2 - 12, header.size.y + 12)
 	var content: Control = get_node(^"Margin/Layout/Picker") if get_node(^"Margin/Layout/Picker").visible else get_node(^"Margin/Layout/Body")
-	var top: float = content.get_global_rect().position.y - get_global_rect().position.y - 8 if header.visible else outer
+	var top: float = content.get_global_rect().position.y - get_global_rect().position.y - _leaf_inset() if header.visible else outer
 	var b := Rect2(outer, top, size.x - outer * 2, size.y - outer - top)
 	var f := Rect2()
 	var picker: Control = get_node(^"Margin/Layout/Picker")
 	if picker.visible:
 		var actions: Control = picker.get_node("Actions")
-		f = Rect2(actions.get_global_rect().position.x - get_global_rect().position.x - 12, actions.get_global_rect().position.y - get_global_rect().position.y - 6, actions.size.x + 24, actions.size.y + 12)
+		f = Rect2(actions.get_global_rect().position.x - get_global_rect().position.x - 12, actions.get_global_rect().position.y - get_global_rect().position.y - 12, actions.size.x + 24, actions.size.y + 24)
 		b = Rect2(b.position.x, b.position.y, b.size.x, f.position.y - 8 - b.position.y)
 	get_node(^"Frame").set_sections(h if header.visible else Rect2(), b, f)
 
