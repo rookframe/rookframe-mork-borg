@@ -7,6 +7,9 @@ enabled=PackedStringArray("res://addons/rookframe_development/plugin.cfg", "res:
 [rendering]
 renderer/rendering_method="gl_compatibility"
 
+[editor]
+import/use_multiple_threads=false
+
 [gdunit4]
 
 report/godot/push_error=true
