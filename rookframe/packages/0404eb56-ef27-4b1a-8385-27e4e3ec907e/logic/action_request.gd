@@ -1,7 +1,7 @@
 extends RefCounted
 
 ## Finish an in-flight action request/cancellation even after its task is freed.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ENDED := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 var _sdk: SDK
 var _tree: SceneTree

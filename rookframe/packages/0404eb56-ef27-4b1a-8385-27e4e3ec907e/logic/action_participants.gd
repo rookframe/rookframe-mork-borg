@@ -1,5 +1,5 @@
 extends RefCounted
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
 func owner(context: SDK.SystemActionContext, caller: Dictionary, source: SDK.ActorId) -> Dictionary:
 	var owner := {"id": str(caller.participant_id), "session": str(caller.session_id)}

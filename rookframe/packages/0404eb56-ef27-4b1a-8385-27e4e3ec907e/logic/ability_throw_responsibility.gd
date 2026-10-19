@@ -1,6 +1,6 @@
 extends RefCounted
 
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
 ## Resolve the existing Requested Throw responsibility for sheet or tabletop input.
 func resolve(facade: SDK, actor: SDK.ActorId, sheet: bool = false) -> Dictionary:

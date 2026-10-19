@@ -1,6 +1,6 @@
 extends VBoxContainer
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const ACTIONS = preload(ROOT + "logic/miniature_actions.gd")
 signal closed(saved: bool)
@@ -101,10 +101,11 @@ func _apply() -> void:
 	var message := ""
 	if _actor == null:
 		var result := await sdk.system_actions.submit("miniature.default", {"definition": _definition, "package_id": reference.get("package_id", ""), "local_id": reference.get("local_id", "")})
+		var result_data: Dictionary = result.value if typeof(result.value) == TYPE_DICTIONARY else {}
 		if not result.ok:
 			message = result.message
-		elif str(result.value.get("state", "error")) != "resolved":
-			message = str(result.value.get("message", "Could not save. Try again."))
+		elif str(result_data.get("state", "error")) != "resolved":
+			message = str(result_data.get("message", "Could not save. Try again."))
 	else:
 		var result := await ACTIONS.new(sdk).set_actor(_actor, reference)
 		if not result.ok:

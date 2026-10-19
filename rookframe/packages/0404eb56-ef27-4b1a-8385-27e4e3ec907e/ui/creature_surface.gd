@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/sdk/window.gd"
 ## Live SDK Actor adapter. Rules, loot and Appearance retain separate boundaries.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const DRAFT = preload(ROOT + "ui/sheet_draft.gd")

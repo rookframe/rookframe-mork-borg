@@ -2,7 +2,7 @@ extends RefCounted
 ## An announced special has no automated gameplay effects. Authority validates
 ## the exact Actor and existing rule, then records and explicitly announces the use.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ACTIONS = preload(ROOT + "logic/creature_hud_actions.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 var _accepted: Dictionary = {}

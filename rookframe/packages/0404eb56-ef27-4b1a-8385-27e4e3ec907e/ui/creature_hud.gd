@@ -318,11 +318,12 @@ func _special(actor: SDK.ActorId, entry: String) -> void:
 		_special_request = {"id": sdk.dice.new_request_id(), "actor": actor.value, "entry": entry}
 	_special_pending = true
 	var result := await REQUEST.new(sdk, self).submit("creature-hud.special", _special_request.duplicate(true))
+	var result_data: Dictionary = result.value if typeof(result.value) == TYPE_DICTIONARY else {}
 	_special_pending = false
-	if result.ok and typeof(result.value) == TYPE_DICTIONARY and result.value.get("ok", false):
+	if result.ok and typeof(result.value) == TYPE_DICTIONARY and result_data.get("ok", false):
 		_special_request = {}
 	else:
-		_error(str(result.value.get("message", "Creature action is unavailable.")) if result.ok and typeof(result.value) == TYPE_DICTIONARY else result.message)
+		_error(str(result_data.get("message", "Creature action is unavailable.")) if result.ok and typeof(result.value) == TYPE_DICTIONARY else result.message)
 
 func _amount_changed(_text: String) -> void:
 	_hp_request = {}

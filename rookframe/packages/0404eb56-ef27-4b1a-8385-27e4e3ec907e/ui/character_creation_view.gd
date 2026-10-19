@@ -2,7 +2,7 @@ extends "res://rookframe/ui/components/surfaces/fullscreen_wizard.gd"
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const PLAN = preload(ROOT + "logic/creation_roll_plan.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 var _roll_plan := PLAN.new()

@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 ## This SDK seam proves synchronous copied-data conversion and failure signaling;
 ## actual atomic persistence and startup refusal belong to host acceptance.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const BOUNDARY = preload("res://tests/creature_appearance_boundary.gd")
 

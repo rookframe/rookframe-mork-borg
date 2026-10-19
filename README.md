@@ -13,24 +13,24 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 ## Dependencies
 
-[`plug.gd`](plug.gd) installs both dependencies from their public repositories:
+[`plug.gd`](plug.gd) installs the dependencies from their public repositories:
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.34.1` | `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `1a4c4109d3f57508fc86ed712406f7d3d01d5131` | `rookframe/ui/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.36.0-rc.2` | `rookframe/sdk/`, `addons/rookframe_sdk/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `ac8d2ce1e08ec28db3b620810129a1de03eab13c` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
 by Git. `.rookframe/authoring.lock.json` records their versions.
 
-The Package-local `sdk/` files are generated output of the installed public SDK,
-as required by its authoring contract. Regenerate them with the SDK command;
-do not hand-edit them or copy them from another project.
+The SDK is downloaded as ordinary typed GDScript at `rookframe/sdk/`.
+Rookframe supplies those scripts when the Package runs. Package authors never
+regenerate them. The Development Plugin is pinned to `v0.2.0-rc.1`.
 
 ## Fresh clone
 
-Use Godot 4.7.2, Python 3.10+, Git, curl and the .NET 10 runtime. Replace `godot`
+Use stock Godot 4.7.2 .NET, Python 3.10+, Git, curl and an installed Rookframe application. Replace `godot`
 with your Godot executable. Matching Godot export templates are needed to build
 an archive.
 
@@ -41,8 +41,7 @@ mkdir -p addons/gd-plug
 curl -fsSL https://raw.githubusercontent.com/imjp94/gd-plug/209276d1f00d14b49b74403d9839f29598e9a8eb/addons/gd-plug/plug.gd -o addons/gd-plug/plug.gd
 curl -fsSL https://raw.githubusercontent.com/imjp94/gd-plug/209276d1f00d14b49b74403d9839f29598e9a8eb/LICENSE -o addons/gd-plug/LICENSE
 godot --headless --path . --script plug.gd install
-python3 addons/rookframe_sdk/rookframe_authoring.py facade --project .
-python3 addons/rookframe_sdk/rookframe_authoring.py check --project . --godot /path/to/godot
+python3 addons/rookframe_sdk/rookframe_authoring.py check --project . --godot /path/to/godot --rookframe /path/to/Rookframe
 ```
 
 The bootstrap URLs pin gd-plug itself. Only gd-plug installs the SDK and UI Kit;
@@ -51,11 +50,11 @@ no Rookframe application checkout is needed.
 Build a new archive with the installed SDK:
 
 ```sh
-python3 addons/rookframe_sdk/rookframe_authoring.py build --project . --godot /path/to/godot --output build/mork-borg.rookpackage
+python3 addons/rookframe_sdk/rookframe_authoring.py build --project . --godot /path/to/godot --rookframe /path/to/Rookframe --output build/mork-borg.rookpackage
 ```
 
 Use a fresh output path for each build. Commit authored files, dependency pins,
-the authoring lock and regenerated facade. Do not commit installed dependencies.
+and the authoring lock. Do not commit installed dependencies.
 
 ## Distribution
 
@@ -78,10 +77,10 @@ Desktop hover hints show a title, rules summary and inspection prompt for
 attributes, resources, combat, protection and collection entries. Inventory
 actions remain icon-only, with item-specific accessible labels.
 
-Iterate using the SDK's Rookframe → Development dock and a complete compiled
-Development Mode runtime bundle. Save Package scenes and scripts in the editor
-to update the retained World. Host managed-code changes require rebuilding the
-stock Godot export and runtime bundle before preparing the project again.
+Select your installed Rookframe application in the Rookframe Development dock.
+Save supported Package scene and script edits in the editor to update the retained
+World. After Rookframe itself changes, select the updated application and prepare
+the project again.
 
 Run the sheet's native geometry and interaction checks with a display:
 
@@ -95,7 +94,7 @@ Run the focused Godot suite with the installed public dependencies:
 python3 tests/run_character_creation.py --godot /path/to/godot
 ```
 
-The suite exercises authored System actions through the generated public SDK.
+The suite exercises authored System actions through the public SDK.
 It covers all six optional class branches and their complete feature tables,
 source origins, class dice, scroll choices (including repeated equipment
 rerolls), late Roll/choice discard, atomic refusal/retry and companion projection.
@@ -216,7 +215,7 @@ Action identities belong to one live Participant session. Duplicate calls retain
 the existing result. Closure, cancellation, lost access or a required session
 ending prevents further interpretation. Completed raw Rolls and accepted HP,
 armor, equipment and public reports remain; reopening does not resume an action.
-The focused melee suite exercises this through generated public SDK actions,
+The focused melee suite exercises this through public SDK actions,
 with only the external host boundary substituted.
 
 Melee d2 damage or protection uses a physical d4: 1–2 gives 1, 3–4 gives 2.
@@ -467,7 +466,7 @@ Rookframe → Settings → Game settings → Language before opening the World.
 English remains the Package default for unsupported application languages.
 
 The Manifest declares ordinary Godot `Translation` resources at `i18n/en.tres`
-and `i18n/ru.tres`. Authored views receive the generated SDK's translation
+and `i18n/ru.tres`. Authored views receive the SDK's translation
 capability through `localize()` and translate complete templates before formatting.
 The two rail entry scenes select their authored Russian copy through the same
 Package catalog; the rail API itself does not inject an SDK into Button scenes.

@@ -2,7 +2,7 @@ extends RefCounted
 
 ## Presentation values, without changing the System's gameplay data.
 const ABILITIES := ["Strength", "Agility", "Presence", "Toughness"]
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const POWERS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/powers.gd")
 const HEART = preload("res://rookframe/ui/icons/character/heart.svg")
 const MAGIC = preload("res://rookframe/ui/icons/character/palms.svg")

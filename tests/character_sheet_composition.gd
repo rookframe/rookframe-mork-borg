@@ -25,7 +25,7 @@ func test_health_has_no_eligibility_or_authorization_widgets() -> void:
 	assert_bool(view.find_child("Eligible", true, false) == null).is_true()
 	assert_bool(view.find_child("Authorize", true, false) == null).is_true()
 
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/miniature_boundary.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 

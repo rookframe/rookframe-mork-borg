@@ -1,6 +1,6 @@
 extends RefCounted
 ## Local portrait presentation only. Adapters own mutation and session lifetimes.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 var message := ""
 var _path := ""
 var _texture: Texture2D

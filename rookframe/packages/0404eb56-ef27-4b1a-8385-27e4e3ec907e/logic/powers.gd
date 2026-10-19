@@ -3,7 +3,7 @@ extends RefCounted
 ## Bare Bones pp. 34–35. Range is the approved application convention;
 ## Death's area and Telekinesis's movement remain separate from casting range.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const HANDLING: Dictionary = {
 	"palms-open-the-southern-gate": ["immediate damage", "multiple", 30, true],

@@ -7,7 +7,7 @@ signal CharacterHudContextChanged
 signal WorldChanged
 signal TabletopCommandCompleted(result: Dictionary)
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 var sessions := [{"participant_id": "player", "session_id": "player-session", "is_gm": false}, {"participant_id": "gm", "session_id": "gm-session", "is_gm": true}]
 var handler: Node
 var actors := {

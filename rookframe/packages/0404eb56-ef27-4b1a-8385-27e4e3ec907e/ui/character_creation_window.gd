@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/sdk/window.gd"
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 var _created_actor_id := ""
@@ -71,7 +71,8 @@ func _restart() -> void:
 
 func _created(actor: SDK.Actor) -> void:
 	_created_actor_id = actor.id.value
-	_created_actor_data = actor.data.duplicate(true)
+	var actor_data: Dictionary = actor.data
+	_created_actor_data = actor_data.duplicate(true)
 	_open_created()
 
 func _open_created() -> void:

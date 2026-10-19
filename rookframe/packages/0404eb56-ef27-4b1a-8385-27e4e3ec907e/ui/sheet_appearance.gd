@@ -2,7 +2,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creatu
 signal changed
 signal message(text: String)
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ACTIONS = preload(ROOT + "logic/character_actions.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 var _sdk: SDK

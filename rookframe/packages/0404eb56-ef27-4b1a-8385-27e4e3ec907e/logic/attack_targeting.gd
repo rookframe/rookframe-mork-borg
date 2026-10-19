@@ -3,7 +3,7 @@ const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 
 ## Creature selection/range preparation. Defence and companion resolution use
 ## the chosen source action. One rolling side is selected by ordinary Access.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
 func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> Dictionary:
 	for key in ["source", "rook", "attack", "item"]:

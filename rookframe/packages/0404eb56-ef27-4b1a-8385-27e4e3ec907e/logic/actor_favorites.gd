@@ -2,7 +2,7 @@ extends RefCounted
 ## Shared sheet/HUD projection. Membership is independent of source availability.
 ## Saved records retain display context when an exact owned source disappears.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")

@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/sdk/window.gd"
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
 var _locale := I18N.new()
@@ -167,7 +167,8 @@ func _target(reach: float, creature: bool) -> void:
 	if rook.ok and rook.rook.actor != null:
 		var actor := sdk.actors.read(rook.rook.actor)
 		if actor.ok:
-			schema = str(actor.actor.data.get("schema", ""))
+			var actor_data: Dictionary = actor.actor.data
+			schema = str(actor_data.get("schema", ""))
 			_defence_target = schema == "mork-borg-character/v1"
 			if creature and schema == "mork-borg-adversary/v1":
 				var access := sdk.actors.access(actor.actor.id)

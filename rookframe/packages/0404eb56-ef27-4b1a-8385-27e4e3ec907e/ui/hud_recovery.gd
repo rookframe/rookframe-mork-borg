@@ -2,7 +2,7 @@ extends RefCounted
 
 ## Recovery is a fixed list, independent of Actor Favorites and targeting.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const RULES = preload(ROOT + "logic/recovery_rules.gd")
 const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/hud_recovery_surface.tres")

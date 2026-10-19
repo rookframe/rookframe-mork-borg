@@ -3,7 +3,7 @@ extends GdUnitTestSuite
 ## Retained for severe saved-capability loss and stale-entry corruption risks.
 ## Uses the existing public SDK host boundary; does not exercise native saves.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const ACTIONS = preload(ROOT + "logic/creature_actions.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")

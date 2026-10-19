@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_silkbound_layout.gd"
+extends "sheet_silkbound_layout.gd"
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
@@ -1385,8 +1385,9 @@ func _incident(operation: String) -> void:
 	_busy = true
 	var incident: Dictionary = _data().get("broken_incident", {})
 	var result := await sdk.system_actions.submit("health.incident", {"source": _actor.id.value, "incident": int(incident.get("id", 0)), "elapsed": int(incident.get("elapsed", 0)), "event": operation})
+	var value: Dictionary = result.value if typeof(result.value) == TYPE_DICTIONARY else {}
 	_busy = false
-	_status(str(result.value.get("message", "Recorded.")) if result.ok else result.message)
+	_status(str(value.get("message", "Recorded.")) if result.ok else result.message)
 	_refresh_pending = true
 
 func _appearance() -> void:

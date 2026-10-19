@@ -2,7 +2,7 @@ extends RefCounted
 
 ## Items and initiating class Features share exact owned Favorite identities.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")

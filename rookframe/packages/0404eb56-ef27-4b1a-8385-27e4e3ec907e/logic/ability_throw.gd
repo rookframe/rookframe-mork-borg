@@ -2,7 +2,7 @@ extends RefCounted
 ## Write the full ability explanation to history, then explicitly announce its numeric total. Cancellation remains history and local action feedback.
 
 ## One live modifier action. No draft or reconnect state is retained by the System.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ENDED_MESSAGE := "Action ended. Completed rolls and changes remain. Resolve unfinished results with ordinary dice and sheet editing."
 signal changed
 var pending := false

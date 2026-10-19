@@ -199,9 +199,9 @@ func SubmitSystemIntent(name: String, payload: Variant) -> Dictionary:
 	return await _sheet_reply(name, payload)
 
 func _sheet_reply(name: String, payload: Variant) -> Dictionary:
-	var sdk = load(ROOT + "sdk/package_sdk_facade.gd").new(self)
+	var sdk = load("res://rookframe/sdk/package_sdk_facade.gd").new(self)
 	var handler = load(ROOT + "logic/sheet_authority.gd").new()
-	var outcome: Dictionary = await handler.handle(load(ROOT + "sdk/system_action_context.gd").new(self, "sheet"), sdk, name, payload)
+	var outcome: Dictionary = await handler.handle(load("res://rookframe/sdk/system_action_context.gd").new(self, "sheet"), sdk, name, payload)
 	return {"ok": true, "value": outcome}
 
 func SystemIntentReadActor(_token: String, id: String) -> Dictionary:

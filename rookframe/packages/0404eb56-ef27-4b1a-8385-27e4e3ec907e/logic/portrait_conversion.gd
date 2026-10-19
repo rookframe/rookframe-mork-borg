@@ -2,7 +2,7 @@ extends RefCounted
 ## Convert saved inline portraits into retained files before Authority startup.
 ## Return copies; the host commits one candidate only after every callback succeeds.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
 func actor_data(sdk: SDK, value: Variant) -> Variant:
 	if typeof(value) != TYPE_DICTIONARY:

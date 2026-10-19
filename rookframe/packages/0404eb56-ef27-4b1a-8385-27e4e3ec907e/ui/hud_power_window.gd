@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/sdk/window.gd"
 
 ## This task captures its Actor and exact scroll once. HUD selection is unrelated.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -27,7 +27,8 @@ func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
 	if not current.ok or current.actor.access_level != "Owner":
 		_close()
 		return
-	get_node("Layout/Actor").text = str(current.actor.data.get("name", "Character"))
+	var actor_data: Dictionary = current.actor.data
+	get_node("Layout/Actor").text = str(actor_data.get("name", "Character"))
 	if task.get("daily", false):
 		_panel.configure_morning(current.actor, sdk)
 		return

@@ -2,7 +2,7 @@ extends RefCounted
 ## Casting consequences are recorded history. Parameter requests, targeting and manual instructions stay in the action window; physical Rolls announce through Rookframe.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
 const ITEMS = preload(ROOT + "logic/character_actions.gd")
