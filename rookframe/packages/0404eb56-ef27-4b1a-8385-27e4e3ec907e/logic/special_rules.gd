@@ -76,7 +76,7 @@ func definition(key: String) -> Dictionary:
 		return {"range_feet": 0}
 	return {}
 
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd")
 
 func owned(data: Dictionary, id: String) -> Dictionary:

@@ -1,7 +1,7 @@
 extends RefCounted
 ## Sheet composition for the same Actor Favorite model consumed by the HUD.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
 const STAR_SCRIPT = preload(ROOT + "ui/sheet_favorite.gd")
 const COMPANION = preload(ROOT + "ui/sheet_companion_favorite.tscn")

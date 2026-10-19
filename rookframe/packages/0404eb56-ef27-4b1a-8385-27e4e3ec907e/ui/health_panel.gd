@@ -3,7 +3,7 @@ extends VBoxContainer
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ACTION = preload(ROOT + "logic/health_action.gd")
 const RECOVERY = preload(ROOT + "logic/recovery_rules.gd")

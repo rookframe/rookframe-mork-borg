@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/sdk/window.gd"
 
 ## The managed task owns its initiating Actor independently of HUD selection.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -29,7 +29,8 @@ func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
 		_close()
 		return
 	_actor = actor
-	get_node(^"Layout/Actor").text = str(current.actor.data.get("name", "Character"))
+	var actor_data: Dictionary = current.actor.data
+	get_node(^"Layout/Actor").text = str(actor_data.get("name", "Character"))
 	_panel.configure_tabletop(current.actor, sdk, key)
 
 func _action_created(action: Node) -> void:

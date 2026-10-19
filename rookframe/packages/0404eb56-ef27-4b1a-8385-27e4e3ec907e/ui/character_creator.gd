@@ -3,7 +3,7 @@ extends VBoxContainer
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SCROLLS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/starting_scrolls.gd")
 const PLAN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_roll_plan.gd")
 var _roll_plan := PLAN.new()

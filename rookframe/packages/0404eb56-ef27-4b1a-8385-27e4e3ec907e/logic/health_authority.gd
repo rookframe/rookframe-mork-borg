@@ -3,7 +3,7 @@ extends RefCounted
 
 ## Bare Bones pp. 29, 31, 33, 49. Eligibility and delayed consequences stay at the table.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")

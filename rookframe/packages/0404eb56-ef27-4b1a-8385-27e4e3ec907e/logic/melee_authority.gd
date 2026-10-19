@@ -1,6 +1,6 @@
 extends RefCounted
 ## Attack consequences, ammunition, and cancellation are recorded history. Physical Rolls announce through Rookframe; choices and errors stay in the action window.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
 ## One live System action per supplied UUID, resolved on World Authority.
 ## World data is shared in full; Actor privacy applies only to UI display.

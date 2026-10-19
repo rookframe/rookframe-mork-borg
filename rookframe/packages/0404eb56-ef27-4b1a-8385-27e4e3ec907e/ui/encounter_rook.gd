@@ -1,4 +1,4 @@
-extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/window.gd"
+extends "res://rookframe/sdk/window.gd"
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
@@ -57,11 +57,12 @@ func _toggle() -> void:
 	_busy = true
 	refresh()
 	var result := await sdk.system_actions.submit("encounter.edit", {"revision": int(encounter.revision), "kind": "remove" if included else "add", "rook": selected.value})
+	var result_data: Dictionary = result.value if typeof(result.value) == TYPE_DICTIONARY else {}
 	_busy = false
-	if not result.ok or str(result.value.get("state", "error")) == "error":
+	if not result.ok or str(result_data.get("state", "error")) == "error":
 		var message := SDK.FeedbackMessage.new()
 		message.title = _t("Encounter")
-		message.message = result.message if not result.ok else str(result.value.message)
+		message.message = result.message if not result.ok else str(result_data.message)
 		sdk.feedback.error(message)
 	else:
 		VIEW.new().local_state(self).select_rook(selected.value)

@@ -2,7 +2,7 @@ extends RefCounted
 ## Dice consequences are recorded history; manual no-roll uses explicitly announce below. Pending decisions and corrective feedback stay in the action window.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")

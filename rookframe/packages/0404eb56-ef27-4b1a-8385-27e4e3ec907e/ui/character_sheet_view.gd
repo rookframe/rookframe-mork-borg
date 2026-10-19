@@ -8,7 +8,7 @@ const INVENTORY_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-838
 const ITEM_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_item.tscn")
 const EDIT_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_edit.tscn")
 const APPEARANCE_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_appearance.tscn")
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
 const OVERVIEW_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.gd")
 var _overview: OVERVIEW_SCRIPT

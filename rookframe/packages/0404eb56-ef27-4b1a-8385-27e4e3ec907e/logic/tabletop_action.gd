@@ -10,10 +10,11 @@ func attack(input: Dictionary, creature: bool) -> void:
 		_operation = "companion"
 	elif creature:
 		var result := await _submit("attack.validate", input)
-		if not result.ok or str(result.value.get("state", "error")) != "ready":
+		var result_data: Dictionary = result.value if typeof(result.value) == TYPE_DICTIONARY else {}
+		if not result.ok or str(result_data.get("state", "error")) != "ready":
 			_accept(result)
 			return
-		_operation = "defence" if str(result.value.resolution) == "defence" else "melee"
+		_operation = "defence" if str(result_data.resolution) == "defence" else "melee"
 	await start(input)
 
 func choose(choice: String) -> void:

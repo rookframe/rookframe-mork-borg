@@ -1,7 +1,7 @@
 extends RefCounted
 
 ## Ordinary Actor inventory operations, shared by Character and Creature sheets.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 var _sdk: SDK
 var _id: SDK.ActorId
 ## The rejected correction, for field-local feedback; empty for domain failures.

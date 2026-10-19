@@ -1,7 +1,7 @@
 extends Control
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 
 signal closed

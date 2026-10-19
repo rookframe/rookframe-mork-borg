@@ -1,6 +1,6 @@
 extends RefCounted
 ## Package-local SDK translation capability. Saved data is never translated.
-const SDK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 var _translations: SDK.Translations
 
 func bind(sdk: SDK) -> void:

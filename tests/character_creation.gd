@@ -6,7 +6,7 @@ extends GdUnitTestSuite
 # Native views receive a desktop-sized allocation; this Node test parent does not
 # provide the bounded Control layout that the real host supplies.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CREATOR = preload(ROOT + "ui/character_creator.tscn")
 const BOUNDARY = preload("res://tests/creation_sdk_boundary.gd")
 var stage := 0

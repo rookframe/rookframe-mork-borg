@@ -1,7 +1,7 @@
 extends RefCounted
 ## World-local defaults never mutate Package Actor Definitions.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 
 func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, payload: Variant) -> Dictionary:

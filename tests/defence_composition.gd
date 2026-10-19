@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const DIALOG = preload(ROOT + "ui/shield_dialog.tscn")
 
 func test_compact_shield_geometry_focus_pending_and_close() -> void:

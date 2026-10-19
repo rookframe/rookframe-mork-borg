@@ -1,6 +1,6 @@
 extends GdUnitTestSuite
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 

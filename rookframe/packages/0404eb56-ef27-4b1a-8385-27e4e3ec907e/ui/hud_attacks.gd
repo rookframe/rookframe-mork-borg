@@ -1,7 +1,7 @@
 extends RefCounted
 ## HUD handoff only. The managed tabletop action owns the captured Actor/source.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const SDK = preload(ROOT + "sdk/package_sdk_facade.gd")
+const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
