@@ -1267,4 +1267,5 @@ func finish_corrections() -> void:
 	_update_visibility()
 
 func _label_style(label: Label, role: String) -> void:
-	label.theme_type_variation = "SilkCreature" + role + ("Phone" if _phone else "Tablet" if _tablet else "Desktop")
+	var variation := "SilkCreature" + role + ("Phone" if _phone else "Tablet" if _tablet else "Desktop")
+	label.theme_type_variation = "RookframeCreatureClassificationTablet" if variation == "SilkCreatureClassificationTablet" else variation

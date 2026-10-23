@@ -18,7 +18,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
 | [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.36.0-rc.3` | `rookframe/sdk/`, `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `ac8d2ce1e08ec28db3b620810129a1de03eab13c` | `rookframe/ui/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `746e087d0e23ba29b15e651ee99da8ab2006a1a8` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
@@ -70,7 +70,7 @@ stores are not part of this workflow.
 The full-screen Character sheet follows the approved Silkbound Ledger
 `character-game/sheet.html` reference at 1920 × 1080, 1024 × 768 and 844 × 390.
 Its authored Godot Controls use the public UI Kit theme, fonts, icons and
-`SilkboundCollection`. Character data supplies the content; the reference's
+`Collection`. Character data supplies the content; the reference's
 portrait and illustrative equipment are not shipped as gameplay data.
 Journal notes are local to the current World application visit.
 Desktop hover hints show a title, rules summary and inspection prompt for

@@ -47,7 +47,7 @@ func configure(keys: Array, values: Dictionary, locale: I18N, phone: bool, ident
 			button.tooltip_text = button.text
 		button.text = ""
 		button.icon = preload("res://rookframe/ui/icons/check.svg") if path.ends_with("Save") else preload("res://rookframe/ui/icons/back.svg") if path.ends_with("Back") else preload("res://rookframe/ui/icons/close.svg")
-		button.theme_type_variation = "SilkPrimaryIcon" if path.ends_with("Save") else "SilkIcon"
+		button.theme_type_variation = "RookframePrimaryIcon" if path.ends_with("Save") else "RookframeIcon"
 		button.custom_minimum_size = Vector2(44,44)
 		button.icon_alignment = 1
 	configure_density(phone)

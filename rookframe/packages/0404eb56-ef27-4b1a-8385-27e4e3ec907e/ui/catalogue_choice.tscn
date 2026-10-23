@@ -1,5 +1,5 @@
 [gd_scene load_steps=5 format=3]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/choice_row.tscn" id="1"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/choice.tscn" id="1"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/check.svg" id="2"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/catalogue_choice.gd" id="3"]
 [sub_resource type="StyleBoxFlat" id="SelectedIndicator"]
@@ -15,13 +15,23 @@ corner_radius_bottom_right = 12
 [node name="CatalogueChoice" instance=ExtResource("1")]
 custom_minimum_size = Vector2(0, 52)
 script = ExtResource("3")
-[node name="State" parent="Content" index=1]
+[node name="Icon" parent="Content/Row" index=0]
 visible = false
-[node name="IndicatorLane" type="Control" parent="Content" index=2]
+[node name="Marker" parent="Content/Row" index=1]
+visible = false
+[node name="SelectedMarker" parent="Content/Row" index=2]
+visible = false
+[node name="SelectionMark" parent="Content/Row" index=4]
+visible = false
+[node name="Value" parent="Content/Row" index=5]
+visible = false
+[node name="State" parent="Content/Row" index=6]
+visible = false
+[node name="IndicatorLane" type="Control" parent="Content/Row" index=7]
 custom_minimum_size = Vector2(24, 0)
 layout_mode = 2
 mouse_filter = 2
-[node name="Indicator" type="PanelContainer" parent="Content/IndicatorLane"]
+[node name="Indicator" type="PanelContainer" parent="Content/Row/IndicatorLane"]
 layout_mode = 0
 anchor_top = 0.5
 anchor_bottom = 0.5
@@ -30,7 +40,7 @@ offset_right = 24.0
 offset_bottom = 12.0
 mouse_filter = 2
 theme_override_styles/panel = SubResource("SelectedIndicator")
-[node name="Check" type="TextureRect" parent="Content/IndicatorLane/Indicator"]
+[node name="Check" type="TextureRect" parent="Content/Row/IndicatorLane/Indicator"]
 layout_mode = 2
 mouse_filter = 2
 texture = ExtResource("2")

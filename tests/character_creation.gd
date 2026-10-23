@@ -39,7 +39,7 @@ func test_overlapping_equipment_rolls_insert_dependencies_beside_their_parent() 
 			creator.primary()
 	assert_str(primary).is_equal("Roll Equipment second")
 	var rows: Node = creator.get_node(^"View").get_node(creator.get_node(^"View").LEFT + "/Choices/Area/Rows")
-	var titles: Array = rows.get_children().map(func(row): return row.get_node(^"Inset/Row/Copy/Title").text)
+	var titles: Array = rows.get_children().map(func(row): return row.get_node(^"Content/Row/Copy/Title").text)
 	assert_int(titles.find("Red poison doses")).is_equal(titles.find("Equipment first") + 1)
 	creator.primary()
 	for frame in 3:
@@ -55,10 +55,10 @@ func test_overlapping_equipment_rolls_insert_dependencies_beside_their_parent() 
 	host.complete_roll("Equipment second")
 	await get_tree().process_frame
 	assert_str(primary).is_equal("Roll Monkey count")
-	titles = rows.get_children().map(func(row): return row.get_node(^"Inset/Row/Copy/Title").text)
+	titles = rows.get_children().map(func(row): return row.get_node(^"Content/Row/Copy/Title").text)
 	assert_int(titles.find("Monkey count")).is_equal(titles.find("Equipment second") + 1)
 	var weapon_row = rows.get_children()[titles.find("Weapon")]
-	assert_str(weapon_row.get_node(^"Inset/Row/Value").text).is_equal("Rolling…")
+	assert_str(weapon_row.get_node(^"Content/Row/Value").text).is_equal("Rolling…")
 	host.complete_roll("Weapon")
 	assert_str(primary).is_equal("Roll Monkey count")
 	await _finish(creator)
@@ -111,8 +111,8 @@ func test_arms_wait_for_the_equipment_that_changes_their_dice() -> void:
 	var view: Node = creator.get_node(^"View")
 	var rows: Array = view.get_node(view.LEFT + "/Choices/Area/Rows").get_children()
 	for pair in [["Weapon", "1d6"], ["Armor", "1d2"]]:
-		var row: Node = rows.filter(func(item): return item.get_node(^"Inset/Row/Copy/Title").text == pair[0])[0]
-		assert_str(row.get_node(^"Inset/Row/Copy/Subtitle").text).is_equal(pair[1])
+		var row: Node = rows.filter(func(item): return item.get_node(^"Content/Row/Copy/Title").text == pair[0])[0]
+		assert_str(row.get_node(^"Content/Row/Copy/Description").text).is_equal(pair[1])
 	host.complete_roll("Sacred scroll")
 	await _finish(creator)
 	assert_bool(host.errors.is_empty()).is_true()

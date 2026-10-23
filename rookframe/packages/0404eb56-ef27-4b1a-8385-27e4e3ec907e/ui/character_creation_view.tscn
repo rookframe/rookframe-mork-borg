@@ -580,7 +580,7 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
 [node name="Choices" parent="Layout/Body/StageSlot/Stage/Content/Split/Left" instance=ExtResource("choices")]
-silkbound = true
+spaced_range = true
 layout_mode = 2
 size_flags_vertical = 3
 
@@ -602,7 +602,6 @@ custom_minimum_size = Vector2(0, 20)
 mouse_filter = 2
 
 [node name="Name" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("field")]
-silkbound = true
 layout_mode = 2
 label_text = "Name"
 help_text = "Required"
@@ -614,7 +613,6 @@ custom_minimum_size = Vector2(0, 12)
 mouse_filter = 2
 
 [node name="Description" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("textarea")]
-silkbound = true
 layout_mode = 2
 label_text = "Description"
 help_text = "Optional · a few words to remember them by"
@@ -626,7 +624,7 @@ theme_type_variation = &"WizardDivider"
 
 [node name="Pages" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail" instance=ExtResource("pages")]
 theme = ExtResource("theme")
-silkbound = true
+decorated_pager = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -963,13 +961,13 @@ theme_override_constants/separation = 24
 
 [node name="CharacterPages" parent="Layout/Body/StageSlot/Stage/Content/Review" instance=ExtResource("pages")]
 theme = ExtResource("theme")
-silkbound = true
+decorated_pager = true
 layout_mode = 2
 size_flags_horizontal = 3
 
 [node name="BelongingsPages" parent="Layout/Body/StageSlot/Stage/Content/Review" instance=ExtResource("pages")]
 theme = ExtResource("theme")
-silkbound = true
+decorated_pager = true
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -984,17 +982,13 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 30
 
 [node name="Identity" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character" instance=ExtResource("summary")]
-silkbound = true
 layout_mode = 2
 
 [node name="Abilities" parent="Layout/Body/StageSlot/Stage/Content/Review/CharacterPages/Area/Character" instance=ExtResource("summary")]
-silkbound = true
 layout_mode = 2
 
 [node name="Equipment" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area/Belongings" instance=ExtResource("summary")]
-silkbound = true
 layout_mode = 2
 
 [node name="Traits" parent="Layout/Body/StageSlot/Stage/Content/Review/BelongingsPages/Area/Belongings" instance=ExtResource("summary")]
-silkbound = true
 layout_mode = 2

@@ -6,19 +6,19 @@ signal navigation(direction: int, boundary: bool)
 var title := ""
 
 func _ready() -> void:
-	get_node("Content/Copy/Title").text = _t(title)
-	get_node("Content/Copy/Description").visible = false
+	get_node("Content/Row/Copy/Title").text = _t(title)
+	get_node("Content/Row/Copy/Description").visible = false
 	accessibility_name = _t(title)
-	get_node("Content/Copy/Title").resized.connect(_fit_title)
+	get_node("Content/Row/Copy/Title").resized.connect(_fit_title)
 	_fit_title()
 
 func _fit_title() -> void:
-	custom_minimum_size = Vector2(0, maxf(52, get_node("Content/Copy/Title").size.y + 24))
+	custom_minimum_size = Vector2(0, maxf(52, get_node("Content/Row/Copy/Title").size.y + 24))
 
 func set_selected(chosen: bool) -> void:
 	button_pressed = chosen
-	get_node("Content/State").text = _t("Selected") if chosen else _t("Select")
-	get_node("Content/IndicatorLane/Indicator").visible = chosen
+	get_node("Content/Row/State").text = _t("Selected") if chosen else _t("Select")
+	get_node("Content/Row/IndicatorLane/Indicator").visible = chosen
 	accessibility_description = _t("Selected") if chosen else _t("Not selected")
 
 func _gui_input(event: InputEvent) -> void:
@@ -46,6 +46,6 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Content/Copy/Description").text = _t("Supporting decision copy")
-	get_node(^"Content/Copy/Title").text = _t("Choice")
-	get_node(^"Content/State").text = _t("Select")
+	get_node(^"Content/Row/Copy/Description").text = _t("Supporting decision copy")
+	get_node(^"Content/Row/Copy/Title").text = _t("Choice")
+	get_node(^"Content/Row/State").text = _t("Select")

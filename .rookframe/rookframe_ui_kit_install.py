@@ -15,6 +15,8 @@ import tempfile
 SOURCE = "https://github.com/rookframe/rookframe-ui-kit.git"
 PUBLIC_ROOT = "rookframe/ui/"
 INVENTORY = ".plugged/rookframe-ui-kit-files.json"
+WORKSPACE = "workspace.json"
+LICENSE_ROOT = "rookframe/licenses/"
 PROVENANCE = "rookframe_ui_kit_provenance.json"
 
 
@@ -23,30 +25,52 @@ def git(checkout: Path, *args: str) -> bytes:
 
 
 def committed_runtime(checkout: Path, revision: str) -> tuple[str, dict[str, bytes]]:
-    """Resolve layout from the selected Git tree, never the working checkout."""
+    """Resolve layout from the selected Git tree, never the working checkout.
+
+    Returns project-relative file names. A monorepo revision contributes every
+    package declared by its workspace.json, so all theme packages are available.
+    """
     if not re.fullmatch(r"[0-9a-f]{40}", revision):
         raise ValueError("UI Kit requires a full commit SHA.")
     entries = [entry.split("\t", 1) for entry in git(checkout, "ls-tree", "-rz", revision).decode().split("\0") if entry]
-    roots = [root for root in (PUBLIC_ROOT, "ui-kit/" + PUBLIC_ROOT)
-             if any(name.startswith(root) for _, name in entries)]
-    if len(roots) != 1:
+    names = {name for _, name in entries}
+    if WORKSPACE in names:
+        workspace = json.loads(git(checkout, "show", f"{revision}:{WORKSPACE}"))
+        bases = sorted(package["path"].rstrip("/") + "/" for package in workspace["packages"].values())
+    elif any(name.startswith(PUBLIC_ROOT) for name in names):
+        bases = [""]
+    else:
         raise ValueError("UI Kit must contain exactly one supported core runtime layout.")
-    root = roots[0]
-    if any(metadata.startswith("160000 ") for metadata, name in entries if name.startswith(root)):
+    if not any(name.startswith(base + PUBLIC_ROOT) for base in bases for name in names):
+        raise ValueError("UI Kit runtime is empty.")
+    sources = {}
+    for base in bases:
+        for notice in ("LICENSE", "THIRD_PARTY_NOTICES.md"):
+            if base and base + notice in names:
+                sources[base + notice] = f"{LICENSE_ROOT}{base.rstrip('/').rsplit('/', 1)[-1]}/{notice}"
+    roots = [base + PUBLIC_ROOT for base in bases]
+    if any(metadata.startswith("160000 ") for metadata, name in entries
+           if any(name.startswith(root) for root in roots)):
         raise ValueError("UI Kit core runtime must not contain Git submodules.")
-    archive = git(checkout, "archive", revision, root)
+    archive = git(checkout, "archive", revision, *[root for root in roots if any(name.startswith(root) for name in names)], *sources)
     files = {}
     with tarfile.open(fileobj=io.BytesIO(archive)) as tree:
         for member in tree:
             if member.isdir():
                 continue
-            relative = member.name.removeprefix(root)
-            if not member.name.startswith(root) or not member.isfile() or not relative or ".." in PurePosixPath(relative).parts:
+            if member.name in sources:
+                relative = sources[member.name]
+            else:
+                root = next((root for root in roots if member.name.startswith(root)), "")
+                relative = PUBLIC_ROOT + member.name.removeprefix(root)
+                if not root or relative == PUBLIC_ROOT:
+                    raise ValueError("UI Kit runtime must contain only regular files inside its public root.")
+            if not member.isfile() or ".." in PurePosixPath(relative).parts:
                 raise ValueError("UI Kit runtime must contain only regular files inside its public root.")
+            if relative in files:
+                raise ValueError("UI Kit packages collide at " + relative)
             files[relative] = tree.extractfile(member).read()
-    if not files:
-        raise ValueError("UI Kit runtime is empty.")
-    return root.rstrip("/"), files
+    return ("." if bases == [""] else "workspace.json"), files
 
 
 def safe_path(project: Path, relative: str) -> Path:
@@ -101,10 +125,13 @@ def install_runtime(project: Path, selection: dict[str, str], *, previous_commit
         if not previous_commit:
             previous_commit = git(cache, "rev-parse", "HEAD").decode().strip()
         _, previous = committed_runtime(cache, previous_commit)
-        allowed = None if legacy_files is None else {name.removeprefix("res://").removeprefix(PUBLIC_ROOT) for name in legacy_files if name.startswith("res://" + PUBLIC_ROOT)}
-        old = {"files": {name: digest for name, digest in hashes(previous).items()
-                         if (allowed is None or name in allowed) and safe_path(project, PUBLIC_ROOT + name).exists()}}
+        allowed = None if legacy_files is None else {name.removeprefix("res://") for name in legacy_files}
+        old = {"schemaVersion": 2, "files": {name: digest for name, digest in hashes(previous).items()
+                         if (allowed is None or name in allowed) and safe_path(project, name).exists()}}
     old_files = (old or {}).get("files", {})
+    if (old or {}).get("schemaVersion", 1) < 2:
+        # Version 1 inventories named files relative to the public root.
+        old_files = {PUBLIC_ROOT + name: digest for name, digest in old_files.items()}
     if not cache.exists():
         cache.parent.mkdir(parents=True, exist_ok=True)
         subprocess.run(["git", "init", "--quiet", str(cache)], check=True, capture_output=True)
@@ -115,7 +142,7 @@ def install_runtime(project: Path, selection: dict[str, str], *, previous_commit
     new_hashes = hashes(files)
     # Validate every destination and every stale owned file before any mutation.
     for name in old_files.keys() | files.keys():
-        path = safe_path(project, PUBLIC_ROOT + name)
+        path = safe_path(project, name)
         if path.exists():
             if not path.is_file():
                 raise ValueError("UI Kit destination is not a file: " + name)
@@ -123,10 +150,10 @@ def install_runtime(project: Path, selection: dict[str, str], *, previous_commit
             # may have reserialized them when saving a Package scene.
             if name not in old_files:
                 raise ValueError("UI Kit would overwrite an unrelated file: " + name)
-    record = {"schemaVersion": 1, "commit": commit, "version": selection["tag"],
+    record = {"schemaVersion": 2, "commit": commit, "version": selection["tag"],
               "sourceRoot": source_root, "files": new_hashes}
-    writes = {safe_path(project, PUBLIC_ROOT + name): data for name, data in files.items()}
-    deletes = {safe_path(project, PUBLIC_ROOT + name) for name in old_files.keys() - files.keys()}
+    writes = {safe_path(project, name): data for name, data in files.items()}
+    deletes = {safe_path(project, name) for name in old_files.keys() - files.keys()}
     writes[inventory_path] = encoded(record)
     # Do not leave successful provenance for the previous revision after switching.
     deletes.add(provenance_path)
@@ -145,7 +172,7 @@ def install_runtime(project: Path, selection: dict[str, str], *, previous_commit
             else:
                 atomic_write(path, data)
         raise
-    return {**record, "dest_files": ["res://" + PUBLIC_ROOT + name for name in files]}
+    return {**record, "dest_files": ["res://" + name for name in files]}
 
 
 def verify_runtime(project: Path, commit: str) -> dict:
@@ -154,7 +181,7 @@ def verify_runtime(project: Path, commit: str) -> dict:
     if record["commit"] != commit or record["sourceRoot"] != root or record["files"] != hashes(files):
         raise ValueError("UI Kit ownership inventory does not match the selected revision.")
     for name, data in files.items():
-        if safe_path(project, PUBLIC_ROOT + name).read_bytes() != data:
+        if safe_path(project, name).read_bytes() != data:
             raise ValueError("UI Kit verification failed: " + name)
     return record
 

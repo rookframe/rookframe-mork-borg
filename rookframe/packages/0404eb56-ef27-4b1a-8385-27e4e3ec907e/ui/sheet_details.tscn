@@ -86,7 +86,7 @@ custom_minimum_size = Vector2(44, 44)
 icon = ExtResource("close")
 expand_icon = true
 icon_alignment = 1
-theme_type_variation = "SilkIcon"
+theme_type_variation = "RookframeIcon"
 tooltip_text = "Close details"
 accessibility_name = "Close details"
 [node name="TabsFrame" type="PanelContainer" parent="."]

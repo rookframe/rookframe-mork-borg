@@ -93,7 +93,7 @@ func present(canvas: Vector2) -> void:
 	get_node(HEADER + "Copy/Kicker").theme_type_variation = "SilkCreatureDialogKicker" + density
 	get_node(HEADER + "Copy/TitleBox/Title").theme_type_variation = "SilkCreatureAppearanceTitle" + density
 	get_node(BODY + "Summary").theme_type_variation = "SilkCreatureDialogSummary" + density
-	get_node(BODY + "AmountRow/Caption").theme_type_variation = "SilkCreatureDialogAmount" + density
+	get_node(BODY + "AmountRow/Caption").theme_type_variation = "SilkCreatureDialogAmountPhone" if _phone else "RookframeCreatureDialogAmountDesktop"
 	_refresh_amount_copy()
 	_normal_layout()
 

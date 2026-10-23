@@ -9,7 +9,7 @@
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_chapter_frame.tres" id="chapter_frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_chapter.gd" id="chapter_layout"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/silkbound_collection.tscn" id="choices"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/collection.tscn" id="choices"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition.tscn" id="condition_scene"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition_summary.tscn" id="condition_summary"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_core.gd" id="core_layout"]
@@ -280,7 +280,7 @@ custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
 accessibility_name = "Edit sheet"
-theme_type_variation = &"SilkIcon"
+theme_type_variation = &"RookframeIcon"
 theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_constants/icon_max_width = 24
@@ -345,7 +345,7 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 accessibility_name = "Close character sheet"
-theme_type_variation = &"SilkIcon"
+theme_type_variation = &"RookframeIcon"
 icon = ExtResource("close_icon")
 icon_alignment = 1
 vertical_icon_alignment = 1
@@ -394,7 +394,7 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 accessibility_name = "Edit sheet"
-theme_type_variation = &"SilkIcon"
+theme_type_variation = &"RookframeIcon"
 theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 theme_override_constants/icon_max_width = 22
 icon = ExtResource("edit_icon")
@@ -406,7 +406,7 @@ vertical_icon_alignment = 1
 [node name="PhoneClose" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader"]
 layout_mode = 2
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"SilkIcon"
+theme_type_variation = &"RookframeIcon"
 icon = ExtResource("close_icon")
 theme_override_font_sizes/font_size = 28
 accessibility_name = "Close character sheet"

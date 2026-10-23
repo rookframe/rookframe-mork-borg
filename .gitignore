@@ -3,6 +3,7 @@
 addons/
 build/
 rookframe/ui/
+rookframe/licenses/
 __pycache__/
 *.pyc
 
