@@ -6,6 +6,8 @@ const THEME = preload("res://rookframe/ui/theme/rookframe_theme.tres")
 
 func test_class_can_be_presented_before_the_host_attaches_the_window() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	# Rookframe supplies its active theme to Package surfaces.
+	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("occult-herbmaster")
 	view.present_creation("create-class", {"class_id": "occult-herbmaster", "class_profile": profile}, false)
 	var rules = view.get_node(view.DETAIL + "/ClassBody/Rules")
@@ -27,6 +29,8 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		viewport.gui_embed_subwindows = true
 		add_child(viewport)
 		var surface = load(ROOT + "ui/character_creation_window.tscn").instantiate()
+		# Rookframe supplies its active theme to Package surfaces.
+		surface.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 		host.window = surface
 		surface.sdk = SDK.new(host)
 		viewport.add_child(surface)
@@ -236,6 +240,8 @@ func test_phone_long_origin_detail_stays_above_fixed_actions() -> void:
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	viewport.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("esoteric-hermit")
@@ -306,6 +312,8 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	viewport.size = Vector2i(1920, 1080)
 	add_child(viewport)
 	var surface = load(ROOT + "ui/character_creation_window.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	surface.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	first.window = surface
 	surface.sdk = SDK.new(first)
 	viewport.add_child(surface)
@@ -321,6 +329,8 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	fresh.actors.append(actor.duplicate(true))
 	fresh.reject_sheet = false
 	var restored = load(ROOT + "ui/character_creation_window.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	restored.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	fresh.window = restored
 	restored.sdk = SDK.new(fresh)
 	viewport.add_child(restored)
@@ -346,6 +356,8 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	viewport.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var classes = load(ROOT + "logic/creation_classes.gd").new()

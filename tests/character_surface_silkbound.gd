@@ -33,6 +33,8 @@ func _open(canvas: Vector2i, host: BOUNDARY = BOUNDARY.new()) -> Dictionary:
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var sheet = load(ROOT + "ui/character_surface.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	sheet.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	sheet.sdk = SDK.new(host)
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

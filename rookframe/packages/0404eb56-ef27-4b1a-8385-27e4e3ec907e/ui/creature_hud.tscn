@@ -4,7 +4,6 @@
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="portrait"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_hud.gd" id="script"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/remove.svg" id="damage_icon"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/add.svg" id="heal_icon"]
@@ -29,7 +28,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme = ExtResource("theme")
 script = ExtResource("script")
 
 [node name="Bar" type="Control" parent="."]

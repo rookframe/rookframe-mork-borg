@@ -24,6 +24,8 @@ func _open(canvas: Vector2i) -> Dictionary:
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(viewport)
 	var hud = load(ROOT + "ui/creature_hud.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	hud.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -273,6 +275,8 @@ func test_shared_hud_switches_between_creature_character_and_no_selection() -> v
 	viewport.size = Vector2i(1920, 1080)
 	add_child(viewport)
 	var hud = load(ROOT + "ui/actor_hud.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	hud.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	await _settle()

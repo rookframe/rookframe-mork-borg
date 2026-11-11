@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="frame"]
 [node name="CreationMiniaturePicker" type="Control"]
@@ -61,7 +60,6 @@ script = ExtResource("ornament")
 layout_mode = 1
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource("theme")
 
 [node name="Layout" type="VBoxContainer" parent="Margin"]
 layout_mode = 2

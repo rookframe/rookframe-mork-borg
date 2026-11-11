@@ -29,6 +29,8 @@ func _open(canvas: Vector2i, language := "en") -> Dictionary:
 			background.size = canvas
 			viewport.add_child(background)
 	var hud = load(ROOT + "ui/character_hud.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	hud.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)

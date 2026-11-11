@@ -3,7 +3,6 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface.tscn" id="sheet"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_miniature_picker.tscn" id="miniatures"]
 [ext_resource type="Resource" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_navigation.tres" id="navigation"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_roll_workflow.gd" id="rolls"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_editor.tscn" id="health"]
 [node name="CreatureActor" type="Control"]
@@ -11,7 +10,6 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme = ExtResource("theme")
 script = ExtResource("script")
 navigation = ExtResource("navigation")
 [node name="RollWorkflow" type="Node" parent="."]

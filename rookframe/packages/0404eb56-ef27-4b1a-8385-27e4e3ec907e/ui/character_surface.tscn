@@ -41,7 +41,6 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/strength.svg" id="strength"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/sword.svg" id="sword"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_silkbound_tab.tscn" id="tab"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/toughness.svg" id="toughness"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_validation.gd" id="validation"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_vital.tscn" id="vital"]
@@ -134,7 +133,6 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("theme")
 script = ExtResource("script")
 navigation = ExtResource("navigation")
 
@@ -1570,7 +1568,6 @@ exclusive = true
 unresizable = true
 borderless = true
 accessibility_name = "Entry details"
-theme = ExtResource("theme")
 script = ExtResource("entry_dialog")
 
 [node name="Frame" parent="EntryDialog" instance=ExtResource("evolved_frame")]

@@ -1,9 +1,7 @@
 [gd_scene format=3]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="silk_theme"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_editor.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="field"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_regular.tres" id="body_font"]
 
 [ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_focus.tres" id="focus"]
@@ -63,7 +61,6 @@ exclusive = true
 unresizable = true
 transparent = true
 transparent_bg = true
-theme = ExtResource("theme")
 script = ExtResource("script")
 input_style = SubResource("input")
 focus_style = ExtResource("focus")
@@ -150,7 +147,6 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 15
 text = "Amount"
 [node name="Amount" parent="Panel/Inset/Layout/Content/Body/Rows/AmountRow" instance=ExtResource("field")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(217,48)
 size_flags_horizontal = 0
@@ -174,7 +170,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(0,8)
 mouse_filter = 2
 [node name="Overflow" parent="Panel/Inset/Layout/Content" instance=ExtResource("pages")]
-theme = ExtResource("silk_theme")
 visible = false
 layout_mode = 2
 [node name="Text" type="VBoxContainer" parent="Panel/Inset/Layout/Content/Overflow/Area"]

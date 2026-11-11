@@ -1,9 +1,7 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_surface.gd" id="script"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="silk_theme"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="brand_icon"]
 
-[ext_resource type="Theme" path="res://rookframe/ui/theme/silkbound_theme.tres" id="theme"]
 [ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.tscn" id="appearance"]
@@ -86,7 +84,6 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 texture_filter = 4
-theme = ExtResource("theme")
 script = ExtResource("script")
 correction_frame = ExtResource("correction_frame")
 footer_action_frame = SubResource("footer_action")
@@ -226,7 +223,6 @@ theme_override_styles/panel = ExtResource("identity_frame")
 layout_mode = 2
 theme_override_constants/separation = 0
 [node name="IdentityEditors" parent="Inset/Layout/Body/Identity/Column" instance=ExtResource("correction_form")]
-theme = ExtResource("silk_theme")
 visible = false
 layout_mode = 2
 theme_override_constants/separation = 7
@@ -295,7 +291,6 @@ theme_override_constants/margin_right = 12
 theme_override_constants/margin_top = 8
 theme_override_constants/margin_bottom = 8
 [node name="Fields" parent="Inset/Layout/Body/Identity/Column/HealthEditors/Inset" instance=ExtResource("correction_form")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 vertical = false
 theme_override_constants/separation = 8
@@ -379,7 +374,6 @@ layout_mode = 2
 theme_override_constants/margin_top = 12
 theme_override_constants/margin_bottom = 12
 [node name="Fields" parent="Inset/Layout/Body/Identity/Column/ArmorEditors" instance=ExtResource("correction_form")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 vertical = false
 theme_override_constants/separation = 8
@@ -388,7 +382,6 @@ layout_mode = 2
 custom_minimum_size = Vector2(0,73.5)
 theme_override_constants/separation = 12
 [node name="Armor" parent="Inset/Layout/Body/Identity/Column/Vitals" instance=ExtResource("vital")]
-theme = ExtResource("silk_theme")
 theme_override_styles/focus = ExtResource("roll_focus")
 layout_mode = 2
 [node name="Space" type="Control" parent="Inset/Layout/Body/Identity/Column/Vitals"]
@@ -396,7 +389,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 2
 [node name="Morale" parent="Inset/Layout/Body/Identity/Column/Vitals" instance=ExtResource("vital")]
-theme = ExtResource("silk_theme")
 theme_override_styles/focus = ExtResource("roll_focus")
 layout_mode = 2
 [node name="VitalsRule" type="HSeparator" parent="Inset/Layout/Body/Identity/Column"]
@@ -468,7 +460,6 @@ layout_mode = 2
 theme_override_constants/separation = 0
 
 [node name="Encounter" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)
 size_flags_horizontal = 3
@@ -482,7 +473,6 @@ text = "Encounter"
 toggle_mode = true
 
 [node name="Inventory" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)
 size_flags_horizontal = 3
@@ -496,7 +486,6 @@ text = "Inventory"
 toggle_mode = true
 
 [node name="Appearance" type="Button" parent="Inset/Layout/Body/Workspace/Tabs"]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 custom_minimum_size = Vector2(44, 48)
 size_flags_horizontal = 3
@@ -543,7 +532,6 @@ size_flags_vertical = 3
 theme_override_constants/margin_left = -2
 theme_override_constants/margin_right = -2
 [node name="Primary" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/PrimarySlot" instance=ExtResource("pages")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -563,7 +551,6 @@ size_flags_vertical = 3
 theme_override_constants/margin_left = -2
 theme_override_constants/margin_right = -2
 [node name="Secondary" parent="Inset/Layout/Body/Workspace/Chapter/Content/Encounter/SecondarySlot" instance=ExtResource("pages")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -577,11 +564,9 @@ size_flags_horizontal = 3
 theme_override_constants/separation = 0
 
 [node name="InventoryHeading" parent="Inset/Layout/Body/Workspace/Chapter/Content" instance=ExtResource("inventory_heading")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 visible = false
 [node name="Inventory" parent="Inset/Layout/Body/Workspace/Chapter/Content" instance=ExtResource("pages")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_vertical = 3
 visible = false
@@ -589,7 +574,6 @@ visible = false
 layout_mode = 0
 theme_override_constants/separation = 0
 [node name="Appearance" parent="Inset/Layout/Body/Workspace/Chapter/Content" instance=ExtResource("appearance")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 visible = false
 script = ExtResource("appearance_script")
@@ -599,7 +583,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 [node name="Details" parent="Inset/Layout/Body/Workspace/Chapter/Content/CorrectionSlot" instance=ExtResource("correction_details")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 [node name="Reader" type="VBoxContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content"]
 layout_mode = 2
@@ -611,7 +594,6 @@ custom_minimum_size = Vector2(44, 44)
 text = "Back to creature"
 theme_type_variation = "TaskButton"
 [node name="Pages" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader" instance=ExtResource("pages")]
-theme = ExtResource("silk_theme")
 layout_mode = 2
 size_flags_vertical = 3
 [node name="FocusInset" type="MarginContainer" parent="Inset/Layout/Body/Workspace/Chapter/Content/Reader/Pages/Area"]
@@ -765,7 +747,6 @@ borderless = true
 transient = true
 exclusive = true
 unresizable = true
-theme = ExtResource("theme")
 script = ExtResource("correction_dialog")
 accessibility_name = "Creature corrections"
 [node name="Frame" parent="CorrectionDialog" instance=ExtResource("evolved_frame")]

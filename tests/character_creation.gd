@@ -532,6 +532,8 @@ func test_royalty() -> void:
 func test_fanged_hound() -> void:
 	stages.clear()
 	var creator = CREATOR.instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	creator.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	add_child(auto_free(creator))
 	creator.size = Vector2(1920, 1080)
 	if not _check(creator.has_method("select_class"), "The System creation action must offer Fanged Deserter selection."):
@@ -573,6 +575,8 @@ func test_fanged_hound() -> void:
 
 func test_fanged_scrolls() -> void:
 	var creator = CREATOR.instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	creator.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	add_child(auto_free(creator))
 	creator.size = Vector2(1920, 1080)
 	if not _check(creator.has_method("choose_scroll_disposition"), "Illiteracy requires an explicit choice for each starting scroll."):
@@ -614,6 +618,8 @@ func test_gutterborn_fingersmith() -> void:
 		"Equipment pack": [[1]], "Equipment first": [[1]], "Equipment second": [[6]], "Weapon": [[6]], "Armor": [[4]],
 	}
 	var creator = CREATOR.instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	creator.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	add_child(auto_free(creator))
 	creator.size = Vector2(1920, 1080)
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("gutterborn-scum-character", "actor_definition")]
@@ -645,6 +651,8 @@ func test_hermit_hawk() -> void:
 		"Equipment pack": [[1]], "Equipment first": [[1]], "Equipment second": [[6]], "Hermit scroll family": [[4]], "Hermit scroll": [[7]], "Weapon": [[4]], "Armor": [[4]],
 	}
 	var creator = CREATOR.instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	creator.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	add_child(auto_free(creator))
 	creator.size = Vector2(1920, 1080)
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("esoteric-hermit-character", "actor_definition"), _entry("hawk-as-weapon", "actor_definition")]
@@ -878,6 +886,8 @@ func _host_for(class_id: String, feature_roll: int):
 
 func _creator_for(host, class_id: String):
 	var creator = CREATOR.instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	creator.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	add_child(auto_free(creator))
 	creator.size = Vector2(1920, 1080)
 	var entries: Array[SDK.ContentEntry] = []

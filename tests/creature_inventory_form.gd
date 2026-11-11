@@ -43,6 +43,8 @@ func test_custom_form_saves_typed_damage_and_keeps_creature_capabilities() -> vo
 	viewport.size = Vector2i(1920, 1080)
 	add_child(viewport)
 	var surface = load(ROOT + "ui/creature_surface.tscn").instantiate()
+	# Rookframe supplies its active theme to Package surfaces.
+	surface.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	surface.set_meta("rookframe_sdk", host)
 	viewport.add_child(surface)
 	surface._rookframe_open_actor("hero")

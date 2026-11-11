@@ -3,7 +3,7 @@ const CARD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec9
 
 func _card():
 	var card = auto_free(CARD.instantiate())
-	card.theme = preload("res://rookframe/ui/theme/silkbound_theme.tres")
+	card.theme = preload("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
 	add_child(card)
 	card.identity("Graveworm", "Shortsword", "Melee · Strength · 5 ft")
 	return card
