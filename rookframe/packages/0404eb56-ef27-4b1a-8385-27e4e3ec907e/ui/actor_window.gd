@@ -4,6 +4,7 @@ const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 
 const MINIATURE_ACTIONS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_actions.gd")
 
+const ACTION_BUTTON = preload("res://rookframe/ui/components/actions/button.tscn")
 const CREATURE_KIND := "actor_definition"
 var _pending_route := ""
 const CREATURE_ITEMS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_actions.gd")
@@ -92,12 +93,12 @@ func ready() -> void:
 
 
 func _apply_density() -> void:
-	_layout.add_theme_constant_override("separation", 12)
-	_header.add_theme_constant_override("separation", 2 if _compact else 4)
-	_content.add_theme_constant_override("separation", 8 if _compact else 12)
-	_detail.add_theme_constant_override("separation", 16)
+	_layout.add_theme_constant_override("separation", _space(3))
+	_header.add_theme_constant_override("separation", _space(1))
+	_content.add_theme_constant_override("separation", _space(2 if _compact else 3))
+	_detail.add_theme_constant_override("separation", _space(4))
 	_sheet_grid.vertical = _compact
-	_sheet_grid.add_theme_constant_override("separation", 12 if _compact else 20)
+	_sheet_grid.add_theme_constant_override("separation", _space(3 if _compact else 5))
 	_content.custom_minimum_size = Vector2(0, 0)
 	# The managed host chrome already identifies the Package. Keep the body
 	# focused on the active route so desktop does not repeat that identity above
@@ -106,11 +107,21 @@ func _apply_density() -> void:
 	_header_subtitle.visible = false
 	_header_title.visible = true
 	_status.visible = not _compact
-	_body.add_theme_constant_override("scrollbar_width", 8 if _compact else 12)
-	_stats.add_theme_constant_override("separation", 8)
+	_stats.add_theme_constant_override("separation", _space(2))
 	if _compact:
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
 		_protection_label.text = _t("ARMOR")
+
+
+# Gaps and insets follow the World theme's `space_1`..`space_8` steps.
+func _space(step: int) -> int:
+	return get_theme_constant("space_%d" % step, &"RookframeTokens")
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready() and sdk != null:
+		_apply_density()
+		_configure_surface_spacing()
 
 
 func _refresh_world() -> void:
@@ -744,10 +755,9 @@ func _present_initiated_defence() -> void:
 	owners.visible = not choices.is_empty()
 	for raw in choices:
 		var choice: Dictionary = raw
-		var button := Button.new()
+		var button: Button = ACTION_BUTTON.instantiate()
 		button.text = str(choice.name)
-		button.custom_minimum_size = Vector2(0, 44)
-		button.theme_type_variation = "RookframeSecondaryButton"
+		button.set(&"compact", true)
 		button.pressed.connect(_select_defender.bind(str(choice.id)))
 		owners.add_child(button)
 
@@ -828,15 +838,11 @@ func _creature_decision_closed() -> void:
 
 func _configure_surface_spacing() -> void:
 	var compact := size.x < 600
-	for tabs in [get_node(^"Layout/Header/Routes"), get_node(^"Layout/CharacterTabs")]:
-		for child in tabs.get_children():
-			var tab := child as Button
-			tab.add_theme_font_size_override("font_size", 12 if size.x < 360 else 14)
-	_layout.offset_left = 12.0 if compact else 24.0
+	_layout.offset_left = _space(3 if compact else 5)
 	_layout.offset_right = -_layout.offset_left
-	_layout.offset_top = 0.0 if compact else 16.0
-	_layout.offset_bottom = -6.0 if compact else -8.0
-	_layout.add_theme_constant_override("separation", 8 if compact else 20)
+	_layout.offset_top = 0.0 if compact else float(_space(4))
+	_layout.offset_bottom = -_space(2)
+	_layout.add_theme_constant_override("separation", _space(2 if compact else 5))
 
 
 func localize(locale: I18N) -> void:
