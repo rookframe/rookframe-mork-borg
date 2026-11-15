@@ -1,58 +1,60 @@
 extends PanelContainer
+## One rule of a Creature: heading, copy and its roll or correction actions.
+##
+## The card frame is a hairline under the card, built from `RookframeTokens`.
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
-@export var article_frame: StyleBoxFlat
+const TYPE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_type.gd")
+const TOKENS := &"RookframeTokens"
 signal requested(part: String, id: String)
 const CELL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_resolution_cell.tscn")
+const ACTION = preload("res://rookframe/ui/components/actions/button.tscn")
 var entry_id := ""
 var _buttons := []
 var _parts: Array[String] = []
 var _tablet := false
 var _phone := false
-var _frame: StyleBoxFlat = StyleBoxFlat.new()
-var _copy_line_height := 25.5
+var _actions := false
+var _frame := StyleBoxFlat.new()
+var _reading := false
 
-func _ready() -> void:
-	get_node("Content/Copy").resized.connect(_queue_fit_copy)
+func _init() -> void:
+	add_theme_stylebox_override(&"panel", _frame)
 
-func _queue_fit_copy() -> void:
-	# Measure after native wrapping has accepted the current width and font.
-	_fit_copy.call_deferred()
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_tokens()
 
-func _fit_copy() -> void:
-	var copy: Label = get_node("Content/Copy")
-	var height := copy.get_line_count() * _copy_line_height
-	if copy.custom_minimum_size.y != height:
-		copy.custom_minimum_size = Vector2(0, height)
+# Changing the override's StyleBox notifies this Control of a theme change, so
+# the read guards against re-entering itself.
+func _read_tokens() -> void:
+	if _reading or not is_inside_tree():
+		return
+	_reading = true
+	var padding := get_theme_constant(&"space_1" if _phone else &"space_3" if _tablet else &"space_4", TOKENS)
+	_frame.bg_color = Color.TRANSPARENT
+	_frame.border_color = get_theme_color(&"divider", TOKENS)
+	# The rule above the actions already closes a card that ends with them.
+	_frame.border_width_bottom = 0 if _actions else get_theme_constant(&"border_width", TOKENS)
+	_frame.content_margin_top = padding
+	_frame.content_margin_bottom = 0 if _actions else padding
+	_reading = false
 
-func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool, compact_boss: bool = false) -> void:
+func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool, _compact_boss: bool = false) -> void:
 	_tablet = tablet
 	_phone = phone
-	_copy_line_height = 19.2 if phone else 24.3 if tablet else 29.4
 	entry_id = str(entry.get("id", ""))
 	var heading: Label = get_node("Content/Heading")
 	var copy: Label = get_node("Content/Copy")
 	heading.text = locale.text(str(entry.get("name", "")))
 	copy.text = locale.text(str(entry.get("text", "")))
-	heading.add_theme_font_size_override("font_size", 19 if phone else 20 if tablet else 24)
 	heading.visible = not heading.text.is_empty()
 	copy.visible = not copy.text.is_empty()
-	copy.add_theme_font_size_override("font_size", 16 if phone else 18 if tablet else 21)
-	copy.add_theme_constant_override("line_spacing", 0 if phone else 1 if tablet else 2)
-	_label_style(heading, "RuleTitle")
-	_label_style(copy, "RuleCopy")
-	_queue_fit_copy()
-	get_node("Content/HeadingGap").visible = heading.visible and copy.visible
-	get_node("Content/HeadingGap").custom_minimum_size = Vector2(0, 4 if phone else 6 if tablet else 8)
-	get_node("Content/ResolutionGap").custom_minimum_size = Vector2(0, 6 if phone else 12)
-	var frame: StyleBoxFlat = article_frame.duplicate()
-	frame.content_margin_left = 0
-	frame.content_margin_right = frame.content_margin_left
-	frame.content_margin_top = 6 if phone else 12 if tablet else 16
-	frame.content_margin_bottom = frame.content_margin_top + 1
-	_frame = frame
-	add_theme_stylebox_override("panel", frame)
+	TYPE.apply(heading, "RuleTitle", phone, tablet)
+	TYPE.apply(copy, "RuleCopy", phone, tablet)
+	get_node("Content").set(&"gap", &"space_1" if phone else &"space_2")
 	get_node("Content/Resolution").visible = false
-	get_node("Content/ResolutionGap").visible = false
+	_actions = false
+	_read_tokens()
 
 func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 	_buttons.clear()
@@ -61,40 +63,30 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 	for child in host.get_children():
 		host.remove_child(child)
 		child.queue_free()
-	host.add_theme_constant_override("h_separation", 8 if phone else 14)
+	host.set(&"gap_horizontal", &"space_2" if phone else &"space_3")
 	for raw in actions:
 		var action: Dictionary = raw
-		var button: Button = CELL.instantiate() if action.has("dice") else Button.new()
+		var button: Button = CELL.instantiate() if action.has("dice") else ACTION.instantiate()
 		host.add_child(button)
 		var caption := locale.text(str(action.get("name", "")))
 		var value := str(action.get("dice", ""))
 		if action.has("dice"):
 			var passive := bool(action.get("reference", false))
-			# Complete native caption/value lines retain the reference insets.
-			button.custom_minimum_size = Vector2(44, 57 if phone else 58 if _tablet else 66)
-			(button.get_node("Inset/Row/Copy/Caption") as Label).text = caption
-			(button.get_node("Inset/Row/Copy/Caption") as Label).add_theme_font_size_override("font_size", 14 if phone or _tablet else 17)
-			(button.get_node("Inset/Row/Copy/Value") as Label).text = "1" + value if value.begins_with("d") and not value.contains("/") else value
-			(button.get_node("Inset/Row/Copy/Value") as Label).add_theme_font_size_override("font_size", 21 if phone else 22 if _tablet else 26)
-			(button.get_node("Inset/Row/Copy/Value") as Label).add_theme_color_override("font_color", Color(0.905882,0.905882,0.866667, 1) if passive else Color(0.905882,0.905882,0.866667, 1))
-			(button.get_node("Inset/Row/Icon") as TextureRect).visible = not passive
-			var icon_size := 20 if phone or _tablet else 24
-			(button.get_node("Inset/Row/Icon") as TextureRect).custom_minimum_size = Vector2(icon_size, icon_size)
-			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_top", 8)
-			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_bottom", 8)
-			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_left", 8 if phone else 12)
-			(button.get_node("Inset") as MarginContainer).add_theme_constant_override("margin_right", 8 if phone else 12)
-			_label_style(button.get_node("Inset/Row/Copy/Caption"), "RollCaption")
-			_label_style(button.get_node("Inset/Row/Copy/Value"), "RollValue")
-			var minimum_height := button.custom_minimum_size.y
+			var caption_label: Label = button.get_node("Inset/Row/Copy/Caption")
 			var value_label: Label = button.get_node("Inset/Row/Copy/Value")
-			value_label.resized.connect(_queue_fit_cell.bind(button, minimum_height))
-			_queue_fit_cell(button, minimum_height)
+			caption_label.text = caption
+			value_label.text = "1" + value if value.begins_with("d") and not value.contains("/") else value
+			(button.get_node("Inset/Row/Icon") as TextureRect).visible = not passive
+			TYPE.apply(caption_label, "Caption", phone, _tablet)
+			TYPE.apply(value_label, "Value", phone, _tablet)
+			var inset: MarginContainer = button.get_node("Inset")
+			inset.minimum_size_changed.connect(_queue_fit_cell.bind(button))
+			_queue_fit_cell(button)
 			button.disabled = passive or bool(action.get("disabled", false))
 		else:
 			button.text = caption
-			button.custom_minimum_size = Vector2(44,44)
-			button.add_theme_font_size_override("font_size", 11 if phone else 14)
+			button.compact = true
+			button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			button.disabled = bool(action.get("disabled", false))
 		button.accessibility_name = get_node("Content/Heading").text + ": " + caption + " " + value
 		button.pressed.connect(_action_requested.bind(str(action.get("part", "details"))))
@@ -105,23 +97,22 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 		var space := Control.new()
 		space.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		host.add_child(space)
-	var frame: StyleBoxFlat = _frame.duplicate()
-	if not actions.is_empty():
-		frame.content_margin_bottom = 1
-	add_theme_stylebox_override("panel", frame)
-	get_node("Content/Resolution").visible = not actions.is_empty()
-	get_node("Content/ResolutionGap").visible = not actions.is_empty()
+	_actions = not actions.is_empty()
+	get_node("Content/Resolution").visible = _actions
+	_read_tokens()
 
-func _queue_fit_cell(button: Button, minimum_height: float) -> void:
-	_fit_cell.call_deferred(button, minimum_height)
+func _queue_fit_cell(button: Button) -> void:
+	_fit_cell.call_deferred(button)
 
-func _fit_cell(button: Button, minimum_height: float) -> void:
+func _fit_cell(button: Button) -> void:
 	if not is_instance_valid(button):
 		return
 	# The Button is an indivisible pager item. Let its authored Containers fit
 	# the complete wrapped value, retaining the normal row and all its padding.
 	var inset: MarginContainer = button.get_node("Inset")
-	button.custom_minimum_size = Vector2(44, maxf(minimum_height, inset.get_combined_minimum_size().y))
+	var height := maxf(44.0, inset.get_combined_minimum_size().y)
+	if button.custom_minimum_size.y != height:
+		button.custom_minimum_size = Vector2(44, height)
 
 func _action_requested(part: String) -> void:
 	requested.emit(part, entry_id)
@@ -133,6 +124,3 @@ func restore_focus(part: String = "") -> bool:
 			button.grab_focus()
 			return true
 	return false
-
-func _label_style(label: Label, role: String) -> void:
-	label.theme_type_variation = "SilkCreature" + role + ("Phone" if _phone else "Tablet" if _tablet else "Desktop")

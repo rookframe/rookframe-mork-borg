@@ -16,6 +16,8 @@ const ITEMS = preload(ROOT + "logic/creature_actions.gd")
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const FIELD = preload(ROOT + "ui/creature_loot_field.tscn")
+const TYPE = preload(ROOT + "ui/creature_type.gd")
+const OPTION = preload("res://rookframe/ui/components/actions/button.tscn")
 const FIELD_SCRIPT = preload(ROOT + "ui/creature_loot_field.gd")
 const SEARCH = preload("res://rookframe/ui/components/forms/text_field.tscn")
 const SEARCH_SCRIPT = preload("res://rookframe/ui/components/forms/text_field.gd")
@@ -320,8 +322,6 @@ func _render_detail() -> void:
 		var search: SEARCH_SCRIPT = SEARCH.instantiate()
 		sheet.reader_content().add_child(search)
 		search.label_text = locale.text("Search equipment")
-		var caption: Label = search.get_node("Label")
-		caption.add_theme_font_size_override("font_size", 15 if sheet.size.x <= 900 else 18)
 		search.value = _catalogue_query
 		search.value_changed.connect(_filter_catalogue)
 		var create := _option("Create custom item", _custom, owner())
@@ -338,9 +338,8 @@ func _render_detail() -> void:
 		for key in ["name", "kind", "quantity", "uses", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 			_item_field(str(key), str(_new_item.get(key, "Equipment" if key == "kind" else "1" if key == "quantity" else "0" if key in ["uses", "range_feet", "armor_tier"] else "")), false)
 		var add := _option("Add custom item", _add_custom, owner())
-		add.theme_type_variation = "TaskPrimary"
-		add.custom_minimum_size = Vector2(254, 52)
-		add.size_flags_horizontal = 8
+		add.set(&"variant", 1)
+		add.size_flags_horizontal = Control.SIZE_SHRINK_END
 	elif _detail.begins_with("item:"):
 		var item := _item(return_entry)
 		if item.is_empty():
@@ -355,14 +354,14 @@ func _render_detail() -> void:
 
 			if owner():
 				_option("Finish item editing" if _edit_item else "Edit item", _edit_loot, not _busy)
-				_option("Remove item", _remove_item, not _busy)
+				_option("Remove item", _remove_item, not _busy).set(&"variant", 2)
 	sheet.restore_reader(page)
 
 func _text(text: String) -> Label:
 	var label := Label.new()
 	label.text = locale.text(text)
 	label.autowrap_mode = 3
-	label.theme_type_variation = "SilkCreatureRuleCopy" + ("Phone" if sheet.size.x <= 900 else "Tablet" if sheet.size.x <= 1300 else "Desktop")
+	TYPE.apply(label, "RuleCopy", sheet.size.x <= 900, sheet.size.x > 900 and sheet.size.x <= 1300)
 	sheet.reader_content().add_child(label)
 	return label
 
@@ -378,11 +377,9 @@ func _filter_catalogue(query: String) -> void:
 		_catalogue_empty.visible = count == 0
 
 func _option(title: String, action: Callable, enabled: bool) -> Button:
-	var button := Button.new()
+	var button: Button = OPTION.instantiate()
 	button.text = locale.text(title)
 	button.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	button.theme_type_variation = "TaskButton"
-	button.custom_minimum_size = Vector2(100, 52)
 	button.disabled = not enabled or _busy
 	button.pressed.connect(action)
 	sheet.reader_content().add_child(button)

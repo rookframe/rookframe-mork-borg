@@ -1,10 +1,8 @@
 [gd_scene format=3]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_regular.tres" id="font"]
 [node name="CreatureSectionButton" type="Button"]
 custom_minimum_size = Vector2(44,44)
 size_flags_horizontal = 3
 size_flags_vertical = 0
+theme_type_variation = &"RookframeTabButton"
 toggle_mode = true
 clip_text = false
-theme_override_fonts/font = ExtResource("font")
-theme_override_font_sizes/font_size = 16

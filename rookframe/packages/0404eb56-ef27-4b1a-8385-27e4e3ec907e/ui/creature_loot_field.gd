@@ -1,6 +1,27 @@
 extends VBoxContainer
 
 signal changed(field: String, text: String)
+const TOKENS := &"RookframeTokens"
+## Constant token of the gap between the parts, `space_1` to `space_8`. Empty means no gap.
+@export var gap: StringName = &"space_1":
+	set(value):
+		gap = value
+		_read_tokens()
+var _reading := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_tokens()
+
+# Setting an override notifies this Control of a theme change, so the read
+# guards against re-entering itself.
+func _read_tokens() -> void:
+	if _reading or not is_inside_tree():
+		return
+	_reading = true
+	add_theme_constant_override(&"separation", get_theme_constant(gap, TOKENS) if gap else 0)
+	_reading = false
+
 signal submitted(field: String, text: String)
 var _field := ""
 var _initial := ""
@@ -66,18 +87,9 @@ func _focus_editor() -> void:
 	else:
 		get_node(^"Value").focus_editor()
 
-func configure_layout(phone: bool) -> void:
-	for path in [^"Value", ^"Text"]:
-		get_node(path).add_theme_constant_override("separation", 4 if phone else 6)
-		var editor: Control = get_node("Text/Editor") if path == ^"Text" else get_node("Value/Editor")
-		editor.custom_minimum_size = Vector2(0, 96 if path == ^"Text" else 48)
-		editor.add_theme_font_size_override("font_size", 18 if phone else 20)
-		var label: Label = get_node("Text/Label") if path == ^"Text" else get_node("Value/Label")
-		label.theme_type_variation = "SilkCreatureHealthTitlePhone" if phone else "SilkCreatureDialogSummaryPhone"
-		label.add_theme_font_size_override("font_size", 15 if phone else 18)
-		label.add_theme_color_override("font_color", Color(0.682353,0.729412,0.745098,1))
-	for caption in [^"Value/Help", ^"Value/Error", ^"Text/Help", ^"Text/Error"]:
-		get_node(caption).add_theme_font_size_override("font_size", 15 if phone else 18)
+## The UI Kit fields keep their World theme look in every density.
+func configure_layout(_phone: bool) -> void:
+	pass
 
 func has_editor_focus() -> bool:
 	return get_node(^"Text").is_editor_focused() if _multiline else get_node(^"Value").is_editor_focused()
