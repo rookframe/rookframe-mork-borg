@@ -448,8 +448,9 @@ text = "Create Character"
 variant = 1
 compact = true
 
-[node name="SheetActions" type="HBoxContainer" parent="Layout"]
+[node name="SheetActions" type="HFlowContainer" parent="Layout"]
 layout_mode = 2
+alignment = 2
 visible = false
 script = ExtResource("box")
 
