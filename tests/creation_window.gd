@@ -250,9 +250,14 @@ func test_phone_long_origin_detail_stays_above_fixed_actions() -> void:
 	await _settle()
 	var copy: Label = view.get_node(view.DETAIL + "/RollOutcome/ResultCopy")
 	assert_str(copy.text).is_equal(profile.origins[5])
-	for node in view.get_node(view.DETAIL).find_children("*", "Label", true, false):
-		if node.is_visible_in_tree():
-			assert_bool(view.get_node(view.STAGE + "/Content").get_global_rect().encloses(node.get_global_rect())).is_true()
+	var content: Rect2 = view.get_node(view.STAGE + "/Content").get_global_rect()
+	var pages = view.get_node(view.STAGE + "/Content/Split/Detail/Pages")
+	# The page area clips what a theme's type sizes push onto a later page.
+	assert_bool(content.encloses(pages.get_node(^"Area").get_global_rect())).is_true()
+	if not pages.get_node(^"Pager").visible:
+		for node in view.get_node(view.DETAIL).find_children("*", "Label", true, false):
+			if node.is_visible_in_tree():
+				assert_bool(content.encloses(node.get_global_rect())).is_true()
 	if DisplayServer.get_name() != "headless":
 		RenderingServer.force_draw()
 		viewport.get_texture().get_image().save_png(OS.get_environment("RFG_EVIDENCE_DIR").path_join("creator-phone-long-origin.png"))
@@ -266,8 +271,8 @@ func _capture(viewport: SubViewport, name: String) -> void:
 	await get_tree().create_timer(0.45).timeout
 	if name.begins_with("tablet-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(28, 22, 968, 722)).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
+		_assert_frame(view, bounds, Rect2(28, 22, 968, 722), name)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
 				assert_bool(button.size.y >= 44).is_true()
@@ -285,8 +290,8 @@ func _capture(viewport: SubViewport, name: String) -> void:
 			await _settle()
 	if name.begins_with("phone-") and not name.ends_with("-browser"):
 		var view = viewport.get_child(0).get_node(^"CharacterCreator/View")
-		assert_bool(view.get_node(^"Layout").get_global_rect() == Rect2(24, 18, 796, 352)).override_failure_message(name + " " + str(view.get_node(^"Layout").get_global_rect())).is_true()
 		var bounds := Rect2(Vector2.ZERO, viewport.size)
+		_assert_frame(view, bounds, Rect2(24, 18, 796, 352), name)
 		for button in view.find_children("*", "Button", true, false):
 			if button.is_visible_in_tree():
 				assert_bool(button.size.y >= 44).is_true()
@@ -305,6 +310,14 @@ func _capture(viewport: SubViewport, name: String) -> void:
 		DirAccess.make_dir_recursive_absolute(directory)
 		RenderingServer.force_draw()
 		viewport.get_texture().get_image().save_png(directory.path_join("creator-" + name + ".png"))
+
+# Every World theme keeps the wizard inside the window. The exact inset is the
+# Silkbound Ledger frame's, so it is pinned under that theme only.
+func _assert_frame(view: Control, bounds: Rect2, silkbound: Rect2, name: String) -> void:
+	var layout: Rect2 = view.get_node(^"Layout").get_global_rect()
+	assert_bool(bounds.encloses(layout)).override_failure_message(name + " " + str(layout)).is_true()
+	if WORLD_THEME.name() == "silkbound-ledger":
+		assert_bool(layout == silkbound).override_failure_message(name + " " + str(layout)).is_true()
 
 func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> void:
 	var first = BOUNDARY.new()
