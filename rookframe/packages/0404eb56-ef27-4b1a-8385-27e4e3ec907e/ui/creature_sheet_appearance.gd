@@ -29,6 +29,7 @@ signal portrait_requested
 signal portrait_reset_requested
 @export var miniature_only := false
 var _assigned := false
+var _phone := false
 const PORTRAIT := "Columns/PortraitPanel/Inset/Content/"
 const MINIATURE := "Columns/MiniaturePanel/Inset/Content/"
 func _ready() -> void:
@@ -38,6 +39,7 @@ func _ready() -> void:
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").pressed.connect(_miniature_clear)
 
 func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, phone: bool, tablet: bool, name: String = "") -> void:
+	_phone = phone
 	get_node("Intro").visible = not phone and not miniature_only
 	get_node("Columns/PortraitPanel").visible = not miniature_only
 	get_node("TopSpace").visible = false
@@ -91,7 +93,8 @@ func miniature(locale: I18N, title: String, package: String, assigned: bool) -> 
 	get_node(MINIATURE + "MiniatureCaption").text = title if assigned else locale.text("No miniature selected")
 	get_node(MINIATURE + "PackageCaption").text = package
 	get_node(MINIATURE + "MiniatureCaption").visible = assigned
-	get_node(MINIATURE + "PackageCaption").visible = assigned
+	# A phone keeps the height for the miniature itself.
+	get_node(MINIATURE + "PackageCaption").visible = assigned and not (_phone and miniature_only)
 	get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").text = locale.text("Change miniature" if assigned else "Choose miniature")
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").visible = assigned
 	get_node(MINIATURE + "EmptyPreview").visible = not assigned
