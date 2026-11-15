@@ -7,7 +7,7 @@ func apply_sheet_layout(phone: bool, tablet: bool, detail: bool = false, task: b
 	var outer := _outer()
 	var inset := _leaf_inset()
 	var picker: Control = get_node(^"Margin/Layout/Picker")
-	picker.add_theme_constant_override("separation", inset + SHEET_TOKENS.pixels(self, &"space_5"))
+	picker.set(&"gap", &"space_6" if phone else &"space_7")
 	var margin: MarginContainer = get_node(^"Margin")
 	for edge in ["left", "right"]:
 		margin.add_theme_constant_override("margin_" + edge, outer + inset)
