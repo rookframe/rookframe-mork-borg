@@ -9,15 +9,6 @@ const ITEMS = preload(ROOT + "ui/hud_items.gd")
 const COMPANIONS = preload(ROOT + "ui/hud_companions.gd")
 const RECOVERY = preload(ROOT + "ui/hud_recovery.gd")
 const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
-const CATEGORY_ICONS := {
-	"Abilities": preload(ROOT + "ui/hud_art/abilities.svg"),
-	"Attacks": preload(ROOT + "ui/hud_art/attacks.svg"),
-	"Powers": preload(ROOT + "ui/hud_art/powers.svg"),
-	"Items": preload(ROOT + "ui/hud_art/items.svg"),
-	"Features": preload(ROOT + "ui/hud_art/features.svg"),
-	"Companions": preload(ROOT + "ui/hud_art/companions.svg"),
-	"Recovery": preload(ROOT + "ui/hud_art/recovery.svg"),
-}
 const ABILITIES := ["Strength", "Agility", "Presence", "Toughness"]
 const ABILITY_ICONS := [preload(ROOT + "ui/hud_art/abilities.svg"), preload("res://rookframe/ui/icons/character/agility.svg"), preload(ROOT + "ui/hud_art/ability-presence.svg"), preload("res://rookframe/ui/icons/character/presence.svg")]
 
@@ -69,32 +60,34 @@ func ready() -> void:
 	sdk.character_hud.context_changed.connect(_refresh)
 	sdk.world_changed.connect(_refresh)
 	resized.connect(_layout)
-	_panel.reaction_changed.connect(_leaf_reaction)
-	get_node("Bar/Dice").pressed.connect(_open_dice)
-	get_node("Bar/Dice").accessibility_name = sdk.translations.text("Dice")
-	get_node("Bar/Identity").pressed.connect(_open_sheet)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty/Sheet").pressed.connect(_empty_action)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Close").pressed.connect(_close_panel)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Back").pressed.connect(_back_or_close)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").toggled.connect(_toggle_all)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Morning").pressed.connect(_morning)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Morning").text = sdk.translations.text("Morning")
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Morning").accessibility_name = sdk.translations.text("Morning Power allowance")
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Previous").pressed.connect(_change_page.bind(-1))
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Next").pressed.connect(_change_page.bind(1))
+	_bar.minimum_size_changed.connect(_layout)
+	_bar.resized.connect(_layout_panel)
+	_bar.more_text = sdk.translations.text("More")
+	get_node("%Dice").pressed.connect(_open_dice)
+	get_node("%Identity").pressed.connect(_open_sheet)
+	get_node(CONTENT + "Empty/Sheet").pressed.connect(_empty_action)
+	get_node(CONTENT + "Header/Close").pressed.connect(_close_panel)
+	get_node(CONTENT + "Header/Back").pressed.connect(_back_or_close)
+	get_node(CONTENT + "Header/ShowAll").toggled.connect(_toggle_all)
+	get_node(CONTENT + "Header/Morning").pressed.connect(_morning)
+	get_node(CONTENT + "Header/Morning").text = sdk.translations.text("Morning")
+	get_node(CONTENT + "Header/Morning").accessibility_name = sdk.translations.text("Morning Power allowance")
+	get_node(CONTENT + "Footer/Previous").pressed.connect(_change_page.bind(-1))
+	get_node(CONTENT + "Footer/Next").pressed.connect(_change_page.bind(1))
 	for category in BUTTONS:
-		var button: Button = get_node("Bar/Categories/" + category)
-		button.pressed.connect(_open_category.bind(category))
-		get_node("Bar/Categories/" + category + "/Title").text = sdk.translations.text(category)
-		button.accessibility_name = sdk.translations.text(category)
-		get_node("Bar/Categories/" + category + "/Icon").texture = CATEGORY_ICONS.get(category)
-		get_node("Bar/Categories/" + category + "/Icon").modulate = PICTOGRAM
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty/Title").text = sdk.translations.text("No entries")
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty/Sheet").text = sdk.translations.text("Character sheet")
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").text = sdk.translations.text("Show all")
-	for path in ["Panel/Surface/Viewport/Root/Ink/Content/Header/Close", "Panel/Surface/Viewport/Root/Ink/Content/Back", "Panel/Surface/Viewport/Root/Ink/Content/Footer/Previous", "Panel/Surface/Viewport/Root/Ink/Content/Footer/Next"]:
+		var button: Button = get_node("%" + category)
+		button.toggled.connect(_category_toggled.bind(category))
+		button.text = sdk.translations.text(category)
+	get_node(CONTENT + "Empty/Title").text = sdk.translations.text("No entries")
+	get_node(CONTENT + "Empty/Sheet").text = sdk.translations.text("Character sheet")
+	get_node(CONTENT + "Header/ShowAll").text = sdk.translations.text("Show all")
+	# Icon-only actions name themselves through their tooltip and accessible name.
+	for path in ["%Dice", "%Identity", CONTENT + "Header/Close", CONTENT + "Header/Back", CONTENT + "Footer/Previous", CONTENT + "Footer/Next"]:
 		var control: Button = get_node(path)
-		control.accessibility_name = sdk.translations.text(control.accessibility_name)
+		control.tooltip_text = sdk.translations.text(control.tooltip_text)
+		if not control.accessibility_name.is_empty():
+			control.accessibility_name = sdk.translations.text(control.accessibility_name)
+	get_node("%Hp").caption = sdk.translations.text("HP")
 	_style()
 	_layout()
 	_refresh()
@@ -107,7 +100,7 @@ func _layout() -> void:
 			_phone = experience.is_phone
 			_tablet = experience.is_tablet
 			_style()
-			if _panel.is_open and not get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible:
+			if _panel.is_open and not get_node(CONTENT + "Detail").visible:
 				_render_panel()
 	super._layout()
 
@@ -146,20 +139,26 @@ func _refresh() -> void:
 		_entries = {}
 		_show_all = {}
 	_actor = source.actor.id
-	get_node("Bar/Identity").accessibility_name = str(data.get("name", "")) + " · " + sdk.translations.text("Character sheet")
-	get_node("Bar/Identity/Name").text = str(data.get("name", sdk.translations.text("Unnamed Actor")))
-	get_node("Bar/Identity/Class").text = sdk.translations.text(str(data.get("class_title", "")))
-	get_node("Bar/Identity/Hp").text = "%s / %s %s" % [int(data.get("hit_points", 0)), int(data.get("maximum_hit_points", 0)), sdk.translations.text("HP")]
-	get_node("Bar/Identity/HpTrack").value = clampf(float(data.get("hit_points", 0)) / maxf(1.0, float(data.get("maximum_hit_points", 0))) * 100.0, 0.0, 100.0)
+	var identity = get_node("%Identity")
+	var name_text := str(data.get("name", sdk.translations.text("Unnamed Actor")))
+	identity.title = name_text
+	identity.detail = sdk.translations.text(str(data.get("class_title", "")))
+	identity.initials = name_text.strip_edges().left(1).to_upper()
 	var portrait: String = data.get("portrait", "") if typeof(data.get("portrait", "")) == TYPE_STRING else ""
-	var texture: Texture2D = preload("res://rookframe/ui/icons/character/character.svg")
+	var texture: Texture2D = null
 	if not portrait.is_empty():
 		var decoded := sdk.portraits.decode(portrait)
 		if decoded.ok:
 			texture = decoded.texture
-	get_node("Bar/Identity/PortraitFrame/Portrait").texture = texture
-	_layout_portrait()
-	_layout_health()
+	identity.portrait = texture
+	var hit_points := int(data.get("hit_points", 0))
+	var maximum := int(data.get("maximum_hit_points", 0))
+	var hp = get_node("%Hp")
+	hp.max_value = maxf(1.0, maximum)
+	hp.value = clampf(hit_points, 0.0, hp.max_value)
+	hp.value_text = "%s / %s" % [hit_points, maximum]
+	# The track names the current state only; it applies no rule thresholds.
+	hp.level = hp.Level.DEPLETED if hit_points <= 0 else hp.Level.WOUNDED if hit_points < maximum else hp.Level.STEADY
 	var entries: Array[ENTRY] = []
 	var abilities: Dictionary = data.get("abilities", {})
 	var can_roll: bool = _launcher.can_roll(source.actor)
@@ -176,7 +175,7 @@ func _refresh() -> void:
 	_entries["Abilities"] = entries
 	_project_categories(source.actor)
 	visible = true
-	if not _category.is_empty() and not get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible:
+	if not _category.is_empty() and not get_node(CONTENT + "Detail").visible:
 		_render_panel()
 
 func _project_categories(actor: SDK.Actor) -> void:
@@ -230,7 +229,7 @@ func _action_changed() -> void:
 	var entries: Array[ENTRY] = _entries.get("Abilities", [])
 	for entry in entries:
 		entry.available = can_roll
-	if _category == "Abilities" and _panel.is_open and not get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible:
+	if _category == "Abilities" and _panel.is_open and not get_node(CONTENT + "Detail").visible:
 		for index in range(_page_entries.size()):
 			_add_row(_rows[index], _page_entries[index], true)
 
@@ -254,14 +253,22 @@ func _error(message: String) -> void:
 	feedback.message = sdk.translations.text(message)
 	sdk.feedback.error(feedback)
 
+## Tiles share one group; the bar's overflow toggles the original tile.
+func _category_toggled(on: bool, category: String) -> void:
+	if on:
+		if _category != category or not _panel.is_open:
+			_open_category(category)
+	elif _category == category and (get_node("%" + category) as Button).button_group.get_pressed_button() == null:
+		_close_panel()
+
 func _open_category(category: String) -> void:
 	if _category == category and _panel.is_open:
 		_close_panel()
 		return
 	_category = category
 	_page = 0
-	_panel_anchor = get_node("Bar/Categories").get_node(category)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible = false
+	_panel_anchor = get_node("%" + category)
+	get_node(CONTENT + "Detail").visible = false
 	_panel.set_open(true)
 	_render_panel()
 	if category in ["Attacks", "Powers", "Items", "Features", "Companions"] and _actor != null:
@@ -273,8 +280,8 @@ func _open_category(category: String) -> void:
 			_refresh()
 
 func _back_or_close() -> void:
-	if get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible:
-		get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible = false
+	if get_node(CONTENT + "Detail").visible:
+		get_node(CONTENT + "Detail").visible = false
 		_render_panel()
 		return
 	_close_panel()
@@ -282,14 +289,12 @@ func _back_or_close() -> void:
 func _close_panel() -> void:
 	if _panel.is_open and _panel_anchor != null and _panel_anchor.is_visible_in_tree():
 		_panel_anchor.grab_focus()
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible = false
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Back").visible = false
+	get_node(CONTENT + "Detail").visible = false
+	get_node(CONTENT + "Header/Back").visible = false
 	_category = ""
 	_panel.set_open(false)
 	for category in BUTTONS:
-		var button: Button = get_node("Bar/Categories/" + category)
-		button.set_pressed_no_signal(false)
-		_category_colors(button, false)
+		(get_node("%" + category) as Button).set_pressed_no_signal(false)
 
 func _morning() -> void:
 	var initiating_actor := _actor
@@ -303,7 +308,7 @@ func _toggle_all(enabled: bool) -> void:
 	_render_panel()
 
 func _change_page(direction: int) -> void:
-	if get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible:
+	if get_node(CONTENT + "Detail").visible:
 		_detail_page += direction
 		_layout_panel()
 		return
@@ -319,31 +324,30 @@ func _visible_entries() -> Array[ENTRY]:
 
 func _render_panel() -> void:
 	var fixed := _category in ["Abilities", "Recovery"]
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Title").text = sdk.translations.text(_category)
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").visible = not fixed and not _entries.get(_category, []).is_empty()
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Back").visible = false
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Morning").visible = _category == "Powers"
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Morning").disabled = not _can_morning
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
+	get_node(CONTENT + "Header/Title").text = sdk.translations.text(_category)
+	get_node(CONTENT + "Header/ShowAll").visible = not fixed and not _entries.get(_category, []).is_empty()
+	get_node(CONTENT + "Header/Back").visible = false
+	get_node(CONTENT + "Header/Morning").visible = _category == "Powers"
+	get_node(CONTENT + "Header/Morning").disabled = not _can_morning
+	get_node(CONTENT + "Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
 	for category in BUTTONS:
-		var button: Button = get_node("Bar/Categories/" + category)
+		var button: Button = get_node("%" + category)
 		button.set_pressed_no_signal(button == _panel_anchor)
-		_category_colors(button, button == _panel_anchor)
 	var entries := _visible_entries()
 	var page_size := 4 if not _phone or _category == "Abilities" else 2
 	var pages := maxi(1, ceili(float(entries.size()) / page_size))
 	_page = clampi(_page, 0, pages-1)
 	_list.columns = 2 if _phone and _category == "Abilities" else 1
 	_list.visible = not entries.is_empty()
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty").visible = entries.is_empty()
+	get_node(CONTENT + "Empty").visible = entries.is_empty()
 	var has_entries: bool = not _entries.get(_category, []).is_empty()
 	var empty_titles := {"Attacks":"No attacks", "Powers":"No scrolls", "Items":"No usable items", "Features":"No active features", "Companions":"No companion attacks"}
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty/Title").text = sdk.translations.text("No favorites" if has_entries else empty_titles.get(_category, "No entries"))
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty/Sheet").text = sdk.translations.text("Show all" if has_entries else "Character sheet")
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer").visible = pages > 1
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Page").text = "%s / %s" % [_page+1, pages]
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Previous").disabled = _page == 0
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer/Next").disabled = _page == pages-1
+	get_node(CONTENT + "Empty/Title").text = sdk.translations.text("No favorites" if has_entries else empty_titles.get(_category, "No entries"))
+	get_node(CONTENT + "Empty/Sheet").text = sdk.translations.text("Show all" if has_entries else "Character sheet")
+	get_node(CONTENT + "Footer").visible = pages > 1
+	get_node(CONTENT + "Footer/Page").text = "%s / %s" % [_page+1, pages]
+	get_node(CONTENT + "Footer/Previous").disabled = _page == 0
+	get_node(CONTENT + "Footer/Next").disabled = _page == pages-1
 	_page_entries = []
 	for index in range(_page*page_size, mini((_page+1)*page_size, entries.size())):
 		_page_entries.append(entries[index])
@@ -353,7 +357,6 @@ func _render_panel() -> void:
 		if row.visible:
 			_add_row(row, _page_entries[index], fixed)
 			row.separator = index < _page_entries.size()-1 and not (_phone and _category == "Abilities")
-			row.add_theme_constant_override("separation", 0)
 			row.column_divider = _phone and _category == "Abilities" and index % 2 == 0
 			row.queue_redraw()
 	_layout_panel()
@@ -361,65 +364,49 @@ func _render_panel() -> void:
 
 func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	var ability_grid := _phone and _category == "Abilities"
-	var height := 50 if ability_grid else 58 if _phone else 64 if _tablet else 70
-	row.custom_minimum_size = Vector2(0, height)
+	row.custom_minimum_size = Vector2(0, _row_minimum())
 	row.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	var launch: Button = row.get_node("Launch")
 	launch.disabled = not entry.available
 	launch.accessibility_name = entry.title
-	_button_style(launch)
 	var content: HBoxContainer = launch.get_node("Content")
-	content.add_theme_constant_override("separation", 8 if ability_grid else 10 if _phone else 12 if _tablet else 16)
-	content.offset_left = 8 if _phone else 10 if _tablet else 12
+	content.set(&"gap", &"space_2" if _phone else &"space_3")
+	content.offset_left = _space(2 if _phone else 3)
 	content.offset_right = -content.offset_left
-	content.offset_top = 6 if _phone else 8
+	content.offset_top = _space(1 if _phone else 2)
 	content.offset_bottom = -content.offset_top
 	var icon: TextureRect = content.get_node("Icon")
 	icon.texture = entry.icon
-	var icon_size := 20 if ability_grid else 24 if _phone else 26 if _tablet else 34
+	var icon_size := get_theme_constant(&"icon_small" if ability_grid else &"icon_medium" if _phone or _tablet else &"icon_large", TOKENS)
 	icon.custom_minimum_size = Vector2(icon_size, icon_size)
-	icon.modulate = PICTOGRAM if entry.available else MUTED
-	var copy: VBoxContainer = content.get_node("Copy")
-	copy.add_theme_constant_override("separation", 2 if _phone else 4)
-	var title: Label = copy.get_node("Title")
+	# Pictograms are decoration; unavailable entries read as disabled copy.
+	row.tint(&"ornament" if entry.available else &"content_disabled", &"" if entry.available else &"content_disabled")
+	var title: Label = content.get_node("Copy/Title")
 	title.text = entry.title
-	_type(title, 18 if _phone else 22 if _tablet else 26, 1.25 if _phone else 1.15)
-	var detail: Label = copy.get_node("Detail")
+	title.max_lines_visible = 2
+	var detail: Label = content.get_node("Copy/Detail")
 	detail.text = entry.detail
 	detail.visible = not entry.detail.is_empty()
-	_type(detail, 14 if _phone else 16 if _tablet else 19, 1.2)
-	detail.add_theme_color_override("font_color", MUTED)
-	title.max_lines_visible = 2
 	row.get_node("FullName").visible = false
 	var value: Label = content.get_node("Value")
 	value.text = entry.value
 	value.visible = not entry.value.is_empty() and not entry.value_is_action
-	_type(value, 18 if _phone else 21 if _tablet else 26, 1.25)
-	value.add_theme_color_override("font_color", CONTENT if entry.available else MUTED)
-	value.custom_minimum_size = Vector2(value.get_minimum_size().x+8, 0)
-	value.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	title.add_theme_color_override("font_color", CONTENT if entry.available else MUTED)
+	# Ability modifiers are stats; other values read with their entry.
+	value.theme_type_variation = &"RookframeValue" if _category == "Abilities" and not _phone else &"RookframeBody"
 	var use: Button = row.get_node("Use")
 	use.visible = entry.value_is_action
 	use.text = entry.value
 	use.disabled = not entry.available
 	use.accessibility_name = entry.value + " " + entry.title
-	_button_style(use, false, 8 if _phone else 12)
-	_type(use, 18 if _phone else 17 if _tablet else 21, 1.25)
 	var star: Button = row.get_node("Favorite")
 	star.visible = not fixed
 	star.disabled = _pending_favorites.has(_favorite_request_key(_actor, str(entry.id)))
 	star.set_pressed_no_signal(bool(entry.favorite))
-	star.text = "★" if entry.favorite else "☆"
-	_button_style(star)
-	_type(star, 22, 1.25)
 	star.accessibility_name = sdk.translations.text("Remove %s from favorites" if entry.favorite else "Add %s to favorites") % entry.title
-	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color"]:
-		star.add_theme_color_override(state, NEUTRAL if entry.favorite else MUTED)
+	star.tooltip_text = star.accessibility_name
 	var full_name: Button = row.get_node("FullName")
 	full_name.accessibility_name = sdk.translations.text("Show full name")
-	_button_style(full_name)
-	_type(full_name, 18, 1.25)
+	full_name.tooltip_text = full_name.accessibility_name
 
 func _empty_action() -> void:
 	if not _entries.get(_category, []).is_empty():
@@ -449,22 +436,16 @@ func _full_name_row(index: int) -> void:
 
 func _full_name(title: String) -> void:
 	_detail_page = 0
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Title").text = sdk.translations.text("Full name")
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Back").visible = true
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Empty").visible = false
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail/Text").text = title
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Detail").visible = true
+	get_node(CONTENT + "Header/Title").text = sdk.translations.text("Full name")
+	get_node(CONTENT + "Header/Back").visible = true
+	get_node(CONTENT + "Empty").visible = false
+	get_node(CONTENT + "Detail/Text").text = title
+	get_node(CONTENT + "Detail").visible = true
 	_list.visible = false
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Footer").visible = false
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/ShowAll").visible = false
-	get_node("Panel/Surface/Viewport/Root/Ink/Content/Header/Morning").visible = false
+	get_node(CONTENT + "Footer").visible = false
+	get_node(CONTENT + "Header/ShowAll").visible = false
+	get_node(CONTENT + "Header/Morning").visible = false
 	_layout_panel()
-
-func _category_colors(button: Button, active: bool) -> void:
-	var title: Label = button.get_node("Title")
-	title.add_theme_color_override("font_color", INK if active else CONTENT)
-	var icon: TextureRect = button.get_node("Icon")
-	icon.modulate = INK if active else PICTOGRAM
 
 func _input(event: InputEvent) -> void:
 	if not is_visible_in_tree() or not _panel.is_open:

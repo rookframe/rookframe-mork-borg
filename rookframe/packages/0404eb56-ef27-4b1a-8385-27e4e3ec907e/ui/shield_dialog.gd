@@ -58,6 +58,7 @@ func localize(locale: I18N) -> void:
 	get_node(^"Shell/Content/Actions/Break").text = _t("Break shield")
 	get_node(^"Shell/Content/Actions/Take").text = _t("Take 2 damage")
 	get_node(^"Shell/Content/Header/Close").accessibility_name = _t("Close shield decision and end action")
+	get_node(^"Shell/Content/Header/Close").tooltip_text = _t("Close shield decision and end action")
 	get_node(^"Shell/Content/Header/Title").text = _t("Break shield?")
 
 func _fit_material() -> void:

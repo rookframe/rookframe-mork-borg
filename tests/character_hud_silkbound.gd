@@ -38,8 +38,7 @@ func _open(canvas: Vector2i, language := "en") -> Dictionary:
 	for argument in OS.get_cmdline_user_args():
 		if argument.begins_with("--reference-dir="):
 			var portrait := Image.load_from_file(argument.trim_prefix("--reference-dir=").path_join("character-game/assets/graveworm.png"))
-			hud.get_node("Bar/Identity/PortraitFrame/Portrait").texture = ImageTexture.create_from_image(portrait)
-			hud._layout_portrait()
+			hud.get_node("%Identity").portrait = ImageTexture.create_from_image(portrait)
 	return {"host":host,"hud":hud,"viewport":viewport}
 
 func _settle() -> void:
@@ -55,7 +54,7 @@ func test_keyboard_enters_leaf_and_returns_to_category(reduced: bool, _test_para
 	await hud._open_category("Attacks")
 	await get_tree().create_timer(1.0).timeout
 	var source: SubViewport = panel.get_node("Surface/Viewport")
-	assert_object(source.gui_get_focus_owner()).is_same(panel.get_content().get_node("Header/ShowAll"))
+	assert_object(source.gui_get_focus_owner()).is_same(panel.get_content().get_node("Layout/Header/ShowAll"))
 	for key in [KEY_TAB, KEY_ENTER]:
 		for down in [true, false]:
 			var event := InputEventKey.new()
@@ -64,7 +63,7 @@ func test_keyboard_enters_leaf_and_returns_to_category(reduced: bool, _test_para
 			fixture.viewport.push_input(event, true)
 		await _settle()
 	assert_bool(panel.is_open).is_false()
-	assert_object(fixture.viewport.gui_get_focus_owner()).is_same(hud.get_node("Bar/Categories/Attacks"))
+	assert_object(fixture.viewport.gui_get_focus_owner()).is_same(hud.get_node("%Attacks"))
 
 func _capture(fixture: Dictionary, name: String) -> void:
 	for argument in OS.get_cmdline_user_args():
@@ -82,7 +81,8 @@ func test_resizing_reuses_the_current_sdk_presentation_experience() -> void:
 	fixture.viewport.size = Vector2i(844, 390)
 	await _settle()
 	assert_bool(fixture.hud._phone).is_true()
-	assert_vector(fixture.hud.get_node("Bar").size).is_equal(Vector2(680, 98))
+	assert_str(fixture.hud.get_node("Bar").get_profile()).is_equal("compact")
+	assert_bool(fixture.hud.get_global_rect().encloses(fixture.hud.get_node("Bar").get_global_rect())).is_true()
 	assert_bool(fixture.hud.get_global_rect().encloses(fixture.hud.get_node("Panel").get_global_rect())).is_true()
 
 func test_resizing_keeps_full_name_detail_until_back() -> void:
@@ -104,29 +104,32 @@ func test_resizing_keeps_full_name_detail_until_back() -> void:
 		fixture.host.device = 2 if canvas.x == 844 else 1 if canvas.x == 1024 else 0
 		fixture.viewport.size = canvas
 		await _settle()
-		assert_bool(content.get_node("Detail").visible).is_true()
-		assert_bool(content.get_node("List").visible).is_false()
-		assert_bool(content.get_node("Back").visible).is_true()
-		assert_str(content.get_node("Header/Title").text).is_equal("Full name")
-		assert_str(content.get_node("Detail/Text").text).is_equal(entry.title)
+		assert_bool(content.get_node("Layout/Detail").visible).is_true()
+		assert_bool(content.get_node("Layout/List").visible).is_false()
+		assert_bool(content.get_node("Layout/Header/Back").visible).is_true()
+		assert_str(content.get_node("Layout/Header/Title").text).is_equal("Full name")
+		assert_str(content.get_node("Layout/Detail/Text").text).is_equal(entry.title)
 		assert_bool(hud.get_global_rect().encloses(hud.get_node("Panel").get_global_rect())).is_true()
 		await _capture(fixture, str(canvas.x)+"-resized-full-name")
-	content.get_node("Back").pressed.emit()
+	content.get_node("Layout/Header/Back").pressed.emit()
 	await _settle()
-	assert_bool(content.get_node("Detail").visible).is_false()
-	assert_bool(content.get_node("List").visible).is_true()
-	assert_str(content.get_node("Header/Title").text).is_equal("Items")
+	assert_bool(content.get_node("Layout/Detail").visible).is_false()
+	assert_bool(content.get_node("Layout/List").visible).is_true()
+	assert_str(content.get_node("Layout/Header/Title").text).is_equal("Items")
 
 func test_reference_composition_and_bounded_actions(width: int, height: int, _test_parameters := [[1920,1080],[1024,768],[844,390]]) -> void:
 	var fixture := _open(Vector2i(width,height))
 	var hud = fixture.hud
 	await _settle()
-	var expected: Rect2 = Rect2(82,274,680,98) if width == 844 else Rect2(48,630,928,114) if width == 1024 else Rect2(415,920,1090,136)
-	assert_vector(hud.get_node("Bar").position).is_equal(expected.position)
-	assert_vector(hud.get_node("Bar").size).is_equal(expected.size)
 	var bar: Control = hud.get_node("Bar")
-	for button: Control in [hud.get_node("Bar/Dice"),hud.get_node("Bar/Identity")]+hud.get_node("Bar/Categories").get_children():
-		if button is Button and button.visible:
+	# The kit bar sizes itself from the World theme; the HUD centres it on the bottom edge.
+	assert_bool(hud.get_global_rect().encloses(bar.get_global_rect())).is_true()
+	assert_float(bar.get_rect().get_center().x).is_equal_approx(width / 2.0, 1.0)
+	assert_float(bar.get_rect().end.y).is_less(float(height))
+	assert_str(bar.get_profile()).is_equal("wide" if width == 1920 else "compact")
+	var expected := bar.position
+	for button: Control in [hud.get_node("%Dice"),hud.get_node("%Identity")]+bar.get_category_slot().get_children():
+		if button is Button and button.is_visible_in_tree():
 			assert_bool(bar.get_global_rect().encloses(button.get_global_rect())).override_failure_message("HUD action leaves the fixed bar: "+str(button.name)).is_true()
 			assert_bool(button.size.x >= 44 and button.size.y >= 44).is_true()
 	await _capture(fixture, str(width)+"-bar")
@@ -135,14 +138,14 @@ func test_reference_composition_and_bounded_actions(width: int, height: int, _te
 	var panel: Control = hud.get_node("Panel")
 	assert_bool(hud.get_global_rect().encloses(panel.get_global_rect())).is_true()
 	assert_bool(panel.get_global_rect().intersects(bar.get_global_rect())).is_false()
-	assert_float(panel.size.x).is_equal_approx(400.0 if width == 844 else 546.0 if width == 1024 else 548.0, 0.001)
+	assert_float(panel.size.x).is_equal_approx(400.0 if width == 844 else 548.0, 0.001)
 	assert_float(panel.get_global_rect().position.y).is_greater_equal(0.0)
-	assert_int(hud.get_node("Panel").get_content().get_node("List").columns).is_equal(2 if width == 844 else 1)
-	assert_bool(hud.get_node("Panel").get_content().get_node("Footer").visible).is_false()
-	assert_bool(hud.get_node("Panel").get_content().get_node("Header/ShowAll").visible).is_false()
+	assert_int(hud.get_node("Panel").get_content().get_node("Layout/List").columns).is_equal(2 if width == 844 else 1)
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer").visible).is_false()
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Header/ShowAll").visible).is_false()
 	await _capture(fixture, str(width)+"-abilities")
-	assert_vector(bar.position).is_equal(expected.position)
-	hud.get_node("Bar/Dice").pressed.emit()
+	assert_vector(bar.position).is_equal(expected)
+	hud.get_node("%Dice").pressed.emit()
 	assert_int(fixture.host.dice_opened).is_equal(1)
 	assert_bool(panel.is_open).is_false()
 
@@ -163,19 +166,19 @@ func test_empty_favorites_pagination_and_unavailable_entries(width: int, height:
 		entries.append(entry)
 	hud.set_entries("Items",entries)
 	await _settle()
-	assert_bool(hud.get_node("Panel").get_content().get_node("Empty").visible).is_true()
-	assert_str(hud.get_node("Panel").get_content().get_node("Empty/Sheet").text).is_equal("Show all")
-	hud.get_node("Panel").get_content().get_node("Empty/Sheet").pressed.emit()
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Empty").visible).is_true()
+	assert_str(hud.get_node("Panel").get_content().get_node("Layout/Empty/Sheet").text).is_equal("Show all")
+	hud.get_node("Panel").get_content().get_node("Layout/Empty/Sheet").pressed.emit()
 	await _settle()
 	assert_int(hud._page_entries.size()).is_equal(2 if width == 844 else 4)
 	assert_bool(hud._rows[0].get_node("Launch").disabled).is_true()
 	assert_bool(hud._rows[0].get_node("Favorite").disabled).is_false()
-	assert_bool(hud.get_node("Panel").get_content().get_node("Footer").visible).is_true()
-	assert_bool(hud.get_node("Panel").get_content().get_node("Footer/Previous").disabled).is_true()
-	hud.get_node("Panel").get_content().get_node("Footer/Next").pressed.emit()
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer").visible).is_true()
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer/Previous").disabled).is_true()
+	hud.get_node("Panel").get_content().get_node("Layout/Footer/Next").pressed.emit()
 	await _settle()
 	assert_str(hud._page_entries[0].id).is_equal("item-2" if width == 844 else "item-4")
-	assert_bool(hud.get_node("Panel").get_content().get_node("Footer/Previous").disabled).is_false()
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer/Previous").disabled).is_false()
 	assert_bool(hud.get_global_rect().encloses(hud.get_node("Panel").get_global_rect())).is_true()
 	await _capture(fixture, str(width)+"-items")
 	fixture.host.actors.hero.access_level = "Viewer"
@@ -199,35 +202,38 @@ func test_long_name_pages_and_return_to_list(width: int, height: int, _test_para
 	assert_bool(hud._rows[0].get_node("FullName").visible).is_true()
 	hud._rows[0].get_node("FullName").pressed.emit()
 	await _settle()
-	var detail: Control = hud.get_node("Panel").get_content().get_node("Detail")
+	var detail: Control = hud.get_node("Panel").get_content().get_node("Layout/Detail")
 	var detail_text: Label = detail.get_node("Text")
 	assert_bool(detail.visible).is_true()
-	assert_str(hud.get_node("Panel").get_content().get_node("Header/Title").text).is_equal("Full name")
-	assert_bool(hud.get_node("Panel").get_content().get_node("Back").visible).is_true()
-	assert_bool(hud.get_node("Panel").get_content().get_node("Footer").visible).is_true()
+	assert_str(hud.get_node("Panel").get_content().get_node("Layout/Header/Title").text).is_equal("Full name")
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Header/Back").visible).is_true()
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer").visible).is_true()
 	assert_bool(hud.get_global_rect().encloses(hud.get_node("Panel").get_global_rect())).is_true()
 	assert_bool(hud.get_node("Panel").get_global_rect().encloses(_rect_in_fixture(hud, detail))).is_true()
-	assert_float(detail.size.y).is_less_equal(detail_text.get_line_height()*(3 if width == 844 else 5))
+	var pitch := detail_text.get_line_height() + detail_text.get_theme_constant("line_spacing")
+	assert_float(detail.size.y).is_less_equal(pitch*(3 if width == 844 else 5))
 	await _capture(fixture,str(width)+"-full-name")
-	hud.get_node("Panel").get_content().get_node("Footer/Next").pressed.emit()
-	assert_float(detail_text.position.y).is_equal(float(-detail_text.get_line_height()*(3 if width == 844 else 5)))
-	hud.get_node("Panel").get_content().get_node("Back").pressed.emit()
+	hud.get_node("Panel").get_content().get_node("Layout/Footer/Next").pressed.emit()
+	assert_float(detail_text.position.y).is_equal(float(-pitch*(3 if width == 844 else 5)))
+	hud.get_node("Panel").get_content().get_node("Layout/Header/Back").pressed.emit()
 	await _settle()
 	assert_bool(detail.visible).is_false()
-	assert_str(hud.get_node("Panel").get_content().get_node("Header/Title").text).is_equal("Items")
-	assert_bool(hud.get_node("Panel").get_content().get_node("List").visible).is_true()
+	assert_str(hud.get_node("Panel").get_content().get_node("Layout/Header/Title").text).is_equal("Items")
+	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/List").visible).is_true()
 	var escape := InputEventKey.new()
 	escape.keycode = KEY_ESCAPE
 	escape.pressed = true
 	fixture.viewport.push_input(escape,true)
 	assert_bool(hud.get_node("Panel").is_open).is_false()
-	assert_bool(hud.get_node("Bar/Categories/Items").has_focus()).is_true()
+	assert_bool(hud.get_node("%Items").has_focus()).is_true()
 	if width == 844:
-		assert_bool(hud.get_node("Bar/Categories/Recovery").visible).is_true()
-		hud.get_node("Bar/Categories/Recovery").pressed.emit()
+		# A phone keeps four tiles; More toggles the original Recovery tile.
+		assert_bool(hud.get_node("%Recovery").visible).is_false()
+		hud.get_node("%Recovery").button_pressed = true
 		await _settle()
-		assert_str(hud.get_node("Panel").get_content().get_node("Header/Title").text).is_equal("Recovery")
-		assert_bool(hud.get_node("Bar/Categories/Recovery").button_pressed).is_true()
+		assert_bool(hud.get_node("Panel").is_open).is_true()
+		assert_str(hud.get_node("Panel").get_content().get_node("Layout/Header/Title").text).is_equal("Recovery")
+		assert_bool(hud.get_global_rect().encloses(hud.get_node("Panel").get_global_rect())).is_true()
 
 func test_russian_header_controls_and_rows_fit_phone() -> void:
 	var fixture := _open(Vector2i(844,390),"ru")
@@ -243,7 +249,7 @@ func test_russian_header_controls_and_rows_fit_phone() -> void:
 	var entries: Array[ENTRY] = [entry]
 	hud.set_entries("Powers",entries)
 	await _settle()
-	var header: Control = hud.get_node("Panel").get_content().get_node("Header")
+	var header: Control = hud.get_node("Panel").get_content().get_node("Layout/Header")
 	for control: Control in [header.get_node("Title"),header.get_node("ShowAll"),header.get_node("Morning"),header.get_node("Close")]:
 		assert_bool(header.get_global_rect().encloses(control.get_global_rect())).is_true()
 	assert_str(header.get_node("ShowAll").text).is_equal("Все")
@@ -284,12 +290,14 @@ func test_fallback_portrait_fits_and_hover_is_drawn(width: int, height: int, _te
 	var fixture := _open(Vector2i(width,height))
 	var hud = fixture.hud
 	await _settle()
-	var portrait: TextureRect = hud.get_node("Bar/Identity/PortraitFrame/Portrait")
-	assert_bool(portrait.get_parent().get_global_rect().encloses(portrait.get_global_rect())).override_failure_message("The fallback portrait must fit inside its frame.").is_true()
+	var identity: Button = hud.get_node("%Identity")
+	assert_object(identity.portrait).is_null()
+	assert_str(identity.initials).is_equal("G")
+	assert_bool(hud.get_node("Bar").get_global_rect().encloses(identity.get_global_rect())).is_true()
 	await hud._open_category("Attacks")
-	hud.get_node("Panel").get_content().get_node("Header/ShowAll").set_pressed(true)
+	hud.get_node("Panel").get_content().get_node("Layout/Header/ShowAll").set_pressed(true)
 	await _settle()
-	var buttons: Array[Button] = [hud.get_node("Bar/Dice"), hud.get_node("Bar/Identity"), hud.get_node("Bar/Categories/Items"), hud.get_node("Panel").get_content().get_node("Header/Close"), hud._rows[0].get_node("Launch"), hud._rows[0].get_node("Favorite")]
+	var buttons: Array[Button] = [hud.get_node("%Dice"), hud.get_node("%Identity"), hud.get_node("%Items"), hud.get_node("Panel").get_content().get_node("Layout/Header/Close"), hud._rows[0].get_node("Launch"), hud._rows[0].get_node("Favorite")]
 	for button in buttons:
 		var motion := InputEventMouseMotion.new()
 		motion.position = _rect_in_fixture(hud, button).get_center()
@@ -302,8 +310,8 @@ func test_fallback_portrait_fits_and_hover_is_drawn(width: int, height: int, _te
 	star.set_pressed_no_signal(true)
 	await _settle()
 	assert_int(star.get_draw_mode()).is_equal(BaseButton.DRAW_HOVER_PRESSED)
-	assert_float(star.get_theme_stylebox("pressed").bg_color.a).is_zero()
-	assert_bool(star.get_theme_stylebox("hover_pressed").bg_color.a > 0.0).is_true()
+	assert_str(star.theme_type_variation).is_equal("RookframeFavorite")
+	assert_object(star.get_theme_icon("checked")).is_not_same(star.get_theme_icon("unchecked"))
 	await _capture(fixture, str(width)+"-hover")
 
 func test_use_action_keeps_its_entry_and_favorite_separate() -> void:
@@ -335,19 +343,17 @@ func test_use_action_keeps_its_entry_and_favorite_separate() -> void:
 	assert_str(requested[0][1]).is_equal("Items")
 	assert_str(requested[0][2]).is_equal("owned-waterskin")
 
-func test_show_all_shared_scene_keeps_padding_and_colors_in_every_state() -> void:
+func test_show_all_takes_every_state_from_the_world_theme() -> void:
 	var fixture := _open(Vector2i(844,390))
 	var hud = fixture.hud
 	await _settle()
 	hud._open_category("Attacks")
 	await _settle()
-	var all: CheckBox = hud.get_node("Panel").get_content().get_node("Header/ShowAll")
+	var all: CheckBox = hud.get_node("Panel").get_content().get_node("Layout/Header/ShowAll")
 	for state in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
-		assert_bool(all.get_theme_color(state).is_equal_approx(Color(0.682352941, 0.729411765, 0.745098039, 1.0))).is_true()
-	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-		var box: StyleBox = all.get_theme_stylebox(state)
-		assert_float(box.get_content_margin(SIDE_LEFT)).is_equal(8.0)
-		assert_float(box.get_content_margin(SIDE_RIGHT)).is_equal(8.0)
+		assert_bool(all.has_theme_color_override(state)).is_false()
+	for state in ["normal", "hover", "pressed", "hover_pressed", "disabled", "focus"]:
+		assert_bool(all.has_theme_stylebox_override(state)).is_false()
 	all.set_pressed(true)
 	await _settle()
 	assert_bool(all.button_pressed).is_true()

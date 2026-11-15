@@ -18,9 +18,49 @@ var _closed := false
 @onready var _primary_button: Button = get_node(^"Layout/Footer/TrailingSlot/Navigation/Primary")
 @onready var _previous_button: Button = get_node(^"Layout/Footer/TrailingSlot/Navigation/Previous")
 
+## Footer width the two navigation actions share at least, in pixels.
+const NAVIGATION_WIDTH := 272.0
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_insets()
+		_arrange_navigation()
+
+# The layout's insets follow the World theme's spacing. Moving a child does not
+# notify this Control again.
+func _read_insets() -> void:
+	var layout := get_node_or_null(^"Layout") as Control
+	if layout == null:
+		return
+	var horizontal := get_theme_constant(&"space_3", &"RookframeTokens")
+	var vertical := get_theme_constant(&"space_2", &"RookframeTokens")
+	layout.offset_left = horizontal
+	layout.offset_right = -horizontal
+	layout.offset_top = vertical
+	layout.offset_bottom = -vertical
+
+# Previous and the primary action split the footer into equal halves with a
+# theme gap between them, whatever their labels.
+func _arrange_navigation() -> void:
+	var previous := get_node_or_null(^"Layout/Footer/TrailingSlot/Navigation/Previous") as Control
+	var primary := get_node_or_null(^"Layout/Footer/TrailingSlot/Navigation/Primary") as Control
+	if previous == null or primary == null:
+		return
+	var gap := get_theme_constant(&"space_2", &"RookframeTokens")
+	previous.offset_right = -gap / 2.0
+	primary.offset_left = gap / 2.0
+	var previous_size := previous.get_combined_minimum_size()
+	var primary_size := primary.get_combined_minimum_size()
+	(previous.get_parent() as Control).custom_minimum_size = Vector2(
+		maxf(NAVIGATION_WIDTH, 2.0 * maxf(previous_size.x, primary_size.x) + gap),
+		maxf(previous_size.y, primary_size.y))
+
 func ready() -> void:
 	i18n.bind(sdk)
 	localize(i18n)
+	_primary_button.minimum_size_changed.connect(_arrange_navigation)
+	_previous_button.minimum_size_changed.connect(_arrange_navigation)
+	_arrange_navigation()
 	if sdk == null:
 		return
 	_local = VIEW.new().local_state(self)

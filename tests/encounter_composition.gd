@@ -4,6 +4,7 @@ const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const BOUNDARY = preload("res://tests/encounter_sdk_boundary.gd")
 const VIEW = preload(ROOT + "ui/encounter_view.gd")
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 func test_phone_gm_can_act_without_scrolling_and_participant_sees_active_side() -> void:
 	var host := BOUNDARY.new()
@@ -19,6 +20,7 @@ func test_phone_gm_can_act_without_scrolling_and_participant_sees_active_side() 
 	viewport.size = Vector2i(375, 369)
 	add_child(viewport)
 	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
+	strip.theme = WORLD_THEME.entry()
 	strip.sdk = sdk
 	viewport.add_child(strip)
 	var local = strip.encounter_view_state()
@@ -28,6 +30,7 @@ func test_phone_gm_can_act_without_scrolling_and_participant_sees_active_side() 
 	task_slot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	task_slot.offset_top = 56
 	var window = auto_free(load(ROOT + "ui/encounter_window.tscn").instantiate())
+	window.theme = WORLD_THEME.entry()
 	window.sdk = sdk
 	task_slot.add_child(window)
 	await get_tree().process_frame
@@ -102,9 +105,11 @@ func test_swords_action_targets_currently_selected_rook_with_shared_actor() -> v
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
 	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
+	strip.theme = WORLD_THEME.entry()
 	strip.sdk = SDK.new(host)
 	add_child(strip)
 	var context = auto_free(load(ROOT + "ui/encounter_rook.tscn").instantiate())
+	context.theme = WORLD_THEME.entry()
 	context.sdk = SDK.new(host)
 	add_child(context)
 	var button: Button = context.get_node("Toggle")
@@ -149,6 +154,7 @@ func test_desktop_order_shows_three_complete_miniatures() -> void:
 	viewport.size = Vector2i(1920, 1080)
 	add_child(viewport)
 	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
+	strip.theme = WORLD_THEME.entry()
 	strip.sdk = sdk
 	viewport.add_child(strip)
 	await get_tree().process_frame
@@ -179,6 +185,7 @@ func test_desktop_round_correction_stays_visible_after_error() -> void:
 	viewport.size = Vector2i(400, 292)
 	add_child(viewport)
 	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
+	strip.theme = WORLD_THEME.entry()
 	strip.sdk = sdk
 	viewport.add_child(strip)
 	var slot := VBoxContainer.new()
@@ -186,6 +193,7 @@ func test_desktop_round_correction_stays_visible_after_error() -> void:
 	slot.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	slot.offset_top = 56
 	var window = auto_free(load(ROOT + "ui/encounter_window.tscn").instantiate())
+	window.theme = WORLD_THEME.entry()
 	window.sdk = sdk
 	slot.add_child(window)
 	for frame in range(4):

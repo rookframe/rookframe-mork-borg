@@ -3,6 +3,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/power_composition_boundary.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 func test_use_item_shows_recipient_focus_pending_and_healing_outcome() -> void:
 	var host := BOUNDARY.new()
@@ -19,6 +20,7 @@ func test_use_item_shows_recipient_focus_pending_and_healing_outcome() -> void:
 	add_child(viewport)
 	var scene: PackedScene = load(path)
 	var panel = auto_free(scene.instantiate())
+	panel.theme = WORLD_THEME.entry()
 	viewport.add_child(panel)
 	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
 	panel.size = Vector2(351, 260)
@@ -46,6 +48,7 @@ func test_book_preview_uses_selected_recipient_and_stock_radio_choices() -> void
 	host.actors.hero.data.inventory.append({"inventory_id": "book", "source_item_id": "book-of-boiling-blood", "quantity": 1, "uses": 1})
 	var scene: PackedScene = load(ROOT + "ui/special_panel.tscn")
 	var panel = auto_free(scene.instantiate())
+	panel.theme = WORLD_THEME.entry()
 	add_child(panel)
 	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "book")
 	await get_tree().process_frame
@@ -61,7 +64,9 @@ func test_separate_sheets_keep_independent_radio_selection() -> void:
 	host.actors.hero.data.inventory.append({"inventory_id": "mitre", "source_item_id": "stolen-mitre", "quantity": 1, "equipped": true})
 	var scene: PackedScene = load(ROOT + "ui/special_panel.tscn")
 	var first = auto_free(scene.instantiate())
+	first.theme = WORLD_THEME.entry()
 	var second = auto_free(scene.instantiate())
+	second.theme = WORLD_THEME.entry()
 	add_child(first)
 	add_child(second)
 	first.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "mitre")
@@ -80,6 +85,7 @@ func test_malformed_dr_adjustment_does_not_request_a_throw() -> void:
 	host.actors.hero.data.inventory.append({"inventory_id": "mitre", "source_item_id": "stolen-mitre", "quantity": 1, "equipped": true})
 	var scene: PackedScene = load(ROOT + "ui/special_panel.tscn")
 	var panel = auto_free(scene.instantiate())
+	panel.theme = WORLD_THEME.entry()
 	add_child(panel)
 	panel.action_created.connect(func(action: Node) -> void: add_child(auto_free(action)))
 	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "mitre")

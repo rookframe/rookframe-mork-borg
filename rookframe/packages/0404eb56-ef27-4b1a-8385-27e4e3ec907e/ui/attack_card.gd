@@ -14,12 +14,12 @@ const DICE_ICONS := {
 	"d20": preload(ROOT + "attack_assets/icons/d20.svg"),
 }
 const FRAME = preload("res://rookframe/ui/components/surfaces/action_panel/action_panel.gd")
-const LINE_HEIGHT = preload("res://rookframe/ui/theme/silkbound_line_height.gd")
 @onready var _frame: FRAME = get_node("Frame")
 const I18N = preload(ROOT + "localization.gd")
 var _locale := I18N.new()
-const BRASS := Color(0.8157, 0.7451, 0.5569, 1)
-const DANGER := Color(1, 0.5059, 0.4784, 1)
+const TOKENS := &"RookframeTokens"
+var _target_valid := true
+var _roles := {}
 @onready var body: VBoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body")
 var _device := ""
 @onready var _view_combat: BoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body/Combat")
@@ -54,6 +54,35 @@ func _ready() -> void:
 	(_view_decision_first as Button).pressed.connect(_first_decision)
 	(_view_decision_second as Button).pressed.connect(_second_decision)
 	responsive("desktop")
+	_read_tokens()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready():
+		_read_tokens()
+
+# Pictograms take the World theme's ornament ink, and an out-of-reach target its
+# danger ink. Tinting children does not notify this container again.
+func _read_tokens() -> void:
+	var ornament := get_theme_color(&"ornament", TOKENS)
+	for icon in [_view_header_weapon, _view_combat_attack.get_node("Icon"), _view_combat_damage_icon]:
+		(icon as CanvasItem).self_modulate = ornament
+	_view_target_icon.self_modulate = ornament if _target_valid else get_theme_color(&"danger", TOKENS)
+	for label: Label in _roles:
+		_apply_role(label)
+
+# Every theme's Action Panel presentation may put its own Theme between these
+# labels and the World theme, which hides the World theme's label variations.
+# Each label therefore reads its type role and ink from RookframeTokens.
+func _role(label: Label, type_role: StringName, ink: StringName) -> void:
+	_roles[label] = [type_role, ink]
+	if is_inside_tree():
+		_apply_role(label)
+
+func _apply_role(label: Label) -> void:
+	var role: Array = _roles[label]
+	label.add_theme_font_override(&"font", get_theme_font(role[0], TOKENS))
+	label.add_theme_font_size_override(&"font_size", get_theme_font_size(role[0], TOKENS))
+	label.add_theme_color_override(&"font_color", get_theme_color(role[1], TOKENS))
 
 func responsive(device: String) -> void:
 	if device == _device:
@@ -63,32 +92,34 @@ func responsive(device: String) -> void:
 	var phone := device == "phone"
 	_frame.compact = touch
 	custom_minimum_size = Vector2(320 if phone else 380 if touch else 520, 0)
-	_view_header_identity_actor.add_theme_font_size_override("font_size", 13 if phone else 14)
-	_view_header_identity_title.add_theme_font_size_override("font_size", 22 if phone else 24 if touch else 26)
-	_view_header_identity_reach.add_theme_font_size_override("font_size", 15 if phone else 16 if touch else 17)
+	# Touch layouts step each type role down instead of shrinking pixels.
+	_role(_view_header_identity_actor, &"meta", &"content_muted")
+	_role(_view_header_identity_title, &"heading" if touch else &"title", &"content_heading")
+	_role(_view_header_identity_reach, &"meta" if touch else &"body", &"content_muted")
 	_view_header_weapon.custom_minimum_size = Vector2(30,30) if touch else Vector2(42,42)
 	_view_combat.vertical = not touch
-	_view_combat.add_theme_constant_override("separation", 16 if touch else 0)
+	_view_combat.set(&"gap", &"space_4" if touch else &"")
 	_view_combat_attack.size_flags_horizontal = 1 if touch else Control.SIZE_EXPAND_FILL # Native SIZE_FILL, without expansion.
 	_view_combat_damagedivider.visible = not touch
 	_view_combat_attack_roll.custom_minimum_size = Vector2(48,46) if touch else Vector2(56,52)
 	for row in ["Attack", "Damage"]:
 		var line: HBoxContainer = body.get_node("Combat/" + row)
 		line.custom_minimum_size = Vector2(0, 58 if touch else 66 if row == "Attack" else 54)
-		line.add_theme_constant_override("separation", 5 if touch else 16)
+		line.set(&"gap", &"space_1" if touch else &"space_4")
 		(line.get_node("Icon") as TextureRect).custom_minimum_size = Vector2(24,24) if touch else Vector2(36,36)
 		(line.get_node("Values") as BoxContainer).vertical = touch
 		line.alignment = 2 if touch and row == "Damage" else 0 # Native end/begin alignment.
 		(line.get_node("Values") as BoxContainer).size_flags_horizontal = 1 if touch else Control.SIZE_EXPAND_FILL
-		(line.get_node("Values") as BoxContainer).add_theme_constant_override("separation", 0 if touch else 14)
+		(line.get_node("Values") as BoxContainer).set(&"gap", &"" if touch else &"space_4")
 		(line.get_node("Values/Label") as Label).custom_minimum_size = Vector2(0 if touch else 110, 0)
-		(line.get_node("Values/Label") as Label).add_theme_font_size_override("font_size", 14 if phone else 16 if touch else 20)
-		(line.get_node("Values/Formula") as Label).add_theme_font_size_override("font_size", 23 if phone else 26 if touch else 30)
+		_role(line.get_node("Values/Label") as Label, &"meta" if phone else &"label", &"content_muted")
+		_role(line.get_node("Values/Formula") as Label, &"heading" if phone else &"value", &"content")
 	_view_target_icon.custom_minimum_size = Vector2(26,26) if touch else Vector2(32,32)
-	_view_target_name.add_theme_font_size_override("font_size", 18 if phone else 20 if touch else 21)
-	_view_target_distance.add_theme_font_size_override("font_size", 15 if touch else 18)
-	for label in [_view_header_identity_actor, _view_header_identity_title, _view_header_identity_reach, _view_combat_attack_values_formula, _view_combat_attack_values_label, _view_combat_damage_values_formula, _view_combat_damage_values_label, _view_target_name, _view_target_distance, _view_message]:
-		LINE_HEIGHT.apply(label, 1.2)
+	_role(_view_target_name, &"meta" if phone else &"body", &"content")
+	if not _roles.has(_view_target_distance):
+		_role(_view_target_distance, &"meta", &"content_muted")
+	if not _roles.has(_view_message):
+		_role(_view_message, &"body", &"content")
 
 func show_target(visible: bool) -> void:
 	_frame.show_footer = visible
@@ -117,9 +148,7 @@ func combat(formula: String, damage: String, can_prepare: bool, caption := "Atta
 		_view_combat_damage_icon.texture = DICE_ICONS.get(die)
 	for path in ["Combat/Attack/Roll"]:
 		var button: Button = body.get_node(path)
-		button.add_theme_constant_override("icon_max_width", 54 if _device == "phone" else 60 if _device == "tablet" else 73)
 		button.disabled = not can_prepare
-
 		button.accessibility_name = _locale.text("Prepare defence" if caption == "Defence" else "Prepare attack")
 		button.tooltip_text = button.accessibility_name
 
@@ -127,8 +156,10 @@ func target(name: String, distance: String, valid: bool, editable: bool) -> void
 	_frame.show_footer = true
 	_view_target_name.text = _locale.text(name)
 	_view_target_distance.text = distance
-	_view_target_icon.self_modulate = BRASS if valid or distance.is_empty() else DANGER
-	_view_target_distance.self_modulate = Color(1, 1, 1, 1) if valid else DANGER
+	_target_valid = valid or distance.is_empty()
+	_role(_view_target_distance, &"meta", &"content_muted" if valid else &"danger")
+	if is_node_ready():
+		_read_tokens()
 	_view_target_change.disabled = not editable
 	_view_target_change.accessibility_name = _locale.text("Choose target")
 	_view_target_change.tooltip_text = _locale.text("Choose target")
@@ -136,7 +167,7 @@ func target(name: String, distance: String, valid: bool, editable: bool) -> void
 func message(text: String, error := false) -> void:
 	_view_message.text = _locale.text(text)
 	_view_message.visible = not text.is_empty()
-	_view_message.self_modulate = DANGER if error else Color(1, 1, 1, 1)
+	_role(_view_message, &"body", &"danger" if error else &"content")
 
 func consequence(first: String, second: String, enabled := true) -> void:
 	_view_combat.visible = false

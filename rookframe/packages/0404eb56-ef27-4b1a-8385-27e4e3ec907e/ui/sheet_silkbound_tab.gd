@@ -1,23 +1,28 @@
 extends Button
+## Chapter tab: the UI Kit tab button with the chapter's pictogram and title.
+const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
+var _title := ""
+var _pictogram: Texture2D
 
 func _ready() -> void:
-	get_node(^"Center/Content/Title").text = text
-	get_node(^"Center/Content/Icon").texture = icon
-	accessibility_name = text
-	text = ""
-	icon = null
-	toggled.connect(_selected)
-	_selected(button_pressed)
+	_remember()
 
-func configure_layout(font_size: int, icon_size: int, gap: int) -> void:
-	get_node(^"Center/Content/Title").add_theme_font_size_override("font_size", font_size)
-	get_node(^"Center/Content/Icon").custom_minimum_size = Vector2(icon_size, icon_size)
-	get_node(^"Center/Content").add_theme_constant_override("separation", gap)
+func _remember() -> void:
+	if _title.is_empty():
+		_title = text
+		_pictogram = icon
+		accessibility_name = _title
+
+## A narrow canvas shows the title alone; a tab without a title keeps its
+## pictogram and names itself in its tooltip.
+func configure_layout(font_size: int, icon_size: StringName, titled: bool, pictogram: bool) -> void:
+	_remember()
+	add_theme_font_size_override("font_size", font_size)
+	add_theme_constant_override("icon_max_width", SHEET_TOKENS.pixels(self, icon_size))
+	text = _title if titled else ""
+	icon = _pictogram if pictogram or not titled else null
+	tooltip_text = "" if titled else _title
+	size_flags_stretch_ratio = 1.0 if titled else 0.5
 
 func set_selected(selected: bool) -> void:
 	set_pressed_no_signal(selected)
-	_selected(selected)
-
-func _selected(selected: bool) -> void:
-	get_node(^"Center/Content/Title").add_theme_color_override("font_color", Color(0.905882, 0.905882, 0.866667, 1) if selected else Color(0.682353, 0.729412, 0.745098, 1))
-	get_node(^"Center/Content/Icon").self_modulate = Color(0.905882, 0.905882, 0.866667, 1) if selected else Color(0.815686, 0.745098, 0.556863, 1)

@@ -1,4 +1,5 @@
-extends VBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
+## The root gap follows the World theme's spacing through token_box.gd.
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
@@ -12,8 +13,9 @@ func _layout() -> void:
 	get_node(^"Sections").columns = 1 if compact else 2
 	for metric_name in ["Attacker", "Attack", "Difficulty"]:
 		var metric: Control = get_node("Metrics/" + metric_name + "/Content")
-		metric.get_node(^"Label").set("theme_override_font_sizes/font_size", 12 if compact else 14)
-		metric.get_node(^"Value").set("theme_override_font_sizes/font_size", (16 if metric_name == "Attacker" else 24) if compact else 28)
+		# A narrow view steps each type role down instead of shrinking pixels.
+		(metric.get_node(^"Label") as Label).theme_type_variation = &"RookframeMeta" if compact else &"RookframeLabel"
+		(metric.get_node(^"Value") as Label).theme_type_variation = &"RookframeHeading" if compact else &"RookframeValue"
 
 func configure(outcome: Dictionary, state: String, message: String) -> void:
 	get_node(^"Metrics/Attacker/Content/Value").text = str(outcome.get("attacker", "Creature"))

@@ -21,6 +21,7 @@ const STAGE := "Layout/Body/StageSlot/Stage"
 const CONTEXT := "Layout/Body/ContextSlot/Context"
 const LEFT := "Layout/Body/StageSlot/Stage/Content/Split/Left"
 const DETAIL := "Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"
+const TOKENS := &"RookframeTokens"
 const MINIATURE := DETAIL + "/Appearance/Columns/MiniaturePanel/Inset/Content/"
 signal class_selected(class_id: String)
 signal scroll_selected(slot: String, disposition: String)
@@ -39,6 +40,7 @@ var _details := false
 var _review_section := "Character"
 var _pending_choice := ""
 var _detail_key := ""
+var _fitting := false
 
 func _ready() -> void:
 	super._ready()
@@ -57,38 +59,51 @@ func _ready() -> void:
 	localize(i18n)
 	_fit()
 
+func _notification(what: int) -> void:
+	# A World theme switch changes token values, so the token reads repeat.
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready() and not _fitting:
+		_fit()
+
 func _fit() -> void:
-	super._fit()
-	if not is_node_ready():
+	if _fitting:
 		return
+	_fitting = true
+	super._fit()
+	if is_node_ready():
+		_fit_creation()
+	_fitting = false
+
+func _fit_creation() -> void:
 	var phone := is_compact()
 	var tablet := is_tablet()
-	var context := get_node(CONTEXT)
-	context.add_theme_constant_override("separation", 1 if phone else 12 if tablet else 20)
+	var small := phone or tablet
+	var icon_small := Vector2.ONE * get_theme_constant(&"icon_small", TOKENS)
+	var icon_medium := Vector2.ONE * get_theme_constant(&"icon_medium", TOKENS)
+	var icon_large := Vector2.ONE * get_theme_constant(&"icon_large", TOKENS)
+	var ornament := get_theme_color(&"ornament", TOKENS)
+	_gap(CONTEXT, &"" if phone else &"space_2" if tablet else &"space_5")
 	for name in ["Heading", "Spacer"]:
-		get_node(CONTEXT + "/" + name).visible = not phone and (name == "Heading" or not tablet)
-	_text(CONTEXT + "/Heading/Title", 14 if tablet else 18,1.3)
-	_text(CONTEXT + "/Heading/State", 14 if tablet else 16,1.4)
-	get_node(CONTEXT + "/PortraitVitals").add_theme_constant_override("separation", 12 if phone else 16 if tablet else 20)
+		get_node(CONTEXT + "/" + name).visible = not small
+	_gap(CONTEXT + "/PortraitVitals", &"space_3" if phone else &"space_4" if tablet else &"space_5")
 	for path in ["/PortraitVitals/PortraitFrame", "/PortraitVitals/PortraitFrame/Portrait"]:
 		get_node(CONTEXT + path).custom_minimum_size = Vector2(80,90) if phone else Vector2(100,125) if tablet else Vector2(152,190)
-	get_node(CONTEXT + "/PortraitVitals/Vitals").add_theme_constant_override("separation", 2 if phone else 8 if tablet else 16)
+	get_node(CONTEXT + "/PortraitVitals/PortraitFrame/Portrait").self_modulate = ornament
+	_gap(CONTEXT + "/PortraitVitals/Vitals", &"space_1" if small else &"space_4")
 	for vital in ["HitPoints", "Omens", "Silver"]:
 		var path: String = CONTEXT + "/PortraitVitals/Vitals/" + vital
-		get_node(path).add_theme_constant_override("separation", 0)
-		get_node(path + "/Row").add_theme_constant_override("separation", 6 if phone or tablet else 8)
-		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(18,18) if phone else Vector2(20,20) if tablet else Vector2(24,24)
-		get_node(path + "/Row/Icon").self_modulate = Color(0.643137, 0.776471, 0.717647, 1) if vital == "HitPoints" else Color(0.815686, 0.745098, 0.556863, 1)
-		_text(path + "/Row/Value", 18 if phone else 24 if tablet else 30, 1.0 if phone else 1.05)
-		_text(path + "/Label", 11 if phone else 14 if tablet else 16, 1.1 if phone else 1.2)
-	_text(CONTEXT + "/Name/Title",22 if phone else 29 if tablet else 40,1.1)
-	_text(CONTEXT + "/Name/Class",14 if phone else 18 if tablet else 20,1.2 if phone else 1.4)
-	get_node(CONTEXT + "/Name").add_theme_constant_override("separation",0 if phone else 4)
+		get_node(path + "/Row/Icon").custom_minimum_size = icon_small if phone else icon_medium
+		get_node(path + "/Row/Icon").self_modulate = get_theme_color(&"vital_full", TOKENS) if vital == "HitPoints" else ornament
+		_role(path + "/Row/Value", "RookframeLabel" if small else "RookframeValue")
+		# A phone names each resource by its pictogram alone.
+		get_node(path + "/Label").visible = not phone
+	_role(CONTEXT + "/Name/Class", "RookframeMeta" if small else "RookframeLabel")
+	get_node(CONTEXT + "/Name/Class").visible = not phone
+	_gap(CONTEXT + "/Name", &"" if phone else &"space_1")
 	var has_history := not str(_draft.get("origin", "")).is_empty()
 	get_node(CONTEXT + "/PhoneHistory").visible = has_history
 	get_node(CONTEXT + "/History").visible = not has_history and not phone
-	get_node(CONTEXT + "/PhoneHistory").add_theme_constant_override("separation",2 if phone else 8 if tablet else 12)
-	_text(CONTEXT + "/History",16 if tablet else 18)
+	_gap(CONTEXT + "/PhoneHistory", &"space_1" if phone else &"space_2" if tablet else &"space_3")
+	_role(CONTEXT + "/History", "RookframeMeta" if tablet else "RookframeBody")
 	var history_count := 0
 	for row in get_node(CONTEXT + "/PhoneHistory").get_children():
 		if not (row.get_node(^"Text") as Label).text.is_empty():
@@ -96,119 +111,96 @@ func _fit() -> void:
 	for name in ["Line0", "Line1", "Line2", "Line3"]:
 		var index: int = ["Line0", "Line1", "Line2", "Line3"].find(name)
 		var path: String = CONTEXT + "/PhoneHistory/" + name
-		_text(path + "/Text",13 if phone else 17 if tablet else 19)
-		get_node(path + "/Icon").custom_minimum_size = Vector2(16,16) if phone else Vector2(24,24)
+		_role(path + "/Text", "RookframeMeta" if small else "RookframeBody")
+		get_node(path + "/Icon").custom_minimum_size = icon_small if phone else icon_medium
+		get_node(path + "/Icon").self_modulate = ornament
 		get_node(path).visible = not (get_node(path + "/Text") as Label).text.is_empty() and (not phone or index >= maxi(0, history_count - 2))
 	get_node(CONTEXT + "/Attributes").columns = 4 if phone else 2
-	get_node(CONTEXT + "/Attributes").add_theme_constant_override("h_separation",6 if phone else 16)
-	get_node(CONTEXT + "/Attributes").add_theme_constant_override("v_separation",0)
+	get_node(CONTEXT + "/Attributes").set(&"gap_horizontal", &"space_2" if phone else &"space_4")
 	for ability in ["Agility","Presence","Strength","Toughness"]:
 		var path: String = CONTEXT + "/Attributes/" + ability
-		get_node(path).custom_minimum_size = Vector2(0,34 if phone else 44 if tablet else 48)
-		get_node(path).theme_type_variation = "WizardAttributeCompact" if phone else "WizardAttribute"
-		get_node(path + "/Row").vertical = phone
-		get_node(path + "/Row").add_theme_constant_override("separation",0 if phone else 5 if tablet else 8)
-		get_node(path + "/Row/Icon").visible = not phone
-		get_node(path + "/Row/Icon").custom_minimum_size = Vector2(20,20) if tablet else Vector2(24,24)
-		_text(path + "/Row/Label",13 if phone else 14 if tablet else 17,1.1 if phone else 1.4)
-		_text(path + "/Row/Value",22 if phone or tablet else 27,1.1 if phone else 1.3)
-		get_node(path + "/Row/Label").horizontal_alignment = 1 if phone else 0
-		get_node(path + "/Row/Value").horizontal_alignment = 1 if phone else 0
-	get_node(STAGE).add_theme_constant_override("separation",4 if phone else 6 if tablet and size.y <= 740 else 10 if tablet else 24)
-	var column_gap := 0 if phone else 16 if tablet else 24
-	get_node(STAGE + "/Content/Split").add_theme_constant_override("separation",column_gap)
+		get_node(path).set(&"padding_vertical", &"" if phone else &"space_1" if tablet else &"space_2")
+		_gap(path + "/Row", &"space_1" if small else &"space_2")
+		# A phone has room for the pictogram and the modifier; the cell's tooltip names the ability.
+		get_node(path + "/Row/Label").visible = not phone
+		get_node(path + "/Row/Icon").custom_minimum_size = icon_small if phone else icon_medium
+		get_node(path + "/Row/Icon").self_modulate = ornament
+		_role(path + "/Row/Value", "RookframeLabel" if small else "RookframeHeading")
+	_gap(STAGE, &"space_1" if phone else &"space_2" if tablet and size.y <= 740 else &"space_3" if tablet else &"space_5")
+	var column_gap := &"" if phone else &"space_4" if tablet else &"space_5"
+	_gap(STAGE + "/Content/Split", column_gap)
 	get_node(LEFT).size_flags_stretch_ratio = 0.9 if tablet else 1.0
 	get_node(STAGE + "/Content/Split/Detail").size_flags_stretch_ratio = 1.1 if tablet else 1.0
-	get_node(STAGE + "/Content/Split/Detail").theme_type_variation = "WizardPlain" if phone else "WizardDivider"
-	get_node(STAGE + "/Heading/Copy").add_theme_constant_override("separation",2 if tablet else 4)
-	_text(STAGE + "/Heading/Copy/Kicker",16 if tablet else 18,1.3)
-	_text(STAGE + "/Heading/Copy/Subtitle",17 if tablet else 20,1.3)
+	_gap(STAGE + "/Content/Split/Detail", column_gap)
+	get_node(STAGE + "/Content/Split/Detail/Rule").visible = not phone
 	for name in ["Kicker","Subtitle"]:
 		get_node(STAGE + "/Heading/Copy/" + name).visible = not phone
-	_text(STAGE + "/Heading/Copy/Title",25 if phone else 29 if tablet else 36,1.1 if phone else 1.2)
+	_role(STAGE + "/Heading/Copy/Subtitle", "RookframeBody")
+	_role(STAGE + "/Heading/Copy/Title", "RookframeHeading" if phone else "RookframeSubtitle" if tablet else "RookframeTitle")
 	get_node(STAGE + "/Heading/Copy/Title").text_overrun_behavior = 3
-	get_node(STAGE + "/Heading").custom_minimum_size = Vector2(0, 44 if phone else 0)
-	_text(STAGE + "/Heading/Details",17)
+	get_node(STAGE + "/Heading").custom_minimum_size = Vector2(0, get_theme_constant(&"target_minimum", TOKENS) if phone else 0)
+	get_node(STAGE + "/Heading/Details").compact = true
 	for section in ["Character","Gear","Traits"]:
-		_text(STAGE + "/Heading/ReviewTabs/" + section,17)
-		get_node(STAGE + "/Heading/ReviewTabs/" + section).clip_text = false
-		for state in ["normal", "hover", "pressed", "hover_pressed", "disabled"]:
-			var button: Button = get_node(STAGE + "/Heading/ReviewTabs/" + section)
-			var frame := button.get_theme_stylebox(state).duplicate()
-			frame.content_margin_left = 10
-			frame.content_margin_right = 10
-			button.add_theme_stylebox_override(state, frame)
+		get_node(STAGE + "/Heading/ReviewTabs/" + section).compact = true
 	get_node(LEFT + "/Choices").columns = 2 if phone and _route == "create-class" and size.x > 600 else 1
-	get_node(LEFT + "/Identity").add_theme_constant_override("separation",0)
-	get_node(LEFT + "/Identity/FieldGap").custom_minimum_size = Vector2(0, 0 if phone else 20)
-	get_node(LEFT + "/Identity/DescriptionGap").custom_minimum_size = Vector2(0, 0 if phone else 12)
+	_gap(LEFT + "/Identity", &"" if phone else &"space_4")
 	for field in [get_name_field(),get_description_field()]:
 		field.compact = phone
-	var detail := get_node(DETAIL)
 	var pages := get_node(STAGE + "/Content/Split/Detail/Pages")
 	pages.enabled = true
-	for edge in ["left","top","right","bottom"]:
-		pages.set("offset_" + edge, column_gap + 1 if edge == "left" and not phone else 0)
-	detail.add_theme_constant_override("separation",6 if tablet and _route == "create-class" else 2 if phone else 8 if tablet else 20)
-	get_node(DETAIL + "/Heading").add_theme_constant_override("separation",12 if phone else 10 if tablet else 16)
-	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = Vector2(32,32) if phone else Vector2(36,36) if tablet else Vector2(56,56)
-	get_node(DETAIL + "/Heading/Copy").add_theme_constant_override("separation",0)
-	_text(DETAIL + "/Heading/Copy/Title",21 if phone else 26 if tablet else 32,1.1 if phone else 1.15)
-	_text(DETAIL + "/Heading/Copy/Kicker",11 if phone else 15 if tablet else 18,1.3)
+	_gap(DETAIL, &"space_2" if tablet and _route == "create-class" else &"space_1" if phone else &"space_2" if tablet else &"space_5")
+	_gap(DETAIL + "/Heading", &"space_3" if small else &"space_4")
+	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = icon_large if small else Vector2.ONE * get_theme_constant(&"space_7", TOKENS)
+	get_node(DETAIL + "/Heading/Icon").self_modulate = ornament
+	_role(DETAIL + "/Heading/Copy/Title", "RookframeHeading" if small else "RookframeSubtitle")
 	get_node(DETAIL + "/RollInfo").vertical = not phone
 	get_node(DETAIL + "/RollOutcome").vertical = not phone
 	get_node(DETAIL + "/RollInfo").visible = not _route in ["create-class","create-identity"]
 	get_node(DETAIL + "/RollOutcome").visible = get_node(DETAIL + "/RollOutcome/Result").visible or get_node(DETAIL + "/RollOutcome/ResultCopy").visible
 	for group in ["RollInfo","RollOutcome"]:
-		get_node(DETAIL + "/" + group).add_theme_constant_override("separation",16 if phone else 8 if tablet else 20)
-	_text(DETAIL + "/RollInfo/FormulaRow/Row/Value",28 if phone else 30 if tablet else 40)
-	_text(DETAIL + "/RollInfo/FormulaRow/Row/Caption",15 if phone else 16 if tablet else 18,1.3)
-	_text(DETAIL + "/RollInfo/Flavor",14 if phone else 18 if tablet else 21,1.2 if phone else 1.25 if tablet else 1.35)
-	_text(DETAIL + "/RollOutcome/ResultCopy",17 if phone else 18 if tablet else 21,1.2 if phone else 1.25 if tablet else 1.35)
-	_text(DETAIL + "/RollOutcome/Result/Content/Value",22 if phone else 23 if tablet else 28)
+		_gap(DETAIL + "/" + group, &"space_4" if phone else &"space_2" if tablet else &"space_5")
+	_role(DETAIL + "/RollInfo/FormulaRow/Row/Value", "RookframeHeading" if phone else "RookframeValue")
+	for copy in ["/RollInfo/Flavor", "/RollOutcome/ResultCopy", "/ClassBody/FactsColumn/Flavor"]:
+		_role(DETAIL + copy, "RookframeMeta" if phone else "RookframeBody")
+	_role(DETAIL + "/RollOutcome/Result/Content/Value", "RookframeLabel" if phone else "RookframeHeading" if tablet else "RookframeValue")
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").max_lines_visible = 2 if phone else -1
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").text_overrun_behavior = 3 if phone else 0
 	get_node(DETAIL + "/RollOutcome/Result/Content/Label").visible = not phone
-	_text(DETAIL + "/RollOutcome/Result/Content/Label",14 if phone else 17,1.3)
-	get_node(DETAIL + "/RollOutcome/Result").theme_type_variation = "WizardResultCompact" if phone else "WizardResult"
-	get_node(DETAIL + "/RollInfo/FormulaRow").theme_type_variation = "WizardFormulaBoxCompact" if phone else "WizardFormulaBoxTablet" if tablet else "WizardFormulaBox"
+	get_node(DETAIL + "/RollInfo/FormulaRow").set(&"padding_vertical", &"space_1" if phone else &"space_2" if tablet else &"space_3")
 	get_node(DETAIL + "/ClassBody").vertical = not phone
-	get_node(DETAIL + "/ClassBody").add_theme_constant_override("separation",20 if phone else 6 if tablet else 20)
-	get_node(DETAIL + "/ClassBody/FactsColumn").add_theme_constant_override("separation",8 if phone else 6 if tablet else 20)
-	_text(DETAIL + "/ClassBody/FactsColumn/Flavor",17 if phone else 18 if tablet else 21,1.2 if phone else 1.25 if tablet else 1.35)
+	_gap(DETAIL + "/ClassBody", &"space_5" if phone else &"space_2" if tablet else &"space_5")
+	_gap(DETAIL + "/ClassBody/FactsColumn", &"space_2" if small else &"space_5")
 	if _route == "create-class":
 		_present_class_rules()
 	for fact in ["HitPoints","Silver","Omens"]:
-		var path: String = DETAIL + "/ClassBody/FactsColumn/Facts/Row/" + fact
-		get_node(path).add_theme_constant_override("separation",2 if phone else 4)
-		_text(path + "/Label",14 if phone else 15 if tablet else 18)
-		_text(path + "/Value",21 if phone or tablet else 26)
-	get_node(DETAIL + "/ClassBody/FactsColumn/Facts").theme_type_variation = "WizardFactsCompact" if phone else "WizardFactsTablet" if tablet else "WizardFacts"
-	_text(DETAIL + "/NoteRow/Note",14 if tablet else 17,1.3)
+		_role(DETAIL + "/ClassBody/FactsColumn/Facts/Row/" + fact + "/Value", "RookframeLabel" if small else "RookframeHeading")
+	get_node(DETAIL + "/ClassBody/FactsColumn/Facts").set(&"padding_vertical", &"space_1" if phone else &"space_2" if tablet else &"space_4")
+	get_node(DETAIL + "/NoteRow/Icon").custom_minimum_size = icon_medium
+	get_node(DETAIL + "/NoteRow/Icon").self_modulate = ornament
 	for name in ["Spacer","NoteRule","NoteRow"]:
 		get_node(DETAIL + "/" + name).visible = not get_node(DETAIL + "/NoteRow/Note").text.is_empty() and _route != "create-identity" and not phone and (name != "Spacer" or not tablet) and (_route != "create-equipment" or get_node(DETAIL + "/PackChoices").visible) and (_route == "create-class" or not bool(_record(_choice).get("complete", false)) or get_node(DETAIL + "/PackChoices").visible)
 	get_node(DETAIL + "/Heading").visible = _route != "create-identity"
 	get_node(DETAIL + "/Appearance").configure(i18n, null, false, true, phone, tablet)
 	get_node(DETAIL + "/PackChoices/Options").columns = 3 if phone else 2
-	get_node(DETAIL + "/PackChoices/Options").add_theme_constant_override("v_separation",6 if phone else 8)
 	get_node(DETAIL + "/PackChoices/Prompt").visible = not phone
 	get_node(DETAIL + "/ScrollChoice").vertical = not phone
 	for group in [PACK_BUTTONS,["/ScrollChoice/Reroll","/ScrollChoice/Eat","/ScrollChoice/Paper"]]:
 		for path in group:
-			_text(DETAIL + path,17 if phone or tablet else 20)
-	get_node(STAGE + "/Content/Review").add_theme_constant_override("separation",20 if tablet else 32)
+			get_node(DETAIL + path).compact = small
+	_gap(STAGE + "/Content/Review", &"space_5" if tablet else &"space_6")
 	for column in ["Character","Belongings"]:
 		get_node(STAGE + "/Content/Review/"+column+"Pages").enabled = true
-		get_node(STAGE + "/Content/Review/"+column+"Pages").content_inset_left = 0 if phone or column == "Character" else 17 if tablet else 25
-		get_node(STAGE + "/Content/Review/"+column+"Pages/Area/"+column).add_theme_constant_override("separation",8 if phone else 10 if tablet else 24)
+		get_node(STAGE + "/Content/Review/"+column+"Pages").content_inset_left = 0 if phone or column == "Character" else get_theme_constant(&"space_4" if tablet else &"space_5", TOKENS)
+		_gap(STAGE + "/Content/Review/"+column+"Pages/Area/"+column, &"space_2" if phone else &"space_3" if tablet else &"space_5")
 	_sync_navigation()
 
-func _text(path: String, font_size: int, line_height: float = 1.2) -> void:
-	_style_text(get_node(path), font_size, line_height)
+## Sets the gap token of a container that carries `token_box.gd`.
+func _gap(path: String, token: StringName) -> void:
+	get_node(path).set(&"gap", token)
 
-func _style_text(node: Control, font_size: int, line_height: float) -> void:
-	node.add_theme_font_size_override("font_size",font_size)
-	preload("res://rookframe/ui/theme/silkbound_line_height.gd").apply(node,line_height)
+## Sets the UI Kit label variation that carries the type role of a Label.
+func _role(path: String, variation: StringName) -> void:
+	get_node(path).theme_type_variation = variation
 
 func _toggle_details() -> void:
 	_details = not _details
@@ -269,6 +261,11 @@ func localize(locale: I18N) -> void:
 	get_name_field().help_text = _t("Required")
 	get_description_field().label_text = _t("Description")
 	get_description_field().help_text = _t("Optional · a few words to remember them by")
+	# Pictograms stand alone on a phone, so their groups carry the names.
+	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
+		get_node(CONTEXT + "/Attributes/" + ability).tooltip_text = _t(ability)
+	for vital in [["HitPoints", "Hit Points"], ["Omens", "Omens"], ["Silver", "Silver"]]:
+		get_node(CONTEXT + "/PortraitVitals/Vitals/" + vital[0]).tooltip_text = _t(vital[1])
 	for path in ["/Content/Split/Detail/Pages", "/Content/Review/CharacterPages", "/Content/Review/BelongingsPages"]:
 		get_node(STAGE + path + "/Pager/Previous").text = _t("Previous")
 		get_node(STAGE + path + "/Pager/Next").text = _t("Next")
@@ -529,7 +526,7 @@ func _present_class_rules() -> void:
 		child.queue_free()
 	var phone := is_compact()
 	var tablet := is_tablet()
-	container.add_theme_constant_override("separation",8 if phone else 6 if tablet else 16)
+	container.set(&"gap", &"space_2" if phone or tablet else &"space_4")
 	var profile: Dictionary = _draft.get("class_profile", {})
 	var offsets: Dictionary = profile.get("ability_offsets", {})
 	var parts: Array[Array] = []
@@ -549,14 +546,13 @@ func _present_class_rules() -> void:
 	for part in parts:
 		var rule := preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creation_class_rule.tscn").instantiate()
 		container.add_child(rule)
-		rule.add_theme_constant_override("separation",2 if phone or tablet else 4)
 		var title := rule.get_node(^"Title") as Label
 		var copy := rule.get_node(^"Copy") as Label
 		title.text = part[0]
 		title.visible = not part[0].is_empty()
 		copy.text = part[1]
-		_style_text(title,18 if phone else 20 if tablet else 24,1.1 if phone else 1.2)
-		_style_text(copy,15 if phone else 16 if tablet else 19,1.15 if phone else 1.3)
+		title.theme_type_variation = "RookframeLabel" if phone or tablet else "RookframeHeading"
+		copy.theme_type_variation = "RookframeMeta" if phone else "RookframeBody"
 
 func _present_identity() -> void:
 	_reset_detail()

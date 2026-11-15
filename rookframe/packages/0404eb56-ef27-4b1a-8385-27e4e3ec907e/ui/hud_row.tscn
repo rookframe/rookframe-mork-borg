@@ -1,30 +1,30 @@
 [gd_scene format=3]
 
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_row.gd" id="script"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/favorite_toggle.tscn" id="favorite"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/info.svg" id="info"]
 
 [node name="Row" type="HBoxContainer"]
-theme_override_constants/separation = 0
 script = ExtResource("script")
 
 [node name="Launch" type="Button" parent="."]
 size_flags_horizontal = 3
 size_flags_vertical = 1
+theme_type_variation = &"RookframeQuietButton"
 
 [node name="Content" type="HBoxContainer" parent="Launch"]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 12.0
-offset_top = 10.0
-offset_right = -12.0
-offset_bottom = -10.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_constants/separation = 14
+script = ExtResource("box")
+gap = &"space_3"
 
 [node name="Icon" type="TextureRect" parent="Launch/Content"]
-custom_minimum_size = Vector2(27, 27)
 size_flags_vertical = 4
 mouse_filter = 2
 expand_mode = 1
@@ -34,16 +34,19 @@ stretch_mode = 5
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 4
+script = ExtResource("box")
+gap = &"space_1"
 
 [node name="Title" type="Label" parent="Launch/Content/Copy"]
 mouse_filter = 2
+theme_type_variation = &"RookframeBody"
 autowrap_mode = 3
 max_lines_visible = 2
 text_overrun_behavior = 3
 
 [node name="Detail" type="Label" parent="Launch/Content/Copy"]
 mouse_filter = 2
+theme_type_variation = &"RookframeMeta"
 autowrap_mode = 3
 max_lines_visible = 1
 text_overrun_behavior = 3
@@ -51,21 +54,20 @@ text_overrun_behavior = 3
 [node name="Value" type="Label" parent="Launch/Content"]
 mouse_filter = 2
 size_flags_vertical = 4
+theme_type_variation = &"RookframeBody"
+horizontal_alignment = 1
 
-[node name="Use" type="Button" parent="."]
+[node name="Use" parent="." instance=ExtResource("button")]
 visible = false
-custom_minimum_size = Vector2(60, 44)
-size_flags_vertical = 1
+size_flags_vertical = 4
 text = "Use"
+compact = true
 
-[node name="FullName" type="Button" parent="."]
+[node name="FullName" parent="." instance=ExtResource("button")]
 visible = false
-custom_minimum_size = Vector2(44, 44)
-size_flags_vertical = 1
-text = "ⓘ"
+size_flags_vertical = 4
+icon = ExtResource("info")
+compact = true
 
-[node name="Favorite" type="Button" parent="."]
-custom_minimum_size = Vector2(44, 44)
-size_flags_vertical = 1
-text = "☆"
-toggle_mode = true
+[node name="Favorite" parent="." instance=ExtResource("favorite")]
+size_flags_vertical = 4

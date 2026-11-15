@@ -1,4 +1,5 @@
 extends VBoxContainer
+const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
 signal resource_requested(id: String)
 signal resource_changed(field: String, value: String)
 @onready var _route_quick = get_node(^"Page/Content/QuickResources")
@@ -25,47 +26,26 @@ func _power_changed(value: String) -> void:
 		resource_changed.emit("power_uses", value)
 
 func configure_layout(phone: bool, tablet: bool) -> void:
-	add_theme_constant_override("separation", 8 if phone else 0)
+	SHEET_TOKENS.gap(self, &"space_2" if phone else &"")
 	var section: OptionButton = get_node(^"Page/Content/Section")
 	section.add_theme_font_size_override("font_size", 18)
 	section.expand_icon = true
 	section.fit_to_longest_item = false
 	section.clip_text = true
-	section.add_theme_constant_override("icon_max_width", 25)
-	section.add_theme_constant_override("h_separation", 18)
-	for state in ["normal", "hover", "pressed", "disabled"]:
-		section.add_theme_stylebox_override(state, preload("res://rookframe/ui/theme/silkbound_row.tres"))
+	section.add_theme_constant_override("icon_max_width", SHEET_TOKENS.pixels(self, &"icon_medium"))
 	for path in ["Tabs/TabCharacter", "Tabs/TabPowers", "Tabs/TabInventory", "Tabs/TabJournal", "Tabs/TabAppearance"]:
 		var button = get_node(path)
 		button.custom_minimum_size = Vector2(44, 44 if phone else 48 if tablet else 54)
-		button.configure_layout(18 if phone else 19 if tablet else 23, 22 if phone else 23 if tablet else 30, 6 if phone or tablet else 10)
-		button.get_node(^"Center/Content/Title").visible = not (phone and path.ends_with("TabAppearance"))
-		button.tooltip_text = "Appearance" if path.ends_with("TabAppearance") else ""
-		button.icon_alignment = 0
-		button.vertical_icon_alignment = 1
-		button.add_theme_constant_override("icon_max_width", 22 if phone else 23 if tablet else 30)
-		button.add_theme_constant_override("h_separation", 6 if phone or tablet else 10)
-		button.add_theme_font_size_override("font_size", 18 if phone else 19 if tablet else 23)
-	get_node(^"Tabs").add_theme_constant_override("separation", 4 if phone else 6 if tablet else 8)
+		var compact := phone or tablet
+		button.configure_layout(18 if phone else 19 if tablet else 23, &"icon_medium" if compact else &"icon_large", not (compact and path.ends_with("TabAppearance")), not compact)
+	get_node(^"Tabs").set(&"gap", &"space_1" if phone else &"space_2")
 	get_node(^"Page/Content/ChapterCaption/Caption").add_theme_font_size_override("font_size", 17 if tablet else 20)
 	for raw in get_node(^"Page/Content/ChapterCaption/InventoryFilters").get_children():
 		var child := raw as Control
 		child.add_theme_font_size_override("font_size", 17 if tablet else 20)
-		for state in ["normal", "pressed", "hover", "hover_pressed"]:
-			var style := StyleBoxFlat.new()
-			style.bg_color = Color(0, 0, 0, 0) if state == "normal" else Color(0.737255, 0.572549, 0.466667, 0.094118)
-			style.border_width_bottom = 2 if state in ["pressed", "hover_pressed"] else 0
-			style.border_color = Color(0.737255, 0.572549, 0.466667, 1)
-			style.content_margin_left = 12
-			style.content_margin_right = 12
-			style.content_margin_top = 6
-			style.content_margin_bottom = 6
-			child.add_theme_stylebox_override(state, style)
 		child.custom_minimum_size = Vector2(child.custom_minimum_size.x, 44)
 	get_node(^"Page/Content/ChapterCaption/InventoryFilters/Ready").text = "Equipped"
-	get_node(^"Page/Content/ChapterCaption/Resource").add_theme_stylebox_override("normal", preload("res://rookframe/ui/theme/silkbound_plain.tres"))
 	get_node(^"Page/Content/ChapterCaption/Resource").icon = null
-	get_node(^"Page/Content/ChapterCaption/PersonalNotes").add_theme_stylebox_override("normal", preload("res://rookframe/ui/theme/silkbound_plain.tres"))
 	get_node(^"Page/Content/ChapterCaption/PersonalNotes").add_theme_font_size_override("font_size", 17 if tablet else 20)
 	get_node(^"Page/Content/AppearancePanel").configure_layout(phone, tablet)
 
