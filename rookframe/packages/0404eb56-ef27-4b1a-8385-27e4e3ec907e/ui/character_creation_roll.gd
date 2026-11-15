@@ -8,7 +8,10 @@ const DICE = preload("res://rookframe/ui/icons/dice.svg")
 const SPINNER = preload("res://rookframe/ui/icons/spinner.svg")
 const LOCK = preload("res://rookframe/ui/icons/lock.svg")
 
+const TOKENS := &"RookframeTokens"
+
 var _rolling := false
+var _compact := false
 
 func _process(delta: float) -> void:
 	if not _rolling or not is_visible_in_tree():
@@ -17,15 +20,16 @@ func _process(delta: float) -> void:
 	icon.rotation_degrees = icon.rotation_degrees + delta * 360.0
 
 func present_roll(title: String, formula: String, result: String, state: String, ordinal: int, compact: bool, meaning: String = "") -> void:
+	_compact = compact
 	get_node(^"Highlight").visible = state in ["current", "pending"]
 	get_node(^"Row/Identity/Title").text = _t(title)
-	get_node(^"Row/Identity/Title").set("theme_override_font_sizes/font_size", 14 if compact else 16)
+	get_node(^"Row/Identity/Title").theme_type_variation = &"RookframeLabel" if compact else &"RookframeIdentity"
 	get_node(^"Row/Identity/Formula").text = _t(formula)
-	get_node(^"Row/Identity/Formula").set("theme_override_font_sizes/font_size", 12 if compact else 16)
 	get_node(^"Row/Result").text = _t(result)
 	get_node(^"Row/Identity/Meaning").text = meaning
 	get_node(^"Row/Identity/Meaning").visible = not meaning.is_empty()
-	get_node(^"Row/Result").set("theme_override_font_sizes/font_size", 16 if compact else 18)
+	get_node(^"Row/Identity/Meaning").theme_type_variation = &"RookframeMeta" if compact else &"RookframeBody"
+	get_node(^"Row/Result").theme_type_variation = &"RookframeHeading" if compact else &"RookframeValue"
 	get_node(^"Row/Ordinal").text = str(ordinal)
 	get_node(^"Row/Ordinal").visible = not compact
 	get_node(^"Row/Die").texture = DICE
@@ -34,8 +38,24 @@ func present_roll(title: String, formula: String, result: String, state: String,
 	_rolling = state == "pending"
 	if state != "pending":
 		get_node(^"Row/State").rotation = 0.0
-	custom_minimum_size = Vector2(0, 52 if compact else 64)
+	_read_tokens()
 	accessibility_name = "%s, %s, %s" % [_t(title), _t(formula), (meaning if not meaning.is_empty() else _t(result)) if state == "complete" else _t(state)]
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_tokens()
+
+## Sizes and tints that come from the World theme's tokens.
+func _read_tokens() -> void:
+	if not is_inside_tree():
+		return
+	custom_minimum_size = Vector2(0, get_theme_constant(&"action_height" if _compact else &"space_8", TOKENS))
+	var icon := Vector2.ONE * get_theme_constant(&"icon_medium", TOKENS)
+	for name in [^"Row/State", ^"Row/Die"]:
+		var pictogram := get_node(name) as TextureRect
+		pictogram.custom_minimum_size = icon
+		pictogram.pivot_offset = icon / 2
+		pictogram.self_modulate = get_theme_color(&"content", TOKENS)
 
 
 func _t(source: String) -> String:

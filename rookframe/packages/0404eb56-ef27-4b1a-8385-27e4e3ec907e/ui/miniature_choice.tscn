@@ -1,6 +1,6 @@
 [gd_scene format=3]
-[node name="MiniatureChoice" type="Button"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[node name="MiniatureChoice" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
+compact = true
 toggle_mode = true
