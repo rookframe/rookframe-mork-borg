@@ -1,23 +1,34 @@
 [gd_scene format=3 uid="uid://duueivqppfjle"]
 
-[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/d20.svg" id="dice"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_action_launcher.gd" id="launcher"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="portrait"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_hud.gd" id="script"]
-
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_action_launcher.gd" id="launcher"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="grid"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_show_all.tscn" id="show_all"]
-
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_divider.tscn" id="divider"]
-
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/hud_bar.tscn" id="hud_bar"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/identity_plate.tscn" id="identity"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/data/vital_meter.tscn" id="vital"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/hinged_leaf/hinged_leaf.tscn" id="leaf"]
-[ext_resource type="StyleBoxTexture" path="res://rookframe/ui/assets/action-panel/body.tres" id="leather"]
-[ext_resource type="StyleBoxTexture" path="res://rookframe/ui/assets/action-panel/hud_identity.tres" id="identity_skin"]
-[ext_resource type="StyleBoxTexture" path="res://rookframe/ui/assets/action-panel/hud_badge.tres" id="badge_skin"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/hinged_leaf/binding_pair.tscn" id="bindings"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/d20.svg" id="dice"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/abilities.svg" id="abilities"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/attacks.svg" id="attacks"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/powers.svg" id="powers"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/items.svg" id="items"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/features.svg" id="features"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/companions.svg" id="companions"]
+[ext_resource type="Texture2D" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_art/recovery.svg" id="recovery"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/back.svg" id="back"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/chevron-left.svg" id="previous"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/chevron-right.svg" id="next"]
 
-[node name="CharacterHud" type="Control" unique_id=1088359577]
-texture_filter = 4
+[sub_resource type="ButtonGroup" id="Categories"]
+resource_local_to_scene = true
+allow_unpress = true
+
+[node name="CharacterHud" type="Control"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -27,304 +38,222 @@ grow_vertical = 2
 mouse_filter = 2
 script = ExtResource("script")
 
-[node name="Launcher" type="Node" parent="." unique_id=913150764]
+[node name="Launcher" type="Node" parent="."]
 script = ExtResource("launcher")
 
-[node name="Bar" type="Control" parent="." unique_id=752508119]
-layout_mode = 0
-mouse_filter = 2
+[node name="Bar" parent="." instance=ExtResource("hud_bar")]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 0
+compact_width = 1100.0
+compact_category_limit = 4
 
-[node name="Dice" type="Button" parent="Bar" unique_id=1265794663]
-layout_mode = 0
+[node name="Dice" parent="Bar/Bar/Row/LeadingSlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Dice"
+accessibility_name = "Dice"
+icon = ExtResource("dice")
+variant = 3
 
-[node name="Skin" type="Panel" parent="Bar/Dice"]
-show_behind_parent = true
-anchor_right = 2.5
-anchor_bottom = 2.5
-scale = Vector2(0.4, 0.4)
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("badge_skin")
+[node name="Identity" parent="Bar/Bar/Row/IdentitySlot" instance=ExtResource("identity")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Character sheet"
+title = ""
 
-[node name="Emblem" type="TextureRect" parent="Bar/Dice" unique_id=1052559151]
-layout_mode = 0
-mouse_filter = 2
-texture = ExtResource("dice")
-expand_mode = 1
-stretch_mode = 5
+[node name="Hp" parent="Bar/Bar/Row/IdentitySlot/Identity/Content/Row/Copy/VitalSlot" instance=ExtResource("vital")]
+unique_name_in_owner = true
+layout_mode = 2
 
-[node name="Identity" type="Button" parent="Bar" unique_id=1547338191]
-layout_mode = 0
-
-[node name="Skin" type="Panel" parent="Bar/Identity"]
-show_behind_parent = true
-anchor_right = 2.5
-anchor_bottom = 2.5
-scale = Vector2(0.4, 0.4)
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("identity_skin")
-
-[node name="PortraitFrame" type="Control" parent="Bar/Identity" unique_id=901269825]
-clip_contents = true
-anchors_preset = 0
-mouse_filter = 2
-
-[node name="Portrait" type="TextureRect" parent="Bar/Identity/PortraitFrame" unique_id=2064650261]
-layout_mode = 0
-mouse_filter = 2
-texture = ExtResource("portrait")
-expand_mode = 1
-stretch_mode = 6
-
-[node name="Name" type="Label" parent="Bar/Identity" unique_id=1220189425]
-layout_mode = 0
-theme_override_fonts/font = ExtResource("display")
-text_overrun_behavior = 3
-
-[node name="Class" type="Label" parent="Bar/Identity" unique_id=1646660914]
-layout_mode = 0
-text_overrun_behavior = 3
-
-[node name="Hp" type="Label" parent="Bar/Identity" unique_id=1366777454]
-layout_mode = 0
-
-[node name="HpTrack" type="ProgressBar" parent="Bar/Identity" unique_id=607498682]
-layout_mode = 0
-mouse_filter = 2
-show_percentage = false
-
-[node name="Divider" parent="Bar/Identity" instance=ExtResource("divider")]
-
-[node name="Categories" type="Control" parent="Bar" unique_id=1557663948]
-anchors_preset = 0
-mouse_filter = 2
-
-[node name="Skin" type="Panel" parent="Bar/Categories"]
-show_behind_parent = true
-anchor_right = 2.5
-anchor_bottom = 2.5
-scale = Vector2(0.4, 0.4)
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("leather")
-
-[node name="Abilities" type="Button" parent="Bar/Categories" unique_id=1889071361]
-layout_mode = 0
+[node name="Abilities" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Abilities" unique_id=366712050]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Abilities" unique_id=1097281085]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Abilities"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
+icon = ExtResource("abilities")
+layout = 1
 
-[node name="Attacks" type="Button" parent="Bar/Categories" unique_id=946788552]
-layout_mode = 0
+[node name="Attacks" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Attacks" unique_id=1222473667]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Attacks" unique_id=670803575]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Attacks"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
+icon = ExtResource("attacks")
+layout = 1
 
-[node name="Powers" type="Button" parent="Bar/Categories" unique_id=1876620833]
-layout_mode = 0
+[node name="Powers" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Powers" unique_id=1358602619]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Powers" unique_id=1494302329]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Powers"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
+icon = ExtResource("powers")
+layout = 1
 
-[node name="Items" type="Button" parent="Bar/Categories" unique_id=1945264601]
-layout_mode = 0
+[node name="Items" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Items" unique_id=1755537816]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Items" unique_id=2103399670]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Items"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
+icon = ExtResource("items")
+layout = 1
 
-[node name="Features" type="Button" parent="Bar/Categories" unique_id=308392818]
-layout_mode = 0
+[node name="Features" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Features" unique_id=1906477129]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Features" unique_id=738379728]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Features"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
+icon = ExtResource("features")
+layout = 1
 
-[node name="Companions" type="Button" parent="Bar/Categories" unique_id=1081877319]
-layout_mode = 0
+[node name="Companions" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Companions" unique_id=908000910]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Companions" unique_id=81092318]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Companions"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
+icon = ExtResource("companions")
+layout = 1
 
-[node name="Recovery" type="Button" parent="Bar/Categories" unique_id=1783613773]
-layout_mode = 0
+[node name="Recovery" parent="Bar/Bar/Row/CategorySlot" instance=ExtResource("button")]
+unique_name_in_owner = true
+layout_mode = 2
 toggle_mode = true
-
-[node name="Icon" type="TextureRect" parent="Bar/Categories/Recovery" unique_id=1756515630]
-layout_mode = 0
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Title" type="Label" parent="Bar/Categories/Recovery" unique_id=978627878]
-vertical_alignment = 1
-layout_mode = 0
+button_group = SubResource("Categories")
 text = "Recovery"
-horizontal_alignment = 1
-clip_text = true
-text_overrun_behavior = 3
-
-[node name="Rule" parent="Bar/Categories" instance=ExtResource("divider")]
-
-[node name="LeftBindings" parent="Bar" instance=ExtResource("bindings")]
-
-[node name="RightBindings" parent="Bar" instance=ExtResource("bindings")]
+icon = ExtResource("recovery")
+layout = 1
 
 [node name="Panel" parent="." instance=ExtResource("leaf")]
 
-[node name="Back" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content" unique_id=2011697557]
-visible = false
-layout_mode = 0
-accessibility_name = "Back to actions"
-text = "‹"
-
-[node name="Header" type="Control" parent="Panel/Surface/Viewport/Root/Ink/Content" unique_id=670346750]
-anchors_preset = 0
+[node name="Layout" type="VBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+script = ExtResource("box")
+gap = &""
 
-[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Header" unique_id=1637701207]
-layout_mode = 0
-theme_override_fonts/font = ExtResource("display")
-vertical_alignment = 1
+[node name="Header" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout"]
+layout_mode = 2
+mouse_filter = 2
+script = ExtResource("box")
+
+[node name="Back" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Header" instance=ExtResource("button")]
+visible = false
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Back to actions"
+accessibility_name = "Back to actions"
+icon = ExtResource("back")
+compact = true
+
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Header"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_type_variation = &"RookframeHeading"
 clip_text = true
 text_overrun_behavior = 3
 
-[node name="ShowAll" parent="Panel/Surface/Viewport/Root/Ink/Content/Header" instance=ExtResource("show_all")]
-layout_mode = 0
+[node name="ShowAll" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Header" instance=ExtResource("show_all")]
+layout_mode = 2
+size_flags_vertical = 4
 
-[node name="Morning" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Header" unique_id=2141346985]
+[node name="Morning" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Header" instance=ExtResource("button")]
 visible = false
-layout_mode = 0
+layout_mode = 2
+size_flags_vertical = 4
 disabled = true
 text = "Morning"
+compact = true
 
-[node name="Close" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Header" unique_id=988365147]
-layout_mode = 0
+[node name="Close" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Header" instance=ExtResource("button")]
+layout_mode = 2
+size_flags_vertical = 4
+tooltip_text = "Close character actions"
 accessibility_name = "Close character actions"
-text = "×"
+icon = ExtResource("close")
+compact = true
 
-[node name="Rule" type="ColorRect" parent="Panel/Surface/Viewport/Root/Ink/Content/Header" unique_id=1150370993]
-layout_mode = 0
-mouse_filter = 2
-color = Color(0.244353, 0.262784, 0.272745, 1)
-
-[node name="List" type="GridContainer" parent="Panel/Surface/Viewport/Root/Ink/Content" unique_id=388342374]
-layout_mode = 0
-theme_override_constants/h_separation = 0
-theme_override_constants/v_separation = 0
-
-[node name="Footer" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content" unique_id=10636164]
-layout_mode = 0
-theme_override_constants/separation = 12
-alignment = 1
-
-[node name="Previous" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Footer" unique_id=813459568]
-custom_minimum_size = Vector2(44, 44)
+[node name="Rule" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout" instance=ExtResource("divider")]
 layout_mode = 2
-accessibility_name = "Previous page"
-text = "‹"
+vertical = false
 
-[node name="Page" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Footer" unique_id=830633110]
+[node name="List" type="GridContainer" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout"]
 layout_mode = 2
-vertical_alignment = 1
+script = ExtResource("grid")
+gap_horizontal = &""
+gap_vertical = &""
 
-[node name="Next" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Footer" unique_id=2103898449]
-custom_minimum_size = Vector2(44, 44)
+[node name="Empty" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout"]
 layout_mode = 2
-accessibility_name = "Next page"
-text = "›"
+size_flags_vertical = 3
+script = ExtResource("box")
 
-[node name="Empty" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content" unique_id=2077082743]
-layout_mode = 0
-
-[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Empty" unique_id=1908135483]
+[node name="Title" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Empty"]
 layout_mode = 2
 size_flags_horizontal = 3
+theme_type_variation = &"RookframeMeta"
 text = "No entries"
 vertical_alignment = 1
+autowrap_mode = 3
 
-[node name="Sheet" type="Button" parent="Panel/Surface/Viewport/Root/Ink/Content/Empty" unique_id=975887282]
-custom_minimum_size = Vector2(44, 44)
+[node name="Sheet" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Empty" instance=ExtResource("button")]
 layout_mode = 2
 size_flags_vertical = 4
 text = "Character sheet"
+compact = true
 
-[node name="Detail" type="Control" parent="Panel/Surface/Viewport/Root/Ink/Content" unique_id=753011404]
+[node name="Detail" type="Control" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout"]
 visible = false
 clip_contents = true
-anchors_preset = 0
+layout_mode = 2
 mouse_filter = 2
 
-[node name="Text" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Detail" unique_id=323170497]
+[node name="Text" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Detail"]
 layout_mode = 0
+theme_type_variation = &"RookframeBody"
 autowrap_mode = 3
 
+[node name="Footer" type="HBoxContainer" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout"]
+layout_mode = 2
+alignment = 1
+script = ExtResource("box")
+gap = &"space_3"
+
+[node name="Previous" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Footer" instance=ExtResource("button")]
+layout_mode = 2
+tooltip_text = "Previous page"
+accessibility_name = "Previous page"
+icon = ExtResource("previous")
+compact = true
+
+[node name="Page" type="Label" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Footer"]
+layout_mode = 2
+theme_type_variation = &"RookframeMeta"
+vertical_alignment = 1
+
+[node name="Next" parent="Panel/Surface/Viewport/Root/Ink/Content/Layout/Footer" instance=ExtResource("button")]
+layout_mode = 2
+tooltip_text = "Next page"
+accessibility_name = "Next page"
+icon = ExtResource("next")
+compact = true
+
+[editable path="Bar"]
+[editable path="Bar/Bar/Row/IdentitySlot/Identity"]
 [editable path="Panel"]
