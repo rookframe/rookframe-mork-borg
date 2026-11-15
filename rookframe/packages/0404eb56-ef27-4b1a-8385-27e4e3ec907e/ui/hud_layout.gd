@@ -23,6 +23,11 @@ var _rows: Array[ROW_SCRIPT] = []
 var _panel_anchor: Button
 var _name_check_pending := false
 var _restyle_pending := false
+## Entries on one page: a page gives up rows until the list stands above the bar.
+const ROW_LIMIT := 4
+var _row_limit := ROW_LIMIT
+var _page_size := ROW_LIMIT
+var _refit_pending := false
 @onready var _bar = get_node(^"Bar")
 @onready var _panel = get_node(^"Panel")
 @onready var _content: Control = get_node(^"Panel/Surface/Viewport/Root/Ink/Content/Layout")
@@ -144,8 +149,24 @@ func _layout_panel() -> void:
 	var slot: Control = _bar.get_category_slot()
 	var lane := slot.get_global_rect() if slot.is_visible_in_tree() else bar
 	var x := clampf(lane.get_center().x - hud.position.x - width / 2, outer, maxf(outer, size.x - width - outer))
-	var y := maxf(0.0, bar.position.y - hud.position.y - _panel.hinge_gap - height)
+	var room: float = bar.position.y - hud.position.y - _panel.hinge_gap
+	var y := maxf(0.0, room - height)
 	_rect(_panel, x, y, width, height)
+	# Rows grow with the theme's type scale and the bar with its content, so a
+	# short canvas shows fewer entries on a page instead of covering the bar.
+	var step := _list.columns
+	var listing: bool = _list.visible and not get_node(CONTENT + "Detail").visible
+	if _panel.is_open and listing and height > room + _panel.hinge_gap and _page_size > step and not _refit_pending:
+		_refit_pending = true
+		_row_limit = _page_size - step
+		_refit.call_deferred()
+
+func _refit() -> void:
+	_refit_pending = false
+	_render_panel()
+
+func _render_panel() -> void:
+	pass
 
 ## Distance between the tops of two wrapped lines of a Label.
 func _line_pitch(label: Label) -> int:

@@ -171,14 +171,20 @@ func test_empty_favorites_pagination_and_unavailable_entries(width: int, height:
 	assert_str(hud.get_node("Panel").get_content().get_node("Layout/Empty/Sheet").text).is_equal("Show all")
 	hud.get_node("Panel").get_content().get_node("Layout/Empty/Sheet").pressed.emit()
 	await _settle()
-	assert_int(hud._page_entries.size()).is_equal(2 if width == 844 else 4)
+	# A phone page holds two entries in Silkbound Ledger's type scale; a theme
+	# with taller rows shows fewer so the list stays above the bar.
+	if width == 844 and WORLD_THEME.name() != "silkbound-ledger":
+		assert_int(hud._page_entries.size()).is_between(1, 2)
+		assert_bool(hud.get_node("Panel").get_global_rect().intersects(hud.get_node("Bar").get_global_rect())).is_false()
+	else:
+		assert_int(hud._page_entries.size()).is_equal(2 if width == 844 else 4)
 	assert_bool(hud._rows[0].get_node("Launch").disabled).is_true()
 	assert_bool(hud._rows[0].get_node("Favorite").disabled).is_false()
 	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer").visible).is_true()
 	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer/Previous").disabled).is_true()
 	hud.get_node("Panel").get_content().get_node("Layout/Footer/Next").pressed.emit()
 	await _settle()
-	assert_str(hud._page_entries[0].id).is_equal("item-2" if width == 844 else "item-4")
+	assert_str(hud._page_entries[0].id).is_equal("item-%d" % hud._page_size if width == 844 else "item-4")
 	assert_bool(hud.get_node("Panel").get_content().get_node("Layout/Footer/Previous").disabled).is_false()
 	assert_bool(hud.get_global_rect().encloses(hud.get_node("Panel").get_global_rect())).is_true()
 	await _capture(fixture, str(width)+"-items")

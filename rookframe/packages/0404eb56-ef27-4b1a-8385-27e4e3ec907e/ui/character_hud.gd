@@ -99,6 +99,7 @@ func _layout() -> void:
 		if _phone != experience.is_phone or _tablet != experience.is_tablet:
 			_phone = experience.is_phone
 			_tablet = experience.is_tablet
+			_row_limit = ROW_LIMIT
 			_style()
 			if _panel.is_open and not get_node(CONTENT + "Detail").visible:
 				_render_panel()
@@ -267,6 +268,7 @@ func _open_category(category: String) -> void:
 		return
 	_category = category
 	_page = 0
+	_row_limit = ROW_LIMIT
 	_panel_anchor = get_node("%" + category)
 	get_node(CONTENT + "Detail").visible = false
 	_panel.set_open(true)
@@ -334,7 +336,8 @@ func _render_panel() -> void:
 		var button: Button = get_node("%" + category)
 		button.set_pressed_no_signal(button == _panel_anchor)
 	var entries := _visible_entries()
-	var page_size := 4 if not _phone or _category == "Abilities" else 2
+	var page_size := mini(4 if not _phone or _category == "Abilities" else 2, _row_limit)
+	_page_size = page_size
 	var pages := maxi(1, ceili(float(entries.size()) / page_size))
 	_page = clampi(_page, 0, pages-1)
 	_list.columns = 2 if _phone and _category == "Abilities" else 1
