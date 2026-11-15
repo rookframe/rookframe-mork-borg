@@ -13,7 +13,7 @@ const FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec
 func _ready() -> void:
 	get_node(^"Back").pressed.connect(_back)
 func configure(data: Dictionary, _miniatures: Array) -> void:
-	for entry in [["name", "Name"], ["hit_points", "HP"], ["omens", "OMENS"], ["silver", "SILVER"], ["description", "Description"], ["maximum_hit_points", "Maximum HP"], ["class_title", "Class"], ["origin", "Origin"], ["pack", "Pack"], ["power_uses", "Power uses remaining"]]:
+	for entry in [["name", "Name"], ["hit_points", "HP"], ["omens", "Omens"], ["silver", "Silver"], ["description", "Description"], ["maximum_hit_points", "Maximum HP"], ["class_title", "Class"], ["origin", "Origin"], ["pack", "Pack"], ["power_uses", "Power uses remaining"]]:
 		_add(entry[0], entry[1], str(data.get(entry[0], 0 if entry[0] == "power_uses" else "")))
 	var abilities: Dictionary = data.get("abilities", {})
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
@@ -143,4 +143,4 @@ func localize(locale: I18N) -> void:
 	_localized = true
 	i18n = locale
 	get_node(^"Back").text = _t("Back to Character")
-	get_node(^"Heading").text = _t("CHARACTER DETAILS")
+	get_node(^"Heading").text = _t("Character details")

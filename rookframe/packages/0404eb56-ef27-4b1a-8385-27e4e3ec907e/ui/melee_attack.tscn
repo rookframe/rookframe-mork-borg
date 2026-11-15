@@ -29,7 +29,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Metrics/Damage/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "DAMAGE"
+text = "Damage"
 [node name="Value" type="Label" parent="Metrics/Damage/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -44,7 +44,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Metrics/Reach/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "REACH"
+text = "Reach"
 [node name="Value" type="Label" parent="Metrics/Reach/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -59,7 +59,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Metrics/Strength/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "STRENGTH"
+text = "Strength"
 [node name="Value" type="Label" parent="Metrics/Strength/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -84,7 +84,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Ammunition"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "AMMUNITION"
+text = "Ammunition"
 [node name="Resource" type="Label" parent="Ammunition"]
 layout_mode = 2
 theme_type_variation = &"RookframeError"
@@ -104,7 +104,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeLabel"
-text = "DIFFICULTY"
+text = "Difficulty"
 [node name="Editor" type="LineEdit" parent="Rules/Difficulty"]
 layout_mode = 2
 custom_minimum_size = Vector2(100, 44)

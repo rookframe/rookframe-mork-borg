@@ -260,7 +260,7 @@ func _build_character_sheet_route(route: String) -> void:
 		_character_actor = latest.actor
 	var data: Dictionary = _character_actor.data
 	var name: String = data.get("name", "Unnamed Character")
-	_header_title.text = name.to_upper()
+	_header_title.text = name
 	_header_subtitle.text = _t(str(data.get("class_title", "No Class"))) + _t(" Character · private sheet")
 	_set_window_title(name)
 	_character_tabs.visible = true
@@ -294,7 +294,7 @@ func _on_sheet_changed() -> void:
 		var data: Dictionary = _character_actor.data
 		var name: String = data.get("name", "Unnamed Character")
 		if _last_sheet_route in ["character", "inventory", "appearance"]:
-			_header_title.text = name.to_upper()
+			_header_title.text = name
 			_set_window_title(name)
 
 
@@ -333,7 +333,7 @@ func _on_character_unavailable() -> void:
 		return
 	get_node(^"Layout/SheetActions").visible = false
 	_character_actor = null
-	_header_title.text = _t("CHARACTER UNAVAILABLE")
+	_header_title.text = _t("Character unavailable")
 	_header_subtitle.text = ""
 	_set_window_title(_t("Character unavailable"))
 	_character_tabs.visible = false
@@ -345,10 +345,10 @@ func _on_sheet_workflow_changed(route: String, title: String, can_submit: bool, 
 	_sheet_workflow_title = title
 	_header_title.theme_type_variation = "RookframeTitle" if route in ACTION_ROUTES else "RookframeHeading"
 	if route in ACTION_ROUTES:
-		_header_title.text = _t(title).to_upper()
+		_header_title.text = _t(title)
 	elif _character_actor != null:
 		var data: Dictionary = _character_actor.data
-		_header_title.text = str(data.get("name", "Unnamed Character")).to_upper()
+		_header_title.text = str(data.get("name", "Unnamed Character"))
 	_header_subtitle.visible = not _compact and not route in ACTION_ROUTES
 	if route != _last_sheet_route:
 		get_node(^"Layout/Body").scroll_vertical = 0

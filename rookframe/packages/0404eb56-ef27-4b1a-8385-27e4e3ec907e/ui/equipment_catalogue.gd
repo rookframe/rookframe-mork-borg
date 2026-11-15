@@ -76,5 +76,5 @@ func localize(locale: I18N) -> void:
 	get_node(^"Back").text = _t("Back to Inventory")
 	get_node(^"Custom").text = _t("Create custom item")
 	get_node(^"Empty").text = _t("No matching equipment.")
-	get_node(^"Heading").text = _t("CORE EQUIPMENT")
+	get_node(^"Heading").text = _t("Core equipment")
 	get_node(^"Search").label_text = _t("Search equipment")

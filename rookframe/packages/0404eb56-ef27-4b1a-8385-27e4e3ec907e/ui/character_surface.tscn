@@ -1071,7 +1071,7 @@ layout_mode = 2
 text = "Personal notes"
 theme_type_variation = &"RookframeQuietButton"
 
-[node name="InventoryFilters" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=788754543]
+[node name="InventoryFilters" type="HFlowContainer" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=788754543]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3

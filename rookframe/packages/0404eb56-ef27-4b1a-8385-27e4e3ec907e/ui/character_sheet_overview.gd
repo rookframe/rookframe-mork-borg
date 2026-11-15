@@ -147,11 +147,11 @@ func localize(locale: I18N) -> void:
 		var button: Button = get_node(entry[0])
 		button.tooltip_text = _t(entry[1])
 		button.accessibility_name = _t(entry[1])
-	for entry in [["HitPoints", "HP"], ["Omens", "OMENS"], ["Silver", "SILVER"]]:
+	for entry in [["HitPoints", "HP"], ["Omens", "Omens"], ["Silver", "Silver"]]:
 		get_node("Resources/" + entry[0] + "/Padding/Content/Title").text = _t(entry[1])
 	for entry in [["rest", "Rest"], ["improve", "Level up"], ["broken", "Broken / death"]]:
 		get_node("HealthActions/" + entry[0]).text = _t(entry[1])
-	get_node(^"Body/Combat/Title").text = _t("COMBAT")
+	get_node(^"Body/Combat/Title").text = _t("Combat")
 
 func _edit() -> void:
 	edit_requested.emit()

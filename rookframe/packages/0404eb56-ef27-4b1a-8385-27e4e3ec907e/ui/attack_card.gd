@@ -104,7 +104,8 @@ func responsive(device: String) -> void:
 	_view_combat_attack_roll.custom_minimum_size = Vector2(48,46) if touch else Vector2(56,52)
 	for row in ["Attack", "Damage"]:
 		var line: HBoxContainer = body.get_node("Combat/" + row)
-		line.custom_minimum_size = Vector2(0, 58 if touch else 66 if row == "Attack" else 54)
+		# A touch row is as tall as its stacked label and formula in the theme's type.
+		line.custom_minimum_size = Vector2(0, 0 if touch else 66 if row == "Attack" else 54)
 		line.set(&"gap", &"space_1" if touch else &"space_4")
 		(line.get_node("Icon") as TextureRect).custom_minimum_size = Vector2(24,24) if touch else Vector2(36,36)
 		(line.get_node("Values") as BoxContainer).vertical = touch
@@ -112,8 +113,8 @@ func responsive(device: String) -> void:
 		(line.get_node("Values") as BoxContainer).size_flags_horizontal = 1 if touch else Control.SIZE_EXPAND_FILL
 		(line.get_node("Values") as BoxContainer).set(&"gap", &"" if touch else &"space_4")
 		(line.get_node("Values/Label") as Label).custom_minimum_size = Vector2(0 if touch else 110, 0)
-		_role(line.get_node("Values/Label") as Label, &"meta" if phone else &"label", &"content_muted")
-		_role(line.get_node("Values/Formula") as Label, &"heading" if phone else &"value", &"content")
+		_role(line.get_node("Values/Label") as Label, &"meta" if touch else &"label", &"content_muted")
+		_role(line.get_node("Values/Formula") as Label, &"heading" if touch else &"value", &"content")
 	_view_target_icon.custom_minimum_size = Vector2(26,26) if touch else Vector2(32,32)
 	_role(_view_target_name, &"meta" if phone else &"body", &"content")
 	if not _roles.has(_view_target_distance):

@@ -317,7 +317,7 @@ right = &"space_5"
 bottom = &"space_3"
 [node name="Title" type="Label" parent="Body/Main/Content/RestContent/Choices/Frame/Heading/Inset"]
 layout_mode = 2
-text = "CHOOSE A REST"
+text = "Choose a rest"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
 theme_type_variation = &"RookframeHeading"
@@ -471,7 +471,7 @@ right = &"space_5"
 bottom = &"space_3"
 [node name="Title" type="Label" parent="Body/Main/Content/RestContent/Recovery/Frame/Heading/Inset"]
 layout_mode = 2
-text = "RECOVERY"
+text = "Recovery"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
 theme_type_variation = &"RookframeHeading"
@@ -579,7 +579,7 @@ right = &"space_5"
 bottom = &"space_3"
 [node name="Title" type="Label" parent="Body/Main/Content/DailyContent/Frame/Heading/Inset"]
 layout_mode = 2
-text = "DAILY RESOURCES"
+text = "Daily resources"
 autowrap_mode = 3
 theme_override_font_sizes/font_size = 16
 theme_type_variation = &"RookframeHeading"

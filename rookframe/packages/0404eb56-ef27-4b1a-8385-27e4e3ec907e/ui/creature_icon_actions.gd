@@ -14,7 +14,6 @@ const ACTION_ICONS := {
 	"chevron-right": preload("res://rookframe/ui/icons/chevron-right.svg"),
 }
 const PRIMARY := 1
-const TOKENS := &"RookframeTokens"
 
 func icon_action(button: Button, role: String, primary: bool = false) -> void:
 	if not button.text.is_empty():
@@ -25,13 +24,6 @@ func icon_action(button: Button, role: String, primary: bool = false) -> void:
 	if primary and &"variant" in button:
 		button.variant = PRIMARY
 	button.icon = ACTION_ICONS.get(role, ACTION_ICONS["close"])
-	bound_icon(button)
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.size_flags_horizontal = Control.SIZE_SHRINK_END
 	button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-
-## Pictograms come in several source sizes; the theme's icon size bounds them.
-func bound_icon(button: Button) -> void:
-	var extent := button.get_theme_constant(&"icon_medium", TOKENS)
-	if button.get_theme_constant(&"icon_max_width") != extent:
-		button.add_theme_constant_override(&"icon_max_width", extent)

@@ -53,9 +53,9 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Metrics/Attack/Content/Label").text = _t("ATTACK")
-	get_node(^"Metrics/Attacker/Content/Label").text = _t("ATTACKER")
-	get_node(^"Metrics/Difficulty/Content/Label").text = _t("DEFENCE")
+	get_node(^"Metrics/Attack/Content/Label").text = _t("Attack")
+	get_node(^"Metrics/Attacker/Content/Label").text = _t("Attacker")
+	get_node(^"Metrics/Difficulty/Content/Label").text = _t("Defence")
 	get_node(^"Options/Difficulty/Editor").accessibility_name = _t("Difficulty override")
 	get_node(^"Options/Difficulty/Label").text = _t("Difficulty override")
 	get_node(^"Options/Hint").text = _t("Blank difficulty uses the source rule and armor. Agree situational changes with the table.")

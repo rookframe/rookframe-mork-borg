@@ -6,7 +6,7 @@ extends RefCounted
 
 const ROLES := {
 	"Name": [&"RookframeTitle", &"RookframeSubtitle", &"RookframeHeading"],
-	"Classification": [&"RookframeBody", &"RookframeBody", &"RookframeLabel"],
+	"Classification": [&"RookframeBodyMuted", &"RookframeBodyMuted", &"RookframeMeta"],
 	"Section": [&"RookframeHeading", &"RookframeHeading", &"RookframeLabel"],
 	"RuleTitle": [&"RookframeHeading", &"RookframeHeading", &"RookframeLabel"],
 	"RuleCopy": [&"RookframeBody", &"RookframeBody", &"RookframeLabel"],

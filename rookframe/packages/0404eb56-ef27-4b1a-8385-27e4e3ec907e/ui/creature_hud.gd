@@ -32,7 +32,9 @@ const PAGE_ROWS_PHONE := 2
 ## Width of the attached panel; a layout breakpoint, not a themed size.
 const PANEL_WIDTH := 510.0
 const PANEL_WIDTH_TABLET := 460.0
-const PANEL_WIDTH_PHONE := 480.0
+## A phone is wide and short, so its panel spends width instead of height.
+const PANEL_WIDTH_PHONE := 720.0
+const SEARCH_WIDTH_PHONE := 200.0
 const SLOT := "Hud/AttachedPanel/AttachedSlot/Panel/"
 var _model := MODEL.new()
 var _roll: ROLL
@@ -62,6 +64,11 @@ var _render_queued := false
 @onready var _health: Button = get_node("Hud/Bar/Row/TrailingSlot/Health")
 @onready var _amount: LineEdit = get_node(SLOT + "Health/Stepper/Amount")
 @onready var _search: Control = get_node(SLOT + "Search")
+@onready var _health_editor: Control = get_node(SLOT + "Health")
+@onready var _stepper: Control = get_node(SLOT + "Health/Stepper")
+@onready var _minus: Button = get_node(SLOT + "Health/Stepper/Minus")
+@onready var _plus: Button = get_node(SLOT + "Health/Stepper/Plus")
+@onready var _actions: Control = get_node(SLOT + "Header/TitleRow/ActionsSlot")
 
 func _init() -> void:
 	visible = false
@@ -157,6 +164,22 @@ func _layout() -> void:
 	var width := PANEL_WIDTH_PHONE if _phone else PANEL_WIDTH_TABLET if _tablet else PANEL_WIDTH
 	_panel.custom_minimum_size = Vector2(minf(width, size.x - edge * 2), 0)
 	_page_rows = PAGE_ROWS_PHONE if _phone else PAGE_ROWS
+	_place_tools()
+
+## The search field and the amount stepper each have a line of their own under
+## the header; a phone has no height for that line, so there they join the
+## header's actions and the stepper drops its visible caption.
+func _place_tools() -> void:
+	_place(_search, _actions if _phone else _panel, 0 if _phone else 1)
+	_place(_stepper, _actions if _phone else _health_editor, 0)
+	_search.custom_minimum_size.x = SEARCH_WIDTH_PHONE if _phone else 0.0
+	_search.size_flags_vertical = Control.SIZE_SHRINK_CENTER if _phone else Control.SIZE_FILL
+	_stepper.get_node(^"AmountLabel").visible = not _phone
+
+func _place(tool: Control, home: Node, index: int) -> void:
+	if tool.get_parent() != home:
+		tool.reparent(home, false)
+		home.move_child(tool, index)
 
 func _edge() -> int:
 	return get_theme_constant(&"space_2" if _phone else &"space_5", TOKENS)
@@ -287,7 +310,8 @@ func _render_panel() -> void:
 	current.visible = hp
 	current.text = _model.hp(_data)
 	_search.visible = scene
-	get_node(SLOT + "Health").visible = hp
+	_health_editor.visible = hp
+	_stepper.visible = hp
 	var entries: Array[ENTRY] = []
 	if scene:
 		entries = _model.roster(_rook, _search.value)
@@ -406,8 +430,8 @@ func _preview_hp() -> void:
 		(get_node(SLOT + "Health/Actions/" + operation + "Preview") as Label).text = preview
 		button.tooltip_text = sdk.translations.text(str(result.get("message", "")))
 		button.accessibility_name = button.text + " · " + preview
-	get_node(SLOT + "Health/Stepper/Minus").disabled = _hp_pending
-	get_node(SLOT + "Health/Stepper/Plus").disabled = _hp_pending
+	_minus.disabled = _hp_pending
+	_plus.disabled = _hp_pending
 
 func _adjust_hp(operation: String) -> void:
 	if _actor == null or _hp_pending or not _hp_result(operation).ok:

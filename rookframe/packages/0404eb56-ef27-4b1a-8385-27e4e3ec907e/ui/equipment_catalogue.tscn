@@ -14,7 +14,7 @@ text = "Back to Inventory"
 [node name="Heading" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "CORE EQUIPMENT"
+text = "Core equipment"
 autowrap_mode = 2
 [node name="Custom" parent="." instance=ExtResource("button")]
 layout_mode = 2

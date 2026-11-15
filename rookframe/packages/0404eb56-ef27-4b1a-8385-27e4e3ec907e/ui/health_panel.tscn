@@ -38,7 +38,7 @@ visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
-text = "RECOVERY"
+text = "Recovery"
 
 [node name="Breath" type="Button" parent="Columns/Task/Rest/Content"]
 layout_mode = 2
@@ -131,7 +131,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 visible = false
-text = "CURRENT VALUES"
+text = "Current values"
 
 [node name="Copy" type="Label" parent="Columns/Context/Content"]
 layout_mode = 2
@@ -172,7 +172,7 @@ script = ExtResource("token_box")
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
-text = "CHOOSE THE FOUND SCROLL"
+text = "Choose the found scroll"
 
 [node name="Choices" type="VBoxContainer" parent="Scrolls"]
 layout_mode = 2
@@ -256,7 +256,7 @@ script = ExtResource("token_box")
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
-text = "GUTTERBORN SPECIALTIES"
+text = "Gutterborn specialties"
 
 [node name="Copy" type="Label" parent="Specialties"]
 layout_mode = 2

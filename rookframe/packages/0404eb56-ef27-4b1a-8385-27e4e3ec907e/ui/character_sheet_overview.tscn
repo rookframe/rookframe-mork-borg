@@ -102,7 +102,7 @@ gap = &""
 [node name="Title" type="Label" parent="Resources/Omens/Padding/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "OMENS"
+text = "Omens"
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 12
 
@@ -157,7 +157,7 @@ gap = &""
 [node name="Title" type="Label" parent="Resources/Silver/Padding/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "SILVER"
+text = "Silver"
 autowrap_mode = 2
 theme_override_font_sizes/font_size = 12
 
@@ -332,7 +332,7 @@ script = ExtResource("token_box")
 [node name="Title" type="Label" parent="Body/Combat"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "COMBAT"
+text = "Combat"
 autowrap_mode = 0
 theme_override_font_sizes/font_size = 14
 

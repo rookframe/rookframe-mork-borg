@@ -25,7 +25,7 @@ text = "‹ Character"
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeHeading"
-text = "POWERS & SCROLLS"
+text = "Powers & scrolls"
 autowrap_mode = 2
 [node name="Metrics" type="GridContainer" parent="."]
 layout_mode = 2
@@ -43,7 +43,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Metrics/Uses/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "DAILY USES"
+text = "Daily uses"
 [node name="Value" type="Label" parent="Metrics/Uses/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -57,7 +57,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Metrics/Presence/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "PRESENCE"
+text = "Presence"
 [node name="Value" type="Label" parent="Metrics/Presence/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -71,7 +71,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Metrics/Difficulty/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "DIFFICULTY"
+text = "Difficulty"
 [node name="Value" type="Label" parent="Metrics/Difficulty/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -140,7 +140,7 @@ script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="Cast/Columns/Power/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "POWER"
+text = "Power"
 [node name="Copy" type="Label" parent="Cast/Columns/Power/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
@@ -155,7 +155,7 @@ script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="Cast/Columns/Targets/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "TARGETS"
+text = "Targets"
 [node name="Copy" type="Label" parent="Cast/Columns/Targets/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

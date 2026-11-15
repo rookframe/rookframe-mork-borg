@@ -110,7 +110,7 @@ func test_equipped_bow_view_selects_only_matching_ammunition() -> void:
 	bolts.inventory_id = "bolts"
 	view.configure({"name": "Graveworm", "abilities": {"Presence": {"modifier": 2}}, "inventory": [arrows, bolts]}, bow, {"difficulty": 0, "modifier": 0, "fumble": "break"}, "ready", "")
 	assert_str(view.options().ammunition).is_equal("arrows")
-	assert_str(view.get_node("Metrics/Strength/Content/Label").text).is_equal("PRESENCE")
+	assert_str(view.get_node("Metrics/Strength/Content/Label").text).is_equal("Presence")
 	assert_str(view.get_node("Ammunition/Resource").text).contains("20 left")
 	view.configure({"inventory": [arrows]}, bow, {"difficulty": 0, "modifier": 0, "fumble": "break", "ammunition": "arrows"}, "pending", "Waiting for the attack Throw")
 	assert_str(view.options().ammunition).is_equal("arrows")

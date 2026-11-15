@@ -29,7 +29,7 @@ script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="EquippedSection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "EQUIPPED"
+text = "Equipped"
 [node name="Items" type="VBoxContainer" parent="EquippedSection/Content"]
 layout_mode = 2
 script = ExtResource("token_box")
@@ -43,7 +43,7 @@ script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="CarriedSection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "CARRIED"
+text = "Carried"
 [node name="Items" type="VBoxContainer" parent="CarriedSection/Content"]
 layout_mode = 2
 script = ExtResource("token_box")

@@ -110,7 +110,7 @@ func _apply_density() -> void:
 	_stats.set(&"gap", _step(2))
 	if _compact:
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
-		_protection_label.text = _t("ARMOR")
+		_protection_label.text = _t("Armor")
 
 
 # Gaps and insets follow the World theme's `space_1`..`space_8` steps. The
@@ -213,7 +213,7 @@ func _render_actor() -> void:
 	var armor_reduction: String = armor.get("reduction", "")
 	var attacks: Array = CREATURES.new().attack_options(actor_data)
 
-	_header_title.text = private_name.to_upper()
+	_header_title.text = private_name
 	_header_subtitle.text = _t("Creature sheet · ") + _t(_selected_actor.access_level)
 	_set_window_title(private_name)
 	if _compact:
@@ -222,7 +222,7 @@ func _render_actor() -> void:
 	_public_identity.text = _selected_actor.public_label if not _selected_actor.public_label.is_empty() else _t("Public name pending")
 	_hit_points_metric.text = "%d / %d" % [hit_points, maximum_hit_points]
 	_morale_metric.text = _t(morale_value)
-	_protection_label.text = _t("ARMOR")
+	_protection_label.text = _t("Armor")
 	_protection_metric.tooltip_text = _t(armor_name)
 	_protection_metric.text = "−" + armor_reduction if not armor_reduction.is_empty() else "—"
 	_rules.text = _t(str(actor_data.get("rules", "")))
@@ -246,7 +246,7 @@ func _render_actor() -> void:
 func _detail_title_if_present(private_name: String) -> void:
 	var title := get_node(^"Layout/Body/Content/Detail/Title") as Label
 	var summary := get_node(^"Layout/Body/Content/Detail/Summary") as Label
-	title.text = private_name.to_upper()
+	title.text = private_name
 	summary.text = _t("Private Creature sheet · GM")
 	# The host/header already owns the route title. Keep the sheet body focused
 	# on its stats and sections at every profile, including desktop.
@@ -442,13 +442,13 @@ func _apply_route(route: String) -> void:
 	if _selected_actor != null:
 		_render_actor()
 	if edit:
-		_header_title.text = _t("EDIT CREATURE")
+		_header_title.text = _t("Edit creature")
 		_header_subtitle.text = _t("Private values · public name")
-		_set_window_title(_t("EDIT CREATURE"))
+		_set_window_title(_t("Edit creature"))
 	elif inventory:
 		var selected_data: Dictionary = _selected_actor.data
-		var inventory_name: String = selected_data.get("name", "CREATURE")
-		_header_title.text = inventory_name.to_upper()
+		var inventory_name: String = selected_data.get("name", "Creature")
+		_header_title.text = inventory_name
 		_header_subtitle.text = _t("Creature inventory · ") + _t(_selected_actor.access_level)
 		_set_window_title(inventory_name)
 	_set_status(_status.text)
@@ -621,7 +621,7 @@ func _present_creature_attack(id: String) -> void:
 	_responsible_owner = ""
 	get_node(^"Layout/Body/Content/CreatureAttack/Owners").visible = false
 	var title := _t("%s attack") % _t(str(_creature_attack.get("name", "Attack")))
-	_header_title.text = title.to_upper()
+	_header_title.text = title
 	_header_subtitle.visible = false
 	_set_window_title(title)
 	_routes.visible = false
@@ -812,7 +812,7 @@ func _offer_actor_defence(actor: SDK.Actor, outcome: Dictionary) -> void:
 	_selected_actor = actor
 	_apply_route("creature-defence")
 	_routes.visible = false
-	_header_title.text = str(data.get("name", "Creature")).to_upper() + _t(" · DEFENCE")
+	_header_title.text = str(data.get("name", "Creature")) + _t(" · Defence")
 	_header_subtitle.visible = false
 	_set_window_title(str(data.get("name", "Creature")) + _t(" · Defence"))
 	_creature_defence.visible = true
@@ -857,7 +857,7 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Header/Routes/Creature").text = _t("Creature")
 	get_node(^"Layout/Header/Routes/CreatureInventory").text = _t("Inventory")
 	get_node(^"Layout/Header/Routes/Appearance").text = _t("Appearance")
-	get_node(^"Layout/Body/Content/Detail/Identity/Copy/Label").text = _t("PUBLIC NAME")
+	get_node(^"Layout/Body/Content/Detail/Identity/Copy/Label").text = _t("Public name")
 	var settings: Button = get_node(^"Layout/Body/Content/Detail/Identity/EditCreature")
 	settings.tooltip_text = _t("Edit values")
 	settings.accessibility_name = settings.tooltip_text
@@ -873,29 +873,29 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Body/Content/CharacterNameField").label_text = _t("Field label")
 	get_node(^"Layout/Body/Content/CharacterOmensField").label_text = _t("Field label")
 	get_node(^"Layout/Body/Content/CharacterSilverField").label_text = _t("Field label")
-	get_node(^"Layout/Body/Content/Detail/EditFields/HitPoints").label_text = _t("HIT POINTS")
+	get_node(^"Layout/Body/Content/Detail/EditFields/HitPoints").label_text = _t("Hit points")
 	get_node(^"Layout/Body/Content/Detail/EditFields/HitPoints").placeholder = _t("Private hit points")
-	get_node(^"Layout/Body/Content/Detail/EditFields/IdentityHeading").text = _t("IDENTITY")
-	get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints").label_text = _t("MAXIMUM HIT POINTS")
+	get_node(^"Layout/Body/Content/Detail/EditFields/IdentityHeading").text = _t("Identity")
+	get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints").label_text = _t("Maximum hit points")
 	get_node(^"Layout/Body/Content/Detail/EditFields/MaximumHitPoints").placeholder = _t("Private maximum hit points")
-	get_node(^"Layout/Body/Content/Detail/EditFields/Morale").label_text = _t("MORALE")
+	get_node(^"Layout/Body/Content/Detail/EditFields/Morale").label_text = _t("Morale")
 	get_node(^"Layout/Body/Content/Detail/EditFields/Morale").placeholder = _t("Private morale")
-	get_node(^"Layout/Body/Content/Detail/EditFields/PrivateName").label_text = _t("PRIVATE NAME")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PrivateName").label_text = _t("Private name")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PrivateName").placeholder = _t("Private name")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").help_text = _t("Only the public name appears to Players.")
-	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").label_text = _t("PUBLIC NAME")
+	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").label_text = _t("Public name")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").placeholder = _t("Public name shown to Players")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Title").text = _t("ATTACKS")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Title").text = _t("Attacks")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/BodySlot/Access").text = _t("Players see the public name, not this sheet.")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").text = _t("GM only")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Title").text = _t("ACCESS")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Title").text = _t("Access")
 	get_node(^"Layout/CreatureEditActions/LeadingSlot/Back").text = _t("Back")
 	get_node(^"Layout/CreatureEditActions/LeadingSlot/SaveChanges").text = _t("Save changes")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/BodySlot/Rules").text = _t("Quick, attacks and defence are DR14.")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/Header/Title").text = _t("SPECIAL RULES")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/Header/Title").text = _t("Special rules")
 	get_node(^"Layout/Body/Content/Detail/Stats/HitPoints/Content/Label").text = _t("HP")
-	get_node(^"Layout/Body/Content/Detail/Stats/Morale/Content/Label").text = _t("MORALE")
-	get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Label").text = _t("PROTECTION")
+	get_node(^"Layout/Body/Content/Detail/Stats/Morale/Content/Label").text = _t("Morale")
+	get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Label").text = _t("Protection")
 	get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Value").text = _t("−d2")
 	get_node(^"Layout/Body/Content/Detail/Summary").text = _t("Private Creature sheet · GM")
 	get_node(^"Layout/Body/Content/Detail/Title").text = _t("Seth, Goblin")

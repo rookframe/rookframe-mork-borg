@@ -14,7 +14,7 @@ gap = &""
 size_flags_vertical = 3
 [node name="Caption" type="Label" parent="."]
 layout_mode = 2
-text = "RESOURCES"
+text = "Resources"
 theme_override_font_sizes/font_size = 16
 custom_minimum_size = Vector2(0, 39)
 vertical_alignment = 1

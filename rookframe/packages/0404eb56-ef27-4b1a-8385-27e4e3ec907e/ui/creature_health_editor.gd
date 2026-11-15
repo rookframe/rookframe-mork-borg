@@ -1,7 +1,6 @@
 extends Window
 ## Table-resolved HP adjustment, presented over the unchanged Creature sheet.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
-const CHROME = preload(ROOT + "ui/creature_icon_actions.gd")
 const HEALTH = preload(ROOT + "logic/creature_health.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 const CONTENT := "Panel/Inset/Layout/Content/"
@@ -39,7 +38,6 @@ func begin(locale: I18N, data: Dictionary, canvas: Vector2) -> void:
 		var button: Button = get_node(pair[0])
 		button.accessibility_name = locale.text(pair[1])
 		button.tooltip_text = button.accessibility_name
-		CHROME.new().bound_icon(button)
 	var previous: Control = get_node(ACTIONS + "Pager").get_child(0).get_node("Previous")
 	var next: Control = get_node(ACTIONS + "Pager").get_child(0).get_node("Next")
 	previous.accessibility_name = locale.text("Previous page")

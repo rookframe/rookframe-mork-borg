@@ -13,7 +13,7 @@ text = "Back to Inventory"
 [node name="Title" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "ITEM"
+text = "Item"
 autowrap_mode = 2
 [node name="Rules" type="Label" parent="."]
 layout_mode = 2

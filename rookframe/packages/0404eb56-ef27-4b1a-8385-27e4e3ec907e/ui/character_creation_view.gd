@@ -103,7 +103,7 @@ func _fit_creation() -> void:
 	get_node(CONTEXT + "/PhoneHistory").visible = has_history
 	get_node(CONTEXT + "/History").visible = not has_history and not phone
 	_gap(CONTEXT + "/PhoneHistory", &"space_1" if phone else &"space_2" if tablet else &"space_3")
-	_role(CONTEXT + "/History", "RookframeMeta" if tablet else "RookframeBody")
+	_role(CONTEXT + "/History", "RookframeMeta" if tablet else "RookframeBodyMuted")
 	var history_count := 0
 	for row in get_node(CONTEXT + "/PhoneHistory").get_children():
 		if not (row.get_node(^"Text") as Label).text.is_empty():
@@ -111,7 +111,7 @@ func _fit_creation() -> void:
 	for name in ["Line0", "Line1", "Line2", "Line3"]:
 		var index: int = ["Line0", "Line1", "Line2", "Line3"].find(name)
 		var path: String = CONTEXT + "/PhoneHistory/" + name
-		_role(path + "/Text", "RookframeMeta" if small else "RookframeBody")
+		_role(path + "/Text", "RookframeMeta" if small else "RookframeBodyMuted")
 		get_node(path + "/Icon").custom_minimum_size = icon_small if phone else icon_medium
 		get_node(path + "/Icon").self_modulate = ornament
 		get_node(path).visible = not (get_node(path + "/Text") as Label).text.is_empty() and (not phone or index >= maxi(0, history_count - 2))
@@ -135,7 +135,7 @@ func _fit_creation() -> void:
 	get_node(STAGE + "/Content/Split/Detail/Rule").visible = not phone
 	for name in ["Kicker","Subtitle"]:
 		get_node(STAGE + "/Heading/Copy/" + name).visible = not phone
-	_role(STAGE + "/Heading/Copy/Subtitle", "RookframeBody")
+	_role(STAGE + "/Heading/Copy/Subtitle", "RookframeBodyMuted")
 	_role(STAGE + "/Heading/Copy/Title", "RookframeHeading" if phone else "RookframeSubtitle" if tablet else "RookframeTitle")
 	get_node(STAGE + "/Heading/Copy/Title").text_overrun_behavior = 3
 	get_node(STAGE + "/Heading").custom_minimum_size = Vector2(0, get_theme_constant(&"target_minimum", TOKENS) if phone else 0)
@@ -143,7 +143,14 @@ func _fit_creation() -> void:
 	for section in ["Character","Gear","Traits"]:
 		get_node(STAGE + "/Heading/ReviewTabs/" + section).compact = true
 	get_node(LEFT + "/Choices").columns = 2 if phone and _route == "create-class" and size.x > 600 else 1
-	_gap(LEFT + "/Identity", &"" if phone else &"space_4")
+	# A phone has no height for two stacked fields in every theme's type scale,
+	# so the name and the description stand side by side there.
+	var identity: BoxContainer = get_node(LEFT + "/Identity")
+	identity.vertical = not phone
+	identity.get_node(^"TopInset").visible = not phone
+	_gap(LEFT + "/Identity", &"space_3" if phone else &"space_4")
+	# Half the width has no room for the long hint on one line.
+	get_description_field().help_text = _t("Optional" if phone else "Optional · a few words to remember them by")
 	for field in [get_name_field(),get_description_field()]:
 		field.compact = phone
 	var pages := get_node(STAGE + "/Content/Split/Detail/Pages")
@@ -161,7 +168,7 @@ func _fit_creation() -> void:
 		_gap(DETAIL + "/" + group, &"space_4" if phone else &"space_2" if tablet else &"space_5")
 	_role(DETAIL + "/RollInfo/FormulaRow/Row/Value", "RookframeHeading" if phone else "RookframeValue")
 	for copy in ["/RollInfo/Flavor", "/RollOutcome/ResultCopy", "/ClassBody/FactsColumn/Flavor"]:
-		_role(DETAIL + copy, "RookframeMeta" if phone else "RookframeBody")
+		_role(DETAIL + copy, "RookframeMeta" if phone else "RookframeBodyMuted")
 	_role(DETAIL + "/RollOutcome/Result/Content/Value", "RookframeLabel" if phone else "RookframeHeading" if tablet else "RookframeValue")
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").max_lines_visible = 2 if phone else -1
 	get_node(DETAIL + "/RollOutcome/Result/Content/Value").text_overrun_behavior = 3 if phone else 0
@@ -260,7 +267,7 @@ func localize(locale: I18N) -> void:
 	get_name_field().label_text = _t("Name")
 	get_name_field().help_text = _t("Required")
 	get_description_field().label_text = _t("Description")
-	get_description_field().help_text = _t("Optional · a few words to remember them by")
+	get_description_field().help_text = _t("Optional" if is_node_ready() and is_compact() else "Optional · a few words to remember them by")
 	# Pictograms stand alone on a phone, so their groups carry the names.
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		get_node(CONTEXT + "/Attributes/" + ability).tooltip_text = _t(ability)
@@ -552,7 +559,7 @@ func _present_class_rules() -> void:
 		title.visible = not part[0].is_empty()
 		copy.text = part[1]
 		title.theme_type_variation = "RookframeLabel" if phone or tablet else "RookframeHeading"
-		copy.theme_type_variation = "RookframeMeta" if phone else "RookframeBody"
+		copy.theme_type_variation = "RookframeMeta" if phone else "RookframeBodyMuted"
 
 func _present_identity() -> void:
 	_reset_detail()

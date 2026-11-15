@@ -45,7 +45,6 @@ size_flags_vertical = 4
 theme_type_variation = &"RookframeActionIcon"
 icon = ExtResource("close")
 icon_alignment = 1
-expand_icon = true
 [node name="Weapon" type="TextureRect" parent="Frame/Header/Emblem/Leaf/EmblemSlot"]
 layout_mode = 2
 custom_minimum_size = Vector2(42,42)
@@ -183,6 +182,5 @@ size_flags_vertical = 4
 theme_type_variation = &"RookframeActionIcon"
 icon = ExtResource("retarget")
 icon_alignment = 1
-expand_icon = true
 [editable path="Frame"]
 [editable path="Frame/Sections/SectionsSlot/Section"]

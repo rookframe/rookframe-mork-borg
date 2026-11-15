@@ -10,5 +10,5 @@ theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 [node name="Copy" type="Label" parent="."]
 layout_mode = 2
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 autowrap_mode = 2

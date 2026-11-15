@@ -331,7 +331,7 @@ script = ExtResource("rule")
 layout_mode = 2
 text = "Your history, traits and belongings will appear as you create your character."
 autowrap_mode = 2
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="PhoneHistory" type="VBoxContainer" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
@@ -354,7 +354,7 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text_overrun_behavior = 3
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="Line1" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
 layout_mode = 2
@@ -371,7 +371,7 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text_overrun_behavior = 3
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="Line2" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
 layout_mode = 2
@@ -388,7 +388,7 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text_overrun_behavior = 3
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="Line3" type="HBoxContainer" parent="Layout/Body/ContextSlot/Context/PhoneHistory"]
 layout_mode = 2
@@ -405,7 +405,7 @@ mouse_filter = 2
 layout_mode = 2
 size_flags_horizontal = 3
 text_overrun_behavior = 3
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="Spacer" type="Control" parent="Layout/Body/ContextSlot/Context"]
 layout_mode = 2
@@ -431,7 +431,7 @@ gap = &"space_2"
 
 [node name="Kicker" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
-text = "STEP 01 / 06"
+text = "Step 01 / 06"
 theme_type_variation = &"RookframeMeta"
 
 [node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
@@ -442,7 +442,7 @@ theme_type_variation = &"RookframeTitle"
 [node name="Subtitle" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
 text = "A beginning, not a destiny."
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="Status" type="Label" parent="Layout/Body/StageSlot/Stage/Heading/Copy"]
 layout_mode = 2
@@ -504,10 +504,11 @@ spaced_range = true
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Identity" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Left"]
+[node name="Identity" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Left"]
 layout_mode = 2
 visible = false
 size_flags_vertical = 3
+vertical = true
 script = ExtResource("box")
 gap = &"space_5"
 
@@ -518,12 +519,14 @@ script = ExtResource("rule")
 
 [node name="Name" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("field")]
 layout_mode = 2
+size_flags_horizontal = 3
 label_text = "Name"
 help_text = "Required"
 placeholder = ""
 
 [node name="Description" parent="Layout/Body/StageSlot/Stage/Content/Split/Left/Identity" instance=ExtResource("textarea")]
 layout_mode = 2
+size_flags_horizontal = 3
 label_text = "Description"
 help_text = "Optional · a few words to remember them by"
 
@@ -577,7 +580,7 @@ gap = &""
 
 [node name="Kicker" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Heading/Copy"]
 layout_mode = 2
-text = "STARTING CLASS"
+text = "Starting class"
 theme_type_variation = &"RookframeMeta"
 
 [node name="Title" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/Heading/Copy"]
@@ -624,7 +627,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = ""
 autowrap_mode = 2
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="ClassBody" type="BoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2
@@ -641,7 +644,7 @@ gap = &"space_5"
 [node name="Flavor" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn"]
 layout_mode = 2
 autowrap_mode = 2
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="Facts" type="PanelContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/ClassBody/FactsColumn"]
 layout_mode = 2
@@ -730,7 +733,7 @@ gap = &"space_1"
 
 [node name="Label" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome/Result/Content"]
 layout_mode = 2
-text = "RECORDED RESULT"
+text = "Recorded result"
 theme_type_variation = &"RookframeMeta"
 
 [node name="Value" type="Label" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content/RollOutcome/Result/Content"]
@@ -743,7 +746,7 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = ""
 autowrap_mode = 2
-theme_type_variation = &"RookframeBody"
+theme_type_variation = &"RookframeBodyMuted"
 
 [node name="PackChoices" type="VBoxContainer" parent="Layout/Body/StageSlot/Stage/Content/Split/Detail/Pages/Area/Content"]
 layout_mode = 2

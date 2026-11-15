@@ -80,7 +80,7 @@ func _render() -> void:
 	get_node(^"Columns/Task/Omens/Content/SixHours").disabled = not editing
 	get_node(^"Columns/Task/Improvement").visible = improve
 	get_node(^"Columns/Task/Broken").visible = _route == "broken"
-	get_node(^"Columns/Context/Content/Heading").text = _t("CURRENT VALUES")
+	get_node(^"Columns/Context/Content/Heading").text = _t("Current values")
 	get_node(^"Columns/Context/Content/Copy").text = _t("When the GM calls for improvement, roll each step in order.") if improve else (_t("Without food and drink, or while infected, rest restores no HP.") if _route == "rest" else _t("Roll at 0 HP. Below 0 HP means death."))
 	get_node(^"Columns/Context/Content/Copy").visible = _route != "rest" or not get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed or get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed
 	get_node(^"Columns/Context/Content/Values").text = _t("HP · %s / %s") % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
@@ -123,7 +123,7 @@ func _render() -> void:
 	var outcome := _action.message if _action != null else ""
 	get_node(^"Outcome").text = _t(outcome)
 	get_node(^"Outcome").visible = not outcome.is_empty() and not terminal
-	get_node(^"Result/Content/Heading").text = _t(title).to_upper()
+	get_node(^"Result/Content/Heading").text = _t(title)
 	get_node(^"Result/Content/Copy").text = _t(outcome)
 	if terminal and not _terminal_shown:
 		get_node(^"Result/Content/Heading").grab_focus()
@@ -224,17 +224,17 @@ func localize(locale: I18N) -> void:
 	_localized = true
 	i18n = locale
 	get_node(^"Columns/Task/Omens/Content/SixHours").text = _t("At least six hours of rest completed")
-	get_node(^"Columns/Context/Content/Heading").text = _t("BEFORE ROLLING")
+	get_node(^"Columns/Context/Content/Heading").text = _t("Before rolling")
 	get_node(^"Columns/Context/Content/Restrictions/Food").text = _t("Food & drink")
 	get_node(^"Columns/Context/Content/Restrictions/Infected").text = _t("Infected")
 	get_node(^"Columns/Task/Broken/Content/Heading").text = _t("BROKEN · d4")
 	get_node(^"Columns/Task/Broken/Content/Rules").text = _t("1 · Unconscious\n2 · Broken limb or lost eye\n3 · Hemorrhage\n4 · Dead")
 	get_node(^"Columns/Task/Rest/Content/Breath").text = _t("Catch your breath · d4 HP")
-	get_node(^"Columns/Task/Rest/Content/Heading").text = _t("RECOVERY")
+	get_node(^"Columns/Task/Rest/Content/Heading").text = _t("Recovery")
 	get_node(^"Columns/Task/Rest/Content/Sleep").text = _t("Full night’s sleep · d6 HP")
-	get_node(^"Scrolls/Heading").text = _t("CHOOSE THE FOUND SCROLL")
+	get_node(^"Scrolls/Heading").text = _t("Choose the found scroll")
 	get_node(^"Specialties/Copy").text = _t("Leave both unchecked to keep them.")
-	get_node(^"Specialties/Heading").text = _t("GUTTERBORN SPECIALTIES")
+	get_node(^"Specialties/Heading").text = _t("Gutterborn specialties")
 	get_node(^"Columns/Task/Improvement/Abilities").localize(locale)
 	get_node(^"Columns/Task/Improvement/Debris").localize(locale)
 	get_node(^"Columns/Task/Improvement/MoreHP").localize(locale)

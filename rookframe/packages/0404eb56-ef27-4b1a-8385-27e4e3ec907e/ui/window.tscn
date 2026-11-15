@@ -55,7 +55,7 @@ text = "MÖRK BORG"
 [node name="Title" type="Label" parent="Layout/Header"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "CREATURES"
+text = "Creatures"
 autowrap_mode = 2
 
 [node name="Subtitle" type="Label" parent="Layout/Header"]
@@ -200,7 +200,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Identity/Copy"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "PUBLIC NAME"
+text = "Public name"
 
 [node name="PublicIdentity" type="Label" parent="Layout/Body/Content/Detail/Identity/Copy"]
 layout_mode = 2
@@ -252,7 +252,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Stats/Morale/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "MORALE"
+text = "Morale"
 
 [node name="Value" type="Label" parent="Layout/Body/Content/Detail/Stats/Morale/Content"]
 layout_mode = 2
@@ -273,7 +273,7 @@ layout_mode = 2
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Stats/Protection/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "PROTECTION"
+text = "Protection"
 
 [node name="Value" type="Label" parent="Layout/Body/Content/Detail/Stats/Protection/Content"]
 layout_mode = 2
@@ -315,7 +315,7 @@ layout_mode = 2
 [node name="Title" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "ATTACKS"
+text = "Attacks"
 
 [node name="BodySlot" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content"]
 layout_mode = 2
@@ -342,7 +342,7 @@ layout_mode = 2
 [node name="Title" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/Header"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "SPECIAL RULES"
+text = "Special rules"
 
 [node name="BodySlot" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content"]
 layout_mode = 2
@@ -367,7 +367,7 @@ layout_mode = 2
 [node name="Title" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "ACCESS"
+text = "Access"
 
 [node name="Description" type="Label" parent="Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header"]
 layout_mode = 2
@@ -391,32 +391,32 @@ script = ExtResource("box")
 [node name="IdentityHeading" type="Label" parent="Layout/Body/Content/Detail/EditFields"]
 layout_mode = 2
 theme_type_variation = &"RookframeSubtitle"
-text = "IDENTITY"
+text = "Identity"
 
 [node name="PrivateName" parent="Layout/Body/Content/Detail/EditFields" instance=ExtResource("4_text_field")]
 layout_mode = 2
-label_text = "PRIVATE NAME"
+label_text = "Private name"
 placeholder = "Private name"
 
 [node name="PublicLabel" parent="Layout/Body/Content/Detail/EditFields" instance=ExtResource("4_text_field")]
 layout_mode = 2
-label_text = "PUBLIC NAME"
+label_text = "Public name"
 placeholder = "Public name shown to Players"
 help_text = "Only the public name appears to Players."
 
 [node name="HitPoints" parent="Layout/Body/Content/Detail/EditFields" instance=ExtResource("4_text_field")]
 layout_mode = 2
-label_text = "HIT POINTS"
+label_text = "Hit points"
 placeholder = "Private hit points"
 
 [node name="MaximumHitPoints" parent="Layout/Body/Content/Detail/EditFields" instance=ExtResource("4_text_field")]
 layout_mode = 2
-label_text = "MAXIMUM HIT POINTS"
+label_text = "Maximum hit points"
 placeholder = "Private maximum hit points"
 
 [node name="Morale" parent="Layout/Body/Content/Detail/EditFields" instance=ExtResource("4_text_field")]
 layout_mode = 2
-label_text = "MORALE"
+label_text = "Morale"
 placeholder = "Private morale"
 
 [node name="Inventory" type="VBoxContainer" parent="Layout/Body/Content/Detail"]

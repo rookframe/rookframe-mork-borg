@@ -27,7 +27,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Metrics/Attacker/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "ATTACKER"
+text = "Attacker"
 [node name="Value" type="Label" parent="Metrics/Attacker/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -43,7 +43,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Metrics/Attack/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "ATTACK"
+text = "Attack"
 [node name="Value" type="Label" parent="Metrics/Attack/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
@@ -59,7 +59,7 @@ gap = &"space_1"
 [node name="Label" type="Label" parent="Metrics/Difficulty/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "DEFENCE"
+text = "Defence"
 [node name="Value" type="Label" parent="Metrics/Difficulty/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"

@@ -70,4 +70,4 @@ func localize(locale: I18N) -> void:
 	get_node(^"BackRow/Label").text = _t("Companions")
 	get_node(^"Section/Content/Empty").text = _t("No granted Creature sheets are available to you.")
 	get_node(^"Section/Content/Hint").text = _t("Each creature has its own sheet. Place its Rook after creation.")
-	get_node(^"Section/Content/Title").text = _t("GRANTED CREATURES")
+	get_node(^"Section/Content/Title").text = _t("Granted creatures")

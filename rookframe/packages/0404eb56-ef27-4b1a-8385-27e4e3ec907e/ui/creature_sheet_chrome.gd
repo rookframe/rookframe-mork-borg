@@ -20,7 +20,6 @@ func _layout_chapters() -> void:
 		button.accessibility_name = button.text
 		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		button.clip_text = false
-		_chrome.bound_icon(button)
 	var source: Button = get_node(SOURCE)
 	source.text = _locale.text("Published source")
 	source.compact = true

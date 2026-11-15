@@ -17,7 +17,7 @@ func _ready() -> void:
 func configure(item: Dictionary, _miniatures: Array, loot_only: bool = false) -> void:
 	_new = item.is_empty()
 	_id = str(item.get("inventory_id", ""))
-	get_node(^"Title").text = _t("CUSTOM ITEM") if _new else (str(item.get("name", "Item")) if item.get("custom", false) else _t(str(item.get("name", "Item"))))
+	get_node(^"Title").text = _t("Custom item") if _new else (str(item.get("name", "Item")) if item.get("custom", false) else _t(str(item.get("name", "Item"))))
 	get_node(^"Rules").text = (str(item.get("rules", "")) if item.get("custom", false) else _t(str(item.get("rules", ""))))
 	get_node(^"Use").visible = not loot_only and not RULES.new().definition(str(item.get("source_item_id", ""))).is_empty()
 	get_node(^"Remove").visible = not _new
@@ -98,5 +98,5 @@ func localize(locale: I18N) -> void:
 	get_node(^"Back").text = _t("Back to Inventory")
 	get_node(^"Create").text = _t("Add custom item")
 	get_node(^"Remove").text = _t("Remove item")
-	get_node(^"Title").text = _t("ITEM")
+	get_node(^"Title").text = _t("Item")
 	get_node(^"Use").text = _t("Use item")

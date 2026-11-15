@@ -7,7 +7,7 @@
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="ledger"]
 [node name="ShieldDecision" type="Window"]
 visible = false
-size = Vector2i(368, 224)
+wrap_controls = true
 unresizable = true
 borderless = true
 transparent = true
@@ -22,6 +22,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+custom_minimum_size = Vector2(368, 0)
 script = ExtResource("margin")
 left = &"space_4"
 top = &"space_4"
@@ -44,10 +45,9 @@ icon = ExtResource("3")
 tooltip_text = "Close shield decision and end action"
 accessibility_name = "Close shield decision and end action"
 compact = true
-[node name="Body" type="ScrollContainer" parent="Shell/Content"]
+[node name="Body" type="VBoxContainer" parent="Shell/Content"]
 layout_mode = 2
 size_flags_vertical = 3
-horizontal_scroll_mode = 0
 [node name="Copy" type="Label" parent="Shell/Content/Body"]
 layout_mode = 2
 size_flags_horizontal = 3

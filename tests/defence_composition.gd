@@ -2,11 +2,14 @@ extends GdUnitTestSuite
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const DIALOG = preload(ROOT + "ui/shield_dialog.tscn")
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 func test_compact_shield_geometry_focus_pending_and_close() -> void:
 	get_window().gui_embed_subwindows = true
 	get_window().size = Vector2i(844, 390)
 	var dialog = auto_free(DIALOG.instantiate())
+	# Rookframe supplies its active theme to Package surfaces.
+	dialog.theme = WORLD_THEME.entry()
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(844, 390)
 	viewport.gui_embed_subwindows = true
@@ -15,17 +18,25 @@ func test_compact_shield_geometry_focus_pending_and_close() -> void:
 	dialog.present({"character": "Graveworm", "loss": 2, "hp": 7})
 	await get_tree().process_frame
 	await get_tree().process_frame
-	# The headless display driver has no native Window size. Native evidence
-	# checks the real dialog, while this case checks the authored composition.
-	if DisplayServer.get_name() != "headless":
-		assert_vector(dialog.size).is_equal(Vector2i(368, 224))
-	else:
-		dialog.get_node("Shell").size = Vector2(368, 224)
-		await get_tree().process_frame
-	await get_tree().process_frame
-	await get_tree().process_frame
 	var shell: Control = dialog.get_node("Shell")
-	assert_vector(shell.size).is_equal(Vector2(368, 224))
+	var copy: Label = dialog.get_node("Shell/Content/Body/Copy")
+	# The dialog grows to its content. The headless display driver has no
+	# native Window size, so there the shell takes the size the dialog would.
+	if DisplayServer.get_name() != "headless":
+		assert_bool(dialog.size.x >= shell.get_combined_minimum_size().x and dialog.size.y >= shell.get_combined_minimum_size().y).is_true()
+		assert_bool(Rect2i(Vector2i.ZERO, viewport.size).encloses(Rect2i(dialog.position, dialog.size))).is_true()
+	else:
+		for pass_index in 2:
+			shell.size = shell.get_combined_minimum_size()
+			await get_tree().process_frame
+			await get_tree().process_frame
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var needed := shell.get_combined_minimum_size()
+	assert_bool(shell.size.x >= needed.x and shell.size.y >= needed.y).override_failure_message("Shield dialog %s is smaller than its content %s." % [shell.size, needed]).is_true()
+	assert_bool(needed.x <= viewport.size.x and needed.y <= viewport.size.y).override_failure_message("Shield dialog content %s does not fit the canvas." % needed).is_true()
+	assert_int(copy.get_visible_line_count()).is_equal(copy.get_line_count())
+	assert_bool(shell.get_global_rect().encloses(copy.get_global_rect())).is_true()
 	var take: Button = dialog.get_node("Shell/Content/Actions/Take")
 	var destroy: Button = dialog.get_node("Shell/Content/Actions/Break")
 	assert_bool(take.has_focus()).is_true()

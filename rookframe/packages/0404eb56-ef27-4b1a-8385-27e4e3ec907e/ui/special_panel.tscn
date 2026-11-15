@@ -34,7 +34,7 @@ script = ExtResource("box")
 [node name="Heading" type="Label" parent="Columns/Item/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "USE ITEM"
+text = "Use item"
 [node name="Name" type="Label" parent="Columns/Item/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
@@ -57,7 +57,7 @@ script = ExtResource("box")
 [node name="Heading" type="Label" parent="Columns/Recipient/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
-text = "RECIPIENT"
+text = "Recipient"
 [node name="Copy" type="Label" parent="Columns/Recipient/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

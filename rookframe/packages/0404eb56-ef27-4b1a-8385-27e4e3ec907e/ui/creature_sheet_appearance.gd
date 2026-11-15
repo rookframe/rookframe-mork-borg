@@ -71,7 +71,8 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	for path in [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait", MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]:
 		var button: Button = get_node(path)
 		button.disabled = not can_edit
-		button.compact = phone
+		# The creator's tablet column is narrow enough to wrap the two actions.
+		button.compact = phone or (tablet and miniature_only)
 	get_node(MINIATURE + "Explanation").visible = not miniature_only
 	get_node(MINIATURE + "EmptyPreview/Content/Title").text = locale.text("No miniature assigned")
 	get_node(MINIATURE + "EmptyPreview/Content/Copy").text = locale.text("Choose from installed Packages.")
@@ -83,6 +84,8 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").text = locale.text("Reset")
 	get_node(MINIATURE + "PreviewCaptionGap").visible = false
 	get_node(MINIATURE + "EmptyPreview/Content/Image").custom_minimum_size = Vector2(32, 32) if phone else Vector2(96, 96)
+	# The creator's phone page keeps its height for the words and the action.
+	get_node(MINIATURE + "EmptyPreview/Content/Image").visible = not (phone and miniature_only)
 	TYPE.apply(get_node("Intro/Title"), "Title", phone, tablet)
 	TYPE.apply(get_node(MINIATURE + "EmptyPreview/Content/Title"), "Section", phone, tablet)
 	TYPE.apply(get_node(MINIATURE + "MiniatureCaption"), "Section", phone, tablet)

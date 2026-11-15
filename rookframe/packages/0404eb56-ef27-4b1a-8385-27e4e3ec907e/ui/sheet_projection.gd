@@ -73,7 +73,7 @@ func condition(data: Dictionary) -> Dictionary:
 	var elapsed := int(incident.get("elapsed", 0))
 	var duration := int(incident.get("duration", 0))
 	if hp < 0 or incident.get("dead", false):
-		return {"title": "DEAD", "copy": "Negative HP means death." if hp < 0 else ("Untreated hemorrhage reached its deadline." if outcome == 3 else "Broken d4: 4 · Dead.")}
+		return {"title": "Dead", "copy": "Negative HP means death." if hp < 0 else ("Untreated hemorrhage reached its deadline." if outcome == 3 else "Broken d4: 4 · Dead.")}
 	if BROKEN.new().can_complete_followup(data):
 		return {"title": "Broken", "copy": "Broken d4: %d is retained. Complete its follow-up dice; the initial outcome is not rerolled." % outcome}
 	if outcome == 3 and not incident.get("treated", false):
@@ -81,7 +81,7 @@ func condition(data: Dictionary) -> Dictionary:
 	if outcome in [1, 2] and not incident.get("recovered", false):
 		return {"title": "Unconscious" if outcome == 1 else "Unable to act", "copy": "You cannot act until you awaken." if outcome == 1 else str(incident.get("injury", "Injured")) + ". You cannot act until recovery is due."}
 	if hp == 0 and outcome == 3 and incident.get("treated", false):
-		return {"title": "TREATED", "copy": "Bleeding stopped. 0 HP. Record HP when healing is resolved; treatment does not restore HP."}
+		return {"title": "Treated", "copy": "Bleeding stopped. 0 HP. Record HP when healing is resolved; treatment does not restore HP."}
 	if hp == 0 and outcome == 0:
 		return {"title": "Broken", "copy": "Roll once to find out what happens to you."}
 	return {}

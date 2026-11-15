@@ -309,9 +309,9 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Columns/Item/Content/Heading").text = _t("USE ITEM")
+	get_node(^"Columns/Item/Content/Heading").text = _t("Use item")
 	get_node(^"Columns/Recipient/Content/Change").text = _t("Change recipient")
-	get_node(^"Columns/Recipient/Content/Heading").text = _t("RECIPIENT")
+	get_node(^"Columns/Recipient/Content/Heading").text = _t("Recipient")
 	get_node(^"Columns/Recipient/Content/Self").text = _t("Self")
 	get_node(^"Options/Ability/Choices/Agility").text = _t("Agility")
 	get_node(^"Options/Ability/Choices/Presence").text = _t("Presence")

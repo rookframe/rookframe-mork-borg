@@ -50,9 +50,9 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"CarriedSection/Content/Heading").text = _t("CARRIED")
+	get_node(^"CarriedSection/Content/Heading").text = _t("Carried")
 	get_node(^"Empty").text = _t("No items yet. Add equipment from the core catalogue or create a custom item.")
-	get_node(^"EquippedSection/Content/Heading").text = _t("EQUIPPED")
+	get_node(^"EquippedSection/Content/Heading").text = _t("Equipped")
 	get_node(^"Toolbar/Add").tooltip_text = _t("Add Item")
 	get_node(^"Toolbar/Add").accessibility_name = _t("Add Item")
 	get_node(^"Toolbar/Count").text = _t("Inventory")

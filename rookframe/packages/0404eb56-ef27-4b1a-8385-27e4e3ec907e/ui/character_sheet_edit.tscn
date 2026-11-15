@@ -14,7 +14,7 @@ text = "Back to Character"
 [node name="Heading" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
-text = "CHARACTER DETAILS"
+text = "Character details"
 [node name="Fields" type="VBoxContainer" parent="."]
 layout_mode = 2
 script = ExtResource("token_box")

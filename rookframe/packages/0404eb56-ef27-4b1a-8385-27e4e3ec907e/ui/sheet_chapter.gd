@@ -32,7 +32,6 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	section.expand_icon = true
 	section.fit_to_longest_item = false
 	section.clip_text = true
-	section.add_theme_constant_override("icon_max_width", SHEET_TOKENS.pixels(self, &"icon_medium"))
 	for path in ["Tabs/TabCharacter", "Tabs/TabPowers", "Tabs/TabInventory", "Tabs/TabJournal", "Tabs/TabAppearance"]:
 		var button = get_node(path)
 		button.custom_minimum_size = Vector2(44, 44 if phone else 48 if tablet else 54)

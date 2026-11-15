@@ -16,7 +16,7 @@ script = ExtResource("token_box")
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 theme_override_font_sizes/font_size = 14
-text = "ACTOR DEFAULT"
+text = "Actor default"
 [node name="Row" type="HBoxContainer" parent="Default/Content"]
 layout_mode = 2
 script = ExtResource("token_box")
@@ -68,7 +68,7 @@ script = ExtResource("token_box")
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 theme_override_font_sizes/font_size = 14
-text = "THIS ROOK"
+text = "This Rook"
 [node name="Row" type="HBoxContainer" parent="Selected/Content"]
 layout_mode = 2
 script = ExtResource("token_box")

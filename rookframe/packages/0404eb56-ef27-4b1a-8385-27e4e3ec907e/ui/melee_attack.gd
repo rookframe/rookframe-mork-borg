@@ -36,10 +36,10 @@ func configure(character: Dictionary, item: Dictionary, options: Dictionary, sta
 	var abilities: Dictionary = character.get("abilities", {})
 	var ability_name := str(item.get("attack_ability", "Strength"))
 	var ability: Dictionary = abilities.get(ability_name, {})
-	get_node(^"Metrics/Strength/Content/Label").text = _t(ability_name).to_upper()
+	get_node(^"Metrics/Strength/Content/Label").text = _t(ability_name)
 	var creature := str(character.get("schema", "")) == "mork-borg-adversary/v1"
 	if creature:
-		get_node(^"Metrics/Strength/Content/Label").text = _t("FLAT TEST")
+		get_node(^"Metrics/Strength/Content/Label").text = _t("Flat test")
 	var ability_modifier: int = 0 if creature else ability.get("modifier", 0)
 	get_node(^"Metrics/Strength/Content/Value").text = "%+d" % ability_modifier
 	var ammunition_kind := str(item.get("ammunition", ""))
@@ -95,13 +95,13 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Ammunition/Label").text = _t("AMMUNITION")
+	get_node(^"Ammunition/Label").text = _t("Ammunition")
 	get_node(^"Ammunition/Resource").text = _t("No ammunition available. Add it in Inventory.")
-	get_node(^"Metrics/Damage/Content/Label").text = _t("DAMAGE")
-	get_node(^"Metrics/Reach/Content/Label").text = _t("REACH")
-	get_node(^"Metrics/Strength/Content/Label").text = _t("STRENGTH")
+	get_node(^"Metrics/Damage/Content/Label").text = _t("Damage")
+	get_node(^"Metrics/Reach/Content/Label").text = _t("Reach")
+	get_node(^"Metrics/Strength/Content/Label").text = _t("Strength")
 	get_node(^"Rules/Difficulty/Editor").accessibility_name = _t("Difficulty override, blank uses source rule")
-	get_node(^"Rules/Difficulty/Label").text = _t("DIFFICULTY")
+	get_node(^"Rules/Difficulty/Label").text = _t("Difficulty")
 	get_node(^"Rules/Eligible").text = _t("Requirements confirmed")
 	get_node(^"Rules/Faithless").text = _t("Target is a faithless human (ordinary staff damage)")
 	get_node(^"Rules/Hint").text = _t("Blank difficulty uses the Creature’s printed rule. Choose overrides with the table. Distance uses committed Rook centers.")

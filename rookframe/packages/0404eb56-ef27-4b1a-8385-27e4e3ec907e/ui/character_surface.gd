@@ -708,11 +708,11 @@ func _render_detail() -> void:
 	elif _detail.begins_with("journal:"):
 		_primary(_detail_ui.compose_journal(data, _nav, _detail == "journal:story", _detail_tab, _phone), true)
 	elif _detail == "catalogue":
-		_detail_title.text = "EQUIPMENT CATALOGUE"
+		_detail_title.text = "Equipment catalogue"
 		for item in EQUIPMENT.new().entries():
 			_option(str(item.get("name", "Equipment")) + " · " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))), _owner())
 	elif _detail == "custom":
-		_detail_title.text = "CUSTOM ITEM"
+		_detail_title.text = "Custom item"
 		_detail_ui.group_fields(["name", "quantity", "uses"] if _phone else ["name", "quantity"], [2, 1, 1] if _phone else [1, 1])
 		for key in ["name", "kind", "quantity", "uses", "damage", "range_feet", "armor_tier", "reduction", "rules"]:
 			_item_field(str(key), str(_new_item.get(str(key), "Equipment" if key == "kind" else "1" if key == "quantity" else "0" if key in ["uses", "range_feet", "armor_tier"] else "")), false)

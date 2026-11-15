@@ -64,11 +64,11 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Default/Content/Heading").text = _t("ACTOR DEFAULT")
+	get_node(^"Default/Content/Heading").text = _t("Actor default")
 	get_node(^"Default/Content/Row/Details/Apply").text = _t("Use Miniature")
 	get_node(^"Default/Content/Row/Details/Choose").text = _t("Choose Miniature")
 	get_node(^"Default/Content/Row/Details/Description").text = _t("Preferred Miniature for this Actor’s Rooks.")
-	get_node(^"Selected/Content/Heading").text = _t("THIS ROOK")
+	get_node(^"Selected/Content/Heading").text = _t("This Rook")
 	get_node(^"Selected/Content/Row/Details/Apply").text = _t("Use Miniature")
 	get_node(^"Selected/Content/Row/Details/Choose").text = _t("Choose Miniature")
 	get_node(^"Selected/Content/Row/Details/Description").text = _t("Appearance for the selected Rook.")
