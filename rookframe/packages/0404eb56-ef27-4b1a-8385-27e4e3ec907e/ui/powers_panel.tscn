@@ -1,10 +1,11 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/powers_panel.gd" id="1"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="2"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
 [node name="PowersPanel" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
 script = ExtResource("1")
 [node name="Source" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -29,9 +30,10 @@ autowrap_mode = 2
 [node name="Metrics" type="GridContainer" parent="."]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 0
-theme_override_constants/v_separation = 0
 columns = 3
+script = ExtResource("token_grid")
+gap_horizontal = &""
+gap_vertical = &""
 [node name="Uses" type="PanelContainer" parent="Metrics"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -76,7 +78,7 @@ theme_type_variation = &"RookframeValue"
 autowrap_mode = 2
 [node name="Result" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Power" type="Label" parent="Result"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
@@ -86,7 +88,7 @@ layout_mode = 2
 theme_type_variation = &"RookframeSection"
 [node name="Content" type="VBoxContainer" parent="Result/Section"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="Result/Section/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
@@ -102,7 +104,7 @@ theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
 [node name="Scrolls" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Empty" type="Label" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
@@ -110,7 +112,7 @@ text = "No core scrolls carried. Add a scroll from the Inventory catalogue."
 autowrap_mode = 2
 [node name="Daily" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Hint" type="Label" parent="Daily"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
@@ -123,17 +125,18 @@ theme_type_variation = &"RookframeSecondaryButton"
 text = "Morning: roll daily uses"
 [node name="Cast" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Columns" type="BoxContainer" parent="Cast"]
 layout_mode = 2
-theme_override_constants/separation = 12
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Power" type="PanelContainer" parent="Cast/Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSection"
 [node name="Content" type="VBoxContainer" parent="Cast/Columns/Power"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="Cast/Columns/Power/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
@@ -148,7 +151,7 @@ size_flags_horizontal = 3
 theme_type_variation = &"RookframeSection"
 [node name="Content" type="VBoxContainer" parent="Cast/Columns/Targets"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Heading" type="Label" parent="Cast/Columns/Targets/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
@@ -168,7 +171,7 @@ theme_type_variation = &"RookframeSecondaryButton"
 text = "Change targets"
 [node name="Options" type="VBoxContainer" parent="Cast"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Modifier" parent="Cast/Options" instance=ExtResource("2")]
 layout_mode = 2
 label_text = "Situational modifier"

@@ -1,10 +1,11 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_edit.gd" id="1"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [node name="CharacterEdit" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 16
 script = ExtResource("1")
+gap = &"space_4"
 [node name="Back" type="Button" parent="."]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
@@ -16,4 +17,5 @@ theme_type_variation = &"RookframeHeading"
 text = "CHARACTER DETAILS"
 [node name="Fields" type="VBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"

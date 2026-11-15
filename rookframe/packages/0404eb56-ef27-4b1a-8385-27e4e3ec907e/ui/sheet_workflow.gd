@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 signal back_requested
 signal rest_selected(kind: String)
 signal section_changed
@@ -9,6 +9,14 @@ const CHOICES := "Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/C
 const RECOVERY := "Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content"
 const DAILY := "Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content"
 const CONTEXT := "Body/Context/Inset/Content"
+
+## The rest pictograms take the World theme's ornament color.
+const ORNAMENTS: Array[NodePath] = [^"Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row/Icon", ^"Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row/Icon"]
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		for path in ORNAMENTS:
+			(get_node(path) as CanvasItem).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func _ready() -> void:
 	get_node("Header/Back").pressed.connect(_back)
@@ -42,7 +50,7 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 	var tablet := get_viewport_rect().size.x <= 1150 and not phone
 	var main = get_node(MAIN)
 	var context = get_node(CONTEXT)
-	add_theme_constant_override("separation", 6 if phone else 20 if tablet else 28)
+	gap = &"space_1" if phone else &"space_5" if tablet else &"space_6"
 	get_node("Header").custom_minimum_size = Vector2(get_node("Header").custom_minimum_size.x, 54 if phone else 70 if tablet else 80)
 	get_node("Header/Titles/Identity").text = str(data.get("name", "Character")) + " · MÖRK BORG"
 	get_node("Header/Titles/Title").text = "Rest" if kind == "rest" else "Getting better — or worse"
@@ -50,11 +58,11 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 	get_node("Header/HP").text = "HP %d / %d" % [int(data.get("hit_points", 0)), int(data.get("maximum_hit_points", 1))]
 	get_node("Footer").custom_minimum_size = Vector2(get_node("Footer").custom_minimum_size.x, 50 if phone else 66 if tablet else 70)
 	get_node("Footer/Status").add_theme_font_size_override("font_size", 11 if phone else 14)
-	get_node("Body").add_theme_constant_override("separation", 24 if tablet else 44)
+	get_node("Body").set(&"gap", &"space_5" if tablet else &"space_7")
 	get_node("Body/Context").visible = not phone
 	get_node("Body/Context").custom_minimum_size = Vector2(190 if tablet else 280, get_node("Body/Context").custom_minimum_size.y)
-	get_node("Body/Context/Inset").add_theme_constant_override("margin_right", 20 if tablet else 28)
-	context.add_theme_constant_override("separation", 10 if tablet else 14)
+	get_node("Body/Context/Inset").set(&"right", &"space_5" if tablet else &"space_6")
+	context.set(&"gap", &"space_3" if tablet else &"space_4")
 	(get_node("Body/Context/Inset/Content/Portrait") as Control).custom_minimum_size = Vector2(170, 212) if tablet else Vector2(250, 312)
 	(get_node("Body/Context/Inset/Content/Portrait") as TextureRect).texture = texture
 	(get_node("Body/Context/Inset/Content/Name") as Label).text = str(data.get("name", "Character"))
@@ -74,7 +82,7 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 	var side := int(maxf(0, (get_viewport_rect().size.x - 60 - 280 - 44 - 1300) / 2)) if not phone and not tablet else 0
 	get_node("Body/Main").add_theme_constant_override("margin_left", side)
 	get_node("Body/Main").add_theme_constant_override("margin_right", side)
-	main.add_theme_constant_override("separation", 6 if phone else 16 if tablet else 24)
+	main.set(&"gap", &"space_1" if phone else &"space_4" if tablet else &"space_5")
 	(get_node("Body/Main/Content/Sections") as Control).visible = kind == "rest"
 	(get_node("Body/Main/Content/Sections/Recovery") as Button).set_pressed_no_signal(not _daily)
 	(get_node("Body/Main/Content/Sections/Daily") as Button).set_pressed_no_signal(_daily)
@@ -82,15 +90,15 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 	(get_node("Body/Main/Content/DailyContent") as Control).visible = kind == "rest" and _daily
 	(get_node("Body/Main/Content/Procedure") as Control).visible = kind == "improve"
 	(get_node("Body/Main/Content/Progress") as Control).visible = kind == "improve" and not action.is_empty()
-	(get_node("Body/Main/Content/RestContent") as Control).add_theme_constant_override("separation", 12 if phone else 16 if tablet else 28)
+	(get_node("Body/Main/Content/RestContent") as Control).set(&"gap", &"space_3" if phone else &"space_4" if tablet else &"space_6")
 	for path in ["RestContent/Choices", "RestContent/Recovery", "DailyContent"]:
 		var panel_path: String = "Body/Main/Content/" + path
 		(get_node(panel_path + "/Frame/Heading/Inset/Title") as Control).add_theme_font_size_override("font_size", 13 if phone else 16)
 
 		for edge in ["left", "right", "top", "bottom"]:
-			(get_node(panel_path + "/Frame/Inset") as Control).add_theme_constant_override("margin_" + edge, 10 if phone else 16 if tablet else 24)
-			(get_node(panel_path + "/Frame/Heading/Inset") as Control).add_theme_constant_override("margin_" + edge, (10 if phone else 20) if edge in ["left", "right"] else 6 if phone else 12)
-		(get_node(panel_path + "/Frame/Inset/Pages/Area/Content") as Control).add_theme_constant_override("separation", 8 if phone else 14 if tablet else 20)
+			(get_node(panel_path + "/Frame/Inset") as Control).set(edge, &"space_2" if phone else &"space_4" if tablet else &"space_5")
+			(get_node(panel_path + "/Frame/Heading/Inset") as Control).set(edge, (&"space_2" if phone else &"space_5") if edge in ["left", "right"] else &"space_1" if phone else &"space_3")
+		(get_node(panel_path + "/Frame/Inset/Pages/Area/Content") as Control).set(&"gap", &"space_2" if phone else &"space_4" if tablet else &"space_5")
 	for name in ["Breath", "Sleep"]:
 		var choice_path: String = "Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/" + name
 		var choice = get_node(choice_path)
@@ -98,7 +106,7 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 		choice.disabled = not action.is_empty()
 		choice.custom_minimum_size = Vector2(choice.custom_minimum_size.x, 72 if phone else 88 if tablet else 92)
 		for edge in ["left", "right", "top", "bottom"]:
-			(get_node(choice_path + "/Inset") as Control).add_theme_constant_override("margin_" + edge, 10 if phone else 12 if tablet else 16)
+			(get_node(choice_path + "/Inset") as Control).set(edge, &"space_2" if phone else &"space_3" if tablet else &"space_4")
 		(get_node(choice_path + "/Inset/Row/Icon") as Control).visible = not phone and not tablet
 		(get_node(choice_path + "/Inset/Row/Die") as Control).add_theme_font_size_override("font_size", 20 if phone else 21 if tablet else 24)
 		(get_node(choice_path + "/Inset/Row/Copy/Title") as Control).add_theme_font_size_override("font_size", 13 if phone else 16)
@@ -112,11 +120,11 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 	(get_node("Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result/HP/Maximum") as Control).add_theme_font_size_override("font_size", 18 if phone else 22)
 	(get_node("Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset/Result/Copy") as Label).text = "Restored %d HP. Power uses and Omens are unchanged." % int(result.restored) if not result.is_empty() else str(action.get("message", "Recover d%d HP, up to your maximum." % [4 if rest == "breath" else 6]))
 	for edge in ["left", "right", "top", "bottom"]:
-		(get_node("Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset") as Control).add_theme_constant_override("margin_" + edge, (14 if phone else 24) if edge in ["left", "right"] else 10 if phone else 18)
+		(get_node("Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/ResultFrame/Inset") as Control).set(edge, (&"space_3" if phone else &"space_5") if edge in ["left", "right"] else &"space_2" if phone else &"space_4")
 	for path in ["ResultFrame/Inset/Result/Copy", "Restrictions"]:
 		(get_node("Body/Main/Content/RestContent/Recovery/Frame/Inset/Pages/Area/Content/" + path) as Control).add_theme_font_size_override("font_size", 12 if phone else 15)
 	for path in ["Omens", "Power"]:
-		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path) as Control).add_theme_constant_override("separation", 8 if phone else 16 if tablet else 20)
+		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path) as Control).set(&"gap", &"space_2" if phone else &"space_4" if tablet else &"space_5")
 		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Term") as Control).custom_minimum_size = Vector2(116 if phone else 140 if tablet else 180, (get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Term") as Control).custom_minimum_size.y)
 		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Term") as Control).add_theme_font_size_override("font_size", 12 if phone else 16)
 		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Rules") as Control).add_theme_font_size_override("font_size", 12 if phone else 16)
@@ -142,6 +150,6 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 		var completed := index < step or resolved
 		(get_node(entry_path + "/Title") as Label).text = ("✓ " if completed else "%d. " % [index + 1]) + str(labels[index])
 		(get_node(entry_path + "/Title") as Control).add_theme_font_size_override("font_size", 12 if phone else 14 if tablet else 16)
-		(get_node(entry_path + "/Title") as Control).add_theme_color_override("font_color", Color(0.941176, 0.733333, 0.196078, 1) if index == step and not resolved else Color(0.603922, 0.647059, 0.65098, 1))
-		(get_node(entry_path + "/Current") as ColorRect).color = Color(0.941176, 0.733333, 0.196078, 1) if index == step and not resolved else Color(0.27451, 0.321569, 0.337255, 1)
+		(get_node(entry_path + "/Title") as Control).theme_type_variation = &"RookframeLabel" if index == step and not resolved else &"RookframeMeta"
+		get_node(entry_path + "/Current").set(&"fill", &"accent" if index == step and not resolved else &"divider")
 		entry.accessibility_description = str(labels[index]) + (" · complete" if completed else " · current step" if index == step else " · upcoming")

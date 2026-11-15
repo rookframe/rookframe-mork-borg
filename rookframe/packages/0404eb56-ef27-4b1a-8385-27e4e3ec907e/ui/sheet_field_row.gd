@@ -1,4 +1,4 @@
-extends HBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 ## Authored correction fields share the approved column proportions.
 func configure(weights: Array, count: int) -> void:
 	var columns = [get_node(^"First"), get_node(^"Second"), get_node(^"Third")]

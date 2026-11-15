@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 @onready var _status: Label = get_node(^"Status")
 ## Routes draft text and validation to each authored inline copy of a shared field.
 ## Retain native references before phone footers reparent the quick controls.
@@ -45,6 +45,6 @@ func show_status(message: String) -> void:
 	_status.accessibility_description = message
 
 func configure_density(phone: bool, tablet: bool) -> void:
-	add_theme_constant_override("separation", 8 if phone else 16)
-	get_node(^"Body").add_theme_constant_override("separation", 26 if phone else 24 if tablet else 44)
+	gap = &"space_2" if phone else &"space_4"
+	get_node(^"Body").set(&"gap", &"space_5" if phone or tablet else &"space_7")
 	get_node(^"Header").configure_layout(phone, tablet)
