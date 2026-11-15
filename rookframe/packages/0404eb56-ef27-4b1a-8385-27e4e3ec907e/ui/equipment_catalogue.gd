@@ -8,6 +8,28 @@ const EQUIPMENT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 const ROW_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.gd")
 var _rows: Array[ROW_SCRIPT] = []
 const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
+
+const TOKENS := &"RookframeTokens"
+## Constant token of the gap between rows, `space_1` to `space_8`. Empty means no gap.
+@export var gap: StringName = &"space_2":
+	set(value):
+		gap = value
+		_read_tokens()
+var _reading := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_tokens()
+
+# Setting an override notifies this Control of a theme change, so the read
+# guards against re-entering itself.
+func _read_tokens() -> void:
+	if _reading or not is_inside_tree():
+		return
+	_reading = true
+	add_theme_constant_override(&"separation", get_theme_constant(gap, TOKENS) if gap else 0)
+	_reading = false
+
 func _ready() -> void:
 	get_node(^"Back").pressed.connect(_back)
 	get_node(^"Custom").pressed.connect(_custom)

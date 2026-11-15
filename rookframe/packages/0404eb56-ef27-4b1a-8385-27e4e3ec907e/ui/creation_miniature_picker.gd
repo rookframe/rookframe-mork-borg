@@ -3,6 +3,7 @@ extends Control
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
+const TOKENS := &"RookframeTokens"
 
 signal closed
 signal selected(reference: Dictionary)
@@ -20,7 +21,7 @@ func _ready() -> void:
 
 func open(facade: SDK, locale: I18N, saved: Dictionary, character_name: String = "") -> void:
 	sdk = facade
-	get_node(^"Margin/Layout/Header/Name/Row/Text").text = locale.text("Choose a miniature")
+	get_node(^"Margin/Layout/Header/Text").text = locale.text("Choose a miniature")
 	get_node(^"Margin/Layout/Header/Close").accessibility_name = locale.text("Close miniature browser")
 	get_node(^"Margin/Layout/Header/Close").tooltip_text = locale.text("Close miniature browser")
 	picker.open_choice(facade, locale, saved)
@@ -36,29 +37,35 @@ func _cancel() -> void:
 func _picker_closed(_saved: bool) -> void:
 	_cancel()
 
+func _notification(what: int) -> void:
+	# A World theme switch changes token values, so the token reads repeat.
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready():
+		_arrange()
+
 func _arrange() -> void:
 	if not is_node_ready():
 		return
 	var phone := size.y <= 560
-	var outer := 12 if phone else 16 if size.x <= 1300 else 28
-	get_node(^"Ledger").visible = false
-	get_node(^"Ornament").visible = false
-	for edge in ["left", "right"]: get_node(^"Margin").add_theme_constant_override("margin_" + edge, outer + 16)
-	for edge in ["top", "bottom"]: get_node(^"Margin").add_theme_constant_override("margin_" + edge, outer + 8)
-	get_node(^"Margin/Layout").add_theme_constant_override("separation", 20)
-	get_node(^"Margin/Layout/Header").custom_minimum_size = Vector2(0, 44 if phone else 56)
-	get_node(^"Margin/Layout/Header/Name").custom_minimum_size = Vector2(0, 44)
-	get_node(^"Margin/Layout/Header/Name/Row/Text").add_theme_font_size_override("font_size", 25 if phone else 32)
-	get_node(^"Margin/Layout/Header/RibbonSpace").visible = true
-	get_node(^"Margin/Layout/Header/RibbonSpace").custom_minimum_size = Vector2(16, 0)
+	var tablet := size.x <= 1300
+	var margin := get_node(^"Margin")
+	for edge in [&"left", &"right"]:
+		margin.set(edge, &"space_5" if phone else &"space_6" if tablet else &"space_7")
+	for edge in [&"top", &"bottom"]:
+		margin.set(edge, &"space_5" if phone or tablet else &"space_6")
+	get_node(^"Margin/Layout").set(&"gap", &"space_3" if phone else &"space_5")
+	var icon := get_node(^"Margin/Layout/Header/Icon") as TextureRect
+	icon.custom_minimum_size = Vector2.ONE * get_theme_constant(&"icon_medium" if phone else &"icon_large", TOKENS)
+	icon.self_modulate = get_theme_color(&"ornament", TOKENS)
+	get_node(^"Margin/Layout/Header/Text").theme_type_variation = &"RookframeHeading" if phone else &"RookframeSubtitle"
 	get_node(^"Margin/Layout/Picker/Title").visible = false
-	get_node(^"Margin/Layout/Picker/Actions").custom_minimum_size = Vector2(0, 48 if phone else 60)
 	_fit_frame.call_deferred()
 
 func _fit_frame() -> void:
 	if not is_node_ready(): return
+	# The kit's ledger leaves sit one step outside the content they frame.
+	var outset := Vector2(get_theme_constant(&"space_4", TOKENS), get_theme_constant(&"space_2", TOKENS))
 	var rects: Array[Rect2] = []
 	for path in ["Margin/Layout/Header", "Margin/Layout/Picker/Browser", "Margin/Layout/Picker/Actions"]:
 		var item: Control = get_node(path)
-		rects.append(Rect2(item.get_global_rect().position.x - get_global_rect().position.x - 16, item.get_global_rect().position.y - get_global_rect().position.y - 8, item.size.x + 32, item.size.y + 16))
+		rects.append(Rect2(item.get_global_rect().position - get_global_rect().position - outset, item.size + outset * 2))
 	get_node("Frame").set_sections(rects[0], rects[1], rects[2])
