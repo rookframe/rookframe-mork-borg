@@ -8,7 +8,7 @@ signal cancelled
 func _ready() -> void:
 	close_requested.connect(_cancel)
 	get_node("Shell").item_rect_changed.connect(_fit_material)
-	size_changed.connect(_keep_centered)
+	get_node("Shell").minimum_size_changed.connect(_fit_size.call_deferred)
 	_fit_material()
 	get_node(^"Shell/Content/Header/Close").pressed.connect(_cancel)
 	get_node(^"Shell/Content/Actions/Take").pressed.connect(_choose.bind("take"))
@@ -20,9 +20,8 @@ func present(outcome: Dictionary) -> void:
 	get_node(^"Shell/Content/Body/Copy").text = _t("%s will take %d damage (%d → %d HP).\n\nBreak your shield to take no damage instead.") % [str(outcome.character), loss, hp, hp - loss]
 	get_node(^"Shell/Content/Actions/Take").text = _t("Take %d damage") % loss
 	if not visible:
-		# The dialog is as tall as its wrapped copy and actions in the World theme.
-		reset_size()
 		popup_centered()
+		_fit_size.call_deferred()
 		_reveal.call_deferred()
 		get_node(^"Shell/Content/Actions/Take").grab_focus()
 
@@ -64,9 +63,11 @@ func localize(locale: I18N) -> void:
 	get_node(^"Shell/Content/Header/Close").tooltip_text = _t("Close shield decision and end action")
 	get_node(^"Shell/Content/Header/Title").text = _t("Break shield?")
 
-## The copy wraps after the dialog opens, which grows it; it stays centred.
-func _keep_centered() -> void:
+## The dialog is as tall as its wrapped copy and actions in the World theme.
+## The copy wraps once it has its width, so the size follows the content.
+func _fit_size() -> void:
 	if visible:
+		reset_size()
 		move_to_center()
 
 func _fit_material() -> void:

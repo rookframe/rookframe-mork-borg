@@ -227,7 +227,7 @@ func localize(locale: I18N) -> void:
 	get_node(^"Columns/Context/Content/Heading").text = _t("Before rolling")
 	get_node(^"Columns/Context/Content/Restrictions/Food").text = _t("Food & drink")
 	get_node(^"Columns/Context/Content/Restrictions/Infected").text = _t("Infected")
-	get_node(^"Columns/Task/Broken/Content/Heading").text = _t("BROKEN · d4")
+	get_node(^"Columns/Task/Broken/Content/Heading").text = _t("Broken · d4")
 	get_node(^"Columns/Task/Broken/Content/Rules").text = _t("1 · Unconscious\n2 · Broken limb or lost eye\n3 · Hemorrhage\n4 · Dead")
 	get_node(^"Columns/Task/Rest/Content/Breath").text = _t("Catch your breath · d4 HP")
 	get_node(^"Columns/Task/Rest/Content/Heading").text = _t("Recovery")

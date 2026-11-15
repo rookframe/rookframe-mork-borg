@@ -108,7 +108,7 @@ script = ExtResource("token_box")
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
-text = "BROKEN · d4"
+text = "Broken · d4"
 
 [node name="Rules" type="Label" parent="Columns/Task/Broken/Content"]
 layout_mode = 2

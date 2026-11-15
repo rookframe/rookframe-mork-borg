@@ -67,6 +67,11 @@ func _read_tokens() -> void:
 	for icon in [_view_header_weapon, _view_combat_attack.get_node("Icon"), _view_combat_damage_icon]:
 		(icon as CanvasItem).self_modulate = ornament
 	_view_target_icon.self_modulate = ornament if _target_valid else get_theme_color(&"danger", TOKENS)
+	# A theme may paint the roll action's die in its own material; where it
+	# does not, the icon-only action carries the die pictogram.
+	var painted := _view_combat_attack_roll.get_theme_stylebox(&"normal") is StyleBoxTexture
+	_view_combat_attack_roll.icon = null if painted else DICE_ICONS["d20"]
+	_view_combat_attack_roll.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	for label: Label in _roles:
 		_apply_role(label)
 

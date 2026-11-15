@@ -58,7 +58,6 @@ layout_mode = 2
 [node name="Body" type="VBoxContainer" parent="Frame/Sections/SectionsSlot/Section"]
 layout_mode = 2
 script = ExtResource("box")
-gap = &""
 [node name="Combat" type="BoxContainer" parent="Frame/Sections/SectionsSlot/Section/Body"]
 layout_mode = 2
 vertical = true

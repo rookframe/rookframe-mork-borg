@@ -34,7 +34,7 @@ const PANEL_WIDTH := 510.0
 const PANEL_WIDTH_TABLET := 460.0
 ## A phone is wide and short, so its panel spends width instead of height.
 const PANEL_WIDTH_PHONE := 720.0
-const SEARCH_WIDTH_PHONE := 200.0
+const SEARCH_WIDTH_PHONE := 260.0
 const SLOT := "Hud/AttachedPanel/AttachedSlot/Panel/"
 var _model := MODEL.new()
 var _roll: ROLL
