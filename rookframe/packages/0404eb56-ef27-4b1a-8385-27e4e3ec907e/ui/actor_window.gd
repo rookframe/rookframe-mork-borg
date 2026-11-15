@@ -93,12 +93,12 @@ func ready() -> void:
 
 
 func _apply_density() -> void:
-	_layout.add_theme_constant_override("separation", _space(3))
-	_header.add_theme_constant_override("separation", _space(1))
-	_content.add_theme_constant_override("separation", _space(2 if _compact else 3))
-	_detail.add_theme_constant_override("separation", _space(4))
+	_layout.set(&"gap", _step(3))
+	_header.set(&"gap", _step(1))
+	_content.set(&"gap", _step(2 if _compact else 3))
+	_detail.set(&"gap", _step(4))
 	_sheet_grid.vertical = _compact
-	_sheet_grid.add_theme_constant_override("separation", _space(3 if _compact else 5))
+	_sheet_grid.set(&"gap", _step(3 if _compact else 5))
 	_content.custom_minimum_size = Vector2(0, 0)
 	# The managed host chrome already identifies the Package. Keep the body
 	# focused on the active route so desktop does not repeat that identity above
@@ -107,20 +107,24 @@ func _apply_density() -> void:
 	_header_subtitle.visible = false
 	_header_title.visible = true
 	_status.visible = not _compact
-	_stats.add_theme_constant_override("separation", _space(2))
+	_stats.set(&"gap", _step(2))
 	if _compact:
 		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
 		_protection_label.text = _t("ARMOR")
 
 
-# Gaps and insets follow the World theme's `space_1`..`space_8` steps.
+# Gaps and insets follow the World theme's `space_1`..`space_8` steps. The
+# containers carry token_box.gd, which resolves the named step.
+func _step(step: int) -> StringName:
+	return StringName("space_%d" % step)
+
+
 func _space(step: int) -> int:
-	return get_theme_constant("space_%d" % step, &"RookframeTokens")
+	return get_theme_constant(_step(step), &"RookframeTokens")
 
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED and is_node_ready() and sdk != null:
-		_apply_density()
 		_configure_surface_spacing()
 
 
@@ -842,7 +846,7 @@ func _configure_surface_spacing() -> void:
 	_layout.offset_right = -_layout.offset_left
 	_layout.offset_top = 0.0 if compact else float(_space(4))
 	_layout.offset_bottom = -_space(2)
-	_layout.add_theme_constant_override("separation", _space(2 if compact else 5))
+	_layout.set(&"gap", _step(2 if compact else 5))
 
 
 func localize(locale: I18N) -> void:

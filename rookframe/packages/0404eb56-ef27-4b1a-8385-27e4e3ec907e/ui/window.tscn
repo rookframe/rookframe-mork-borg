@@ -18,9 +18,11 @@
 
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="frame"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 
 [sub_resource type="ButtonGroup" id="CreatureTabs"]
+
+
 
 [node name="CreatureSurface" type="Control"]
 layout_mode = 2
@@ -39,9 +41,11 @@ offset_right = -24.0
 offset_bottom = -8.0
 grow_horizontal = 1
 grow_vertical = 2
+script = ExtResource("box")
 
 [node name="Header" type="VBoxContainer" parent="Layout"]
 layout_mode = 2
+script = ExtResource("box")
 
 [node name="Brand" type="Label" parent="Layout/Header"]
 layout_mode = 2
@@ -63,6 +67,8 @@ autowrap_mode = 2
 [node name="Routes" type="HFlowContainer" parent="Layout/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
+script = ExtResource("box")
+gap = &"space_1"
 
 [node name="Creature" parent="Layout/Header/Routes" instance=ExtResource("button")]
 layout_mode = 2
@@ -98,6 +104,8 @@ autowrap_mode = 2
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
+script = ExtResource("box")
+gap = &"space_1"
 
 [node name="Character" parent="Layout/CharacterTabs" instance=ExtResource("button")]
 layout_mode = 2
@@ -131,6 +139,7 @@ vertical_scroll_mode = 1
 custom_minimum_size = Vector2(0, 520)
 layout_mode = 2
 size_flags_horizontal = 3
+script = ExtResource("box")
 
 [node name="CharacterNameField" parent="Layout/Body/Content" instance=ExtResource("4_text_field")]
 visible = false
@@ -160,6 +169,7 @@ layout_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 visible = false
+script = ExtResource("box")
 
 [node name="Title" type="Label" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
@@ -177,13 +187,15 @@ visible = false
 
 [node name="Identity" type="HBoxContainer" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
-theme_override_constants/separation = 12
+script = ExtResource("box")
+gap = &"space_3"
 
 [node name="Copy" type="VBoxContainer" parent="Layout/Body/Content/Detail/Identity"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_override_constants/separation = 4
+script = ExtResource("box")
+gap = &"space_1"
 
 [node name="Label" type="Label" parent="Layout/Body/Content/Detail/Identity/Copy"]
 layout_mode = 2
@@ -206,11 +218,12 @@ compact = true
 [node name="Stats" type="HBoxContainer" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
 size_flags_horizontal = 3
+script = ExtResource("box")
 
 [node name="HitPoints" type="PanelContainer" parent="Layout/Body/Content/Detail/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("frame")
+theme_type_variation = &"RookframeInsetSurface"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Stats/HitPoints"]
 layout_mode = 2
@@ -231,7 +244,7 @@ vertical_alignment = 1
 [node name="Morale" type="PanelContainer" parent="Layout/Body/Content/Detail/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("frame")
+theme_type_variation = &"RookframeInsetSurface"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Stats/Morale"]
 layout_mode = 2
@@ -252,7 +265,7 @@ vertical_alignment = 1
 [node name="Protection" type="PanelContainer" parent="Layout/Body/Content/Detail/Stats"]
 layout_mode = 2
 size_flags_horizontal = 3
-script = ExtResource("frame")
+theme_type_variation = &"RookframeInsetSurface"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/Stats/Protection"]
 layout_mode = 2
@@ -274,24 +287,27 @@ vertical_alignment = 1
 layout_mode = 2
 size_flags_horizontal = 3
 vertical = false
+script = ExtResource("box")
 
 [node name="Left" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+script = ExtResource("box")
+gap = &"space_3"
 
 [node name="Right" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 12
+script = ExtResource("box")
+gap = &"space_3"
 
 [node name="EquipmentSection" type="PanelContainer" parent="Layout/Body/Content/Detail/SheetGrid/Left"]
 layout_mode = 2
-theme_type_variation = &"RookframeRaisedSurface"
+theme_type_variation = &"RookframeSection"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 
 [node name="Header" type="HBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content"]
 layout_mode = 2
@@ -303,20 +319,22 @@ text = "ATTACKS"
 
 [node name="BodySlot" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content"]
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("box")
+gap = &"space_1"
 
 [node name="EquipmentList" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/BodySlot"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+script = ExtResource("box")
+gap = &"space_1"
 
 [node name="SpecialRulesSection" type="PanelContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right"]
 layout_mode = 2
-theme_type_variation = &"RookframeRaisedSurface"
+theme_type_variation = &"RookframeSection"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 
 [node name="Header" type="HBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content"]
 layout_mode = 2
@@ -337,11 +355,11 @@ autowrap_mode = 2
 
 [node name="AccessSection" type="PanelContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right"]
 layout_mode = 2
-theme_type_variation = &"RookframeRaisedSurface"
+theme_type_variation = &"RookframeSection"
 
 [node name="Content" type="VBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right/AccessSection"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 
 [node name="Header" type="HBoxContainer" parent="Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content"]
 layout_mode = 2
@@ -367,8 +385,8 @@ autowrap_mode = 2
 
 [node name="EditFields" type="VBoxContainer" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
-theme_override_constants/separation = 8
 visible = false
+script = ExtResource("box")
 
 [node name="IdentityHeading" type="Label" parent="Layout/Body/Content/Detail/EditFields"]
 layout_mode = 2
@@ -407,8 +425,8 @@ size_flags_horizontal = 3
 
 [node name="CatalogueBar" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
-theme_override_constants/separation = 8
 visible = false
+script = ExtResource("box")
 
 [node name="LeadingSlot" type="HBoxContainer" parent="Layout/CatalogueBar"]
 layout_mode = 2
@@ -433,7 +451,7 @@ compact = true
 [node name="SheetActions" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
 visible = false
-theme_override_constants/separation = 8
+script = ExtResource("box")
 
 [node name="Back" parent="Layout/SheetActions" instance=ExtResource("button")]
 layout_mode = 2
@@ -466,7 +484,7 @@ layout_mode = 2
 
 [node name="Miniature" type="VBoxContainer" parent="Layout/Body/Content/Detail"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 
 [node name="Heading" type="Label" parent="Layout/Body/Content/Detail/Miniature"]
 layout_mode = 2
@@ -502,13 +520,12 @@ layout_mode = 2
 [node name="CreatureEditActions" type="VBoxContainer" parent="Layout"]
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 
 [node name="LeadingSlot" type="HFlowContainer" parent="Layout/CreatureEditActions"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/h_separation = 8
-theme_override_constants/v_separation = 8
+script = ExtResource("box")
 
 [node name="TrailingSlot" type="HBoxContainer" parent="Layout/CreatureEditActions"]
 layout_mode = 2
