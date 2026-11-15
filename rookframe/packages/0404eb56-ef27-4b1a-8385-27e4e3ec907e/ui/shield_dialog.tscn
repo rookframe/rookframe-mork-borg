@@ -1,13 +1,10 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=7 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_dialog.gd" id="1"]
-[ext_resource type="Theme" path="res://rookframe/ui/theme/rookframe_theme.tres" id="2"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="margin"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="3"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="ledger"]
-[sub_resource type="StyleBoxEmpty" id="Frame"]
-content_margin_left = 16.0
-content_margin_top = 16.0
-content_margin_right = 16.0
-content_margin_bottom = 16.0
 [node name="ShieldDecision" type="Window"]
 visible = false
 size = Vector2i(368, 224)
@@ -17,61 +14,57 @@ transparent = true
 transparent_bg = true
 transient = true
 exclusive = true
-theme = ExtResource("2")
 script = ExtResource("1")
 [node name="Frame" parent="." instance=ExtResource("ledger")]
-[node name="Shell" type="PanelContainer" parent="."]
+[node name="Shell" type="MarginContainer" parent="."]
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("Frame")
+script = ExtResource("margin")
+left = &"space_4"
+top = &"space_4"
+right = &"space_4"
+bottom = &"space_4"
 [node name="Content" type="VBoxContainer" parent="Shell"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 [node name="Header" type="HBoxContainer" parent="Shell/Content"]
 layout_mode = 2
+script = ExtResource("box")
 [node name="Title" type="Label" parent="Shell/Content/Header"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeHeading"
-theme_override_font_sizes/font_size = 24
 text = "Break shield?"
-[node name="Close" type="Button" parent="Shell/Content/Header"]
+[node name="Close" parent="Shell/Content/Header" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
 icon = ExtResource("3")
-expand_icon = true
-icon_alignment = 1
-theme_override_constants/icon_max_width = 20
-theme_type_variation = &"RookframeQuietButton"
+tooltip_text = "Close shield decision and end action"
 accessibility_name = "Close shield decision and end action"
+compact = true
 [node name="Body" type="ScrollContainer" parent="Shell/Content"]
 layout_mode = 2
 size_flags_vertical = 3
 horizontal_scroll_mode = 0
 [node name="Copy" type="Label" parent="Shell/Content/Body"]
 layout_mode = 2
+size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_type_variation = &"RookframeBody"
-theme_override_font_sizes/font_size = 16
-size_flags_horizontal = 3
 autowrap_mode = 2
-[node name="Actions" type="HBoxContainer" parent="Shell/Content"]
+[node name="Actions" type="HFlowContainer" parent="Shell/Content"]
 layout_mode = 2
-theme_override_constants/separation = 8
-[node name="Take" type="Button" parent="Shell/Content/Actions"]
+script = ExtResource("box")
+[node name="Take" parent="Shell/Content/Actions" instance=ExtResource("button")]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-theme_override_font_sizes/font_size = 14
 text = "Take 2 damage"
-[node name="Break" type="Button" parent="Shell/Content/Actions"]
+compact = true
+[node name="Break" parent="Shell/Content/Actions" instance=ExtResource("button")]
 layout_mode = 2
 size_flags_horizontal = 3
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeDangerButton"
-theme_override_font_sizes/font_size = 14
 text = "Break shield"
+variant = 2
+compact = true

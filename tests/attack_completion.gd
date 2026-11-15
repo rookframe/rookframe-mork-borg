@@ -4,6 +4,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const WINDOW = preload(ROOT + "ui/tabletop_attack.tscn")
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 var _windows: Array[Node] = []
 
 class WindowHost:
@@ -36,6 +37,7 @@ func _host() -> WindowHost:
 
 func _window(host: WindowHost, outcome: Dictionary, incoming: bool = false):
 	var window = WINDOW.instantiate()
+	window.theme = WORLD_THEME.entry()
 	_windows.append(window)
 	window.sdk = SDK.new(host)
 	host.window = window

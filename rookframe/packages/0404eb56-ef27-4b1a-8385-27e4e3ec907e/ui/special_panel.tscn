@@ -1,7 +1,8 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_panel.gd" id="1"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="2"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/special_choice.tscn" id="3"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 [sub_resource type="ButtonGroup" id="Abilities"]
 resource_local_to_scene = true
 [sub_resource type="ButtonGroup" id="FirstScroll"]
@@ -11,7 +12,6 @@ resource_local_to_scene = true
 [node name="SpecialPanel" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 8
 script = ExtResource("1")
 [node name="Source" type="VBoxContainer" parent="."]
 layout_mode = 2
@@ -22,14 +22,15 @@ custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 [node name="Columns" type="BoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 12
+script = ExtResource("box")
+gap = &"space_3"
 [node name="Item" type="PanelContainer" parent="Columns"]
 layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeSection"
 [node name="Content" type="VBoxContainer" parent="Columns/Item"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 [node name="Heading" type="Label" parent="Columns/Item/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"
@@ -52,7 +53,7 @@ size_flags_horizontal = 3
 theme_type_variation = &"RookframeSection"
 [node name="Content" type="VBoxContainer" parent="Columns/Recipient"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("box")
 [node name="Heading" type="Label" parent="Columns/Recipient/Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeLabel"

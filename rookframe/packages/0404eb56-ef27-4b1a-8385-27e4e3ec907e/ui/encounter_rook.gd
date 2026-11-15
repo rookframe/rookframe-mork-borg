@@ -4,7 +4,23 @@ const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec9
 var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const VIEW = preload(ROOT + "ui/encounter_view.gd")
+const TOKENS := &"RookframeTokens"
 var _busy := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_tokens()
+
+# The check badge marks a Rook in the encounter, sized and tinted by the World
+# theme. Changing a child does not notify this Control again.
+func _read_tokens() -> void:
+	var check := get_node_or_null(^"Check") as TextureRect
+	if check == null:
+		return
+	var side := get_theme_constant(&"icon_small", TOKENS)
+	check.offset_left = -side
+	check.offset_top = -side
+	check.modulate = get_theme_color(&"success", TOKENS)
 
 func ready() -> void:
 	i18n.bind(sdk)

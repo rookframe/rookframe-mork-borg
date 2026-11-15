@@ -277,6 +277,8 @@ func _present_outcome(outcome: Dictionary) -> void:
 		_range_key = ""
 	(card.body.get_node("Choices") as Control).visible = false
 	(card.body.get_node("Decision") as Control).visible = false
+	# Only the shield decision promotes its second choice to the primary action.
+	(card.body.get_node("Decision/Second") as Button).set(&"variant", 0)
 	var state := str(outcome.get("state", "pending"))
 	var defender := str(outcome.get("defender", "")) == sdk.context().participant_id
 	if state == "resolved":
@@ -300,7 +302,7 @@ func _present_outcome(outcome: Dictionary) -> void:
 		card.identity(str(outcome.get("character", "")), "Shield", str(outcome.get("attack", "")), true)
 		card.message("Break your shield to prevent all damage from this attack." if defender else "Waiting for the defending Player")
 		card.consequence((_locale.text("Take %d damage") % int(outcome.get("loss", 0))) if defender else "", "Break shield")
-		(card.body.get_node("Decision/Second") as Control).theme_type_variation = "RookframePrimaryButton"
+		(card.body.get_node("Decision/Second") as Button).set(&"variant", 1)
 	elif state == "fumble":
 		card.identity(str(outcome.get("character", "")), "Fumble", str(outcome.get("weapon", "")))
 		card.message("" if sdk.context().is_gm else "Waiting for the GM")
