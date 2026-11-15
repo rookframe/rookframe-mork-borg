@@ -1,5 +1,6 @@
 extends VBoxContainer
 const PROJECTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd")
+const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
 const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const _ability_paths := {
 	"Strength": ^"Abilities/StrengthRow/Strength",
@@ -51,36 +52,23 @@ func _field_typed(text: String, field: String) -> void:
 	field_changed.emit(text, field)
 
 func configure_layout(phone: bool, tablet: bool) -> void:
-	add_theme_constant_override("separation", 2 if phone else 6 if tablet else 10)
+	# The phone canvas has no room between rows; their hairlines separate them.
+	SHEET_TOKENS.gap(self, &"" if phone else &"space_2" if tablet else &"space_3")
 	get_node(^"Likeness").size_flags_vertical = 1
 	get_node(^"Likeness").custom_minimum_size = Vector2(get_node(^"Likeness").custom_minimum_size.x, 104 if phone else 132 if tablet else 170)
-	get_node(^"Likeness/Vitals").add_theme_constant_override("separation", 0 if phone or tablet else 4)
-	get_node(^"Likeness").add_theme_constant_override("separation", 10 if phone else 12 if tablet else 22)
+	SHEET_TOKENS.gap(get_node(^"Likeness/Vitals"), &"" if phone or tablet else &"space_1")
+	SHEET_TOKENS.gap(get_node(^"Likeness"), &"space_3" if phone or tablet else &"space_5")
 	get_node(^"Likeness/Portrait").custom_minimum_size = Vector2(66, 98) if phone else Vector2(88, 118) if tablet else Vector2(136, 170)
-	get_node(^"Abilities").add_theme_constant_override("v_separation", 0 if phone or tablet else 4)
-	get_node(^"Abilities").add_theme_constant_override("h_separation", 8 if phone or tablet else 16)
+	SHEET_TOKENS.grid_gaps(get_node(^"Abilities"), &"space_2" if phone or tablet else &"space_4", &"" if phone or tablet else &"space_1")
 	get_node(^"Class").custom_minimum_size = Vector2(get_node(^"Class").custom_minimum_size.x, 30 if tablet else 36)
 	get_node(^"Class").add_theme_font_size_override("font_size", 22 if tablet else 28)
-	var class_font: FontVariation = preload("res://rookframe/ui/theme/silkbound_medium.tres").duplicate()
-	class_font.spacing_top = -1
-	class_font.spacing_bottom = -1
-	get_node(^"Class").add_theme_font_override("font", class_font)
-	for state in ["normal", "hover", "pressed", "disabled"]:
-		var style: StyleBox = get_node(^"Weapon").get_theme_stylebox(state).duplicate()
-		if style is StyleBoxFlat:
-			(style as StyleBoxFlat).bg_color = Color(0.737255, 0.572549, 0.466667, 0.12) if state in ["hover", "pressed"] else Color(0.031373, 0.043137, 0.039216, 0.4)
-			(style as StyleBoxFlat).border_color = Color(0.737255, 0.572549, 0.466667, 0.38)
-		style.content_margin_top = 3
-		style.content_margin_bottom = 3
-		style.content_margin_left = 8 if tablet else 12
-		get_node(^"Weapon").add_theme_stylebox_override(state, style)
+	# Compact rows trim each line box so the heading sits close to the likeness.
+	get_node(^"Class").add_theme_font_override("font", SHEET_TOKENS.font(self, &"heading", 1, 1))
 	get_node(^"Origin").visible = false
 	get_node(^"ManageEquipment").visible = false
 	get_node(^"WeaponActions/Damage").visible = false
 	get_node(^"PhoneHeader/PhoneEdit").visible = true
-	var phone_font: FontVariation = preload("res://rookframe/ui/theme/silkbound_medium.tres").duplicate()
-	phone_font.spacing_top = -2
-	phone_font.spacing_bottom = -3
+	var phone_font := SHEET_TOKENS.font(self, &"heading", 2, 3)
 	get_node(^"PhoneHeader/PhoneName").add_theme_font_override("font", phone_font)
 	get_node(^"ReadyWeapon").size_flags_vertical = 3 if phone else 1
 	get_node(^"Protection").size_flags_vertical = 3 if phone else 1
@@ -88,14 +76,17 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"Likeness/Vitals/PhoneClass").custom_minimum_size = Vector2(0, 16)
 	get_node(^"Likeness/Vitals/PhoneClass").add_theme_font_size_override("font_size", 12)
 	get_node(^"Likeness/Vitals/PhoneClass").add_theme_font_override("font", phone_font)
+	# The portrait's outline stands off the likeness; the phone keeps it tight.
 	var outline: Control = get_node(^"Likeness/Portrait/Outline")
-	outline.offset_left = 4 if phone else 0
-	outline.offset_top = 4 if phone else 0
-	outline.offset_right = -4 if phone else 0
-	outline.offset_bottom = -4 if phone else 0
+	var stand_off := -2 if phone else -6
+	outline.offset_left = stand_off
+	outline.offset_top = stand_off
+	outline.offset_right = -stand_off
+	outline.offset_bottom = -stand_off
+	(get_node(^"Likeness/Portrait/ConditionBadge") as CanvasItem).self_modulate = SHEET_TOKENS.color(self, &"danger")
 	for path in [^"WeaponHeading/Actions/Center/Row", ^"ProtectionHeading/Center/Row"]:
 		(get_node(path).get_node(^"Title") as Label).add_theme_font_size_override("font_size", 19 if tablet else 23)
-		(get_node(path).get_node(^"Icon") as TextureRect).self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
+		(get_node(path).get_node(^"Icon") as TextureRect).self_modulate = SHEET_TOKENS.color(self, &"ornament")
 		(get_node(path).get_node(^"Icon") as TextureRect).custom_minimum_size = Vector2(22, 22) if tablet else Vector2(26, 26)
 	get_node(^"WeaponHeading").custom_minimum_size = Vector2(get_node(^"WeaponHeading").custom_minimum_size.x, 28 if tablet else 44)
 	get_node(^"ProtectionHeading").custom_minimum_size = Vector2(get_node(^"ProtectionHeading").custom_minimum_size.x, 28 if tablet else 44)
@@ -175,12 +166,13 @@ func configure(data: Dictionary, values: Dictionary, draft: Dictionary, items: A
 			(button.get_node(^"Content/Amount") as Label).text = str(item.get("reduction", "−1")) + " damage"
 			(button.get_node(^"Content/Icon") as TextureRect).texture = load("res://rookframe/ui/icons/character/shield.svg" if item.get("kind") == "Shield" else "res://rookframe/ui/icons/character/armor.svg")
 			(button.get_node(^"Content/Icon") as TextureRect).visible = not tablet
+			(button.get_node(^"Content/Icon") as TextureRect).self_modulate = SHEET_TOKENS.color(self, &"ornament")
 			(button.get_node(^"Content/Name") as Label).add_theme_font_size_override("font_size", 14 if tablet else 20)
 			(button.get_node(^"Content/Amount") as Label).add_theme_font_size_override("font_size", 15 if tablet else 21)
 			button.custom_minimum_size = Vector2(button.custom_minimum_size.x, 62 if tablet else 40)
 			button.size_flags_horizontal = 3
 			(button.get_node(^"Content") as BoxContainer).vertical = tablet
-			(button.get_node(^"Content") as BoxContainer).add_theme_constant_override("separation", 1 if tablet else 8)
+			(button.get_node(^"Content") as BoxContainer).set(&"gap", &"" if tablet else &"space_2")
 			(button.get_node(^"Content") as BoxContainer).offset_top = 10 if tablet else 0
 			(button.get_node(^"Content") as BoxContainer).offset_bottom = -10 if tablet else 0
 			(button.get_node(^"Content/Amount") as Label).clip_text = tablet
@@ -217,9 +209,6 @@ func configure_condition(data: Dictionary, condition: Dictionary, phone: bool) -
 	get_node(^"Protection").visible = combat and phone
 	get_node(^"ProtectionItems").visible = combat and not phone
 	get_node(^"ProtectionItems").visible = combat and not phone and get_node(^"ProtectionItems").get_child_count() > 0
-	var defence_rule: StyleBoxFlat = get_node(^"Dodge").get_theme_stylebox("normal").duplicate() as StyleBoxFlat
-	defence_rule.border_width_top = 0
-	get_node(^"Dodge").add_theme_stylebox_override("normal", defence_rule)
 	get_node(^"Dodge").visible = combat and not phone
 	get_node(^"ConditionReminder").visible = not combat
 	get_node(^"ConditionReminder").configure(data, condition, phone)

@@ -12,7 +12,6 @@ func configure(entry: Dictionary, owner: bool, busy: bool = false) -> void:
 	_key = str(entry.key)
 	var starred: bool = entry.get("starred", false)
 	set_pressed_no_signal(starred)
-	text = "★" if starred else "☆"
 	accessibility_name = ("Unstar" if starred else "Star") + " · " + str(entry.get("name", "Entry"))
 	tooltip_text = accessibility_name
 	disabled = not owner or busy

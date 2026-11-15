@@ -3,6 +3,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/miniature_boundary.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 const CHAPTER := ^"Margin/Layout/Body/Chapter"
 
 class RollBoundary extends BOUNDARY:
@@ -33,8 +34,8 @@ func _open(canvas: Vector2i, host: BOUNDARY = BOUNDARY.new()) -> Dictionary:
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var sheet = load(ROOT + "ui/character_surface.tscn").instantiate()
-	# Rookframe supplies its active theme to Package surfaces.
-	sheet.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	# Rookframe supplies the World theme to Package surfaces.
+	sheet.theme = WORLD_THEME.entry()
 	sheet.sdk = SDK.new(host)
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
