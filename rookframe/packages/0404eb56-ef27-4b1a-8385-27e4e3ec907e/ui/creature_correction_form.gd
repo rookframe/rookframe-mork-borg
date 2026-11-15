@@ -4,9 +4,29 @@ const FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec
 const FIELD_SCRIPT = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_correction_field.gd")
 const PROJECTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_projection.gd")
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
+const TOKENS := &"RookframeTokens"
 signal changed(field: String, text: String)
+## Constant token of the gap between fields, `space_1` to `space_8`. Empty means no gap.
+@export var gap: StringName = &"space_3":
+	set(value):
+		gap = value
+		_read_tokens()
 var _keys: Array = []
 var entry_id := ""
+var _reading := false
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_tokens()
+
+# Setting an override notifies this Control of a theme change, so the read
+# guards against re-entering itself.
+func _read_tokens() -> void:
+	if _reading or not is_inside_tree():
+		return
+	_reading = true
+	add_theme_constant_override(&"separation", get_theme_constant(gap, TOKENS) if gap else 0)
+	_reading = false
 
 func configure(keys: Array, values: Dictionary, locale: I18N, phone: bool, identity: String = "") -> void:
 	if keys != _keys or identity != entry_id:
@@ -60,7 +80,7 @@ func restore_focus(key: String = "") -> bool:
 			return true
 	return false
 
-func configure_density(phone: bool, input_size: int = 20) -> void:
+func configure_density(phone: bool) -> void:
 	for child in get_children():
 		var field := child as FIELD_SCRIPT
-		field.configure_density(phone, input_size)
+		field.configure_density(phone)

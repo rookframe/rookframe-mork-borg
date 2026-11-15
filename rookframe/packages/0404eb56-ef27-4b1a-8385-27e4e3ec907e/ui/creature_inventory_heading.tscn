@@ -1,44 +1,42 @@
 [gd_scene format=3]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
-[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_section_heading_frame.tres" id="frame"]
-
-
-
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="frame"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_tint.gd" id="tint"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[ext_resource type="Texture2D" path="res://rookframe/ui/icons/add.svg" id="add"]
 [node name="CreatureInventoryHeading" type="PanelContainer"]
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_styles/panel = ExtResource("frame")
 mouse_filter = 2
+script = ExtResource("frame")
+fill = &""
+outline_sides = 8
+radius = &""
+padding_horizontal = &""
+padding_vertical = &"space_2"
 [node name="Row" type="HBoxContainer" parent="."]
 layout_mode = 2
-theme_override_constants/separation = 12
 mouse_filter = 2
-[node name="Heading" type="PanelContainer" parent="Row"]
-layout_mode = 2
-size_flags_horizontal = 3
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("frame")
-[node name="Content" type="HBoxContainer" parent="Row/Heading"]
-layout_mode = 2
-theme_override_constants/separation = 10
-mouse_filter = 2
-[node name="Icon" type="TextureRect" parent="Row/Heading/Content"]
+script = ExtResource("box")
+gap = &"space_3"
+[node name="Icon" type="TextureRect" parent="Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(24, 24)
 size_flags_vertical = 4
 expand_mode = 1
 stretch_mode = 5
-modulate = Color(0.815686,0.745098,0.556863, 1)
 mouse_filter = 2
-[node name="Title" type="Label" parent="Row/Heading/Content"]
+script = ExtResource("tint")
+[node name="Title" type="Label" parent="Row"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_fonts/font = ExtResource("display")
-theme_override_font_sizes/font_size = 17
+theme_type_variation = &"RookframeHeading"
 autowrap_mode = 3
 mouse_filter = 2
-[node name="Add" type="Button" parent="Row"]
+[node name="Add" parent="Row" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-text = "Add Item"
-theme_type_variation = "TaskButton"
+size_flags_vertical = 4
+tooltip_text = "Add Item"
+accessibility_name = "Add Item"
+icon = ExtResource("add")
+compact = true
