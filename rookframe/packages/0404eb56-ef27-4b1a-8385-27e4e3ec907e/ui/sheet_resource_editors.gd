@@ -1,4 +1,4 @@
-extends VBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 signal changed(field: String, value: String)
 var _setting := false
 const EDITORS := {"hit_points": "Pages/Area/Rows/HP/Row/Editors/hit_points/Editor",
@@ -6,6 +6,14 @@ const EDITORS := {"hit_points": "Pages/Area/Rows/HP/Row/Editors/hit_points/Edito
 "omens": "Pages/Area/Rows/Omens/Row/Editors/omens/Editor",
 "power_uses": "Pages/Area/Rows/Powers/Row/Editors/power_uses/Editor",
 "silver": "Pages/Area/Rows/Silver/Row/Editors/silver/Editor"}
+
+## The resource pictograms take the World theme's ornament color.
+const ORNAMENTS: Array[NodePath] = [^"Pages/Area/Rows/HP/Row/Icon", ^"Pages/Area/Rows/Omens/Row/Icon", ^"Pages/Area/Rows/Powers/Row/Icon", ^"Pages/Area/Rows/Silver/Row/Icon"]
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		for path in ORNAMENTS:
+			(get_node(path) as CanvasItem).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func _ready() -> void:
 	for field in ["hit_points", "maximum_hit_points", "omens", "power_uses", "silver"]:
@@ -29,11 +37,11 @@ func configure(values: Dictionary, phone: bool, tablet: bool) -> void:
 	for path in ["Pages/Area/Rows/HP", "Pages/Area/Rows/Omens", "Pages/Area/Rows/Powers", "Pages/Area/Rows/Silver"]:
 		var row = get_node(path)
 		row.custom_minimum_size = Vector2(row.custom_minimum_size.x, 56 if phone else 64)
-		(get_node(path + "/Row") as Control).add_theme_constant_override("separation", 6 if phone or tablet else 10)
+		(get_node(path + "/Row") as Control).set(&"gap", &"space_1" if phone else &"space_2" if tablet else &"space_3")
 		(get_node(path + "/Row/Icon") as Control).custom_minimum_size = Vector2(24, 24) if phone or tablet else Vector2(28, 28)
 		(get_node(path + "/Row/Editors") as Control).custom_minimum_size = Vector2(140 if phone else 110 if tablet else 120, (get_node(path + "/Row/Editors") as Control).custom_minimum_size.y)
 		for edge in ["left", "right", "top", "bottom"]:
-			row.add_theme_constant_override("margin_" + edge, 4 if phone else 6 if tablet or edge in ["top", "bottom"] else 10)
+			row.set(edge, &"space_1" if phone else &"space_2" if tablet or edge in ["top", "bottom"] else &"space_3")
 	get_node("Caption").visible = not phone
 	get_node("Caption").custom_minimum_size = Vector2(get_node("Caption").custom_minimum_size.x, 32 if tablet else 39)
 	get_node("Pages").refresh()

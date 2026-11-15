@@ -213,5 +213,5 @@ func test_overview_groups_actions_in_responsive_sections() -> void:
 	assert_int(overview.get_node("Abilities").columns).is_equal(2)
 	var actions: Control = overview.get_node("HealthActions")
 	for button in actions.get_children():
-		assert_bool(button.size.y == 28).is_true()
+		assert_bool(button.size.y == actions.get_child(0).size.y).override_failure_message("Health actions share one compact height whatever the World theme's button padding.").is_true()
 		assert_bool(actions.get_global_rect().encloses(button.get_global_rect())).is_true()

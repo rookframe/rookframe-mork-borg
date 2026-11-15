@@ -309,7 +309,7 @@ func _update_character_density() -> void:
 	_header_title.visible = not compact
 	_header_subtitle.visible = not compact and not _last_sheet_route in ACTION_ROUTES
 	_content.custom_minimum_size = Vector2(0, 0) if compact else Vector2(0, 520)
-	_layout.add_theme_constant_override("separation", 8 if compact else 20)
+	_layout.set(&"gap", &"space_2" if compact else &"space_5")
 	if _character_actor != null:
 		var data: Dictionary = _character_actor.data
 		_set_window_title(_sheet_workflow_title if not _sheet_workflow_title.is_empty() else str(data.get("name", "Unnamed Character")))

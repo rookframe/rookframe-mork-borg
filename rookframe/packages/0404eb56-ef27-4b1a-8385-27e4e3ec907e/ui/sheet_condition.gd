@@ -1,6 +1,5 @@
-extends VBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
-const MUTED := Color(0.568627, 0.6, 0.603922, 1)
 signal event_requested(operation: String)
 signal broken_requested
 signal edit_hp_requested
@@ -15,6 +14,16 @@ func _ready() -> void:
 	get_node(^"Main/Frame/Inset/Content/Footer/Treat").pressed.connect(_event.bind("treat"))
 	get_node(^"Main/Frame/Inset/Content/Footer/UndoDeath").pressed.connect(_event.bind("undo"))
 	get_node(^"Main/Frame/Inset/Content/Footer/EditHP").pressed.connect(_edit_hp)
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		_read_condition_tokens()
+
+# The condition title and the death mark carry the World theme's danger color.
+func _read_condition_tokens() -> void:
+	var danger := get_theme_color(&"danger", TOKENS)
+	get_node(^"Main/Frame/Inset/Content/Header/Title").add_theme_color_override(&"font_color", danger)
+	get_node(^"Main/Frame/Inset/Content/Death/Mark").self_modulate = danger
 
 func _edit_hp() -> void:
 	edit_hp_requested.emit()
@@ -62,7 +71,7 @@ func configure(data: Dictionary, condition: Dictionary, enabled: bool) -> void:
 		var pip = get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"][index])
 		pip.visible = index < duration
 		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).text = str(index + 1)
-		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).add_theme_color_override("font_color", MUTED if index < elapsed else Color(1, 1, 1, 1))
+		get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Number", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number"][index]).theme_type_variation = &"RookframeMeta" if index < elapsed else &"RookframeValue"
 		(get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Elapsed", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Elapsed", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Elapsed", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Elapsed"][index]) as Control).visible = index < elapsed
 		(get_node([^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Strike", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2/Strike", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3/Strike", ^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Strike"][index]) as Control).visible = index < elapsed
 		pip.accessibility_name = "Round %d · %s" % [index + 1, "elapsed" if index < elapsed else "remaining"]
@@ -96,49 +105,49 @@ func _resize() -> void:
 	var phone := get_viewport_rect().size.y <= 560
 	var tablet := get_viewport_rect().size.x <= 1150 and not phone
 	size_flags_vertical = 3 if phone else 1
-	add_theme_constant_override("separation", 6 if phone else 18)
-	get_node(^"Main/Frame/Inset/Content").add_theme_constant_override("separation", 8 if phone else 14 if tablet else 20)
-	get_node(^"Main/Frame/Inset/Content/Header").add_theme_constant_override("separation", 3 if phone else 6 if tablet else 12)
+	gap = &"space_1" if phone else &"space_4"
+	get_node(^"Main/Frame/Inset/Content").set(&"gap", &"space_2" if phone else &"space_4" if tablet else &"space_5")
+	get_node(^"Main/Frame/Inset/Content/Header").set(&"gap", &"space_1" if phone else &"space_2" if tablet else &"space_3")
 	for edge in ["left", "right", "top", "bottom"]:
-		get_node(^"Main/Frame/Inset").add_theme_constant_override("margin_" + edge, (12 if edge in ["left", "right"] else 10) if phone else 16 if tablet else 32)
-		get_node(^"Results/Inset").add_theme_constant_override("margin_" + edge, (8 if edge in ["left", "right"] else 5) if phone else 12 if tablet else (20 if edge in ["left", "right"] else 14))
+		get_node(^"Main/Frame/Inset").set(edge, (&"space_3" if edge in ["left", "right"] else &"space_2") if phone else &"space_4" if tablet else &"space_6")
+		get_node(^"Results/Inset").set(edge, (&"space_2" if edge in ["left", "right"] else &"space_1") if phone else &"space_3" if tablet else (&"space_5" if edge in ["left", "right"] else &"space_4"))
 	get_node(^"Main/Frame/Inset/Content/Header/Caption").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 14)
 	get_node(^"Main/Frame/Inset/Content/Header/Title").add_theme_font_size_override("font_size", 25 if phone else 32 if tablet else 48)
 	get_node(^"Main/Frame/Inset/Content/Header/Copy").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 18)
 	get_node(^"Main/Frame/Inset/Content/Counter/Value/Amount/Number").add_theme_font_size_override("font_size", 54 if phone else 72 if tablet else 96)
 	get_node(^"Main/Frame/Inset/Content/Counter/Value/Amount/Hours").add_theme_font_size_override("font_size", 26 if phone else 40)
-	get_node(^"Main/Frame/Inset/Content/Treated").add_theme_constant_override("separation", 8 if phone else 18)
+	get_node(^"Main/Frame/Inset/Content/Treated").set(&"gap", &"space_2" if phone else &"space_4")
 	get_node(^"Main/Frame/Inset/Content/Treated/Title").add_theme_font_size_override("font_size", 23 if phone else 30)
 	get_node(^"Main/Frame/Inset/Content/Treated/Copy").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 18)
 	get_node(^"Main/Frame/Inset/Content/Counter/Value/Units").add_theme_font_size_override("font_size", 12 if phone else 15 if tablet else 18)
 	get_node(^"Main/Frame/Inset/Content/Footer/Note").add_theme_font_size_override("font_size", 12 if phone else 14 if tablet else 16)
 	get_node(^"Main/Frame/Inset/Content/Death/Copy").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 18)
 	get_node(^"Main/Frame/Inset/Content/Death/Mark").custom_minimum_size = Vector2(65, 70) if phone else Vector2(100, 115) if tablet else Vector2(130, 150)
-	get_node(^"Main/Frame/Inset/Content/Counter/Value").add_theme_constant_override("separation", 4 if phone else 8)
-	get_node(^"Main/Frame/Inset/Content/Counter").add_theme_constant_override("separation", 16 if phone or tablet else 24)
-	get_node(^"Main/Frame/Inset/Content/Outcomes").add_theme_constant_override("h_separation", 16 if phone else 12 if tablet else 32)
-	get_node(^"Main/Frame/Inset/Content/Outcomes").add_theme_constant_override("v_separation", 6 if phone else 12 if tablet else 20)
-	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome1").add_theme_constant_override("separation", 8 if phone or tablet else 16)
+	get_node(^"Main/Frame/Inset/Content/Counter/Value").set(&"gap", &"space_1" if phone else &"space_2")
+	get_node(^"Main/Frame/Inset/Content/Counter").set(&"gap", &"space_4" if phone or tablet else &"space_5")
+	get_node(^"Main/Frame/Inset/Content/Outcomes").set(&"gap_horizontal", &"space_4" if phone else &"space_3" if tablet else &"space_6")
+	get_node(^"Main/Frame/Inset/Content/Outcomes").set(&"gap_vertical", &"space_1" if phone else &"space_3" if tablet else &"space_5")
+	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome1").set(&"gap", &"space_2" if phone or tablet else &"space_4")
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome1/Number").custom_minimum_size = Vector2(24 if phone else 30 if tablet else 44, 0)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome1/Number").add_theme_font_size_override("font_size", 27 if phone else 32 if tablet else 40)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome1/Words/Title").add_theme_font_size_override("font_size", 16 if phone else 19 if tablet else 22)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome1/Words/Copy").add_theme_font_size_override("font_size", 11 if phone else 13 if tablet else 15)
-	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome2").add_theme_constant_override("separation", 8 if phone or tablet else 16)
+	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome2").set(&"gap", &"space_2" if phone or tablet else &"space_4")
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome2/Number").custom_minimum_size = Vector2(24 if phone else 30 if tablet else 44, 0)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome2/Number").add_theme_font_size_override("font_size", 27 if phone else 32 if tablet else 40)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome2/Words/Title").add_theme_font_size_override("font_size", 16 if phone else 19 if tablet else 22)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome2/Words/Copy").add_theme_font_size_override("font_size", 11 if phone else 13 if tablet else 15)
-	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome3").add_theme_constant_override("separation", 8 if phone or tablet else 16)
+	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome3").set(&"gap", &"space_2" if phone or tablet else &"space_4")
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome3/Number").custom_minimum_size = Vector2(24 if phone else 30 if tablet else 44, 0)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome3/Number").add_theme_font_size_override("font_size", 27 if phone else 32 if tablet else 40)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome3/Words/Title").add_theme_font_size_override("font_size", 16 if phone else 19 if tablet else 22)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome3/Words/Copy").add_theme_font_size_override("font_size", 11 if phone else 13 if tablet else 15)
-	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome4").add_theme_constant_override("separation", 8 if phone or tablet else 16)
+	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome4").set(&"gap", &"space_2" if phone or tablet else &"space_4")
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome4/Number").custom_minimum_size = Vector2(24 if phone else 30 if tablet else 44, 0)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome4/Number").add_theme_font_size_override("font_size", 27 if phone else 32 if tablet else 40)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome4/Words/Title").add_theme_font_size_override("font_size", 16 if phone else 19 if tablet else 22)
 	get_node(^"Main/Frame/Inset/Content/Outcomes/Outcome4/Words/Copy").add_theme_font_size_override("font_size", 11 if phone else 13 if tablet else 15)
-	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Pips").add_theme_constant_override("separation", 6 if phone else 8 if tablet else 12)
+	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Pips").set(&"gap", &"space_1" if phone else &"space_2" if tablet else &"space_3")
 	var side_Pip1 := 26 if phone else 40 if tablet else 52
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1").custom_minimum_size = Vector2(side_Pip1, side_Pip1)
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1/Number").add_theme_font_size_override("font_size", 15 if phone else 24)
@@ -151,29 +160,24 @@ func _resize() -> void:
 	var side_Pip4 := 26 if phone else 40 if tablet else 52
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4").custom_minimum_size = Vector2(side_Pip4, side_Pip4)
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4/Number").add_theme_font_size_override("font_size", 15 if phone else 24)
-	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/First").add_theme_constant_override("separation", 3 if phone else 8)
+	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/First").set(&"gap", &"space_1" if phone else &"space_2")
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/First/Caption").add_theme_font_size_override("font_size", 11 if phone else 15)
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/First/Value").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 20)
-	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last").add_theme_constant_override("separation", 3 if phone else 8)
+	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last").set(&"gap", &"space_1" if phone else &"space_2")
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last/Caption").add_theme_font_size_override("font_size", 11 if phone else 15)
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last/Value").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 20)
 	for path in [^"Main/Frame/Inset/Content/Counter/Tracker/Controls/Undo", ^"Main/Frame/Inset/Content/Counter/Tracker/Controls/Next", ^"Main/Frame/Inset/Content/Footer/Broken", ^"Main/Frame/Inset/Content/Footer/Recover", ^"Main/Frame/Inset/Content/Footer/Treat", ^"Main/Frame/Inset/Content/Footer/UndoDeath", ^"Main/Frame/Inset/Content/Footer/EditHP"]:
 		get_node(path).add_theme_font_size_override("font_size", 12 if phone else 14 if tablet else 16)
-	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules").add_theme_constant_override("separation", 12 if phone else 16 if tablet else 24)
-	get_node(^"Main/Frame/Inset/Content/Death").add_theme_constant_override("separation", 24 if phone else 40)
-	get_node(^"Results/Inset/Values").add_theme_constant_override("separation", 12 if phone or tablet else 24)
-	get_node(^"Results/Inset/Values/Broken").add_theme_constant_override("separation", 2 if phone else 4)
+	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules").set(&"gap", &"space_3" if phone else &"space_4" if tablet else &"space_5")
+	get_node(^"Main/Frame/Inset/Content/Death").set(&"gap", &"space_5" if phone else &"space_7")
+	get_node(^"Results/Inset/Values").set(&"gap", &"space_3" if phone or tablet else &"space_5")
 	get_node(^"Results/Inset/Values/Broken/Caption").add_theme_font_size_override("font_size", 10 if phone else 13)
 	get_node(^"Results/Inset/Values/Broken/Value").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 16)
-	get_node(^"Results/Inset/Values/Injury").add_theme_constant_override("separation", 2 if phone else 4)
 	get_node(^"Results/Inset/Values/Injury/Caption").add_theme_font_size_override("font_size", 10 if phone else 13)
 	get_node(^"Results/Inset/Values/Injury/Value").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 16)
-	get_node(^"Results/Inset/Values/Duration").add_theme_constant_override("separation", 2 if phone else 4)
 	get_node(^"Results/Inset/Values/Duration/Caption").add_theme_font_size_override("font_size", 10 if phone else 13)
 	get_node(^"Results/Inset/Values/Duration/Value").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 16)
-	get_node(^"Results/Inset/Values/Recovery").add_theme_constant_override("separation", 2 if phone else 4)
 	get_node(^"Results/Inset/Values/Recovery/Caption").add_theme_font_size_override("font_size", 10 if phone else 13)
 	get_node(^"Results/Inset/Values/Recovery/Value").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 16)
-	get_node(^"Results/Inset/Values/Elapsed").add_theme_constant_override("separation", 2 if phone else 4)
 	get_node(^"Results/Inset/Values/Elapsed/Caption").add_theme_font_size_override("font_size", 10 if phone else 13)
 	get_node(^"Results/Inset/Values/Elapsed/Value").add_theme_font_size_override("font_size", 11 if phone else 14 if tablet else 16)

@@ -1,63 +1,62 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition.gd" id="script"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="death"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
-[sub_resource type="StyleBoxFlat" id="frame"]
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
-[sub_resource type="StyleBoxFlat" id="pip"]
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_color = Color(1, 0.505882, 0.478431, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
-[sub_resource type="StyleBoxFlat" id="results"]
-bg_color = Color(0.058824, 0.101961, 0.109804, 1)
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-border_width_left = 1
-border_width_right = 1
-border_width_top = 1
-border_width_bottom = 1
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="token_frame"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_rule.gd" id="token_rule"]
 [node name="Condition" type="VBoxContainer"]
 script = ExtResource("script")
-theme_override_constants/separation = 18
+gap = &"space_4"
 [node name="Main" type="PanelContainer" parent="."]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/panel = SubResource("frame")
+script = ExtResource("token_frame")
+fill = &"surface"
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Frame" type="VBoxContainer" parent="Main"]
 layout_mode = 2
-theme_override_constants/separation = 0
-[node name="DangerEdge" type="ColorRect" parent="Main/Frame"]
+script = ExtResource("token_box")
+gap = &""
+[node name="DangerEdge" type="PanelContainer" parent="Main/Frame"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 3)
 mouse_filter = 2
-color = Color(1, 0.505882, 0.478431, 1)
+script = ExtResource("token_frame")
+fill = &"danger"
+outline = &""
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Inset" type="MarginContainer" parent="Main/Frame"]
 layout_mode = 2
 size_flags_vertical = 3
+script = ExtResource("token_margin")
+left = &""
+top = &""
+right = &""
+bottom = &""
 [node name="Content" type="VBoxContainer" parent="Main/Frame/Inset"]
 layout_mode = 2
-theme_override_constants/separation = 20
+script = ExtResource("token_box")
+gap = &"space_5"
 [node name="Header" type="VBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
-theme_override_constants/separation = 12
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Caption" type="Label" parent="Main/Frame/Inset/Content/Header"]
 layout_mode = 2
 text = "Broken · unresolved"
 theme_override_font_sizes/font_size = 14
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Header"]
 layout_mode = 2
 text = "Broken"
 theme_override_font_sizes/font_size = 48
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeTitle"
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Header"]
 layout_mode = 2
 text = "Roll once to find out what happens to you."
@@ -66,140 +65,145 @@ autowrap_mode = 3
 [node name="Outcomes" type="GridContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
 columns = 2
-theme_override_constants/h_separation = 32
-theme_override_constants/v_separation = 20
+script = ExtResource("token_grid")
+gap_horizontal = &"space_6"
+gap_vertical = &"space_5"
 [node name="Outcome1" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome1"]
 layout_mode = 2
 text = "1"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeValue"
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome1"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome1/Words"]
 layout_mode = 2
 text = "Unconscious"
 theme_override_font_sizes/font_size = 22
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeHeading"
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome1/Words"]
 layout_mode = 2
 text = "d4 rounds → d4 HP"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Outcome2" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome2"]
 layout_mode = 2
 text = "2"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeValue"
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome2"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome2/Words"]
 layout_mode = 2
 text = "Injury"
 theme_override_font_sizes/font_size = 22
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeHeading"
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome2/Words"]
 layout_mode = 2
 text = "d6 injury · d4 rounds → d4 HP"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Outcome3" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome3"]
 layout_mode = 2
 text = "3"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeValue"
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome3"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome3/Words"]
 layout_mode = 2
 text = "Hemorrhage"
 theme_override_font_sizes/font_size = 22
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeHeading"
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome3/Words"]
 layout_mode = 2
 text = "Treat within d2 hours"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Outcome4" type="HBoxContainer" parent="Main/Frame/Inset/Content/Outcomes"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome4"]
 layout_mode = 2
 text = "4"
 theme_override_font_sizes/font_size = 40
 custom_minimum_size = Vector2(44, 0)
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeValue"
 [node name="Words" type="VBoxContainer" parent="Main/Frame/Inset/Content/Outcomes/Outcome4"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome4/Words"]
 layout_mode = 2
 text = "Dead"
 theme_override_font_sizes/font_size = 22
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeHeading"
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Outcomes/Outcome4/Words"]
 layout_mode = 2
 text = "No further roll"
 theme_override_font_sizes/font_size = 15
 autowrap_mode = 3
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="TopSpacer" type="Control" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
 size_flags_vertical = 3
 mouse_filter = 2
 [node name="Counter" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
-theme_override_constants/separation = 24
+script = ExtResource("token_box")
+gap = &"space_5"
 [node name="Value" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Amount" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Value"]
 layout_mode = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Value/Amount"]
 layout_mode = 2
 text = "4"
 theme_override_font_sizes/font_size = 96
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeValue"
 [node name="Hours" type="Label" parent="Main/Frame/Inset/Content/Counter/Value/Amount"]
 layout_mode = 2
 text = "h"
 vertical_alignment = 2
 theme_override_font_sizes/font_size = 40
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
+theme_type_variation = &"RookframeValue"
 [node name="Units" type="Label" parent="Main/Frame/Inset/Content/Counter/Value"]
 layout_mode = 2
 text = "rounds remaining"
@@ -208,22 +212,28 @@ theme_override_font_sizes/font_size = 18
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Pips" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
 layout_mode = 2
-theme_override_constants/separation = 12
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Pip1" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
 layout_mode = 2
 custom_minimum_size = Vector2(52, 52)
 mouse_filter = 2
-[node name="Frame" type="Panel" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
+[node name="Frame" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("pip")
-[node name="Elapsed" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
+script = ExtResource("token_frame")
+fill = &"surface"
+outline = &"danger"
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
+[node name="Elapsed" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
 visible = false
 layout_mode = 1
 anchor_right = 1.0
@@ -232,8 +242,13 @@ offset_left = 1.0
 offset_top = 1.0
 offset_right = -1.0
 offset_bottom = -1.0
-color = Color(0.070588, 0.290196, 0.282353, 1)
 mouse_filter = 2
+script = ExtResource("token_frame")
+fill = &"surface_pressed"
+outline = &""
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
 layout_mode = 1
 anchor_right = 1.0
@@ -242,8 +257,8 @@ text = "1"
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_fonts/font = ExtResource("display")
-[node name="Strike" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
+theme_type_variation = &"RookframeValue"
+[node name="Strike" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip1"]
 visible = false
 layout_mode = 1
 anchor_left = 0.25
@@ -251,20 +266,26 @@ anchor_right = 0.75
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_bottom = 1.0
-color = Color(0.607843, 0.647059, 0.65098, 1)
 mouse_filter = 2
+script = ExtResource("token_rule")
+color = &"content_muted"
 [node name="Pip2" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
 layout_mode = 2
 custom_minimum_size = Vector2(52, 52)
 mouse_filter = 2
-[node name="Frame" type="Panel" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
+[node name="Frame" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("pip")
-[node name="Elapsed" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
+script = ExtResource("token_frame")
+fill = &"surface"
+outline = &"danger"
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
+[node name="Elapsed" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
 visible = false
 layout_mode = 1
 anchor_right = 1.0
@@ -273,8 +294,13 @@ offset_left = 1.0
 offset_top = 1.0
 offset_right = -1.0
 offset_bottom = -1.0
-color = Color(0.070588, 0.290196, 0.282353, 1)
 mouse_filter = 2
+script = ExtResource("token_frame")
+fill = &"surface_pressed"
+outline = &""
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
 layout_mode = 1
 anchor_right = 1.0
@@ -283,8 +309,8 @@ text = "2"
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_fonts/font = ExtResource("display")
-[node name="Strike" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
+theme_type_variation = &"RookframeValue"
+[node name="Strike" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip2"]
 visible = false
 layout_mode = 1
 anchor_left = 0.25
@@ -292,20 +318,26 @@ anchor_right = 0.75
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_bottom = 1.0
-color = Color(0.607843, 0.647059, 0.65098, 1)
 mouse_filter = 2
+script = ExtResource("token_rule")
+color = &"content_muted"
 [node name="Pip3" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
 layout_mode = 2
 custom_minimum_size = Vector2(52, 52)
 mouse_filter = 2
-[node name="Frame" type="Panel" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
+[node name="Frame" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("pip")
-[node name="Elapsed" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
+script = ExtResource("token_frame")
+fill = &"surface"
+outline = &"danger"
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
+[node name="Elapsed" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
 visible = false
 layout_mode = 1
 anchor_right = 1.0
@@ -314,8 +346,13 @@ offset_left = 1.0
 offset_top = 1.0
 offset_right = -1.0
 offset_bottom = -1.0
-color = Color(0.070588, 0.290196, 0.282353, 1)
 mouse_filter = 2
+script = ExtResource("token_frame")
+fill = &"surface_pressed"
+outline = &""
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
 layout_mode = 1
 anchor_right = 1.0
@@ -324,8 +361,8 @@ text = "3"
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_fonts/font = ExtResource("display")
-[node name="Strike" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
+theme_type_variation = &"RookframeValue"
+[node name="Strike" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip3"]
 visible = false
 layout_mode = 1
 anchor_left = 0.25
@@ -333,20 +370,26 @@ anchor_right = 0.75
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_bottom = 1.0
-color = Color(0.607843, 0.647059, 0.65098, 1)
 mouse_filter = 2
+script = ExtResource("token_rule")
+color = &"content_muted"
 [node name="Pip4" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips"]
 layout_mode = 2
 custom_minimum_size = Vector2(52, 52)
 mouse_filter = 2
-[node name="Frame" type="Panel" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
+[node name="Frame" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
-theme_override_styles/panel = SubResource("pip")
-[node name="Elapsed" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
+script = ExtResource("token_frame")
+fill = &"surface"
+outline = &"danger"
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
+[node name="Elapsed" type="PanelContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
 visible = false
 layout_mode = 1
 anchor_right = 1.0
@@ -355,8 +398,13 @@ offset_left = 1.0
 offset_top = 1.0
 offset_right = -1.0
 offset_bottom = -1.0
-color = Color(0.070588, 0.290196, 0.282353, 1)
 mouse_filter = 2
+script = ExtResource("token_frame")
+fill = &"surface_pressed"
+outline = &""
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Number" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
 layout_mode = 1
 anchor_right = 1.0
@@ -365,8 +413,8 @@ text = "4"
 theme_override_font_sizes/font_size = 24
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_fonts/font = ExtResource("display")
-[node name="Strike" type="ColorRect" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
+theme_type_variation = &"RookframeValue"
+[node name="Strike" type="Control" parent="Main/Frame/Inset/Content/Counter/Tracker/Pips/Pip4"]
 visible = false
 layout_mode = 1
 anchor_left = 0.25
@@ -374,58 +422,60 @@ anchor_right = 0.75
 anchor_top = 0.5
 anchor_bottom = 0.5
 offset_bottom = 1.0
-color = Color(0.607843, 0.647059, 0.65098, 1)
 mouse_filter = 2
+script = ExtResource("token_rule")
+color = &"content_muted"
 [node name="Rules" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
 layout_mode = 2
-theme_override_constants/separation = 24
+script = ExtResource("token_box")
+gap = &"space_5"
 [node name="First" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Caption" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/First"]
 layout_mode = 2
 text = "First hour"
 theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/First"]
 layout_mode = 2
 text = "All tests DR16"
 theme_override_font_sizes/font_size = 20
 [node name="Last" type="VBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Caption" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/Last"]
 layout_mode = 2
 text = "Last hour"
 theme_override_font_sizes/font_size = 15
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Main/Frame/Inset/Content/Counter/Tracker/Rules/Last"]
 layout_mode = 2
 text = "All tests DR18"
 theme_override_font_sizes/font_size = 20
 [node name="Controls" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
 layout_mode = 2
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
 [node name="Undo" type="Button" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls"]
 layout_mode = 2
 text = "−"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = &"RookframeSecondaryButton"
 [node name="Next" type="Button" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls"]
 layout_mode = 2
 text = "Next round"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = &"RookframeSecondaryButton"
 [node name="Death" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
-theme_override_constants/separation = 40
+script = ExtResource("token_box")
+gap = &"space_7"
 [node name="Mark" type="TextureRect" parent="Main/Frame/Inset/Content/Death"]
 layout_mode = 2
 custom_minimum_size = Vector2(130, 150)
 texture = ExtResource("death")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(1, 0.505882, 0.478431, 1)
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Death"]
 layout_mode = 2
 text = "Your story ends here."
@@ -435,13 +485,13 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 [node name="Treated" type="VBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
-theme_override_constants/separation = 18
+script = ExtResource("token_box")
+gap = &"space_4"
 [node name="Title" type="Label" parent="Main/Frame/Inset/Content/Treated"]
 layout_mode = 2
 text = "Hemorrhage stopped"
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 30
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
+theme_type_variation = &"RookframeHeading"
 [node name="Copy" type="Label" parent="Main/Frame/Inset/Content/Treated"]
 layout_mode = 2
 text = "Keep the resolved treatment. Update HP when healing changes it."
@@ -454,7 +504,8 @@ mouse_filter = 2
 layout_mode = 2
 [node name="Footer" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 [node name="Note" type="Label" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "At exactly 0 HP · Broken d4"
@@ -462,96 +513,110 @@ theme_override_font_sizes/font_size = 16
 autowrap_mode = 3
 size_flags_horizontal = 3
 size_flags_vertical = 4
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Broken" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Roll Broken d4"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskPrimary"
+theme_type_variation = &"RookframePrimaryButton"
 [node name="Recover" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Awaken"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskPrimary"
+theme_type_variation = &"RookframePrimaryButton"
 [node name="Treat" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Record treatment"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskPrimary"
+theme_type_variation = &"RookframePrimaryButton"
 [node name="EditHP" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Edit HP"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = &"RookframeSecondaryButton"
 [node name="UndoDeath" type="Button" parent="Main/Frame/Inset/Content/Footer"]
 layout_mode = 2
 text = "Undo last hour"
 custom_minimum_size = Vector2(44, 44)
-theme_type_variation = "TaskButton"
+theme_type_variation = &"RookframeSecondaryButton"
 [node name="Results" type="PanelContainer" parent="."]
 layout_mode = 2
-theme_override_styles/panel = SubResource("results")
+script = ExtResource("token_frame")
+radius = &""
+padding_horizontal = &""
+padding_vertical = &""
 [node name="Inset" type="MarginContainer" parent="Results"]
 layout_mode = 2
+script = ExtResource("token_margin")
+left = &""
+top = &""
+right = &""
+bottom = &""
 [node name="Values" type="HBoxContainer" parent="Results/Inset"]
 layout_mode = 2
-theme_override_constants/separation = 24
+script = ExtResource("token_box")
+gap = &"space_5"
 [node name="Broken" type="VBoxContainer" parent="Results/Inset/Values"]
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Caption" type="Label" parent="Results/Inset/Values/Broken"]
 layout_mode = 2
 text = "Broken"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Results/Inset/Values/Broken"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 16
 [node name="Injury" type="VBoxContainer" parent="Results/Inset/Values"]
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Caption" type="Label" parent="Results/Inset/Values/Injury"]
 layout_mode = 2
 text = "Injury"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Results/Inset/Values/Injury"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 16
 [node name="Duration" type="VBoxContainer" parent="Results/Inset/Values"]
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Caption" type="Label" parent="Results/Inset/Values/Duration"]
 layout_mode = 2
 text = "Duration"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Results/Inset/Values/Duration"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 16
 [node name="Recovery" type="VBoxContainer" parent="Results/Inset/Values"]
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Caption" type="Label" parent="Results/Inset/Values/Recovery"]
 layout_mode = 2
 text = "Recovery"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Results/Inset/Values/Recovery"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 16
 [node name="Elapsed" type="VBoxContainer" parent="Results/Inset/Values"]
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="Caption" type="Label" parent="Results/Inset/Values/Elapsed"]
 layout_mode = 2
 text = "Elapsed"
 theme_override_font_sizes/font_size = 13
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
+theme_type_variation = &"RookframeMeta"
 [node name="Value" type="Label" parent="Results/Inset/Values/Elapsed"]
 layout_mode = 2
 text = ""

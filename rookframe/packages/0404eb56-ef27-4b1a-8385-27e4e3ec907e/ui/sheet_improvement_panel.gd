@@ -1,4 +1,12 @@
-extends VBoxContainer
+extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
+
+## The ability pictograms take the World theme's ornament color.
+const ORNAMENTS: Array[NodePath] = [^"Body/Content/Abilities/Strength/Icon", ^"Body/Content/Abilities/Agility/Icon", ^"Body/Content/Abilities/Presence/Icon", ^"Body/Content/Abilities/Toughness/Icon"]
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED:
+		for path in ORNAMENTS:
+			(get_node(path) as CanvasItem).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func configure(data: Dictionary, action: Dictionary, phone: bool, prepared: bool, ending: bool) -> void:
 	var results: Dictionary = action.get("results", {})
@@ -54,11 +62,11 @@ func configure(data: Dictionary, action: Dictionary, phone: bool, prepared: bool
 		(get_node(row_path + "/Roll") as Label).text = "d6 · " + str(change.roll)
 		(get_node(row_path + "/Change") as Label).text = "%+d → %+d" % [int(change.before), int(change.after)]
 	var tablet := get_viewport_rect().size.x <= 1150 and not phone
-	add_theme_constant_override("separation", 0)
-	get_node("Body/Content").add_theme_constant_override("separation", 8 if phone else 14 if tablet else 20)
+	gap = &""
+	get_node("Body/Content").set(&"gap", &"space_2" if phone else &"space_4" if tablet else &"space_5")
 	for edge in ["left", "right", "top", "bottom"]:
-		get_node("Body").add_theme_constant_override("margin_" + edge, 10 if phone else 16 if tablet else 24)
-		get_node("Heading/Inset").add_theme_constant_override("margin_" + edge, (10 if phone else 20) if edge in ["left", "right"] else 6 if phone else 12)
+		get_node("Body").set(edge, &"space_2" if phone else &"space_4" if tablet else &"space_5")
+		get_node("Heading/Inset").set(edge, (&"space_2" if phone else &"space_5") if edge in ["left", "right"] else &"space_1" if phone else &"space_3")
 
 	get_node("Body/Content/Steps").visible = action.is_empty() and not prepared and not ending
 	get_node("Body/Content/Steps").vertical = not phone
@@ -71,7 +79,7 @@ func configure(data: Dictionary, action: Dictionary, phone: bool, prepared: bool
 	get_node("Body/Content/DebrisKey").columns = 4 if phone else 2
 	for path in ["Body/Content/DebrisKey/Nothing", "Body/Content/DebrisKey/Silver", "Body/Content/DebrisKey/Unclean", "Body/Content/DebrisKey/Sacred"]:
 		get_node(path).vertical = phone
-		get_node(path).add_theme_constant_override("separation", 4 if phone else 12)
+		get_node(path).set(&"gap", &"space_1" if phone else &"space_3")
 		(get_node(path + "/Face") as Control).add_theme_font_size_override("font_size", 12 if phone else 16)
 		(get_node(path + "/Result") as Control).add_theme_font_size_override("font_size", 12 if phone else 16)
 	for path in ["Body/Content/Abilities/Strength", "Body/Content/Abilities/Agility", "Body/Content/Abilities/Presence", "Body/Content/Abilities/Toughness"]:
@@ -91,7 +99,7 @@ func configure(data: Dictionary, action: Dictionary, phone: bool, prepared: bool
 	get_node("Body/Content/Result/Inset/Content/Value").add_theme_font_size_override("font_size", 30 if phone else 42)
 	get_node("Body/Content/Result/Inset/Content/Copy").add_theme_font_size_override("font_size", 12 if phone else 16)
 	for edge in ["left", "right", "top", "bottom"]:
-		get_node("Body/Content/Result/Inset").add_theme_constant_override("margin_" + edge, (14 if phone else 24) if edge in ["left", "right"] else 10 if phone else 18)
+		get_node("Body/Content/Result/Inset").set(edge, (&"space_3" if phone else &"space_5") if edge in ["left", "right"] else &"space_2" if phone else &"space_4")
 
 func _faces(values: Array) -> String:
 	var result := ""

@@ -6,58 +6,37 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
-[sub_resource type="StyleBoxFlat" id="InlineEditor"]
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-content_margin_left = 5.0
-content_margin_right = 5.0
-content_margin_top = 17.0
-content_margin_bottom = 3.0
-
-[sub_resource type="StyleBoxFlat" id="InlineFocus"]
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_color = Color(0.905882, 0.905882, 0.866667, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-content_margin_left = 5.0
-content_margin_right = 5.0
-content_margin_top = 17.0
-content_margin_bottom = 3.0
-
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
 [node name="ResourceEditors" type="VBoxContainer"]
 script = ExtResource("script")
+gap = &""
 size_flags_vertical = 3
-theme_override_constants/separation = 0
 [node name="Caption" type="Label" parent="."]
 layout_mode = 2
 text = "RESOURCES"
 theme_override_font_sizes/font_size = 16
 custom_minimum_size = Vector2(0, 39)
 vertical_alignment = 1
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
+theme_type_variation = &"RookframeLabel"
 [node name="Pages" parent="." instance=ExtResource("pages")]
 theme = null
 layout_mode = 2
 size_flags_vertical = 3
 [node name="Rows" type="VBoxContainer" parent="Pages/Area"]
 layout_mode = 0
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="HP" type="MarginContainer" parent="Pages/Area/Rows"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_bottom = 6
+script = ExtResource("token_margin")
+left = &"space_3"
+right = &"space_3"
 [node name="Row" type="HBoxContainer" parent="Pages/Area/Rows/HP"]
 layout_mode = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Icon" type="TextureRect" parent="Pages/Area/Rows/HP/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(28, 28)
@@ -65,7 +44,6 @@ size_flags_vertical = 4
 texture = ExtResource("heart")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/HP/Row"]
 layout_mode = 2
 text = "Hit points"
@@ -75,7 +53,8 @@ vertical_alignment = 1
 [node name="Editors" type="HBoxContainer" parent="Pages/Area/Rows/HP/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(120, 44)
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="hit_points" type="VBoxContainer" parent="Pages/Area/Rows/HP/Row/Editors"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -84,25 +63,29 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Hit points"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/hit_points/Editor"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
 text = "HP"
 theme_override_font_sizes/font_size = 11
-offset_left = 5.0
-offset_top = 3.0
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+offset_right = -8.0
 mouse_filter = 2
+theme_type_variation = &"RookframeMeta"
 [node name="Error" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/hit_points"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
 visible = false
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 [node name="maximum_hit_points" type="VBoxContainer" parent="Pages/Area/Rows/HP/Row/Editors"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -111,35 +94,39 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Hit points maximum"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/maximum_hit_points/Editor"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
 text = "Max"
 theme_override_font_sizes/font_size = 11
-offset_left = 5.0
-offset_top = 3.0
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+offset_right = -8.0
 mouse_filter = 2
+theme_type_variation = &"RookframeMeta"
 [node name="Error" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/maximum_hit_points"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
 visible = false
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 [node name="Omens" type="MarginContainer" parent="Pages/Area/Rows"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_bottom = 6
+script = ExtResource("token_margin")
+left = &"space_3"
+right = &"space_3"
 [node name="Row" type="HBoxContainer" parent="Pages/Area/Rows/Omens"]
 layout_mode = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Icon" type="TextureRect" parent="Pages/Area/Rows/Omens/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(28, 28)
@@ -147,7 +134,6 @@ size_flags_vertical = 4
 texture = ExtResource("dice")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/Omens/Row"]
 layout_mode = 2
 text = "Omens"
@@ -157,7 +143,8 @@ vertical_alignment = 1
 [node name="Editors" type="HBoxContainer" parent="Pages/Area/Rows/Omens/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(120, 44)
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="omens" type="VBoxContainer" parent="Pages/Area/Rows/Omens/Row/Editors"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -166,35 +153,39 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Omens"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Omens/Row/Editors/omens/Editor"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
 text = "Omens"
 theme_override_font_sizes/font_size = 11
-offset_left = 5.0
-offset_top = 3.0
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+offset_right = -8.0
 mouse_filter = 2
+theme_type_variation = &"RookframeMeta"
 [node name="Error" type="Label" parent="Pages/Area/Rows/Omens/Row/Editors/omens"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
 visible = false
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 [node name="Powers" type="MarginContainer" parent="Pages/Area/Rows"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_bottom = 6
+script = ExtResource("token_margin")
+left = &"space_3"
+right = &"space_3"
 [node name="Row" type="HBoxContainer" parent="Pages/Area/Rows/Powers"]
 layout_mode = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Icon" type="TextureRect" parent="Pages/Area/Rows/Powers/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(28, 28)
@@ -202,7 +193,6 @@ size_flags_vertical = 4
 texture = ExtResource("palms")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/Powers/Row"]
 layout_mode = 2
 text = "Power uses"
@@ -212,7 +202,8 @@ vertical_alignment = 1
 [node name="Editors" type="HBoxContainer" parent="Pages/Area/Rows/Powers/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(120, 44)
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="power_uses" type="VBoxContainer" parent="Pages/Area/Rows/Powers/Row/Editors"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -221,35 +212,39 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Power uses"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Powers/Row/Editors/power_uses/Editor"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
 text = "Uses"
 theme_override_font_sizes/font_size = 11
-offset_left = 5.0
-offset_top = 3.0
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+offset_right = -8.0
 mouse_filter = 2
+theme_type_variation = &"RookframeMeta"
 [node name="Error" type="Label" parent="Pages/Area/Rows/Powers/Row/Editors/power_uses"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
 visible = false
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 [node name="Silver" type="MarginContainer" parent="Pages/Area/Rows"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 64)
-theme_override_constants/margin_left = 10
-theme_override_constants/margin_right = 10
-theme_override_constants/margin_top = 6
-theme_override_constants/margin_bottom = 6
+script = ExtResource("token_margin")
+left = &"space_3"
+right = &"space_3"
 [node name="Row" type="HBoxContainer" parent="Pages/Area/Rows/Silver"]
 layout_mode = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 [node name="Icon" type="TextureRect" parent="Pages/Area/Rows/Silver/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(28, 28)
@@ -257,7 +252,6 @@ size_flags_vertical = 4
 texture = ExtResource("silver")
 expand_mode = 1
 stretch_mode = 5
-self_modulate = Color(0.815686, 0.745098, 0.556863, 1)
 [node name="Title" type="Label" parent="Pages/Area/Rows/Silver/Row"]
 layout_mode = 2
 text = "Silver"
@@ -267,7 +261,8 @@ vertical_alignment = 1
 [node name="Editors" type="HBoxContainer" parent="Pages/Area/Rows/Silver/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(120, 44)
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 [node name="silver" type="VBoxContainer" parent="Pages/Area/Rows/Silver/Row/Editors"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -276,26 +271,30 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
 accessibility_name = "Silver"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Silver/Row/Editors/silver/Editor"]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
+anchor_right = 1.0
+anchor_bottom = 0.5
+grow_horizontal = 0
+grow_vertical = 2
 text = "Silver"
 theme_override_font_sizes/font_size = 11
-offset_left = 5.0
-offset_top = 3.0
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
+offset_right = -8.0
 mouse_filter = 2
+theme_type_variation = &"RookframeMeta"
 [node name="Error" type="Label" parent="Pages/Area/Rows/Silver/Row/Editors/silver"]
 layout_mode = 2
 text = ""
 theme_override_font_sizes/font_size = 12
 visible = false
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 [node name="Footer" type="HBoxContainer" parent="."]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
-theme_override_constants/separation = 8
+script = ExtResource("token_box")
