@@ -131,13 +131,12 @@ var _phone := false
 var _setting := false
 var _end_after_roll := false
 var _rendered_chapter := -1
+var _theme_pending := false
 var _locale := I18N.new()
 
 func ready() -> void:
 	for button in [_quick_omens, _quick_silver]:
 		button.add_theme_font_size_override("font_size", 15)
-		button.add_theme_stylebox_override("normal", preload("res://rookframe/ui/theme/silkbound_plain.tres"))
-		button.add_theme_constant_override("icon_max_width", 20)
 	_quick_omens.icon = preload("res://rookframe/ui/icons/character/dice.svg")
 	if sdk == null:
 		return
@@ -438,7 +437,6 @@ func _show_route() -> void:
 	if chapter == 4:
 		_appearance()
 	get_node(^"Margin/Layout/Body/CoreDivider").visible = _core_ui.visible
-	get_node(^"Ornament").visible = false
 	_sync_frame.call_deferred()
 	present_entry_dialog(modal and not (_action != null and _action.state == "pending") and not (_ability != null and _ability.pending), "note" if _detail == "journal:notes" and _detail_tab == 2 else "entry")
 
@@ -1436,7 +1434,7 @@ func _status(message: String) -> void:
 
 func _density() -> void:
 	# Window composition reparents the sheet; resized can fire during that move.
-	if not is_inside_tree() or not get_node(^"Ledger").is_inside_tree():
+	if not is_inside_tree() or not get_node(^"Margin").is_inside_tree():
 		return
 	var canvas := get_viewport_rect().size
 	_phone = canvas.x <= 900
@@ -1449,6 +1447,16 @@ func _density() -> void:
 		_core(_actor.data)
 		_render_condition(_actor.data)
 		_request_route()
+
+# The layout reads World theme tokens, so a live theme change lays it out again.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_THEME_CHANGED and is_node_ready() and not _theme_pending:
+		_theme_pending = true
+		_retheme.call_deferred()
+
+func _retheme() -> void:
+	_theme_pending = false
+	_density()
 
 func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and event.is_action_pressed("ui_cancel"):

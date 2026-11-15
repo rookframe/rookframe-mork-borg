@@ -6,7 +6,6 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/armor.svg" id="armor"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/bag.svg" id="bag"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/book.svg" id="book"]
-[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_chapter_frame.tres" id="chapter_frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_chapter.gd" id="chapter_layout"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/character.svg" id="character"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/collection.tscn" id="choices"]
@@ -15,26 +14,20 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_core.gd" id="core_layout"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.tscn" id="details_scene"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/dice.svg" id="dice"]
-[ext_resource type="FontVariation" path="res://rookframe/ui/theme/silkbound_medium.tres" id="display"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/elixir.svg" id="elixir"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_dialog.gd" id="entry_dialog"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_header.gd" id="header_script"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/heart.svg" id="heart"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_inline_field.gd" id="inline_field"]
-[ext_resource type="StyleBoxFlat" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ledger.tres" id="ledger"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/linen.png" id="linen"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/miniature_workflow.tscn" id="miniatures"]
 [ext_resource type="Resource" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_navigation.tres" id="navigation"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_ornament.gd" id="ornament"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/palms.svg" id="palms"]
-[ext_resource type="StyleBoxFlat" path="res://rookframe/ui/theme/silkbound_plain.tres" id="plain"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/presence.svg" id="presence"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/psychopomp.svg" id="psychopomp"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="edit_icon"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close_icon"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_readiness.tscn" id="readiness"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_resource_editors.tscn" id="resource_editors"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/assets/silkbound-ledger/ribbon.svg" id="ribbon"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.gd" id="script"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_secondary.gd" id="secondary"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/shield.svg" id="shield"]
@@ -46,83 +39,13 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_vital.tscn" id="vital"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.tscn" id="workflow_scene"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd" id="hint_button"]
-
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="evolved_frame"]
-
-[sub_resource type="StyleBoxEmpty" id="NamePlain"]
-content_margin_left = 10.0
-content_margin_right = 10.0
-
-[sub_resource type="StyleBoxFlat" id="InlineEditor"]
-content_margin_left = 5.0
-content_margin_top = 17.0
-content_margin_right = 5.0
-content_margin_bottom = 3.0
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-
-[sub_resource type="StyleBoxFlat" id="InlineFocus"]
-content_margin_left = 5.0
-content_margin_top = 17.0
-content_margin_right = 5.0
-content_margin_bottom = 3.0
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(0.905882, 0.905882, 0.866667, 1)
-
-[sub_resource type="StyleBoxFlat" id="PortraitOutline"]
-bg_color = Color(0, 0, 0, 0)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.243137, 0.262745, 0.27451, 1)
-expand_margin_left = 6.0
-expand_margin_top = 6.0
-expand_margin_right = 6.0
-expand_margin_bottom = 6.0
-
-[sub_resource type="StyleBoxFlat" id="ConditionPortrait"]
-bg_color = Color(0, 0, 0, 0)
-border_width_left = 2
-border_width_top = 2
-border_width_right = 2
-border_width_bottom = 2
-border_color = Color(1, 0.505882, 0.478431, 1)
-
-[sub_resource type="StyleBoxFlat" id="CoreHeading"]
-content_margin_left = 10.0
-content_margin_top = 4.0
-content_margin_right = 14.0
-content_margin_bottom = 4.0
-bg_color = Color(0, 0, 0, 0)
-border_width_bottom = 1
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-
-[sub_resource type="StyleBoxFlat" id="PanelFrame"]
-bg_color = Color(0.137255, 0.156863, 0.168627, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.358353, 0.384235, 0.395686, 1)
-
-[sub_resource type="StyleBoxFlat" id="CombatBottomRule"]
-bg_color = Color(0, 0, 0, 0)
-border_width_bottom = 1
-border_color = Color(0.244353, 0.262784, 0.272745, 1)
-
-[sub_resource type="StyleBoxFlat" id="CombatTopRule"]
-bg_color = Color(0, 0, 0, 0)
-border_width_top = 1
-border_color = Color(0.244353, 0.262784, 0.272745, 1)
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="token_frame"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_rule.gd" id="token_rule"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_caption_editor.gd" id="caption_editor"]
 
 [node name="CharacterSurface" type="Control" unique_id=509514634]
 unique_name_in_owner = true
@@ -138,68 +61,21 @@ navigation = ExtResource("navigation")
 
 [node name="Frame" parent="." instance=ExtResource("evolved_frame")]
 
-[node name="Ledger" type="Panel" parent="." unique_id=65817984]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 32.0
-offset_top = 32.0
-offset_right = -32.0
-offset_bottom = -32.0
-mouse_filter = 2
-theme_override_styles/panel = ExtResource("ledger")
-
-[node name="Linen" type="TextureRect" parent="Ledger" unique_id=17950701]
-texture_filter = 1
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = 6.0
-offset_bottom = -6.0
-mouse_filter = 2
-texture = ExtResource("linen")
-expand_mode = 1
-stretch_mode = 1
-
-[node name="Ribbon" type="TextureRect" parent="Ledger" unique_id=1907485349]
-layout_mode = 0
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -60.0
-offset_right = -32.0
-offset_bottom = 100.0
-mouse_filter = 2
-texture = ExtResource("ribbon")
-expand_mode = 1
-
-[node name="Ornament" type="Control" parent="."]
-layout_mode = 0
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-script = ExtResource("ornament")
-
 [node name="Margin" type="MarginContainer" parent="." unique_id=569939350]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-theme_override_constants/margin_left = 24
-theme_override_constants/margin_top = 16
-theme_override_constants/margin_right = 24
-theme_override_constants/margin_bottom = 16
 
 [node name="Layout" type="VBoxContainer" parent="Margin" unique_id=1506010392]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 16
 script = ExtResource("validation")
 
 [node name="Header" type="HBoxContainer" parent="Margin/Layout" unique_id=1338230041]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 8
 script = ExtResource("header_script")
 
 [node name="Name" type="Button" parent="Margin/Layout/Header" unique_id=379713453]
@@ -208,26 +84,18 @@ custom_minimum_size = Vector2(44, 60)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
-theme_type_variation = &"TaskButton"
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_constants/icon_max_width = 24
-theme_override_fonts/font = ExtResource("display")
-theme_override_styles/normal = SubResource("NamePlain")
-theme_override_styles/pressed = SubResource("NamePlain")
-theme_override_styles/hover = SubResource("NamePlain")
 text = "Character"
 icon = ExtResource("character")
-flat = true
 alignment = 0
 text_overrun_behavior = 3
 clip_text = true
 expand_icon = true
+theme_type_variation = &"RookframeQuietButton"
 
 [node name="NameEditField" type="VBoxContainer" parent="Margin/Layout/Header" unique_id=1919580092]
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Header/NameEditField" unique_id=242037551]
@@ -235,10 +103,8 @@ visible = false
 custom_minimum_size = Vector2(320, 44)
 layout_mode = 2
 accessibility_name = "Character name"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Header/NameEditField/Editor" unique_id=1594398214]
 layout_mode = 0
@@ -247,17 +113,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Name"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Header/NameEditField" unique_id=1904821541]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="Spacer" type="Control" parent="Margin/Layout/Header" unique_id=540767975]
 visible = false
@@ -268,56 +134,51 @@ size_flags_horizontal = 3
 unique_name_in_owner = true
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 12
 text = "MÖRK BORG"
+theme_type_variation = &"RookframeMeta"
 
 [node name="Edit" type="Button" parent="Margin/Layout/Header" unique_id=291896109]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
+tooltip_text = "Edit sheet"
 accessibility_name = "Edit sheet"
 theme_type_variation = &"RookframeIcon"
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_constants/icon_max_width = 24
 text = ""
 icon = ExtResource("edit_icon")
 icon_alignment = 1
 vertical_icon_alignment = 1
+expand_icon = true
 
 [node name="Rest" type="Button" parent="Margin/Layout/Header" unique_id=723642292]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
-theme_type_variation = &"TaskButton"
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_constants/icon_max_width = 24
 text = "Rest"
 icon = ExtResource("elixir")
+theme_type_variation = &"RookframeSecondaryButton"
+expand_icon = true
 
 [node name="Improve" type="Button" parent="Margin/Layout/Header" unique_id=1807916317]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
-theme_type_variation = &"TaskButton"
-theme_override_colors/font_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_constants/icon_max_width = 24
 text = "Level up"
 icon = ExtResource("strength")
+theme_type_variation = &"RookframeSecondaryButton"
+expand_icon = true
 
 [node name="EditingStatus" type="Label" parent="Margin/Layout/Header" unique_id=718347929]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 14
 text = "Editing sheet"
 vertical_alignment = 1
+theme_type_variation = &"RookframeBody"
 
 [node name="CancelSheet" type="Button" parent="Margin/Layout/Header" unique_id=1517818285]
 unique_name_in_owner = true
@@ -325,8 +186,8 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
-theme_type_variation = &"TaskButton"
 text = "Cancel"
+theme_type_variation = &"RookframeSecondaryButton"
 
 [node name="SaveSheet" type="Button" parent="Margin/Layout/Header" unique_id=773728658]
 unique_name_in_owner = true
@@ -334,67 +195,64 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_vertical = 4
-theme_type_variation = &"TaskPrimary"
 text = "Save sheet"
+theme_type_variation = &"RookframePrimaryButton"
 
 [node name="Close" type="Button" parent="Margin/Layout/Header" unique_id=331984972]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
+tooltip_text = "Close character sheet"
 accessibility_name = "Close character sheet"
 theme_type_variation = &"RookframeIcon"
 icon = ExtResource("close_icon")
 icon_alignment = 1
 vertical_icon_alignment = 1
+expand_icon = true
 
 [node name="RibbonSpace" type="Control" parent="Margin/Layout/Header"]
 layout_mode = 2
-custom_minimum_size = Vector2(56, 0)
+custom_minimum_size = Vector2(24, 0)
 mouse_filter = 2
 
 [node name="Body" type="HBoxContainer" parent="Margin/Layout" unique_id=2034042610]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 24
+script = ExtResource("token_box")
+gap = &""
 
 [node name="Core" type="VBoxContainer" parent="Margin/Layout/Body" unique_id=1164050204]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(460, 0)
 layout_mode = 2
-theme_override_constants/separation = 12
 script = ExtResource("core_layout")
 
 [node name="PhoneHeader" type="HBoxContainer" parent="Margin/Layout/Body/Core" unique_id=525661443]
 visible = false
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 
 [node name="PhoneName" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader" unique_id=1234011022]
 custom_minimum_size = Vector2(0, 26)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TaskButton"
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 23
-theme_override_styles/normal = ExtResource("plain")
-theme_override_styles/pressed = ExtResource("plain")
-theme_override_styles/hover = ExtResource("plain")
 text = "Character"
-flat = true
 alignment = 0
 clip_text = true
+theme_type_variation = &"RookframeQuietButton"
 
 [node name="PhoneEdit" type="Button" parent="Margin/Layout/Body/Core/PhoneHeader" unique_id=222185166]
 visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
+tooltip_text = "Edit sheet"
 accessibility_name = "Edit sheet"
 theme_type_variation = &"RookframeIcon"
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_constants/icon_max_width = 22
 icon = ExtResource("edit_icon")
 clip_text = true
 expand_icon = true
@@ -411,34 +269,34 @@ accessibility_name = "Close character sheet"
 tooltip_text = "Close character sheet"
 icon_alignment = 1
 vertical_icon_alignment = 1
+expand_icon = true
 
 [node name="Class" type="Label" parent="Margin/Layout/Body/Core" unique_id=1573180520]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(0, 36)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 22
 text = "Class"
 autowrap_mode = 3
 text_overrun_behavior = 3
 max_lines_visible = 1
+theme_type_variation = &"RookframeHeading"
 
 [node name="Origin" type="Button" parent="Margin/Layout/Body/Core" unique_id=1472202039]
 unique_name_in_owner = true
 visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskChoice"
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 text = "Origin"
 text_overrun_behavior = 3
 clip_text = true
+theme_type_variation = &"RookframeChoiceRow"
 
 [node name="Likeness" type="HBoxContainer" parent="Margin/Layout/Body/Core" unique_id=1176883264]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 
 [node name="Portrait" type="TextureRect" parent="Margin/Layout/Body/Core/Likeness" unique_id=1192386776]
 unique_name_in_owner = true
@@ -448,7 +306,7 @@ size_flags_vertical = 0
 expand_mode = 1
 stretch_mode = 6
 
-[node name="Outline" type="Panel" parent="Margin/Layout/Body/Core/Likeness/Portrait" unique_id=361167682]
+[node name="Outline" type="PanelContainer" parent="Margin/Layout/Body/Core/Likeness/Portrait" unique_id=361167682]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -456,9 +314,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("PortraitOutline")
+script = ExtResource("token_frame")
+fill = &""
+outline = &"divider"
+padding_horizontal = &""
+padding_vertical = &""
 
-[node name="ConditionFrame" type="Panel" parent="Margin/Layout/Body/Core/Likeness/Portrait" unique_id=1423207438]
+[node name="ConditionFrame" type="PanelContainer" parent="Margin/Layout/Body/Core/Likeness/Portrait" unique_id=1423207438]
 visible = false
 layout_mode = 1
 anchors_preset = 15
@@ -467,11 +329,15 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("ConditionPortrait")
+script = ExtResource("token_frame")
+fill = &""
+outline = &"danger"
+outline_width = &"border_width_strong"
+padding_horizontal = &""
+padding_vertical = &""
 
 [node name="ConditionBadge" type="TextureRect" parent="Margin/Layout/Body/Core/Likeness/Portrait" unique_id=1787926501]
 visible = false
-self_modulate = Color(1, 0.505882, 0.478431, 1)
 layout_mode = 1
 anchors_preset = 3
 anchor_left = 1.0
@@ -489,16 +355,17 @@ stretch_mode = 5
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 
 [node name="PhoneClass" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals" unique_id=788641246]
 visible = false
 custom_minimum_size = Vector2(0, 20)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 10
 text = "Class"
 clip_text = true
+theme_type_variation = &"RookframeBody"
 
 [node name="HitPoints" parent="Margin/Layout/Body/Core/Likeness/Vitals" unique_id=1040961050 instance=ExtResource("vital")]
 icon = ExtResource("heart")
@@ -511,7 +378,6 @@ layout_mode = 2
 [node name="HitPointsCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit" unique_id=711073662]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField" unique_id=1137572872]
@@ -519,10 +385,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Current hit points"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor" unique_id=1123412114]
 layout_mode = 0
@@ -531,22 +395,21 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "HP"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField" unique_id=416630970]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="HitPointsMaximumField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit" unique_id=16324342]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField" unique_id=17707965]
@@ -554,10 +417,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Maximum hit points"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor" unique_id=1608242940]
 layout_mode = 0
@@ -566,17 +427,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Max HP"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField" unique_id=675565290]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="PowerUses" parent="Margin/Layout/Body/Core/Likeness/Vitals" unique_id=875722807 instance=ExtResource("vital")]
 icon = ExtResource("palms")
@@ -589,7 +450,6 @@ layout_mode = 2
 [node name="PowerUsesCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit" unique_id=1949785314]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField" unique_id=1302486745]
@@ -597,10 +457,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Current Power uses"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor" unique_id=1265989824]
 layout_mode = 0
@@ -609,17 +467,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Power uses"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField" unique_id=1682814874]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="Omens" parent="Margin/Layout/Body/Core/Likeness/Vitals" unique_id=128812941 instance=ExtResource("vital")]
 icon = ExtResource("dice")
@@ -632,7 +490,6 @@ layout_mode = 2
 [node name="OmensCurrentField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit" unique_id=1019883650]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField" unique_id=172286136]
@@ -640,10 +497,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Current Omens"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField/Editor" unique_id=483748051]
 layout_mode = 0
@@ -652,24 +507,25 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Omens"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField" unique_id=1919026274]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="Abilities" type="GridContainer" parent="Margin/Layout/Body/Core" unique_id=1139692681]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 12
-theme_override_constants/v_separation = 4
 columns = 2
+script = ExtResource("token_grid")
+gap_horizontal = &"space_3"
+gap_vertical = &"space_1"
 
 [node name="StrengthRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities" unique_id=1219625165]
 unique_name_in_owner = true
@@ -682,7 +538,6 @@ icon = ExtResource("strength")
 [node name="StrengthEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/StrengthRow" unique_id=1285996776]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField" unique_id=1481081533]
@@ -691,10 +546,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Strength modifier"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField/Editor" unique_id=1135167534]
 layout_mode = 0
@@ -703,17 +556,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Strength"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField" unique_id=1291765865]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="AgilityRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities" unique_id=9430611]
 unique_name_in_owner = true
@@ -726,7 +579,6 @@ icon = ExtResource("agility")
 [node name="AgilityEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/AgilityRow" unique_id=1238248669]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField" unique_id=1200356419]
@@ -735,10 +587,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Agility modifier"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField/Editor" unique_id=424056389]
 layout_mode = 0
@@ -747,17 +597,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Agility"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField" unique_id=1522958342]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="PresenceRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities" unique_id=1866623764]
 unique_name_in_owner = true
@@ -770,7 +620,6 @@ icon = ExtResource("presence")
 [node name="PresenceEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/PresenceRow" unique_id=1923627366]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField" unique_id=509472582]
@@ -779,10 +628,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Presence modifier"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField/Editor" unique_id=1644060707]
 layout_mode = 0
@@ -791,17 +638,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Presence"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField" unique_id=351943610]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="ToughnessRow" type="HBoxContainer" parent="Margin/Layout/Body/Core/Abilities" unique_id=1854966988]
 unique_name_in_owner = true
@@ -814,7 +661,6 @@ icon = ExtResource("toughness")
 [node name="ToughnessEditField" type="VBoxContainer" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow" unique_id=1598471209]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField" unique_id=633285014]
@@ -823,10 +669,8 @@ custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Toughness modifier"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField/Editor" unique_id=1132527443]
 layout_mode = 0
@@ -835,17 +679,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Toughness"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField" unique_id=2045709194]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="ConditionReminder" parent="Margin/Layout/Body/Core" unique_id=1943214641 instance=ExtResource("condition_summary")]
 visible = false
@@ -855,14 +699,16 @@ layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 alignment = 0
 
 [node name="WeaponHeading" type="PanelContainer" parent="Margin/Layout/Body/Core" unique_id=85067903]
 custom_minimum_size = Vector2(0, 44)
 layout_mode = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("CoreHeading")
+script = ExtResource("token_frame")
+fill = &""
+outline_sides = 8
+padding_horizontal = &"space_3"
 
 [node name="Actions" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading" unique_id=1094133639]
 layout_mode = 2
@@ -875,10 +721,10 @@ mouse_filter = 2
 [node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center" unique_id=986998981]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 
 [node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center/Row" unique_id=1428054976]
-self_modulate = Color(0.905882, 0.905882, 0.866667, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_vertical = 4
@@ -889,11 +735,10 @@ stretch_mode = 5
 
 [node name="Title" type="Label" parent="Margin/Layout/Body/Core/WeaponHeading/Actions/Center/Row" unique_id=1060340612]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 16
 text = "Ready weapon"
 vertical_alignment = 1
+theme_type_variation = &"RookframeHeading"
 
 [node name="Options" type="Button" parent="Margin/Layout/Body/Core/WeaponHeading/Actions" unique_id=1532413790]
 visible = false
@@ -901,8 +746,8 @@ custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 tooltip_text = "Weapon selection and attack options"
 accessibility_name = "Ready weapon options"
-theme_type_variation = &"TaskQuiet"
 text = "Options"
+theme_type_variation = &"RookframeQuietButton"
 
 [node name="Weapon" type="OptionButton" parent="Margin/Layout/Body/Core" unique_id=1404828090]
 unique_name_in_owner = true
@@ -922,11 +767,8 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TaskChoice"
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
-theme_override_constants/icon_max_width = 24
-theme_override_styles/normal = SubResource("CombatBottomRule")
 expand_icon = true
+theme_type_variation = &"RookframeChoiceRow"
 
 [node name="Summary" type="HBoxContainer" parent="Margin/Layout/Body/Core/WeaponActions/Attack" unique_id=441803825]
 layout_mode = 0
@@ -935,67 +777,72 @@ anchor_bottom = 1.0
 offset_left = 9.0
 offset_right = -9.0
 mouse_filter = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 
 [node name="Copy" type="VBoxContainer" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary" unique_id=1308894668]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 
 [node name="Title" type="Label" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary/Copy" unique_id=780846293]
 layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "Cut"
+theme_type_variation = &"RookframeBody"
 
 [node name="Subtitle" type="Label" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary/Copy" unique_id=1319380952]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 16
 text = "Close"
+theme_type_variation = &"RookframeMeta"
 
 [node name="Test" type="VBoxContainer" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary" unique_id=1366405344]
 custom_minimum_size = Vector2(72, 0)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 
 [node name="Value" type="Label" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary/Test" unique_id=545520488]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 24
 text = "−1"
 horizontal_alignment = 1
+theme_type_variation = &"RookframeValue"
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary/Test" unique_id=621752107]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 16
 text = "test"
 horizontal_alignment = 1
+theme_type_variation = &"RookframeMeta"
 
 [node name="Damage" type="VBoxContainer" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary" unique_id=190132188]
 custom_minimum_size = Vector2(74, 0)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 
 [node name="Value" type="Label" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary/Damage" unique_id=1968061663]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 24
 text = "d6"
 horizontal_alignment = 1
+theme_type_variation = &"RookframeValue"
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/WeaponActions/Attack/Summary/Damage" unique_id=1105891013]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 16
 text = "damage"
 horizontal_alignment = 1
+theme_type_variation = &"RookframeMeta"
 
 [node name="Damage" type="Button" parent="Margin/Layout/Body/Core/WeaponActions" unique_id=524820718]
 unique_name_in_owner = true
@@ -1003,22 +850,24 @@ visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TaskChoice"
-theme_override_colors/icon_normal_color = Color(0.815686, 0.745098, 0.556863, 1)
 text = "Damage"
+theme_type_variation = &"RookframeChoiceRow"
 
 [node name="ManageEquipment" type="Button" parent="Margin/Layout/Body/Core" unique_id=1288684928]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 text = "Manage equipment ›"
+theme_type_variation = &"RookframeSecondaryButton"
 
 [node name="ProtectionHeading" type="PanelContainer" parent="Margin/Layout/Body/Core" unique_id=1835812609]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 mouse_filter = 2
-theme_override_styles/panel = SubResource("CoreHeading")
+script = ExtResource("token_frame")
+fill = &""
+outline_sides = 8
+padding_horizontal = &"space_3"
 
 [node name="Center" type="HBoxContainer" parent="Margin/Layout/Body/Core/ProtectionHeading" unique_id=355085836]
 layout_mode = 2
@@ -1027,10 +876,10 @@ mouse_filter = 2
 [node name="Row" type="HBoxContainer" parent="Margin/Layout/Body/Core/ProtectionHeading/Center" unique_id=2044075864]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 
 [node name="Icon" type="TextureRect" parent="Margin/Layout/Body/Core/ProtectionHeading/Center/Row" unique_id=336672457]
-self_modulate = Color(0.905882, 0.905882, 0.866667, 1)
 custom_minimum_size = Vector2(24, 24)
 layout_mode = 2
 size_flags_vertical = 4
@@ -1041,34 +890,31 @@ stretch_mode = 5
 
 [node name="Title" type="Label" parent="Margin/Layout/Body/Core/ProtectionHeading/Center/Row" unique_id=1590281757]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 16
 text = "Protection"
 vertical_alignment = 1
+theme_type_variation = &"RookframeHeading"
 
 [node name="Protection" parent="Margin/Layout/Body/Core" unique_id=357744607 instance=ExtResource("readiness")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 24
 icon = ExtResource("armor")
 alignment = 0
 
 [node name="ProtectionItems" type="GridContainer" parent="Margin/Layout/Body/Core" unique_id=687063690]
 layout_mode = 2
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 3
+script = ExtResource("token_grid")
+gap_horizontal = &"space_1"
+gap_vertical = &"space_1"
 
 [node name="Dodge" type="Button" parent="Margin/Layout/Body/Core" unique_id=1689901376]
 script = ExtResource("hint_button")
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_styles/normal = SubResource("CombatTopRule")
+theme_type_variation = &"RookframeChoiceRow"
 
 [node name="Summary" type="HBoxContainer" parent="Margin/Layout/Body/Core/Dodge" unique_id=1175577180]
 layout_mode = 0
@@ -1077,78 +923,81 @@ anchor_bottom = 1.0
 offset_left = 9.0
 offset_right = -9.0
 mouse_filter = 2
-theme_override_constants/separation = 10
+script = ExtResource("token_box")
+gap = &"space_3"
 
 [node name="Copy" type="VBoxContainer" parent="Margin/Layout/Body/Core/Dodge/Summary" unique_id=1087039723]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 
 [node name="Title" type="Label" parent="Margin/Layout/Body/Core/Dodge/Summary/Copy" unique_id=1673128010]
 layout_mode = 2
 theme_override_font_sizes/font_size = 21
 text = "Defence"
+theme_type_variation = &"RookframeBody"
 
 [node name="Subtitle" type="Label" parent="Margin/Layout/Body/Core/Dodge/Summary/Copy" unique_id=1009507602]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 16
 text = "Agility · DR12"
+theme_type_variation = &"RookframeMeta"
 
 [node name="Test" type="VBoxContainer" parent="Margin/Layout/Body/Core/Dodge/Summary" unique_id=1323191995]
 custom_minimum_size = Vector2(66, 0)
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 
 [node name="Value" type="Label" parent="Margin/Layout/Body/Core/Dodge/Summary/Test" unique_id=65496172]
 layout_mode = 2
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 24
 text = "d20 +0"
 horizontal_alignment = 1
+theme_type_variation = &"RookframeValue"
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Dodge/Summary/Test" unique_id=286476545]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 1
+theme_type_variation = &"RookframeMeta"
 
 [node name="CoreDivider" type="Control" parent="Margin/Layout/Body" unique_id=284735218]
 custom_minimum_size = Vector2(61, 0)
 layout_mode = 2
 mouse_filter = 2
 
-[node name="Line" type="ColorRect" parent="Margin/Layout/Body/CoreDivider" unique_id=250975116]
-layout_mode = 0
+[node name="Line" type="Control" parent="Margin/Layout/Body/CoreDivider" unique_id=250975116]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 28.0
-offset_right = 29.0
 mouse_filter = 2
-color = Color(0.244353, 0.262784, 0.272745, 1)
+script = ExtResource("token_rule")
+vertical = true
 
 [node name="Chapter" type="VBoxContainer" parent="Margin/Layout/Body" unique_id=2083787496]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
-theme_override_constants/separation = 16
 script = ExtResource("chapter_layout")
 
 [node name="Tabs" type="HBoxContainer" parent="Margin/Layout/Body/Chapter" unique_id=163207690]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/separation = 0
+script = ExtResource("token_box")
+gap = &""
 
 [node name="TabCharacter" parent="Margin/Layout/Body/Chapter/Tabs" unique_id=1434730491 instance=ExtResource("tab")]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 26
 toggle_mode = true
 text = "Character"
 icon = ExtResource("character")
@@ -1158,8 +1007,6 @@ expand_icon = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 26
 toggle_mode = true
 text = "Powers"
 icon = ExtResource("palms")
@@ -1169,8 +1016,6 @@ expand_icon = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 26
 toggle_mode = true
 text = "Inventory"
 icon = ExtResource("bag")
@@ -1180,8 +1025,6 @@ expand_icon = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 26
 toggle_mode = true
 text = "Journal"
 icon = ExtResource("book")
@@ -1191,8 +1034,6 @@ expand_icon = true
 unique_name_in_owner = true
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 26
 toggle_mode = true
 text = "Appearance"
 icon = ExtResource("character")
@@ -1201,11 +1042,14 @@ expand_icon = true
 [node name="Page" type="PanelContainer" parent="Margin/Layout/Body/Chapter" unique_id=1699027932]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_styles/panel = ExtResource("chapter_frame")
+script = ExtResource("token_frame")
+fill = &""
+outline = &""
 
 [node name="Content" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page" unique_id=1599130251]
 layout_mode = 2
-theme_override_constants/separation = 12
+script = ExtResource("token_box")
+gap = &"space_3"
 
 [node name="ChapterCaption" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=228402405]
 visible = false
@@ -1218,13 +1062,14 @@ size_flags_horizontal = 3
 theme_override_font_sizes/font_size = 14
 text = "Known Powers"
 autowrap_mode = 3
+theme_type_variation = &"RookframeBody"
 
 [node name="PersonalNotes" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=1328739182]
 visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 text = "Personal notes"
+theme_type_variation = &"RookframeQuietButton"
 
 [node name="InventoryFilters" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=788754543]
 visible = false
@@ -1234,38 +1079,37 @@ size_flags_horizontal = 3
 [node name="All" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1581386627]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 theme_override_font_sizes/font_size = 13
 toggle_mode = true
 text = "All belongings"
+theme_type_variation = &"RookframeTabButton"
 
 [node name="Arms" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1896568205]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 theme_override_font_sizes/font_size = 13
 toggle_mode = true
 text = "Arms"
+theme_type_variation = &"RookframeTabButton"
 
 [node name="Supplies" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1801508993]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 theme_override_font_sizes/font_size = 13
 toggle_mode = true
 text = "Supplies"
+theme_type_variation = &"RookframeTabButton"
 
 [node name="Ready" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1307923468]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 theme_override_font_sizes/font_size = 13
 toggle_mode = true
 text = "Ready"
+theme_type_variation = &"RookframeTabButton"
 
 [node name="SilverEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=163773450]
 layout_mode = 2
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField" unique_id=1693469128]
@@ -1273,10 +1117,8 @@ visible = false
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 accessibility_name = "Silver"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField/Editor" unique_id=1863162049]
 layout_mode = 0
@@ -1285,21 +1127,20 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Silver"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField" unique_id=1089958838]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="PowerEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=495066637]
 layout_mode = 2
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField" unique_id=726197432]
@@ -1307,10 +1148,8 @@ visible = false
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 accessibility_name = "Power uses"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField/Editor" unique_id=2052541615]
 layout_mode = 0
@@ -1319,32 +1158,31 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Power uses"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField" unique_id=999657694]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="Resource" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption" unique_id=1310862681]
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
-theme_override_constants/icon_max_width = 26
 text = "Silver"
 expand_icon = true
+theme_type_variation = &"RookframeQuietButton"
 
 [node name="ReferenceBack" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=1786335368]
 visible = false
 custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 text = "‹ Back to condition"
+theme_type_variation = &"RookframeSecondaryButton"
 
 [node name="Section" type="OptionButton" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=950454945]
 unique_name_in_owner = true
@@ -1360,14 +1198,12 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 
 [node name="Primary" parent="Margin/Layout/Body/Chapter/Page/Content/Collections" unique_id=501967095 instance=ExtResource("choices")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
 
 [node name="Secondary" type="MarginContainer" parent="Margin/Layout/Body/Chapter/Page/Content/Collections" unique_id=1799790986]
 unique_name_in_owner = true
@@ -1379,15 +1215,13 @@ script = ExtResource("secondary")
 [node name="Content" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary" unique_id=218656266]
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 24
+script = ExtResource("token_box")
+gap = &"space_5"
 
 [node name="Resources" parent="Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content" unique_id=350095225 instance=ExtResource("choices")]
 unique_name_in_owner = true
 layout_mode = 2
 size_flags_stretch_ratio = 2.4
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
 
 [node name="ResourceEditors" parent="Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content" unique_id=369512574 instance=ExtResource("resource_editors")]
 visible = false
@@ -1396,16 +1230,14 @@ layout_mode = 2
 [node name="Companions" parent="Margin/Layout/Body/Chapter/Page/Content/Collections/Secondary/Content" unique_id=15947515 instance=ExtResource("choices")]
 unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
 empty_text = "Travelling alone."
 
 [node name="JournalPanel" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=1823855847]
 visible = false
 layout_mode = 2
 size_flags_vertical = 3
-theme_override_constants/separation = 16
+script = ExtResource("token_box")
+gap = &"space_4"
 
 [node name="Story" parent="Margin/Layout/Body/Chapter/Page/Content/JournalPanel" unique_id=447291650 instance=ExtResource("choices")]
 layout_mode = 2
@@ -1416,20 +1248,20 @@ layout_mode = 2
 [node name="AppearanceIntro" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=1559983857]
 visible = false
 layout_mode = 2
-theme_override_constants/separation = 4
+script = ExtResource("token_box")
+gap = &"space_1"
 
 [node name="Title" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/AppearanceIntro" unique_id=1886091450]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
-theme_override_fonts/font = ExtResource("display")
 theme_override_font_sizes/font_size = 26
 text = "Appearance"
+theme_type_variation = &"RookframeHeading"
 
 [node name="Copy" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/AppearanceIntro" unique_id=1043596156]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
 theme_override_font_sizes/font_size = 13
 text = "Portrait and preferred Miniature for this Character."
+theme_type_variation = &"RookframeMeta"
 
 [node name="AppearancePanel" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=1819057583 instance=ExtResource("appearance_scene")]
 visible = false
@@ -1439,10 +1271,10 @@ layout_mode = 2
 visible = false
 custom_minimum_size = Vector2(0, 28)
 layout_mode = 2
-theme_override_colors/font_color = Color(0.603922, 0.647059, 0.65098, 1)
 theme_override_font_sizes/font_size = 12
 text_overrun_behavior = 3
 max_lines_visible = 1
+theme_type_variation = &"RookframeMeta"
 
 [node name="QuickResources" type="HBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=794482483]
 unique_name_in_owner = true
@@ -1453,13 +1285,13 @@ layout_mode = 2
 unique_name_in_owner = true
 custom_minimum_size = Vector2(86, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 theme_override_font_sizes/font_size = 13
 text = "Omens"
+theme_type_variation = &"RookframeQuietButton"
+expand_icon = true
 
 [node name="QuickOmensEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources" unique_id=917395184]
 layout_mode = 2
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField" unique_id=430261322]
@@ -1467,10 +1299,8 @@ visible = false
 custom_minimum_size = Vector2(86, 44)
 layout_mode = 2
 accessibility_name = "Current Omens"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField/Editor" unique_id=727840354]
 layout_mode = 0
@@ -1479,29 +1309,29 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Omens"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField" unique_id=1721578684]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="QuickSilver" type="Button" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources" unique_id=1262051854]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(86, 44)
 layout_mode = 2
-theme_type_variation = &"TaskButton"
 theme_override_font_sizes/font_size = 13
 text = "Silver"
+theme_type_variation = &"RookframeQuietButton"
+expand_icon = true
 
 [node name="QuickSilverEditField" type="VBoxContainer" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources" unique_id=2063428867]
 layout_mode = 2
-theme_override_constants/separation = 3
 script = ExtResource("inline_field")
 
 [node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField" unique_id=1062778067]
@@ -1509,10 +1339,8 @@ visible = false
 custom_minimum_size = Vector2(86, 44)
 layout_mode = 2
 accessibility_name = "Silver"
-theme_override_colors/font_color = Color(0.905882, 0.905882, 0.866667, 1)
 theme_override_font_sizes/font_size = 18
-theme_override_styles/normal = SubResource("InlineEditor")
-theme_override_styles/focus = SubResource("InlineFocus")
+script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField/Editor" unique_id=151133938]
 layout_mode = 0
@@ -1521,17 +1349,17 @@ offset_left = 5.0
 offset_top = 3.0
 offset_right = -5.0
 offset_bottom = 15.0
-theme_override_colors/font_color = Color(0.682353, 0.729412, 0.745098, 1)
 theme_override_font_sizes/font_size = 9
 text = "Silver"
 clip_text = true
+theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField" unique_id=1280653377]
 visible = false
 layout_mode = 2
-theme_override_colors/font_color = Color(1, 0.505882, 0.478431, 1)
 theme_override_font_sizes/font_size = 10
 autowrap_mode = 3
+theme_type_variation = &"RookframeError"
 
 [node name="Detail" parent="Margin/Layout/Body/Chapter/Page/Content" unique_id=1957848894 instance=ExtResource("details_scene")]
 visible = false
@@ -1552,13 +1380,13 @@ layout_mode = 2
 theme_override_font_sizes/font_size = 12
 text_overrun_behavior = 3
 max_lines_visible = 1
+theme_type_variation = &"RookframeBody"
 
 [node name="EntryScrim" type="ColorRect" parent="." unique_id=2123503575]
 visible = false
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0, 0, 0, 0.666667)
 
 [node name="EntryDialog" type="Window" parent="." unique_id=865392878]
 size = Vector2i(640, 610)
@@ -1578,11 +1406,16 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_styles/panel = SubResource("PanelFrame")
+script = ExtResource("token_frame")
+fill = &""
+outline = &""
+padding_horizontal = &"space_3"
+padding_vertical = &"space_3"
 
 [node name="Inset" type="MarginContainer" parent="EntryDialog/Surface" unique_id=1708039024]
 layout_mode = 2
-theme_override_constants/margin_left = 0
-theme_override_constants/margin_top = 0
-theme_override_constants/margin_right = 0
-theme_override_constants/margin_bottom = 0
+script = ExtResource("token_margin")
+left = &""
+top = &""
+right = &""
+bottom = &""
