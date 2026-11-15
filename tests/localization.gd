@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const LOCALE = preload(ROOT + "ui/localization.gd")
@@ -14,7 +15,7 @@ func _locale(language: String):
 func test_russian_creation_uses_display_labels_without_changing_draft() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
-	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	view.theme = WORLD_THEME.entry()
 	view.localize(_locale("ru_RU"))
 	add_child(view)
 	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("fanged-deserter")

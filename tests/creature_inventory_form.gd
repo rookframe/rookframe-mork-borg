@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -44,7 +45,7 @@ func test_custom_form_saves_typed_damage_and_keeps_creature_capabilities() -> vo
 	add_child(viewport)
 	var surface = load(ROOT + "ui/creature_surface.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
-	surface.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	surface.theme = WORLD_THEME.entry()
 	surface.set_meta("rookframe_sdk", host)
 	viewport.add_child(surface)
 	surface._rookframe_open_actor("hero")

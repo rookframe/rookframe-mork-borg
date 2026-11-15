@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -25,7 +26,7 @@ func _open(canvas: Vector2i) -> Dictionary:
 	add_child(viewport)
 	var hud = load(ROOT + "ui/creature_hud.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
-	hud.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	hud.theme = WORLD_THEME.entry()
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -276,7 +277,7 @@ func test_shared_hud_switches_between_creature_character_and_no_selection() -> v
 	add_child(viewport)
 	var hud = load(ROOT + "ui/actor_hud.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
-	hud.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	hud.theme = WORLD_THEME.entry()
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	await _settle()

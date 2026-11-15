@@ -1,9 +1,10 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 const CARD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_card.tscn")
 
 func _card():
 	var card = auto_free(CARD.instantiate())
-	card.theme = preload("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	card.theme = WORLD_THEME.entry()
 	add_child(card)
 	card.identity("Graveworm", "Shortsword", "Melee · Strength · 5 ft")
 	return card

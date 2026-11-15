@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 
@@ -14,7 +15,7 @@ func test_pending_roll_indicator_keeps_moving() -> void:
 func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
-	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	view.size = Vector2(1024, 768)
 	add_child(view)
@@ -32,7 +33,7 @@ func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 func test_fixed_pack_does_not_offer_a_choice_button() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
-	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	view.size = Vector2(1024, 768)
 	add_child(view)
@@ -55,7 +56,7 @@ func _copy(root: Node) -> String:
 func test_completed_conditional_results_remain_selectable_with_raw_faces() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
-	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	view.size = Vector2(1024, 768)
 	add_child(view)
@@ -76,7 +77,7 @@ func test_completed_conditional_results_remain_selectable_with_raw_faces() -> vo
 func test_origin_detail_contains_only_the_selected_resolved_trait() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
-	view.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
 	view.size = Vector2(1024, 768)
 	add_child(view)

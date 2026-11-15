@@ -94,6 +94,17 @@ Run the focused Godot suite with the installed public dependencies:
 python3 tests/run_character_creation.py --godot /path/to/godot
 ```
 
+Suites that mount a Package surface take its World theme from
+`tests/world_theme.gd` and run once per UI Kit theme: Silkbound Ledger, Fantasy
+and Cyberpunk. All other suites run once. Pass `--theme <name>` (repeatable) to
+select themes. `character_surface_silkbound` and `character_hud_silkbound`
+assert the Silkbound Ledger reference geometry and always use that theme.
+
+The Package ships no Theme. Its surfaces inherit the World theme and use UI Kit
+components, the kit's `Rookframe*` type variations, or `RookframeTokens` items
+read with the native `get_theme_*` methods. `ui/token_frame.gd` and
+`ui/token_rule.gd` build a frame and a hairline rule from tokens alone.
+
 The suite exercises authored System actions through the public SDK.
 It covers all six optional class branches and their complete feature tables,
 source origins, class dice, scroll choices (including repeated equipment

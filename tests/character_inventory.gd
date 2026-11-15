@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -190,7 +191,7 @@ func test_overview_groups_actions_in_responsive_sections() -> void:
 	assert_bool(overview.has_node("HealthActions")).override_failure_message("Character actions use one compact row.").is_true()
 	if not overview.has_node("HealthActions"):
 		return
-	overview.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
+	overview.theme = WORLD_THEME.entry()
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(960, 944)
 	add_child(viewport)

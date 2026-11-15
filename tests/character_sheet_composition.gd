@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 
 func test_phone_overview_has_one_edit_and_inline_omens() -> void:
@@ -6,7 +7,7 @@ func test_phone_overview_has_one_edit_and_inline_omens() -> void:
 	viewport.size = Vector2i(351, 313)
 	add_child(viewport)
 	var view = auto_free(load(ROOT + "ui/character_sheet_overview.tscn").instantiate())
-	view.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
+	view.theme = WORLD_THEME.entry()
 	viewport.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	view.configure({"description": "Hu", "class_title": "No Class", "hit_points": 3, "maximum_hit_points": 3, "omens": 1, "silver": 60}, [], true)
@@ -46,12 +47,11 @@ func test_sheet_at_constrained_sizes(width: int, height: int, language: String, 
 	viewport.render_target_update_mode = SubViewport.UPDATE_ALWAYS
 	add_child(viewport)
 	var background: Panel = auto_free(Panel.new())
-	background.theme = load("res://rookframe/ui/theme/rookframe_theme.tres")
-	background.add_theme_stylebox_override("panel", background.theme.get_stylebox("panel", "RookframePackageInk"))
 	viewport.add_child(background)
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var sheet = auto_free(load(ROOT + "ui/window.tscn").instantiate())
 	sheet.sdk = SDK.new(host)
+	sheet.theme = WORLD_THEME.entry()
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sheet.opened(SDK.ActorId.new("hero"))

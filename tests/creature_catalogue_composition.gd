@@ -1,4 +1,5 @@
 extends GdUnitTestSuite
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const LIBRARY = preload(ROOT + "ui/creature_library.gd")
@@ -22,7 +23,7 @@ class Boundary extends "res://tests/miniature_boundary.gd":
 			var loaded: PackedScene = ResourceLoader.load(scene.resource_path, "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
 			var content := loaded.instantiate()
 			# Rookframe supplies its active theme to Package surfaces.
-			content.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+			content.theme = WORLD_THEME.entry()
 			content.set_meta("rookframe_sdk", self)
 			surface_parent.add_child(content)
 			content._rookframe_open_actor(actor)
@@ -51,7 +52,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	var host := _host()
 	var sheet = auto_free(load(ROOT + "ui/creature_definition_sheet.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
-	sheet.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	sheet.theme = WORLD_THEME.entry()
 	sheet.sdk = SDK.new(host)
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(844, 390)
@@ -88,7 +89,7 @@ func test_button_creates_actor_and_loads_live_sheet_after_create_signal_returns(
 	var scene: PackedScene = ResourceLoader.load(ROOT + "ui/creature_definition_sheet.tscn", "PackedScene", ResourceLoader.CACHE_MODE_IGNORE_DEEP)
 	var sheet := scene.instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
-	sheet.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	sheet.theme = WORLD_THEME.entry()
 	sheet.set_meta("rookframe_sdk", host)
 	viewport.add_child(sheet)
 	sheet._rookframe_open_definition(host.PackageId(), "seth-goblin")
