@@ -5,6 +5,7 @@ const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/character_hud_boundary.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
+const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 func _open(canvas: Vector2i, language := "en") -> Dictionary:
 	var host := BOUNDARY.new()
@@ -30,7 +31,7 @@ func _open(canvas: Vector2i, language := "en") -> Dictionary:
 			viewport.add_child(background)
 	var hud = load(ROOT + "ui/character_hud.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
-	hud.theme = load("res://rookframe/ui/themes/silkbound-ledger/theme.tres")
+	hud.theme = WORLD_THEME.entry()
 	hud.sdk = SDK.new(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
