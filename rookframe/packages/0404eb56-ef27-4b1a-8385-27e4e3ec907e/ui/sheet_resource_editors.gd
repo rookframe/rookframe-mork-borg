@@ -8,12 +8,12 @@ const EDITORS := {"hit_points": "Pages/Area/Rows/HP/Row/Editors/hit_points/Edito
 "silver": "Pages/Area/Rows/Silver/Row/Editors/silver/Editor"}
 
 ## The resource pictograms take the World theme's ornament color.
-const ORNAMENTS: Array[NodePath] = [^"Pages/Area/Rows/HP/Row/Icon", ^"Pages/Area/Rows/Omens/Row/Icon", ^"Pages/Area/Rows/Powers/Row/Icon", ^"Pages/Area/Rows/Silver/Row/Icon"]
+const ORNAMENTS := [^"Pages/Area/Rows/HP/Row/Icon", ^"Pages/Area/Rows/Omens/Row/Icon", ^"Pages/Area/Rows/Powers/Row/Icon", ^"Pages/Area/Rows/Silver/Row/Icon"]
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
 		for path in ORNAMENTS:
-			(get_node(path) as CanvasItem).self_modulate = get_theme_color(&"ornament", TOKENS)
+			(get_node(path) as Control).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func _ready() -> void:
 	for field in ["hit_points", "maximum_hit_points", "omens", "power_uses", "silver"]:

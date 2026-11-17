@@ -6,6 +6,7 @@ signal cancel_requested
 ## Retain the reading position while the same entry receives World updates.
 const ENTRY_FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_field.gd")
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
+var _tokens := SHEET_TOKENS.new()
 const TOKEN_BOX = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd")
 const FIELD_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_field_row.tscn")
 var _field_row: Control
@@ -61,7 +62,7 @@ func _cancel() -> void:
 	cancel_requested.emit()
 
 func configure_layout(phone: bool, tablet: bool, task: bool, draft: bool, reading: bool) -> void:
-	SHEET_TOKENS.gap(self, &"")
+	add_theme_constant_override(&"separation", _tokens.pixels(self, &""))
 	_phone = phone
 	_tablet = tablet
 	_task = task
@@ -194,13 +195,13 @@ func append_text(text: String, phone: bool) -> void:
 	label.size_flags_horizontal = 3 # Control.SIZE_EXPAND_FILL
 	label.theme_type_variation = &"RookframeBody"
 	label.add_theme_font_size_override("font_size", 17 if phone else 18 if _tablet and _reading else 20)
-	label.add_theme_constant_override("line_spacing", SHEET_TOKENS.pixels(self, &"line_spacing_body"))
+	label.add_theme_constant_override("line_spacing", _tokens.pixels(self, &"line_spacing_body"))
 	get_node(^"Body/DetailPages/Area/DetailContent").add_child(label)
 
 func append_summary(caption: String, text: String) -> void:
-	var summary := VBoxContainer.new()
-	summary.set_script(TOKEN_BOX)
-	summary.set(&"gap", &"space_3")
+	var summary := TOKEN_BOX.new()
+	summary.vertical = true
+	summary.gap = &"space_3"
 	get_node(^"Body/DetailPages/Area/DetailContent").add_child(summary)
 	var heading := Label.new()
 	heading.text = caption
@@ -231,7 +232,7 @@ func group_fields(fields: Array, weights: Array) -> void:
 	var row = FIELD_ROW.instantiate()
 	get_node(^"Body/DetailPages/Area/DetailContent").add_child(row)
 	row.configure(weights, fields.size())
-	SHEET_TOKENS.gap(row, &"space_3" if _phone else &"space_4")
+	row.gap = &"space_3" if _phone else &"space_4"
 	if _phone and weights == [1, 2]:
 		row.slot(0).custom_minimum_size = Vector2(190, row.slot(0).custom_minimum_size.y)
 	_field_row = row

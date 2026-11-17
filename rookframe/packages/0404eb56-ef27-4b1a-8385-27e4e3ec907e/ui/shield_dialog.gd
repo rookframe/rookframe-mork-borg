@@ -8,7 +8,7 @@ signal cancelled
 func _ready() -> void:
 	close_requested.connect(_cancel)
 	get_node("Shell").item_rect_changed.connect(_fit_material)
-	get_node("Shell").minimum_size_changed.connect(_fit_size.call_deferred)
+	get_node("Shell").minimum_size_changed.connect(_queue_fit_size)
 	_fit_material()
 	get_node(^"Shell/Content/Header/Close").pressed.connect(_cancel)
 	get_node(^"Shell/Content/Actions/Take").pressed.connect(_choose.bind("take"))
@@ -65,6 +65,9 @@ func localize(locale: I18N) -> void:
 
 ## The dialog is as tall as its wrapped copy and actions in the World theme.
 ## The copy wraps once it has its width, so the size follows the content.
+func _queue_fit_size() -> void:
+	_fit_size.call_deferred()
+
 func _fit_size() -> void:
 	if visible:
 		reset_size()

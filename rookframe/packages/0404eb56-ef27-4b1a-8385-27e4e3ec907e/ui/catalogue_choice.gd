@@ -23,7 +23,7 @@ func _notification(what: int) -> void:
 ## The selected mark is a check in `accent_content` on an `accent` pill.
 func _read_tokens() -> void:
 	var check := get_node(^"Content/Row/IndicatorLane/Indicator/Check") as TextureRect
-	check.custom_minimum_size = Vector2.ONE * get_theme_constant(&"icon_small", TOKENS)
+	check.custom_minimum_size = Vector2(get_theme_constant(&"icon_small", TOKENS), get_theme_constant(&"icon_small", TOKENS))
 	check.self_modulate = get_theme_color(&"accent_content", TOKENS)
 	# The lane keeps its width so choosing a row does not shift the title.
 	get_node(^"Content/Row/IndicatorLane").custom_minimum_size = Vector2(check.custom_minimum_size.x + 2 * get_theme_constant(&"space_1", TOKENS), 0)

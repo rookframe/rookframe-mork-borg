@@ -1,9 +1,8 @@
-extends Container
-## Gap of a box or flow container, taken from the World theme's `RookframeTokens`.
+extends BoxContainer
+## Gap of a box container, taken from the World theme's `RookframeTokens`.
 ##
-## Attach to an HBoxContainer, VBoxContainer, BoxContainer, HFlowContainer or
-## VFlowContainer. A flow container uses the gap between items and between
-## lines. The gap follows a live World theme change.
+## Attach to an HBoxContainer, VBoxContainer or BoxContainer; a flow container
+## takes token_flow.gd. The gap follows a live World theme change.
 
 const TOKENS := &"RookframeTokens"
 
@@ -27,10 +26,5 @@ func _read_tokens() -> void:
 	if _reading or not is_inside_tree():
 		return
 	_reading = true
-	var pixels := get_theme_constant(gap, TOKENS) if gap else 0
-	if is_class("FlowContainer"):
-		add_theme_constant_override(&"h_separation", pixels)
-		add_theme_constant_override(&"v_separation", pixels)
-	else:
-		add_theme_constant_override(&"separation", pixels)
+	add_theme_constant_override(&"separation", get_theme_constant(gap, TOKENS) if gap else 0)
 	_reading = false

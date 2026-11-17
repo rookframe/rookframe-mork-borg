@@ -1,5 +1,6 @@
 extends VBoxContainer
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
+var _tokens := SHEET_TOKENS.new()
 signal resource_requested(id: String)
 signal resource_changed(field: String, value: String)
 @onready var _route_quick = get_node(^"Page/Content/QuickResources")
@@ -26,7 +27,7 @@ func _power_changed(value: String) -> void:
 		resource_changed.emit("power_uses", value)
 
 func configure_layout(phone: bool, tablet: bool) -> void:
-	SHEET_TOKENS.gap(self, &"space_2" if phone else &"")
+	add_theme_constant_override(&"separation", _tokens.pixels(self, &"space_2" if phone else &""))
 	var section: OptionButton = get_node(^"Page/Content/Section")
 	section.add_theme_font_size_override("font_size", 18)
 	section.expand_icon = true

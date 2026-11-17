@@ -63,8 +63,8 @@ func ready() -> void:
 	_bar.minimum_size_changed.connect(_layout)
 	_bar.resized.connect(_layout_panel)
 	_bar.more_text = sdk.translations.text("More")
-	get_node("%Dice").pressed.connect(_open_dice)
-	get_node("%Identity").pressed.connect(_open_sheet)
+	get_node("Bar/Bar/Row/LeadingSlot/Dice").pressed.connect(_open_dice)
+	get_node("Bar/Bar/Row/IdentitySlot/Identity").pressed.connect(_open_sheet)
 	get_node(CONTENT + "Empty/Sheet").pressed.connect(_empty_action)
 	get_node(CONTENT + "Header/Close").pressed.connect(_close_panel)
 	get_node(CONTENT + "Header/Back").pressed.connect(_back_or_close)
@@ -75,7 +75,7 @@ func ready() -> void:
 	get_node(CONTENT + "Footer/Previous").pressed.connect(_change_page.bind(-1))
 	get_node(CONTENT + "Footer/Next").pressed.connect(_change_page.bind(1))
 	for category in BUTTONS:
-		var button: Button = get_node("%" + category)
+		var button: Button = get_node("Bar/Bar/Row/CategorySlot/" + category)
 		button.toggled.connect(_category_toggled.bind(category))
 		button.text = sdk.translations.text(category)
 	get_node(CONTENT + "Empty/Title").text = sdk.translations.text("No entries")
@@ -87,7 +87,7 @@ func ready() -> void:
 		control.tooltip_text = sdk.translations.text(control.tooltip_text)
 		if not control.accessibility_name.is_empty():
 			control.accessibility_name = sdk.translations.text(control.accessibility_name)
-	get_node("%Hp").caption = sdk.translations.text("HP")
+	get_node("Bar/Bar/Row/IdentitySlot/Identity/Content/Row/Copy/VitalSlot/Hp").caption = sdk.translations.text("HP")
 	_style()
 	_layout()
 	_refresh()
@@ -140,7 +140,7 @@ func _refresh() -> void:
 		_entries = {}
 		_show_all = {}
 	_actor = source.actor.id
-	var identity = get_node("%Identity")
+	var identity = get_node("Bar/Bar/Row/IdentitySlot/Identity")
 	var name_text := str(data.get("name", sdk.translations.text("Unnamed Actor")))
 	identity.title = name_text
 	identity.detail = sdk.translations.text(str(data.get("class_title", "")))
@@ -154,12 +154,13 @@ func _refresh() -> void:
 	identity.portrait = texture
 	var hit_points := int(data.get("hit_points", 0))
 	var maximum := int(data.get("maximum_hit_points", 0))
-	var hp = get_node("%Hp")
+	var hp = get_node("Bar/Bar/Row/IdentitySlot/Identity/Content/Row/Copy/VitalSlot/Hp")
 	hp.max_value = maxf(1.0, maximum)
 	hp.value = clampf(hit_points, 0.0, hp.max_value)
 	hp.value_text = "%s / %s" % [hit_points, maximum]
 	# The track names the current state only; it applies no rule thresholds.
-	hp.level = hp.Level.DEPLETED if hit_points <= 0 else hp.Level.WOUNDED if hit_points < maximum else hp.Level.STEADY
+	# VitalMeter.Level: 0 steady, 1 wounded, 3 depleted.
+	hp.level = 3 if hit_points <= 0 else 1 if hit_points < maximum else 0
 	var entries: Array[ENTRY] = []
 	var abilities: Dictionary = data.get("abilities", {})
 	var can_roll: bool = _launcher.can_roll(source.actor)
@@ -259,8 +260,14 @@ func _category_toggled(on: bool, category: String) -> void:
 	if on:
 		if _category != category or not _panel.is_open:
 			_open_category(category)
-	elif _category == category and (get_node("%" + category) as Button).button_group.get_pressed_button() == null:
+	elif _category == category and not _any_category_pressed():
 		_close_panel()
+
+func _any_category_pressed() -> bool:
+	for name in CATEGORIES:
+		if (get_node("Bar/Bar/Row/CategorySlot/" + name) as Button).button_pressed:
+			return true
+	return false
 
 func _open_category(category: String) -> void:
 	if _category == category and _panel.is_open:
@@ -269,7 +276,7 @@ func _open_category(category: String) -> void:
 	_category = category
 	_page = 0
 	_row_limit = ROW_LIMIT
-	_panel_anchor = get_node("%" + category)
+	_panel_anchor = get_node("Bar/Bar/Row/CategorySlot/" + category)
 	get_node(CONTENT + "Detail").visible = false
 	_panel.set_open(true)
 	_render_panel()
@@ -296,7 +303,7 @@ func _close_panel() -> void:
 	_category = ""
 	_panel.set_open(false)
 	for category in BUTTONS:
-		(get_node("%" + category) as Button).set_pressed_no_signal(false)
+		(get_node("Bar/Bar/Row/CategorySlot/" + category) as Button).set_pressed_no_signal(false)
 
 func _morning() -> void:
 	var initiating_actor := _actor
@@ -333,7 +340,7 @@ func _render_panel() -> void:
 	get_node(CONTENT + "Header/Morning").disabled = not _can_morning
 	get_node(CONTENT + "Header/ShowAll").set_pressed_no_signal(_show_all.get(_category, false))
 	for category in BUTTONS:
-		var button: Button = get_node("%" + category)
+		var button: Button = get_node("Bar/Bar/Row/CategorySlot/" + category)
 		button.set_pressed_no_signal(button == _panel_anchor)
 	var entries := _visible_entries()
 	var page_size := mini(4 if not _phone or _category == "Abilities" else 2, _row_limit)
@@ -373,7 +380,7 @@ func _add_row(row: ROW_SCRIPT, entry: ENTRY, fixed: bool) -> void:
 	launch.disabled = not entry.available
 	launch.accessibility_name = entry.title
 	var content: HBoxContainer = launch.get_node("Content")
-	content.set(&"gap", &"space_2" if _phone else &"space_3")
+	(launch.get_node("Content") as TOKEN_BOX).gap = &"space_2" if _phone else &"space_3"
 	content.offset_left = _space(2 if _phone else 3)
 	content.offset_right = -content.offset_left
 	content.offset_top = _space(1 if _phone else 2)

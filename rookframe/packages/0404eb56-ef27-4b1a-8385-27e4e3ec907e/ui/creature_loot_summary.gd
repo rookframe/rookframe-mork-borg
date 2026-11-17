@@ -2,6 +2,7 @@ extends Button
 ## One ordinary button keeps a loot summary and its Details action on the same page.
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 const TYPE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_type.gd")
+var _type := TYPE.new()
 signal requested(part: String, id: String)
 signal full_name_needed
 var entry_id := ""
@@ -25,9 +26,9 @@ func configure(item: Dictionary, locale: I18N, phone: bool, tablet: bool) -> voi
 	get_node("Padding/Row/Identity/CompactName").text = title
 	get_node("Padding/Row/Identity/Summary").text = summary
 	get_node("Padding/Row/Details").text = locale.text("Details")
-	TYPE.apply(get_node("Padding/Row/Identity/Name"), "RuleTitle", phone, tablet)
-	TYPE.apply(get_node("Padding/Row/Identity/CompactName"), "RuleTitle", phone, tablet)
-	TYPE.apply(get_node("Padding/Row/Identity/Summary"), "RuleCopy", phone, tablet)
+	_type.apply(get_node("Padding/Row/Identity/Name"), "RuleTitle", phone, tablet)
+	_type.apply(get_node("Padding/Row/Identity/CompactName"), "RuleTitle", phone, tablet)
+	_type.apply(get_node("Padding/Row/Identity/Summary"), "RuleCopy", phone, tablet)
 	get_node("Padding/Row/Identity").set(&"gap", &"space_1" if phone else &"space_2")
 	var padding: StringName = &"space_2" if phone else &"space_3" if tablet else &"space_4"
 	for edge in [&"left", &"right", &"top", &"bottom"]:

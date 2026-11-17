@@ -50,11 +50,11 @@ func _read_tokens() -> void:
 	if not is_inside_tree():
 		return
 	custom_minimum_size = Vector2(0, get_theme_constant(&"action_height" if _compact else &"space_8", TOKENS))
-	var icon := Vector2.ONE * get_theme_constant(&"icon_medium", TOKENS)
+	var side := get_theme_constant(&"icon_medium", TOKENS)
 	for name in [^"Row/State", ^"Row/Die"]:
 		var pictogram := get_node(name) as TextureRect
-		pictogram.custom_minimum_size = icon
-		pictogram.pivot_offset = icon / 2
+		pictogram.custom_minimum_size = Vector2(side, side)
+		pictogram.pivot_offset = Vector2(side / 2.0, side / 2.0)
 		pictogram.self_modulate = get_theme_color(&"content", TOKENS)
 
 

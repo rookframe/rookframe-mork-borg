@@ -11,15 +11,9 @@ var _source: Control
 
 func _enter_tree() -> void:
 	_source = get_parent() as Control
-	if _source != null:
+	if _source != null and not _source.theme_changed.is_connected(_read_tokens):
 		_source.theme_changed.connect(_read_tokens)
 	_read_tokens()
-
-
-func _exit_tree() -> void:
-	if _source != null and _source.theme_changed.is_connected(_read_tokens):
-		_source.theme_changed.disconnect(_read_tokens)
-	_source = null
 
 
 func _read_tokens() -> void:

@@ -1,5 +1,4 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd"
-const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
 ## Ability corrections stay in place while the reading view separates the modifier.
 func configure(caption: String, modifier: int, phone: bool = false, tablet: bool = false) -> void:
 	custom_minimum_size = Vector2(44, 44)
@@ -17,6 +16,6 @@ func configure(caption: String, modifier: int, phone: bool = false, tablet: bool
 		icon = null if compact else preload("res://rookframe/ui/icons/character/presence.svg")
 	elif caption == "Toughness":
 		icon = null if compact else preload("res://rookframe/ui/icons/character/toughness.svg")
-	SHEET_TOKENS.icon_margins(get_node(^"Inset"), self, &"" if compact else &"icon_medium", &"" if compact else &"space_2", &"", &"space_2")
+	_icon_margins(&"" if compact else &"icon_medium", &"" if compact else &"space_2", &"", &"space_2")
 	configure_hint(caption, {"Strength":"Physical force and melee attacks.", "Agility":"Balance, movement and defence.", "Presence":"Awareness, influence and Powers.", "Toughness":"Endure poison, sickness and hardship."}.get(caption, ""), not phone)
 	accessibility_name = "%s. %+d" % [caption, modifier]

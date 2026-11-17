@@ -1,12 +1,12 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
 ## The ability pictograms take the World theme's ornament color.
-const ORNAMENTS: Array[NodePath] = [^"Body/Content/Abilities/Strength/Icon", ^"Body/Content/Abilities/Agility/Icon", ^"Body/Content/Abilities/Presence/Icon", ^"Body/Content/Abilities/Toughness/Icon"]
+const ORNAMENTS := [^"Body/Content/Abilities/Strength/Icon", ^"Body/Content/Abilities/Agility/Icon", ^"Body/Content/Abilities/Presence/Icon", ^"Body/Content/Abilities/Toughness/Icon"]
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
 		for path in ORNAMENTS:
-			(get_node(path) as CanvasItem).self_modulate = get_theme_color(&"ornament", TOKENS)
+			(get_node(path) as Control).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func configure(data: Dictionary, action: Dictionary, phone: bool, prepared: bool, ending: bool) -> void:
 	var results: Dictionary = action.get("results", {})

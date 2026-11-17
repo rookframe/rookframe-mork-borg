@@ -17,6 +17,7 @@ const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const FIELD = preload(ROOT + "ui/creature_loot_field.tscn")
 const TYPE = preload(ROOT + "ui/creature_type.gd")
+var _type := TYPE.new()
 const OPTION = preload("res://rookframe/ui/components/actions/button.tscn")
 const FIELD_SCRIPT = preload(ROOT + "ui/creature_loot_field.gd")
 const SEARCH = preload("res://rookframe/ui/components/forms/text_field.tscn")
@@ -361,7 +362,7 @@ func _text(text: String) -> Label:
 	var label := Label.new()
 	label.text = locale.text(text)
 	label.autowrap_mode = 3
-	TYPE.apply(label, "RuleCopy", sheet.size.x <= 900, sheet.size.x > 900 and sheet.size.x <= 1300)
+	_type.apply(label, "RuleCopy", sheet.size.x <= 900, sheet.size.x > 900 and sheet.size.x <= 1300)
 	sheet.reader_content().add_child(label)
 	return label
 

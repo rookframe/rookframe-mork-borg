@@ -18,9 +18,10 @@ const ROLES := {
 }
 
 
-static func variation(role: String, phone: bool, tablet: bool) -> StringName:
-	return ROLES[role][2 if phone else 1 if tablet else 0]
+func variation(role: String, phone: bool, tablet: bool) -> StringName:
+	var steps: Array = ROLES.get(role, ROLES["Label"])
+	return steps[2 if phone else 1 if tablet else 0]
 
 
-static func apply(label: Control, role: String, phone: bool, tablet: bool) -> void:
+func apply(label: Control, role: String, phone: bool, tablet: bool) -> void:
 	label.theme_type_variation = variation(role, phone, tablet)

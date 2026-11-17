@@ -37,8 +37,8 @@ func _read_tokens() -> void:
 	if _reading or not is_inside_tree():
 		return
 	_reading = true
-	var sides := {&"margin_left": left, &"margin_top": top, &"margin_right": right, &"margin_bottom": bottom}
-	for item: StringName in sides:
-		var token: StringName = sides[item]
-		add_theme_constant_override(item, get_theme_constant(token, TOKENS) if token else 0)
+	add_theme_constant_override(&"margin_left", get_theme_constant(left, TOKENS) if left else 0)
+	add_theme_constant_override(&"margin_top", get_theme_constant(top, TOKENS) if top else 0)
+	add_theme_constant_override(&"margin_right", get_theme_constant(right, TOKENS) if right else 0)
+	add_theme_constant_override(&"margin_bottom", get_theme_constant(bottom, TOKENS) if bottom else 0)
 	_reading = false

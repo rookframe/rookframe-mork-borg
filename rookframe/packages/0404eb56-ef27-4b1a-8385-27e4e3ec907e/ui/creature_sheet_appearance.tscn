@@ -1,6 +1,7 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.gd" id="script"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_flow.gd" id="flow"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="margin"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_tint.gd" id="tint"]
@@ -100,7 +101,7 @@ mouse_filter = 2
 [node name="PortraitButtons" type="HFlowContainer" parent="Columns/PortraitPanel/Inset/Content"]
 layout_mode = 2
 alignment = 1
-script = ExtResource("box")
+script = ExtResource("flow")
 [node name="ChangePortrait" parent="Columns/PortraitPanel/Inset/Content/PortraitButtons" instance=ExtResource("button")]
 layout_mode = 2
 text = "Choose image"
@@ -219,7 +220,7 @@ mouse_filter = 2
 [node name="MiniatureButtons" type="HFlowContainer" parent="Columns/MiniaturePanel/Inset/Content"]
 layout_mode = 2
 alignment = 1
-script = ExtResource("box")
+script = ExtResource("flow")
 [node name="ChangeMiniature" parent="Columns/MiniaturePanel/Inset/Content/MiniatureButtons" instance=ExtResource("button")]
 layout_mode = 2
 text = "Choose miniature"

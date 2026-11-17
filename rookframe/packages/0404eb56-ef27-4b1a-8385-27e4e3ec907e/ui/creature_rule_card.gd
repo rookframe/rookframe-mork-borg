@@ -4,6 +4,7 @@ extends PanelContainer
 ## The card frame is a hairline under the card, built from `RookframeTokens`.
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 const TYPE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_type.gd")
+var _type := TYPE.new()
 const TOKENS := &"RookframeTokens"
 signal requested(part: String, id: String)
 const CELL = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_resolution_cell.tscn")
@@ -31,7 +32,7 @@ func _read_tokens() -> void:
 		return
 	_reading = true
 	var padding := get_theme_constant(&"space_1" if _phone else &"space_3" if _tablet else &"space_4", TOKENS)
-	_frame.bg_color = Color.TRANSPARENT
+	_frame.bg_color = Color(0, 0, 0, 0)
 	_frame.border_color = get_theme_color(&"divider", TOKENS)
 	# The rule above the actions already closes a card that ends with them.
 	_frame.border_width_bottom = 0 if _actions else get_theme_constant(&"border_width", TOKENS)
@@ -49,8 +50,8 @@ func configure(entry: Dictionary, locale: I18N, phone: bool, tablet: bool, _comp
 	copy.text = locale.text(str(entry.get("text", "")))
 	heading.visible = not heading.text.is_empty()
 	copy.visible = not copy.text.is_empty()
-	TYPE.apply(heading, "RuleTitle", phone, tablet)
-	TYPE.apply(copy, "RuleCopy", phone, tablet)
+	_type.apply(heading, "RuleTitle", phone, tablet)
+	_type.apply(copy, "RuleCopy", phone, tablet)
 	get_node("Content").set(&"gap", &"space_1" if phone else &"space_2")
 	get_node("Content/Resolution").visible = false
 	_actions = false
@@ -66,7 +67,13 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 	host.set(&"gap_horizontal", &"space_2" if phone else &"space_3")
 	for raw in actions:
 		var action: Dictionary = raw
-		var button: Button = CELL.instantiate() if action.has("dice") else ACTION.instantiate()
+		var button: Button
+		if action.has("dice"):
+			button = CELL.instantiate()
+		else:
+			var plain := ACTION.instantiate()
+			plain.compact = true
+			button = plain
 		host.add_child(button)
 		var caption := locale.text(str(action.get("name", "")))
 		var value := str(action.get("dice", ""))
@@ -77,15 +84,14 @@ func configure_actions(actions: Array, locale: I18N, phone: bool) -> void:
 			caption_label.text = caption
 			value_label.text = "1" + value if value.begins_with("d") and not value.contains("/") else value
 			(button.get_node("Inset/Row/Icon") as TextureRect).visible = not passive
-			TYPE.apply(caption_label, "Caption", phone, _tablet)
-			TYPE.apply(value_label, "Value", phone, _tablet)
+			_type.apply(caption_label, "Caption", phone, _tablet)
+			_type.apply(value_label, "Value", phone, _tablet)
 			var inset: MarginContainer = button.get_node("Inset")
 			inset.minimum_size_changed.connect(_queue_fit_cell.bind(button))
 			_queue_fit_cell(button)
 			button.disabled = passive or bool(action.get("disabled", false))
 		else:
 			button.text = caption
-			button.compact = true
 			button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			button.disabled = bool(action.get("disabled", false))
 		button.accessibility_name = get_node("Content/Heading").text + ": " + caption + " " + value

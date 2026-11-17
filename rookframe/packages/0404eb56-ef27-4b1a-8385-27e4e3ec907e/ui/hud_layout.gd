@@ -5,6 +5,7 @@ extends "res://rookframe/sdk/window.gd"
 ## `RookframeTokens` reads that follow a live World theme change.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const ROW_SCRIPT = preload(ROOT + "ui/hud_row.gd")
+const TOKEN_BOX = preload(ROOT + "ui/token_box.gd")
 const TOKENS := &"RookframeTokens"
 const CATEGORIES := ["Abilities", "Attacks", "Powers", "Items", "Features", "Companions", "Recovery"]
 const BUTTONS := CATEGORIES
@@ -46,7 +47,7 @@ func _restyle() -> void:
 	_schedule_name_check()
 
 func _space(step: int) -> int:
-	return get_theme_constant(StringName("space_%d" % step), TOKENS)
+	return get_theme_constant("space_%d" % step, TOKENS)
 
 func _schedule_name_check() -> void:
 	if not _name_check_pending:
@@ -89,8 +90,8 @@ func _needs_full_name(row: Control) -> bool:
 	var font := title.get_theme_font(&"font")
 	var font_size := title.get_theme_font_size(&"font_size")
 	var wrapped := font.get_multiline_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, width, font_size, -1,
-		TextServer.BREAK_MANDATORY | TextServer.BREAK_WORD_BOUND | TextServer.BREAK_ADAPTIVE)
-	return roundi(wrapped.y / font.get_height(font_size)) > title.max_lines_visible
+		11) # TextServer line breaks: mandatory (1), word bound (2) and adaptive (8).
+	return int(wrapped.y / font.get_height(font_size) + 0.5) > title.max_lines_visible
 
 func _row_minimum() -> float:
 	return get_theme_constant(&"target_minimum", TOKENS) + _space(1 if _phone else 2) * 2
@@ -148,7 +149,7 @@ func _layout_panel() -> void:
 	var bar: Rect2 = _bar.get_global_rect()
 	var slot: Control = _bar.get_category_slot()
 	var lane := slot.get_global_rect() if slot.is_visible_in_tree() else bar
-	var x := clampf(lane.get_center().x - hud.position.x - width / 2, outer, maxf(outer, size.x - width - outer))
+	var x := clampf(lane.position.x + lane.size.x / 2 - hud.position.x - width / 2, outer, maxf(outer, size.x - width - outer))
 	var room: float = bar.position.y - hud.position.y - _panel.hinge_gap
 	var y := maxf(0.0, room - height)
 	_rect(_panel, x, y, width, height)
@@ -159,11 +160,12 @@ func _layout_panel() -> void:
 	if _panel.is_open and listing and height > room + _panel.hinge_gap and _page_size > step and not _refit_pending:
 		_refit_pending = true
 		_row_limit = _page_size - step
-		_refit.call_deferred()
 
-func _refit() -> void:
-	_refit_pending = false
-	_render_panel()
+# The shorter page renders on the next frame, after this layout has settled.
+func _process(_delta: float) -> void:
+	if _refit_pending:
+		_refit_pending = false
+		_render_panel()
 
 func _render_panel() -> void:
 	pass

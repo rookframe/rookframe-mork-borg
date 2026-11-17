@@ -77,9 +77,9 @@ func _fit_creation() -> void:
 	var phone := is_compact()
 	var tablet := is_tablet()
 	var small := phone or tablet
-	var icon_small := Vector2.ONE * get_theme_constant(&"icon_small", TOKENS)
-	var icon_medium := Vector2.ONE * get_theme_constant(&"icon_medium", TOKENS)
-	var icon_large := Vector2.ONE * get_theme_constant(&"icon_large", TOKENS)
+	var icon_small := Vector2(get_theme_constant(&"icon_small", TOKENS), get_theme_constant(&"icon_small", TOKENS))
+	var icon_medium := Vector2(get_theme_constant(&"icon_medium", TOKENS), get_theme_constant(&"icon_medium", TOKENS))
+	var icon_large := Vector2(get_theme_constant(&"icon_large", TOKENS), get_theme_constant(&"icon_large", TOKENS))
 	var ornament := get_theme_color(&"ornament", TOKENS)
 	_gap(CONTEXT, &"" if phone else &"space_2" if tablet else &"space_5")
 	for name in ["Heading", "Spacer"]:
@@ -157,7 +157,7 @@ func _fit_creation() -> void:
 	pages.enabled = true
 	_gap(DETAIL, &"space_2" if tablet and _route == "create-class" else &"space_1" if phone else &"space_2" if tablet else &"space_5")
 	_gap(DETAIL + "/Heading", &"space_3" if small else &"space_4")
-	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = icon_large if small else Vector2.ONE * get_theme_constant(&"space_7", TOKENS)
+	get_node(DETAIL + "/Heading/Icon").custom_minimum_size = icon_large if small else Vector2(get_theme_constant(&"space_7", TOKENS), get_theme_constant(&"space_7", TOKENS))
 	get_node(DETAIL + "/Heading/Icon").self_modulate = ornament
 	_role(DETAIL + "/Heading/Copy/Title", "RookframeHeading" if small else "RookframeSubtitle")
 	get_node(DETAIL + "/RollInfo").vertical = not phone

@@ -1,5 +1,6 @@
 extends HBoxContainer
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
+var _tokens := SHEET_TOKENS.new()
 
 func configure(data: Dictionary, draft: Dictionary, owner: bool, action_live: bool, dead: bool) -> void:
 	var editing := not draft.is_empty()
@@ -19,7 +20,7 @@ func configure(data: Dictionary, draft: Dictionary, owner: bool, action_live: bo
 	get_node(^"CancelSheet").visible = editing
 
 func configure_layout(phone: bool, tablet: bool) -> void:
-	SHEET_TOKENS.gap(self, &"space_2")
+	add_theme_constant_override(&"separation", _tokens.pixels(self, &"space_2"))
 	get_node(^"NameEditField/Editor").custom_minimum_size = Vector2(220 if phone else 230 if tablet else 320, 44)
 	get_node(^"NameEditField/Editor").add_theme_font_size_override("font_size", 18 if phone or tablet else 20)
 	get_node(^"NameEditField/Editor/Caption").add_theme_font_size_override("font_size", 9 if phone or tablet else 11)
@@ -27,7 +28,7 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 		button.add_theme_font_size_override("font_size", 12 if phone else 16)
 	var title: Button = get_node(^"Name")
 	title.custom_minimum_size = Vector2(title.custom_minimum_size.x, 44 if phone else 56 if tablet else 64)
-	title.add_theme_font_override("font", SHEET_TOKENS.font(self, &"display"))
+	title.add_theme_font_override("font", get_theme_font(&"display", SHEET_TOKENS.TYPE))
 	# The phone title fits the UI Kit button inside the 44 px header row.
 	title.add_theme_font_size_override("font_size", 18 if phone else 29 if tablet else 32)
 	get_node(^"RibbonSpace").visible = true

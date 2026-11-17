@@ -54,7 +54,7 @@ func _arrange() -> void:
 		margin.set(edge, &"space_5" if phone or tablet else &"space_6")
 	get_node(^"Margin/Layout").set(&"gap", &"space_3" if phone else &"space_5")
 	var icon := get_node(^"Margin/Layout/Header/Icon") as TextureRect
-	icon.custom_minimum_size = Vector2.ONE * get_theme_constant(&"icon_medium" if phone else &"icon_large", TOKENS)
+	icon.custom_minimum_size = Vector2(get_theme_constant(&"icon_medium" if phone else &"icon_large", TOKENS), get_theme_constant(&"icon_medium" if phone else &"icon_large", TOKENS))
 	icon.self_modulate = get_theme_color(&"ornament", TOKENS)
 	get_node(^"Margin/Layout/Header/Text").theme_type_variation = &"RookframeHeading" if phone else &"RookframeSubtitle"
 	get_node(^"Margin/Layout/Picker/Title").visible = false
@@ -63,9 +63,10 @@ func _arrange() -> void:
 func _fit_frame() -> void:
 	if not is_node_ready(): return
 	# The kit's ledger leaves sit one step outside the content they frame.
-	var outset := Vector2(get_theme_constant(&"space_4", TOKENS), get_theme_constant(&"space_2", TOKENS))
+	var outset_x := get_theme_constant(&"space_4", TOKENS)
+	var outset_y := get_theme_constant(&"space_2", TOKENS)
 	var rects: Array[Rect2] = []
 	for path in ["Margin/Layout/Header", "Margin/Layout/Picker/Browser", "Margin/Layout/Picker/Actions"]:
 		var item: Control = get_node(path)
-		rects.append(Rect2(item.get_global_rect().position - get_global_rect().position - outset, item.size + outset * 2))
+		rects.append(Rect2(item.get_global_rect().position.x - get_global_rect().position.x - outset_x, item.get_global_rect().position.y - get_global_rect().position.y - outset_y, item.size.x + outset_x * 2, item.size.y + outset_y * 2))
 	get_node("Frame").set_sections(rects[0], rects[1], rects[2])

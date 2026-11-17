@@ -38,7 +38,7 @@ func _read_tokens() -> void:
 	# The caption occupies the top of the frame.
 	_normal.content_margin_top = get_theme_constant(&"space_4", TOKENS)
 	_normal.content_margin_bottom = side
-	_focus.bg_color = Color.TRANSPARENT
+	_focus.bg_color = Color(0, 0, 0, 0)
 	_focus.border_color = get_theme_color(&"focus_ring", TOKENS)
 	_focus.set_border_width_all(get_theme_constant(&"focus_width", TOKENS))
 	_focus.set_corner_radius_all(get_theme_constant(&"radius_small", TOKENS))

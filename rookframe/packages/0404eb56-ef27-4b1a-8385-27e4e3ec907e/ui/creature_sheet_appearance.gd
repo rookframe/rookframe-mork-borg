@@ -2,6 +2,7 @@ extends VBoxContainer
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 ## Authored presentation only. Actor/World appearance mutations stay in adapters.
 const TYPE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_type.gd")
+var _type := TYPE.new()
 const TOKENS := &"RookframeTokens"
 ## Constant token of the gap between the parts, `space_1` to `space_8`. Empty means no gap.
 @export var gap: StringName = &"space_4":
@@ -60,12 +61,13 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 		# only stands clear of the divider.
 		get_node("Columns/MiniaturePanel/Inset").set(edge, ((&"space_2" if edge == &"bottom" else &"") if phone else inset) if miniature_only else &"space_4" if edge == &"left" else &"")
 	get_node("Columns/MiniaturePanel").set(&"outline", &"" if miniature_only else &"divider")
+	for content in ["Columns/PortraitPanel/Inset/Content", "Columns/MiniaturePanel/Inset/Content"]:
+		get_node(content).set(&"gap", &"space_1" if phone else &"space_2")
 	for base in [PORTRAIT, MINIATURE]:
-		get_node(base).set(&"gap", &"space_1" if phone else &"space_2")
 		for spacer in ["HeadingGap", "ControlsGap", "ExplanationGap"]:
 			get_node(base + spacer).visible = false
 		get_node(base + ("PortraitHeading" if base == PORTRAIT else "MiniatureHeading")).set(&"gap", &"space_2")
-		TYPE.apply(get_node(base + ("PortraitHeading/Title" if base == PORTRAIT else "MiniatureHeading/Title")), "Title" if miniature_only else "Section", phone, tablet)
+		_type.apply(get_node(base + ("PortraitHeading/Title" if base == PORTRAIT else "MiniatureHeading/Title")), "Title" if miniature_only else "Section", phone, tablet)
 	for controls in [PORTRAIT + "PortraitButtons", MINIATURE + "MiniatureButtons"]:
 		get_node(controls).set(&"gap", &"space_2" if phone else &"space_3")
 	for path in [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait", MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]:
@@ -86,9 +88,9 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(MINIATURE + "EmptyPreview/Content/Image").custom_minimum_size = Vector2(32, 32) if phone else Vector2(96, 96)
 	# The creator's phone page keeps its height for the words and the action.
 	get_node(MINIATURE + "EmptyPreview/Content/Image").visible = not (phone and miniature_only)
-	TYPE.apply(get_node("Intro/Title"), "Title", phone, tablet)
-	TYPE.apply(get_node(MINIATURE + "EmptyPreview/Content/Title"), "Section", phone, tablet)
-	TYPE.apply(get_node(MINIATURE + "MiniatureCaption"), "Section", phone, tablet)
+	_type.apply(get_node("Intro/Title"), "Title", phone, tablet)
+	_type.apply(get_node(MINIATURE + "EmptyPreview/Content/Title"), "Section", phone, tablet)
+	_type.apply(get_node(MINIATURE + "MiniatureCaption"), "Section", phone, tablet)
 	_present_actions()
 
 func miniature(locale: I18N, title: String, package: String, assigned: bool) -> void:

@@ -24,8 +24,8 @@ const TOKENS := &"RookframeTokens"
 	set(value):
 		outline_width = value
 		_read_tokens()
-## Sides that carry the outline.
-@export_flags("Left", "Top", "Right", "Bottom") var outline_sides := 15:
+## Sides that carry the outline, as bit flags: 1 left, 2 top, 4 right, 8 bottom.
+@export var outline_sides := 15:
 	set(value):
 		outline_sides = value
 		_read_tokens()
@@ -63,13 +63,18 @@ func _read_tokens() -> void:
 	if _reading or not is_inside_tree():
 		return
 	_reading = true
-	_box.bg_color = get_theme_color(fill, TOKENS) if fill else Color.TRANSPARENT
-	_box.border_color = get_theme_color(outline, TOKENS) if outline else Color.TRANSPARENT
+	_box.bg_color = get_theme_color(fill, TOKENS) if fill else Color(0, 0, 0, 0)
+	_box.border_color = get_theme_color(outline, TOKENS) if outline else Color(0, 0, 0, 0)
 	var width := get_theme_constant(outline_width, TOKENS) if outline and outline_width else 0
-	var sides := [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]
-	for index in 4:
-		_box.set_border_width(sides[index], width if outline_sides & (1 << index) else 0)
-	_box.set_corner_radius_all(get_theme_constant(radius, TOKENS) if radius else 0)
+	_box.border_width_left = width if outline_sides % 2 >= 1 else 0
+	_box.border_width_top = width if outline_sides % 4 >= 2 else 0
+	_box.border_width_right = width if outline_sides % 8 >= 4 else 0
+	_box.border_width_bottom = width if outline_sides % 16 >= 8 else 0
+	var corner := get_theme_constant(radius, TOKENS) if radius else 0
+	_box.corner_radius_top_left = corner
+	_box.corner_radius_top_right = corner
+	_box.corner_radius_bottom_right = corner
+	_box.corner_radius_bottom_left = corner
 	var horizontal := get_theme_constant(padding_horizontal, TOKENS) if padding_horizontal else 0
 	var vertical := get_theme_constant(padding_vertical, TOKENS) if padding_vertical else 0
 	_box.content_margin_left = horizontal

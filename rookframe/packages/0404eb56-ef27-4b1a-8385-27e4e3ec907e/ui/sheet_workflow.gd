@@ -11,12 +11,12 @@ const DAILY := "Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content"
 const CONTEXT := "Body/Context/Inset/Content"
 
 ## The rest pictograms take the World theme's ornament color.
-const ORNAMENTS: Array[NodePath] = [^"Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row/Icon", ^"Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row/Icon"]
+const ORNAMENTS := [^"Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath/Inset/Row/Icon", ^"Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep/Inset/Row/Icon"]
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
 		for path in ORNAMENTS:
-			(get_node(path) as CanvasItem).self_modulate = get_theme_color(&"ornament", TOKENS)
+			(get_node(path) as Control).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func _ready() -> void:
 	get_node("Header/Back").pressed.connect(_back)

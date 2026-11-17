@@ -19,7 +19,8 @@ const I18N = preload(ROOT + "localization.gd")
 var _locale := I18N.new()
 const TOKENS := &"RookframeTokens"
 var _target_valid := true
-var _roles := {}
+var _distance_ink: StringName = &"content_muted"
+var _message_ink: StringName = &"content"
 @onready var body: VBoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body")
 var _device := ""
 @onready var _view_combat: BoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body/Combat")
@@ -65,29 +66,38 @@ func _notification(what: int) -> void:
 func _read_tokens() -> void:
 	var ornament := get_theme_color(&"ornament", TOKENS)
 	for icon in [_view_header_weapon, _view_combat_attack.get_node("Icon"), _view_combat_damage_icon]:
-		(icon as CanvasItem).self_modulate = ornament
+		(icon as Control).self_modulate = ornament
 	_view_target_icon.self_modulate = ornament if _target_valid else get_theme_color(&"danger", TOKENS)
 	# A theme may paint the roll action's die in its own material; where it
 	# does not, the icon-only action carries the die pictogram.
 	var painted := _view_combat_attack_roll.get_theme_stylebox(&"normal") is StyleBoxTexture
 	_view_combat_attack_roll.icon = null if painted else DICE_ICONS["d20"]
 	_view_combat_attack_roll.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	for label: Label in _roles:
-		_apply_role(label)
+	_apply_roles()
 
 # Every theme's Action Panel presentation may put its own Theme between these
 # labels and the World theme, which hides the World theme's label variations.
 # Each label therefore reads its type role and ink from RookframeTokens.
-func _role(label: Label, type_role: StringName, ink: StringName) -> void:
-	_roles[label] = [type_role, ink]
-	if is_inside_tree():
-		_apply_role(label)
+# Touch layouts step each type role down instead of shrinking pixels.
+func _apply_roles() -> void:
+	if not is_inside_tree():
+		return
+	var touch := _device != "desktop"
+	_role(_view_header_identity_actor, &"meta", &"content_muted")
+	_role(_view_header_identity_title, &"heading" if touch else &"title", &"content_heading")
+	_role(_view_header_identity_reach, &"meta" if touch else &"body", &"content_muted")
+	for row in ["Attack", "Damage"]:
+		var line: HBoxContainer = body.get_node("Combat/" + row)
+		_role(line.get_node("Values/Label") as Label, &"meta" if touch else &"label", &"content_muted")
+		_role(line.get_node("Values/Formula") as Label, &"heading" if touch else &"value", &"content")
+	_role(_view_target_name, &"meta" if _device == "phone" else &"body", &"content")
+	_role(_view_target_distance, &"meta", _distance_ink)
+	_role(_view_message, &"body", _message_ink)
 
-func _apply_role(label: Label) -> void:
-	var role: Array = _roles[label]
-	label.add_theme_font_override(&"font", get_theme_font(role[0], TOKENS))
-	label.add_theme_font_size_override(&"font_size", get_theme_font_size(role[0], TOKENS))
-	label.add_theme_color_override(&"font_color", get_theme_color(role[1], TOKENS))
+func _role(label: Label, type_role: StringName, ink: StringName) -> void:
+	label.add_theme_font_override(&"font", get_theme_font(type_role, TOKENS))
+	label.add_theme_font_size_override(&"font_size", get_theme_font_size(type_role, TOKENS))
+	label.add_theme_color_override(&"font_color", get_theme_color(ink, TOKENS))
 
 func responsive(device: String) -> void:
 	if device == _device:
@@ -97,10 +107,6 @@ func responsive(device: String) -> void:
 	var phone := device == "phone"
 	_frame.compact = touch
 	custom_minimum_size = Vector2(320 if phone else 380 if touch else 520, 0)
-	# Touch layouts step each type role down instead of shrinking pixels.
-	_role(_view_header_identity_actor, &"meta", &"content_muted")
-	_role(_view_header_identity_title, &"heading" if touch else &"title", &"content_heading")
-	_role(_view_header_identity_reach, &"meta" if touch else &"body", &"content_muted")
 	_view_header_weapon.custom_minimum_size = Vector2(30,30) if touch else Vector2(42,42)
 	_view_combat.vertical = not touch
 	_view_combat.set(&"gap", &"space_4" if touch else &"")
@@ -118,14 +124,8 @@ func responsive(device: String) -> void:
 		(line.get_node("Values") as BoxContainer).size_flags_horizontal = 1 if touch else Control.SIZE_EXPAND_FILL
 		(line.get_node("Values") as BoxContainer).set(&"gap", &"" if touch else &"space_4")
 		(line.get_node("Values/Label") as Label).custom_minimum_size = Vector2(0 if touch else 110, 0)
-		_role(line.get_node("Values/Label") as Label, &"meta" if touch else &"label", &"content_muted")
-		_role(line.get_node("Values/Formula") as Label, &"heading" if touch else &"value", &"content")
 	_view_target_icon.custom_minimum_size = Vector2(26,26) if touch else Vector2(32,32)
-	_role(_view_target_name, &"meta" if phone else &"body", &"content")
-	if not _roles.has(_view_target_distance):
-		_role(_view_target_distance, &"meta", &"content_muted")
-	if not _roles.has(_view_message):
-		_role(_view_message, &"body", &"content")
+	_apply_roles()
 
 func show_target(visible: bool) -> void:
 	_frame.show_footer = visible
@@ -163,7 +163,7 @@ func target(name: String, distance: String, valid: bool, editable: bool) -> void
 	_view_target_name.text = _locale.text(name)
 	_view_target_distance.text = distance
 	_target_valid = valid or distance.is_empty()
-	_role(_view_target_distance, &"meta", &"content_muted" if valid else &"danger")
+	_distance_ink = &"content_muted" if valid else &"danger"
 	if is_node_ready():
 		_read_tokens()
 	_view_target_change.disabled = not editable
@@ -173,7 +173,8 @@ func target(name: String, distance: String, valid: bool, editable: bool) -> void
 func message(text: String, error := false) -> void:
 	_view_message.text = _locale.text(text)
 	_view_message.visible = not text.is_empty()
-	_role(_view_message, &"body", &"danger" if error else &"content")
+	_message_ink = &"danger" if error else &"content"
+	_apply_roles()
 
 func consequence(first: String, second: String, enabled := true) -> void:
 	_view_combat.visible = false

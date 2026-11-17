@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="token_frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_rule.gd" id="rule"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_tint.gd" id="tint"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_tint_rect.gd" id="tint_rect"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_appearance.tscn" id="appearance"]
@@ -91,9 +92,11 @@ visible = false
 layout_mode = 2
 text = "Save sheet"
 visible = false
+variant = 1
 [node name="Create" parent="Inset/Layout/Footer" instance=ExtResource("button")]
 layout_mode = 2
 text = "Create Actor"
+variant = 1
 [node name="Edit" parent="Inset/Layout/Footer" instance=ExtResource("button")]
 layout_mode = 2
 text = "Edit sheet"
@@ -566,8 +569,8 @@ anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 0
-script = ExtResource("tint")
-color = &"scrim"
+script = ExtResource("tint_rect")
+tint = &"scrim"
 [node name="CorrectionDialog" type="Window" parent="."]
 visible = false
 size = Vector2i(640,610)

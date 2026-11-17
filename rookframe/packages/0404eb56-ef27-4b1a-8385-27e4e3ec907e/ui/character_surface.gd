@@ -131,7 +131,6 @@ var _phone := false
 var _setting := false
 var _end_after_roll := false
 var _rendered_chapter := -1
-var _theme_pending := false
 var _locale := I18N.new()
 
 func ready() -> void:
@@ -1447,16 +1446,6 @@ func _density() -> void:
 		_core(_actor.data)
 		_render_condition(_actor.data)
 		_request_route()
-
-# The layout reads World theme tokens, so a live theme change lays it out again.
-func _notification(what: int) -> void:
-	if what == NOTIFICATION_THEME_CHANGED and is_node_ready() and not _theme_pending:
-		_theme_pending = true
-		_retheme.call_deferred()
-
-func _retheme() -> void:
-	_theme_pending = false
-	_density()
 
 func _input(event: InputEvent) -> void:
 	if is_visible_in_tree() and event.is_action_pressed("ui_cancel"):

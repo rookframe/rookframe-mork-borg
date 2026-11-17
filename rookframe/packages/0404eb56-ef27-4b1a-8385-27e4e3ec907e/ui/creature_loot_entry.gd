@@ -2,6 +2,7 @@ extends VBoxContainer
 ## Oversized names remain complete native paginated text above a contextual action.
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 const TYPE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_type.gd")
+var _type := TYPE.new()
 signal requested(part: String, id: String)
 const TOKENS := &"RookframeTokens"
 ## Constant token of the gap between the parts, `space_1` to `space_8`. Empty means no gap.
@@ -34,7 +35,7 @@ func configure(item: Dictionary, locale: I18N, phone: bool, tablet: bool) -> voi
 	entry_id = str(item.get("inventory_id", ""))
 	get_node("Summary").configure(item, locale, phone, tablet)
 	get_node("FullName").text = get_node("Summary/Padding/Row/Identity/Name").text
-	TYPE.apply(get_node("FullName"), "RuleTitle", phone, tablet)
+	_type.apply(get_node("FullName"), "RuleTitle", phone, tablet)
 
 func set_page_height(height: float) -> void:
 	get_node("Summary").set_page_height(height)

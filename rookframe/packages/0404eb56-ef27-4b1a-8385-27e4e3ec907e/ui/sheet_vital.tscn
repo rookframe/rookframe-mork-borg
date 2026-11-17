@@ -19,46 +19,48 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 mouse_filter = 2
 
-[node name="Copy" type="VBoxContainer" parent="Inset"]
+[node name="Copy" type="MarginContainer" parent="Inset"]
 layout_mode = 2
 size_flags_vertical = 4
 mouse_filter = 2
-script = ExtResource("box")
-gap = &""
 
-[node name="Caption" type="Label" parent="Inset/Copy"]
+[node name="Lines" type="VBoxContainer" parent="Inset/Copy"]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Caption" type="Label" parent="Inset/Copy/Lines"]
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 12
 
-[node name="Number" type="HBoxContainer" parent="Inset/Copy"]
+[node name="Number" type="HBoxContainer" parent="Inset/Copy/Lines"]
 layout_mode = 2
 mouse_filter = 2
 script = ExtResource("box")
 gap = &"space_2"
 
-[node name="Value" type="Label" parent="Inset/Copy/Number"]
+[node name="Value" type="Label" parent="Inset/Copy/Lines/Number"]
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 28
 
-[node name="HealthValue" type="Label" parent="Inset/Copy/Number"]
+[node name="HealthValue" type="Label" parent="Inset/Copy/Lines/Number"]
 visible = false
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"RookframeValue"
 theme_override_font_sizes/font_size = 28
 
-[node name="DeadValue" type="Label" parent="Inset/Copy/Number"]
+[node name="DeadValue" type="Label" parent="Inset/Copy/Lines/Number"]
 visible = false
 layout_mode = 2
 mouse_filter = 2
 theme_type_variation = &"RookframeError"
 theme_override_font_sizes/font_size = 28
 
-[node name="Extra" type="Label" parent="Inset/Copy/Number"]
+[node name="Extra" type="Label" parent="Inset/Copy/Lines/Number"]
 layout_mode = 2
 size_flags_vertical = 8
 mouse_filter = 2

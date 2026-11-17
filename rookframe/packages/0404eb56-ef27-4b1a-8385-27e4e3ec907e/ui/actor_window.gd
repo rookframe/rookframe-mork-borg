@@ -116,7 +116,7 @@ func _apply_density() -> void:
 # Gaps and insets follow the World theme's `space_1`..`space_8` steps. The
 # containers carry token_box.gd, which resolves the named step.
 func _step(step: int) -> StringName:
-	return StringName("space_%d" % step)
+	return "space_%d" % step
 
 
 func _space(step: int) -> int:

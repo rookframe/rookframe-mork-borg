@@ -40,10 +40,10 @@ func configure(facts: Array, phone: bool) -> void:
 		frame.padding_horizontal = &""
 		frame.padding_vertical = &"space_2"
 		add_child(frame)
-		var lane := VBoxContainer.new()
-		lane.set_script(BOX)
+		var lane := BOX.new()
+		lane.vertical = true
 		lane.size_flags_horizontal = 3
-		lane.set(&"gap", &"space_1")
+		lane.gap = &"space_1"
 		frame.add_child(lane)
 		var caption := Label.new()
 		caption.text = str(fact[0])

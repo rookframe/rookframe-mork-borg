@@ -46,7 +46,7 @@ var _phone := false
 var _tablet := false
 var _open := false
 var _panel_anchor: Button
-var _rows: Array[Control] = []
+var _rows: Array = []
 var _page := 0
 var _page_rows := PAGE_ROWS
 var _show_all := false
@@ -172,13 +172,14 @@ func _layout() -> void:
 func _place_tools() -> void:
 	_place(_search, _actions if _phone else _panel, 0 if _phone else 1)
 	_place(_stepper, _actions if _phone else _health_editor, 0)
-	_search.custom_minimum_size.x = SEARCH_WIDTH_PHONE if _phone else 0.0
+	_search.custom_minimum_size = Vector2(SEARCH_WIDTH_PHONE if _phone else 0.0, _search.custom_minimum_size.y)
 	_search.size_flags_vertical = Control.SIZE_SHRINK_CENTER if _phone else Control.SIZE_FILL
 	_stepper.get_node(^"AmountLabel").visible = not _phone
 
 func _place(tool: Control, home: Node, index: int) -> void:
 	if tool.get_parent() != home:
-		tool.reparent(home, false)
+		tool.get_parent().remove_child(tool)
+		home.add_child(tool)
 		home.move_child(tool, index)
 
 func _edge() -> int:
@@ -323,7 +324,9 @@ func _render_panel() -> void:
 			filtered.append(entry)
 	var pages := maxi(1, ceili(filtered.size() / float(_page_rows)))
 	_page = clampi(_page, 0, pages - 1)
-	_page_entries = filtered.slice(_page * _page_rows, (_page + 1) * _page_rows)
+	_page_entries.clear()
+	for index in range(_page * _page_rows, mini(filtered.size(), (_page + 1) * _page_rows)):
+		_page_entries.append(filtered[index])
 	_list.visible = not hp and not filtered.is_empty()
 	var empty: Label = get_node(SLOT + "Empty")
 	empty.visible = not hp and filtered.is_empty()
@@ -335,14 +338,14 @@ func _render_panel() -> void:
 	get_node(SLOT + "Header/TitleRow/ActionsSlot/Previous").disabled = _page == 0
 	get_node(SLOT + "Header/TitleRow/ActionsSlot/Next").disabled = _page == pages - 1
 	for index in range(_rows.size()):
-		var row := _rows[index]
+		var row: Control = _rows[index]
 		row.visible = not hp and index < _page_entries.size()
 		if row.visible:
 			_render_entry(row, _page_entries[index], attacks)
 	if hp:
 		_preview_hp()
 
-func _render_entry(row: Control, entry: ENTRY, favorites: bool) -> void:
+func _render_entry(row, entry: ENTRY, favorites: bool) -> void:
 	row.title = entry.title
 	# A phone row has no room for a value lane beside a wrapped creature name.
 	var joined := _phone and _category == "Scene"

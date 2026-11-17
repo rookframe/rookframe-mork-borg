@@ -13,16 +13,12 @@ const ACTION_ICONS := {
 	"chevron-left": preload("res://rookframe/ui/icons/chevron-left.svg"),
 	"chevron-right": preload("res://rookframe/ui/icons/chevron-right.svg"),
 }
-const PRIMARY := 1
 
-func icon_action(button: Button, role: String, primary: bool = false) -> void:
+func icon_action(button: Button, role: String) -> void:
 	if not button.text.is_empty():
 		button.accessibility_name = button.text
 		button.tooltip_text = button.text
 	button.text = ""
-	# Only the UI Kit button component carries an emphasis variant.
-	if primary and &"variant" in button:
-		button.variant = PRIMARY
 	button.icon = ACTION_ICONS.get(role, ACTION_ICONS["close"])
 	button.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	button.size_flags_horizontal = Control.SIZE_SHRINK_END

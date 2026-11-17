@@ -4,6 +4,9 @@ extends Control
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 const CHROME = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_icon_actions.gd")
 const TYPE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_type.gd")
+var _type := TYPE.new()
+const TOKEN_BOX = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd")
+const TOKEN_MARGIN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd")
 const TOKENS := &"RookframeTokens"
 var _chrome := CHROME.new()
 var _locale: I18N = I18N.new()

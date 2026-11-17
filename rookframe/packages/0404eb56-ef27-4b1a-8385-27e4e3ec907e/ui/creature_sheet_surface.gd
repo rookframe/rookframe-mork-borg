@@ -177,7 +177,7 @@ func _layout() -> void:
 	get_node(WORK + "Reader/Back").text = _locale.text("Back to creature")
 	get_node(WORK + "Reader/Publication").text = _locale.text("Open publication")
 	for action in ["Create", "Save", "Cancel", "Core"]:
-		_chrome.icon_action(get_node("Inset/Layout/Footer/" + action), {"Create":"person-add", "Save":"check", "Cancel":"close", "Core":"edit"}[action], action in ["Create", "Save"])
+		_chrome.icon_action(get_node("Inset/Layout/Footer/" + action), {"Create":"person-add", "Save":"check", "Cancel":"close", "Core":"edit"}[action])
 	_chrome.icon_action(get_node("Inset/Layout/Footer/Edit"), "edit")
 	_chrome.icon_action(get_node(WORK + "InventoryHeading/Row/Add"), "add")
 	_chrome.icon_action(get_node(WORK + "Reader/Back"), "back")
@@ -872,7 +872,7 @@ func _layout_frame() -> void:
 	identity.custom_minimum_size = Vector2(218 if _phone else 300 if _tablet else (size.x - 80) * 0.3, 0)
 	identity.set(&"padding_horizontal", &"space_2" if _phone else &"space_3" if _tablet else &"space_4")
 	identity.set(&"padding_vertical", &"space_2" if _phone else &"space_3" if _tablet else &"space_4")
-	get_node(IDENTITY).set(&"gap", &"space_1" if _phone else &"space_2" if _tablet else &"space_3")
+	get_node("Inset/Layout/Body/Identity/Column").set(&"gap", &"space_1" if _phone else &"space_2" if _tablet else &"space_3")
 	get_node(WORK + "Encounter").set(&"gap", &"space_4" if _tablet else &"space_5")
 	get_node("Inset/Layout/Footer/SourceNote/Citation").text = "MÖRK BORG"
 	_configure_heading(get_node(WORK + "InventoryHeading"), "Inventory" if _library else "Carried loot")
@@ -884,10 +884,16 @@ func _notification(what: int) -> void:
 ## A bespoke button grows to hold its content in the World theme's type scale.
 func _fit_button(button: Button, content: Control) -> void:
 	# Wrapped copy changes height with its width, so the fit follows the content.
-	var refit := _fit_button.bind(button, content)
+	var refit := _queue_button_height.bind(button, content)
 	if not content.minimum_size_changed.is_connected(refit):
-		content.minimum_size_changed.connect(refit, CONNECT_DEFERRED)
-	var height := maxf(44.0, ceilf(content.get_combined_minimum_size().y))
+		content.minimum_size_changed.connect(refit)
+	_fit_button_height(button, content)
+
+func _queue_button_height(button: Button, content: Control) -> void:
+	_fit_button_height.call_deferred(button, content)
+
+func _fit_button_height(button: Button, content: Control) -> void:
+	var height := maxf(44.0, ceili(content.get_combined_minimum_size().y))
 	if button.custom_minimum_size.y != height:
 		button.custom_minimum_size = Vector2(44, height)
 
@@ -899,7 +905,7 @@ func _layout_identity(metadata: Dictionary) -> void:
 	var maximum := str(_draft.get("maximum_hit_points", _data.get("maximum_hit_points", "—")))
 	hp.accessibility_name = _locale.text("Hit points") + " " + value + ("" if _library else " / " + maximum + ". " + _locale.text("Core values" if _editing else "Apply damage or Heal"))
 	var row := (hp.get_node("Inset/Row") as HBoxContainer)
-	row.set(&"gap", &"space_1" if _phone else &"space_2" if _tablet else &"space_3")
+	(hp.get_node("Inset/Row") as TOKEN_BOX).gap = &"space_1" if _phone else &"space_2" if _tablet else &"space_3"
 	(row.get_node("Icon") as TextureRect).visible = not _phone
 	(row.get_node("Captions/Subtitle") as Label).visible = not _phone
 	(row.get_node("Captions/Title") as Label).text = _locale.text("Hit points")
@@ -909,7 +915,7 @@ func _layout_identity(metadata: Dictionary) -> void:
 	(row.get_node("Maximum") as Label).visible = not _library
 	(row.get_node("Adjust") as Label).visible = not _library and _can_edit
 	for edge in [&"left", &"right", &"top", &"bottom"]:
-		(hp.get_node("Inset") as MarginContainer).set(edge, &"space_2" if _phone else &"space_3")
+		(hp.get_node("Inset") as TOKEN_MARGIN).set(edge, &"space_2" if _phone else &"space_3")
 	var health := HEALTH.new()
 	var fraction := 1.0
 	if not _library:
@@ -938,12 +944,12 @@ func _layout_identity(metadata: Dictionary) -> void:
 	var summary: Button = get_node(IDENTITY + "MiniatureSummary")
 	summary.visible = not _phone
 	var summary_row: HBoxContainer = summary.get_node("Row")
-	summary.get_node("Row/Copy/Caption").text = _locale.text("Tabletop miniature")
-	summary.get_node("Row/Action").text = _locale.text("Appearance") + " →"
+	(summary.get_node("Row/Copy/Caption") as Label).text = _locale.text("Tabletop miniature")
+	(summary.get_node("Row/Action") as Label).text = _locale.text("Appearance") + " →"
 	var inset := get_theme_constant(&"space_3", TOKENS)
 	summary_row.offset_left = inset
 	summary_row.offset_right = -inset
-	summary_row.set(&"gap", &"space_2" if _tablet else &"space_3")
+	(summary.get_node("Row") as TOKEN_BOX).gap = &"space_2" if _tablet else &"space_3"
 	_label_style(row.get_node("Value"), "Value")
 	_fit_button.call_deferred(hp, hp.get_node("Inset"))
 	_fit_button.call_deferred(summary, summary_row)
@@ -958,7 +964,7 @@ func _layout_vital(key: String, caption: String, value: String, icon: Texture2D,
 	(row.get_node("Arrow") as Label).visible = not _library and not _phone
 	(row.get_node("Copy/Caption") as Label).text = caption + (" ↗" if _phone and not _library else "")
 	(row.get_node("Copy/Value") as Label).text = value
-	row.set(&"gap", &"space_1" if _phone else &"space_2")
+	(button.get_node("Inset/Row") as TOKEN_BOX).gap = &"space_1" if _phone else &"space_2"
 	_label_style(row.get_node("Copy/Value"), "Value")
 	button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_fit_button.call_deferred(button, button.get_node("Inset"))
@@ -1056,7 +1062,7 @@ func _fit_identity() -> void:
 	opener.custom_minimum_size = Vector2(0, maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y))
 	# The portrait takes whatever height the native column has left.
 	if portrait.custom_minimum_size.y != 0:
-		portrait.custom_minimum_size = Vector2.ZERO
+		portrait.custom_minimum_size = Vector2(0, 0)
 
 func _capture_reference_page() -> void:
 	if not _reference_route.is_empty() and _reader:
@@ -1154,7 +1160,7 @@ func _fit_inline_core() -> void:
 	# The portrait takes whatever height the native column has left.
 	var portrait: Control = get_node(IDENTITY + "Portrait")
 	if portrait.custom_minimum_size.y != 0:
-		portrait.custom_minimum_size = Vector2.ZERO
+		portrait.custom_minimum_size = Vector2(0, 0)
 
 func begin_corrections() -> void:
 	_return_focus_frames = 0
@@ -1202,4 +1208,4 @@ func finish_corrections() -> void:
 	_update_visibility()
 
 func _label_style(label: Label, role: String) -> void:
-	TYPE.apply(label, role, _phone, _tablet)
+	_type.apply(label, role, _phone, _tablet)

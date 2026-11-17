@@ -10,6 +10,7 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_icon_button.tscn" id="compact_icon"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_text_button.tscn" id="compact_text"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_flow.gd" id="flow"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
 
@@ -272,7 +273,7 @@ text = "+0"
 
 [node name="HealthActions" type="HFlowContainer" parent="."]
 layout_mode = 2
-script = ExtResource("token_box")
+script = ExtResource("flow")
 gap = &"space_1"
 
 [node name="rest" parent="HealthActions" instance=ExtResource("compact_text")]

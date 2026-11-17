@@ -1,7 +1,7 @@
-extends Control
-## Tints a Creature sheet pictogram, rule or scrim with a `RookframeTokens`
-## color of the World theme. Attach to a TextureRect or a ColorRect; the tint
-## follows a live World theme change.
+extends TextureRect
+## Tints a Creature sheet pictogram with a `RookframeTokens` color of the World
+## theme. A ColorRect takes creature_tint_rect.gd. The tint follows a live
+## World theme change.
 
 const TOKENS := &"RookframeTokens"
 
