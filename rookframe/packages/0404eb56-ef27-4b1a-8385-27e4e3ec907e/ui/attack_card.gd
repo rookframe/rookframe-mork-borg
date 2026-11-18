@@ -18,11 +18,15 @@ const FRAME = preload("res://rookframe/ui/components/surfaces/action_panel/actio
 const I18N = preload(ROOT + "localization.gd")
 var _locale := I18N.new()
 const TOKENS := &"RookframeTokens"
+## Tallest touch card that leaves the tabletop usable; a layout bound, not a themed size.
+const TOUCH_HEIGHT := 260.0
 var _target_valid := true
 var _distance_ink: StringName = &"content_muted"
 var _message_ink: StringName = &"content"
 @onready var body: VBoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body")
 var _device := ""
+var _roomy_rows := false
+var _fit_queued := false
 @onready var _view_combat: BoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body/Combat")
 @onready var _view_combat_attack: HBoxContainer = get_node("Frame/Sections/SectionsSlot/Section/Body/Combat/Attack")
 @onready var _view_combat_attack_roll: Button = get_node("Frame/Sections/SectionsSlot/Section/Body/Combat/Attack/Roll")
@@ -68,11 +72,6 @@ func _read_tokens() -> void:
 	for icon in [_view_header_weapon, _view_combat_attack.get_node("Icon"), _view_combat_damage_icon]:
 		(icon as Control).self_modulate = ornament
 	_view_target_icon.self_modulate = ornament if _target_valid else get_theme_color(&"danger", TOKENS)
-	# A theme may paint the roll action's die in its own material; where it
-	# does not, the icon-only action carries the die pictogram.
-	var painted := _view_combat_attack_roll.get_theme_stylebox(&"normal") is StyleBoxTexture
-	_view_combat_attack_roll.icon = null if painted else DICE_ICONS["d20"]
-	_view_combat_attack_roll.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_apply_roles()
 
 # Every theme's Action Panel presentation may put its own Theme between these
@@ -86,13 +85,42 @@ func _apply_roles() -> void:
 	_role(_view_header_identity_actor, &"meta", &"content_muted")
 	_role(_view_header_identity_title, &"heading" if touch else &"title", &"content_heading")
 	_role(_view_header_identity_reach, &"meta" if touch else &"body", &"content_muted")
-	for row in ["Attack", "Damage"]:
-		var line: HBoxContainer = body.get_node("Combat/" + row)
-		_role(line.get_node("Values/Label") as Label, &"meta" if touch else &"label", &"content_muted")
-		_role(line.get_node("Values/Formula") as Label, &"heading" if touch else &"value", &"content")
+	_row_roles(touch and not (_device == "tablet" and _roomy_rows))
 	_role(_view_target_name, &"meta" if _device == "phone" else &"body", &"content")
 	_role(_view_target_distance, &"meta", _distance_ink)
 	_role(_view_message, &"body", _message_ink)
+	if _device == "tablet" and not _fit_queued:
+		_fit_queued = true
+		_fit_rows.call_deferred()
+
+# A tablet's rows take the larger type where the theme's scale leaves the card
+# inside its touch height. The UI Kit frame takes its compact form over the
+# next frames, so the card is measured after them, without its message.
+func _fit_rows() -> void:
+	for frame in range(2):
+		if is_inside_tree():
+			await get_tree().process_frame
+	_fit_queued = false
+	if not is_inside_tree() or _device != "tablet" or not _view_combat.visible:
+		return
+	var least := _view_combat_attack_roll.custom_minimum_size.y
+	var extra := maxf(_line(&"label") + _line(&"value"), least) - maxf(_line(&"meta") + _line(&"heading"), least)
+	var height := get_combined_minimum_size().y - (extra if _roomy_rows else 0.0)
+	if _view_message.visible:
+		height -= _view_message.get_combined_minimum_size().y + body.get_theme_constant(&"separation")
+	var roomy := height + extra <= TOUCH_HEIGHT
+	if roomy != _roomy_rows:
+		_roomy_rows = roomy
+		_row_roles(not roomy)
+
+func _line(type_role: StringName) -> float:
+	return get_theme_font(type_role, TOKENS).get_height(get_theme_font_size(type_role, TOKENS))
+
+func _row_roles(small: bool) -> void:
+	for row in ["Attack", "Damage"]:
+		var line: HBoxContainer = body.get_node("Combat/" + row)
+		_role(line.get_node("Values/Label") as Label, &"meta" if small else &"label", &"content_muted")
+		_role(line.get_node("Values/Formula") as Label, &"heading" if small else &"value", &"content")
 
 func _role(label: Label, type_role: StringName, ink: StringName) -> void:
 	label.add_theme_font_override(&"font", get_theme_font(type_role, TOKENS))
