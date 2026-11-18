@@ -18,7 +18,7 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
 | [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.36.0-rc.3` | `rookframe/sdk/`, `addons/rookframe_sdk/` |
-| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `c59ae3057909975aa93fc001d15924a5fbf76045` | `rookframe/ui/` |
+| [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `17ab08839bb6369b89cdade64cfdd3d37b06f633` | `rookframe/ui/` |
 
 Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored

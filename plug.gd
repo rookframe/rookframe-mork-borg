@@ -33,4 +33,4 @@ func _plugging() -> void:
     plug("godot-gdunit-labs/gdUnit4", {"commit": "08ffc7c65b61b1b2edd545616061a99973c13ce1", "include": ["addons/gdUnit4"]})
     plug("rookframe/rookframe-sdk", {"tag": "v0.36.0-rc.3", "include": ["addons/rookframe_sdk", "rookframe/sdk"]})
     plug("rookframe/rookframe-development-plugin", {"tag": "v0.2.0-rc.1", "include": ["addons/rookframe_development"]})
-    plug("rookframe/rookframe-ui-kit", {"commit": "c59ae3057909975aa93fc001d15924a5fbf76045", "include": ["rookframe/ui"]})
+    plug("rookframe/rookframe-ui-kit", {"commit": "17ab08839bb6369b89cdade64cfdd3d37b06f633", "include": ["rookframe/ui"]})
