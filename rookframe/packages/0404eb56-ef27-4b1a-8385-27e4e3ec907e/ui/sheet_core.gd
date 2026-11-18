@@ -34,14 +34,36 @@ const _vital_edit_paths := {
 
 signal entry_requested(entry: String)
 signal field_changed(text: String, field: String)
+## Smallest type an ability name steps down to.
+const ABILITY_FONT_FLOOR := 12
 
 func _ready() -> void:
 	get_node(^"WeaponHeading/Actions/Options").pressed.connect(_ready_weapon_pressed)
 	for key in PROJECTION.ABILITIES:
 		get_node(_ability_paths.get(str(key), ^"Abilities/StrengthRow/Strength")).pressed.connect(_ability_pressed.bind(str(key)))
+		(get_node(_ability_paths.get(str(key), ^"Abilities/StrengthRow/Strength")).get_node(^"Inset/Row/Title") as Control).resized.connect(_fit_abilities)
 		get_node(_ability_edit_paths.get(str(key) + "Edit", ^"Abilities/StrengthRow/StrengthEditField/Editor")).text_changed.connect(_field_typed.bind(str(key)))
 	for pair in [["HitPointsCurrent", "hit_points"], ["HitPointsMaximum", "maximum_hit_points"], ["PowerUsesCurrent", "power_uses"], ["OmensCurrent", "omens"]]:
 		get_node(_vital_edit_paths.get(str(pair[0]), ^"Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor")).text_changed.connect(_field_typed.bind(str(pair[1])))
+
+# An ability name wider than its cell steps the four names down together, so
+# no name is cut short where a theme's face runs wide.
+func _fit_abilities() -> void:
+	var fitted := 0
+	for key in ["Strength", "Agility", "Presence", "Toughness"]:
+		fitted = maxi(fitted, get_node(_ability_paths.get(key, ^"Abilities/StrengthRow/Strength")).title_size)
+	var fits := false
+	while not fits and fitted > ABILITY_FONT_FLOOR:
+		fits = true
+		for key in ["Strength", "Agility", "Presence", "Toughness"]:
+			var ability: Control = get_node(_ability_paths.get(key, ^"Abilities/StrengthRow/Strength"))
+			fits = fits and (not ability.is_visible_in_tree() or ability.title_fits(fitted))
+		if not fits:
+			fitted -= 1
+	for key in ["Strength", "Agility", "Presence", "Toughness"]:
+		var title: Label = get_node(_ability_paths.get(key, ^"Abilities/StrengthRow/Strength")).get_node(^"Inset/Row/Title")
+		if title.get_theme_font_size(&"font_size") != fitted:
+			title.add_theme_font_size_override(&"font_size", fitted)
 
 func _ready_weapon_pressed() -> void:
 	entry_requested.emit("ready_weapon")
@@ -130,6 +152,7 @@ func configure(data: Dictionary, values: Dictionary, draft: Dictionary, items: A
 		get_node(_ability_paths.get(key, ^"Abilities/StrengthRow/Strength")).visible = draft.is_empty()
 		get_node(_ability_edit_paths.get(key + "Edit", ^"Abilities/StrengthRow/StrengthEditField/Editor")).text = str(draft.get(key, "")) if not draft.is_empty() else str(values.get(key, "0"))
 		get_node(_ability_edit_paths.get(key + "Edit", ^"Abilities/StrengthRow/StrengthEditField/Editor")).visible = not draft.is_empty()
+	_fit_abilities()
 	for vital in ["HitPoints", "PowerUses", "Omens"]:
 		get_node(_vital_paths.get(str(vital), ^"Likeness/Vitals/HitPoints")).visible = draft.is_empty() and (not phone or vital != "Omens")
 		get_node(_vital_group_paths.get(str(vital) + "Edit", ^"Likeness/Vitals/HitPointsEdit")).visible = not draft.is_empty() and (not phone or vital != "Omens")

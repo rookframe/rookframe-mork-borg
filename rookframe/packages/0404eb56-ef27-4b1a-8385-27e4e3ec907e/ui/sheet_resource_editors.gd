@@ -34,6 +34,8 @@ func configure(values: Dictionary, phone: bool, tablet: bool) -> void:
 		get_node(EDITORS.get(str(field), "Pages/Area/Rows/HP/Row/Editors/hit_points/Editor")).text = str(values.get(str(field), ""))
 		get_node(EDITORS.get(str(field), "Pages/Area/Rows/HP/Row/Editors/hit_points/Editor")).add_theme_font_size_override("font_size", 18 if phone or tablet else 20)
 		(get_node(EDITORS.get(str(field), "Pages/Area/Rows/HP/Row/Editors/hit_points/Editor") + "/Caption") as Control).add_theme_font_size_override("font_size", 9 if phone or tablet else 11)
+		# Two editors share the narrow column's row, so each reserves two digits there.
+		get_node(EDITORS.get(str(field), "Pages/Area/Rows/HP/Row/Editors/hit_points/Editor")).add_theme_constant_override("minimum_character_width", 2 if phone or tablet else 4)
 	for path in ["Pages/Area/Rows/HP", "Pages/Area/Rows/Omens", "Pages/Area/Rows/Powers", "Pages/Area/Rows/Silver"]:
 		var row = get_node(path)
 		row.custom_minimum_size = Vector2(row.custom_minimum_size.x, 56 if phone else 64)

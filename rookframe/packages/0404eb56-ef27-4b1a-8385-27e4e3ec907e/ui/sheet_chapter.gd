@@ -8,11 +8,39 @@ var _resource := "power_uses"
 var _setting_resource := false
 var _story: Array[Dictionary] = []
 var _notes: Array[Dictionary] = []
+var _tab_font_size := 18
+## Smallest type a chapter tab steps down to.
+const TAB_FONT_FLOOR := 13
 
 func _ready() -> void:
 	get_node("Page/Content/ChapterCaption/Resource").pressed.connect(_open_resource)
 	get_node("Page/Content/ChapterCaption/SilverEditField/Editor").text_changed.connect(_silver_changed)
 	get_node("Page/Content/ChapterCaption/PowerEditField/Editor").text_changed.connect(_power_changed)
+	for tab in get_node(^"Tabs").get_children():
+		(tab as Control).resized.connect(_fit_tabs)
+
+# A chapter title wider than its tab steps the tabs' type down together, so no
+# title is clipped where a theme's face runs wide or editing narrows the tabs.
+func _fit_tabs() -> void:
+	var fitted := _tab_font_size
+	while fitted > TAB_FONT_FLOOR and not _tabs_fit(fitted):
+		fitted -= 1
+	for tab in get_node(^"Tabs").get_children():
+		if (tab as Button).get_theme_font_size(&"font_size") != fitted:
+			(tab as Button).add_theme_font_size_override(&"font_size", fitted)
+
+func _tabs_fit(font_size: int) -> bool:
+	for child in get_node(^"Tabs").get_children():
+		var tab := child as Button
+		if tab.text.is_empty() or not tab.visible:
+			continue
+		var frame := tab.get_theme_stylebox(&"normal")
+		var room := tab.size.x - maxf(0.0, frame.content_margin_left) - maxf(0.0, frame.content_margin_right)
+		if tab.icon != null:
+			room -= tab.get_theme_constant(&"icon_max_width") + tab.get_theme_constant(&"h_separation")
+		if tab.get_theme_font(&"font").get_multiline_string_size(tab.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x > room:
+			return false
+	return true
 
 func _open_resource() -> void:
 	resource_requested.emit("resource:" + _resource)
@@ -33,12 +61,14 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	section.expand_icon = true
 	section.fit_to_longest_item = false
 	section.clip_text = true
+	_tab_font_size = 18 if phone else 19 if tablet else 23
 	for path in ["Tabs/TabCharacter", "Tabs/TabPowers", "Tabs/TabInventory", "Tabs/TabJournal", "Tabs/TabAppearance"]:
 		var button = get_node(path)
 		button.custom_minimum_size = Vector2(44, 44 if phone else 48 if tablet else 54)
 		var compact := phone or tablet
-		button.configure_layout(18 if phone else 19 if tablet else 23, &"icon_medium" if compact else &"icon_large", not (compact and path.ends_with("TabAppearance")), not compact)
+		button.configure_layout(_tab_font_size, &"icon_medium" if compact else &"icon_large", not (compact and path.ends_with("TabAppearance")), not compact)
 	get_node(^"Tabs").set(&"gap", &"space_1" if phone else &"space_2")
+	_fit_tabs()
 	get_node(^"Page/Content/ChapterCaption/Caption").add_theme_font_size_override("font_size", 17 if tablet else 20)
 	for raw in get_node(^"Page/Content/ChapterCaption/InventoryFilters").get_children():
 		var child := raw as Control

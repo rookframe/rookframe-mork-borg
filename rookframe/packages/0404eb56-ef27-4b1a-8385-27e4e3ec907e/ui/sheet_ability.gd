@@ -1,9 +1,19 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_hint_button.gd"
 ## Ability corrections stay in place while the reading view separates the modifier.
+## Type size of the name before the sheet fits the four names to their cells.
+var title_size := 21
+
+## Whether the whole name fits its label at a type size. A label without a
+## layout yet has nothing to measure against.
+func title_fits(font_size: int) -> bool:
+	var title: Label = get_node(^"Inset/Row/Title")
+	return title.size.x <= 0.0 or title.get_theme_font(&"font").get_multiline_string_size(title.text, HORIZONTAL_ALIGNMENT_LEFT, -1, font_size).x <= title.size.x
+
 func configure(caption: String, modifier: int, phone: bool = false, tablet: bool = false) -> void:
 	custom_minimum_size = Vector2(44, 44)
 	get_node(^"Inset/Row/Title").text = {"Strength": "STR", "Agility": "AGI", "Presence": "PRE", "Toughness": "TOU"}.get(caption, caption) if phone else caption
-	get_node(^"Inset/Row/Title").add_theme_font_size_override("font_size", 14 if phone else 17 if tablet else 21)
+	title_size = 14 if phone else 17 if tablet else 21
+	get_node(^"Inset/Row/Title").add_theme_font_size_override("font_size", title_size)
 	get_node(^"Inset/Row/Value").text = ("%+d" % modifier).replace("-", "−")
 	get_node(^"Inset/Row/Value").add_theme_font_size_override("font_size", 22 if phone or tablet else 27)
 	# Phone and tablet rows carry no pictogram, so their copy starts at the row's own inset.
