@@ -32,9 +32,10 @@ const PAGE_ROWS_PHONE := 2
 ## Width of the attached panel; a layout breakpoint, not a themed size.
 const PANEL_WIDTH := 510.0
 const PANEL_WIDTH_TABLET := 460.0
-## A phone is wide and short, so its panel spends width instead of height.
-const PANEL_WIDTH_PHONE := 720.0
-const SEARCH_WIDTH_PHONE := 260.0
+const PANEL_WIDTH_PHONE := 480.0
+## A phone is wide and short, so a panel too tall for it spends width instead.
+const PANEL_WIDTH_PHONE_WIDE := 720.0
+const SEARCH_WIDTH_WIDE := 260.0
 const SLOT := "Hud/AttachedPanel/AttachedSlot/Panel/"
 var _model := MODEL.new()
 var _roll: ROLL
@@ -43,6 +44,10 @@ var _rook: SDK.RookId
 var _data: Dictionary = {}
 var _category := ""
 var _phone := false
+var _wide := false
+var _fitting := false
+## Categories whose panel needed the wide form on this canvas and theme.
+var _wide_categories := {}
 var _tablet := false
 var _open := false
 var _panel_anchor: Button
@@ -75,6 +80,9 @@ func _init() -> void:
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED and is_node_ready():
+		# Another theme's type may leave the height for the regular panel.
+		_wide_categories = {}
+		_wide = false
 		_layout()
 
 func ready() -> void:
@@ -161,20 +169,22 @@ func _layout() -> void:
 	var edge := _edge()
 	_hud.offset_top = -edge
 	_hud.offset_bottom = -edge
-	var width := PANEL_WIDTH_PHONE if _phone else PANEL_WIDTH_TABLET if _tablet else PANEL_WIDTH
+	_wide = _wide and _phone
+	var width := PANEL_WIDTH_PHONE_WIDE if _wide else PANEL_WIDTH_PHONE if _phone else PANEL_WIDTH_TABLET if _tablet else PANEL_WIDTH
 	_panel.custom_minimum_size = Vector2(minf(width, size.x - edge * 2), 0)
 	_page_rows = PAGE_ROWS_PHONE if _phone else PAGE_ROWS
 	_place_tools()
 
 ## The search field and the amount stepper each have a line of their own under
-## the header; a phone has no height for that line, so there they join the
-## header's actions and the stepper drops its visible caption.
+## the header. A phone whose theme leaves no height for that line widens the
+## panel instead: the tools join the header's actions and the stepper drops its
+## visible caption.
 func _place_tools() -> void:
-	_place(_search, _actions if _phone else _panel, 0 if _phone else 1)
-	_place(_stepper, _actions if _phone else _health_editor, 0)
-	_search.custom_minimum_size = Vector2(SEARCH_WIDTH_PHONE if _phone else 0.0, _search.custom_minimum_size.y)
-	_search.size_flags_vertical = Control.SIZE_SHRINK_CENTER if _phone else Control.SIZE_FILL
-	_stepper.get_node(^"AmountLabel").visible = not _phone
+	_place(_search, _actions if _wide else _panel, 0 if _wide else 1)
+	_place(_stepper, _actions if _wide else _health_editor, 0)
+	_search.custom_minimum_size = Vector2(SEARCH_WIDTH_WIDE if _wide else 0.0, _search.custom_minimum_size.y)
+	_search.size_flags_vertical = Control.SIZE_SHRINK_CENTER if _wide else Control.SIZE_FILL
+	_stepper.get_node(^"AmountLabel").visible = not _wide
 
 func _place(tool: Control, home: Node, index: int) -> void:
 	if tool.get_parent() != home:
@@ -185,14 +195,39 @@ func _place(tool: Control, home: Node, index: int) -> void:
 func _edge() -> int:
 	return get_theme_constant(&"space_2" if _phone else &"space_5", TOKENS)
 
-## Rows grow with wrapped names and with the theme's type scale, so a page
-## gives up rows until the attached panel stands inside the canvas.
+## Rows grow with wrapped names and with the theme's type scale. A panel taller
+## than the canvas first widens on a phone, then its page gives up rows until
+## it stands inside the canvas.
 func _fit_rows() -> void:
-	if _open and _page_rows > 1 and _hud.position.y < _edge():
-		var first := _page * _page_rows
-		_page_rows -= 1
-		_page = first / _page_rows
-		_render_panel()
+	if _open and not _fitting and _hud.position.y < _edge():
+		_fitting = true
+		_refit.call_deferred()
+
+# Rows report a tall minimum until their wrapped copy has a width, so the panel
+# is measured once the layout has settled, and again after each change.
+func _refit() -> void:
+	var changed := true
+	while changed:
+		for frame in range(2):
+			if is_inside_tree():
+				await get_tree().process_frame
+		changed = false
+		if is_inside_tree() and _open and _hud.position.y < _edge():
+			if _phone and not _wide:
+				_wide = true
+				_wide_categories[_category] = true
+				_layout()
+				_render_panel()
+				# A tool that moved lost the focus the opening gave it.
+				_focus_panel()
+				changed = true
+			elif _page_rows > 1:
+				var first := _page * _page_rows
+				_page_rows -= 1
+				_page = first / _page_rows
+				_render_panel()
+				changed = true
+	_fitting = false
 
 func _refresh() -> void:
 	var context := sdk.character_hud.context()
@@ -241,6 +276,9 @@ func _resized() -> void:
 		var experience := sdk.presentation_experience()
 		_phone = experience.is_phone
 		_tablet = experience.is_tablet
+	# A new canvas tries the panel's regular width again.
+	_wide_categories = {}
+	_wide = false
 	_layout()
 	_queue_render()
 
@@ -255,7 +293,8 @@ func _open_category(category: String) -> void:
 		return
 	_category = category
 	_page = 0
-	_page_rows = PAGE_ROWS_PHONE if _phone else PAGE_ROWS
+	_wide = _wide_categories.has(category)
+	_layout()
 	_panel_anchor = _health if category == "Hit points" else _tile(category)
 	_open = true
 	_panel.visible = true
