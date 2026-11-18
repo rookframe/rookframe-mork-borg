@@ -106,3 +106,11 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	super.configure(_locale, _texture, false, _actor != null and _actor.access_level == "Owner" and not _busy, phone, tablet, str(data.get("name", "Character")))
 	get_node(PORTRAIT + "Explanation").text = "Shown in the character sheet."
 	get_node(MINIATURE + "Explanation").text = "Saved for this character. Existing Rooks keep their current miniature."
+	# The sheet keeps its compact density: a phone page has no height for two
+	# notes in the theme's caption size.
+	for base in [PORTRAIT, MINIATURE]:
+		var note: Label = get_node(base + "Explanation")
+		if phone:
+			note.add_theme_font_size_override("font_size", 12)
+		else:
+			note.remove_theme_font_size_override("font_size")
