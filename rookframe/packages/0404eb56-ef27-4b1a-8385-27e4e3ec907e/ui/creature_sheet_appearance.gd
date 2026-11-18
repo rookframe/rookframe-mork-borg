@@ -31,6 +31,10 @@ signal portrait_reset_requested
 @export var miniature_only := false
 var _assigned := false
 var _phone := false
+## Width at which a row's regular actions wrapped, by row name.
+var _wrapped := {}
+## Rows whose actions are compact now, by row name.
+var _compact_rows := {}
 const PORTRAIT := "Columns/PortraitPanel/Inset/Content/"
 const MINIATURE := "Columns/MiniaturePanel/Inset/Content/"
 func _ready() -> void:
@@ -38,6 +42,10 @@ func _ready() -> void:
 	get_node(PORTRAIT + "PortraitButtons/ClearPortrait").pressed.connect(_portrait_reset)
 	get_node(MINIATURE + "MiniatureButtons/ChangeMiniature").pressed.connect(_miniature)
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").pressed.connect(_miniature_clear)
+	for row in [PORTRAIT + "PortraitButtons", MINIATURE + "MiniatureButtons"]:
+		# A row that wraps grows taller, and one that is resized may fit again.
+		get_node(row).minimum_size_changed.connect(_fit_actions.bind(get_node(row)))
+		get_node(row).resized.connect(_fit_actions.bind(get_node(row)))
 
 func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, phone: bool, tablet: bool, name: String = "") -> void:
 	_phone = phone
@@ -73,8 +81,6 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	for path in [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait", MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]:
 		var button: Button = get_node(path)
 		button.disabled = not can_edit
-		# The creator's tablet column is narrow enough to wrap the two actions.
-		button.compact = phone or (tablet and miniature_only)
 	get_node(MINIATURE + "Explanation").visible = not miniature_only
 	get_node(MINIATURE + "EmptyPreview/Content/Title").text = locale.text("No miniature assigned")
 	get_node(MINIATURE + "EmptyPreview/Content/Copy").text = locale.text("Choose from installed Packages.")
@@ -88,6 +94,7 @@ func configure(locale: I18N, texture: Texture2D, library: bool, can_edit: bool, 
 	get_node(MINIATURE + "EmptyPreview/Content/Image").custom_minimum_size = Vector2(32, 32) if phone else Vector2(96, 96)
 	# The creator's phone page keeps its height for the words and the action.
 	get_node(MINIATURE + "EmptyPreview/Content/Image").visible = not (phone and miniature_only)
+	_refit_actions()
 	_type.apply(get_node("Intro/Title"), "Title", phone, tablet)
 	_type.apply(get_node(MINIATURE + "EmptyPreview/Content/Title"), "Section", phone, tablet)
 	_type.apply(get_node(MINIATURE + "MiniatureCaption"), "Section", phone, tablet)
@@ -104,7 +111,44 @@ func miniature(locale: I18N, title: String, package: String, assigned: bool) -> 
 	get_node(MINIATURE + "MiniatureButtons/ClearMiniature").visible = assigned
 	get_node(MINIATURE + "EmptyPreview").visible = not assigned
 	get_node(MINIATURE + "MiniaturePreview").visible = assigned
+	_refit_actions()
 	_present_actions()
+
+# Actions take their compact size on a phone and wherever a row of regular
+# ones wraps. A row tries the regular size again when its width changes.
+func _fit_actions(row: HFlowContainer) -> void:
+	var key := str(row.name)
+	var wrapped_at: float = _wrapped.get(key, -1.0)
+	if wrapped_at >= 0.0 and maxf(wrapped_at - row.size.x, row.size.x - wrapped_at) >= 1.0:
+		_wrapped.erase(key)
+	elif wrapped_at < 0.0 and not _phone and _wraps(row):
+		_wrapped[key] = row.size.x
+	var compact: bool = _phone or _wrapped.has(key)
+	if _compact_rows.get(key, false) == compact:
+		return
+	_compact_rows[key] = compact
+	var actions := [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait"] if key == "PortraitButtons" else [MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]
+	for path in actions:
+		var button: Button = get_node(path)
+		button.compact = compact
+
+# A wrapped row places a later action below its first one.
+func _wraps(row: HFlowContainer) -> bool:
+	var first: Control = null
+	for child in row.get_children():
+		var action := child as Control
+		if action == null or not action.visible:
+			continue
+		if first == null:
+			first = action
+		elif action.position.y >= first.position.y + first.size.y:
+			return true
+	return false
+
+func _refit_actions() -> void:
+	_wrapped = {}
+	for row in [PORTRAIT + "PortraitButtons", MINIATURE + "MiniatureButtons"]:
+		_fit_actions(get_node(row))
 
 func _present_actions() -> void:
 	for path in [PORTRAIT + "PortraitButtons/ChangePortrait", PORTRAIT + "PortraitButtons/ClearPortrait", MINIATURE + "MiniatureButtons/ChangeMiniature", MINIATURE + "MiniatureButtons/ClearMiniature"]:

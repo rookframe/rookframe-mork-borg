@@ -53,6 +53,9 @@ func _ready() -> void:
 	get_node(DETAIL + "/ScrollChoice/Eat").pressed.connect(_request_scroll.bind("eat"))
 	get_node(DETAIL + "/ScrollChoice/Paper").pressed.connect(_request_scroll.bind("toilet-paper"))
 	get_name_field().value_changed.connect(_name_changed)
+	(get_node(STAGE + "/Content") as Control).resized.connect(_arrange_identity)
+	for field in [get_name_field(), get_description_field()]:
+		field.minimum_size_changed.connect(_arrange_identity)
 	get_node(STAGE + "/Heading/Details").pressed.connect(_toggle_details)
 	for section in ["Character", "Gear", "Traits"]:
 		get_node(STAGE + "/Heading/ReviewTabs/" + section).pressed.connect(_select_review.bind(section))
@@ -143,16 +146,10 @@ func _fit_creation() -> void:
 	for section in ["Character","Gear","Traits"]:
 		get_node(STAGE + "/Heading/ReviewTabs/" + section).compact = true
 	get_node(LEFT + "/Choices").columns = 2 if phone and _route == "create-class" and size.x > 600 else 1
-	# A phone has no height for two stacked fields in every theme's type scale,
-	# so the name and the description stand side by side there.
-	var identity: BoxContainer = get_node(LEFT + "/Identity")
-	identity.vertical = not phone
-	identity.get_node(^"TopInset").visible = not phone
-	_gap(LEFT + "/Identity", &"space_3" if phone else &"space_4")
-	# Half the width has no room for the long hint on one line.
-	get_description_field().help_text = _t("Optional" if phone else "Optional · a few words to remember them by")
+	get_node(LEFT + "/Identity/TopInset").visible = not phone
 	for field in [get_name_field(),get_description_field()]:
 		field.compact = phone
+	_arrange_identity()
 	var pages := get_node(STAGE + "/Content/Split/Detail/Pages")
 	pages.enabled = true
 	_gap(DETAIL, &"space_2" if tablet and _route == "create-class" else &"space_1" if phone else &"space_2" if tablet else &"space_5")
@@ -204,6 +201,27 @@ func _fit_creation() -> void:
 ## Sets the gap token of a container that carries `token_box.gd`.
 func _gap(path: String, token: StringName) -> void:
 	get_node(path).set(&"gap", token)
+
+## The name stands over the description wherever the stage has the height for
+## both in the theme's type; a phone that lacks it stands them side by side.
+func _arrange_identity() -> void:
+	var identity: BoxContainer = get_node(LEFT + "/Identity")
+	var phone := is_compact()
+	var gap: StringName = &"space_1" if phone else &"space_2" if is_tablet() else &"space_4"
+	var stacked := true
+	if phone:
+		var needed := get_name_field().get_combined_minimum_size().y + get_description_field().get_combined_minimum_size().y + get_theme_constant(gap, TOKENS)
+		stacked = needed <= (get_node(STAGE + "/Content") as Control).size.y
+	if not stacked:
+		gap = &"space_3"
+	if identity.vertical != stacked:
+		identity.vertical = stacked
+	if identity.get(&"gap") != gap:
+		identity.set(&"gap", gap)
+	# Half the width has no room for the long hint on one line.
+	var hint := _t("Optional · a few words to remember them by" if stacked else "Optional")
+	if get_description_field().help_text != hint:
+		get_description_field().help_text = hint
 
 ## Sets the UI Kit label variation that carries the type role of a Label.
 func _role(path: String, variation: StringName) -> void:
@@ -267,7 +285,9 @@ func localize(locale: I18N) -> void:
 	get_name_field().label_text = _t("Name")
 	get_name_field().help_text = _t("Required")
 	get_description_field().label_text = _t("Description")
-	get_description_field().help_text = _t("Optional" if is_node_ready() and is_compact() else "Optional · a few words to remember them by")
+	get_description_field().help_text = _t("Optional · a few words to remember them by")
+	if is_node_ready():
+		_arrange_identity()
 	# Pictograms stand alone on a phone, so their groups carry the names.
 	for ability in ["Agility", "Presence", "Strength", "Toughness"]:
 		get_node(CONTEXT + "/Attributes/" + ability).tooltip_text = _t(ability)
