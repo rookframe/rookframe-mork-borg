@@ -5,9 +5,12 @@
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/favorite_toggle.tscn" id="favorite"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/paginated_text_area.tscn" id="notepad"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="margin"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="frame"]
+
+[sub_resource type="ButtonGroup" id="DetailTabs"]
 
 [node name="Detail" type="VBoxContainer"]
 size_flags_horizontal = 3
@@ -101,22 +104,22 @@ bottom = &""
 layout_mode = 2
 script = ExtResource("box")
 
-[node name="Overview" type="Button" parent="TabsFrame/Inset/DetailTabs"]
+[node name="Overview" parent="TabsFrame/Inset/DetailTabs" instance=ExtResource("button")]
 custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-theme_override_font_sizes/font_size = 14
 toggle_mode = true
+button_group = SubResource("DetailTabs")
+compact = true
 text = "Overview"
 
-[node name="Details" type="Button" parent="TabsFrame/Inset/DetailTabs"]
+[node name="Details" parent="TabsFrame/Inset/DetailTabs" instance=ExtResource("button")]
 custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-theme_override_font_sizes/font_size = 14
 toggle_mode = true
+button_group = SubResource("DetailTabs")
+compact = true
 text = "Details"
 
 [node name="Body" type="MarginContainer" parent="."]
