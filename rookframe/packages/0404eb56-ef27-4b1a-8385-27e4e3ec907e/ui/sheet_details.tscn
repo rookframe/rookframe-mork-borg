@@ -10,8 +10,6 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="margin"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="frame"]
 
-[sub_resource type="ButtonGroup" id="DetailTabs"]
-
 [node name="Detail" type="VBoxContainer"]
 size_flags_horizontal = 3
 size_flags_vertical = 3
@@ -105,7 +103,6 @@ custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
-button_group = SubResource("DetailTabs")
 compact = true
 text = "Overview"
 
@@ -114,7 +111,6 @@ custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 3
 toggle_mode = true
-button_group = SubResource("DetailTabs")
 compact = true
 text = "Details"
 

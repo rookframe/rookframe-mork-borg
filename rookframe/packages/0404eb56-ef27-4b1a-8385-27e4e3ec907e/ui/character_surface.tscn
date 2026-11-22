@@ -47,8 +47,6 @@
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/input.tscn" id="input"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="kit_button"]
 
-[sub_resource type="ButtonGroup" id="InventoryFilters"]
-
 [node name="CharacterSurface" type="Control" unique_id=509514634]
 unique_name_in_owner = true
 texture_filter = 4
@@ -1121,28 +1119,24 @@ size_flags_horizontal = 3
 [node name="All" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1581386627 instance=ExtResource("kit_button")]
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("InventoryFilters")
 text = "All belongings"
 compact = true
 
 [node name="Arms" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1896568205 instance=ExtResource("kit_button")]
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("InventoryFilters")
 text = "Arms"
 compact = true
 
 [node name="Supplies" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1801508993 instance=ExtResource("kit_button")]
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("InventoryFilters")
 text = "Supplies"
 compact = true
 
 [node name="Ready" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/InventoryFilters" unique_id=1307923468 instance=ExtResource("kit_button")]
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("InventoryFilters")
 text = "Ready"
 compact = true
 

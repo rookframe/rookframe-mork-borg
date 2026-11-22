@@ -33,6 +33,10 @@ var _focused_field := ""
 @onready var _primary_action = get_node(^"FooterFrame/FooterInset/DetailActions/PrimaryAction")
 
 func _ready() -> void:
+	# Each open instance owns its set: a group saved in the scene is shared between instances or copied per UI Kit control.
+	var tabs := ButtonGroup.new()
+	for tab in get_node(^"TabsFrame/Inset/DetailTabs").get_children():
+		(tab as BaseButton).button_group = tabs
 	get_node(^"HeaderFrame/Inset/DetailHeader/DetailTitle").resized.connect(_fit_title)
 	get_node(^"HeaderFrame/Inset/DetailHeader/Close").pressed.connect(_close)
 	(_save_button as Button).pressed.connect(_save)

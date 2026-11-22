@@ -6,7 +6,6 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="token_frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
-[sub_resource type="ButtonGroup" id="Sections"]
 [node name="Workflow" type="VBoxContainer"]
 script = ExtResource("script")
 gap = &"space_5"
@@ -197,7 +196,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Recovery"
 toggle_mode = true
-button_group = SubResource("Sections")
 clip_text = true
 compact = true
 [node name="Daily" parent="Body/Main/Content/Sections" instance=ExtResource("tab")]
@@ -205,7 +203,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 text = "Daily resources"
 toggle_mode = true
-button_group = SubResource("Sections")
 clip_text = true
 compact = true
 [node name="Progress" type="VBoxContainer" parent="Body/Main/Content"]

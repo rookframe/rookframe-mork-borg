@@ -38,6 +38,10 @@ var _world_refresh_pending := false
 @export var character_creation := false
 
 func ready() -> void:
+	# Each open instance owns its set: a group saved in the scene is shared between instances or copied per UI Kit control.
+	var routes := ButtonGroup.new()
+	for route in [^"Layout/Header/Routes/Creature", ^"Layout/Header/Routes/CreatureInventory", ^"Layout/Header/Routes/Appearance"]:
+		(get_node(route) as BaseButton).button_group = routes
 	i18n.bind(sdk)
 	localize(i18n)
 	if sdk == null:

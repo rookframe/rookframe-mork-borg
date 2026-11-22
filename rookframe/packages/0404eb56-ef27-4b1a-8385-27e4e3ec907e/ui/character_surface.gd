@@ -134,6 +134,10 @@ var _rendered_chapter := -1
 var _locale := I18N.new()
 
 func ready() -> void:
+	# Each open instance owns its set: a group saved in the scene is shared between instances or copied per UI Kit control.
+	var filters := ButtonGroup.new()
+	for filter in _chapter_ui.get_node(^"Page/Content/ChapterCaption/InventoryFilters").get_children():
+		(filter as BaseButton).button_group = filters
 	_quick_omens.icon = preload("res://rookframe/ui/icons/character/dice.svg")
 	if sdk == null:
 		return
