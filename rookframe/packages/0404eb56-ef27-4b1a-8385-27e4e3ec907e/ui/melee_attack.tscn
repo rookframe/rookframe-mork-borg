@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/input.tscn" id="input"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [node name="MeleeAttack" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -74,11 +75,10 @@ size_flags_horizontal = 3
 theme_type_variation = &"RookframeBody"
 text = "Choose one Creature target"
 autowrap_mode = 2
-[node name="Change" type="Button" parent="Target"]
+[node name="Change" parent="Target" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Change"
+compact = true
 [node name="Ammunition" type="VBoxContainer" parent="."]
 layout_mode = 2
 script = ExtResource("box")
@@ -116,18 +116,16 @@ size_flags_horizontal = 1
 layout_mode = 2
 label_text = "Situational modifier"
 value = "0"
-[node name="Lose" type="Button" parent="Rules"]
+[node name="Lose" parent="Rules" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 toggle_mode = true
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Fumble: lose instead of break"
-[node name="Piercing" type="Button" parent="Rules"]
+compact = true
+[node name="Piercing" parent="Rules" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 toggle_mode = true
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Piercing attack"
+compact = true
 [node name="Hint" type="Label" parent="Rules"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"

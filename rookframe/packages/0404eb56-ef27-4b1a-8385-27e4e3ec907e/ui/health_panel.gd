@@ -31,6 +31,11 @@ func _ready() -> void:
 	get_node(^"Columns/Context/Content/Restrictions/Food").pressed.connect(_changed)
 	get_node(^"Columns/Context/Content/Restrictions/Infected").pressed.connect(_changed)
 	get_node(^"Columns/Task/Omens/Content/SixHours").pressed.connect(_changed)
+	# A scene-local ButtonGroup is copied for each instanced UI Kit control, so every set joins one here.
+	for choices in [get_node(^"Columns/Task/Rest/Content").find_children("*", "BaseButton", false, false), get_node(^"Scrolls/Choices").get_children()]:
+		var group := ButtonGroup.new()
+		for choice in choices:
+			(choice as BaseButton).button_group = group
 	_rest_changed()
 
 func _rest_changed() -> void:

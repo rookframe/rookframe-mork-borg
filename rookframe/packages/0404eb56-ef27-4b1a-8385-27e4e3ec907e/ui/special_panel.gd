@@ -46,6 +46,11 @@ func _ready() -> void:
 		for number in range(list.get_child_count()):
 			var row := list.get_child(number) as Button
 			row.pressed.connect(_choose_scroll_option.bind(index, number))
+	# A scene-local ButtonGroup is copied for each instanced UI Kit control, so every set joins one here.
+	for path in [^"Options/Ability/Choices", ^"Scrolls/First", ^"Scrolls/Second"]:
+		var group := ButtonGroup.new()
+		for choice in get_node(path).get_children():
+			(choice as BaseButton).button_group = group
 	get_node(^"Columns/Recipient/Content/Change").pressed.connect(_choose_targets)
 	get_node(^"Columns/Recipient/Content/Self").pressed.connect(_self_changed)
 

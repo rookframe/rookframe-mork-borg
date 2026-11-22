@@ -1,6 +1,7 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_companions.gd" id="1"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [node name="Companions" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -9,13 +10,12 @@ gap = &"space_3"
 [node name="BackRow" type="HBoxContainer" parent="."]
 layout_mode = 2
 script = ExtResource("token_box")
-[node name="Back" type="Button" parent="BackRow"]
+[node name="Back" parent="BackRow" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeQuietButton"
 text = "Back"
 tooltip_text = "Back to Character"
 accessibility_name = "Back to Character"
+compact = true
 [node name="Label" type="Label" parent="BackRow"]
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"

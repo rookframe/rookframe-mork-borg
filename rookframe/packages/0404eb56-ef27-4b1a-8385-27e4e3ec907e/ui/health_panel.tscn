@@ -4,12 +4,7 @@
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.tscn" id="2"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
-
-[sub_resource type="ButtonGroup" id="RestGroup"]
-resource_local_to_scene = true
-
-[sub_resource type="ButtonGroup" id="ScrollGroup"]
-resource_local_to_scene = true
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 
 [node name="HealthPanel" type="VBoxContainer"]
 layout_mode = 2
@@ -41,28 +36,24 @@ theme_type_variation = &"RookframeHeading"
 autowrap_mode = 2
 text = "Recovery"
 
-[node name="Breath" type="Button" parent="Columns/Task/Rest/Content"]
+[node name="Breath" parent="Columns/Task/Rest/Content" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeChoiceRow"
 alignment = 0
 icon_alignment = 2
 toggle_mode = true
 autowrap_mode = 2
 text = "Catch your breath · d4 HP"
-button_group = SubResource("RestGroup")
 button_pressed = true
+compact = true
 
-[node name="Sleep" type="Button" parent="Columns/Task/Rest/Content"]
+[node name="Sleep" parent="Columns/Task/Rest/Content" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeChoiceRow"
 alignment = 0
 icon_alignment = 2
 toggle_mode = true
 autowrap_mode = 2
 text = "Full night’s sleep · d6 HP"
-button_group = SubResource("RestGroup")
+compact = true
 
 [node name="Omens" type="PanelContainer" parent="Columns/Task"]
 layout_mode = 2
@@ -178,52 +169,42 @@ layout_mode = 2
 [node name="Scroll0" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll1" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll2" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll3" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll4" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll5" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll6" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll7" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll8" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Scroll9" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-button_group = SubResource("ScrollGroup")
 
 [node name="Specialties" type="VBoxContainer" parent="."]
 layout_mode = 2

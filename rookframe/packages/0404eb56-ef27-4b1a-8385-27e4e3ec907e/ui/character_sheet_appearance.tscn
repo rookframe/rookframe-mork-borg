@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_appearance.gd" id="1"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="2"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [node name="CharacterAppearance" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -43,21 +44,20 @@ theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14
 text = "Preferred Miniature for this Actor’s Rooks."
 autowrap_mode = 2
-[node name="Choose" type="Button" parent="Default/Content/Row/Details"]
+[node name="Choose" parent="Default/Content/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Choose Miniature"
+compact = true
 [node name="Picker" type="VBoxContainer" parent="Default/Content/Row/Details"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 visible = false
-[node name="Apply" type="Button" parent="Default/Content/Row/Details"]
+[node name="Apply" parent="Default/Content/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframePrimaryButton"
 text = "Use Miniature"
 visible = false
+variant = 1
+compact = true
 [node name="Selected" type="PanelContainer" parent="."]
 layout_mode = 2
 theme_type_variation = &"RookframeSection"
@@ -95,18 +95,17 @@ theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14
 text = "Appearance for the selected Rook."
 autowrap_mode = 2
-[node name="Choose" type="Button" parent="Selected/Content/Row/Details"]
+[node name="Choose" parent="Selected/Content/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Choose Miniature"
+compact = true
 [node name="Picker" type="VBoxContainer" parent="Selected/Content/Row/Details"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 visible = false
-[node name="Apply" type="Button" parent="Selected/Content/Row/Details"]
+[node name="Apply" parent="Selected/Content/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframePrimaryButton"
 text = "Use Miniature"
 visible = false
+variant = 1
+compact = true

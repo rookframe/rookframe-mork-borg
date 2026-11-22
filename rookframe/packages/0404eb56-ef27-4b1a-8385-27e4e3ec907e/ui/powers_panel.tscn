@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [node name="PowersPanel" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -17,11 +18,10 @@ custom_minimum_size = Vector2(0, 44)
 theme_type_variation = &"RookframeSecondaryButton"
 [node name="Browse" type="HBoxContainer" parent="."]
 layout_mode = 2
-[node name="Back" type="Button" parent="Browse"]
+[node name="Back" parent="Browse" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeQuietButton"
 text = "‹ Character"
+compact = true
 [node name="Title" type="Label" parent="Browse"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -119,11 +119,10 @@ layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 text = "Every morning: Presence + d4 uses. Confirm the morning with the table before rolling. Current uses can also be corrected in Edit Character."
 autowrap_mode = 2
-[node name="Roll" type="Button" parent="Daily"]
+[node name="Roll" parent="Daily" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Morning: roll daily uses"
+compact = true
 [node name="Cast" type="VBoxContainer" parent="."]
 layout_mode = 2
 script = ExtResource("token_box")
@@ -165,11 +164,10 @@ autowrap_mode = 2
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 autowrap_mode = 2
-[node name="Change" type="Button" parent="Cast/Columns/Targets/Content"]
+[node name="Change" parent="Cast/Columns/Targets/Content" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Change targets"
+compact = true
 [node name="Options" type="VBoxContainer" parent="Cast"]
 layout_mode = 2
 script = ExtResource("token_box")
