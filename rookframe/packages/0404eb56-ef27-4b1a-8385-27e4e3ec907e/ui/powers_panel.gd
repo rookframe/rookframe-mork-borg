@@ -32,7 +32,7 @@ func _ready() -> void:
 	get_node(^"Source/Choice").item_selected.connect(_source_selected)
 	get_node(^"Browse/Back").pressed.connect(_back)
 	get_node(^"Daily/Roll").pressed.connect(_daily)
-	get_node(^"Cast/Columns/Targets/Content/Change").pressed.connect(_choose_targets)
+	get_node(^"Cast/Columns/Targets/Content/BodySlot/Change").pressed.connect(_choose_targets)
 
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
@@ -147,12 +147,12 @@ func _render() -> void:
 	get_node(^"Metrics/Uses/Content/Value").text = str(_action.snapshot.get("natural_face", 0)) if terminal else str(data.get("power_uses", 0))
 	get_node(^"Metrics/Presence/Content/Value").text = (_t("Critical") if adjudication == "critical" else _t("Fumble")) if terminal else "%+d" % presence
 	get_node(^"Metrics/Difficulty/Content/Value").text = _t("DR10") if str(data.get("class_id", "")) == "gutterborn-scum" else _t("DR12")
-	get_node(^"Cast/Columns/Power/Content/Copy").text = _t(str(_power.get("rules", "This scroll is unavailable.")))
+	get_node(^"Cast/Columns/Power/Content/BodySlot/Copy").text = _t(str(_power.get("rules", "This scroll is unavailable.")))
 	var mode := str(_power.get("target_mode", ""))
 	var reach: int = _power.get("range_feet", 0)
-	get_node(^"Cast/Columns/Power/Content/Range").text = _t("Area · 30 ft") if mode == "area" else (_t("Self") if mode == "self" else _t("Range · %d ft") % reach)
+	get_node(^"Cast/Columns/Power/Content/BodySlot/Range").text = _t("Area · 30 ft") if mode == "area" else (_t("Self") if mode == "self" else _t("Range · %d ft") % reach)
 	get_node(^"Cast/Columns/Targets").visible = mode != "self"
-	get_node(^"Cast/Columns/Targets/Content/Change").disabled = state == "pending"
+	get_node(^"Cast/Columns/Targets/Content/BodySlot/Change").disabled = state == "pending"
 	get_node(^"Cast/Options").visible = state in ["ready", "error"]
 	if _action != null:
 		_status(_action.message, state == "error" or _action.snapshot.get("target_error", false))
@@ -161,8 +161,8 @@ func _render() -> void:
 		title = "Action ended" if state == "ended" else "Daily allowance" if _morning_only else ("Power " + adjudication if not adjudication.is_empty() else "Power resolved")
 		get_node(^"Outcome").visible = false
 		get_node(^"Result/Power").text = _t("Morning Power allowance" if _morning_only else str(_power.get("name", "Power")))
-		get_node(^"Result/Section/Content/Heading").text = _t("The action was interrupted") if state == "ended" else (_t("GM determines the outcome") if not adjudication.is_empty() else _t(str(_action.snapshot.get("outcome", "Manual outcome"))))
-		get_node(^"Result/Section/Content/Copy").text = _t(_action.message)
+		get_node(^"Result/Section").title = _t("The action was interrupted") if state == "ended" else (_t("GM determines the outcome") if not adjudication.is_empty() else _t(str(_action.snapshot.get("outcome", "Manual outcome"))))
+		get_node(^"Result/Section/Content/BodySlot/Copy").text = _t(_action.message)
 	workflow_changed.emit("cast" if casting else "powers", title, terminal or ((casting or _morning_only) and state in ["ready", "error", "targets"] and _actor.access_level == "Owner" and (_morning_only or _power.get("playable", false))), state == "pending")
 	_layout()
 
@@ -235,7 +235,7 @@ func _process(_delta: float) -> void:
 				summary = _t("No targets")
 		_target_reading = false
 		if is_inside_tree() and version == _context_version:
-			get_node(^"Cast/Columns/Targets/Content/Copy").text = summary
+			get_node(^"Cast/Columns/Targets/Content/BodySlot/Copy").text = summary
 
 func _choose_targets() -> void:
 	var result := _sdk.targeting.choose()
@@ -284,9 +284,9 @@ func localize(locale: I18N) -> void:
 	i18n = locale
 	get_node(^"Browse/Back").text = _t("‹ Character")
 	get_node(^"Browse/Title").text = _t("Powers & scrolls")
-	get_node(^"Cast/Columns/Power/Content/Heading").text = _t("Power")
-	get_node(^"Cast/Columns/Targets/Content/Change").text = _t("Change targets")
-	get_node(^"Cast/Columns/Targets/Content/Heading").text = _t("Targets")
+	get_node(^"Cast/Columns/Power").title = _t("Power")
+	get_node(^"Cast/Columns/Targets/Content/BodySlot/Change").text = _t("Change targets")
+	get_node(^"Cast/Columns/Targets").title = _t("Targets")
 	get_node(^"Cast/Options/Eligible").text = _t("Not dizzy; requirements met")
 	get_node(^"Cast/Options/Modifier").label_text = _t("Situational modifier")
 	get_node(^"Cast/Rules").text = _t("Confirm fictional requirements with the table, including a deceased target or death within a week where stated. Failure: lose d2 HP; dizziness is manual. Critical/fumble: GM decides. Armor and zweihand restrictions apply.")

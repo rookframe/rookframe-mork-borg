@@ -113,7 +113,7 @@ func _apply_density() -> void:
 	_status.visible = not _compact
 	_stats.set(&"gap", _step(2))
 	if _compact:
-		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").visible = false
+		get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection").description = ""
 		_protection_label.text = _t("Armor")
 
 
@@ -889,14 +889,14 @@ func localize(locale: I18N) -> void:
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").help_text = _t("Only the public name appears to Players.")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").label_text = _t("Public name")
 	get_node(^"Layout/Body/Content/Detail/EditFields/PublicLabel").placeholder = _t("Public name shown to Players")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection/Content/Header/Title").text = _t("Attacks")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Left/EquipmentSection").title = _t("Attacks")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/BodySlot/Access").text = _t("Players see the public name, not this sheet.")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Description").text = _t("GM only")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection/Content/Header/Title").text = _t("Access")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection").description = _t("GM only")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/AccessSection").title = _t("Access")
 	get_node(^"Layout/CreatureEditActions/LeadingSlot/Back").text = _t("Back")
 	get_node(^"Layout/CreatureEditActions/LeadingSlot/SaveChanges").text = _t("Save changes")
 	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/BodySlot/Rules").text = _t("Quick, attacks and defence are DR14.")
-	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection/Content/Header/Title").text = _t("Special rules")
+	get_node(^"Layout/Body/Content/Detail/SheetGrid/Right/SpecialRulesSection").title = _t("Special rules")
 	get_node(^"Layout/Body/Content/Detail/Stats/HitPoints/Content/Label").text = _t("HP")
 	get_node(^"Layout/Body/Content/Detail/Stats/Morale/Content/Label").text = _t("Morale")
 	get_node(^"Layout/Body/Content/Detail/Stats/Protection/Content/Label").text = _t("Protection")

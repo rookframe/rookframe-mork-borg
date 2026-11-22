@@ -2,6 +2,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_companions.gd" id="1"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/section.tscn" id="kit_section"]
 [node name="Companions" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -20,25 +21,18 @@ compact = true
 layout_mode = 2
 theme_type_variation = &"RookframeHeading"
 text = "Companions"
-[node name="Section" type="PanelContainer" parent="."]
+[node name="Section" parent="." instance=ExtResource("kit_section")]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="Section"]
+title = "Granted creatures"
+[node name="Items" type="VBoxContainer" parent="Section/Content/BodySlot"]
 layout_mode = 2
 script = ExtResource("token_box")
-[node name="Title" type="Label" parent="Section/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-text = "Granted creatures"
-[node name="Items" type="VBoxContainer" parent="Section/Content"]
-layout_mode = 2
-script = ExtResource("token_box")
-[node name="Empty" type="Label" parent="Section/Content"]
+[node name="Empty" type="Label" parent="Section/Content/BodySlot"]
 layout_mode = 2
 autowrap_mode = 2
 text = "No granted Creature sheets are available to you."
-[node name="Hint" type="Label" parent="Section/Content"]
+[node name="Hint" type="Label" parent="Section/Content/BodySlot"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14

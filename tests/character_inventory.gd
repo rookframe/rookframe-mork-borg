@@ -106,12 +106,12 @@ func _check_appearance(host: RefCounted) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var appearance = sheet.find_child("CharacterAppearance", true, false)
-	assert_bool(appearance.get_node(^"Selected/Content/Row/Details/Choose").disabled).override_failure_message("Appearance without a selection disables only the Rook choice.").is_true()
+	assert_bool(appearance.get_node(^"Selected/Content/BodySlot/Row/Details/Choose").disabled).override_failure_message("Appearance without a selection disables only the Rook choice.").is_true()
 	host.selected_rook = "one"
 	await get_tree().process_frame
 	await get_tree().process_frame
 	appearance = sheet.find_child("CharacterAppearance", true, false)
-	assert_bool(not appearance.get_node(^"Selected/Content/Row/Details/Choose").disabled).override_failure_message("An open Appearance sheet follows a new local Rook selection.").is_true()
+	assert_bool(not appearance.get_node(^"Selected/Content/BodySlot/Row/Details/Choose").disabled).override_failure_message("An open Appearance sheet follows a new local Rook selection.").is_true()
 	sheet._on_appearance_save_requested("Default", 2)
 	await get_tree().process_frame
 	assert_bool(host.actors[0].data.preferred_miniature.local_id == "b" and host.appearance_changes == 0).override_failure_message("Actor default changes no existing Rook.").is_true()

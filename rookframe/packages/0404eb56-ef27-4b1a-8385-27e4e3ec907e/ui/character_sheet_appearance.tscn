@@ -3,107 +3,92 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="2"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/section.tscn" id="kit_section"]
 [node name="CharacterAppearance" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("1")
-[node name="Default" type="PanelContainer" parent="."]
+[node name="Default" parent="." instance=ExtResource("kit_section")]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="Default"]
-layout_mode = 2
-script = ExtResource("token_box")
-[node name="Heading" type="Label" parent="Default/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-theme_override_font_sizes/font_size = 14
-text = "Actor default"
-[node name="Row" type="HBoxContainer" parent="Default/Content"]
+title = "Actor default"
+[node name="Row" type="HBoxContainer" parent="Default/Content/BodySlot"]
 layout_mode = 2
 script = ExtResource("token_box")
 gap = &"space_3"
-[node name="Portrait" type="TextureRect" parent="Default/Content/Row"]
+[node name="Portrait" type="TextureRect" parent="Default/Content/BodySlot/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(72, 84)
 size_flags_vertical = 0
 texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
-[node name="Details" type="VBoxContainer" parent="Default/Content/Row"]
+[node name="Details" type="VBoxContainer" parent="Default/Content/BodySlot/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("token_box")
-[node name="Title" type="Label" parent="Default/Content/Row/Details"]
+[node name="Title" type="Label" parent="Default/Content/BodySlot/Row/Details"]
 layout_mode = 2
 theme_type_variation = &"RookframeIdentity"
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
-[node name="Description" type="Label" parent="Default/Content/Row/Details"]
+[node name="Description" type="Label" parent="Default/Content/BodySlot/Row/Details"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14
 text = "Preferred Miniature for this Actor’s Rooks."
 autowrap_mode = 2
-[node name="Choose" parent="Default/Content/Row/Details" instance=ExtResource("button")]
+[node name="Choose" parent="Default/Content/BodySlot/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
 text = "Choose Miniature"
 compact = true
-[node name="Picker" type="VBoxContainer" parent="Default/Content/Row/Details"]
+[node name="Picker" type="VBoxContainer" parent="Default/Content/BodySlot/Row/Details"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 visible = false
-[node name="Apply" parent="Default/Content/Row/Details" instance=ExtResource("button")]
+[node name="Apply" parent="Default/Content/BodySlot/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
 text = "Use Miniature"
 visible = false
 variant = 1
 compact = true
-[node name="Selected" type="PanelContainer" parent="."]
+[node name="Selected" parent="." instance=ExtResource("kit_section")]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="Selected"]
-layout_mode = 2
-script = ExtResource("token_box")
-[node name="Heading" type="Label" parent="Selected/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-theme_override_font_sizes/font_size = 14
-text = "This Rook"
-[node name="Row" type="HBoxContainer" parent="Selected/Content"]
+title = "This Rook"
+[node name="Row" type="HBoxContainer" parent="Selected/Content/BodySlot"]
 layout_mode = 2
 script = ExtResource("token_box")
 gap = &"space_3"
-[node name="Portrait" type="TextureRect" parent="Selected/Content/Row"]
+[node name="Portrait" type="TextureRect" parent="Selected/Content/BodySlot/Row"]
 layout_mode = 2
 custom_minimum_size = Vector2(72, 84)
 size_flags_vertical = 0
 texture = ExtResource("2")
 expand_mode = 1
 stretch_mode = 5
-[node name="Details" type="VBoxContainer" parent="Selected/Content/Row"]
+[node name="Details" type="VBoxContainer" parent="Selected/Content/BodySlot/Row"]
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("token_box")
-[node name="Title" type="Label" parent="Selected/Content/Row/Details"]
+[node name="Title" type="Label" parent="Selected/Content/BodySlot/Row/Details"]
 layout_mode = 2
 theme_type_variation = &"RookframeIdentity"
 theme_override_font_sizes/font_size = 16
 autowrap_mode = 2
-[node name="Description" type="Label" parent="Selected/Content/Row/Details"]
+[node name="Description" type="Label" parent="Selected/Content/BodySlot/Row/Details"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 theme_override_font_sizes/font_size = 14
 text = "Appearance for the selected Rook."
 autowrap_mode = 2
-[node name="Choose" parent="Selected/Content/Row/Details" instance=ExtResource("button")]
+[node name="Choose" parent="Selected/Content/BodySlot/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
 text = "Choose Miniature"
 compact = true
-[node name="Picker" type="VBoxContainer" parent="Selected/Content/Row/Details"]
+[node name="Picker" type="VBoxContainer" parent="Selected/Content/BodySlot/Row/Details"]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 visible = false
-[node name="Apply" parent="Selected/Content/Row/Details" instance=ExtResource("button")]
+[node name="Apply" parent="Selected/Content/BodySlot/Row/Details" instance=ExtResource("button")]
 layout_mode = 2
 text = "Use Miniature"
 visible = false

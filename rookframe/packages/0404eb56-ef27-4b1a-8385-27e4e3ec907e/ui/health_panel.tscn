@@ -5,6 +5,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/section.tscn" id="kit_section"]
 
 [node name="HealthPanel" type="VBoxContainer"]
 layout_mode = 2
@@ -87,21 +88,11 @@ layout_mode = 2
 [node name="Abilities" parent="Columns/Task/Improvement" instance=ExtResource("2")]
 layout_mode = 2
 
-[node name="Broken" type="PanelContainer" parent="Columns/Task"]
+[node name="Broken" parent="Columns/Task" instance=ExtResource("kit_section")]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
+title = "Broken · d4"
 
-[node name="Content" type="VBoxContainer" parent="Columns/Task/Broken"]
-layout_mode = 2
-script = ExtResource("token_box")
-
-[node name="Heading" type="Label" parent="Columns/Task/Broken/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-autowrap_mode = 2
-text = "Broken · d4"
-
-[node name="Rules" type="Label" parent="Columns/Task/Broken/Content"]
+[node name="Rules" type="Label" parent="Columns/Task/Broken/Content/BodySlot"]
 layout_mode = 2
 theme_type_variation = &"RookframeBody"
 autowrap_mode = 2

@@ -53,8 +53,8 @@ func test_book_preview_uses_selected_recipient_and_stock_radio_choices() -> void
 	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "book")
 	await get_tree().process_frame
 	await get_tree().process_frame
-	assert_bool(panel.get_node("Columns/Recipient/Content/Self").button_pressed).is_false()
-	assert_str(panel.get_node("Columns/Recipient/Content/Copy").text).contains("Hooded stranger").not_contains("Graveworm")
+	assert_bool(panel.get_node("Columns/Recipient/Content/BodySlot/Self").button_pressed).is_false()
+	assert_str(panel.get_node("Columns/Recipient/Content/BodySlot/Copy").text).contains("Hooded stranger").not_contains("Graveworm")
 	var choices: Array = panel.get_node("Options/Ability/Choices").get_children()
 	assert_bool(choices[0] is CheckBox).is_true()
 	assert_bool(choices[0].button_group != null).is_true()
