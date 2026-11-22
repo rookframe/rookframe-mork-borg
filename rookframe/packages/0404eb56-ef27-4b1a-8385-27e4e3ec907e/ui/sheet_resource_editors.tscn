@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/silver.svg" id="silver"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/input.tscn" id="input"]
 [node name="ResourceEditors" type="VBoxContainer"]
 script = ExtResource("script")
 gap = &""
@@ -63,7 +64,6 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 accessibility_name = "Hit points"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/hit_points/Editor"]
 layout_mode = 1
@@ -94,7 +94,6 @@ script = ExtResource("inline")
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 accessibility_name = "Hit points maximum"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/HP/Row/Editors/maximum_hit_points/Editor"]
 layout_mode = 1
@@ -149,11 +148,10 @@ gap = &"space_1"
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline")
-[node name="Editor" type="LineEdit" parent="Pages/Area/Rows/Omens/Row/Editors/omens"]
+[node name="Editor" parent="Pages/Area/Rows/Omens/Row/Editors/omens" instance=ExtResource("input")]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 accessibility_name = "Omens"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Omens/Row/Editors/omens/Editor"]
 layout_mode = 1
@@ -208,11 +206,10 @@ gap = &"space_1"
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline")
-[node name="Editor" type="LineEdit" parent="Pages/Area/Rows/Powers/Row/Editors/power_uses"]
+[node name="Editor" parent="Pages/Area/Rows/Powers/Row/Editors/power_uses" instance=ExtResource("input")]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 accessibility_name = "Power uses"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Powers/Row/Editors/power_uses/Editor"]
 layout_mode = 1
@@ -267,11 +264,10 @@ gap = &"space_1"
 layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline")
-[node name="Editor" type="LineEdit" parent="Pages/Area/Rows/Silver/Row/Editors/silver"]
+[node name="Editor" parent="Pages/Area/Rows/Silver/Row/Editors/silver" instance=ExtResource("input")]
 layout_mode = 2
 custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-theme_override_font_sizes/font_size = 20
 accessibility_name = "Silver"
 [node name="Caption" type="Label" parent="Pages/Area/Rows/Silver/Row/Editors/silver/Editor"]
 layout_mode = 1

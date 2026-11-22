@@ -45,7 +45,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="token_frame"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_rule.gd" id="token_rule"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_caption_editor.gd" id="caption_editor"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/input.tscn" id="input"]
 
 [node name="CharacterSurface" type="Control" unique_id=509514634]
 unique_name_in_owner = true
@@ -98,24 +98,25 @@ size_flags_horizontal = 0
 size_flags_vertical = 4
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Header/NameEditField" unique_id=242037551]
+[node name="Editor" parent="Margin/Layout/Header/NameEditField" unique_id=242037551 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(320, 44)
 layout_mode = 2
 accessibility_name = "Character name"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Header/NameEditField/Editor" unique_id=1594398214]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Name"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Header/NameEditField" unique_id=1904821541]
@@ -380,24 +381,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField" unique_id=1137572872]
+[node name="Editor" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField" unique_id=1137572872 instance=ExtResource("input")]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Current hit points"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor" unique_id=1123412114]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "HP"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsCurrentField" unique_id=416630970]
@@ -412,24 +414,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField" unique_id=17707965]
+[node name="Editor" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField" unique_id=17707965 instance=ExtResource("input")]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Maximum hit points"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor" unique_id=1608242940]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Max HP"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/HitPointsEdit/HitPointsMaximumField" unique_id=675565290]
@@ -452,24 +455,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField" unique_id=1302486745]
+[node name="Editor" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField" unique_id=1302486745 instance=ExtResource("input")]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Current Power uses"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor" unique_id=1265989824]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Power uses"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField" unique_id=1682814874]
@@ -492,24 +496,25 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField" unique_id=172286136]
+[node name="Editor" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField" unique_id=172286136 instance=ExtResource("input")]
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Current Omens"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField/Editor" unique_id=483748051]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Omens"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Likeness/Vitals/OmensEdit/OmensCurrentField" unique_id=1919026274]
@@ -540,25 +545,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField" unique_id=1481081533]
+[node name="Editor" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField" unique_id=1481081533 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Strength modifier"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField/Editor" unique_id=1135167534]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Strength"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/StrengthRow/StrengthEditField" unique_id=1291765865]
@@ -581,25 +587,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField" unique_id=1200356419]
+[node name="Editor" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField" unique_id=1200356419 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Agility modifier"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField/Editor" unique_id=424056389]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Agility"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/AgilityRow/AgilityEditField" unique_id=1522958342]
@@ -622,25 +629,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField" unique_id=509472582]
+[node name="Editor" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField" unique_id=509472582 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Presence modifier"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField/Editor" unique_id=1644060707]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Presence"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/PresenceRow/PresenceEditField" unique_id=351943610]
@@ -663,25 +671,26 @@ layout_mode = 2
 size_flags_horizontal = 3
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField" unique_id=633285014]
+[node name="Editor" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField" unique_id=633285014 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(56, 44)
 layout_mode = 2
 size_flags_horizontal = 3
 accessibility_name = "Toughness modifier"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField/Editor" unique_id=1132527443]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Toughness"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Core/Abilities/ToughnessRow/ToughnessEditField" unique_id=2045709194]
@@ -1112,24 +1121,25 @@ theme_type_variation = &"RookframeTabButton"
 layout_mode = 2
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField" unique_id=1693469128]
+[node name="Editor" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField" unique_id=1693469128 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 accessibility_name = "Silver"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField/Editor" unique_id=1863162049]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Silver"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/SilverEditField" unique_id=1089958838]
@@ -1143,24 +1153,25 @@ theme_type_variation = &"RookframeError"
 layout_mode = 2
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField" unique_id=726197432]
+[node name="Editor" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField" unique_id=726197432 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(120, 44)
 layout_mode = 2
 accessibility_name = "Power uses"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField/Editor" unique_id=2052541615]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Power uses"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/ChapterCaption/PowerEditField" unique_id=999657694]
@@ -1294,24 +1305,25 @@ expand_icon = true
 layout_mode = 2
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField" unique_id=430261322]
+[node name="Editor" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField" unique_id=430261322 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(86, 44)
 layout_mode = 2
 accessibility_name = "Current Omens"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField/Editor" unique_id=727840354]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Omens"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickOmensEditField" unique_id=1721578684]
@@ -1334,24 +1346,25 @@ expand_icon = true
 layout_mode = 2
 script = ExtResource("inline_field")
 
-[node name="Editor" type="LineEdit" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField" unique_id=1062778067]
+[node name="Editor" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField" unique_id=1062778067 instance=ExtResource("input")]
 visible = false
 custom_minimum_size = Vector2(86, 44)
 layout_mode = 2
 accessibility_name = "Silver"
-theme_override_font_sizes/font_size = 18
-script = ExtResource("caption_editor")
 
 [node name="Caption" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField/Editor" unique_id=151133938]
-layout_mode = 0
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_top = 0.5
 anchor_right = 1.0
-offset_left = 5.0
-offset_top = 3.0
-offset_right = -5.0
-offset_bottom = 15.0
+anchor_bottom = 0.5
+offset_right = -8.0
+grow_horizontal = 0
+grow_vertical = 2
+mouse_filter = 2
 theme_override_font_sizes/font_size = 9
 text = "Silver"
-clip_text = true
 theme_type_variation = &"RookframeMeta"
 
 [node name="Error" type="Label" parent="Margin/Layout/Body/Chapter/Page/Content/QuickResources/QuickSilverEditField" unique_id=1280653377]

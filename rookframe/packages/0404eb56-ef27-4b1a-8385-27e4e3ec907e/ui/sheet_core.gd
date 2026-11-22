@@ -123,9 +123,6 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 		(button.get_node(^"Summary/Test/Caption") as Label).add_theme_font_size_override("font_size", 13 if tablet else 16)
 	get_node(^"WeaponActions/Attack/Summary/Damage/Value").add_theme_font_size_override("font_size", 20 if tablet else 24)
 	get_node(^"WeaponActions/Attack/Summary/Damage/Caption").add_theme_font_size_override("font_size", 13 if tablet else 16)
-	for path in [^"Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor", ^"Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor", ^"Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor", ^"Likeness/Vitals/OmensEdit/OmensCurrentField/Editor", ^"Abilities/StrengthRow/StrengthEditField/Editor", ^"Abilities/AgilityRow/AgilityEditField/Editor", ^"Abilities/PresenceRow/PresenceEditField/Editor", ^"Abilities/ToughnessRow/ToughnessEditField/Editor"]:
-		var field = get_node(path)
-		field.add_theme_font_size_override("font_size", 18 if phone or tablet else 20)
 	for path in [^"Likeness/Vitals/HitPointsEdit/HitPointsCurrentField/Editor/Caption", ^"Likeness/Vitals/HitPointsEdit/HitPointsMaximumField/Editor/Caption", ^"Likeness/Vitals/PowerUsesEdit/PowerUsesCurrentField/Editor/Caption", ^"Likeness/Vitals/OmensEdit/OmensCurrentField/Editor/Caption", ^"Abilities/StrengthRow/StrengthEditField/Editor/Caption", ^"Abilities/AgilityRow/AgilityEditField/Editor/Caption", ^"Abilities/PresenceRow/PresenceEditField/Editor/Caption", ^"Abilities/ToughnessRow/ToughnessEditField/Editor/Caption"]:
 		get_node(path).add_theme_font_size_override("font_size", 9 if phone or tablet else 11)
 

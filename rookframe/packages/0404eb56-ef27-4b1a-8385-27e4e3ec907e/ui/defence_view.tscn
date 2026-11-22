@@ -4,6 +4,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_rule.gd" id="rule"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="grid"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/input.tscn" id="input"]
 [node name="Defence" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -138,11 +139,11 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeLabel"
 text = "Difficulty override"
-[node name="Editor" type="LineEdit" parent="Options/Difficulty"]
+[node name="Editor" parent="Options/Difficulty" instance=ExtResource("input")]
 layout_mode = 2
 custom_minimum_size = Vector2(80, 44)
-text = ""
 accessibility_name = "Difficulty override"
+size_flags_horizontal = 1
 [node name="Modifier" type="HBoxContainer" parent="Options"]
 layout_mode = 2
 [node name="Label" type="Label" parent="Options/Modifier"]
@@ -150,11 +151,12 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_type_variation = &"RookframeLabel"
 text = "Situational modifier"
-[node name="Editor" type="LineEdit" parent="Options/Modifier"]
+[node name="Editor" parent="Options/Modifier" instance=ExtResource("input")]
 layout_mode = 2
 custom_minimum_size = Vector2(80, 44)
 text = "0"
 accessibility_name = "Situational modifier"
+size_flags_horizontal = 1
 [node name="Hint" type="Label" parent="Options"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
