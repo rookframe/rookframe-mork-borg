@@ -1060,11 +1060,8 @@ func _fit_identity() -> void:
 	title.visible = not _identity_overflow
 	classification.visible = not _identity_overflow
 	opener.visible = _identity_overflow
-	get_node(IDENTITY + "IdentityDetails/Copy/Name").text = title.text
-	_label_style(get_node(IDENTITY + "IdentityDetails/Copy/Name"), "Name")
-	get_node(IDENTITY + "IdentityDetails/Copy/Caption").text = _locale.text("Full identity") + " ›"
+	opener.text = title.text + "\n" + _locale.text("Full identity") + " ›"
 	opener.accessibility_name = title.text + ". " + classification.text + ". " + _locale.text("Full identity")
-	opener.custom_minimum_size = Vector2(0, maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y))
 	# The portrait takes whatever height the native column has left.
 	if portrait.custom_minimum_size.y != 0:
 		portrait.custom_minimum_size = Vector2(0, 0)

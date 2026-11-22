@@ -127,30 +127,13 @@ gap = &"space_3"
 visible = false
 layout_mode = 2
 gap = &"space_2"
-[node name="IdentityDetails" type="Button" parent="Inset/Layout/Body/Identity/Column"]
+[node name="IdentityDetails" parent="Inset/Layout/Body/Identity/Column" instance=ExtResource("button")]
 visible = false
 layout_mode = 2
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeQuietButton"
-[node name="Copy" type="VBoxContainer" parent="Inset/Layout/Body/Identity/Column/IdentityDetails"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-mouse_filter = 2
-script = ExtResource("box")
-gap = &""
-[node name="Name" type="Label" parent="Inset/Layout/Body/Identity/Column/IdentityDetails/Copy"]
-layout_mode = 2
-size_flags_horizontal = 3
+alignment = 0
+clip_text = true
 text_overrun_behavior = 3
-horizontal_alignment = 0
-theme_type_variation = &"RookframeTitle"
-[node name="Caption" type="Label" parent="Inset/Layout/Body/Identity/Column/IdentityDetails/Copy"]
-layout_mode = 2
-text = "Full identity ›"
-horizontal_alignment = 0
-theme_type_variation = &"RookframeMeta"
+compact = true
 [node name="Name" type="Label" parent="Inset/Layout/Body/Identity/Column"]
 layout_mode = 2
 autowrap_mode = 3
