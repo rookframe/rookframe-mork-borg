@@ -6,49 +6,53 @@ const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 func test_compact_shield_geometry_focus_pending_and_close() -> void:
 	get_window().gui_embed_subwindows = true
-	get_window().size = Vector2i(844, 390)
+	# A portrait phone: the headless display driver gives a Window no size, so
+	# the Dialog's opening height has to fit the canvas for it to be placed.
+	get_window().size = Vector2i(390, 844)
 	var dialog = auto_free(DIALOG.instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
 	dialog.theme = WORLD_THEME.entry()
 	var viewport: SubViewport = auto_free(SubViewport.new())
-	viewport.size = Vector2i(844, 390)
+	viewport.size = Vector2i(390, 844)
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	viewport.add_child(dialog)
 	dialog.present({"character": "Graveworm", "loss": 2, "hp": 7})
-	await get_tree().process_frame
-	await get_tree().process_frame
-	var shell: Control = dialog.get_node("Shell")
-	var copy: Label = dialog.get_node("Shell/Content/Body/Copy")
-	# The dialog grows to its content. The headless display driver has no
-	# native Window size, so there the shell takes the size the dialog would.
+	# The UI Kit Dialog settles its size over two frames, then the Package
+	# focuses its own body action.
+	for frame in 6:
+		await get_tree().process_frame
+	var window: Window = dialog.get_node("Dialog")
+	assert_bool(window.visible).is_true()
 	if DisplayServer.get_name() != "headless":
-		assert_bool(dialog.size.x >= shell.get_combined_minimum_size().x and dialog.size.y >= shell.get_combined_minimum_size().y).is_true()
-		assert_bool(Rect2i(Vector2i.ZERO, viewport.size).encloses(Rect2i(dialog.position, dialog.size))).is_true()
-	else:
-		for pass_index in 2:
-			shell.size = shell.get_combined_minimum_size()
-			await get_tree().process_frame
-			await get_tree().process_frame
-	await get_tree().process_frame
-	await get_tree().process_frame
-	var needed := shell.get_combined_minimum_size()
-	assert_bool(shell.size.x >= needed.x and shell.size.y >= needed.y).override_failure_message("Shield dialog %s is smaller than its content %s." % [shell.size, needed]).is_true()
-	assert_bool(needed.x <= viewport.size.x and needed.y <= viewport.size.y).override_failure_message("Shield dialog content %s does not fit the canvas." % needed).is_true()
-	assert_int(copy.get_visible_line_count()).is_equal(copy.get_line_count())
-	assert_bool(shell.get_global_rect().encloses(copy.get_global_rect())).is_true()
-	var take: Button = dialog.get_node("Shell/Content/Actions/Take")
-	var destroy: Button = dialog.get_node("Shell/Content/Actions/Break")
+		var needed := window.get_contents_minimum_size()
+		assert_bool(window.size.x >= needed.x and window.size.y >= needed.y).override_failure_message("Shield dialog %s is smaller than its content %s." % [window.size, needed]).is_true()
+		assert_bool(Rect2i(Vector2i.ZERO, viewport.size).encloses(Rect2i(window.position, window.size))).override_failure_message("Shield dialog %s at %s does not fit the canvas." % [window.size, window.position]).is_true()
+	var take: Button = window.get_body_slot().get_child(0)
 	assert_bool(take.has_focus()).is_true()
 	assert_str(take.text).is_equal("Take 2 damage")
-	assert_bool(take.size.y >= 44 and destroy.size.y >= 44).is_true()
-	assert_bool(shell.get_global_rect().encloses(take.get_global_rect())).is_true()
-	assert_bool(shell.get_global_rect().encloses(destroy.get_global_rect())).is_true()
-	assert_str(dialog.get_node("Shell/Content/Body/Copy").text).contains("7 → 5 HP")
-	dialog.set_pending(true)
-	assert_bool(take.disabled and destroy.disabled).is_true()
-	dialog.close_requested.emit()
-	assert_bool(dialog.visible).is_false()
+	assert_bool(take.size.y >= 44).is_true()
+	if DisplayServer.get_name() != "headless":
+		assert_bool(Rect2(Vector2.ZERO, window.size).encloses(take.get_global_rect())).is_true()
+	assert_str(window.heading).is_equal("Break shield?")
+	assert_str(window.confirm_label).is_equal("Break shield")
+	assert_str(window.description).contains("7 → 5 HP")
+	var choices: Array[String] = []
+	var cancellations: Array[bool] = []
+	dialog.choice_requested.connect(func(choice: String) -> void: choices.append(choice))
+	dialog.cancelled.connect(func() -> void: cancellations.append(true))
+	take.pressed.emit()
+	assert_array(choices).is_equal(["take"])
+	assert_bool(window.visible).is_true()
+	assert_bool(take.disabled and not window.confirm_enabled).is_true()
+	dialog.set_pending(false)
+	assert_bool(not take.disabled and window.confirm_enabled).is_true()
+	window.confirmed.emit()
+	assert_array(choices).is_equal(["take", "break"])
+	assert_bool(take.disabled and not window.confirm_enabled).is_true()
+	window.close_requested.emit()
+	assert_bool(window.visible).is_false()
+	assert_array(cancellations).is_equal([true])
 
 func after_test() -> void:
 	await get_tree().process_frame

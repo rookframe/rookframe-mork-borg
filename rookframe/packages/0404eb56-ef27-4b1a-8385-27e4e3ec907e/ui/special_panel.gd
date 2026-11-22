@@ -10,9 +10,7 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const ACTION = preload(ROOT + "logic/special_action.gd")
 const SHIELD_SCENE = preload(ROOT + "ui/shield_dialog.tscn")
 const SHIELD_SCRIPT = preload(ROOT + "ui/shield_dialog.gd")
-const BACKDROP = preload(ROOT + "ui/shield_backdrop.tscn")
 var _shield: SHIELD_SCRIPT
-var _backdrop: CanvasLayer
 const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
@@ -165,20 +163,15 @@ func _render() -> void:
 		get_node(^"Scrolls/Second").visible = count == 2
 	if state == "shield":
 		if _shield == null:
-			var backdrop := BACKDROP.instantiate()
-			add_child(backdrop)
-			_backdrop = backdrop
 			var dialog := SHIELD_SCENE.instantiate()
 			dialog.localize(i18n)
 			add_child(dialog)
 			_shield = dialog
 			_shield.choice_requested.connect(_choose_shield)
 			_shield.cancelled.connect(close_action)
-		_backdrop.visible = true
 		_shield.present(_action.snapshot)
 	elif _shield != null:
 		_shield.dismiss()
-		_backdrop.visible = false
 	var outcome := _action.message if _action != null else ""
 	get_node(^"Outcome").text = _t(outcome)
 	get_node(^"Outcome").visible = not outcome.is_empty()
@@ -269,7 +262,6 @@ func _choose_targets() -> void:
 func close_action() -> void:
 	if _shield != null:
 		_shield.dismiss()
-		_backdrop.visible = false
 	if _action != null:
 		_action.cancel()
 

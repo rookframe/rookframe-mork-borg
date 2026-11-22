@@ -38,8 +38,7 @@ var _powers_action: MELEE_ACTION
 var _defence_update_pending := false
 var _defence: DEFENCE_ACTION
 var _defence_view: DEFENCE_VIEW
-const SHIELD_BACKDROP = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/shield_backdrop.tscn")
-var _shield_backdrop: CanvasLayer
+var _shield_open := false
 var _shield: SHIELD_DIALOG
 var _melee: MELEE_ACTION
 var _melee_view: MELEE_VIEW
@@ -506,8 +505,7 @@ func close_action() -> void:
 		_defence.cancel()
 	if _shield != null:
 		_shield.dismiss()
-	if _shield_backdrop != null:
-		_shield_backdrop.visible = false
+	_shield_open = false
 	if _melee != null:
 		_melee.cancel()
 	if _ability_throw != null:
@@ -633,11 +631,7 @@ func _present_defence_update() -> void:
 	_render_pending = true
 	_refresh_pending = true
 	if _defence.state == "shield":
-		if _shield_backdrop == null:
-			var backdrop := SHIELD_BACKDROP.instantiate()
-			add_child(backdrop)
-			_shield_backdrop = backdrop
-		_shield_backdrop.visible = true
+		_shield_open = true
 		if _shield == null:
 			var dialog := SHIELD_SCENE.instantiate()
 			dialog.localize(i18n)
@@ -648,9 +642,9 @@ func _present_defence_update() -> void:
 		_shield.present(_defence.snapshot)
 		_shield.set_pending(_defence.is_submitting())
 	elif _shield != null:
-		var was_open: bool = _shield_backdrop.visible
+		var was_open := _shield_open
 		_shield.dismiss()
-		_shield_backdrop.visible = false
+		_shield_open = false
 		if was_open:
 			shield_decision_closed.emit()
 
