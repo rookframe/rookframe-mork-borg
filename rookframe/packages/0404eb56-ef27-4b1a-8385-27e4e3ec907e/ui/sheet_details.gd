@@ -8,6 +8,7 @@ const ENTRY_FIELD = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
 var _tokens := SHEET_TOKENS.new()
 const TOKEN_BOX = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd")
+const KIT_BUTTON = preload("res://rookframe/ui/components/actions/button.tscn")
 const FIELD_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_field_row.tscn")
 var _field_row: Control
 var _field_names: Array = []
@@ -216,13 +217,12 @@ func append_summary(caption: String, text: String) -> void:
 	summary.add_child(description)
 
 func append_option(text: String, enabled: bool = true) -> Button:
-	var button := Button.new()
+	var button: Button = KIT_BUTTON.instantiate()
+	button.set(&"compact", true)
 	button.text = text
 	button.accessibility_name = button.text
 	button.clip_text = true
 	button.disabled = not enabled
-	button.custom_minimum_size = Vector2(0, 44)
-	button.theme_type_variation = &"RookframeSecondaryButton"
 	button.text_overrun_behavior = 3 # TextServer.OVERRUN_TRIM_ELLIPSIS
 	get_node(^"Body/DetailPages/Area/DetailContent").add_child(button)
 	return button

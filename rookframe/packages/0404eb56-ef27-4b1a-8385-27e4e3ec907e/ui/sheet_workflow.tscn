@@ -16,12 +16,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 80)
 script = ExtResource("token_box")
 gap = &"space_5"
-[node name="Back" type="Button" parent="Header"]
+[node name="Back" parent="Header" instance=ExtResource("tab")]
 layout_mode = 2
 text = "‹ Sheet"
-custom_minimum_size = Vector2(44,44)
-theme_type_variation = &"RookframeQuietButton"
 accessibility_name = "Back to character sheet"
+compact = true
 [node name="Titles" type="VBoxContainer" parent="Header"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -345,10 +344,9 @@ layout_mode = 2
 layout_mode = 2
 script = ExtResource("token_box")
 gap = &"space_5"
-[node name="Breath" type="Button" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content"]
+[node name="Breath" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content" instance=ExtResource("tab")]
 layout_mode = 2
-custom_minimum_size = Vector2(44,92)
-theme_type_variation = &"RookframeChoiceRow"
+custom_minimum_size = Vector2(44, 92)
 toggle_mode = true
 accessibility_name = "Catch your breath. Have a drink. d4 HP"
 [node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath"]
@@ -398,10 +396,9 @@ vertical_alignment = 1
 theme_override_font_sizes/font_size = 24
 mouse_filter = 2
 theme_type_variation = &"RookframeValue"
-[node name="Sleep" type="Button" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content"]
+[node name="Sleep" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content" instance=ExtResource("tab")]
 layout_mode = 2
-custom_minimum_size = Vector2(44,92)
-theme_type_variation = &"RookframeChoiceRow"
+custom_minimum_size = Vector2(44, 92)
 toggle_mode = true
 accessibility_name = "Full night’s sleep. A night of uninterrupted rest. d6 HP"
 [node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep"]

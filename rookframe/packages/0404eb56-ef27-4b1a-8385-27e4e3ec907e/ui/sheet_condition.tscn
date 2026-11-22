@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="token_margin"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_rule.gd" id="token_rule"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [node name="Condition" type="VBoxContainer"]
 script = ExtResource("script")
 gap = &"space_4"
@@ -456,16 +457,14 @@ theme_override_font_sizes/font_size = 20
 [node name="Controls" type="HBoxContainer" parent="Main/Frame/Inset/Content/Counter/Tracker"]
 layout_mode = 2
 script = ExtResource("token_box")
-[node name="Undo" type="Button" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls"]
+[node name="Undo" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls" instance=ExtResource("button")]
 layout_mode = 2
 text = "−"
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeSecondaryButton"
-[node name="Next" type="Button" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls"]
+compact = true
+[node name="Next" parent="Main/Frame/Inset/Content/Counter/Tracker/Controls" instance=ExtResource("button")]
 layout_mode = 2
 text = "Next round"
-custom_minimum_size = Vector2(44, 44)
-theme_type_variation = &"RookframeSecondaryButton"
+compact = true
 [node name="Death" type="HBoxContainer" parent="Main/Frame/Inset/Content"]
 layout_mode = 2
 script = ExtResource("token_box")

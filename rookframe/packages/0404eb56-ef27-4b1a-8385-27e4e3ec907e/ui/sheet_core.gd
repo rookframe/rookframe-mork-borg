@@ -2,6 +2,7 @@ extends VBoxContainer
 const PROJECTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd")
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
 var _tokens := SHEET_TOKENS.new()
+const CONDITION_SUMMARY = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_condition_summary.gd")
 const BROKEN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/broken_incident.gd")
 const _ability_paths := {
 	"Strength": ^"Abilities/StrengthRow/Strength",
@@ -232,7 +233,7 @@ func configure_condition(data: Dictionary, condition: Dictionary, phone: bool) -
 	get_node(^"ProtectionItems").visible = combat and not phone and get_node(^"ProtectionItems").get_child_count() > 0
 	get_node(^"Dodge").visible = combat and not phone
 	get_node(^"ConditionReminder").visible = not combat
-	get_node(^"ConditionReminder").configure(data, condition, phone)
+	CONDITION_SUMMARY.configure(get_node(^"ConditionReminder"), data, condition, phone)
 
 func focused_entry() -> Control:
 	for path in [^"WeaponHeading/Actions/Options", ^"Abilities/StrengthRow/Strength", ^"Abilities/AgilityRow/Agility", ^"Abilities/PresenceRow/Presence", ^"Abilities/ToughnessRow/Toughness"]:

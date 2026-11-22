@@ -23,7 +23,7 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	add_theme_constant_override(&"separation", _tokens.pixels(self, &"space_2"))
 	get_node(^"NameEditField/Editor").custom_minimum_size = Vector2(220 if phone else 230 if tablet else 320, 44)
 	get_node(^"NameEditField/Editor/Caption").add_theme_font_size_override("font_size", 9 if phone or tablet else 11)
-	for button in [get_node(^"Rest"), get_node(^"Improve"), get_node(^"SaveSheet"), get_node(^"CancelSheet")]:
+	for button in [get_node(^"SaveSheet"), get_node(^"CancelSheet")]:
 		button.add_theme_font_size_override("font_size", 12 if phone else 16)
 	var title: Button = get_node(^"Name")
 	title.custom_minimum_size = Vector2(title.custom_minimum_size.x, 44 if phone else 56 if tablet else 64)

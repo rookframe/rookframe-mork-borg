@@ -134,8 +134,6 @@ var _rendered_chapter := -1
 var _locale := I18N.new()
 
 func ready() -> void:
-	for button in [_quick_omens, _quick_silver]:
-		button.add_theme_font_size_override("font_size", 15)
 	_quick_omens.icon = preload("res://rookframe/ui/icons/character/dice.svg")
 	if sdk == null:
 		return

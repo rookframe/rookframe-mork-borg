@@ -72,7 +72,6 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"Page/Content/ChapterCaption/Caption").add_theme_font_size_override("font_size", 17 if tablet else 20)
 	get_node(^"Page/Content/ChapterCaption/InventoryFilters/Ready").text = "Equipped"
 	get_node(^"Page/Content/ChapterCaption/Resource").icon = null
-	get_node(^"Page/Content/ChapterCaption/PersonalNotes").add_theme_font_size_override("font_size", 17 if tablet else 20)
 	get_node(^"Page/Content/AppearancePanel").configure_layout(phone, tablet)
 
 func configure_caption(chapter: int, phone: bool, filter: int, data: Dictionary, draft: Dictionary, section: int) -> void:

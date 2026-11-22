@@ -166,7 +166,7 @@ func _resize() -> void:
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last").set(&"gap", &"space_1" if phone else &"space_2")
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last/Caption").add_theme_font_size_override("font_size", 11 if phone else 15)
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules/Last/Value").add_theme_font_size_override("font_size", 12 if phone else 16 if tablet else 20)
-	for path in [^"Main/Frame/Inset/Content/Counter/Tracker/Controls/Undo", ^"Main/Frame/Inset/Content/Counter/Tracker/Controls/Next", ^"Main/Frame/Inset/Content/Footer/Broken", ^"Main/Frame/Inset/Content/Footer/Recover", ^"Main/Frame/Inset/Content/Footer/Treat", ^"Main/Frame/Inset/Content/Footer/UndoDeath", ^"Main/Frame/Inset/Content/Footer/EditHP"]:
+	for path in [^"Main/Frame/Inset/Content/Footer/Broken", ^"Main/Frame/Inset/Content/Footer/Recover", ^"Main/Frame/Inset/Content/Footer/Treat", ^"Main/Frame/Inset/Content/Footer/UndoDeath", ^"Main/Frame/Inset/Content/Footer/EditHP"]:
 		get_node(path).add_theme_font_size_override("font_size", 12 if phone else 14 if tablet else 16)
 	get_node(^"Main/Frame/Inset/Content/Counter/Tracker/Rules").set(&"gap", &"space_3" if phone else &"space_4" if tablet else &"space_5")
 	get_node(^"Main/Frame/Inset/Content/Death").set(&"gap", &"space_5" if phone else &"space_7")
