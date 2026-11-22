@@ -1,6 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_workflow.gd" id="script"]
-[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_tab_button.tscn" id="tab"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="tab"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/elixir.svg" id="rest_icon"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
@@ -15,12 +15,11 @@ layout_mode = 2
 custom_minimum_size = Vector2(0, 80)
 script = ExtResource("token_box")
 gap = &"space_5"
-[node name="Back" type="Button" parent="Header"]
+[node name="Back" parent="Header" instance=ExtResource("tab")]
 layout_mode = 2
 text = "‹ Sheet"
-custom_minimum_size = Vector2(44,44)
-theme_type_variation = &"RookframeQuietButton"
 accessibility_name = "Back to character sheet"
+compact = true
 [node name="Titles" type="VBoxContainer" parent="Header"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -194,12 +193,18 @@ script = ExtResource("token_box")
 gap = &""
 [node name="Recovery" parent="Body/Main/Content/Sections" instance=ExtResource("tab")]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Recovery"
 toggle_mode = true
+clip_text = true
+compact = true
 [node name="Daily" parent="Body/Main/Content/Sections" instance=ExtResource("tab")]
 layout_mode = 2
+size_flags_horizontal = 3
 text = "Daily resources"
 toggle_mode = true
+clip_text = true
+compact = true
 [node name="Progress" type="VBoxContainer" parent="Body/Main/Content"]
 layout_mode = 2
 [node name="Summary" type="Label" parent="Body/Main/Content/Progress"]
@@ -336,10 +341,9 @@ layout_mode = 2
 layout_mode = 2
 script = ExtResource("token_box")
 gap = &"space_5"
-[node name="Breath" type="Button" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content"]
+[node name="Breath" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content" instance=ExtResource("tab")]
 layout_mode = 2
-custom_minimum_size = Vector2(44,92)
-theme_type_variation = &"RookframeChoiceRow"
+custom_minimum_size = Vector2(44, 92)
 toggle_mode = true
 accessibility_name = "Catch your breath. Have a drink. d4 HP"
 [node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Breath"]
@@ -389,10 +393,9 @@ vertical_alignment = 1
 theme_override_font_sizes/font_size = 24
 mouse_filter = 2
 theme_type_variation = &"RookframeValue"
-[node name="Sleep" type="Button" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content"]
+[node name="Sleep" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content" instance=ExtResource("tab")]
 layout_mode = 2
-custom_minimum_size = Vector2(44,92)
-theme_type_variation = &"RookframeChoiceRow"
+custom_minimum_size = Vector2(44, 92)
 toggle_mode = true
 accessibility_name = "Full night’s sleep. A night of uninterrupted rest. d6 HP"
 [node name="Inset" type="MarginContainer" parent="Body/Main/Content/RestContent/Choices/Frame/Inset/Pages/Area/Content/Sleep"]

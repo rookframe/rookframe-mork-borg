@@ -24,10 +24,6 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/chevron-left.svg" id="previous"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/chevron-right.svg" id="next"]
 
-[sub_resource type="ButtonGroup" id="Categories"]
-resource_local_to_scene = true
-allow_unpress = true
-
 [node name="CharacterHud" type="Control"]
 layout_mode = 3
 anchors_preset = 15
@@ -77,7 +73,6 @@ layout_mode = 2
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Abilities"
 icon = ExtResource("abilities")
 layout = 1
@@ -86,7 +81,6 @@ layout = 1
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Attacks"
 icon = ExtResource("attacks")
 layout = 1
@@ -95,7 +89,6 @@ layout = 1
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Powers"
 icon = ExtResource("powers")
 layout = 1
@@ -104,7 +97,6 @@ layout = 1
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Items"
 icon = ExtResource("items")
 layout = 1
@@ -113,7 +105,6 @@ layout = 1
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Features"
 icon = ExtResource("features")
 layout = 1
@@ -122,7 +113,6 @@ layout = 1
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Companions"
 icon = ExtResource("companions")
 layout = 1
@@ -131,7 +121,6 @@ layout = 1
 unique_name_in_owner = true
 layout_mode = 2
 toggle_mode = true
-button_group = SubResource("Categories")
 text = "Recovery"
 icon = ExtResource("recovery")
 layout = 1

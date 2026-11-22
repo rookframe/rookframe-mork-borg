@@ -3,12 +3,17 @@ extends RefCounted
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
-const STAR_SCRIPT = preload(ROOT + "ui/sheet_favorite.gd")
+const STAR = preload(ROOT + "ui/sheet_favorite.gd")
 const COMPANION = preload(ROOT + "ui/sheet_companion_favorite.tscn")
 const PROJECTION = preload(ROOT + "ui/sheet_projection.gd")
 signal favorite_changed(key: String, starred: bool)
 var sdk: SDK
 var _model := MODEL.new()
+var _keys := {}
+
+## Reports presses of a UI Kit FavoriteToggle with the key it was last configured for.
+func bind(star: Button) -> void:
+	star.pressed.connect(func() -> void: favorite_changed.emit(str(_keys.get(star.get_instance_id(), "")), star.button_pressed))
 
 func needs_identity(data: Dictionary) -> bool:
 	return _model.needs_identity(data)
@@ -24,7 +29,7 @@ func find(actor: SDK.Actor, key: String) -> Dictionary:
 			return entry
 	return {}
 
-func configure(star: STAR_SCRIPT, actor: SDK.Actor, detail: String, busy: bool) -> void:
+func configure(star: Button, actor: SDK.Actor, detail: String, busy: bool) -> void:
 	var entry: Dictionary = {}
 	var data: Dictionary = actor.data
 	if detail.begins_with("favorite:"):
@@ -43,7 +48,7 @@ func configure(star: STAR_SCRIPT, actor: SDK.Actor, detail: String, busy: bool) 
 		if index >= 0 and index < traits.size():
 			var feature: Dictionary = traits[index]
 			entry = find(actor, "feature:" + str(feature.get("favorite_entry_id", "")) + ":use")
-	star.configure(entry, actor.access_level == "Owner", busy)
+	_keys[star.get_instance_id()] = STAR.configure(star, entry, actor.access_level == "Owner", busy)
 
 func append_missing(rows: Dictionary, actor: SDK.Actor, chapter: int) -> void:
 	var companions: Array = rows.companions

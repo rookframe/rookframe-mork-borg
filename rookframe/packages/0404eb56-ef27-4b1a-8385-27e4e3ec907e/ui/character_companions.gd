@@ -14,7 +14,7 @@ func _ready() -> void:
 	get_node(^"BackRow/Back").pressed.connect(_back)
 
 func configure(actors: Array[SDK.Actor], descriptions: Array = []) -> void:
-	get_node(^"Section/Content/Empty").visible = actors.is_empty() and descriptions.is_empty()
+	get_node(^"Section/Content/BodySlot/Empty").visible = actors.is_empty() and descriptions.is_empty()
 	for actor in actors:
 		var row := ROW.instantiate()
 		i18n.companion_row(row)
@@ -47,7 +47,7 @@ func _place(actor: SDK.Actor) -> void:
 	placement_requested.emit(actor)
 
 func _append_record(record: Control) -> void:
-	var items := get_node(^"Section/Content/Items")
+	var items := get_node(^"Section/Content/BodySlot/Items")
 	if items.get_child_count() > 0:
 		items.add_child(DIVIDER.instantiate())
 	items.add_child(record)
@@ -68,6 +68,6 @@ func localize(locale: I18N) -> void:
 	get_node(^"BackRow/Back").text = _t("Back")
 	get_node(^"BackRow/Back").tooltip_text = _t("Back to Character")
 	get_node(^"BackRow/Label").text = _t("Companions")
-	get_node(^"Section/Content/Empty").text = _t("No granted Creature sheets are available to you.")
-	get_node(^"Section/Content/Hint").text = _t("Each creature has its own sheet. Place its Rook after creation.")
-	get_node(^"Section/Content/Title").text = _t("Granted creatures")
+	get_node(^"Section/Content/BodySlot/Empty").text = _t("No granted Creature sheets are available to you.")
+	get_node(^"Section/Content/BodySlot/Hint").text = _t("Each creature has its own sheet. Place its Rook after creation.")
+	get_node(^"Section").title = _t("Granted creatures")

@@ -34,11 +34,11 @@ func test_cast_controls_and_terminal_gm_report_in_phone_body() -> void:
 	eligible.button_pressed = true
 	await panel.submit()
 	await get_tree().process_frame
-	assert_bool(panel.get_node("Cast/Columns/Targets/Content/Change").disabled).is_true()
+	assert_bool(panel.get_node("Cast/Columns/Targets/Content/BodySlot/Change").disabled).is_true()
 	host.roll(host.last_request, [20])
 	host.WorldChanged.emit()
 	await get_tree().create_timer(0.6).timeout
-	assert_str(panel.get_node("Result/Section/Content/Copy").text).contains("Power critical: GM determines the outcome")
+	assert_str(panel.get_node("Result/Section/Content/BodySlot/Copy").text).contains("Power critical: GM determines the outcome")
 	assert_str(panel.get_node("Metrics/Uses/Content/Value").text).is_equal("20")
 	assert_str(panel.get_node("Metrics/Presence/Content/Value").text).is_equal("Critical")
 	assert_str(panel.primary_text()).is_equal("Done")
@@ -73,7 +73,7 @@ func test_immediate_healing_guides_count_errors_and_reports_applied_hp() -> void
 	await get_tree().create_timer(0.6).timeout
 	assert_str(panel.primary_text()).is_equal("Confirm targets")
 	assert_str(panel.get_node("Outcome").text).contains("exactly 1")
-	assert_bool(panel.get_node("Cast/Columns/Targets/Content/Change").disabled).is_false()
+	assert_bool(panel.get_node("Cast/Columns/Targets/Content/BodySlot/Change").disabled).is_false()
 	host.targets = PackedStringArray(["enemy-rook", "hero-rook"])
 	await panel.submit()
 	await get_tree().process_frame
@@ -83,7 +83,7 @@ func test_immediate_healing_guides_count_errors_and_reports_applied_hp() -> void
 	await panel.submit()
 	host.roll(host.last_request, [4])
 	await get_tree().create_timer(0.6).timeout
-	assert_str(panel.get_node("Result/Section/Content/Heading").text).is_equal("Healing applied")
-	assert_str(panel.get_node("Result/Section/Content/Copy").text).contains("regained 4 HP")
+	assert_str(panel.get_node("Result/Section").title).is_equal("Healing applied")
+	assert_str(panel.get_node("Result/Section/Content/BodySlot/Copy").text).contains("regained 4 HP")
 	assert_str(panel.primary_text()).is_equal("Done")
 	assert_int(host.actors.enemy.data.hit_points).is_equal(10)

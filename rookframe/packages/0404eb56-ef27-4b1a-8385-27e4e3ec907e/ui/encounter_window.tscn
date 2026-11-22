@@ -1,4 +1,4 @@
-[gd_scene load_steps=8 format=3]
+[gd_scene load_steps=9 format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_window.gd" id="script"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/person.svg" id="fallback"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/action_bar.tscn" id="footer"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/feedback/task_state.tscn" id="state"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/input.tscn" id="input"]
 
 [node name="Encounter" type="Control"]
 layout_mode = 2
@@ -143,11 +144,12 @@ size_flags_horizontal = 3
 theme_type_variation = &"RookframeLabel"
 text = "Round"
 
-[node name="Value" type="LineEdit" parent="Layout/Body/Content/Options/Round"]
+[node name="Value" parent="Layout/Body/Content/Options/Round" instance=ExtResource("input")]
 layout_mode = 2
 custom_minimum_size = Vector2(72, 44)
 accessibility_name = "Round"
 max_length = 4
+size_flags_horizontal = 1
 
 [node name="Set" parent="Layout/Body/Content/Options/Round" instance=ExtResource("button")]
 layout_mode = 2

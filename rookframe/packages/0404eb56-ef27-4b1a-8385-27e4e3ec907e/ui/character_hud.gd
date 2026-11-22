@@ -32,6 +32,11 @@ var _page_entries: Array[ENTRY] = []
 @onready var _launcher = get_node("Launcher")
 
 func ready() -> void:
+	# Each open instance owns its set: a group saved in the scene is shared between instances or copied per UI Kit control.
+	var categories := ButtonGroup.new()
+	categories.allow_unpress = true
+	for category in BUTTONS:
+		(get_node("Bar/Bar/Row/CategorySlot/" + category) as BaseButton).button_group = categories
 	if sdk == null:
 		visible = false
 		return

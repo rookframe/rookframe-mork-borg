@@ -39,7 +39,7 @@ signal health_requested
 const WORK := "Inset/Layout/Body/Workspace/Chapter/Content/"
 const IDENTITY := "Inset/Layout/Body/Identity/Column/"
 const IDENTITY_PANEL := "Inset/Layout/Body/Identity"
-const SECTION_BUTTON = preload(ROOT + "ui/creature_section_button.tscn")
+const SECTION_BUTTON = preload("res://rookframe/ui/components/actions/button.tscn")
 var _data: Dictionary = {}
 var _library := true
 var _can_edit := false
@@ -310,12 +310,17 @@ func _build_groups(metadata: Dictionary) -> void:
 	_section = mini(_section, maxi(0, groups.size() - 1))
 	var selector := get_node(WORK + "Section")
 	_clear(selector)
+	var sections := ButtonGroup.new()
 	for index in range(_groups.size()):
 		var button: Button = SECTION_BUTTON.instantiate()
 		button.name = "Section" + str(index)
+		button.set(&"compact", true)
+		button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		button.size_flags_vertical = Control.SIZE_SHRINK_BEGIN
+		button.toggle_mode = true
+		button.button_group = sections
 		selector.add_child(button)
 		button.text = _locale.text(str(_groups[index].title))
-		button.toggle_mode = true
 		button.set_pressed_no_signal(index == _section)
 		button.pressed.connect(_section_selected.bind(index))
 
@@ -1055,11 +1060,8 @@ func _fit_identity() -> void:
 	title.visible = not _identity_overflow
 	classification.visible = not _identity_overflow
 	opener.visible = _identity_overflow
-	get_node(IDENTITY + "IdentityDetails/Copy/Name").text = title.text
-	_label_style(get_node(IDENTITY + "IdentityDetails/Copy/Name"), "Name")
-	get_node(IDENTITY + "IdentityDetails/Copy/Caption").text = _locale.text("Full identity") + " ›"
+	opener.text = title.text + "\n" + _locale.text("Full identity") + " ›"
 	opener.accessibility_name = title.text + ". " + classification.text + ". " + _locale.text("Full identity")
-	opener.custom_minimum_size = Vector2(0, maxf(44, get_node(IDENTITY + "IdentityDetails/Copy").get_combined_minimum_size().y))
 	# The portrait takes whatever height the native column has left.
 	if portrait.custom_minimum_size.y != 0:
 		portrait.custom_minimum_size = Vector2(0, 0)

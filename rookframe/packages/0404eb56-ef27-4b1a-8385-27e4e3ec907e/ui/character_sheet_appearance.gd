@@ -10,15 +10,15 @@ var _default_rows: Array[Button] = []
 var _selected_rows: Array[Button] = []
 func _ready() -> void:
 	for scope in ["Default", "Selected"]:
-		get_node(scope + "/Content/Row/Details/Choose").pressed.connect(_choose.bind(scope))
-		get_node(scope + "/Content/Row/Details/Apply").pressed.connect(_apply.bind(scope))
+		get_node(scope + "/Content/BodySlot/Row/Details/Choose").pressed.connect(_choose.bind(scope))
+		get_node(scope + "/Content/BodySlot/Row/Details/Apply").pressed.connect(_apply.bind(scope))
 func configure(data: Dictionary, _count: int, choices: Array[Dictionary]) -> void:
 	_choices = choices
 	var read_only: bool = data.get("read_only", false)
 	for scope in ["Default", "Selected"]:
 		var reference: Dictionary = data.get("preferred_miniature" if scope == "Default" else "selected_miniature", {})
 		var title := "No Miniature selected"
-		var picker := get_node(scope + "/Content/Row/Details/Picker") as VBoxContainer
+		var picker := get_node(scope + "/Content/BodySlot/Row/Details/Picker") as VBoxContainer
 		_selection[scope] = 0
 		for index in range(choices.size()):
 			var choice: Dictionary = choices[index]
@@ -37,12 +37,12 @@ func configure(data: Dictionary, _count: int, choices: Array[Dictionary]) -> voi
 				row.button_pressed = true
 		var rook_available: bool = data.get("selected_rook_available", false)
 		var available: bool = scope == "Default" or rook_available
-		get_node(scope + "/Content/Row/Details/Title").text = _t(title) if available else _t("Select this Character’s Rook")
-		get_node(scope + "/Content/Row/Details/Choose").disabled = choices.is_empty() or not available or read_only
+		get_node(scope + "/Content/BodySlot/Row/Details/Title").text = _t(title) if available else _t("Select this Character’s Rook")
+		get_node(scope + "/Content/BodySlot/Row/Details/Choose").disabled = choices.is_empty() or not available or read_only
 func _choose(scope: String) -> void:
-	get_node(scope + "/Content/Row/Details/Picker").visible = true
-	get_node(scope + "/Content/Row/Details/Apply").visible = true
-	get_node(scope + "/Content/Row/Details/Choose").visible = false
+	get_node(scope + "/Content/BodySlot/Row/Details/Picker").visible = true
+	get_node(scope + "/Content/BodySlot/Row/Details/Apply").visible = true
+	get_node(scope + "/Content/BodySlot/Row/Details/Choose").visible = false
 func _apply(scope: String) -> void:
 	appearance_save_requested.emit(scope, int(_selection.get(scope, 0)))
 
@@ -64,11 +64,11 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Default/Content/Heading").text = _t("Actor default")
-	get_node(^"Default/Content/Row/Details/Apply").text = _t("Use Miniature")
-	get_node(^"Default/Content/Row/Details/Choose").text = _t("Choose Miniature")
-	get_node(^"Default/Content/Row/Details/Description").text = _t("Preferred Miniature for this Actor’s Rooks.")
-	get_node(^"Selected/Content/Heading").text = _t("This Rook")
-	get_node(^"Selected/Content/Row/Details/Apply").text = _t("Use Miniature")
-	get_node(^"Selected/Content/Row/Details/Choose").text = _t("Choose Miniature")
-	get_node(^"Selected/Content/Row/Details/Description").text = _t("Appearance for the selected Rook.")
+	get_node(^"Default").title = _t("Actor default")
+	get_node(^"Default/Content/BodySlot/Row/Details/Apply").text = _t("Use Miniature")
+	get_node(^"Default/Content/BodySlot/Row/Details/Choose").text = _t("Choose Miniature")
+	get_node(^"Default/Content/BodySlot/Row/Details/Description").text = _t("Preferred Miniature for this Actor’s Rooks.")
+	get_node(^"Selected").title = _t("This Rook")
+	get_node(^"Selected/Content/BodySlot/Row/Details/Apply").text = _t("Use Miniature")
+	get_node(^"Selected/Content/BodySlot/Row/Details/Choose").text = _t("Choose Miniature")
+	get_node(^"Selected/Content/BodySlot/Row/Details/Description").text = _t("Appearance for the selected Rook.")

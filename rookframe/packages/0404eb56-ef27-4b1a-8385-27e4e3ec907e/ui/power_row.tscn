@@ -1,5 +1,6 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [node name="PowerRow" type="HBoxContainer"]
 layout_mode = 2
 script = ExtResource("token_box")
@@ -18,9 +19,8 @@ autowrap_mode = 2
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 2
-[node name="Cast" type="Button" parent="."]
+[node name="Cast" parent="." instance=ExtResource("button")]
 layout_mode = 2
 size_flags_vertical = 4
-custom_minimum_size = Vector2(0, 44)
-theme_type_variation = &"RookframeSecondaryButton"
 text = "Cast"
+compact = true

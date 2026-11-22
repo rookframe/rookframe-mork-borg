@@ -19,6 +19,10 @@ func _notification(what: int) -> void:
 			(get_node(path) as Control).self_modulate = get_theme_color(&"ornament", TOKENS)
 
 func _ready() -> void:
+	# Each open instance owns its set: a group saved in the scene is shared between instances or copied per UI Kit control.
+	var sections := ButtonGroup.new()
+	for section in get_node("Body/Main/Content/Sections").get_children():
+		(section as BaseButton).button_group = sections
 	get_node("Header/Back").pressed.connect(_back)
 	(get_node("Body/Main/Content/Sections/Recovery") as Button).pressed.connect(_section.bind(false))
 	(get_node("Body/Main/Content/Sections/Daily") as Button).pressed.connect(_section.bind(true))

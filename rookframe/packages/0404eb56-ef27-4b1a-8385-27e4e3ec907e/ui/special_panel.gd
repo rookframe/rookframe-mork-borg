@@ -10,9 +10,7 @@ const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const ACTION = preload(ROOT + "logic/special_action.gd")
 const SHIELD_SCENE = preload(ROOT + "ui/shield_dialog.tscn")
 const SHIELD_SCRIPT = preload(ROOT + "ui/shield_dialog.gd")
-const BACKDROP = preload(ROOT + "ui/shield_backdrop.tscn")
 var _shield: SHIELD_SCRIPT
-var _backdrop: CanvasLayer
 const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const TARGETS = preload(ROOT + "ui/attack_targets.gd")
 signal action_created(action: ACTION)
@@ -48,15 +46,20 @@ func _ready() -> void:
 		for number in range(list.get_child_count()):
 			var row := list.get_child(number) as Button
 			row.pressed.connect(_choose_scroll_option.bind(index, number))
-	get_node(^"Columns/Recipient/Content/Change").pressed.connect(_choose_targets)
-	get_node(^"Columns/Recipient/Content/Self").pressed.connect(_self_changed)
+	# A scene-local ButtonGroup is copied for each instanced UI Kit control, so every set joins one here.
+	for path in [^"Options/Ability/Choices", ^"Scrolls/First", ^"Scrolls/Second"]:
+		var group := ButtonGroup.new()
+		for choice in get_node(path).get_children():
+			(choice as BaseButton).button_group = group
+	get_node(^"Columns/Recipient/Content/BodySlot/Change").pressed.connect(_choose_targets)
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").pressed.connect(_self_changed)
 
 func configure_tabletop(actor: SDK.Actor, facade: SDK, item: String, rook: String) -> void:
 	_reset_task()
 	_tabletop = true
 	_configure_source(facade, actor.id, rook)
 	# A recipient is never inferred from the authored sheet's Self default.
-	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").button_pressed = false
 	configure(actor, facade, item)
 
 func _configure_source(facade: SDK, actor: SDK.ActorId, preferred: String) -> void:
@@ -113,7 +116,7 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	if _source_rook == null and not _tabletop:
 		_source_rook = _sdk.rooks.selected()
 	if _rule.get("book", false):
-		get_node(^"Columns/Recipient/Content/Self").button_pressed = false
+		get_node(^"Columns/Recipient/Content/BodySlot/Self").button_pressed = false
 	_targets_pending = true
 	_render()
 
@@ -123,10 +126,10 @@ func _render() -> void:
 	var editing := state in ["ready", "error"]
 	get_node(^"Source").visible = _tabletop and _source_rooks.size() > 1 and editing
 	var title := _title
-	get_node(^"Columns/Item/Content/Name").visible = false
-	get_node(^"Columns/Item/Content/Rules").text = _t(str(_entry.get("rules", "")))
+	get_node(^"Columns/Item/Content/BodySlot/Name").visible = false
+	get_node(^"Columns/Item/Content/BodySlot/Rules").text = _t(str(_entry.get("rules", "")))
 	if _rule.get("blade", false):
-		get_node(^"Columns/Item/Content/Rules").text += _t(" Check treachery when the table confirms continual disappointment; choose the possible victim before rolling. The source leaves check frequency and victim selection to the table.")
+		get_node(^"Columns/Item/Content/BodySlot/Rules").text += _t(" Check treachery when the table confirms continual disappointment; choose the possible victim before rolling. The source leaves check frequency and victim selection to the table.")
 	var default_uses: int = _rule.get("uses", -1)
 	var uses: int = _entry.get("uses", default_uses)
 	if _entry.has("dose_pool"):
@@ -137,21 +140,21 @@ func _render() -> void:
 			if str(item.get("source_item_id", "")) == str(_entry.dose_pool):
 				uses = item.get("uses", 0)
 	var reach: int = _rule.get("range_feet", 0)
-	get_node(^"Columns/Item/Content/Uses").text = (str(uses) + _t(" uses remaining · ") if _entry.has("uses") or _rule.has("uses") or _entry.has("dose_pool") else "") + (_t("Self") if reach == 0 else _t("%d ft") % reach)
-	get_node(^"Columns/Recipient/Content/Self").visible = reach > 0 and not _rule.get("book", false)
-	get_node(^"Columns/Recipient/Content/Self").disabled = not editing
-	get_node(^"Columns/Recipient/Content/Change").visible = reach > 0
-	get_node(^"Columns/Recipient/Content/Change").disabled = not editing
-	if reach == 0 or get_node(^"Columns/Recipient/Content/Self").button_pressed:
-		get_node(^"Columns/Recipient/Content/Copy").text = _t("%s\n%s / %s HP") % [str(data.get("name", "Character")), str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
+	get_node(^"Columns/Item/Content/BodySlot/Uses").text = (str(uses) + _t(" uses remaining · ") if _entry.has("uses") or _rule.has("uses") or _entry.has("dose_pool") else "") + (_t("Self") if reach == 0 else _t("%d ft") % reach)
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").visible = reach > 0 and not _rule.get("book", false)
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").disabled = not editing
+	get_node(^"Columns/Recipient/Content/BodySlot/Change").visible = reach > 0
+	get_node(^"Columns/Recipient/Content/BodySlot/Change").disabled = not editing
+	if reach == 0 or get_node(^"Columns/Recipient/Content/BodySlot/Self").button_pressed:
+		get_node(^"Columns/Recipient/Content/BodySlot/Copy").text = _t("%s\n%s / %s HP") % [str(data.get("name", "Character")), str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	get_node(^"Options").visible = editing
 	get_node(^"Options/Ability").visible = _rule.get("ability_choice", false) or _rule.get("book", false)
 	get_node(^"Options/Adjustment").visible = _rule.has("ability") or _rule.get("book", false) or _rule.get("resistance", false)
 	get_node(^"Options/NewFight").visible = _rule.get("gob", false)
 	get_node(^"Options/Morale").visible = _rule.get("morale", false)
-	get_node(^"Columns/Recipient/Content/Change").disabled = not editing and state != "witnesses"
-	get_node(^"Columns/Recipient/Content/Change").text = _t("Choose witnesses") if state == "witnesses" else _t("Change recipient")
-	get_node(^"Columns/Recipient/Content/Self").visible = reach > 0 and not _rule.get("book", false) and state != "witnesses"
+	get_node(^"Columns/Recipient/Content/BodySlot/Change").disabled = not editing and state != "witnesses"
+	get_node(^"Columns/Recipient/Content/BodySlot/Change").text = _t("Choose witnesses") if state == "witnesses" else _t("Change recipient")
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").visible = reach > 0 and not _rule.get("book", false) and state != "witnesses"
 	get_node(^"Scrolls").visible = state == "scrolls"
 	if state == "scrolls" and _scroll_options.is_empty():
 		_scroll_options = SCROLLS.TABLES.get(str(_action.snapshot.get("family", "")), [])
@@ -165,20 +168,15 @@ func _render() -> void:
 		get_node(^"Scrolls/Second").visible = count == 2
 	if state == "shield":
 		if _shield == null:
-			var backdrop := BACKDROP.instantiate()
-			add_child(backdrop)
-			_backdrop = backdrop
 			var dialog := SHIELD_SCENE.instantiate()
 			dialog.localize(i18n)
 			add_child(dialog)
 			_shield = dialog
 			_shield.choice_requested.connect(_choose_shield)
 			_shield.cancelled.connect(close_action)
-		_backdrop.visible = true
 		_shield.present(_action.snapshot)
 	elif _shield != null:
 		_shield.dismiss()
-		_backdrop.visible = false
 	var outcome := _action.message if _action != null else ""
 	get_node(^"Outcome").text = _t(outcome)
 	get_node(^"Outcome").visible = not outcome.is_empty()
@@ -217,7 +215,7 @@ func submit() -> void:
 	_action.changed.connect(_world_changed)
 	var morale_text: String = get_node(^"Options/Morale/Value").value
 	var morale := int(morale_text)
-	await _action.start({"adjustment": adjustment, "source": _actor.id.value, "rook": _source_rook.value if _source_rook != null else "", "item": _item, "self": get_node(^"Columns/Recipient/Content/Self").button_pressed and not _rule.get("book", false), "ability": _ability, "new_fight": get_node(^"Options/NewFight").button_pressed, "presence_sign": -1 if get_node(^"Options/Morale/Subtract").button_pressed else 1, "morale": morale, "eligible": get_node(^"Options/Eligible").button_pressed})
+	await _action.start({"adjustment": adjustment, "source": _actor.id.value, "rook": _source_rook.value if _source_rook != null else "", "item": _item, "self": get_node(^"Columns/Recipient/Content/BodySlot/Self").button_pressed and not _rule.get("book", false), "ability": _ability, "new_fight": get_node(^"Options/NewFight").button_pressed, "presence_sign": -1 if get_node(^"Options/Morale/Subtract").button_pressed else 1, "morale": morale, "eligible": get_node(^"Options/Eligible").button_pressed})
 
 func primary_text() -> String:
 	var state := _action.state if _action != null else "ready"
@@ -240,7 +238,7 @@ func _process(_delta: float) -> void:
 			_actor = latest.actor
 			_entry = RULES.new().owned(_actor.data, _item)
 		_render()
-	if _targets_pending and not _reading_targets and _rule.get("range_feet", 0) > 0 and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
+	if _targets_pending and not _reading_targets and _rule.get("range_feet", 0) > 0 and not get_node(^"Columns/Recipient/Content/BodySlot/Self").button_pressed:
 		_targets_pending = false
 		_reading_targets = true
 		var version := _context_version
@@ -250,7 +248,7 @@ func _process(_delta: float) -> void:
 		if is_inside_tree() and version == _context_version:
 			if _tabletop and summary == _t("Choose one target"):
 				summary = _t("No targets")
-			get_node(^"Columns/Recipient/Content/Copy").text = summary
+			get_node(^"Columns/Recipient/Content/BodySlot/Copy").text = summary
 
 func _targets_changed(_snapshot: SDK.TargetSnapshot) -> void:
 	_targets_pending = true
@@ -260,7 +258,7 @@ func _self_changed() -> void:
 	_render()
 
 func _choose_targets() -> void:
-	get_node(^"Columns/Recipient/Content/Self").button_pressed = false
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").button_pressed = false
 	var result := _sdk.targeting.choose()
 	if not result.ok:
 		get_node(^"Outcome").text = _t(result.message)
@@ -269,7 +267,6 @@ func _choose_targets() -> void:
 func close_action() -> void:
 	if _shield != null:
 		_shield.dismiss()
-		_backdrop.visible = false
 	if _action != null:
 		_action.cancel()
 
@@ -309,10 +306,10 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"Columns/Item/Content/Heading").text = _t("Use item")
-	get_node(^"Columns/Recipient/Content/Change").text = _t("Change recipient")
-	get_node(^"Columns/Recipient/Content/Heading").text = _t("Recipient")
-	get_node(^"Columns/Recipient/Content/Self").text = _t("Self")
+	get_node(^"Columns/Item").title = _t("Use item")
+	get_node(^"Columns/Recipient/Content/BodySlot/Change").text = _t("Change recipient")
+	get_node(^"Columns/Recipient").title = _t("Recipient")
+	get_node(^"Columns/Recipient/Content/BodySlot/Self").text = _t("Self")
 	get_node(^"Options/Ability/Choices/Agility").text = _t("Agility")
 	get_node(^"Options/Ability/Choices/Presence").text = _t("Presence")
 	get_node(^"Options/Ability/Choices/Strength").text = _t("Strength")

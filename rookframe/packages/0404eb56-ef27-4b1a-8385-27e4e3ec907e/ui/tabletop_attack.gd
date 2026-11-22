@@ -11,6 +11,8 @@ const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const AMMO = preload(ROOT + "logic/ammunition.gd")
+const CHECKBOX = preload("res://rookframe/ui/components/forms/checkbox.tscn")
+const INPUT = preload("res://rookframe/ui/components/forms/input.tscn")
 @onready var card: CARD = get_node("Card")
 var _actor: SDK.ActorId
 var _rook: SDK.RookId
@@ -222,8 +224,7 @@ func _choices(items: Array) -> void:
 		picker.item_selected.connect(_weapon_selected.bind(weapons))
 		choices.add_child(picker)
 	if str(_task.get("item", "")) == "intrinsic:improvised":
-		var object_name := LineEdit.new()
-		object_name.theme_type_variation = "RookframeActionTextField"
+		var object_name: LineEdit = INPUT.instantiate()
 		object_name.accessibility_name = _locale.text("Improvised object")
 		object_name.placeholder_text = _locale.text("Improvised object")
 		object_name.custom_minimum_size = Vector2(0, 44)
@@ -246,9 +247,8 @@ func _choices(items: Array) -> void:
 	choices.visible = choices.get_child_count() > 0
 
 func _check(parent: VBoxContainer, text: String, key: String) -> void:
-	var button := CheckBox.new()
+	var button: CheckBox = CHECKBOX.instantiate()
 	button.text = _locale.text(text)
-	button.custom_minimum_size = Vector2(0, 44)
 	button.button_pressed = bool(_options.get(key, false))
 	button.toggled.connect(_option_toggled.bind(key))
 	parent.add_child(button)

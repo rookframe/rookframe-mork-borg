@@ -1,8 +1,0 @@
-[gd_scene format=3]
-[node name="CreatureSectionButton" type="Button"]
-custom_minimum_size = Vector2(44,44)
-size_flags_horizontal = 3
-size_flags_vertical = 0
-theme_type_variation = &"RookframeTabButton"
-toggle_mode = true
-clip_text = false

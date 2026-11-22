@@ -3,6 +3,7 @@
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/add.svg" id="add"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_icon_button.tscn" id="compact_icon"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/layout/section.tscn" id="kit_section"]
 [node name="CharacterInventory" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -20,31 +21,17 @@ layout_mode = 2
 icon = ExtResource("add")
 tooltip_text = "Add Item"
 accessibility_name = "Add Item"
-[node name="EquippedSection" type="PanelContainer" parent="."]
+[node name="EquippedSection" parent="." instance=ExtResource("kit_section")]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="EquippedSection"]
-layout_mode = 2
-script = ExtResource("token_box")
-[node name="Heading" type="Label" parent="EquippedSection/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-text = "Equipped"
-[node name="Items" type="VBoxContainer" parent="EquippedSection/Content"]
+title = "Equipped"
+[node name="Items" type="VBoxContainer" parent="EquippedSection/Content/BodySlot"]
 layout_mode = 2
 script = ExtResource("token_box")
 gap = &"space_1"
-[node name="CarriedSection" type="PanelContainer" parent="."]
+[node name="CarriedSection" parent="." instance=ExtResource("kit_section")]
 layout_mode = 2
-theme_type_variation = &"RookframeSection"
-[node name="Content" type="VBoxContainer" parent="CarriedSection"]
-layout_mode = 2
-script = ExtResource("token_box")
-[node name="Heading" type="Label" parent="CarriedSection/Content"]
-layout_mode = 2
-theme_type_variation = &"RookframeHeading"
-text = "Carried"
-[node name="Items" type="VBoxContainer" parent="CarriedSection/Content"]
+title = "Carried"
+[node name="Items" type="VBoxContainer" parent="CarriedSection/Content/BodySlot"]
 layout_mode = 2
 script = ExtResource("token_box")
 gap = &"space_1"

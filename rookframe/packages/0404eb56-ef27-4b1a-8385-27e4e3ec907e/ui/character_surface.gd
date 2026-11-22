@@ -4,7 +4,7 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
 var _favorites := FAVORITES.new()
 var _favorite_busy := false
-@onready var _favorite_button = get_node(^"Margin/Layout/Body/Chapter/Page/Content/Detail/HeaderFrame/Inset/DetailHeader/Favorite")
+@onready var _favorite_button: Button = get_node(^"Margin/Layout/Body/Chapter/Page/Content/Detail/HeaderFrame/Inset/DetailHeader/Favorite")
 const ACTIONS = preload(ROOT + "logic/character_actions.gd")
 const PROJECTION = preload(ROOT + "ui/sheet_projection.gd")
 const DRAFT = preload(ROOT + "ui/sheet_draft.gd")
@@ -134,14 +134,16 @@ var _rendered_chapter := -1
 var _locale := I18N.new()
 
 func ready() -> void:
-	for button in [_quick_omens, _quick_silver]:
-		button.add_theme_font_size_override("font_size", 15)
+	# Each open instance owns its set: a group saved in the scene is shared between instances or copied per UI Kit control.
+	var filters := ButtonGroup.new()
+	for filter in _chapter_ui.get_node(^"Page/Content/ChapterCaption/InventoryFilters").get_children():
+		(filter as BaseButton).button_group = filters
 	_quick_omens.icon = preload("res://rookframe/ui/icons/character/dice.svg")
 	if sdk == null:
 		return
 	_favorites.sdk = sdk
 	_favorites.favorite_changed.connect(_favorite_changed)
-	_favorite_button.favorite_changed.connect(_favorite_changed)
+	_favorites.bind(_favorite_button)
 	_locale.bind(sdk)
 	get_node(^"EntryDialog").close_requested_by_user.connect(_dismiss_detail)
 	get_node(^"EntryDialog").escape_requested.connect(_escape)
@@ -595,7 +597,7 @@ func _detail_tab_selected(index: int) -> void:
 func _clear_detail() -> void:
 	_fields = []
 	_detail_ui.begin_content(_detail + ":" + str(_detail_tab))
-	_favorite_button.configure({}, false)
+	_favorite_button.visible = false
 	_primary_button.visible = false
 	_secondary_button.visible = false
 	_detail_tabs.visible = not _detail.begins_with("workflow:") and _detail not in ["catalogue", "custom"]

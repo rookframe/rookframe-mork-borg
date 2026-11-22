@@ -70,13 +70,8 @@ func configure_layout(phone: bool, tablet: bool) -> void:
 	get_node(^"Tabs").set(&"gap", &"space_1" if phone else &"space_2")
 	_fit_tabs()
 	get_node(^"Page/Content/ChapterCaption/Caption").add_theme_font_size_override("font_size", 17 if tablet else 20)
-	for raw in get_node(^"Page/Content/ChapterCaption/InventoryFilters").get_children():
-		var child := raw as Control
-		child.add_theme_font_size_override("font_size", 17 if tablet else 20)
-		child.custom_minimum_size = Vector2(child.custom_minimum_size.x, 44)
 	get_node(^"Page/Content/ChapterCaption/InventoryFilters/Ready").text = "Equipped"
 	get_node(^"Page/Content/ChapterCaption/Resource").icon = null
-	get_node(^"Page/Content/ChapterCaption/PersonalNotes").add_theme_font_size_override("font_size", 17 if tablet else 20)
 	get_node(^"Page/Content/AppearancePanel").configure_layout(phone, tablet)
 
 func configure_caption(chapter: int, phone: bool, filter: int, data: Dictionary, draft: Dictionary, section: int) -> void:

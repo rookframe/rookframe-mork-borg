@@ -1,9 +1,10 @@
-extends Button
+extends RefCounted
+## Fills the condition reminder, a UI Kit Button that carries its own summary layout.
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
-var _tokens := SHEET_TOKENS.new()
 
-func configure(data: Dictionary, condition: Dictionary, phone: bool) -> void:
-	var tablet := get_viewport_rect().size.x <= 1150 and not phone
+static func configure(reminder: Button, data: Dictionary, condition: Dictionary, phone: bool) -> void:
+	var tokens := SHEET_TOKENS.new()
+	var tablet := reminder.get_viewport_rect().size.x <= 1150 and not phone
 	var incident: Dictionary = data.get("broken_incident", {})
 	var title := str(condition.get("title", "")).capitalize()
 	var summary := "0 HP · roll d4"
@@ -16,15 +17,15 @@ func configure(data: Dictionary, condition: Dictionary, phone: bool) -> void:
 			summary = "Bleeding stopped · 0 HP"
 		elif incident.has("followup_sequence"):
 			summary = "%d rounds remaining" % remaining if int(incident.get("outcome", 0)) in [1, 2] else "%dh until death unless treated" % remaining
-	get_node(^"Inset/Content/Heading/Title").text = title
-	get_node(^"Inset/Content/Heading/Title").add_theme_font_size_override("font_size", 17 if phone else 21 if tablet else 24)
-	get_node(^"Inset/Content/Copy").text = summary
-	get_node(^"Inset/Content/Copy").add_theme_font_size_override("font_size", 12 if phone else 13 if tablet else 15)
-	get_node(^"Inset/Content/Link/Title").add_theme_font_size_override("font_size", 12 if phone else 14)
-	get_node(^"Inset/Content").gap = &"space_1" if phone else &"space_3"
+	reminder.get_node(^"Inset/Content/Heading/Title").text = title
+	reminder.get_node(^"Inset/Content/Heading/Title").add_theme_font_size_override("font_size", 17 if phone else 21 if tablet else 24)
+	reminder.get_node(^"Inset/Content/Copy").text = summary
+	reminder.get_node(^"Inset/Content/Copy").add_theme_font_size_override("font_size", 12 if phone else 13 if tablet else 15)
+	reminder.get_node(^"Inset/Content/Link/Title").add_theme_font_size_override("font_size", 12 if phone else 14)
+	reminder.get_node(^"Inset/Content").gap = &"space_1" if phone else &"space_3"
 	for edge in ["left", "right", "top", "bottom"]:
-		get_node(^"Inset").add_theme_constant_override("margin_" + edge, _tokens.pixels(self, &"space_2" if phone else &"space_3" if edge in ["left", "right"] else &"space_4"))
-	get_node(^"Inset/Content/Heading/Title").add_theme_font_override("font", get_theme_font(&"heading", SHEET_TOKENS.TYPE))
-	(get_node(^"Inset/Content/Heading/Icon") as Control).self_modulate = _tokens.color(self, &"danger")
-	custom_minimum_size = Vector2(44, 100 if phone else 132)
-	accessibility_name = title + ": " + summary + ". Show condition on Character."
+		reminder.get_node(^"Inset").add_theme_constant_override("margin_" + edge, tokens.pixels(reminder, &"space_2" if phone else &"space_3" if edge in ["left", "right"] else &"space_4"))
+	reminder.get_node(^"Inset/Content/Heading/Title").add_theme_font_override("font", reminder.get_theme_font(&"heading", SHEET_TOKENS.TYPE))
+	(reminder.get_node(^"Inset/Content/Heading/Icon") as Control).self_modulate = tokens.color(reminder, &"danger")
+	reminder.custom_minimum_size = Vector2(44, 100 if phone else 132)
+	reminder.accessibility_name = title + ": " + summary + ". Show condition on Character."

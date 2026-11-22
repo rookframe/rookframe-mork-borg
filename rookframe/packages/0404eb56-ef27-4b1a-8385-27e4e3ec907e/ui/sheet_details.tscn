@@ -2,9 +2,10 @@
 
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
-[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_favorite.tscn" id="favorite"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/favorite_toggle.tscn" id="favorite"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/paginated_text_area.tscn" id="notepad"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="margin"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="frame"]
@@ -29,12 +30,11 @@ layout_mode = 2
 script = ExtResource("box")
 gap = &"space_3"
 
-[node name="Back" type="Button" parent="HeaderFrame/Inset/DetailHeader"]
-custom_minimum_size = Vector2(44, 44)
+[node name="Back" parent="HeaderFrame/Inset/DetailHeader" instance=ExtResource("button")]
 layout_mode = 2
 tooltip_text = "Back"
 accessibility_name = "Back"
-theme_type_variation = &"RookframeQuietButton"
+compact = true
 
 [node name="Copy" type="VBoxContainer" parent="HeaderFrame/Inset/DetailHeader/Back"]
 layout_mode = 1
@@ -72,17 +72,15 @@ text_overrun_behavior = 3
 max_lines_visible = 1
 
 [node name="Favorite" parent="HeaderFrame/Inset/DetailHeader" instance=ExtResource("favorite")]
+visible = false
 layout_mode = 2
 
-[node name="Close" type="Button" parent="HeaderFrame/Inset/DetailHeader"]
-custom_minimum_size = Vector2(44, 44)
+[node name="Close" parent="HeaderFrame/Inset/DetailHeader" instance=ExtResource("button")]
 layout_mode = 2
 tooltip_text = "Close details"
 accessibility_name = "Close details"
-theme_type_variation = &"RookframeIcon"
 icon = ExtResource("close")
-icon_alignment = 1
-expand_icon = true
+compact = true
 
 [node name="TabsFrame" type="PanelContainer" parent="."]
 layout_mode = 2
@@ -100,22 +98,20 @@ bottom = &""
 layout_mode = 2
 script = ExtResource("box")
 
-[node name="Overview" type="Button" parent="TabsFrame/Inset/DetailTabs"]
+[node name="Overview" parent="TabsFrame/Inset/DetailTabs" instance=ExtResource("button")]
 custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-theme_override_font_sizes/font_size = 14
 toggle_mode = true
+compact = true
 text = "Overview"
 
-[node name="Details" type="Button" parent="TabsFrame/Inset/DetailTabs"]
+[node name="Details" parent="TabsFrame/Inset/DetailTabs" instance=ExtResource("button")]
 custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeTabButton"
-theme_override_font_sizes/font_size = 14
 toggle_mode = true
+compact = true
 text = "Details"
 
 [node name="Body" type="MarginContainer" parent="."]
@@ -165,26 +161,24 @@ size_flags_horizontal = 3
 script = ExtResource("box")
 gap = &"space_4"
 
-[node name="SecondaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions/Utility"]
+[node name="SecondaryAction" parent="FooterFrame/FooterInset/DetailActions/Utility" instance=ExtResource("button")]
 visible = false
-custom_minimum_size = Vector2(44, 44)
 layout_mode = 2
 size_flags_horizontal = 3
-theme_type_variation = &"RookframeSecondaryButton"
-theme_override_font_sizes/font_size = 14
+compact = true
 
 [node name="PagerSlot" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions/Utility"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="PrimaryAction" type="Button" parent="FooterFrame/FooterInset/DetailActions"]
+[node name="PrimaryAction" parent="FooterFrame/FooterInset/DetailActions" instance=ExtResource("button")]
 visible = false
 custom_minimum_size = Vector2(44, 48)
 layout_mode = 2
 size_flags_horizontal = 0
 size_flags_vertical = 4
-theme_type_variation = &"RookframePrimaryButton"
-theme_override_font_sizes/font_size = 16
+variant = 1
+compact = true
 
 [node name="Draft" type="HBoxContainer" parent="FooterFrame/FooterInset/DetailActions"]
 visible = false

@@ -17,7 +17,7 @@ var _action: ACTION
 var _update_pending := false
 @onready var _view: VIEW = get_node(^"CompanionDefenceView")
 @onready var _shield: SHIELD = get_node(^"Shield")
-@onready var _backdrop: CanvasLayer = get_node(^"Backdrop")
+var _shield_open := false
 
 func _ready() -> void:
 	_shield.choice_requested.connect(_choose)
@@ -48,7 +48,7 @@ func _process(_delta: float) -> void:
 	var target := _sdk.actors.read(SDK.ActorId.new(str(action.snapshot.target)))
 	if not target.ok or target.actor == null or target.actor.access_level != "Owner":
 		visible = false
-		_backdrop.visible = false
+		_shield_open = false
 		_shield.dismiss()
 		_action = null
 		action.retire()
@@ -56,12 +56,12 @@ func _process(_delta: float) -> void:
 		return
 	_view.configure(action.snapshot, action.state, action.message)
 	if action.state == "shield":
-		_backdrop.visible = true
+		_shield_open = true
 		_shield.present(action.snapshot)
 		_shield.set_pending(action.is_submitting())
 	else:
-		var was_open := _backdrop.visible
-		_backdrop.visible = false
+		var was_open := _shield_open
+		_shield_open = false
 		_shield.dismiss()
 		if was_open:
 			decision_closed.emit()
@@ -82,7 +82,7 @@ func _choose(choice: String) -> void:
 	await _action.choose(choice)
 
 func close() -> void:
-	_backdrop.visible = false
+	_shield_open = false
 	_shield.dismiss()
 	if _action != null:
 		await _action.cancel()

@@ -20,15 +20,15 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 		var row = ROW.instantiate()
 		row.localize(i18n)
 		var equipped: bool = item.get("equipped", false)
-		var target: NodePath = ^"EquippedSection/Content/Items" if equipped and not creature else ^"CarriedSection/Content/Items"
+		var target: NodePath = ^"EquippedSection/Content/BodySlot/Items" if equipped and not creature else ^"CarriedSection/Content/BodySlot/Items"
 		if get_node(target).get_child_count() > 0:
 			get_node(target).add_child(DIVIDER.instantiate())
 		get_node(target).add_child(row)
 		row.configure(item, false, read_only, not creature, creature)
 		row.mutation_requested.connect(_mutation)
 		row.navigate_requested.connect(_navigate)
-	get_node(^"EquippedSection").visible = get_node(^"EquippedSection/Content/Items").get_child_count() > 0
-	get_node(^"CarriedSection").visible = get_node(^"CarriedSection/Content/Items").get_child_count() > 0
+	get_node(^"EquippedSection").visible = get_node(^"EquippedSection/Content/BodySlot/Items").get_child_count() > 0
+	get_node(^"CarriedSection").visible = get_node(^"CarriedSection/Content/BodySlot/Items").get_child_count() > 0
 
 func _add_item() -> void:
 	navigate_requested.emit("catalogue", "")
@@ -50,9 +50,9 @@ func localize(locale: I18N) -> void:
 		return
 	_localized = true
 	i18n = locale
-	get_node(^"CarriedSection/Content/Heading").text = _t("Carried")
+	get_node(^"CarriedSection").title = _t("Carried")
 	get_node(^"Empty").text = _t("No items yet. Add equipment from the core catalogue or create a custom item.")
-	get_node(^"EquippedSection/Content/Heading").text = _t("Equipped")
+	get_node(^"EquippedSection").title = _t("Equipped")
 	get_node(^"Toolbar/Add").tooltip_text = _t("Add Item")
 	get_node(^"Toolbar/Add").accessibility_name = _t("Add Item")
 	get_node(^"Toolbar/Count").text = _t("Inventory")

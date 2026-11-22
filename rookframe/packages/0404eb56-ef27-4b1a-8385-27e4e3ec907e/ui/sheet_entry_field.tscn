@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_entry_field.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_area.tscn" id="textarea"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/task_text_field.tscn" id="textfield"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
 
 [node name="SheetEntryField" type="VBoxContainer"]
 layout_mode = 2
@@ -23,9 +24,8 @@ size_flags_horizontal = 3
 label_text = ""
 compact = true
 
-[node name="Save" type="Button" parent="."]
+[node name="Save" parent="." instance=ExtResource("button")]
 visible = false
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 text = "Save field"
-theme_type_variation = &"RookframeSecondaryButton"
+compact = true

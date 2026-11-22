@@ -1,7 +1,8 @@
 [gd_scene format=3]
-[node name="Choice" type="CheckBox"]
+
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
+
+[node name="Choice" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
-toggle_mode = true
