@@ -38,13 +38,11 @@ autowrap_mode = 2
 layout_mode = 2
 text = "Melee · Strength · 5 ft"
 text_overrun_behavior = 3
-[node name="Close" type="Button" parent="Frame/Header/Leaf/HeaderSlot/Header"]
+[node name="Close" parent="Frame/Header/Leaf/HeaderSlot/Header" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(44,44)
 size_flags_vertical = 4
-theme_type_variation = &"RookframeActionIcon"
 icon = ExtResource("close")
-icon_alignment = 1
+compact = true
 [node name="Weapon" type="TextureRect" parent="Frame/Header/Emblem/Leaf/EmblemSlot"]
 layout_mode = 2
 custom_minimum_size = Vector2(42,42)
@@ -91,13 +89,14 @@ custom_minimum_size = Vector2(110,0)
 layout_mode = 2
 text = "1d20 − 1"
 size_flags_horizontal = 3
-[node name="Roll" type="Button" parent="Frame/Sections/SectionsSlot/Section/Body/Combat/Attack"]
+[node name="Roll" parent="Frame/Sections/SectionsSlot/Section/Body/Combat/Attack" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(56,52)
 size_flags_vertical = 4
-theme_type_variation = &"RookframeActionRoll"
 tooltip_text = "Prepare attack"
 accessibility_name = "Prepare attack"
+icon = ExtResource("d20")
+variant = 3
+compact = true
 [node name="DamageDivider" type="HSeparator" parent="Frame/Sections/SectionsSlot/Section/Body/Combat"]
 layout_mode = 2
 theme_type_variation = &"RookframeActionDivider"
@@ -174,12 +173,10 @@ autowrap_mode = 2
 layout_mode = 2
 text = ""
 
-[node name="Change" type="Button" parent="Frame/Footer/Leaf/FooterSlot/Target"]
+[node name="Change" parent="Frame/Footer/Leaf/FooterSlot/Target" instance=ExtResource("button")]
 layout_mode = 2
-custom_minimum_size = Vector2(44,44)
 size_flags_vertical = 4
-theme_type_variation = &"RookframeActionIcon"
 icon = ExtResource("retarget")
-icon_alignment = 1
+compact = true
 [editable path="Frame"]
 [editable path="Frame/Sections/SectionsSlot/Section"]

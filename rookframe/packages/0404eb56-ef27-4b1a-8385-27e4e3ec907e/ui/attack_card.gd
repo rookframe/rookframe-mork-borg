@@ -140,7 +140,6 @@ func responsive(device: String) -> void:
 	_view_combat.set(&"gap", &"space_4" if touch else &"")
 	_view_combat_attack.size_flags_horizontal = 1 if touch else Control.SIZE_EXPAND_FILL # Native SIZE_FILL, without expansion.
 	_view_combat_damagedivider.visible = not touch
-	_view_combat_attack_roll.custom_minimum_size = Vector2(48,46) if touch else Vector2(56,52)
 	for row in ["Attack", "Damage"]:
 		var line: HBoxContainer = body.get_node("Combat/" + row)
 		# A touch row is as tall as its stacked label and formula in the theme's type.
