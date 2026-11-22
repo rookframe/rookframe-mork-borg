@@ -1,155 +1,106 @@
 [gd_scene format=3]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_editor.gd" id="script"]
+[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_health_escape.gd" id="escape"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_margin.gd" id="margin"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_frame.gd" id="token_frame"]
-[ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_tint_rect.gd" id="tint_rect"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/overlays/dialog.tscn" id="dialog"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="field"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
-[ext_resource type="PackedScene" path="res://rookframe/ui/components/surfaces/ledger_frame.tscn" id="frame"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/actions/button.tscn" id="button"]
-[ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/remove.svg" id="remove"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/add.svg" id="add"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/character/quill.svg" id="edit"]
-[node name="CreatureHealthEditor" type="Window"]
+[node name="CreatureHealthEditor" type="Control"]
 visible = false
-size = Vector2i(844,390)
-borderless = true
-transient = true
-exclusive = true
-unresizable = true
-transparent = true
-transparent_bg = true
-script = ExtResource("script")
-[node name="Backdrop" type="ColorRect" parent="."]
-anchor_right = 1.0
-anchor_bottom = 1.0
+top_level = true
+layout_mode = 0
 mouse_filter = 2
-script = ExtResource("tint_rect")
-tint = &"scrim"
-[node name="Frame" parent="." instance=ExtResource("frame")]
-[node name="Panel" type="PanelContainer" parent="."]
-script = ExtResource("token_frame")
-fill = &""
-radius = &""
-padding_horizontal = &""
-padding_vertical = &""
-[node name="Inset" type="MarginContainer" parent="Panel"]
-layout_mode = 2
-script = ExtResource("margin")
-left = &"space_5"
-top = &"space_5"
-right = &"space_5"
-bottom = &"space_5"
-[node name="Layout" type="VBoxContainer" parent="Panel/Inset"]
-layout_mode = 2
+script = ExtResource("script")
+[node name="Dialog" parent="." instance=ExtResource("dialog")]
+eyebrow = ""
+heading = "Hit points"
+description = ""
+confirm_label = "Close"
+show_cancel = false
+[node name="Content" type="VBoxContainer" parent="."]
+layout_mode = 0
+size_flags_vertical = 3
 script = ExtResource("box")
-gap = &"space_4"
-[node name="Content" type="VBoxContainer" parent="Panel/Inset/Layout"]
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("box")
-gap = &"space_4"
-[node name="Header" type="PanelContainer" parent="Panel/Inset/Layout/Content"]
-layout_mode = 2
-script = ExtResource("token_frame")
-fill = &""
-outline = &"divider"
-outline_sides = 8
-radius = &""
-padding_horizontal = &""
-padding_vertical = &"space_3"
-[node name="Row" type="HBoxContainer" parent="Panel/Inset/Layout/Content/Header"]
-layout_mode = 2
-script = ExtResource("box")
-gap = &"space_5"
-[node name="Copy" type="VBoxContainer" parent="Panel/Inset/Layout/Content/Header/Row"]
-layout_mode = 2
-size_flags_horizontal = 3
-script = ExtResource("box")
-gap = &"space_1"
-[node name="Kicker" type="Label" parent="Panel/Inset/Layout/Content/Header/Row/Copy"]
+[node name="Escape" type="Node" parent="Content"]
+script = ExtResource("escape")
+[node name="Kicker" type="Label" parent="Content"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 3
-[node name="Title" type="Label" parent="Panel/Inset/Layout/Content/Header/Row/Copy"]
-layout_mode = 2
-theme_type_variation = &"RookframeSubtitle"
-text = "Hit points"
-[node name="Close" parent="Panel/Inset/Layout/Content/Header/Row" instance=ExtResource("button")]
-layout_mode = 2
-size_flags_vertical = 0
-tooltip_text = "Close"
-accessibility_name = "Close"
-icon = ExtResource("close")
-compact = true
-[node name="Rows" type="VBoxContainer" parent="Panel/Inset/Layout/Content"]
+[node name="Rows" type="VBoxContainer" parent="Content"]
 layout_mode = 2
 script = ExtResource("box")
-[node name="Summary" type="Label" parent="Panel/Inset/Layout/Content/Rows"]
+[node name="Summary" type="Label" parent="Content/Rows"]
 layout_mode = 2
 theme_type_variation = &"RookframeValue"
 autowrap_mode = 3
-[node name="Amount" parent="Panel/Inset/Layout/Content/Rows" instance=ExtResource("field")]
-layout_mode = 2
-custom_minimum_size = Vector2(216,0)
-size_flags_horizontal = 0
-label_text = "Amount"
-value = "1"
-[node name="Error" type="Label" parent="Panel/Inset/Layout/Content/Rows"]
+[node name="Error" type="Label" parent="Content/Rows"]
 visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeError"
 autowrap_mode = 3
-[node name="Feedback" type="Label" parent="Panel/Inset/Layout/Content/Rows"]
+[node name="Feedback" type="Label" parent="Content/Rows"]
 visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeStatus"
 autowrap_mode = 3
-[node name="Overflow" parent="Panel/Inset/Layout/Content" instance=ExtResource("pages")]
+[node name="Overflow" parent="Content" instance=ExtResource("pages")]
 visible = false
 layout_mode = 2
-[node name="Text" type="VBoxContainer" parent="Panel/Inset/Layout/Content/Overflow/Area"]
+[node name="Text" type="VBoxContainer" parent="Content/Overflow/Area"]
 layout_mode = 0
 script = ExtResource("box")
-[node name="Name" type="Label" parent="Panel/Inset/Layout/Content/Overflow/Area/Text"]
+[node name="Name" type="Label" parent="Content/Overflow/Area/Text"]
 layout_mode = 2
 theme_type_variation = &"RookframeMeta"
 autowrap_mode = 3
-[node name="Error" type="Label" parent="Panel/Inset/Layout/Content/Overflow/Area/Text"]
+[node name="Error" type="Label" parent="Content/Overflow/Area/Text"]
 visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeError"
 autowrap_mode = 3
-[node name="Feedback" type="Label" parent="Panel/Inset/Layout/Content/Overflow/Area/Text"]
+[node name="Feedback" type="Label" parent="Content/Overflow/Area/Text"]
 visible = false
 layout_mode = 2
 theme_type_variation = &"RookframeStatus"
 autowrap_mode = 3
-[node name="Actions" type="HBoxContainer" parent="Panel/Inset/Layout"]
+[node name="Actions" type="HBoxContainer" parent="Content"]
 layout_mode = 2
 alignment = 2
 script = ExtResource("box")
 gap = &"space_3"
-[node name="Pager" type="HBoxContainer" parent="Panel/Inset/Layout/Actions"]
+[node name="Amount" parent="Content/Actions" instance=ExtResource("field")]
+layout_mode = 2
+custom_minimum_size = Vector2(216,0)
+size_flags_horizontal = 2
+label_text = "Amount"
+value = "1"
+[node name="Pager" type="HBoxContainer" parent="Content/Actions"]
 visible = false
 layout_mode = 2
 size_flags_horizontal = 3
-[node name="Damage" parent="Panel/Inset/Layout/Actions" instance=ExtResource("button")]
+size_flags_vertical = 8
+[node name="Damage" parent="Content/Actions" instance=ExtResource("button")]
 layout_mode = 2
+size_flags_vertical = 8
 tooltip_text = "Apply damage"
 accessibility_name = "Apply damage"
 icon = ExtResource("remove")
-[node name="Heal" parent="Panel/Inset/Layout/Actions" instance=ExtResource("button")]
+[node name="Heal" parent="Content/Actions" instance=ExtResource("button")]
 layout_mode = 2
+size_flags_vertical = 8
 tooltip_text = "Heal Creature HP"
 accessibility_name = "Heal Creature HP"
 icon = ExtResource("add")
 variant = 1
-[node name="Correct" parent="Panel/Inset/Layout/Actions" instance=ExtResource("button")]
+[node name="Correct" parent="Content/Actions" instance=ExtResource("button")]
 visible = false
 layout_mode = 2
+size_flags_vertical = 8
 tooltip_text = "Edit sheet"
 accessibility_name = "Edit sheet"
 icon = ExtResource("edit")
