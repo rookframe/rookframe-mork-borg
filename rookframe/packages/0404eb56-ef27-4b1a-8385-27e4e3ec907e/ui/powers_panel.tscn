@@ -3,6 +3,7 @@
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/text_field.tscn" id="2"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_grid.gd" id="token_grid"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
 [node name="PowersPanel" type="VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
@@ -176,10 +177,9 @@ script = ExtResource("token_box")
 layout_mode = 2
 label_text = "Situational modifier"
 value = "0"
-[node name="Eligible" type="CheckBox" parent="Cast/Options"]
+[node name="Eligible" parent="Cast/Options" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 text = "Not dizzy; requirements met"
 [node name="Rules" type="Label" parent="Cast"]
 layout_mode = 2

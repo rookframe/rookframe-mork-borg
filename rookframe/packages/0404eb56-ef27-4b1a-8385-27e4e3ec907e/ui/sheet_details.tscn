@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_details.gd" id="script"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/data/paginated_content.tscn" id="pages"]
-[ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_favorite.tscn" id="favorite"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/favorite_toggle.tscn" id="favorite"]
 [ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/paginated_text_area.tscn" id="notepad"]
 [ext_resource type="Texture2D" path="res://rookframe/ui/icons/close.svg" id="close"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="box"]
@@ -72,6 +72,7 @@ text_overrun_behavior = 3
 max_lines_visible = 1
 
 [node name="Favorite" parent="HeaderFrame/Inset/DetailHeader" instance=ExtResource("favorite")]
+visible = false
 layout_mode = 2
 
 [node name="Close" type="Button" parent="HeaderFrame/Inset/DetailHeader"]

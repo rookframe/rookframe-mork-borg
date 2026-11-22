@@ -11,6 +11,7 @@ const ITEMS = preload(ROOT + "logic/character_actions.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const AMMO = preload(ROOT + "logic/ammunition.gd")
+const CHECKBOX = preload("res://rookframe/ui/components/forms/checkbox.tscn")
 @onready var card: CARD = get_node("Card")
 var _actor: SDK.ActorId
 var _rook: SDK.RookId
@@ -246,9 +247,8 @@ func _choices(items: Array) -> void:
 	choices.visible = choices.get_child_count() > 0
 
 func _check(parent: VBoxContainer, text: String, key: String) -> void:
-	var button := CheckBox.new()
+	var button: CheckBox = CHECKBOX.instantiate()
 	button.text = _locale.text(text)
-	button.custom_minimum_size = Vector2(0, 44)
 	button.button_pressed = bool(_options.get(key, false))
 	button.toggled.connect(_option_toggled.bind(key))
 	parent.add_child(button)

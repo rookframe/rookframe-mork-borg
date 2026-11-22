@@ -8,11 +8,12 @@ const TOKENS := &"RookframeTokens"
 		gap = value
 		_read_tokens()
 var _reading := false
+var _key := ""
 @onready var _title: Label = get_node(^"Title")
-@onready var _star: STAR = get_node(^"Favorite")
+@onready var _star: Button = get_node(^"Favorite")
 
 func _ready() -> void:
-	_star.favorite_changed.connect(_changed)
+	_star.pressed.connect(_changed)
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_THEME_CHANGED:
@@ -29,7 +30,7 @@ func _read_tokens() -> void:
 
 func configure(entry: Dictionary, owner: bool, busy: bool) -> void:
 	_title.text = str(entry.get("name", "Attack"))
-	_star.configure(entry, owner, busy)
+	_key = STAR.configure(_star, entry, owner, busy)
 
-func _changed(key: String, starred: bool) -> void:
-	favorite_changed.emit(key, starred)
+func _changed() -> void:
+	favorite_changed.emit(_key, _star.button_pressed)

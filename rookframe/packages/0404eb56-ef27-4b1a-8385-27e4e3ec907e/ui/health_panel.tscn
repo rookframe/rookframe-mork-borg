@@ -3,6 +3,7 @@
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/health_panel.gd" id="1"]
 [ext_resource type="PackedScene" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.tscn" id="2"]
 [ext_resource type="Script" path="res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd" id="token_box"]
+[ext_resource type="PackedScene" path="res://rookframe/ui/components/forms/checkbox.tscn" id="checkbox"]
 
 [sub_resource type="ButtonGroup" id="RestGroup"]
 resource_local_to_scene = true
@@ -77,9 +78,8 @@ layout_mode = 2
 theme_type_variation = &"RookframeBody"
 autowrap_mode = 2
 
-[node name="SixHours" type="CheckBox" parent="Columns/Task/Omens/Content"]
+[node name="SixHours" parent="Columns/Task/Omens/Content" instance=ExtResource("checkbox")]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 autowrap_mode = 2
 text = "At least six hours of rest completed"
 
@@ -148,18 +148,16 @@ text = ""
 [node name="Restrictions" type="HBoxContainer" parent="Columns/Context/Content"]
 layout_mode = 2
 
-[node name="Food" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
+[node name="Food" parent="Columns/Context/Content/Restrictions" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 text = "Food & drink"
 button_pressed = true
 
-[node name="Infected" type="CheckBox" parent="Columns/Context/Content/Restrictions"]
+[node name="Infected" parent="Columns/Context/Content/Restrictions" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
 size_flags_horizontal = 3
 text = "Infected"
 
@@ -177,74 +175,54 @@ text = "Choose the found scroll"
 [node name="Choices" type="VBoxContainer" parent="Scrolls"]
 layout_mode = 2
 
-[node name="Scroll0" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll0" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll1" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll1" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll2" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll2" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll3" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll3" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll4" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll4" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll5" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll5" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll6" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll6" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll7" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll7" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll8" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll8" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
-[node name="Scroll9" type="CheckBox" parent="Scrolls/Choices"]
+[node name="Scroll9" parent="Scrolls/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 button_group = SubResource("ScrollGroup")
 
 [node name="Specialties" type="VBoxContainer" parent="."]
@@ -267,17 +245,13 @@ text = "Leave both unchecked to keep them."
 [node name="Choices" type="VBoxContainer" parent="Specialties"]
 layout_mode = 2
 
-[node name="Specialty0" type="CheckBox" parent="Specialties/Choices"]
+[node name="Specialty0" parent="Specialties/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 
-[node name="Specialty1" type="CheckBox" parent="Specialties/Choices"]
+[node name="Specialty1" parent="Specialties/Choices" instance=ExtResource("checkbox")]
 autowrap_mode = 2
 layout_mode = 2
-custom_minimum_size = Vector2(0, 44)
-text = ""
 
 [node name="Outcome" type="Label" parent="."]
 layout_mode = 2
