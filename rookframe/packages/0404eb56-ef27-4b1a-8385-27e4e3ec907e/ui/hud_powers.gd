@@ -1,5 +1,9 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 ## Powers share the sheet's Actor Favorite records and authority workflow.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -14,19 +18,20 @@ var _sdk: SDK
 
 func bind(facade: SDK) -> void:
 	_sdk = facade
+	_data_catalogue.bind(facade)
 
 func entries(actor: SDK.Actor) -> Array[ENTRY]:
 	var result: Array[ENTRY] = []
 	if actor == null:
 		return result
 	var responsible := can_morning(actor)
-	for source in FAVORITES.new().entries(actor.data, actor.id.value):
+	for source in FAVORITES.new(_data_catalogue).entries(actor.data, actor.id.value):
 		if str(source.get("category", "")) != "Powers":
 			continue
-		var power := POWERS.new().definition(str(source.get("source", "")))
+		var power := POWERS.new(_data_catalogue).definition(str(source.get("source", "")))
 		var entry := ENTRY.new()
 		entry.id = str(source.key)
-		entry.title = str(source.name) if FAVORITES.new().uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Power")))
+		entry.title = str(source.name) if FAVORITES.new(_data_catalogue).uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Power")))
 		entry.detail = _sdk.translations.text("Sacred scroll" if str(power.get("family", "")) == "sacred" else "Unclean scroll")
 		entry.value = _sdk.translations.text("Cast")
 		entry.icon = ICON
@@ -43,7 +48,7 @@ func launch(actor: SDK.ActorId, key: String) -> void:
 	var current := _sdk.actors.read(actor)
 	if not current.ok or not can_morning(current.actor):
 		return
-	var source := FAVORITES.new().find(current.actor.data, actor.value, [], key)
+	var source := FAVORITES.new(_data_catalogue).find(current.actor.data, actor.value, [], key)
 	if source.is_empty() or source.category != "Powers" or not source.available:
 		return
 	var task := {"key": key, "item": str(source.item), "source": str(source.source), "rook": _source_rook(actor), "daily": false}

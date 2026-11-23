@@ -1,5 +1,7 @@
 extends GdUnitTestSuite
 
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -39,7 +41,7 @@ func _window(host: WindowHost, outcome: Dictionary, incoming: bool = false):
 	var window = WINDOW.instantiate()
 	window.theme = WORLD_THEME.entry()
 	_windows.append(window)
-	window.sdk = SDK.new(host)
+	window.sdk = PACKAGE_DATA.facade(host)
 	host.window = window
 	add_child(window)
 	window.set_process(false)
@@ -55,7 +57,7 @@ func _outcome(state: String) -> Dictionary:
 
 func test_completed_hit_and_miss_close_without_another_click_or_log_entry(do_hit: bool, test_parameters := [[true], [false]]) -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "1", "tabletop": true})
 	host.roll("attack", [18 if do_hit else 2])
 	var outcome := await sdk.system_actions.submit("melee.advance", {"id": "attack"})
@@ -163,7 +165,7 @@ func test_pending_attack_stays_hidden_until_an_actual_decision() -> void:
 
 func test_attack_record_retains_roll_hit_damage_and_final_result() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "1", "tabletop": true})
 	assert_int(host.reports.size()).is_equal(1)
 	assert_str(host.reports[0].result).is_equal("In progress")

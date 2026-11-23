@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -10,8 +12,8 @@ func test_bow_uses_presence_and_one_arrow_for_a_miss() -> void:
 	var system = auto_free(SYSTEM.new())
 	add_child(system)
 	host.handler = system
-	var sdk := SDK.new(host)
-	var bow: Dictionary = EQUIPMENT.new().item("bow")
+	var sdk := PACKAGE_DATA.facade(host)
+	var bow: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("bow")
 	bow.merge({"inventory_id": "1", "equipped": true}, true)
 	host.actors.hero.data.inventory = [bow, {"inventory_id": "2", "source_item_id": "arrow", "quantity": 2}]
 	host.actors.hero.data.abilities["Presence"] = {"modifier": 2}
@@ -35,8 +37,8 @@ func test_presence_hit_spends_ammunition_before_damage_and_preserves_it_on_cance
 	var system = auto_free(SYSTEM.new())
 	add_child(system)
 	host.handler = system
-	var sdk := SDK.new(host)
-	var bow: Dictionary = EQUIPMENT.new().item("bow")
+	var sdk := PACKAGE_DATA.facade(host)
+	var bow: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("bow")
 	bow.merge({"inventory_id": "1", "equipped": true}, true)
 	# An unrelated editable use counter must not replace a single arrow's quantity.
 	host.actors.hero.data.inventory = [bow, {"inventory_id": "2", "source_item_id": "arrow", "quantity": 2, "uses": 0}]
@@ -61,9 +63,9 @@ func test_selected_creature_alternative_owns_its_range() -> void:
 	var system = auto_free(SYSTEM.new())
 	add_child(system)
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var definition = load(ROOT + "content/seth-goblin.tres")
-	host.actors.hero.data = definition.create_data({})
+	host.actors.hero.data = definition.create_data_with_content({}, PACKAGE_DATA.reader())
 	host.distance = 9.144
 	var input := {"source": "hero", "rook": "hero-rook", "attack": "knife"}
 	var knife: SDK.DataResult = await sdk.system_actions.submit("attack.validate", input)
@@ -86,8 +88,8 @@ func test_gutterborn_presence_exception_keeps_source_difficulty() -> void:
 	var system = auto_free(SYSTEM.new())
 	add_child(system)
 	host.handler = system
-	var sdk := SDK.new(host)
-	var sling: Dictionary = EQUIPMENT.new().item("sling")
+	var sdk := PACKAGE_DATA.facade(host)
+	var sling: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("sling")
 	sling.merge({"inventory_id": "1", "equipped": true, "uses": 3}, true)
 	host.actors.hero.data.inventory = [sling]
 	host.actors.hero.data.class_id = "gutterborn-scum"
@@ -103,10 +105,10 @@ func test_gutterborn_presence_exception_keeps_source_difficulty() -> void:
 func test_equipped_bow_view_selects_only_matching_ammunition() -> void:
 	var view = auto_free(load(ROOT + "ui/melee_attack.tscn").instantiate())
 	add_child(view)
-	var bow: Dictionary = EQUIPMENT.new().item("bow")
-	var arrows: Dictionary = EQUIPMENT.new().item("twenty-arrows")
+	var bow: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("bow")
+	var arrows: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("twenty-arrows")
 	arrows.inventory_id = "arrows"
-	var bolts: Dictionary = EQUIPMENT.new().item("bolt")
+	var bolts: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("bolt")
 	bolts.inventory_id = "bolts"
 	view.configure({"name": "Graveworm", "abilities": {"Presence": {"modifier": 2}}, "inventory": [arrows, bolts]}, bow, {"difficulty": 0, "modifier": 0, "fumble": "break"}, "ready", "")
 	assert_str(view.options().ammunition).is_equal("arrows")
@@ -118,7 +120,7 @@ func test_equipped_bow_view_selects_only_matching_ammunition() -> void:
 func test_attack_view_keeps_progress_and_errors_but_leaves_completed_results_in_action_log() -> void:
 	var view = auto_free(load(ROOT + "ui/melee_attack.tscn").instantiate())
 	add_child(view)
-	var bow: Dictionary = EQUIPMENT.new().item("bow")
+	var bow: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("bow")
 	var options := {"difficulty": 0, "modifier": 0, "fumble": "break"}
 	view.configure({}, bow, options, "resolved", "Graveworm hits Hooded stranger for 5 damage after protection.")
 	assert_bool(view.get_node("Outcome").is_visible_in_tree()).is_false()
@@ -148,8 +150,8 @@ func test_creature_source_ranges_and_exceptions_survive_selection() -> void:
 		var system = auto_free(SYSTEM.new())
 		add_child(system)
 		host.handler = system
-		var sdk := SDK.new(host)
-		host.actors.hero.data = load(ROOT + "content/" + row[0] + ".tres").create_data({})
+		var sdk := PACKAGE_DATA.facade(host)
+		host.actors.hero.data = load(ROOT + "content/" + row[0] + ".tres").create_data_with_content({}, PACKAGE_DATA.reader())
 		host.distance = row[2]
 		var input := {"source": "hero", "rook": "hero-rook", "attack": row[1]}
 		var selected: SDK.DataResult = await sdk.system_actions.submit("attack.validate", input)
@@ -170,7 +172,7 @@ func test_saved_creature_combined_attack_keeps_live_values_and_gains_source_choi
 	var system = auto_free(SYSTEM.new())
 	add_child(system)
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.actors.hero.data = {"schema": "mork-borg-adversary/v1", "definition_id": "seth-goblin", "name": "Live goblin", "hit_points": 2, "attacks": [{"name": "Knife / shortbow", "dice": "d6"}]}
 	host.distance = 9.144
 	var selected: SDK.DataResult = await sdk.system_actions.submit("attack.validate", {"source": "hero", "rook": "hero-rook", "attack": "shortbow"})
@@ -188,7 +190,7 @@ func test_unspecified_custom_projectile_is_rejected_before_any_roll() -> void:
 	var system = auto_free(SYSTEM.new())
 	add_child(system)
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.actors.hero.data.inventory = [{"custom": true, "inventory_id": "1", "name": "Custom bow", "kind": "Weapon", "damage": "d6", "range_feet": 30, "equipped": true, "quantity": 1}]
 	var result: SDK.DataResult = await sdk.system_actions.submit("melee.start", {"id": "shot", "source": "hero", "rook": "hero-rook", "item": "1"})
 	assert_str(result.value.state).is_equal("error")

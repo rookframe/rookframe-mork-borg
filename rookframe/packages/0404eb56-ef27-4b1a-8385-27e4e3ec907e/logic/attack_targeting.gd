@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
 ## Creature selection/range preparation. Defence and companion resolution use
@@ -19,7 +26,7 @@ func validate_creature(context: SDK.SystemActionContext, input: Dictionary) -> D
 	if str(data.get("schema", "")) != "mork-borg-adversary/v1" or typeof(data.get("attacks", [])) != TYPE_ARRAY:
 		return _error("Choose a Creature attack.")
 	var selected: Dictionary = {}
-	var attacks: Array = CREATURES.new().attack_options(data)
+	var attacks: Array = CREATURES.new(_data_catalogue).attack_options(data)
 	for raw in attacks:
 		if typeof(raw) != TYPE_DICTIONARY:
 			return _error("Creature attack data is malformed.")

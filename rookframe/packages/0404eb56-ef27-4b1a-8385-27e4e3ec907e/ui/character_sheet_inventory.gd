@@ -2,6 +2,8 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
 signal mutation_requested(operation: String, arguments: Array)
 signal navigate_requested(route: String, item_id: String)
 const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn")
@@ -18,6 +20,7 @@ func configure(data: Dictionary, _miniatures: Array) -> void:
 	for raw in inventory:
 		var item: Dictionary = raw
 		var row = ROW.instantiate()
+		row.data_catalogue = data_catalogue
 		row.localize(i18n)
 		var equipped: bool = item.get("equipped", false)
 		var target: NodePath = ^"EquippedSection/Content/Items" if equipped and not creature else ^"CarriedSection/Content/Items"

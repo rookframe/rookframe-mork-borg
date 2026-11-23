@@ -1,4 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_sheet_chrome.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
 ## Shared authored Full-viewport composition. Domain adapters own mutations/rolls.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const PROJECTION = preload(ROOT + "logic/creature_projection.gd")
@@ -124,11 +128,11 @@ func configure(data: Dictionary, locale: I18N, library: bool = true, can_edit: b
 	_library = library
 	_can_edit = can_edit
 	_texture = texture if texture != null else default_portrait(str(data.get("definition_id", "")))
-	_appearance_texture = texture if texture != null else ART.new().portrait(str(CONTENT.new().details(str(data.get("definition_id", ""))).get("portrait", "")), false)
+	_appearance_texture = texture if texture != null else ART.new().portrait(str(CONTENT.new(data_catalogue).details(str(data.get("definition_id", ""))).get("portrait", "")), false)
 	_queue_layout()
 
 func default_portrait(definition: String) -> Texture2D:
-	var id := str(CONTENT.new().details(definition).get("portrait", ""))
+	var id := str(CONTENT.new(data_catalogue).details(definition).get("portrait", ""))
 	return ART.new().portrait(id)
 
 func _queue_layout() -> void:
@@ -138,12 +142,14 @@ func _queue_layout() -> void:
 
 func _layout() -> void:
 	_layout_pending = false
+	if data_catalogue == null:
+		return
 	_capture_encounter_pages()
 	_phone = size.x <= 900
 	_tablet = not _phone and size.x <= 1300
 	_layout_frame()
 	var name := str(_data.get("name", "Creature"))
-	var metadata := CONTENT.new().details(str(_data.get("definition_id", "")))
+	var metadata := CONTENT.new(data_catalogue).details(str(_data.get("definition_id", "")))
 	get_node(IDENTITY + "Name").text = _locale.text(str(_draft.get("name", name)) if _editing else name)
 	var classification: String = _data.get("classification", metadata.get("classification", ""))
 	if _editing:
@@ -249,7 +255,7 @@ func _build_groups(metadata: Dictionary) -> void:
 	# Live corrections remain the sole accepted free rules text. Preserve unknown/custom rules.
 	if authored.is_empty() and (not str(_data.get("rules", "")).is_empty() or _editing):
 		groups.append({"title": "Special rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Special rules", "text": str(_data.rules), "correction_route": "rules"}]})
-	if not authored.is_empty() and not PROJECTION.new().rules_mirror(_data):
+	if not authored.is_empty() and not PROJECTION.new(data_catalogue).rules_mirror(_data):
 		groups.append({"title": "Additional rules", "lane": "secondary", "entries": [{"id": "rules", "name": "Additional rules", "text": str(_data.get("rules", "")), "correction_route": "rules"}]})
 	var reference: Array = _data.get("reference", metadata.get("reference", []))
 	if not reference.is_empty():
@@ -502,7 +508,7 @@ func show_entry(entry: Dictionary, opener: Control = null) -> void:
 	get_node(WORK + "Reader/Back").grab_focus()
 
 func _source() -> Dictionary:
-	var metadata: Dictionary = CONTENT.new().details(str(_data.get("definition_id", "")))
+	var metadata: Dictionary = CONTENT.new(data_catalogue).details(str(_data.get("definition_id", "")))
 	var source: Dictionary = _data.get("source", metadata.get("source", {}))
 	return source
 
@@ -848,7 +854,7 @@ func correction_pending(pending: bool) -> void:
 func _default_seth_attacks(attacks: Array) -> bool:
 	if attacks.size() != 2:
 		return false
-	var expected: Array = preload(ROOT + "logic/creature_definition.gd").CORE_DEFINITIONS["seth-goblin"].attacks
+	var expected: Array = data_catalogue.creature_profile("seth-goblin").attacks
 	for index in range(attacks.size()):
 		var stored: Dictionary = attacks[index]
 		var attack: Dictionary = stored.duplicate(true)
@@ -1109,7 +1115,7 @@ func _correction_typed(field: String, text: String) -> void:
 
 func correction_keys(route: String) -> Array:
 	var keys: Array = []
-	var printed := PROJECTION.new().printed_routes(_data)
+	var printed := PROJECTION.new(data_catalogue).printed_routes(_data)
 	for key in _draft.keys():
 		var field := str(key)
 		if route == "core":

@@ -1,5 +1,9 @@
 extends "res://rookframe/sdk/presentation.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 
 const WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
 const DESKTOP_WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_desktop.tres")
@@ -36,9 +40,10 @@ func compose() -> void:
 
 
 func describe_actor(actor: SDK.Actor) -> SDK.ActorSummary:
+	_data_catalogue.bind(sdk)
 	var data: Dictionary = actor.data
 	var name: String = data.get("name", sdk.translations.text("Unnamed Actor"))
-	var model: Dictionary = CREATURES.new().effective_miniature(data)
+	var model: Dictionary = CREATURES.new(_data_catalogue).effective_miniature(data)
 	return SDK.ActorSummary.new(name, null, SDK.ContentReference.new(str(model.package_id), str(model.local_id)), true)
 
 
@@ -94,7 +99,8 @@ const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 const LIBRARY = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_library.gd")
 
 func describe_actor_definition(definition: SDK.ContentEntry) -> SDK.ActorDefinitionView:
-	if definition.reference.package_id != sdk.package_id() or not CREATURES.CORE_DEFINITIONS.has(definition.reference.local_id):
+	_data_catalogue.bind(sdk)
+	if definition.reference.package_id != sdk.package_id() or not _data_catalogue.creature_profiles().has(definition.reference.local_id):
 		return SDK.ActorDefinitionView.new()
 	var surface := SDK.ExtensionSurface.new()
 	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_sheet.tscn")

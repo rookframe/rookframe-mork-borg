@@ -1,4 +1,8 @@
 extends "res://rookframe/sdk/window.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## Live SDK Actor adapter. Rules, loot and Appearance retain separate boundaries.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const DRAFT = preload(ROOT + "ui/sheet_draft.gd")
@@ -44,7 +48,7 @@ var _detail_pending := false
 var _edit_item := false
 var _corrections_available := true
 var _draft := DRAFT.new()
-var _projection := PROJECTION.new()
+var _projection := PROJECTION.new(_data_catalogue)
 var _correction_identity := ""
 var _correction_feedback := ""
 var _correction_epoch := 0
@@ -75,6 +79,7 @@ signal gameplay_roll_requested(part: String, id: String)
 @onready var _miniature_picker := get_node(^"MiniatureWorkflow")
 
 func ready() -> void:
+	_data_catalogue.bind(sdk)
 	if sdk == null:
 		return
 	locale.bind(sdk)
@@ -204,7 +209,7 @@ func _refresh() -> void:
 	if actor == null:
 		return
 	var current: Dictionary = actor.data
-	_accepted = CREATURES.new().stat_block(current)
+	_accepted = CREATURES.new(_data_catalogue).stat_block(current)
 	_draft_refresh_pending = _draft.active
 	_render_pending = true
 
@@ -228,6 +233,7 @@ func _render_accepted() -> void:
 	data["roll_pending"] = _roll_live()
 	data["corrections_available"] = _corrections_available and not _roll_live()
 	data["health_available"] = _health_available and not _roll_live()
+	sheet.data_catalogue = _data_catalogue
 	sheet.configure(data, locale, false, owner() and not _busy, _portrait(data))
 	sdk.windows.set_title(str(data.get("name", "Creature")))
 	sheet.status("")
@@ -329,7 +335,7 @@ func _render_detail() -> void:
 		create.size_flags_horizontal = 0
 		_catalogue_buttons.clear()
 		_catalogue_names.clear()
-		for item in EQUIPMENT.new().entries():
+		for item in EQUIPMENT.new(_data_catalogue).entries():
 			_catalogue_names.append(str(item.get("name", "Equipment")))
 			_catalogue_buttons.append(_option(locale.text(str(item.get("name", "Equipment"))) + " · " + str(item.get("price", "")), _add_equipment.bind(str(item.get("source_item_id", ""))), owner()))
 		_catalogue_empty = _text("No matching equipment.")

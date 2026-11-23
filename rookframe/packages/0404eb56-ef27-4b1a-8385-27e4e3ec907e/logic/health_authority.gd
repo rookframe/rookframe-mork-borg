@@ -1,11 +1,17 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Recovery, improvement and Broken consequences are recorded history. Required choices remain in the action window; physical Rolls announce through Rookframe.
 
 ## Bare Bones pp. 29, 31, 33, 49. Eligibility and delayed consequences stay at the table.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const PARTICIPANTS = preload(ROOT + "logic/action_participants.gd")
-const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
@@ -111,9 +117,9 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _end(context, action)
 		return _request(context, action, "more_hp", [SDK.DiceTerm.new("More HP", 10, 6)], true)
 	if str(input.kind) == "omens":
-		if not RECOVERY.new().can_regain_omens(data) or typeof(input.get("six_hours")) != TYPE_BOOL or not input.six_hours:
+		if not RECOVERY.new(_data_catalogue).can_regain_omens(data) or typeof(input.get("six_hours")) != TYPE_BOOL or not input.six_hours:
 			return _error("Omens must be depleted after at least six hours of rest.")
-		var omen_faces := RECOVERY.new().omen_faces(data)
+		var omen_faces := RECOVERY.new(_data_catalogue).omen_faces(data)
 		action["omen_faces"] = omen_faces
 		return _request(context, action, "omens", [SDK.DiceTerm.new("Regain Omens (d%d)" % omen_faces, 4)], true)
 	if str(input.kind) != "rest":
@@ -142,7 +148,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary, current: Dic
 	if str(action.kind) == "improve":
 		return _improve(context, action, current, roll)
 	if str(action.kind) == "omens":
-		if not RECOVERY.new().can_regain_omens(current) or RECOVERY.new().omen_faces(current) != int(action.omen_faces):
+		if not RECOVERY.new(_data_catalogue).can_regain_omens(current) or RECOVERY.new(_data_catalogue).omen_faces(current) != int(action.omen_faces):
 			return _end(context, action)
 		var face: int = roll.terms[0].results[0]
 		var regained := int((face + 1) / 2) if int(action.omen_faces) == 2 else face
@@ -418,7 +424,7 @@ func _choose(context: SDK.SystemActionContext, action: Dictionary, input: Dictio
 			return _public(_finish(context, action, [], "Improvement complete. Both specialties retained."))
 		action["reroll"] = selected.duplicate()
 		return _public(_request(context, action, "specialty_roll", [SDK.DiceTerm.new("Specialty rerolls", 6, selected.size())]))
-	var options: Array = SCROLLS.TABLES.get(str(action.family), [])
+	var options: Array = _data_catalogue.scrolls(str(action.family))
 	var addition: Dictionary = {}
 	for raw in options:
 		var scroll: Dictionary = raw
@@ -428,7 +434,7 @@ func _choose(context: SDK.SystemActionContext, action: Dictionary, input: Dictio
 		action["message"] = "Choose one %s scroll with the table." % str(action.family)
 		return _public(action)
 	var data := current.duplicate(true)
-	var items := ITEMS.new(null, SDK.ActorId.new(str(action.source))).inventory(data)
+	var items := ITEMS.new(null, SDK.ActorId.new(str(action.source)), _data_catalogue).inventory(data)
 	var serial: int = data.get("inventory_serial", 0)
 	for raw in items:
 		var item: Dictionary = raw
@@ -456,7 +462,7 @@ func _specialty_result(context: SDK.SystemActionContext, action: Dictionary, cur
 	var text := "Improvement complete. "
 	for index in range(selected.size()):
 		var face: int = roll.terms[0].results[index]
-		var feature := CLASSES.new().feature("gutterborn-scum", face)
+		var feature := CLASSES.new(_data_catalogue).feature("gutterborn-scum", face)
 		# 'Begin with lockpicks' is starting equipment, not an improvement grant.
 		feature.erase("item")
 		if action.first_improvement:

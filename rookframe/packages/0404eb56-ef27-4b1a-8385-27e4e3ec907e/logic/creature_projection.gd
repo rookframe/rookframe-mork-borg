@@ -1,5 +1,9 @@
 extends RefCounted
-const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE = null) -> void:
+	_data_catalogue = data_catalogue
 ## Exact earlier published mirrors stay hidden without rewriting saved or custom rules.
 const LEGACY_RULE_MIRRORS := {
 	"bone-bowyer": "Test DR12 to detect the Bowyer or it gets two free shots. The bow deals d6 damage. A miss sends the arrow toward another random creature nearby; repeat until it hits. It cannot target or harm the Bone Bowyer. The Bowyer may craft a bow for a wicked character who completes a task: abduct a child; cruelly murder kin; desecrate a shrine or church; sow discord; spread disease; or burn a heretic."
@@ -95,7 +99,7 @@ func rules_text(data: Dictionary) -> String:
 
 func rules_mirror(data: Dictionary) -> bool:
 	var text := str(data.get("rules", ""))
-	var definition: Dictionary = CREATURES.CORE_DEFINITIONS.get(str(data.get("definition_id", "")), {})
+	var definition: Dictionary = _data_catalogue.creature_profile(str(data.get("definition_id", "")))
 	return text.is_empty() or text == rules_text(data) or text == str(definition.get("rules", "")) or text == str(LEGACY_RULE_MIRRORS.get(str(data.get("definition_id", "")), ""))
 
 func title(field: String) -> String:

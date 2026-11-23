@@ -1,4 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
 signal back_requested
 signal rest_selected(kind: String)
 signal section_changed
@@ -128,7 +132,7 @@ func configure(data: Dictionary, kind: String, rest: String, action: Dictionary,
 		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Term") as Control).custom_minimum_size = Vector2(116 if phone else 140 if tablet else 180, (get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Term") as Control).custom_minimum_size.y)
 		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Term") as Control).add_theme_font_size_override("font_size", 12 if phone else 16)
 		(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/" + path + "/Rules") as Control).add_theme_font_size_override("font_size", 12 if phone else 16)
-	var profile: Dictionary = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd").new().profile(str(data.get("class_id", "classless")))
+	var profile: Dictionary = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd").new(data_catalogue).profile(str(data.get("class_id", "classless")))
 	(get_node("Body/Main/Content/DailyContent/Frame/Inset/Pages/Area/Content/Omens/Rules") as Label).text = "Only when depleted: after at least six hours’ rest, roll d%d at the table. Enter the resolved result with Edit sheet. Current Omens: %d." % [int(profile.get("omen_faces", 2)), int(data.get("omens", 0))]
 	var uses := str(data.get("power_uses", 0))
 	if data.has("power_uses_total"):

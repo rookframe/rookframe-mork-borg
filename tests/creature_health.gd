@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 ## Severe normal-use risk: a retried relative adjustment must never apply twice.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -25,8 +27,8 @@ func test_relative_hp_retries_preserve_latest_actor_and_apply_accepted_change_on
 	var host := Host.new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
-	var sdk := SDK.new(host)
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions := ACTIONS.new(sdk, SDK.ActorId.new("hero"))
 	var untouched: Dictionary = host.actors.enemy.data.duplicate(true)
 	# An older client snapshot must not overwrite accepted independent operations.

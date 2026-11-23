@@ -1,4 +1,8 @@
 extends "res://rookframe/sdk/window.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
 var _locale := I18N.new()
@@ -44,6 +48,7 @@ func ready() -> void:
 		sdk.targeting.changed.connect(_targets_changed)
 
 func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
+	_data_catalogue.bind(sdk)
 	if not _closed:
 		if bool(task.get("incoming", false)):
 			var incoming: Dictionary = task.outcome
@@ -113,7 +118,7 @@ func _refresh() -> void:
 		_reading = false
 		return
 	var creature := str(_data.get("schema", "")) == "mork-borg-adversary/v1"
-	var items: Array = CREATURES.new().combat_attacks(_data) if creature else ITEMS.new(sdk, _actor).inventory(_data)
+	var items: Array = CREATURES.new(_data_catalogue).combat_attacks(_data) if creature else ITEMS.new(sdk, _actor).inventory(_data)
 	_item = SOURCES.new().intrinsic(_data, str(_task.get("item", "")), _options)
 	for raw in items:
 		var item: Dictionary = raw

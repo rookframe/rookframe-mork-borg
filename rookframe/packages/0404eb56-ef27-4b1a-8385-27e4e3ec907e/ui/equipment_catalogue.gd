@@ -1,5 +1,9 @@
 extends VBoxContainer
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
@@ -35,8 +39,9 @@ func _ready() -> void:
 	get_node(^"Custom").pressed.connect(_custom)
 	get_node(^"Search").value_changed.connect(_filter)
 func configure(_data: Dictionary, _miniatures: Array) -> void:
-	for item in EQUIPMENT.new().entries():
+	for item in EQUIPMENT.new(data_catalogue).entries():
 		var row = ROW.instantiate()
+		row.data_catalogue = data_catalogue
 		row.localize(i18n)
 		get_node(^"Items").add_child(row)
 		row.configure(item, true)

@@ -1,42 +1,24 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
+
 ## Bare Bones pp. 34–35. Range is the approved application convention;
 ## Death's area and Telekinesis's movement remain separate from casting range.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
-const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
-const HANDLING: Dictionary = {
-	"palms-open-the-southern-gate": ["immediate damage", "multiple", 30, true],
-	"tongue-of-eris": ["narrative", "single", 30, true],
-	"te-le-kin-esis": ["narrative", "object", 30, true],
-	"lucy-fires-levitation": ["ongoing", "self", 0, true],
-	"daemon-of-capillaries": ["ongoing", "single", 30, true],
-	"nine-violet-signs-unknot-the-storm": ["manual allocation", "allocation", 30, true],
-	"metzhuotl-blind-your-eye": ["ongoing", "single", 30, true],
-	"foul-psychompomp": ["individual Creatures", "self", 0, true],
-	"eyelid-blinds-the-mind": ["resistance; manual sleep / PC ability", "multiple", 30, true],
-	"death": ["manual allocation", "area", 0, true],
-	"grace-of-a-dead-saint": ["immediate healing", "multiple", 30, true],
-	"grace-for-a-sinner": ["ongoing", "single", 30, true],
-	"whispers-pass-the-gate": ["narrative", "single", 30, true],
-	"aegis-of-sorrow": ["manual temporary HP", "single", 30, true],
-	"unmet-fate": ["manual restored HP", "single", 30, true],
-	"bestial-speech": ["narrative", "self", 0, true],
-	"false-dawn-nights-chariot": ["ongoing", "self", 0, true],
-	"hermetic-step": ["narrative", "self", 0, true],
-	"roskoes-consuming-glare": ["immediate HP loss", "multiple", 30, true],
-	"enochian-syntax": ["narrative", "single", 30, true]
-}
-
 func definition(id: String) -> Dictionary:
-	var tables: Dictionary = SCROLLS.TABLES
-	for family in ["unclean", "sacred"]:
-		var entries: Array = tables.get(family, [])
+	for family in CATALOGUE.SCROLL_FAMILIES:
+		var entries := _data_catalogue.scrolls(family)
 		for raw in entries:
 			var entry: Dictionary = raw
 			if str(entry.source_item_id) == id:
 				var result: Dictionary = entry.duplicate(true)
-				var handling: Array = HANDLING.get(id, [])
+				var handling: Array = _data_catalogue.power_handling().get(id, [])
 				result["handling"] = str(handling[0])
 				result["target_mode"] = str(handling[1])
 				var reach: int = handling[2]

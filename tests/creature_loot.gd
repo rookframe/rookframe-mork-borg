@@ -1,5 +1,7 @@
 extends GdUnitTestSuite
 
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
+
 ## Retained for severe saved-capability loss and stale-entry corruption risks.
 ## Uses the existing public SDK host boundary; does not exercise native saves.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -17,7 +19,7 @@ func _host() -> BOUNDARY:
 	return host
 
 func _saved_creature() -> Dictionary:
-	var data: Dictionary = load(ROOT + "content/seth-goblin.tres").create_data({})
+	var data: Dictionary = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	data.erase("creature_stat_block")
 	data["creature_inventory"] = true
 	# Knife was removed; the remaining bow and armor were corrected in play.
@@ -34,7 +36,7 @@ func test_saved_capabilities_survive_conversion_and_stale_loot_edits() -> void:
 	var host := _host()
 	host.actors.hero.data = _saved_creature()
 	var saved_items: Array = host.actors.hero.data.inventory.duplicate(true)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions := ACTIONS.new(sdk, SDK.ActorId.new("hero"))
 	var result := await actions.add_equipment("torch")
 	assert_bool(result.ok).is_true()
@@ -48,7 +50,7 @@ func test_saved_capabilities_survive_conversion_and_stale_loot_edits() -> void:
 	assert_str(attacks[0].rules).is_equal("Corrected attack rule.")
 	assert_int(attacks[0].range_feet).is_equal(40)
 	assert_str(armor.reduction).is_equal("d4")
-	assert_int(CREATURES.new().shield_reduction(data)).is_equal(1)
+	assert_int(CREATURES.new(PACKAGE_DATA.catalogue()).shield_reduction(data)).is_equal(1)
 	for index in range(saved_items.size()):
 		for key in saved_items[index]:
 			assert_bool(data.inventory[index][key] == saved_items[index][key]).is_true()
@@ -69,7 +71,7 @@ func test_saved_capabilities_survive_conversion_and_stale_loot_edits() -> void:
 	assert_array(data.attacks).is_equal(attacks)
 	assert_dict(data.armor).is_equal(armor)
 	assert_str(data.inventory[-1].name).is_equal("Stolen relic")
-	assert_array(CREATURES.new().attack_options(data)).is_equal(attacks)
+	assert_array(CREATURES.new(PACKAGE_DATA.catalogue()).attack_options(data)).is_equal(attacks)
 	var before := data.duplicate(true)
 	host.actors.hero.access_level = "Viewer"
 	result = await actions.remove_item(new_id)
@@ -79,7 +81,7 @@ func test_saved_capabilities_survive_conversion_and_stale_loot_edits() -> void:
 func test_accepted_creature_combat_keeps_loot_quantities_and_condition() -> void:
 	var host := _host()
 	host.actors.hero.data = _saved_creature()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions := ACTIONS.new(sdk, SDK.ActorId.new("hero"))
 	await actions.add_equipment("arrow")
 	var before: Array = host.actors.hero.data.inventory.duplicate(true)
@@ -94,7 +96,7 @@ func test_accepted_creature_combat_keeps_loot_quantities_and_condition() -> void
 	assert_str(result.value.state).is_equal("ready")
 	# Targeted defence retains the creature's independent protection procedure and never
 	# presents a loot-shield break or spends the attacker's carried arrows.
-	host.actors.enemy.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
+	host.actors.enemy.data = load(ROOT + "content/nodh-zombie.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.enemy.access_level = "Owner"
 	host.access_by_actor.hero = [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "player-session"}]
 	host.access_by_actor.enemy = [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "player-session"}]

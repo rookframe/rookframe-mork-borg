@@ -1,5 +1,12 @@
 extends "res://rookframe/sdk/actor_definition.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE = null) -> void:
+	_data_catalogue = data_catalogue
+
+
 ## Source-backed Character definitions for the seven creation branches.
 ## The UI owns the staged draft and physical Rolls; this resource owns the
 ## durable Character schema and validates the source-defined choices that can
@@ -7,33 +14,34 @@ extends "res://rookframe/sdk/actor_definition.gd"
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 @export var class_id := "classless"
 const ABILITY_NAMES := ["Agility", "Presence", "Strength", "Toughness"]
-const PACK_CHOICES: Array[String] = ["Nothing", "Backpack", "Sack", "Small wagon", "Donkey"]
-const FIRST_EQUIPMENT_NAMES := ["Rope", "Torch", "Lantern with oil", "Magnesium strip", "Unclean scroll", "Sharp needle", "Medicine box", "Metal file", "Bear trap", "Bomb", "Red poison", "Silver crucifix"]
-const SECOND_EQUIPMENT_NAMES := ["Life elixir", "Sacred scroll", "Small but vicious dog", "Monkeys", "Exquisite perfume", "Toolbox", "Heavy chain", "Grappling hook", "Shield", "Crowbar", "Lard", "Tent"]
-const WEAPON_RESULTS := ["Femur", "Staff", "Shortsword", "Knife", "Warhammer", "Sword", "Bow", "Flail", "Crossbow", "Zweihander"]
-const ARMOR_RESULTS := ["No armor", "Light armor", "Medium armor", "Heavy armor"]
-## Fixed grants are empty for the classless profile. Conditional starting
-## Creature grants are admitted only from SOURCE_CREATURE_CHOICES after the
-## source equipment table selects a combat profile.
-const STARTING_CREATURES: Array[String] = []
-const SOURCE_CREATURE_CHOICES := ["dog-small-but-vicious", "monkey", "ancient-gore-hound", "hawk-as-weapon"]
 
 
-func create_data(raw_choices: Variant) -> Variant:
-	var choices: Dictionary = raw_choices
-	var profile: Dictionary = CLASSES.new().profile(class_id)
+func create_data(_choices: Variant) -> Variant:
+	push_error("MÖRK BORG Actor creation requires the Package data capability.")
+	return null
+
+func create_data_with_content(raw_choices: Variant, content: RefCounted) -> Variant:
+	var data_catalogue := CATALOGUE.new(content)
+	if not data_catalogue.can_create_character():
+		return null
+	return _create(raw_choices, data_catalogue)
+
+func _create(raw_choices: Variant, data_catalogue: CATALOGUE) -> Variant:
+	var choices: Dictionary = raw_choices.duplicate(true)
+	var classes := CLASSES.new(data_catalogue)
+	var profile: Dictionary = classes.profile(class_id)
 	var feature_roll: int = choices.get("feature_roll", 0)
 	var origin_roll: int = choices.get("origin_roll", 0)
-	var feature: Dictionary = CLASSES.new().feature(class_id, feature_roll)
+	var feature: Dictionary = classes.feature(class_id, feature_roll)
 	var traits: Array = [] if feature.is_empty() else [feature]
 	var second_feature_roll: int = choices.get("second_feature_roll", 0)
 	if class_id == "wretched-royalty":
-		traits.append(CLASSES.new().feature(class_id, second_feature_roll))
+		traits.append(classes.feature(class_id, second_feature_roll))
 	var decoction_rolls: Array = choices.get("decoction_rolls", [])
 	if class_id == "occult-herbmaster":
 		for roll in decoction_rolls:
 			var decoction_roll: int = roll
-			traits.append(CLASSES.new().decoction(decoction_roll))
+			traits.append(classes.decoction(decoction_roll))
 	var abilities: Dictionary = {}
 	var submitted_abilities: Dictionary = choices.get("abilities", {})
 	for ability_name in ABILITY_NAMES:
@@ -47,13 +55,13 @@ func create_data(raw_choices: Variant) -> Variant:
 			abilities[ability_name] = {"score": score, "modifier": _modifier(score)}
 	var inventory: Array = choices.get("inventory", [])
 	var pack: String = choices.get("pack", "Nothing")
-	if not PACK_CHOICES.has(pack):
+	if not data_catalogue.creation_choices("PACK_CHOICES").has(pack):
 		pack = "Nothing"
-	var starting_creatures: Array = STARTING_CREATURES.duplicate()
+	var starting_creatures: Array = data_catalogue.creation_choices("STARTING_CREATURES").duplicate()
 	var requested_creatures: Array = choices.get("starting_creature_ids", [])
 	for creature_id in requested_creatures:
 		var creature_id_text: String = creature_id
-		if SOURCE_CREATURE_CHOICES.has(creature_id_text):
+		if data_catalogue.creation_choices("SOURCE_CREATURE_CHOICES").has(creature_id_text):
 			starting_creatures.append(creature_id_text)
 	var name: String = choices.get("name", "Unnamed Character")
 	if name.is_empty():
@@ -96,7 +104,7 @@ func create_data(raw_choices: Variant) -> Variant:
 		"omens": omens,
 		"pack": pack,
 		"inventory": inventory,
-		"origin": CLASSES.new().origin(class_id, origin_roll),
+		"origin": classes.origin(class_id, origin_roll),
 		"origin_roll": origin_roll,
 		"feature_roll": feature_roll,
 		"second_feature_roll": second_feature_roll,
@@ -115,23 +123,19 @@ func resolve_equipment_name(kind: String, roll: int) -> String:
 	var result_index := roll - 1
 	if result_index < 0:
 		result_index = 0
-	if kind == "Weapon":
-		if result_index >= WEAPON_RESULTS.size():
-			result_index = WEAPON_RESULTS.size() - 1
-		return WEAPON_RESULTS[result_index]
-	if kind == "Armor":
-		if result_index >= ARMOR_RESULTS.size():
-			result_index = ARMOR_RESULTS.size() - 1
-		return ARMOR_RESULTS[result_index]
-	return ""
+	if kind not in ["Weapon", "Armor"]:
+		return ""
+	var results := _data_catalogue.creation_choices("WEAPON_RESULTS" if kind == "Weapon" else "ARMOR_RESULTS")
+	return results[mini(result_index, results.size() - 1)]
 
 
 func pack_choices_for_roll(roll: int) -> Array[String]:
-	if roll == 5:
-		return ["Nothing", "Backpack", "Sack", "Small wagon"]
-	if roll == 6:
-		return PACK_CHOICES.duplicate()
-	return []
+	var result: Array[String] = []
+	if roll in [5, 6]:
+		var packs := _data_catalogue.creation_choices("PACK_CHOICES")
+		for pack in (packs.slice(0, 4) if roll == 5 else packs):
+			result.append(str(pack))
+	return result
 
 
 func _modifier(score: int) -> int:

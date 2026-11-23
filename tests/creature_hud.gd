@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -11,11 +13,11 @@ const CANVASES := [[1920,1080],[1024,768],[844,390]]
 
 func _host() -> BOUNDARY:
 	var host := BOUNDARY.new()
-	host.actors.hero.data = load(ROOT + "content/lich-necromancer.tres").create_data({"name": "The Lich, Tired"})
-	host.actors.enemy.data = load(ROOT + "content/bone-bowyer.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/lich-necromancer.tres").create_data_with_content({"name": "The Lich, Tired"}, PACKAGE_DATA.reader())
+	host.actors.enemy.data = load(ROOT + "content/bone-bowyer.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.enemy.access_level = "Owner"
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	return host
 
@@ -29,7 +31,7 @@ func _open(canvas: Vector2i) -> Dictionary:
 	var hud = load(ROOT + "ui/creature_hud.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
 	hud.theme = WORLD_THEME.entry()
-	hud.sdk = SDK.new(host)
+	hud.sdk = PACKAGE_DATA.facade(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	return {"host": host, "hud": hud, "viewport": viewport}
@@ -157,7 +159,7 @@ func test_resizing_preserves_creature_panel_and_refreshes_experience() -> void:
 
 func test_special_announces_once_without_rule_effects_and_validates_current_actor() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var before := host.actors.duplicate(true)
 	var request := {"id": "special-one", "actor": "hero", "entry": "scroll-theft"}
 	var result := await sdk.system_actions.submit("creature-hud.special", request)
@@ -194,7 +196,7 @@ func test_special_announces_once_without_rule_effects_and_validates_current_acto
 
 func test_hp_set_keeps_signed_uncapped_values_and_retries_do_not_rewind_newer_hp() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions := ACTIONS.new(sdk, SDK.ActorId.new("hero"))
 	var result := await actions.adjust_health("set-negative", "set", "-15")
 	assert_bool(result.ok).is_true()
@@ -225,7 +227,7 @@ func test_scene_selection_and_local_favorites_preserve_actor_target_and_action_i
 	assert_dict(host.actors).is_equal(before)
 	assert_bool(host.preferences.is_empty()).is_false()
 	var restored := MODEL.new()
-	restored.sdk = SDK.new(host)
+	restored.bind(PACKAGE_DATA.facade(host))
 	restored.load_preferences()
 	assert_bool(restored.entries(host.actors.hero.data, "Attacks", false)[0].favorite).is_false()
 	hud._open_category("Scene")
@@ -258,7 +260,7 @@ func test_scene_selection_and_local_favorites_preserve_actor_target_and_action_i
 
 func test_generic_checks_capture_raw_physical_roll_without_actor_or_target_changes() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var before := host.actors.duplicate(true)
 	for part in ["test", "reaction", "initiative"]:
 		var id: String = "check-" + part
@@ -280,7 +282,7 @@ func test_shared_hud_switches_between_creature_character_and_no_selection() -> v
 	var hud = load(ROOT + "ui/actor_hud.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
 	hud.theme = WORLD_THEME.entry()
-	hud.sdk = SDK.new(host)
+	hud.sdk = PACKAGE_DATA.facade(host)
 	viewport.add_child(hud)
 	await _settle()
 	var creature: Control = hud.get_node("CreatureHud")
@@ -303,7 +305,7 @@ func test_long_scene_names_wrap_inside_their_rows_on_every_page(width: int, heig
 	var fixture := _open(Vector2i(width,height))
 	for index in range(12):
 		var id := "roster-%02d" % index
-		var data: Dictionary = load(ROOT+"content/bone-bowyer.tres").create_data({"name": "Bone Bowyer %02d, guardian of the northern catacombs" % index})
+		var data: Dictionary = load(ROOT+"content/bone-bowyer.tres").create_data_with_content({"name": "Bone Bowyer %02d, guardian of the northern catacombs" % index}, PACKAGE_DATA.reader())
 		fixture.host.actors[id] = {"id": id, "access_level": "Owner", "public_label": "", "data": data}
 		fixture.host.rooks[id+"-rook"] = id
 	await _settle()

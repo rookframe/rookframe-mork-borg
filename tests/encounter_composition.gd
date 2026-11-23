@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -13,7 +15,7 @@ func test_phone_gm_can_act_without_scrolling_and_participant_sees_active_side() 
 	host.session = "gm-session"
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "rook": "enemy-rook"})
 	var viewport: SubViewport = auto_free(SubViewport.new())
@@ -106,11 +108,11 @@ func test_swords_action_targets_currently_selected_rook_with_shared_actor() -> v
 	add_child(host.handler)
 	var strip = auto_free(load(ROOT + "ui/encounter_strip.tscn").instantiate())
 	strip.theme = WORLD_THEME.entry()
-	strip.sdk = SDK.new(host)
+	strip.sdk = PACKAGE_DATA.facade(host)
 	add_child(strip)
 	var context = auto_free(load(ROOT + "ui/encounter_rook.tscn").instantiate())
 	context.theme = WORLD_THEME.entry()
-	context.sdk = SDK.new(host)
+	context.sdk = PACKAGE_DATA.facade(host)
 	add_child(context)
 	var button: Button = context.get_node("Toggle")
 	assert_str(button.accessibility_name).is_equal("Add to combat")
@@ -145,7 +147,7 @@ func test_desktop_order_shows_three_complete_miniatures() -> void:
 	host.rooks["second-enemy"] = "enemy"
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	for rook in ["hero-rook", "enemy-rook", "second-enemy"]:
 		var revision := int(host.world_data.get("encounter", {}).get("revision", 0))
 		await sdk.system_actions.submit("encounter.edit", {"revision": revision, "kind": "add", "rook": rook})
@@ -178,7 +180,7 @@ func test_desktop_round_correction_stays_visible_after_error() -> void:
 	host.session = "gm-session"
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "enemy-rook"})
 	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "correct", "round": 1, "current": "enemy"})
 	var viewport: SubViewport = auto_free(SubViewport.new())

@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -11,7 +13,7 @@ func test_special_weapon_reach_difficulty_and_damage(key: String, damage: Array,
 	host.actors.hero.data.abilities = {"Strength": {"modifier": 0}, "Presence": {"modifier": 0}}
 	host.actors.hero.data.inventory = [{"inventory_id": "special", "source_item_id": key, "quantity": 1, "equipped": true}]
 	host.actors.enemy.data.armor.reduction = ""
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "special"})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -34,7 +36,7 @@ func test_weapon_secondary_rolls_preserve_immediate_and_delayed_boundaries(key: 
 	host.actors.hero.data.abilities = {"Strength": {"modifier": 0}, "Presence": {"modifier": 0}}
 	host.actors.hero.data.inventory = [{"inventory_id": "special", "source_item_id": key, "quantity": 1, "equipped": true}]
 	host.actors.enemy.data.armor.reduction = ""
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "special", "small_medium": true, "faithless_human": true, "eligible": true})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -64,7 +66,7 @@ func test_bite_and_cowards_jab_use_their_printed_tests(mode: String, _test_param
 	host.actors.hero.data.class_id = "fanged-deserter" if mode == "bite" else "gutterborn-scum"
 	host.actors.hero.data.traits = [{"id": "cowards-jab"}]
 	host.actors.enemy.data.armor.reduction = ""
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "class:bite" if mode == "bite" else "1", "mode": mode, "eligible": true})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -86,7 +88,7 @@ func test_eurekia_destroys_sword_and_records_hamfund_death_on_one_even_on_miss()
 	add_child(host.handler)
 	host.actors.hero.data.inventory = [{"inventory_id": "sword", "source_item_id": "eurekia", "quantity": 1, "uses": 1, "equipped": true}]
 	host.actors.hero.data["companion_sheets"] = [{"id": "hamfund-the-squire", "name": "Hamfund"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "sword", "eligible": true})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -106,7 +108,7 @@ func test_eurekia_vanish_on_fumble_does_not_restore_sword_from_stale_snapshot() 
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
 	host.actors.hero.data.inventory = [{"inventory_id": "sword", "source_item_id": "eurekia", "quantity": 1, "uses": 1, "equipped": true}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("melee.start", {"id": "attack", "source": "hero", "rook": "hero-rook", "item": "sword", "eligible": true})
 	host.roll("attack", [1, 1])
 	await sdk.system_actions.submit("melee.advance", {"id": "attack"})
@@ -117,7 +119,7 @@ func test_eurekia_remaining_draw_correction_starts_a_fresh_combat() -> void:
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
 	host.actors.hero.data.inventory = [{"inventory_id": "sword", "source_item_id": "eurekia", "quantity": 1, "uses": 0, "drawn": true, "equipped": true}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions = load(ROOT + "logic/character_actions.gd").new(sdk, SDK.ActorId.new("hero"))
 	var correction: SDK.ActorResult = await actions.change_item("sword", "uses", "1")
 	assert_bool(correction.ok).is_true()

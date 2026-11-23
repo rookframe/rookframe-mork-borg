@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 ## Severe normal-use risk: late/retried completion must not duplicate accepted reports.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -20,7 +22,7 @@ func test_pending_window_roll_starts_through_temporary_host_hiding_but_not_expli
 	var host := PresentationBoundary.new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	var before: Dictionary = host.actors.duplicate(true)
 	var parent: Control = auto_free(Control.new())
 	add_child(parent)
@@ -28,7 +30,7 @@ func test_pending_window_roll_starts_through_temporary_host_hiding_but_not_expli
 	parent.add_child(surface)
 	var workflow := WORKFLOW.new()
 	surface.add_child(workflow)
-	workflow.configure(SDK.new(host), surface)
+	workflow.configure(PACKAGE_DATA.facade(host), surface)
 	workflow.opened("hero")
 	host.defer_reply = true
 	workflow.start("hero", "damage", str(host.actors.hero.data.attacks[0].id))
@@ -70,9 +72,9 @@ func test_creature_roll_completion_is_once_immutable_and_late_abandonment_cancel
 	var host := PresentationBoundary.new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.hero.data.attacks[0].dice = "2d2+3"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := {"id": "accepted-once", "source": "hero", "part": "damage", "entry": str(host.actors.hero.data.attacks[0].id)}
 	var result := await sdk.system_actions.submit("creature-roll.start", input)
 	assert_str(result.value.state).is_equal("pending")

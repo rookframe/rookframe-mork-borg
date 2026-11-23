@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -9,7 +11,7 @@ func test_melee_attack() -> void:
 	var system = SYSTEM.new()
 	add_child(auto_free(system))
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var started: SDK.DataResult = await sdk.system_actions.submit("melee.start", {"id": "action-1", "source": "hero", "rook": "hero-rook", "item": "1", "difficulty": 12, "modifier": 0, "fumble": "break"})
 	assert_bool(started.ok and started.value.state == "pending").override_failure_message("Equipped melee requests the Player's attack Throw.").is_true()
 	assert_bool(host.requests["action-1"].terms == [{"name": "Attack", "faces": 20, "count": 1}]).override_failure_message("The attack plan contains one Strength d20.").is_true()
@@ -67,7 +69,7 @@ func test_d2_faces() -> void:
 		var system = SYSTEM.new()
 		add_child(auto_free(system))
 		host.handler = system
-		var sdk := SDK.new(host)
+		var sdk := PACKAGE_DATA.facade(host)
 		host.actors.hero.data.inventory[0].damage = "d2"
 		host.actors.enemy.data.armor.reduction = ""
 		await sdk.system_actions.submit("melee.start", _attack_input("d2-weapon"))
@@ -86,7 +88,7 @@ func test_boundaries() -> void:
 		var system = SYSTEM.new()
 		add_child(auto_free(system))
 		host.handler = system
-		var sdk := SDK.new(host)
+		var sdk := PACKAGE_DATA.facade(host)
 		host.actors.hero.data.inventory[0].range_feet = reach
 		host.distance = float(reach) * 0.3048
 		var legal: SDK.DataResult = await sdk.system_actions.submit("melee.start", _attack_input("edge"))
@@ -111,7 +113,7 @@ func test_boundaries() -> void:
 		var system = SYSTEM.new()
 		add_child(auto_free(system))
 		host.handler = system
-		var sdk := SDK.new(host)
+		var sdk := PACKAGE_DATA.facade(host)
 		await sdk.system_actions.submit("melee.start", _attack_input("cancel"))
 		if stage != "before-roll":
 			host.roll("cancel", [17])
@@ -130,7 +132,7 @@ func test_boundaries() -> void:
 	var system = SYSTEM.new()
 	add_child(auto_free(system))
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.actors.hero.access_level = "Viewer"
 	var denied: SDK.DataResult = await sdk.system_actions.submit("melee.start", _attack_input("viewer"))
 	assert_bool(denied.value.state == "error" and host.requests.is_empty()).override_failure_message("Viewer cannot attack with a Character.").is_true()
@@ -154,7 +156,7 @@ func test_lifetime() -> void:
 	var system = SYSTEM.new()
 	add_child(auto_free(system))
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.game_master = true
 	host.participant = "gm"
 	host.access_entries = [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "owner-session"}]
@@ -200,7 +202,7 @@ func test_review_regressions() -> void:
 	var system = SYSTEM.new()
 	add_child(auto_free(system))
 	host.handler = system
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	for field in ["id", "source", "rook", "item", "difficulty", "modifier", "fumble", "piercing"]:
 		var malformed := _attack_input("bad-" + field)
 		malformed[field] = []

@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 ## Conversion risks losing existing saved images or leaving oversized inline records.
 ## This SDK seam proves synchronous copied-data conversion and failure signaling;
 ## actual atomic persistence and startup refusal belong to host acceptance.
@@ -16,7 +18,7 @@ func test_saved_actor_and_world_callbacks_preserve_gameplay_and_source_copies() 
 	var host := BOUNDARY.new()
 	var image := _image()
 	var system = auto_free(SYSTEM.new())
-	system.sdk = SDK.new(host)
+	system.sdk = PACKAGE_DATA.facade(host)
 	var first_path := ""
 	for schema in ["mork-borg-character/v1", "mork-borg-adversary/v1"]:
 		var original := {"schema": schema, "name": "Accepted identity", "hit_points": -3, "portrait": image, "portrait_revision": 9, "inventory": [{"inventory_id": "7", "name": "Saved loot", "quantity": 2}]}
@@ -45,7 +47,7 @@ func test_retention_failure_signals_startup_error_and_preserves_inline_value_for
 	var host := BOUNDARY.new()
 	var image := _image()
 	var system = auto_free(SYSTEM.new())
-	system.sdk = SDK.new(host)
+	system.sdk = PACKAGE_DATA.facade(host)
 	var original := {"schema": "mork-borg-character/v1", "hit_points": 7, "portrait": image}
 	var returned: Array = []
 	host.fail_retention = true
@@ -61,7 +63,7 @@ func test_failed_world_conversion_returns_original_defaults_and_empty_portraits_
 	var host := BOUNDARY.new()
 	var image := _image()
 	var system = auto_free(SYSTEM.new())
-	system.sdk = SDK.new(host)
+	system.sdk = PACKAGE_DATA.facade(host)
 	var original := {"unrelated": "retained", "creature_portraits": {"seth-goblin": image}}
 	var returned: Array = []
 	host.fail_retention = true

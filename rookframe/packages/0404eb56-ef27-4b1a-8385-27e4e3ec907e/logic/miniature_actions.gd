@@ -1,9 +1,17 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 var sdk: SDK
-func _init(facade: SDK) -> void:
+func _init(facade: SDK, data_catalogue: CATALOGUE = null) -> void:
+	_data_catalogue = data_catalogue
+	if _data_catalogue == null:
+		_data_catalogue = CATALOGUE.new()
+		_data_catalogue.bind(facade)
 	sdk = facade
 
 func available(reference: Dictionary) -> bool:
@@ -36,7 +44,7 @@ func place_at(actor: SDK.ActorId, scene_id: SDK.SceneId, position: Vector2) -> S
 	if current.actor.access_level != "Owner":
 		return SDK.RookResult.new({"ok": false, "message": "Owner access is required to place this Actor."})
 	var data: Dictionary = current.actor.data
-	var reference: Dictionary = CREATURES.new().effective_miniature(data)
+	var reference: Dictionary = CREATURES.new(_data_catalogue).effective_miniature(data)
 	if not available(reference):
 		return SDK.RookResult.new({"ok": false, "message": "Choose an available Miniature before placing this Creature."})
 	var created := await sdk.rooks.create(_reference(reference), scene_id, position)
@@ -57,7 +65,7 @@ func apply_selected(actor: SDK.ActorId) -> SDK.RookResult:
 	if not current.ok or not selected.ok or selected.rook.actor == null or selected.rook.actor.value != actor.value:
 		return SDK.RookResult.new({"ok": false, "message": "Select a Rook linked to this Creature."})
 	var data: Dictionary = current.actor.data
-	var reference: Dictionary = CREATURES.new().effective_miniature(data)
+	var reference: Dictionary = CREATURES.new(_data_catalogue).effective_miniature(data)
 	if not available(reference):
 		return SDK.RookResult.new({"ok": false, "message": "This Miniature is unavailable. Choose another."})
 	return await sdk.rooks.set_miniature(selected.rook.id, _reference(reference))

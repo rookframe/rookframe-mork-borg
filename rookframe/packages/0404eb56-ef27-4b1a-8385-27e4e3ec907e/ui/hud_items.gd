@@ -1,5 +1,9 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 ## Items and initiating class Features share exact owned Favorite identities.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -22,18 +26,19 @@ var _sdk: SDK
 
 func bind(facade: SDK) -> void:
 	_sdk = facade
+	_data_catalogue.bind(facade)
 
 func entries(actor: SDK.Actor, category: String = "Items") -> Array[ENTRY]:
 	var result: Array[ENTRY] = []
 	if actor == null or not category in ["Items", "Features"]:
 		return result
 	var responsible: bool = actor.access_level == "Owner" and RESPONSIBILITY.new().resolve(_sdk, actor.id).get("ok", false)
-	for source in FAVORITES.new().entries(actor.data, actor.id.value):
+	for source in FAVORITES.new(_data_catalogue).entries(actor.data, actor.id.value):
 		if str(source.get("category", "")) != category:
 			continue
 		var entry := ENTRY.new()
 		entry.id = str(source.key)
-		entry.title = str(source.name) if FAVORITES.new().uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Item" if category == "Items" else "Feature")))
+		entry.title = str(source.name) if FAVORITES.new(_data_catalogue).uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Item" if category == "Items" else "Feature")))
 		var presentation := _presentation(actor, source)
 		entry.detail = presentation.detail
 		entry.value = presentation.value
@@ -48,7 +53,7 @@ func launch(actor: SDK.ActorId, key: String) -> void:
 	var current := _sdk.actors.read(actor)
 	if not current.ok or current.actor.access_level != "Owner" or not RESPONSIBILITY.new().resolve(_sdk, actor).get("ok", false):
 		return
-	var source := FAVORITES.new().find(current.actor.data, actor.value, [], key)
+	var source := FAVORITES.new(_data_catalogue).find(current.actor.data, actor.value, [], key)
 	if source.is_empty() or not str(source.category) in ["Items", "Features"] or not source.available:
 		return
 	var item := "owned-feature:" + str(source.entry) if source.category == "Features" else str(source.item)
@@ -71,8 +76,8 @@ func _presentation(actor: SDK.Actor, source: Dictionary) -> Dictionary:
 	var data: Dictionary = actor.data
 	var kind := str(source.get("source", ""))
 	var id := "owned-feature:" + str(source.get("entry", "")) if str(source.category) == "Features" else str(source.get("item", ""))
-	var item := RULES.new().owned(data, id)
-	var rule := RULES.new().definition(kind)
+	var item := RULES.new(_data_catalogue).owned(data, id)
+	var rule := RULES.new(_data_catalogue).definition(kind)
 	var value := str(VALUES.get(kind, "Use"))
 	var detail := _sdk.translations.text(str(DETAILS.get(kind, "Class action" if str(source.category) == "Features" else "Equipment")))
 	var icon: Texture2D = FEATURE_ICON if str(source.category) == "Features" else ITEM_ICON

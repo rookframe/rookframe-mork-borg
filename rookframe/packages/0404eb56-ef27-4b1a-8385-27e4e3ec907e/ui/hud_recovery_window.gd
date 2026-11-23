@@ -1,5 +1,9 @@
 extends "res://rookframe/sdk/window.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 ## The managed task owns its initiating Actor independently of HUD selection.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const RECOVERY = preload(ROOT + "logic/recovery_rules.gd")
@@ -18,6 +22,7 @@ func ready() -> void:
 		get_node(^"Layout/Actions/Close").text = sdk.translations.text("Cancel")
 
 func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
+	_data_catalogue.bind(sdk)
 	if sdk == null or _panel.has_live_action():
 		return
 	var current := sdk.actors.read(actor)
@@ -25,7 +30,7 @@ func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
 		_close()
 		return
 	var key := str(task.get("recovery", ""))
-	if not RECOVERY.new().available(current.actor, sdk, key):
+	if not RECOVERY.new(_data_catalogue).available(current.actor, sdk, key):
 		_close()
 		return
 	_actor = actor

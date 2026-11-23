@@ -1,4 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_workflow.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_targets.gd")
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 
@@ -38,6 +42,7 @@ var _world_refresh_pending := false
 @export var character_creation := false
 
 func ready() -> void:
+	_data_catalogue.bind(sdk)
 	i18n.bind(sdk)
 	localize(i18n)
 	if sdk == null:
@@ -198,7 +203,7 @@ func _select_actor(actor: SDK.Actor) -> void:
 func _render_actor() -> void:
 	if _selected_actor == null:
 		return
-	var actor_data: Dictionary = CREATURES.new().stat_block(_selected_actor.data)
+	var actor_data: Dictionary = CREATURES.new(_data_catalogue).stat_block(_selected_actor.data)
 	var private_name: String = actor_data.get("name", "Creature")
 	var hit_points: int = actor_data.get("hit_points", 0)
 	var maximum_hit_points: int = actor_data.get("maximum_hit_points", hit_points)
@@ -211,7 +216,7 @@ func _render_actor() -> void:
 	var armor: Dictionary = actor_data.get("armor", {})
 	var armor_name: String = armor.get("name", "No armor")
 	var armor_reduction: String = armor.get("reduction", "")
-	var attacks: Array = CREATURES.new().attack_options(actor_data)
+	var attacks: Array = CREATURES.new(_data_catalogue).attack_options(actor_data)
 
 	_header_title.text = private_name
 	_header_subtitle.text = _t("Creature sheet · ") + _t(_selected_actor.access_level)
@@ -267,6 +272,7 @@ func _render_equipment(attacks: Array) -> void:
 	for raw in attacks:
 		var attack: Dictionary = raw
 		var row = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/inventory_row.tscn").instantiate()
+		row.data_catalogue = _data_catalogue
 		_equipment_list.add_child(row)
 		row.localize(i18n)
 		row.configure({"inventory_id": str(attack.get("id", "")), "name": str(attack.get("name", "Attack")), "kind": "Weapon", "equipped": true, "damage": str(attack.get("dice", "—")), "range_feet": attack.get("range_feet", 0)}, false, _selected_actor.access_level != "Owner", false)
@@ -286,6 +292,7 @@ func _render_inventory() -> void:
 	data["read_only"] = _selected_actor.access_level != "Owner"
 	if _route in ["creature-item", "creature-custom"]:
 		var item_view = ITEM_VIEW.instantiate()
+		item_view.data_catalogue = _data_catalogue
 		item_view.localize(i18n)
 		_creature_item_view = item_view
 		_connect_creature_inventory(item_view)
@@ -302,6 +309,7 @@ func _render_inventory() -> void:
 		return
 	if _route == "creature-catalogue":
 		var catalogue = CATALOGUE_VIEW.instantiate()
+		catalogue.data_catalogue = _data_catalogue
 		catalogue.localize(i18n)
 		_connect_creature_inventory(catalogue)
 		catalogue.configure(data, [])
@@ -491,7 +499,7 @@ func _save_creature() -> void:
 		_set_status(source.message if not source.ok else "Private Creature data is unavailable.", true)
 		return
 	var original_data: Dictionary = source.actor.data
-	var data: Dictionary = CREATURES.new().stat_block(original_data)
+	var data: Dictionary = CREATURES.new(_data_catalogue).stat_block(original_data)
 	var original_label: String = source.actor.public_label
 	data["name"] = str(_private_name.get("value")).strip_edges()
 	data["hit_points"] = int(_hit_points.get("value"))
@@ -606,7 +614,7 @@ func _present_creature_attack(id: String) -> void:
 	if _selected_actor == null or _selected_actor.access_level != "Owner":
 		return
 	var data: Dictionary = _selected_actor.data
-	var attacks: Array = CREATURES.new().attack_options(data)
+	var attacks: Array = CREATURES.new(_data_catalogue).attack_options(data)
 	_creature_attack = {}
 	for raw in attacks:
 		var attack: Dictionary = raw
@@ -628,7 +636,7 @@ func _present_creature_attack(id: String) -> void:
 	var view = get_node(^"Layout/Body/Content/CreatureAttack")
 	view.visible = true
 	var combat_data := data.duplicate(true)
-	combat_data["inventory"] = CREATURES.new().combat_attacks(data)
+	combat_data["inventory"] = CREATURES.new(_data_catalogue).combat_attacks(data)
 	view.configure(combat_data, {"name": _creature_attack.name, "damage": _creature_attack.dice, "range_feet": _creature_attack.range_feet, "ammunition": _creature_attack.get("ammunition", ""), "natural": _creature_attack.get("natural", false)}, {"difficulty": 0, "modifier": 0, "fumble": "break", "piercing": false}, "ready", "")
 	view.get_node(^"Metrics/Strength").visible = true
 	view.get_node(^"Context").text = str(data.get("name", "Creature")) + _t(" · Selected attack")
@@ -925,7 +933,7 @@ func _actor_miniature() -> Dictionary:
 	if _selected_actor == null:
 		return {}
 	var data: Dictionary = _selected_actor.data
-	return CREATURES.new().effective_miniature(data)
+	return CREATURES.new(_data_catalogue).effective_miniature(data)
 
 func _miniature_title(reference: Dictionary) -> String:
 	if reference.is_empty():

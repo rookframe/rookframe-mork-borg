@@ -1,5 +1,9 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
@@ -40,7 +44,7 @@ func _add_entries(data: Dictionary, key: String, only_index: int = -1) -> void:
 		var entry: Dictionary = entries[index]
 		var prefix := "trait" if key == "traits" else "companion"
 		_add("%s:%d:name" % [prefix, index], _t("Trait" if key == "traits" else "Companion") + _t(" name"), str(entry.get("name", "")))
-		var rule := RULES.new().definition(str(entry.get("id", "")))
+		var rule := RULES.new(data_catalogue).definition(str(entry.get("id", "")))
 		if key == "traits" and rule.has("uses") and not entry.has("item"):
 			var default_uses: int = rule.get("uses", 0)
 			var uses: int = entry.get("uses", default_uses)
@@ -117,7 +121,7 @@ func _specialty_value(data: Dictionary, slot: int) -> String:
 		return "0"
 	var entry: Dictionary = traits[slot]
 	for face in range(1, 7):
-		var feature := CLASSES.new().feature("gutterborn-scum", face)
+		var feature := CLASSES.new(data_catalogue).feature("gutterborn-scum", face)
 		if str(feature.id) == str(entry.get("id", "")):
 			return str(face)
 	return "0"

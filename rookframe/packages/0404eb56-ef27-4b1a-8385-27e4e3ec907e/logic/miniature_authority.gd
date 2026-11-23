@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## World-local defaults never mutate Package Actor Definitions.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -13,7 +20,7 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 		return _error("Miniature choices are malformed.")
 	var input: Dictionary = payload
 	var definition := str(input.get("definition", ""))
-	if not CREATURES.CORE_DEFINITIONS.has(definition):
+	if not _data_catalogue.creature_profiles().has(definition):
 		return _error("Choose a Creature definition.")
 	var saved := context.read_world_data()
 	if not saved.ok:
@@ -37,7 +44,7 @@ func handle(context: SDK.SystemActionContext, sdk: SDK, operation: String, paylo
 		return {"state": "resolved", "message": "Library Miniature saved."} if result.ok else _error(result.message)
 	if operation == "miniature.create":
 		# Snapshot the current World default on Authority, never a client's stale copy.
-		var preferred: Dictionary = defaults.get(definition, CREATURES.new().default_miniature(definition)).duplicate(true)
+		var preferred: Dictionary = defaults.get(definition, CREATURES.new(_data_catalogue).default_miniature(definition)).duplicate(true)
 		var choices := {"preferred_miniature": preferred}
 		var portraits: Dictionary = world.get("creature_portraits", {})
 		if portraits.has(definition):

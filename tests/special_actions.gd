@@ -1,5 +1,7 @@
 extends GdUnitTestSuite
 
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -9,7 +11,7 @@ const ACTION = preload(ROOT + "logic/special_action.gd")
 func test_scroll_selection_during_delayed_refresh_is_accepted_once(close_before_reply: bool, _test_parameters := [[false], [true]]) -> void:
 	var host := _host()
 	host.actors.hero.data.traits = [{"id": "initiate-of-the-invisible-college", "uses": 1}]
-	var action := ACTION.new(SDK.new(host))
+	var action := ACTION.new(PACKAGE_DATA.facade(host))
 	add_child(auto_free(action))
 	var input := _use_input()
 	input.item = "feature:initiate-of-the-invisible-college"
@@ -54,7 +56,7 @@ func _use_input(id: String = "use") -> Dictionary:
 
 func test_medicine_heals_and_consumes_one_use_atomically() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", _use_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -76,7 +78,7 @@ func test_poison_routes_resistance_and_applies_hp_loss(key: String, self_use: bo
 	var host := _host(key)
 	var input := _use_input()
 	input.self = self_use
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", input)
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -105,7 +107,7 @@ func test_elixir_uses_shared_doses_and_heals_private_target_at_contact() -> void
 	host.actors.enemy.data["maximum_hit_points"] = 12
 	var input := _use_input()
 	input.self = false
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", input)
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -120,7 +122,7 @@ func test_elixir_uses_shared_doses_and_heals_private_target_at_contact() -> void
 
 func test_wizard_teeth_request_four_dice_and_report_manual_maximum_damage() -> void:
 	var host := _host("wizard-teeth")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", _use_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -139,7 +141,7 @@ func test_printed_class_tests_resolve_without_automating_later_benefits(key: Str
 	if feature:
 		host.actors.hero.data.traits = [{"id": key, "name": key}]
 		input.item = "feature:" + key
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", input)
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -159,7 +161,7 @@ func test_decoctions_consume_shared_pool_and_report_durations(key: String, value
 	host.actors.hero.data.inventory[-1].erase("uses")
 	host.actors.hero.data.inventory[-1]["dose_pool"] = "portable-laboratory"
 	host.actors.hero.data.inventory.append({"inventory_id": "lab", "source_item_id": "portable-laboratory", "quantity": 1, "uses": 3})
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", _use_input())
 	if not values.is_empty():
 		assert_str(result.value.state).is_equal("pending")
@@ -180,7 +182,7 @@ func test_class_parameters_and_manual_benefits(key: String, feature: bool, value
 	if feature:
 		host.actors.hero.data.traits = [{"id": key, "uses": 2}]
 		input.item = "feature:" + key
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", input)
 	if not values.is_empty():
 		assert_str(result.value.state).is_equal("pending")
@@ -202,7 +204,7 @@ func test_class_parameters_and_manual_benefits(key: String, feature: bool, value
 
 func test_book_creature_resistance_summons_printed_berserkers_and_spends_daily_use() -> void:
 	var host := _host("book-of-boiling-blood")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _use_input()
 	input.self = false
 	var result := await sdk.system_actions.submit("special.start", input)
@@ -229,7 +231,7 @@ func test_book_creature_resistance_summons_printed_berserkers_and_spends_daily_u
 func test_brewing_replaces_two_recipes_and_one_shared_dose_pool() -> void:
 	var host := _host("portable-laboratory")
 	host.actors.hero.data.class_id = "occult-herbmaster"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", _use_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -251,7 +253,7 @@ func test_invisible_college_rolls_count_and_family_then_keeps_table_selected_scr
 	host.actors.hero.data.traits = [{"id": "initiate-of-the-invisible-college", "uses": 1}]
 	var input := _use_input()
 	input.item = "feature:initiate-of-the-invisible-college"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", input)
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -268,7 +270,7 @@ func test_invisible_college_rolls_count_and_family_then_keeps_table_selected_scr
 
 func test_mitre_requires_wearing_and_table_selected_stealth_ability() -> void:
 	var host := _host("stolen-mitre")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _use_input()
 	input["ability"] = "Agility"
 	var result := await sdk.system_actions.submit("special.start", input)
@@ -286,7 +288,7 @@ func test_mitre_requires_wearing_and_table_selected_stealth_ability() -> void:
 func test_crucifix_rolls_morale_with_explicit_presence_sign_and_private_label() -> void:
 	var host := _host("wrong-jesus-crucifix")
 	host.actors.enemy.data["morale"] = 7
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _use_input()
 	input.self = false
 	input["presence_sign"] = 1
@@ -303,7 +305,7 @@ func test_crucifix_rolls_morale_with_explicit_presence_sign_and_private_label() 
 
 func test_vapor_resistance_is_requested_with_table_chosen_ability() -> void:
 	var host := _host("ezumiels-vapor")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _use_input()
 	input["ability"] = "Presence"
 	var result := await sdk.system_actions.submit("special.start", input)
@@ -323,7 +325,7 @@ func test_vapor_resistance_is_requested_with_table_chosen_ability() -> void:
 func test_gob_lobber_rolls_fight_uses_spends_spit_then_routes_witness_tests() -> void:
 	var host := _host()
 	host.actors.hero.data.traits = [{"id": "abominable-gob-lobber"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _use_input()
 	input.item = "feature:abominable-gob-lobber"
 	input.self = false
@@ -357,7 +359,7 @@ func test_gob_lobber_rolls_fight_uses_spends_spit_then_routes_witness_tests() ->
 
 func test_cancel_after_bible_parity_preserves_spent_use_and_logs_once() -> void:
 	var host := _host("blasphemous-nechrubel-bible")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", _use_input())
 	host.roll("use", [3])
 	await sdk.system_actions.submit("special.advance", {"id": "use"})
@@ -372,7 +374,7 @@ func test_cancel_after_bible_parity_preserves_spent_use_and_logs_once() -> void:
 
 func test_pending_action_stops_after_item_removal_and_on_source_access_loss(change: String, _test_parameters := [["item"], ["access"], ["session"]]) -> void:
 	var host := _host("wizard-teeth")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", _use_input())
 	if change == "item":
 		host.actors.hero.data.inventory.pop_back()
@@ -392,14 +394,14 @@ func test_all_invalid_ranges_report_public_labels_and_roll_nothing() -> void:
 	host.distance = 10.0
 	var input := _use_input()
 	input.self = false
-	var result := await SDK.new(host).system_actions.submit("special.start", input)
+	var result := await PACKAGE_DATA.facade(host).system_actions.submit("special.start", input)
 	assert_str(result.value.message).is_equal("target Hooded stranger not in range\ntarget Hooded stranger not in range")
 	assert_int(host.requests.size()).is_equal(0)
 	assert_int(host.actors.hero.data.inventory[-1].uses).is_equal(2)
 
 func test_concurrent_actions_from_same_character_are_refused() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", _use_input())
 	var result := await sdk.system_actions.submit("special.start", _use_input("duplicate"))
 	assert_str(result.value.state).is_equal("error")
@@ -408,7 +410,7 @@ func test_concurrent_actions_from_same_character_are_refused() -> void:
 func test_ancestors_blade_checks_treachery_then_resolves_attack_against_self() -> void:
 	var host := _host("blade-of-your-ancestors")
 	host.actors.hero.data.inventory[-1]["equipped"] = true
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("special.start", _use_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -426,7 +428,7 @@ func test_ancestors_blade_checks_treachery_then_resolves_attack_against_self() -
 
 func test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb(key: String, values: Array, expected: int, _test_parameters := [["bomb", [5, 2], 2], ["bear-trap", [4, 2], 3], ["caltrops", [3, 2, 1], 4]]) -> void:
 	var host := _host(key)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _use_input()
 	input.self = false
 	var result := await sdk.system_actions.submit("special.start", input)
@@ -443,7 +445,7 @@ func test_triggered_equipment_rolls_damage_and_consumes_only_expendable_bomb(key
 
 func test_food_water_and_oil_use_prescribed_resources_without_timers(key: String, quantity: int, uses: int, text: String, _test_parameters := [["dried-food", 0, 2, "one day"], ["waterskin", 1, 1, "water"], ["lard", 1, 1, "meal"], ["lantern-oil", 0, 2, "7 hours"], ["torch", 0, 2, "Burns"]]) -> void:
 	var host := _host(key)
-	var result := await SDK.new(host).system_actions.submit("special.start", _use_input())
+	var result := await PACKAGE_DATA.facade(host).system_actions.submit("special.start", _use_input())
 	assert_str(result.value.state).is_equal("resolved")
 	assert_int(host.actors.hero.data.inventory[-1].quantity).is_equal(quantity)
 	assert_int(host.actors.hero.data.inventory[-1].uses).is_equal(uses)
@@ -454,7 +456,7 @@ func test_treacherous_blade_offers_existing_shield_choice_before_hp_change() -> 
 	var host := _host("blade-of-your-ancestors")
 	host.actors.hero.data.inventory[-1]["equipped"] = true
 	host.actors.hero.data.inventory.append({"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true})
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", _use_input())
 	host.roll("use", [1])
 	await sdk.system_actions.submit("special.advance", {"id": "use"})
@@ -478,7 +480,7 @@ func test_removed_college_ends_before_chosen_scrolls_are_created() -> void:
 	host.actors.hero.data.traits = [{"id": "initiate-of-the-invisible-college", "uses": 1}]
 	var input := _use_input()
 	input.item = "feature:initiate-of-the-invisible-college"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", input)
 	host.roll("use", [1, 1])
 	await sdk.system_actions.submit("special.advance", {"id": "use"})
@@ -496,7 +498,7 @@ func test_class_agility_tests_include_worn_armor(key: String, tier: int, expecte
 	if key == "filthy-fingersmith":
 		host.actors.hero.data.traits = [{"id": key}]
 		input.item = "feature:" + key
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", input)
 	host.roll("use", [7])
 	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})
@@ -507,7 +509,7 @@ func test_special_damage_rejects_changed_protection() -> void:
 	var host := _host("bomb")
 	var input := _use_input()
 	input.self = false
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", input)
 	host.roll("use", [6, 2])
 	host.actors.enemy.data.armor.reduction = "d4"
@@ -522,7 +524,7 @@ func test_shield_continuation_requires_source_item_and_range(change: String, _te
 	host.actors.enemy.data["inventory"] = [{"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true}]
 	var input := _use_input()
 	input.self = false
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", input)
 	host.roll("use", [1])
 	await sdk.system_actions.submit("special.advance", {"id": "use"})
@@ -545,7 +547,7 @@ func test_shield_continuation_requires_source_item_and_range(change: String, _te
 func test_bomb_spends_once_before_shield_and_never_refunds_on_cancel(choice: String, _test_parameters := [["break"], ["cancel"]]) -> void:
 	var host := _host("bomb")
 	host.actors.hero.data.inventory.append({"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true})
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", _use_input())
 	host.roll("use", [5])
 	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})
@@ -562,7 +564,7 @@ func test_bomb_spends_once_before_shield_and_never_refunds_on_cancel(choice: Str
 func test_taking_caltrops_damage_preserves_rolled_infection_report() -> void:
 	var host := _host("caltrops")
 	host.actors.hero.data.inventory.append({"inventory_id": "shield", "source_item_id": "shield", "quantity": 1, "equipped": true})
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("special.start", _use_input())
 	host.roll("use", [4, 1])
 	var result := await sdk.system_actions.submit("special.advance", {"id": "use"})

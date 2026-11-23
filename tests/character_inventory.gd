@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -9,7 +11,7 @@ const BOUNDARY = preload("res://tests/creation_sdk_boundary.gd")
 func test_character_inventory() -> void:
 	var host = BOUNDARY.new()
 	host.actors.append({"id": "character", "access_level": "Owner", "data": {"schema": "mork-borg-character/v1", "name": "Graveworm", "omens": 2, "hit_points": 7, "maximum_hit_points": 9, "abilities": {"Strength": {"score": 8, "modifier": -1}}, "inventory": []}})
-	var sdk = SDK.new(host)
+	var sdk = PACKAGE_DATA.facade(host)
 	var actions = ACTIONS.new(sdk, SDK.ActorId.new("character"))
 	var result: SDK.ActorResult = await actions.correct("Strength", "5")
 	assert_bool(result.ok and result.actor.data.abilities.Strength.modifier == 5).override_failure_message("Completed corrections edit the played modifier, including improvement values.").is_true()
@@ -65,7 +67,7 @@ func _check_pending_fields(host: RefCounted) -> void:
 	add_child(auto_free(sheet))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
-	sheet.set_character(SDK.new(host).actors.read(SDK.ActorId.new("character")).actor, "character", "edit", miniatures, choices, SDK.new(host))
+	sheet.set_character(PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character")).actor, "character", "edit", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var fields: Dictionary = {}
@@ -102,7 +104,7 @@ func _check_appearance(host: RefCounted) -> void:
 	host.selected_rook = ""
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = [{"package_id": "published", "local_id": "a", "title": "A"}, {"package_id": "published", "local_id": "b", "title": "B"}]
-	sheet.set_character(SDK.new(host).actors.read(SDK.ActorId.new("character")).actor, "appearance", "character", miniatures, choices, SDK.new(host))
+	sheet.set_character(PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character")).actor, "appearance", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var appearance = sheet.find_child("CharacterAppearance", true, false)
@@ -130,7 +132,7 @@ func _check_live_refresh(host: RefCounted) -> void:
 	add_child(auto_free(sheet))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
-	sheet.set_character(SDK.new(host).actors.read(SDK.ActorId.new("character")).actor, "inventory", "character", miniatures, choices, SDK.new(host))
+	sheet.set_character(PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character")).actor, "inventory", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	host.actors[0].data.inventory = []
@@ -139,7 +141,7 @@ func _check_live_refresh(host: RefCounted) -> void:
 	await get_tree().process_frame
 	var empty = sheet.find_child("Empty", true, false)
 	assert_bool(empty != null and empty.visible).override_failure_message("An already-open Inventory projects remote removal without reopening.").is_true()
-	sheet.set_character(SDK.new(host).actors.read(SDK.ActorId.new("character")).actor, "character", "character", miniatures, choices, SDK.new(host))
+	sheet.set_character(PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character")).actor, "character", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var overview = sheet.find_child("CharacterOverview", true, false)
@@ -157,7 +159,7 @@ func _check_live_refresh(host: RefCounted) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_str(field.current_value()).override_failure_message("Remote edits preserve a dirty sheet value.").is_equal("23")
-	sheet.set_character(SDK.new(host).actors.read(SDK.ActorId.new("character")).actor, "inventory", "character", miniatures, choices, SDK.new(host))
+	sheet.set_character(PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character")).actor, "inventory", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	host.actors[0].access_level = "Viewer"
@@ -165,7 +167,7 @@ func _check_live_refresh(host: RefCounted) -> void:
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_bool(sheet.find_child("Add", true, false).disabled).override_failure_message("A live access downgrade disables inventory mutation entries.").is_true()
-	sheet.set_character(SDK.new(host).actors.read(SDK.ActorId.new("character")).actor, "character", "character", miniatures, choices, SDK.new(host))
+	sheet.set_character(PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character")).actor, "character", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	host.actors[0].data.name = "Later remote name"
@@ -188,6 +190,7 @@ func after_test() -> void:
 
 func test_overview_groups_actions_in_responsive_sections() -> void:
 	var overview = auto_free(load(ROOT + "ui/character_sheet_overview.tscn").instantiate())
+	overview.data_catalogue = PACKAGE_DATA.catalogue()
 	assert_bool(overview.has_node("HealthActions")).override_failure_message("Character actions use one compact row.").is_true()
 	if not overview.has_node("HealthActions"):
 		return

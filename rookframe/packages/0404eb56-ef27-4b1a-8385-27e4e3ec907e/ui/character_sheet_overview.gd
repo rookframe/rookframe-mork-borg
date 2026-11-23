@@ -1,5 +1,9 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 const RULES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd")
 const ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/power_row.tscn")
@@ -65,7 +69,7 @@ func configure(data: Dictionary, _miniatures: Array, _short_window: bool = false
 	for raw_trait in traits:
 		var trait_data: Dictionary = raw_trait
 		var key := str(trait_data.get("id", ""))
-		if not trait_data.has("item") and not RULES.new().definition(key).is_empty():
+		if not trait_data.has("item") and not RULES.new(data_catalogue).definition(key).is_empty():
 			_action_row(actions, str(trait_data.get("name", key)), str(trait_data.get("rules", "")), "use-item", "feature:" + key, read_only)
 		else:
 			rules += ("\n" if not rules.is_empty() else "") + _t(str(trait_data.get("name", ""))) + "\n" + _t(str(trait_data.get("rules", "")))

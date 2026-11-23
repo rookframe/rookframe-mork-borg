@@ -1,5 +1,9 @@
 extends VBoxContainer
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 
@@ -9,13 +13,6 @@ const PLAN = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec9
 var _roll_plan := PLAN.new()
 const CLASSES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creation_classes.gd")
 const CHARACTER_DEFINITION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/character_definition.gd")
-const FIRST_EQUIPMENT_NAMES = CHARACTER_DEFINITION.FIRST_EQUIPMENT_NAMES
-const SECOND_EQUIPMENT_NAMES = CHARACTER_DEFINITION.SECOND_EQUIPMENT_NAMES
-const FIRST_EQUIPMENT_IDS := ["rope", "torch", "lantern-with-oil", "magnesium-strip", "unclean-scroll", "sharp-needle", "medicine-box", "metal-file", "bear-trap", "bomb", "poison-red", "crucifix-silver"]
-const SECOND_EQUIPMENT_IDS := ["life-elixir", "sacred-scroll", "dog-small-but-vicious", "monkeys", "exquisite-perfume", "toolbox", "heavy-chain", "grappling-hook", "shield", "crowbar", "lard", "tent"]
-const WEAPON_IDS := ["femur", "staff", "shortsword", "knife", "warhammer", "sword", "bow", "flail", "crossbow", "zweihander"]
-const ARMOR_IDS := ["", "light-armor", "medium-armor", "heavy-armor"]
-const PACK_IDS := ["backpack", "sack", "small-wagon", "donkey"]
 
 signal scroll_choice_requested(slot: String)
 signal pack_choice_requested
@@ -57,7 +54,9 @@ func configure(definitions: Array[SDK.ContentEntry], character_definition: SDK.C
 	_character_miniature_choices = miniature_choices
 	_compact = compact
 	sdk = facade
+	_data_catalogue.bind(facade)
 	_view.facade = facade
+	_view.data_catalogue = _data_catalogue
 	i18n.bind(sdk)
 	localize(i18n)
 	_character_content = self
@@ -70,7 +69,7 @@ func begin() -> void:
 func select_class(class_id: String) -> void:
 	if not _creation_active or _character_stage != "create-class":
 		return
-	var profile: Dictionary = CLASSES.new().profile(class_id)
+	var profile: Dictionary = CLASSES.new(_data_catalogue).profile(class_id)
 	var definition := _find_definition(class_id + "-character")
 	if profile.is_empty() or definition == null:
 		return
@@ -177,7 +176,7 @@ func _ready() -> void:
 	_view.class_selected.connect(select_class)
 	_view.scroll_selected.connect(choose_scroll_disposition)
 	_character_content = self
-	_source_definition = CHARACTER_DEFINITION.new()
+	_source_definition = CHARACTER_DEFINITION.new(_data_catalogue)
 	_view.pack_selected.connect(_on_pack_selected)
 	_view.miniature_requested.connect(_choose_preferred_miniature)
 	_view.miniature_reset_requested.connect(_reset_preferred_miniature)
@@ -265,7 +264,7 @@ func _begin_character_creation() -> void:
 		"creation_id": sdk.dice.new_request_id(),
 		"class_id": "classless",
 		"class_title": "No Class",
-		"class_profile": CLASSES.new().profile("classless"),
+		"class_profile": CLASSES.new(_data_catalogue).profile("classless"),
 		"class_rules": [],
 		"abilities": {},
 		"equipment_rolls": {},
@@ -492,11 +491,11 @@ func _refresh_origin() -> void:
 			continue
 		var roll := int(_character_draft.get(str(term[2]), 0))
 		if term[2] == "origin_roll":
-			_character_draft["origin"] = CLASSES.new().origin(class_id, roll)
+			_character_draft["origin"] = CLASSES.new(_data_catalogue).origin(class_id, roll)
 		elif term[2] == "first_decoction_roll" or term[2] == "second_decoction_roll":
-			traits.append(CLASSES.new().decoction(roll))
+			traits.append(CLASSES.new(_data_catalogue).decoction(roll))
 		elif term[2] != "decoction_doses":
-			traits.append(CLASSES.new().feature(class_id, roll))
+			traits.append(CLASSES.new(_data_catalogue).feature(class_id, roll))
 	_character_draft["traits"] = traits
 
 
@@ -527,8 +526,8 @@ func _finalize_equipment() -> void:
 	if totals.has("Hermit scroll"):
 		var sacred := int(totals.get("Hermit scroll family", 0)) == 1
 		var hermit_scroll := int(totals.get("Hermit scroll", 0))
-		inventory.append(SCROLLS.new().item("sacred" if sacred else "unclean", hermit_scroll))
-	var weapon_id := _indexed_item_id(WEAPON_IDS, int(totals.get("Weapon", 0)))
+		inventory.append(SCROLLS.new(_data_catalogue).item("sacred" if sacred else "unclean", hermit_scroll))
+	var weapon_id := _indexed_item_id(_data_catalogue.creation_choices("WEAPON_IDS"), int(totals.get("Weapon", 0)))
 	inventory.append({"name": weapon_name, "source_item_id": weapon_id, "roll": int(totals.get("Weapon", 0)), "kind": "Weapon", "equipped": true})
 	var abilities: Dictionary = _character_draft.get("abilities", {})
 	var presence: Dictionary = abilities.get("Presence", {})
@@ -538,7 +537,7 @@ func _finalize_equipment() -> void:
 	elif weapon_id == "crossbow":
 		inventory.append({"name": "Bolt", "source_item_id": "bolt", "quantity": ammunition_quantity})
 	if armor_name != "No armor":
-		inventory.append({"name": armor_name, "source_item_id": _indexed_item_id(ARMOR_IDS, int(totals.get("Armor", 0))), "roll": int(totals.get("Armor", 0)), "kind": "Armor", "equipped": true})
+		inventory.append({"name": armor_name, "source_item_id": _indexed_item_id(_data_catalogue.creation_choices("ARMOR_IDS"), int(totals.get("Armor", 0))), "roll": int(totals.get("Armor", 0)), "kind": "Armor", "equipped": true})
 	var creature_grants := _starting_creature_grants(second_roll, totals)
 	var companion_sheets: Array = []
 	var traits: Array = _character_draft.get("traits", [])
@@ -577,9 +576,9 @@ func _scroll_was_disposed(slot: String) -> bool:
 
 
 func _first_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
-	if roll < 1 or roll > FIRST_EQUIPMENT_NAMES.size():
+	if roll < 1 or roll > _data_catalogue.creation_choices("FIRST_EQUIPMENT_NAMES").size():
 		return {}
-	var item := {"name": FIRST_EQUIPMENT_NAMES[roll - 1], "source_item_id": FIRST_EQUIPMENT_IDS[roll - 1]}
+	var item := {"name": _data_catalogue.creation_choices("FIRST_EQUIPMENT_NAMES")[roll - 1], "source_item_id": _data_catalogue.creation_choices("FIRST_EQUIPMENT_IDS")[roll - 1]}
 	var abilities: Dictionary = _character_draft.get("abilities", {})
 	if roll == 2:
 		var presence: Dictionary = abilities.get("Presence", {})
@@ -587,7 +586,7 @@ func _first_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
 		item["quantity"] = 1 if torch_quantity < 1 else torch_quantity
 	if roll == 5:
 		var scroll_roll := int(totals.get("Unclean scroll", 0))
-		item = SCROLLS.new().item("unclean", scroll_roll)
+		item = SCROLLS.new(_data_catalogue).item("unclean", scroll_roll)
 	if roll == 7:
 		var medicine_presence: Dictionary = abilities.get("Presence", {})
 		var medicine_uses := int(medicine_presence.get("modifier", 0)) + 4
@@ -598,14 +597,14 @@ func _first_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
 
 
 func _second_equipment_item(roll: int, totals: Dictionary) -> Dictionary:
-	if roll < 1 or roll > SECOND_EQUIPMENT_NAMES.size():
+	if roll < 1 or roll > _data_catalogue.creation_choices("SECOND_EQUIPMENT_NAMES").size():
 		return {}
-	var item := {"name": SECOND_EQUIPMENT_NAMES[roll - 1], "source_item_id": SECOND_EQUIPMENT_IDS[roll - 1]}
+	var item := {"name": _data_catalogue.creation_choices("SECOND_EQUIPMENT_NAMES")[roll - 1], "source_item_id": _data_catalogue.creation_choices("SECOND_EQUIPMENT_IDS")[roll - 1]}
 	if roll == 1:
 		item["uses"] = int(totals.get("Life elixir doses", 0))
 	if roll == 2:
 		var scroll_roll := int(totals.get("Sacred scroll", 0))
-		item = SCROLLS.new().item("sacred", scroll_roll)
+		item = SCROLLS.new(_data_catalogue).item("sacred", scroll_roll)
 	if roll == 4:
 		item["quantity"] = int(totals.get("Monkey count", 0))
 	return item
@@ -720,7 +719,7 @@ func _replace_pack_inventory(pack: String) -> void:
 	var inventory: Array = []
 	for raw_item in current_inventory:
 		var item: Dictionary = raw_item
-		if PACK_IDS.has(str(item.get("source_item_id", ""))):
+		if _data_catalogue.creation_choices("PACK_IDS").has(str(item.get("source_item_id", ""))):
 			continue
 		inventory.append(item)
 	if pack != "Nothing":

@@ -1,5 +1,9 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 ## Recovery is a fixed list, independent of Actor Favorites and targeting.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -11,10 +15,11 @@ var _sdk: SDK
 
 func bind(facade: SDK) -> void:
 	_sdk = facade
+	_data_catalogue.bind(facade)
 
 func entries(actor: SDK.Actor) -> Array[ENTRY]:
 	var result: Array[ENTRY] = []
-	var omen_faces := RULES.new().omen_faces(actor.data) if actor != null else 0
+	var omen_faces := RULES.new(_data_catalogue).omen_faces(actor.data) if actor != null else 0
 	for option in [["breath", "Catch breath", "d4 HP"], ["sleep", "Full night’s sleep", "d6 HP"], ["omens", "Regain Omens", ""]]:
 		var entry := ENTRY.new()
 		entry.id = str(option[0])
@@ -23,7 +28,7 @@ func entries(actor: SDK.Actor) -> Array[ENTRY]:
 		if _sdk != null:
 			entry.value = _sdk.translations.text(entry.value)
 		entry.icon = ICON
-		entry.available = RULES.new().available(actor, _sdk, entry.id)
+		entry.available = RULES.new(_data_catalogue).available(actor, _sdk, entry.id)
 		result.append(entry)
 	return result
 

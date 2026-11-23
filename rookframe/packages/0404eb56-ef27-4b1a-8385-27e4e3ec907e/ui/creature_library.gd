@@ -1,14 +1,21 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
-const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 const MINIATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/miniature_actions.gd")
 var sdk: SDK
 
-func _init(facade: SDK) -> void:
+func _init(facade: SDK, data_catalogue: CATALOGUE = null) -> void:
+	_data_catalogue = data_catalogue
+	if _data_catalogue == null:
+		_data_catalogue = CATALOGUE.new()
+		_data_catalogue.bind(facade)
 	sdk = facade
 
 func create(definition: SDK.ContentReference, scene: SDK.SceneId = null, position: Vector2 = Vector2(0, 0), open_view: bool = true) -> SDK.ActorResult:
-	if definition.package_id != sdk.package_id() or not CREATURES.CORE_DEFINITIONS.has(definition.local_id):
+	if definition.package_id != sdk.package_id() or not _data_catalogue.creature_profiles().has(definition.local_id):
 		return _failure("Choose a Creature definition.")
 	var result := await sdk.system_actions.submit("miniature.create", {"definition": definition.local_id})
 	if not result.ok:

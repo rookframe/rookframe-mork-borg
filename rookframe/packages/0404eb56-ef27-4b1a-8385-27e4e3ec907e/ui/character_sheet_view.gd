@@ -2,6 +2,8 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
+const DATA_CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: DATA_CATALOGUE
 
 const OVERVIEW_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_overview.tscn")
 const INVENTORY_SCENE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_sheet_inventory.tscn")
@@ -28,6 +30,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 	_short_window = short_window
 	if route in ["item", "custom"]:
 		var item_view = ITEM_SCENE.instantiate()
+		item_view.data_catalogue = data_catalogue
 		item_view.localize(i18n)
 		_item_editor = item_view
 		_connect_form(item_view)
@@ -44,6 +47,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		return
 	if route == "edit":
 		var edit = EDIT_SCENE.instantiate()
+		edit.data_catalogue = data_catalogue
 		edit.localize(i18n)
 		_character_editor = edit
 		_connect_form(edit)
@@ -51,6 +55,7 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		return
 	if route == "catalogue":
 		var catalogue = CATALOGUE.instantiate()
+		catalogue.data_catalogue = data_catalogue
 		catalogue.localize(i18n)
 		_connect_form(catalogue)
 		catalogue.configure(data, miniatures)
@@ -64,11 +69,13 @@ func configure(data: Dictionary, tab: String, route: String, miniatures: Array[S
 		return
 	if route == "inventory" or tab == "inventory":
 		var inventory_view = INVENTORY_SCENE.instantiate()
+		inventory_view.data_catalogue = data_catalogue
 		inventory_view.localize(i18n)
 		_connect_form(inventory_view)
 		inventory_view.configure(data, miniatures)
 		return
 	var overview = OVERVIEW_SCENE.instantiate()
+	overview.data_catalogue = data_catalogue
 	overview.localize(i18n)
 	_overview = overview
 	overview.modifier_requested.connect(_roll)

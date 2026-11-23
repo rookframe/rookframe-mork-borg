@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -15,8 +17,8 @@ func _host(power: String = "tongue-of-eris") -> BOUNDARY:
 	host.actors.enemy.data["maximum_hit_points"] = 6
 	host.actors.hero.data["power_uses"] = 3
 	host.actors.hero.data.abilities["Presence"] = {"modifier": 1}
-	for family in SCROLLS.TABLES:
-		for entry in SCROLLS.TABLES[family]:
+	for family in PACKAGE_DATA.CATALOGUE.SCROLL_FAMILIES:
+		for entry in PACKAGE_DATA.catalogue().scrolls(family):
 			if entry.source_item_id == power:
 				var scroll: Dictionary = entry.duplicate(true)
 				scroll["inventory_id"] = "scroll"
@@ -29,7 +31,7 @@ func _cast_input(id: String = "cast") -> Dictionary:
 
 func test_cast_from_owned_scroll_spends_only_success_and_reports_manual_outcome() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var started := await sdk.system_actions.submit("power.start", _cast_input())
 	assert_bool(started.ok).is_true()
 	assert_str(started.value.state).is_equal("pending")
@@ -54,7 +56,7 @@ func test_palms_applies_independent_damage_after_armor_and_shield_once() -> void
 	var host := _host("palms-open-the-southern-gate")
 	host.actors.hero.data.inventory.append({"inventory_id": "armor", "kind": "Armor", "reduction": "d6", "armor_tier": 1, "quantity": 1, "equipped": true})
 	host.actors.hero.data.inventory.append({"inventory_id": "shield", "kind": "Shield", "quantity": 1, "equipped": true})
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("power.start", _cast_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -90,7 +92,7 @@ func test_grace_heals_each_chosen_actor_once_after_rolled_target_count() -> void
 	var host := _host("grace-of-a-dead-saint")
 	host.actors.hero.data["maximum_hit_points"] = 9
 	host.actors.enemy.data["maximum_hit_points"] = 12
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("power.start", _cast_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -127,7 +129,7 @@ func test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_bound
 	var host := _host("palms-open-the-southern-gate")
 	host.targets = PackedStringArray(["hero-rook"])
 	host.actors.hero.data.inventory.append({"inventory_id": "shield", "kind": "Shield", "quantity": 0 if condition == "empty" else 1, "equipped": condition != "unequipped", "broken": condition == "broken"})
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -142,7 +144,7 @@ func test_palms_uses_only_equipped_intact_protection_and_preserves_zero_hp_bound
 
 func test_palms_changed_armor_discards_the_whole_set_without_reapplying_late_rolls() -> void:
 	var host := _host("palms-open-the-southern-gate")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -165,7 +167,7 @@ func test_palms_changed_armor_discards_the_whole_set_without_reapplying_late_rol
 func test_failure_and_natural_faces_preserve_their_distinct_resource_rules() -> void:
 	for face in [2, 1, 20]:
 		var host := _host()
-		var sdk := SDK.new(host)
+		var sdk := PACKAGE_DATA.facade(host)
 		await sdk.system_actions.submit("power.start", _cast_input())
 		host.roll("cast", [face])
 		var result := await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -195,7 +197,7 @@ func test_roskoe_rolls_independent_hp_loss_for_four_targets_without_armor() -> v
 		host.actors[id].id = id
 		host.actors[id].public_label = "Stranger %d" % index
 		host.rooks[id] = id
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("power.start", _cast_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -224,7 +226,7 @@ func test_roskoe_rolls_independent_hp_loss_for_four_targets_without_armor() -> v
 
 func test_hp_targets_revalidate_the_entire_confirmed_set_before_commit() -> void:
 	var host := _host("roskoes-consuming-glare")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -265,7 +267,7 @@ func test_immediate_target_count_and_hp_data_are_validated_before_requesting_dic
 		host.actors.enemy.data.maximum_hit_points = 0
 	else:
 		host.actors.enemy.data.maximum_hit_points = "bad"
-	var result := await SDK.new(host).system_actions.submit("power.start", _cast_input())
+	var result := await PACKAGE_DATA.facade(host).system_actions.submit("power.start", _cast_input())
 	assert_str(result.value.state).override_failure_message(invalid).is_equal("error")
 	assert_bool(host.requests.is_empty()).is_true()
 	assert_int(host.actors.hero.data.power_uses).is_equal(3)
@@ -286,7 +288,7 @@ func test_narrative_parameters_and_manual_hp_boundaries() -> void:
 		["whispers-pass-the-gate", [], "three questions", "deceased"]]
 	for example in examples:
 		var host := _host(example[0])
-		var sdk := SDK.new(host)
+		var sdk := PACKAGE_DATA.facade(host)
 		var start := await sdk.system_actions.submit("power.start", _cast_input())
 		assert_str(start.value.state).override_failure_message(str(example[0])).is_equal("pending")
 		if start.value.state != "pending":
@@ -307,7 +309,7 @@ func test_narrative_parameters_and_manual_hp_boundaries() -> void:
 
 func test_immediate_corrections_interruption_and_atomic_refusal(failure: String, _test_parameters := [["count"], ["duplicate"], ["range"], ["cancel"], ["disconnect"], ["owner"], ["relink"], ["malformed"], ["save"]]) -> void:
 	var host := _host("roskoes-consuming-glare")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -364,7 +366,7 @@ func test_shared_and_long_public_labels_keep_per_target_dice_distinct(long_name:
 	var host := _host("roskoes-consuming-glare")
 	host.actors.hero.public_label = label
 	host.actors.enemy.public_label = label
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -383,7 +385,7 @@ func test_shared_and_long_public_labels_keep_per_target_dice_distinct(long_name:
 
 func test_lightning_reports_each_bolt_without_assigning_damage() -> void:
 	var host := _host("nine-violet-signs-unknot-the-storm")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	var result := await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -412,13 +414,13 @@ func test_restrictions_and_unfinished_powers_refuse_before_any_throw() -> void:
 			"zweihand": host.actors.hero.data.inventory[0].source_item_id = "zweihander"
 			"dizzy": input.eligible = false
 			"unowned": host.actors.hero.data.inventory[-1].quantity = 0
-		var outcome := await SDK.new(host).system_actions.submit("power.start", input)
+		var outcome := await PACKAGE_DATA.facade(host).system_actions.submit("power.start", input)
 		assert_str(outcome.value.state).override_failure_message(restriction).is_equal("error")
 		assert_bool(host.requests.is_empty()).override_failure_message(restriction).is_true()
 	var priest := _host()
 	priest.actors.hero.data["class_id"] = "heretical-priest"
 	priest.actors.hero.data.inventory.append({"kind": "Armor", "armor_tier": 2, "equipped": true})
-	var allowed := await SDK.new(priest).system_actions.submit("power.start", _cast_input())
+	var allowed := await PACKAGE_DATA.facade(priest).system_actions.submit("power.start", _cast_input())
 	assert_str(allowed.value.state).is_equal("pending")
 
 func test_every_target_is_validated_at_authored_range_without_private_data() -> void:
@@ -426,28 +428,28 @@ func test_every_target_is_validated_at_authored_range_without_private_data() -> 
 	host.rooks["farther"] = "enemy"
 	host.targets = PackedStringArray(["enemy-rook", "farther"])
 	host.distances = {"enemy-rook": 9.1440011, "farther": 12.0}
-	var result := await SDK.new(host).system_actions.submit("power.start", _cast_input())
+	var result := await PACKAGE_DATA.facade(host).system_actions.submit("power.start", _cast_input())
 	assert_str(result.value.state).is_equal("error")
 	assert_str(result.value.message).is_equal("target Hooded stranger not in range\ntarget Hooded stranger not in range")
 	assert_bool(host.requests.is_empty()).is_true()
 	assert_int(host.reports.size()).is_equal(0)
 	assert_str(str(host.reports)).not_contains("Seth")
-	await SDK.new(host).system_actions.submit("power.start", _cast_input())
+	await PACKAGE_DATA.facade(host).system_actions.submit("power.start", _cast_input())
 	assert_int(host.reports.size()).is_equal(0)
 	host.targets = PackedStringArray(["enemy-rook"])
 	host.distances = {"enemy-rook": 9.144}
-	result = await SDK.new(host).system_actions.submit("power.start", _cast_input("edge"))
+	result = await PACKAGE_DATA.facade(host).system_actions.submit("power.start", _cast_input("edge"))
 	assert_str(result.value.state).is_equal("pending")
 	var self_cast := _host("lucy-fires-levitation")
 	self_cast.targets = PackedStringArray()
 	var input := _cast_input()
 	input.rook = ""
-	result = await SDK.new(self_cast).system_actions.submit("power.start", input)
+	result = await PACKAGE_DATA.facade(self_cast).system_actions.submit("power.start", input)
 	assert_str(result.value.state).is_equal("pending")
 
 func test_daily_allowance_is_an_explicit_human_throw_and_never_a_timer() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _cast_input("morning")
 	input["morning_confirmed"] = true
 	var result := await sdk.system_actions.submit("power.daily", input)
@@ -464,7 +466,7 @@ func test_daily_allowance_is_an_explicit_human_throw_and_never_a_timer() -> void
 
 func test_interruption_preserves_accepted_use_and_refuses_late_parameters() -> void:
 	var host := _host("aegis-of-sorrow")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -478,16 +480,16 @@ func test_interruption_preserves_accepted_use_and_refuses_late_parameters() -> v
 	assert_int(host.actors.enemy.data.hit_points).is_equal(6)
 	assert_int(host.reports.size()).is_equal(2)
 	var disconnected := _host()
-	await SDK.new(disconnected).system_actions.submit("power.start", _cast_input())
+	await PACKAGE_DATA.facade(disconnected).system_actions.submit("power.start", _cast_input())
 	disconnected.sessions = []
 	disconnected.roll("cast", [20])
-	ended = await SDK.new(disconnected).system_actions.submit("power.advance", {"id": "cast"})
+	ended = await PACKAGE_DATA.facade(disconnected).system_actions.submit("power.advance", {"id": "cast"})
 	assert_str(ended.value.state).is_equal("ended")
 	assert_int(disconnected.actors.hero.data.power_uses).is_equal(3)
 
 func test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance() -> void:
 	var host := _host("eyelid-blinds-the-mind")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -511,7 +513,7 @@ func test_eyelid_selects_the_rolled_count_and_uses_gm_creature_resistance() -> v
 
 func test_eyelid_pc_only_outcome_reports_manual_test_and_one_hour() -> void:
 	var host := _host("eyelid-blinds-the-mind")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -527,7 +529,7 @@ func test_owner_routing_malformed_inputs_and_failed_commits() -> void:
 		var host := _host()
 		var input := _cast_input()
 		input[field] = []
-		var refused := await SDK.new(host).system_actions.submit("power.start", input)
+		var refused := await PACKAGE_DATA.facade(host).system_actions.submit("power.start", input)
 		assert_str(refused.value.state).is_equal("error")
 		assert_bool(host.requests.is_empty()).is_true()
 	var gm := _host()
@@ -535,18 +537,18 @@ func test_owner_routing_malformed_inputs_and_failed_commits() -> void:
 	gm.session = "gm-session"
 	gm.game_master = true
 	gm.access_entries = [{"participant_id": "player", "session_id": "player-session", "access_level": "Owner", "is_connected": true, "display_name": "Player"}]
-	await SDK.new(gm).system_actions.submit("power.start", _cast_input())
+	await PACKAGE_DATA.facade(gm).system_actions.submit("power.start", _cast_input())
 	assert_str(gm.requests.cast.participant).is_equal("player")
 	gm.access_entries[0].access_level = "Viewer"
 	gm.roll("cast", [11])
-	var ended := await SDK.new(gm).system_actions.submit("power.advance", {"id": "cast"})
+	var ended := await PACKAGE_DATA.facade(gm).system_actions.submit("power.advance", {"id": "cast"})
 	assert_str(ended.value.state).is_equal("ended")
 	assert_int(gm.actors.hero.data.power_uses).is_equal(3)
 	var failure := _host()
-	await SDK.new(failure).system_actions.submit("power.start", _cast_input())
+	await PACKAGE_DATA.facade(failure).system_actions.submit("power.start", _cast_input())
 	failure.roll("cast", [11])
 	failure.fail_commit = true
-	ended = await SDK.new(failure).system_actions.submit("power.advance", {"id": "cast"})
+	ended = await PACKAGE_DATA.facade(failure).system_actions.submit("power.advance", {"id": "cast"})
 	assert_str(ended.value.state).is_equal("ended")
 	assert_int(failure.actors.hero.data.power_uses).is_equal(3)
 	assert_bool(failure.reports.is_empty()).is_true()
@@ -555,18 +557,18 @@ func test_all_twenty_core_scrolls_have_an_explicit_playable_boundary() -> void:
 	var expected := ["palms-open-the-southern-gate", "tongue-of-eris", "te-le-kin-esis", "lucy-fires-levitation", "daemon-of-capillaries", "nine-violet-signs-unknot-the-storm", "metzhuotl-blind-your-eye", "foul-psychompomp", "eyelid-blinds-the-mind", "death", "grace-of-a-dead-saint", "grace-for-a-sinner", "whispers-pass-the-gate", "aegis-of-sorrow", "unmet-fate", "bestial-speech", "false-dawn-nights-chariot", "hermetic-step", "roskoes-consuming-glare", "enochian-syntax"]
 	for id in expected:
 		var host := _host(id)
-		var result := await SDK.new(host).system_actions.submit("power.start", _cast_input())
+		var result := await PACKAGE_DATA.facade(host).system_actions.submit("power.start", _cast_input())
 		assert_str(result.value.state).override_failure_message(id).is_equal("pending")
 	var commands := _host("enochian-syntax")
-	await SDK.new(commands).system_actions.submit("power.start", _cast_input())
+	await PACKAGE_DATA.facade(commands).system_actions.submit("power.start", _cast_input())
 	commands.roll("cast", [11])
-	await SDK.new(commands).system_actions.submit("power.advance", {"id": "cast"})
+	await PACKAGE_DATA.facade(commands).system_actions.submit("power.advance", {"id": "cast"})
 	assert_str(str(commands.reports[-1])).contains("single command")
 
 func test_invisible_college_scroll_is_consumed_after_successful_cast() -> void:
 	var host := _host("enochian-syntax")
 	host.actors.hero.data.inventory[-1]["single_use"] = true
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	var result := await sdk.system_actions.submit("power.advance", {"id": "cast"})

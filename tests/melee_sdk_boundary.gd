@@ -1,4 +1,6 @@
 extends RefCounted
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 signal SettingsChanged
 signal TargetingChanged
 signal FeedbackActionSelected
@@ -46,6 +48,8 @@ func SubmitSystemIntent(name: String, data: Variant) -> Dictionary:
   transient_failures[name] -= 1
   return {"ok": false, "code": "rate_limited", "message": "Retry later"}
  active = true
+ if handler.sdk == null:
+  handler.sdk = PACKAGE_DATA.facade(self)
  var outcome: Variant = handler.handle_system_intent(SDK.SystemActionContext.new(self, "active"), name, data)
  active = false
  var reply := {"ok": true, "value": outcome}
@@ -128,7 +132,7 @@ func SystemIntentCreateActors(_token: String, creator: String, entries: Array, r
  var created: Array = []
  for entry in entries:
   var definition = load(ROOT + "content/" + str(entry.local_id) + ".tres")
-  var data: Variant = definition.create_data(entry.choices)
+  var data: Variant = definition.create_data_with_content(entry.choices, PACKAGE_DATA.reader())
   var id := "created-%d" % actors.size()
   var actor := {"id": id, "data": data, "access_level": "Owner" if creator == participant or game_master else "None", "public_label": ""}
   actors[id] = actor

@@ -1,11 +1,18 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
 
 func plan(actor: SDK.Actor, faces: int, infection: bool) -> Dictionary:
-	var data: Dictionary = CREATURES.new().stat_block(actor.data)
+	var data: Dictionary = CREATURES.new(_data_catalogue).stat_block(actor.data)
 	if typeof(data.get("hit_points")) != TYPE_INT:
 		return {"error": "Recipient HP is malformed."}
 	var protection := ""
@@ -16,11 +23,11 @@ func plan(actor: SDK.Actor, faces: int, infection: bool) -> Dictionary:
 			return {"error": "Recipient armor is malformed."}
 		var armor: Dictionary = data.get("armor", {})
 		protection = str(armor.get("reduction", ""))
-		shield = CREATURES.new().shield_reduction(data)
+		shield = CREATURES.new(_data_catalogue).shield_reduction(data)
 	else:
 		if typeof(data.get("inventory", [])) != TYPE_ARRAY:
 			return {"error": "Recipient equipment is malformed."}
-		for raw in ITEMS.new(null, actor.id).inventory(data):
+		for raw in ITEMS.new(null, actor.id, _data_catalogue).inventory(data):
 			var item: Dictionary = raw
 			var quantity: int = item.get("quantity", 0)
 			if not item.get("equipped", false) or item.get("broken", false) or quantity < 1:
@@ -50,7 +57,7 @@ func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Di
 	var current: Dictionary = actor.data
 	if typeof(current.get("hit_points")) != TYPE_INT:
 		return {"error": "Recipient HP is malformed."}
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	var bonus: int = plan.bonus
 	var damage := roll.terms[0].results[0] + bonus
 	if plan.critical:
@@ -75,13 +82,13 @@ func apply(actor: SDK.Actor, plan: Dictionary, roll: SDK.HumanThrowResult) -> Di
 
 func damage_armor(id: SDK.ActorId, data: Dictionary) -> void:
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
-		var changed: Dictionary = CREATURES.new().damage_protection(data)
+		var changed: Dictionary = CREATURES.new(_data_catalogue).damage_protection(data)
 		for key in ["attacks", "armor", "creature_stat_block"]:
 			if changed.has(key):
 				data[key] = changed[key]
 		data.erase("creature_inventory")
 		return
-	var items := ITEMS.new(null, id).inventory(data)
+	var items := ITEMS.new(null, id, _data_catalogue).inventory(data)
 	var worn: Dictionary = {}
 	for raw_item in items:
 		var item: Dictionary = raw_item

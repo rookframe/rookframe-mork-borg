@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Defence consequences and cancellation are recorded history. Shield decisions stay in the action window; accepted physical Rolls announce through Rookframe.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -95,13 +102,13 @@ func handle(context: SDK.SystemActionContext, operation: String, payload: Varian
 func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Dictionary) -> Dictionary:
 	if context.read_throw(str(input.id)).ok:
 		return {"state": "ended", "message": ENDED}
-	var validated := TARGETING.new().validate_creature(context, input)
+	var validated := TARGETING.new(_data_catalogue).validate_creature(context, input)
 	if validated.state != "ready":
 		return validated
 	if validated.resolution != "defence":
 		return _error("Roll the acting Creature’s attack against this target.")
 	var target := context.read_actor(SDK.ActorId.new(str(validated.target)))
-	var data: Dictionary = CREATURES.new().stat_block(target.actor.data)
+	var data: Dictionary = CREATURES.new(_data_catalogue).stat_block(target.actor.data)
 	var creature_target := str(data.get("schema", "")) == "mork-borg-adversary/v1"
 	for previous in _actions:
 		if str(previous.target) == target.actor.id.value and str(previous.state) in ["ready", "pending", "shield"]:
@@ -153,10 +160,10 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var captured_target_rook := ""
 	for target_rook_id in target_rooks:
 		captured_target_rook = str(target_rook_id)
-	var action := {"id": input.id, "source": input.source, "rook": str(input.get("rook", "")), "target_rook": captured_target_rook, "reach": float(attack.range_feet) * 0.3048, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new().attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
+	var action := {"id": input.id, "source": input.source, "rook": str(input.get("rook", "")), "target_rook": captured_target_rook, "reach": float(attack.range_feet) * 0.3048, "target": target.actor.id.value, "participant": caller.participant_id, "session": caller.session_id, "owner": defender, "owner_session": defender_session, "state": "ready", "request": "", "message": "", "attacker": source.actor.public_label if not source.actor.public_label.is_empty() else "Creature", "character": str(data.get("name", "Character")), "attack": attack.name, "damage": attack.dice, "flat_test": creature_target, "agility": 0 if creature_target else ability.get("modifier", 0), "difficulty": 24 - CREATURES.new(_data_catalogue).attack_test_difficulty(attack), "automatic_hit": attack.get("always_hits", false), "phase": "defence", "modifier": 0, "raw": 0, "sequence": 0, "damage_sequence": 0, "loss": 0, "hp": data.get("hit_points", 0), "armor": "", "armor_damaged": false, "protection": "", "shield": ""}
 	if creature_target:
 		var source_dr: int = action.difficulty
-		action["difficulty"] = source_dr + CREATURES.new().defence_test_difficulty(data, attack.get("piercing", false)) - 12
+		action["difficulty"] = source_dr + CREATURES.new(_data_catalogue).defence_test_difficulty(data, attack.get("piercing", false)) - 12
 	if not creature_target:
 		var base_dr := 12
 		for raw_item in _inventory(target.actor.id, data):
@@ -172,7 +179,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		var armor: Dictionary = data.get("armor", {})
 		action["protection"] = str(armor.get("reduction", ""))
 		action["armor"] = "stat-block" if not str(action.protection).is_empty() else ""
-		action["shield_reduction"] = CREATURES.new().shield_reduction(data)
+		action["shield_reduction"] = CREATURES.new(_data_catalogue).shield_reduction(data)
 		action["difficulty"] = int(action.difficulty) + int(armor.get("defence_penalty", 0))
 	for raw_item in _inventory(target.actor.id, data):
 		var item: Dictionary = raw_item
@@ -236,9 +243,9 @@ func _damage_armor(context: SDK.SystemActionContext, action: Dictionary) -> bool
 	if not target.ok:
 		return false
 	var current: Dictionary = target.actor.data
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	if action.flat_test:
-		data = CREATURES.new().damage_protection(data)
+		data = CREATURES.new(_data_catalogue).damage_protection(data)
 		var report := SDK.ActionLogMessage.new("Defence fumble")
 		report.result = "Protection reduced"
 		report.text = [SDK.ActionLogText.new("Natural 1: double damage; recorded protection reduced one tier.")]
@@ -276,7 +283,7 @@ func _apply_damage(context: SDK.SystemActionContext, action: Dictionary, break_s
 	if not target.ok:
 		return _end(context, action)
 	var current: Dictionary = target.actor.data
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	var items := _inventory(target.actor.id, data)
 	var shield_present := str(action.shield).is_empty()
 	for raw_item in items:
@@ -432,4 +439,4 @@ func _find(id: String) -> Dictionary:
 func _inventory(id: SDK.ActorId, data: Dictionary) -> Array:
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
 		return []
-	return ITEMS.new(null, id).inventory(data)
+	return ITEMS.new(null, id, _data_catalogue).inventory(data)

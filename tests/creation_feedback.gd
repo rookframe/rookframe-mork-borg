@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -14,6 +16,7 @@ func test_pending_roll_indicator_keeps_moving() -> void:
 
 func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
@@ -32,6 +35,7 @@ func test_equipment_results_have_meaning_before_remaining_rolls() -> void:
 
 func test_fixed_pack_does_not_offer_a_choice_button() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
@@ -55,6 +59,7 @@ func _copy(root: Node) -> String:
 
 func test_completed_conditional_results_remain_selectable_with_raw_faces() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
@@ -76,6 +81,7 @@ func test_completed_conditional_results_remain_selectable_with_raw_faces() -> vo
 
 func test_origin_detail_contains_only_the_selected_resolved_trait() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)

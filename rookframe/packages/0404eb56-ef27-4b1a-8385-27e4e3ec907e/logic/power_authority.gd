@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Casting consequences are recorded history. Parameter requests, targeting and manual instructions stay in the action window; physical Rolls announce through Rookframe.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -136,7 +143,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Enter a whole-number situational modifier from −20 to +20.")
 	if not BROKEN.new().can_act(data):
 		return _error("This Character cannot cast. Rules references remain available.")
-	var restriction := POWERS.new().casting_restriction(data, data.get("inventory", []))
+	var restriction := POWERS.new(_data_catalogue).casting_restriction(data, data.get("inventory", []))
 	if not restriction.is_empty():
 		return _error(restriction)
 	var targeting := {"state": "ready", "label": "Table outcome", "targets": []} if input.get("sheet", false) else _targets(context, caller, str(input.get("rook", "")), source.actor.id, scroll)
@@ -197,7 +204,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		return _complete(context, action, [SDK.ActorChange.new(source.actor.id, data)], "Daily allowance", "Morning allowance: Presence %+d + d4 %d = %d. %d usable Powers today. The table establishes the morning; no time or replenishment is automatic. Raw Roll #%d." % [presence, daily_face, count, usable, result.sequence])
 	if action["phase"] == "casting":
 		var current := _scroll(data, action.item)
-		if current.is_empty() or str(current.source_item_id) != str(power.source_item_id) or not BROKEN.new().can_act(data) or not POWERS.new().casting_restriction(data, data.get("inventory", [])).is_empty():
+		if current.is_empty() or str(current.source_item_id) != str(power.source_item_id) or not BROKEN.new().can_act(data) or not POWERS.new(_data_catalogue).casting_restriction(data, data.get("inventory", [])).is_empty():
 			return _end(context, action)
 	if action["phase"] == "resistance":
 		return _sleep_result(context, action, result.terms[0].results, result.sequence)
@@ -262,7 +269,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		if str(item.get("inventory_id", "")) == str(action.item) and item.get("single_use", false):
 			var quantity: int = item.get("quantity", 1)
 			item["quantity"] = quantity - 1
-	var terms := POWERS.new().parameters(str(power.source_item_id))
+	var terms := POWERS.new(_data_catalogue).parameters(str(power.source_item_id))
 	if terms.is_empty():
 		return _manual_result(context, action, [SDK.ActorChange.new(source.actor.id, data)], [], result.sequence)
 	var report := SDK.ActionLogMessage.new("Power activated")
@@ -312,7 +319,7 @@ func _manual_result(context: SDK.SystemActionContext, action: Dictionary, change
 	var power: Dictionary = action.scroll
 	var presence: int = action.presence
 	var casting_sequence: int = action.sequence
-	var description := POWERS.new().report(str(power.source_item_id), values, presence)
+	var description := POWERS.new(_data_catalogue).report(str(power.source_item_id), values, presence)
 	return _complete(context, action, changes, "Manual outcome", "%s · %s. %s Handle at the table; no effects or expiry are automated. One daily use spent. Raw Rolls #%d / #%d." % [str(power.name), str(action.label), description, casting_sequence, sequence])
 
 func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanThrowResult) -> Dictionary:
@@ -383,7 +390,7 @@ func _hp_result(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.
 	return _complete(context, action, changes, outcome, "%s. %sOne daily use spent. Raw Rolls #%d, #%d, #%d." % [str(power.name), details, cast_sequence, count_sequence, roll.sequence])
 
 func _protection(current: Dictionary) -> Dictionary:
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	var formula := ""
 	var shield: int = 0
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
@@ -393,7 +400,7 @@ func _protection(current: Dictionary) -> Dictionary:
 		if typeof(armor.get("reduction", "")) != TYPE_STRING:
 			return {"error": "Target armor data is malformed. Correct its sheet before casting."}
 		formula = str(armor.get("reduction", ""))
-		shield = CREATURES.new().shield_reduction(data)
+		shield = CREATURES.new(_data_catalogue).shield_reduction(data)
 	else:
 		if typeof(data.get("inventory", [])) != TYPE_ARRAY or typeof(data.get("inventory_serial", 0)) != TYPE_INT:
 			return {"error": "Target inventory is malformed. Correct its sheet before casting."}
@@ -410,7 +417,7 @@ func _protection(current: Dictionary) -> Dictionary:
 			for key in ["kind", "source_item_id", "inventory_id", "reduction"]:
 				if typeof(item.get(key, "")) != TYPE_STRING:
 					return {"error": "Target equipment is malformed. Correct its sheet before casting."}
-		for raw in ITEMS.new(null, SDK.ActorId.new("")).inventory(data):
+		for raw in ITEMS.new(null, SDK.ActorId.new(""), _data_catalogue).inventory(data):
 			var item: Dictionary = raw
 			var quantity: int = item.quantity
 			if not item.equipped or item.get("broken", false) or quantity < 1:
@@ -501,13 +508,13 @@ func _scroll(data: Dictionary, id: String) -> Dictionary:
 	for raw in inventory:
 		if typeof(raw) != TYPE_DICTIONARY:
 			return {}
-	var items := ITEMS.new(null, SDK.ActorId.new("")).inventory(data)
+	var items := ITEMS.new(null, SDK.ActorId.new(""), _data_catalogue).inventory(data)
 	for raw in items:
 		var item: Dictionary = raw
 		var quantity: int = item.get("quantity", 0)
 		if str(item.get("inventory_id", "")) != id or quantity <= 0 or item.get("broken", false) or int(item.get("uses", 1)) <= 0:
 			continue
-		return POWERS.new().definition(str(item.get("source_item_id", "")))
+		return POWERS.new(_data_catalogue).definition(str(item.get("source_item_id", "")))
 	return {}
 
 func _request(context: SDK.SystemActionContext, action: Dictionary, phase: String, terms: Array[SDK.DiceTerm], message: String, receiver: String = "") -> Dictionary:

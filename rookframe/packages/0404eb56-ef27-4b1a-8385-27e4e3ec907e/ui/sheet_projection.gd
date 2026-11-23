@@ -1,5 +1,12 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE = null) -> void:
+	_data_catalogue = data_catalogue
+
+
 ## Presentation values, without changing the System's gameplay data.
 const ABILITIES := ["Strength", "Agility", "Presence", "Toughness"]
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -37,7 +44,7 @@ func fields(data: Dictionary) -> Dictionary:
 			var trait_entry: Dictionary = traits[index] if index < traits.size() else {}
 			var selected := 0
 			for face in range(1, 7):
-				var feature := CLASSES.new().feature("gutterborn-scum", face)
+				var feature := CLASSES.new(_data_catalogue).feature("gutterborn-scum", face)
 				if str(feature.id) == str(trait_entry.get("id", "")):
 					selected = face
 			values["scum_specialty:%d" % index] = str(selected)
@@ -128,7 +135,7 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 		heading = "Powers"
 		for raw in items:
 			var item: Dictionary = raw
-			var power := POWERS.new().definition(str(item.get("source_item_id", "")))
+			var power := POWERS.new(_data_catalogue).definition(str(item.get("source_item_id", "")))
 			if not power.is_empty():
 				primary.append(row("item:" + str(item.inventory_id), str(item.get("name", "Power")), str(power.get("rules", "")), "Spent" if int(item.get("quantity", 0)) < 1 else str(item.get("family", "Scroll"))))
 		resources.append(row("resource:power_uses", "Power uses", "Morning · d4 + Presence", str(data.get("power_uses", 0)), MAGIC))
@@ -149,7 +156,7 @@ func collections(data: Dictionary, items: Array, chapter: int, actor_id: String,
 				entry.action_icon = equipment_state_icon(item)
 				entry.action_pressed = item.get("equipped", false)
 				entry.action_disabled = not owner or item.get("broken", false) or int(item.get("quantity", 0)) <= 0
-			elif not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd").new().definition(str(item.get("source_item_id", ""))).is_empty():
+			elif not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/special_rules.gd").new(_data_catalogue).definition(str(item.get("source_item_id", ""))).is_empty():
 				entry.action = "Use " + str(item.get("name", "item"))
 				entry.action_icon = preload("res://rookframe/ui/icons/bolt.svg")
 				entry.action_disabled = not owner or int(item.get("quantity", 0)) <= 0
@@ -218,7 +225,7 @@ func hint(id: String, data: Dictionary, items: Array) -> String:
 			var item: Dictionary = raw
 			if "item:" + str(item.get("inventory_id", "")) != id:
 				continue
-			var power := POWERS.new().definition(str(item.get("source_item_id", "")))
+			var power := POWERS.new(_data_catalogue).definition(str(item.get("source_item_id", "")))
 			if not power.is_empty():
 				return text(power.get("rules", ""))
 			var rules := text(item.get("rules", ""))

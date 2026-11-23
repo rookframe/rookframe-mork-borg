@@ -1,4 +1,8 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## HUD handoff only. The managed tabletop action owns the captured Actor/source.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -11,17 +15,18 @@ var _sdk: SDK
 
 func bind(facade: SDK) -> void:
 	_sdk = facade
+	_data_catalogue.bind(facade)
 
 func entries(actor: SDK.Actor) -> Array[ENTRY]:
 	var result: Array[ENTRY] = []
 	if actor == null:
 		return result
-	for source in MODEL.new().entries(actor.data, actor.id.value):
+	for source in MODEL.new(_data_catalogue).entries(actor.data, actor.id.value):
 		if str(source.get("category", "")) != "Attacks":
 			continue
 		var entry := ENTRY.new()
 		entry.id = str(source.key)
-		entry.title = str(source.get("name", "Attack")) if MODEL.new().uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Attack")))
+		entry.title = str(source.get("name", "Attack")) if MODEL.new(_data_catalogue).uses_literal_name(source) else _sdk.translations.text(str(source.get("name", "Attack")))
 		entry.detail = _sdk.translations.text("%s · %s ft") % [_sdk.translations.text(str(source.get("attack_ability", "Strength"))), int(source.get("range_feet", 0))] if source.has("range_feet") else _sdk.translations.text(str(source.get("detail", "")))
 		entry.value = str(source.get("damage", ""))
 		entry.icon = ICON
@@ -39,7 +44,7 @@ func launch(actor: SDK.ActorId, entry: Dictionary) -> void:
 	var current := _sdk.actors.read(actor)
 	if not current.ok:
 		return
-	var exact := MODEL.new().find(current.actor.data, actor.value, [], str(entry.get("key", "")))
+	var exact := MODEL.new(_data_catalogue).find(current.actor.data, actor.value, [], str(entry.get("key", "")))
 	if not available(current.actor, exact) or str(exact.get("category", "")) != "Attacks":
 		return
 	var task := {"item": str(exact.get("item", "")), "mode": "jab" if str(exact.get("source", "")) == "cowards-jab" else "attack", "entry": str(exact.get("entry", ""))}

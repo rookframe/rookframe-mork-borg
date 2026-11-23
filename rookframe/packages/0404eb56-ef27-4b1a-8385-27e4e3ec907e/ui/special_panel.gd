@@ -1,4 +1,8 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## The root gap follows the World theme's spacing through token_box.gd.
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
@@ -6,7 +10,6 @@ var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")
-const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const ACTION = preload(ROOT + "logic/special_action.gd")
 const SHIELD_SCENE = preload(ROOT + "ui/shield_dialog.tscn")
 const SHIELD_SCRIPT = preload(ROOT + "ui/shield_dialog.gd")
@@ -100,11 +103,12 @@ func _reset_task() -> void:
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
 	_sdk = facade
+	_data_catalogue.bind(facade)
 	i18n.bind(_sdk)
 	localize(i18n)
 	_item = item
-	_entry = RULES.new().owned(actor.data, item)
-	_rule = RULES.new().definition(str(_entry.get("source_item_id", "")))
+	_entry = RULES.new(_data_catalogue).owned(actor.data, item)
+	_rule = RULES.new(_data_catalogue).definition(str(_entry.get("source_item_id", "")))
 	_title = str(_entry.get("name", "Use item"))
 	if not _sdk.targeting.changed.is_connected(_targets_changed):
 		_sdk.targeting.changed.connect(_targets_changed)
@@ -154,7 +158,7 @@ func _render() -> void:
 	get_node(^"Columns/Recipient/Content/Self").visible = reach > 0 and not _rule.get("book", false) and state != "witnesses"
 	get_node(^"Scrolls").visible = state == "scrolls"
 	if state == "scrolls" and _scroll_options.is_empty():
-		_scroll_options = SCROLLS.TABLES.get(str(_action.snapshot.get("family", "")), [])
+		_scroll_options = _data_catalogue.scrolls(str(_action.snapshot.get("family", "")))
 		for index in range(2):
 			var list := get_node(^"Scrolls/First" if index == 0 else ^"Scrolls/Second")
 			for number in range(_scroll_options.size()):
@@ -238,7 +242,7 @@ func _process(_delta: float) -> void:
 		var latest := _sdk.actors.read(_actor.id)
 		if latest.ok:
 			_actor = latest.actor
-			_entry = RULES.new().owned(_actor.data, _item)
+			_entry = RULES.new(_data_catalogue).owned(_actor.data, _item)
 		_render()
 	if _targets_pending and not _reading_targets and _rule.get("range_feet", 0) > 0 and not get_node(^"Columns/Recipient/Content/Self").button_pressed:
 		_targets_pending = false

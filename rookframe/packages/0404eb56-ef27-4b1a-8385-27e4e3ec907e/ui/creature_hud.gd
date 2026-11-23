@@ -1,4 +1,8 @@
 extends "res://rookframe/sdk/window.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## Creature Play HUD: the UI Kit HUD bar with the selected Creature's identity,
 ## four category tiles, a hit point action and one attached panel above the bar.
 ##
@@ -86,12 +90,13 @@ func _notification(what: int) -> void:
 		_layout()
 
 func ready() -> void:
+	_data_catalogue.bind(sdk)
 	if sdk == null:
 		visible = false
 		return
 	_phone = sdk.presentation_experience().is_phone
 	_tablet = sdk.presentation_experience().is_tablet
-	_model.sdk = sdk
+	_model.bind(sdk)
 	_model.load_preferences()
 	var roll := ROLL.new()
 	roll.sdk = sdk
@@ -257,7 +262,7 @@ func _refresh() -> void:
 		_special_request = {}
 	_actor = source.actor.id
 	_rook = context.rook
-	_data = CREATURES.new().stat_block(accepted)
+	_data = CREATURES.new(_data_catalogue).stat_block(accepted)
 	var name := str(_data.get("name", "Creature"))
 	var armor: Dictionary = _data.get("armor", {})
 	_identity.title = name

@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -15,8 +17,8 @@ func _host(power: String = "tongue-of-eris") -> BOUNDARY:
 	host.actors.enemy.data["maximum_hit_points"] = 6
 	host.actors.hero.data["power_uses"] = 3
 	host.actors.hero.data.abilities["Presence"] = {"modifier": 1}
-	for family in SCROLLS.TABLES:
-		for entry in SCROLLS.TABLES[family]:
+	for family in PACKAGE_DATA.CATALOGUE.SCROLL_FAMILIES:
+		for entry in PACKAGE_DATA.catalogue().scrolls(family):
 			if entry.source_item_id == power:
 				var scroll: Dictionary = entry.duplicate(true)
 				scroll["inventory_id"] = "scroll"
@@ -30,7 +32,7 @@ func _cast_input(id: String = "cast") -> Dictionary:
 
 func test_psychopomp_creates_individual_source_profiles_once(kind: int, profile: String, armor: String, _test_parameters := [[1, "belze-skeleton", ""], [3, "belze-skeleton", ""], [4, "nodh-zombie", "d2"], [6, "nodh-zombie", "d2"]]) -> void:
 	var host := _host("foul-psychompomp")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("power.start", _cast_input())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -71,7 +73,7 @@ func test_psychopomp_creates_individual_source_profiles_once(kind: int, profile:
 
 func test_summon_termination_preserves_casting_use_and_rejects_late_materialization(reason: String, _test_parameters := [["cancel"], ["tray"], ["disconnect"], ["access"], ["save"], ["restart"]]) -> void:
 	var host := _host("foul-psychompomp")
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	host.roll("cast", [11])
 	await sdk.system_actions.submit("power.advance", {"id": "cast"})
@@ -103,7 +105,7 @@ func test_gm_cast_for_player_grants_the_casters_normal_access() -> void:
 	host.participant = "gm"
 	host.session = "gm-session"
 	host.access_entries = [{"participant_id": "player", "display_name": "Mira", "access_level": "Owner", "is_connected": true, "session_id": "player-session"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("power.start", _cast_input())
 	assert_str(host.requests.cast.participant).is_equal("player")
 	host.roll("cast", [11])
@@ -116,7 +118,7 @@ func test_gm_cast_for_player_grants_the_casters_normal_access() -> void:
 
 func _combat_host() -> BOUNDARY:
 	var host := _host()
-	host.actors.hero.data = load(ROOT + "content/nodh-zombie.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/nodh-zombie.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.enemy.data = {"schema": "mork-borg-character/v1", "name": "Mira", "hit_points": 8, "abilities": {"Agility": {"modifier": 1}}, "inventory": []}
 	host.sessions.append({"participant_id": "defender", "session_id": "defender-session", "is_gm": false})
 	host.access_by_actor = {
@@ -126,7 +128,7 @@ func _combat_host() -> BOUNDARY:
 
 func test_owned_creature_requests_the_other_characters_defence() -> void:
 	var host := _combat_host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("defence.start", {"id": "bite", "source": "hero", "rook": "hero-rook", "attack": "bite"})
 	assert_str(result.value.state).is_equal("ready")
 	if result.value.state != "ready":
@@ -147,10 +149,10 @@ func test_owned_creature_requests_the_other_characters_defence() -> void:
 
 func test_creature_attack_uses_its_own_rook_and_explicit_action() -> void:
 	var host := _host()
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.rooks["owner-rook"] = "owner"
 	host.distances = {"hero-rook->enemy-rook": 8.0, "owner-rook->enemy-rook": 1.0}
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := {"source": "hero", "rook": "owner-rook", "attack": "knife"}
 	var result := await sdk.system_actions.submit("attack.validate", input)
 	assert_str(result.value.message).contains("this Creature’s source Rook")
@@ -186,11 +188,11 @@ func test_companion_rows_keep_owner_actions_at_touch_size(access: String, _test_
 
 func test_companion_flat_attack_combines_printed_drs_and_hides_private_target() -> void:
 	var host := _host()
-	host.actors.hero.data = load(ROOT + "content/ancient-gore-hound.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/ancient-gore-hound.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	# No Character abilities are used, even if unrelated data contains them.
 	host.actors.hero.data["abilities"] = {"Strength": {"modifier": 6}}
-	host.actors.enemy.data = load(ROOT + "content/seth-goblin.tres").create_data({})
-	var sdk := SDK.new(host)
+	host.actors.enemy.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("melee.start", {"id": "hound", "source": "hero", "rook": "hero-rook", "item": "creature:bite"})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -217,10 +219,10 @@ func test_companion_flat_attack_combines_printed_drs_and_hides_private_target() 
 
 func test_companion_defends_flat_with_printed_exceptions_and_its_own_armor() -> void:
 	var host := _combat_host()
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
-	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.enemy.data["abilities"] = {"Agility": {"modifier": 6}}
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("defence.start", {"id": "hawk", "source": "hero", "rook": "hero-rook", "attack": "knife"})
 	assert_str(result.value.state).is_equal("ready")
 	if result.value.state != "ready":
@@ -242,8 +244,8 @@ func test_companion_defends_flat_with_printed_exceptions_and_its_own_armor() -> 
 
 func test_companion_attack_termination_rejects_late_damage(reason: String, _test_parameters := [["cancel"], ["disconnect"], ["access"], ["save"]]) -> void:
 	var host := _host()
-	host.actors.hero.data = load(ROOT + "content/dog-small-but-vicious.tres").create_data({})
-	var sdk := SDK.new(host)
+	host.actors.hero.data = load(ROOT + "content/dog-small-but-vicious.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("melee.start", {"id": "dog", "source": "hero", "rook": "hero-rook", "item": "creature:bite"})
 	host.roll("dog", [16])
 	await sdk.system_actions.submit("melee.advance", {"id": "dog"})
@@ -267,9 +269,9 @@ func test_companion_attack_termination_rejects_late_damage(reason: String, _test
 
 func test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptions() -> void:
 	var host := _host()
-	host.actors.hero.data = load(ROOT + "content/thinx-grotesque.tres").create_data({})
-	host.actors.enemy.data = load(ROOT + "content/belze-skeleton.tres").create_data({})
-	var sdk := SDK.new(host)
+	host.actors.hero.data = load(ROOT + "content/thinx-grotesque.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	host.actors.enemy.data = load(ROOT + "content/belze-skeleton.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("melee.start", {"id": "beam", "source": "hero", "rook": "hero-rook", "item": "creature:eye-beam"})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -286,10 +288,10 @@ func test_companion_always_hit_attack_keeps_printed_hit_and_destruction_exceptio
 
 func test_creature_targeting_selects_one_rolling_side_from_ordinary_access(owned: bool, _test_parameters := [[false], [true]]) -> void:
 	var host := _host()
-	host.actors.hero.data = load(ROOT + "content/dog-small-but-vicious.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/dog-small-but-vicious.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	if owned:
 		host.access_by_actor["enemy"] = [{"participant_id": "player", "display_name": "Player", "access_level": "Owner", "is_connected": true, "session_id": "player-session"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("attack.validate", {"source": "hero", "rook": "hero-rook", "attack": "bite"})
 	assert_str(str(result.value.get("resolution", ""))).is_equal("defence" if owned else "attack")
 	assert_bool(host.requests.is_empty()).is_true()
@@ -297,8 +299,8 @@ func test_creature_targeting_selects_one_rolling_side_from_ordinary_access(owned
 func test_companion_defence_presentation_offers_flat_test_at_phone_dock_width() -> void:
 	var host := _combat_host()
 	host.actors.enemy.access_level = "Owner"
-	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
-	var sdk := SDK.new(host)
+	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("defence.start", {"id": "view", "source": "hero", "rook": "hero-rook", "attack": "bite"})
 	host.participant = "defender"
 	host.session = "defender-session"
@@ -318,9 +320,9 @@ func test_companion_defence_presentation_offers_flat_test_at_phone_dock_width() 
 
 func test_granted_skeleton_is_destroyed_by_five_damage_after_failed_defence() -> void:
 	var host := _combat_host()
-	host.actors.hero.data = load(ROOT + "content/ancient-gore-hound.tres").create_data({})
-	host.actors.enemy.data = load(ROOT + "content/belze-skeleton.tres").create_data({})
-	var sdk := SDK.new(host)
+	host.actors.hero.data = load(ROOT + "content/ancient-gore-hound.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	host.actors.enemy.data = load(ROOT + "content/belze-skeleton.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("defence.start", {"id": "skeleton", "source": "hero", "rook": "hero-rook", "attack": "bite"})
 	host.participant = "defender"
 	host.session = "defender-session"
@@ -339,9 +341,9 @@ func test_natural_attack_presentation_explains_adjudication_without_weapon_loss_
 
 func test_companion_defence_presentation_hides_when_owner_access_is_lost() -> void:
 	var host := _combat_host()
-	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
+	host.actors.enemy.data = load(ROOT + "content/hawk-as-weapon.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.enemy.access_level = "Owner"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("defence.start", {"id": "private-view", "source": "hero", "rook": "hero-rook", "attack": "bite"})
 	host.participant = "defender"
 	host.session = "defender-session"

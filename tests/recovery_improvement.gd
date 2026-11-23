@@ -1,5 +1,7 @@
 extends GdUnitTestSuite
 
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -18,7 +20,7 @@ func _options(kind: String = "rest") -> Dictionary:
 
 func test_recovery_uses_human_throw_caps_hp_and_keeps_omens() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("health.start", _options())
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -43,7 +45,7 @@ func _gm(host: BOUNDARY, enabled: bool) -> void:
 
 func test_owner_starts_improvement_directly_and_applies_ordered_steps(sheet: bool, _test_parameters := [[false], [true]]) -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _options("improve")
 	input.id = "improvement"
 	input["sheet"] = sheet
@@ -78,7 +80,7 @@ func test_owner_starts_improvement_directly_and_applies_ordered_steps(sheet: boo
 func test_broken_reports_delayed_recovery_without_healing(branch: int, values: Array, copy: String, _test_parameters := [[1, [3, 4], "awaken with 4 HP after 3 rounds"], [2, [6, 2, 3], "Lost eye"], [3, [3], "death in 2 hours"], [4, [], "Dead"]]) -> void:
 	var host := _host()
 	host.actors.hero.data.hit_points = 0
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("health.start", _options("broken"))
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -123,13 +125,13 @@ func test_broken_reports_delayed_recovery_without_healing(branch: int, values: A
 		assert_bool(host.actors.hero.data.broken_incident.treated).is_true()
 
 func _begin_improvement(host: BOUNDARY, id: String = "health") -> SDK.DataResult:
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _options("improve")
 	input.id = id
 	return await sdk.system_actions.submit("health.start", input)
 
 func _through_debris(host: BOUNDARY, value: int) -> SDK.DataResult:
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.actors.hero.data.maximum_hit_points = 70
 	await _begin_improvement(host)
 	host.roll("health", [10, 10, 10, 10, 10, 10])
@@ -139,7 +141,7 @@ func _through_debris(host: BOUNDARY, value: int) -> SDK.DataResult:
 
 func test_found_scroll_is_chosen_in_rolled_family_and_added_before_abilities() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await _through_debris(host, 5)
 	assert_str(result.value.state).is_equal("scroll")
 	assert_str(result.value.get("family", "")).is_equal("unclean")
@@ -153,7 +155,7 @@ func test_scum_first_improvement_adds_specialty_then_later_allows_optional_rerol
 	var host := _host()
 	host.actors.hero.data.class_id = "gutterborn-scum"
 	host.actors.hero.data.traits = [{"id": "cowards-jab", "name": "Coward's jab"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await _through_debris(host, 1)
 	host.roll(host.last_request, [2, 2, 3, 6])
 	var result := await sdk.system_actions.submit("health.advance", {"id": "health"})
@@ -185,7 +187,7 @@ func test_scum_first_improvement_adds_specialty_then_later_allows_optional_rerol
 func test_rest_restrictions_and_sleep(hp: int, expected: String, _test_parameters := [[-1, "error"], [7, "pending"]]) -> void:
 	var host := _host()
 	host.actors.hero.data.hit_points = hp
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _options()
 	input.rest = "sleep"
 	var result := await sdk.system_actions.submit("health.start", input)
@@ -201,7 +203,7 @@ func test_rest_restrictions_and_sleep(hp: int, expected: String, _test_parameter
 
 func test_owner_and_valid_options_are_required(case: String, _test_parameters := [["viewer"], ["obsolete_grant"], ["malformed"]]) -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var input := _options()
 	if case == "viewer":
 		host.actors.hero.access_level = "Viewer"
@@ -218,7 +220,7 @@ func test_owner_and_valid_options_are_required(case: String, _test_parameters :=
 
 func test_interruption_rejects_late_changes_and_preserves_accepted_improvement(cause: String, _test_parameters := [["cancel"], ["disconnect"], ["access"], ["restart"], ["save"]]) -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await _begin_improvement(host)
 	host.roll("health", [3, 3, 3, 3, 3, 3])
 	await sdk.system_actions.submit("health.advance", {"id": "health"})
@@ -253,7 +255,7 @@ func test_interruption_rejects_late_changes_and_preserves_accepted_improvement(c
 func test_broken_requires_zero_and_negative_hp_reports_death(hp: int, expected: String, _test_parameters := [[5, "error"], [-2, "resolved"]]) -> void:
 	var host := _host()
 	host.actors.hero.data.hit_points = hp
-	var result := await SDK.new(host).system_actions.submit("health.start", _options("broken"))
+	var result := await PACKAGE_DATA.facade(host).system_actions.submit("health.start", _options("broken"))
 	assert_str(result.value.state).is_equal(expected)
 	assert_int(host.requests.size()).is_equal(0)
 	assert_int(host.actors.hero.data.hit_points).is_equal(hp)
@@ -263,7 +265,7 @@ func test_broken_requires_zero_and_negative_hp_reports_death(hp: int, expected: 
 func test_ability_changes_apply_source_boundaries(before: int, die: int, expected: int, _test_parameters := [[-3, 1, -3], [-3, 2, -2], [-1, 1, -2], [0, 1, -1], [1, 1, 0], [1, 2, 2], [2, 1, 1], [2, 2, 3], [5, 4, 4], [6, 6, 6]]) -> void:
 	var host := _host()
 	host.actors.hero.data.abilities.Agility.modifier = before
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await _through_debris(host, 3)
 	host.roll(host.last_request, [die, 2, 3, 6])
 	var result := await sdk.system_actions.submit("health.advance", {"id": "health"})
@@ -274,7 +276,7 @@ func test_gm_routes_recovery_to_connected_player_and_cannot_replace_offline_owne
 	var host := _host()
 	_gm(host, true)
 	host.access_entries = [{"participant_id": "player", "session_id": "player-session", "display_name": "Player", "access_level": "Owner", "is_connected": true}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("health.start", _options())
 	assert_str(result.value.state).is_equal("pending")
 	assert_str(host.requests.health.participant).is_equal("player")
@@ -290,7 +292,7 @@ func test_interrupted_scum_can_finish_with_ordinary_sheet_corrections() -> void:
 	var host := _host()
 	host.actors.hero.data.class_id = "gutterborn-scum"
 	host.actors.hero.data.traits = [{"id": "cowards-jab", "name": "Coward's jab"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await _begin_improvement(host)
 	await sdk.system_actions.submit("health.cancel", {"id": "health"})
 	var edits = load(ROOT + "logic/character_actions.gd").new(sdk, SDK.ActorId.new("hero"))
@@ -303,7 +305,7 @@ func test_interrupted_scum_can_finish_with_ordinary_sheet_corrections() -> void:
 	assert_str(next.value.state).is_equal("pending")
 
 func _advance_improvement(host: BOUNDARY, sheet: bool) -> SDK.DataResult:
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var requests: int = host.requests.size()
 	var result := await sdk.system_actions.submit("health.advance", {"id": "improvement"})
 	if sheet:

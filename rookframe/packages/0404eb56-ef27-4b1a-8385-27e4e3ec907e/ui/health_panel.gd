@@ -1,5 +1,9 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -8,7 +12,6 @@ const CHECK = preload("res://rookframe/ui/icons/check.svg")
 const ACTION = preload(ROOT + "logic/health_action.gd")
 const RECOVERY = preload(ROOT + "logic/recovery_rules.gd")
 const ROLL_ROW = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_roll.gd")
-const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 signal action_created(action: ACTION)
 signal navigate_requested(route: String, item: String)
 signal workflow_changed(route: String, title: String, can_submit: bool, busy: bool)
@@ -43,6 +46,7 @@ func _rest_changed() -> void:
 func configure(actor: SDK.Actor, facade: SDK, route: String) -> void:
 	_actor = actor
 	_sdk = facade
+	_data_catalogue.bind(facade)
 	i18n.bind(_sdk)
 	localize(i18n)
 	_route = route
@@ -85,7 +89,7 @@ func _render() -> void:
 	get_node(^"Columns/Context/Content/Copy").visible = _route != "rest" or not get_node(^"Columns/Context/Content/Restrictions/Food").button_pressed or get_node(^"Columns/Context/Content/Restrictions/Infected").button_pressed
 	get_node(^"Columns/Context/Content/Values").text = _t("HP · %s / %s") % [str(data.get("hit_points", 0)), str(data.get("maximum_hit_points", 0))]
 	if _route == "omens":
-		var faces := RECOVERY.new().omen_faces(data)
+		var faces := RECOVERY.new(_data_catalogue).omen_faces(data)
 		get_node(^"Columns/Context/Content/Copy").text = _t("Only when depleted, after at least six hours of rest.")
 		get_node(^"Columns/Context/Content/Copy").visible = true
 		get_node(^"Columns/Context/Content/Values").text = _t("Omens · %d") % int(data.get("omens", 0))
@@ -108,7 +112,7 @@ func _render() -> void:
 		var family := str(_action.snapshot.get("family", ""))
 		if family != _scroll_family:
 			_scroll_family = family
-			var options: Array = SCROLLS.TABLES.get(family, [])
+			var options: Array = _data_catalogue.scrolls(family)
 			for index in range(options.size()):
 				var entry: Dictionary = options[index]
 				var button := get_node(^"Scrolls/Choices").get_child(index) as Button
@@ -131,7 +135,7 @@ func _render() -> void:
 	get_node(^"Outcome").theme_type_variation = "RookframeError" if state == "error" else "RookframeMeta"
 	var can_submit := state in ["resolved", "ended", "scroll", "specialties"] or (editing and _actor.access_level == "Owner")
 	if _route == "omens" and editing:
-		can_submit = can_submit and RECOVERY.new().can_regain_omens(data) and get_node(^"Columns/Task/Omens/Content/SixHours").button_pressed
+		can_submit = can_submit and RECOVERY.new(_data_catalogue).can_regain_omens(data) and get_node(^"Columns/Task/Omens/Content/SixHours").button_pressed
 	workflow_changed.emit(_route, title, can_submit, state == "pending")
 	_layout()
 

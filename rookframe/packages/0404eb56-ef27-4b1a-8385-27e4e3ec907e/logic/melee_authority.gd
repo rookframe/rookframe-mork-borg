@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Attack consequences, ammunition, and cancellation are recorded history. Physical Rolls announce through Rookframe; choices and errors stay in the action window.
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 
@@ -27,7 +34,7 @@ func handle_system_intent(context: SDK.SystemActionContext, name: String, payloa
 		return _error("The melee action is malformed.")
 	var input: Dictionary = payload
 	if name == "attack.validate":
-		return TARGETING.new().validate_creature(context, input)
+		return TARGETING.new(_data_catalogue).validate_creature(context, input)
 	if typeof(input.get("id", "")) != TYPE_STRING:
 		return _error("The action identity must be text.")
 	if name == "melee.start" and not _valid_options(input):
@@ -96,7 +103,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Owner access is required to attack with this Actor.")
 	if typeof(source.actor.data) != TYPE_DICTIONARY:
 		return _error("Character data is malformed.")
-	var data: Dictionary = CREATURES.new().stat_block(source.actor.data)
+	var data: Dictionary = CREATURES.new(_data_catalogue).stat_block(source.actor.data)
 	if not _valid_source(data):
 		return _error("Actor combat data is malformed.")
 	if not BROKEN.new().can_act(data):
@@ -152,7 +159,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		return _error("Choose available %s ammunition in Inventory." % str(weapon.ammunition))
 	var profile: Dictionary = {}
 	if creature_source:
-		for raw_option in CREATURES.new().attack_options(data):
+		for raw_option in CREATURES.new(_data_catalogue).attack_options(data):
 			var option: Dictionary = raw_option
 			if str(option.get("inventory_id", "creature:" + str(option.id))) == str(weapon.inventory_id):
 				profile = option
@@ -180,7 +187,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 			return _error("Creature combat data is malformed.")
 		if str(creature.get("schema", "")) != "mork-borg-adversary/v1" or target.actor.id.value == source.actor.id.value:
 			return _error("Choose a Creature target for this attack.")
-		if creature_source and TARGETING.new().resolution_for(context, target.actor) != "attack":
+		if creature_source and TARGETING.new(_data_catalogue).resolution_for(context, target.actor) != "attack":
 			return _error("Request this Actor’s defence instead of a second attack test.")
 		var distance := context.distance(rook_id, SDK.RookId.new(target_id))
 		if not distance.ok:
@@ -213,12 +220,12 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 				return _error("This Character’s Player is not connected.")
 			owner = owners[0].participant_id
 			owner_session = owners[0].session_id
-	var target_data: Dictionary = CREATURES.new().stat_block(targets[0].data)
-	var definition: Dictionary = CREATURES.CORE_DEFINITIONS.get(str(target_data.get("definition_id", "")), {})
+	var target_data: Dictionary = CREATURES.new(_data_catalogue).stat_block(targets[0].data)
+	var definition: Dictionary = _data_catalogue.creature_profile(str(target_data.get("definition_id", "")))
 	if difficulty == 0:
-		difficulty = CREATURES.new().target_attack_difficulty(target_data, weapon.get("piercing", false))
+		difficulty = CREATURES.new(_data_catalogue).target_attack_difficulty(target_data, weapon.get("piercing", false))
 		if creature_source:
-			difficulty += CREATURES.new().attack_test_difficulty(profile) - 12
+			difficulty += CREATURES.new(_data_catalogue).attack_test_difficulty(profile) - 12
 	if difficulty == 0:
 		return _error("Attack difficulty is unavailable.")
 	if not creature_source:
@@ -235,7 +242,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var ability: Dictionary = abilities.get(ability_name, {})
 	var ability_modifier: int = 0 if creature_source else ability.get("modifier", 0)
 	var destruction: int = target_data.get("destroy_at_damage", definition.get("destroy_at_damage", 0))
-	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "rook": rook_id.value, "target_rook": captured_target_rook, "reach": float(reach) * 0.3048, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier, "difficulty": difficulty, "fumble": "", "jab": jab, "natural": weapon.get("natural", false) or bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": CREATURES.new().shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
+	var action := {"id": str(input.id), "participant": str(caller.participant_id), "session": str(caller.session_id), "source": source.actor.id.value, "rook": rook_id.value, "target_rook": captured_target_rook, "reach": float(reach) * 0.3048, "target": targets[0].id.value, "item": str(weapon.inventory_id), "weapon": _short_name(str(weapon.name), 16), "name": _short_name(str(data.get("name", "Character")), 12), "label": _public_name(targets[0]), "owner": owner, "owner_session": owner_session, "destroy_at_damage": destruction, "ammunition": str(ammunition.get("inventory_id", "")), "ammunition_kind": str(weapon.get("ammunition", "")), "resource_spent": false, "modifier": ability_modifier, "difficulty": difficulty, "fumble": "", "jab": jab, "natural": weapon.get("natural", false) or bite or profile.get("natural", false), "automatic_hit": profile.get("always_hits", false), "damage": str(weapon.damage), "special": special, "small_medium": input.get("small_medium", false), "faithless_human": input.get("faithless_human", false), "protection": protection_text, "shield": CREATURES.new(_data_catalogue).shield_reduction(target_data), "state": "pending", "phase": "attack", "request": str(input.id), "raw": 0, "sequence": 0, "message": "Waiting for the attack Throw in the Dice Tray."}
 	var initial_terms: Array[SDK.DiceTerm] = [SDK.DiceTerm.new("Attack", 20)]
 	if bite or special == "eurekia":
 		initial_terms.append(SDK.DiceTerm.new("Free attack chance" if bite else "Eurekia consequence", 6))
@@ -403,7 +410,7 @@ func _damage(context: SDK.SystemActionContext, action: Dictionary, result: SDK.H
 	if poisoned or skull:
 		data["hit_points"] = 0
 	if action.raw == 20 and not action.jab:
-		data = CREATURES.new().damage_protection(data)
+		data = CREATURES.new(_data_catalogue).damage_protection(data)
 	var text := "%s hits %s for %d damage after protection. " % [str(action.name), str(action.label), lost]
 	if action.get("free_attack", false):
 		text += " The enemy gains a free attack; resolve it from its sheet."
@@ -567,7 +574,7 @@ func _spend_ammunition(context: SDK.SystemActionContext, action: Dictionary, sou
 	if str(action.ammunition).is_empty() or action.resource_spent:
 		return true
 	var current: Dictionary = source.data
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	var items := _inventory(source.id, data)
 	var resource := _ammunition(items, {"ammunition": action.ammunition_kind}, action.ammunition)
 	if resource.is_empty():
@@ -595,12 +602,12 @@ func _valid_source(data: Dictionary) -> bool:
 
 func _inventory(id: SDK.ActorId, data: Dictionary) -> Array:
 	if str(data.get("schema", "")) == "mork-borg-adversary/v1":
-		return CREATURES.new().combat_attacks(data)
-	return ITEMS.new(null, id).inventory(data)
+		return CREATURES.new(_data_catalogue).combat_attacks(data)
+	return ITEMS.new(null, id, _data_catalogue).inventory(data)
 
 func _eurekia(context: SDK.SystemActionContext, action: Dictionary, source: SDK.Actor, face: int) -> bool:
 	var current: Dictionary = source.data
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	var items := _inventory(source.id, data)
 	var item := _weapon(items, str(action.item))
 	if item.is_empty():

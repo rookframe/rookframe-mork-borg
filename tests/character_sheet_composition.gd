@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 
@@ -7,6 +9,7 @@ func test_phone_overview_has_one_edit_and_inline_omens() -> void:
 	viewport.size = Vector2i(351, 313)
 	add_child(viewport)
 	var view = auto_free(load(ROOT + "ui/character_sheet_overview.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	view.theme = WORLD_THEME.entry()
 	viewport.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -40,7 +43,7 @@ func test_sheet_at_constrained_sizes(width: int, height: int, language: String, 
 	host.game_master = true
 	host.actors.hero.data.merge({"name": "Graveworm", "description": "Hu", "class_title": "No Class", "hit_points": 3, "maximum_hit_points": 3, "omens": 1, "silver": 60, "abilities": {"Agility": {"modifier": 1}, "Toughness": {"modifier": -3}}}, true)
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(width, height)
@@ -50,7 +53,7 @@ func test_sheet_at_constrained_sizes(width: int, height: int, language: String, 
 	viewport.add_child(background)
 	background.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	var sheet = auto_free(load(ROOT + "ui/window.tscn").instantiate())
-	sheet.sdk = SDK.new(host)
+	sheet.sdk = PACKAGE_DATA.facade(host)
 	sheet.theme = WORLD_THEME.entry()
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -127,7 +130,7 @@ func test_omen_counter_pending_failure_retry_and_read_only() -> void:
 	host.actors.append({"id": "character", "access_level": "Owner", "data": {"schema": "mork-borg-character/v1", "name": "Graveworm", "omens": 1, "hit_points": 3, "maximum_hit_points": 3, "inventory": []}})
 	var sheet = auto_free(load(ROOT + "ui/character_sheet.tscn").instantiate())
 	add_child(sheet)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
 	sheet.set_character(sdk.actors.read(SDK.ActorId.new("character")).actor, "character", "character", miniatures, choices, sdk)

@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const EDITS = preload(ROOT + "logic/creature_edits.gd")
@@ -7,7 +14,7 @@ func handle(context: SDK.SystemActionContext, name: String, payload: Variant) ->
 	if typeof(payload) != TYPE_DICTIONARY:
 		return {"ok": false, "message": "Creature choices are malformed."}
 	var input: Dictionary = payload
-	var actions := EDITS.new(SDK.ActorId.new(str(input.get("actor", ""))), context)
+	var actions := EDITS.new(SDK.ActorId.new(str(input.get("actor", ""))), context, _data_catalogue)
 	var result: SDK.ActorResult
 	if name == "creature.prepare":
 		result = await actions.prepare()

@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/power_composition_boundary.gd")
@@ -24,7 +26,7 @@ func test_use_item_shows_recipient_focus_pending_and_healing_outcome() -> void:
 	viewport.add_child(panel)
 	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
 	panel.size = Vector2(351, 260)
-	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "medicine")
+	panel.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "medicine")
 	await get_tree().process_frame
 	var eligible: Button = panel.get_node("Options/Eligible")
 	assert_bool(eligible.size.y >= 44).is_true()
@@ -50,7 +52,7 @@ func test_book_preview_uses_selected_recipient_and_stock_radio_choices() -> void
 	var panel = auto_free(scene.instantiate())
 	panel.theme = WORLD_THEME.entry()
 	add_child(panel)
-	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "book")
+	panel.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "book")
 	await get_tree().process_frame
 	await get_tree().process_frame
 	assert_bool(panel.get_node("Columns/Recipient/Content/Self").button_pressed).is_false()
@@ -69,8 +71,8 @@ func test_separate_sheets_keep_independent_radio_selection() -> void:
 	second.theme = WORLD_THEME.entry()
 	add_child(first)
 	add_child(second)
-	first.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "mitre")
-	second.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "mitre")
+	first.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "mitre")
+	second.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "mitre")
 	var one: Button = first.get_node("Options/Ability/Choices").get_child(0)
 	var two: Button = second.get_node("Options/Ability/Choices").get_child(1)
 	one.button_pressed = true
@@ -88,7 +90,7 @@ func test_malformed_dr_adjustment_does_not_request_a_throw() -> void:
 	panel.theme = WORLD_THEME.entry()
 	add_child(panel)
 	panel.action_created.connect(func(action: Node) -> void: add_child(auto_free(action)))
-	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "mitre")
+	panel.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "mitre")
 	panel.get_node("Options/Eligible").button_pressed = true
 	panel.get_node("Options/Ability/Choices").get_child(0).emit_signal("pressed")
 	panel.get_node("Options/Adjustment").value = "abc"

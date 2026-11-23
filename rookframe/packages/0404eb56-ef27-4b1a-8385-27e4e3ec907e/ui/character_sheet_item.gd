@@ -1,5 +1,9 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
@@ -19,7 +23,7 @@ func configure(item: Dictionary, _miniatures: Array, loot_only: bool = false) ->
 	_id = str(item.get("inventory_id", ""))
 	get_node(^"Title").text = _t("Custom item") if _new else (str(item.get("name", "Item")) if item.get("custom", false) else _t(str(item.get("name", "Item"))))
 	get_node(^"Rules").text = (str(item.get("rules", "")) if item.get("custom", false) else _t(str(item.get("rules", ""))))
-	get_node(^"Use").visible = not loot_only and not RULES.new().definition(str(item.get("source_item_id", ""))).is_empty()
+	get_node(^"Use").visible = not loot_only and not RULES.new(data_catalogue).definition(str(item.get("source_item_id", ""))).is_empty()
 	get_node(^"Remove").visible = not _new
 	get_node(^"Create").visible = _new
 	for key in ["name", "quantity", "uses"]:

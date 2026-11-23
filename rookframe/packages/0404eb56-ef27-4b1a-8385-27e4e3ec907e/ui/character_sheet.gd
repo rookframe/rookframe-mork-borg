@@ -2,6 +2,7 @@ extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_
 
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
 
 const TARGETS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/attack_targets.gd")
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -216,6 +217,9 @@ func _render_character_sheet() -> void:
 		_show_companions()
 		return
 	var view = CHARACTER_SHEET_VIEW_SCENE.instantiate()
+	var catalogue := CATALOGUE.new()
+	catalogue.bind(sdk)
+	view.data_catalogue = catalogue
 	view.localize(i18n)
 	view.modifier_requested.connect(_roll_ability)
 	view.companions_requested.connect(_on_companions_requested)

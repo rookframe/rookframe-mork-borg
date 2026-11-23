@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Explicit workflow projection of accepted creature data. Never infer actions from prose.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
@@ -6,7 +13,7 @@ const SPECIALS := {"lich-necromancer": ["scroll-theft"], "bone-bowyer": ["ambush
 
 func specials(data: Dictionary) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var accepted := CREATURES.new().stat_block(data)
+	var accepted := CREATURES.new(_data_catalogue).stat_block(data)
 	var keys: Array = SPECIALS.get(str(accepted.get("definition_id", "")), [])
 	var groups: Array = accepted.get("rule_groups", [])
 	for raw in groups:

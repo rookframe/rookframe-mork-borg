@@ -1,4 +1,8 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## Character favorites refer to actual Creature Actors and exact owned attacks.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -12,6 +16,7 @@ var _sdk: SDK
 
 func bind(facade: SDK) -> void:
 	_sdk = facade
+	_data_catalogue.bind(facade)
 
 func entries(character: SDK.Actor) -> Array[ENTRY]:
 	var result: Array[ENTRY] = []
@@ -19,7 +24,7 @@ func entries(character: SDK.Actor) -> Array[ENTRY]:
 		return result
 	var listed := _sdk.actors.list()
 	var companions: Array[SDK.Actor] = listed.items if listed.ok else []
-	for favorite in MODEL.new().entries(character.data, character.id.value, companions):
+	for favorite in MODEL.new(_data_catalogue).entries(character.data, character.id.value, companions):
 		if str(favorite.get("category", "")) != "Companions":
 			continue
 		var row := ENTRY.new()
@@ -40,11 +45,11 @@ func _title(favorite: Dictionary, companions: Array[SDK.Actor]) -> String:
 		if companion.id.value != str(favorite.get("actor", "")):
 			continue
 		var data: Dictionary = companion.data
-		for raw in CREATURES.new().combat_attacks(data):
+		for raw in CREATURES.new(_data_catalogue).combat_attacks(data):
 			var attack: Dictionary = raw
 			if str(attack.inventory_id) == str(favorite.get("item", "")):
 				var name := str(attack.get("name", "Attack"))
-				var display_name := name if MODEL.new().uses_literal_name(attack, data) else _sdk.translations.text(name)
+				var display_name := name if MODEL.new(_data_catalogue).uses_literal_name(attack, data) else _sdk.translations.text(name)
 				return _sdk.translations.text("%s · %s") % [str(data.get("name", "Companion")), display_name]
 	return str(favorite.get("name", "Companion"))
 
@@ -52,7 +57,7 @@ func available(character: SDK.Actor, entry: Dictionary) -> bool:
 	if _sdk == null or character == null or character.access_level != "Owner" or not entry.get("present", false) or not entry.get("available", false):
 		return false
 	var source := _sdk.actors.read(SDK.ActorId.new(str(entry.get("actor", ""))))
-	return source.ok and source.actor.access_level == "Owner" and MODEL.new().is_companion(character.data, character.id.value, source.actor.data) and RESPONSIBILITY.new().resolve(_sdk, source.actor.id).get("ok", false)
+	return source.ok and source.actor.access_level == "Owner" and MODEL.new(_data_catalogue).is_companion(character.data, character.id.value, source.actor.data) and RESPONSIBILITY.new().resolve(_sdk, source.actor.id).get("ok", false)
 
 func launch(character_id: SDK.ActorId, key: String) -> void:
 	if _sdk == null or character_id == null:
@@ -61,7 +66,7 @@ func launch(character_id: SDK.ActorId, key: String) -> void:
 	var listed := _sdk.actors.list()
 	if not character.ok or not listed.ok:
 		return
-	var exact := MODEL.new().find(character.actor.data, character_id.value, listed.items, key)
+	var exact := MODEL.new(_data_catalogue).find(character.actor.data, character_id.value, listed.items, key)
 	if not available(character.actor, exact) or str(exact.get("category", "")) != "Companions":
 		return
 	var source := SDK.ActorId.new(str(exact.actor))

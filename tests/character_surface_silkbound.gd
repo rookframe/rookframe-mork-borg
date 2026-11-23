@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/miniature_boundary.gd")
@@ -27,7 +29,7 @@ func _open(canvas: Vector2i, host: BOUNDARY = BOUNDARY.new()) -> Dictionary:
 	host.game_master = true
 	host.actors.hero.data.merge({"name":"Graveworm", "class_id":"occult-herbmaster", "class_title":"Occult Herbmaster", "class_rules":["Prepare decoctions and recognise the herbs of Sarkash."], "hit_points":7, "maximum_hit_points":9, "power_uses":2, "power_uses_total":3, "omens":2, "silver":34, "abilities":{"Strength":{"modifier":-1},"Agility":{"modifier":0},"Presence":{"modifier":1},"Toughness":{"modifier":2}},"traits":[],"inventory":[{"inventory_id":"sword","source_item_id":"sword","name":"Sword","kind":"Weapon","damage":"d6","attack_ability":"Strength","range_feet":5,"equipped":true,"quantity":1},{"inventory_id":"bow","source_item_id":"shortbow","name":"Shortbow","kind":"Weapon","damage":"d6","attack_ability":"Presence","range_feet":60,"equipped":true,"quantity":1},{"inventory_id":"shield","name":"Shield","kind":"Shield","reduction":"-1","equipped":true,"quantity":1}]}, true)
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = canvas
@@ -36,7 +38,7 @@ func _open(canvas: Vector2i, host: BOUNDARY = BOUNDARY.new()) -> Dictionary:
 	var sheet = load(ROOT + "ui/character_surface.tscn").instantiate()
 	# Rookframe supplies the World theme to Package surfaces.
 	sheet.theme = WORLD_THEME.entry()
-	sheet.sdk = SDK.new(host)
+	sheet.sdk = PACKAGE_DATA.facade(host)
 	viewport.add_child(sheet)
 	sheet.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	sheet.opened(SDK.ActorId.new("hero"))

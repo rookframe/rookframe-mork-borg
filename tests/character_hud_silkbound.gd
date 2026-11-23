@@ -1,5 +1,7 @@
 extends GdUnitTestSuite
 
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const BOUNDARY = preload("res://tests/character_hud_boundary.gd")
@@ -13,7 +15,7 @@ func _open(canvas: Vector2i, language := "en") -> Dictionary:
 	host.device = 2 if canvas.x <= 900 else 1 if canvas.x <= 1300 else 0
 	host.actors.hero.data.merge({"name":"Graveworm", "class_id":"occult-herbmaster", "class_title":"Occult Herbmaster", "hit_points":6, "maximum_hit_points":9, "power_uses":2, "power_uses_total":3, "omens":2, "silver":34, "abilities":{"Strength":{"modifier":-1},"Agility":{"modifier":0},"Presence":{"modifier":2},"Toughness":{"modifier":2}}}, true)
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = canvas
@@ -32,7 +34,7 @@ func _open(canvas: Vector2i, language := "en") -> Dictionary:
 	var hud = load(ROOT + "ui/character_hud.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
 	hud.theme = WORLD_THEME.entry()
-	hud.sdk = SDK.new(host)
+	hud.sdk = PACKAGE_DATA.facade(host)
 	viewport.add_child(hud)
 	hud.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	hud.get_node("Panel").reduced_motion = true

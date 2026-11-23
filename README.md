@@ -17,16 +17,17 @@ equipment, and Herbmaster receives two decoctions with one shared dose pool.
 
 | Dependency | Exact pin | Installed path |
 | --- | --- | --- |
-| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `v0.36.0-rc.3` | `rookframe/sdk/`, `addons/rookframe_sdk/` |
+| [Rookframe SDK](https://github.com/rookframe/rookframe-sdk) | `05353d2565054406f5616df75cef1b6326ae49ee` | `rookframe/sdk/` |
+| [Rookframe Development Plugin](https://github.com/rookframe/rookframe-development-plugin) | `594c44483075bef8dcfaec5a5dc5d71ac25e67ef` | `addons/rookframe_development/` |
 | [Rookframe UI Kit](https://github.com/rookframe/rookframe-ui-kit) | `17ab08839bb6369b89cdade64cfdd3d37b06f633` | `rookframe/ui/` |
 
-Use gd-plug for both. Do not copy SDK/UI Kit source from local checkouts or
+Use gd-plug to install these pins. Do not copy SDK/UI Kit source from local checkouts or
 maintain edited consumer copies. Installed dependencies and caches are ignored
 by Git. `.rookframe/authoring.lock.json` records their versions.
 
 The SDK is downloaded as ordinary typed GDScript at `rookframe/sdk/`.
-Rookframe supplies those scripts when the Package runs. Package authors never
-regenerate them. The Development Plugin is pinned to `v0.2.0-rc.1`.
+Rookframe supplies those scripts when the Package runs. This Package requires
+Rookframe API Edition 2029, revision 37, for compiled gameplay data.
 
 ## Fresh clone
 
@@ -41,16 +42,16 @@ mkdir -p addons/gd-plug
 curl -fsSL https://raw.githubusercontent.com/imjp94/gd-plug/209276d1f00d14b49b74403d9839f29598e9a8eb/addons/gd-plug/plug.gd -o addons/gd-plug/plug.gd
 curl -fsSL https://raw.githubusercontent.com/imjp94/gd-plug/209276d1f00d14b49b74403d9839f29598e9a8eb/LICENSE -o addons/gd-plug/LICENSE
 godot --headless --path . --script plug.gd install
-python3 addons/rookframe_sdk/rookframe_authoring.py check --project . --godot /path/to/godot --rookframe /path/to/Rookframe
+python3 addons/rookframe_development/rookframe_authoring.py check --project . --godot /path/to/godot --rookframe /path/to/Rookframe
 ```
 
-The bootstrap URLs pin gd-plug itself. Only gd-plug installs the SDK and UI Kit;
-no Rookframe application checkout is needed.
+The bootstrap URLs pin gd-plug itself. No Rookframe application checkout is needed.
 
-Build a new archive with the installed SDK:
+Build a new archive with the standalone Development Plugin. It compiles the
+JSON gameplay tables in the Package's `data/` directory.
 
 ```sh
-python3 addons/rookframe_sdk/rookframe_authoring.py build --project . --godot /path/to/godot --rookframe /path/to/Rookframe --output build/mork-borg.rookpackage
+python3 addons/rookframe_development/rookframe_authoring.py build --project . --godot /path/to/godot --rookframe /path/to/Rookframe --output build/mork-borg.rookpackage
 ```
 
 Use a fresh output path for each build. Commit authored files, dependency pins,
@@ -85,13 +86,13 @@ the project again.
 Run the sheet's native geometry and interaction checks with a display:
 
 ```sh
-godot --path . --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests/character_surface_silkbound.gd -c
+python3 tests/run_character_creation.py --godot /path/to/godot --graphical --theme silkbound-ledger --suite character_surface_silkbound.gd
 ```
 
 Run the focused Godot suite with the installed public dependencies:
 
 ```sh
-python3 tests/run_character_creation.py --godot /path/to/godot
+python3 tests/run_character_creation.py --godot /path/to/godot --development-plugin /path/to/rookframe_development
 ```
 
 Suites that mount a Package surface take its World theme from
@@ -282,7 +283,7 @@ and verified with stock Godot 4.7.2 Mono. Install development dependencies and r
 
 ```sh
 godot --headless --path . --script plug.gd install
-python3 tests/run_character_creation.py --godot /Applications/Godot_mono.app/Contents/MacOS/Godot
+python3 tests/run_character_creation.py --godot /Applications/Godot_mono.app/Contents/MacOS/Godot --development-plugin /path/to/rookframe_development
 ```
 
 The runner discovers every suite under `tests/` (24 cases at migration),
@@ -563,5 +564,5 @@ grid. Long names have a bounded, paged reading view with a return to the list.
 Run the native HUD geometry, access, paging and localization checks with a display:
 
 ```sh
-godot --path . --script res://addons/gdUnit4/bin/GdUnitCmdTool.gd -a res://tests/character_hud_silkbound.gd -c
+python3 tests/run_character_creation.py --godot /path/to/godot --graphical --theme silkbound-ledger --suite character_hud_silkbound.gd
 ```

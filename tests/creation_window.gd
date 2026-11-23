@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -6,9 +8,10 @@ const BOUNDARY = preload("res://tests/creation_window_boundary.gd")
 
 func test_class_can_be_presented_before_the_host_attaches_the_window() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
-	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("occult-herbmaster")
+	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new(PACKAGE_DATA.catalogue()).profile("occult-herbmaster")
 	view.present_creation("create-class", {"class_id": "occult-herbmaster", "class_profile": profile}, false)
 	var rules = view.get_node(view.DETAIL + "/ClassBody/Rules")
 	assert_int(rules.get_child_count()).is_equal(3)
@@ -32,7 +35,7 @@ func test_complete_wizard_retains_draft_while_hidden_and_fits_each_window() -> v
 		# Rookframe supplies its active theme to Package surfaces.
 		surface.theme = WORLD_THEME.entry()
 		host.window = surface
-		surface.sdk = SDK.new(host)
+		surface.sdk = PACKAGE_DATA.facade(host)
 		viewport.add_child(surface)
 		surface.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 		var creator = surface.get_node(^"CharacterCreator")
@@ -240,11 +243,12 @@ func test_phone_long_origin_detail_stays_above_fixed_actions() -> void:
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	viewport.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("esoteric-hermit")
+	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new(PACKAGE_DATA.catalogue()).profile("esoteric-hermit")
 	view.present_creation("create-origin", {"class_id": "esoteric-hermit", "class_profile": profile, "origin_roll": 6, "origin": profile.origins[5], "roll_faces": {"Origin": [6]}}, true)
 	view.get_node(view.LEFT + "/Choices").selected.emit("Origin")
 	await _settle()
@@ -328,7 +332,7 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	# Rookframe supplies its active theme to Package surfaces.
 	surface.theme = WORLD_THEME.entry()
 	first.window = surface
-	surface.sdk = SDK.new(first)
+	surface.sdk = PACKAGE_DATA.facade(first)
 	viewport.add_child(surface)
 	var actor := {"id": "already-created", "access_level": "Owner", "data": {"name": "Retained survivor", "class_title": "No Class", "silver": 70, "omens": 2, "inventory": []}}
 	first.actors.append(actor)
@@ -345,7 +349,7 @@ func test_created_actor_sheet_retry_survives_a_fresh_sdk_after_reconnect() -> vo
 	# Rookframe supplies its active theme to Package surfaces.
 	restored.theme = WORLD_THEME.entry()
 	fresh.window = restored
-	restored.sdk = SDK.new(fresh)
+	restored.sdk = PACKAGE_DATA.facade(fresh)
 	viewport.add_child(restored)
 	fresh.restoring_private_draft = true
 	restored.restore_reconnect_state(retained)
@@ -369,11 +373,12 @@ func test_tablet_class_pages_and_long_review_preserve_every_draft_field() -> voi
 	viewport.gui_embed_subwindows = true
 	add_child(viewport)
 	var view = load(ROOT + "ui/character_creation_view.tscn").instantiate()
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	viewport.add_child(view)
 	view.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	var classes = load(ROOT + "logic/creation_classes.gd").new()
+	var classes = load(ROOT + "logic/creation_classes.gd").new(PACKAGE_DATA.catalogue())
 	for class_id in view.CLASS_IDS:
 		var profile: Dictionary = classes.profile(class_id)
 		view.present_creation("create-class", {"class_id": class_id, "class_profile": profile, "class_rules": profile.rules}, true)

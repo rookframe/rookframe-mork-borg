@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -21,7 +23,7 @@ func test_recovery_panel_direct_submit_focus_pending_and_result() -> void:
 	viewport.add_child(panel)
 	panel.size = Vector2(351, 260)
 	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
-	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "rest")
+	panel.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "rest")
 	await get_tree().process_frame
 	var breath: Button = panel.get_node("Columns/Task/Rest/Content/Breath")
 	var sleep: Button = panel.get_node("Columns/Task/Rest/Content/Sleep")
@@ -51,9 +53,10 @@ func after_test() -> void:
 	await get_tree().process_frame
 
 func test_specialty_corrections_refresh_live_fields_and_preserve_other_drafts() -> void:
-	var classes = load(ROOT + "logic/creation_classes.gd").new()
+	var classes = load(ROOT + "logic/creation_classes.gd").new(PACKAGE_DATA.catalogue())
 	var data := {"class_id": "gutterborn-scum", "name": "Graveworm", "traits": [classes.feature("gutterborn-scum", 1)]}
 	var editor = auto_free(load(ROOT + "ui/character_sheet_edit.tscn").instantiate())
+	editor.data_catalogue = PACKAGE_DATA.catalogue()
 	add_child(editor)
 	editor.configure(data, [])
 	var name_field = _field(editor, "name")

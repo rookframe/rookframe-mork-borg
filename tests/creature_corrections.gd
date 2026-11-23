@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 ## Severe risks only: changed-fields reconciliation, stale identity and atomic rejection.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -12,17 +14,17 @@ func _host() -> BOUNDARY:
 	var host := BOUNDARY.new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	return host
 
 func test_changed_fields_preserve_latest_state_and_invalidate_replaced_entries() -> void:
 	var host := _host()
 	host.actors.hero.data.rule_groups[0].entries[0]["rolls"] = [{"id": "printed:rule:roll", "name": "Printed die", "dice": "d6"}]
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions := ACTIONS.new(sdk, SDK.ActorId.new("hero"))
 	var result := await actions.prepare_corrections()
 	assert_bool(result.ok).is_true()
-	var projection := PROJECTION.new()
+	var projection := PROJECTION.new(PACKAGE_DATA.catalogue())
 	var draft := DRAFT.new()
 	var data: Dictionary = result.actor.data
 	assert_int(data.attacks.size()).is_equal(2)
@@ -68,11 +70,11 @@ func test_changed_fields_preserve_latest_state_and_invalidate_replaced_entries()
 
 func test_rejected_correction_is_atomic_and_preserves_independent_accepted_state() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var actions := ACTIONS.new(sdk, SDK.ActorId.new("hero"))
 	var result := await actions.prepare_corrections()
 	assert_bool(result.ok).is_true()
-	var ids := PROJECTION.new().identities(result.actor.data)
+	var ids := PROJECTION.new(PACKAGE_DATA.catalogue()).identities(result.actor.data)
 	var before: Dictionary = host.actors.hero.data.duplicate(true)
 	result = await actions.correct_many({"name": "Not committed", "maximum_hit_points": "0"}, ids)
 	assert_bool(result.ok).is_false()

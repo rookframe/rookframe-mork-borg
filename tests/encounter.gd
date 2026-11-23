@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -18,7 +20,7 @@ func _host() -> BOUNDARY:
 func test_rooks_share_actor_but_keep_membership_and_advance_as_sides() -> void:
 	var host := _host()
 	host.rooks["second-enemy-rook"] = "enemy"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	assert_str(result.value.state).is_equal("resolved")
 	if result.value.state != "resolved":
@@ -49,7 +51,7 @@ func test_rooks_share_actor_but_keep_membership_and_advance_as_sides() -> void:
 
 func test_group_initiative_requests_gm_d6_and_sorts_sides() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "rook": "enemy-rook"})
 	var result := await sdk.system_actions.submit("encounter.roll", {"revision": 2, "id": "initiative", "kind": "group"})
@@ -68,7 +70,7 @@ func test_group_initiative_requests_gm_d6_and_sorts_sides() -> void:
 
 func test_reaction_table_uses_two_d6(a: int, b: int, expected: String, _test_parameters := [[1, 1, "Kill!"], [1, 3, "Angered"], [3, 4, "Indifferent"], [4, 5, "Almost friendly"], [5, 6, "Helpful"]]) -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("encounter.roll", {"revision": 0, "id": "reaction", "kind": "reaction", "actor": "enemy"})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -81,7 +83,7 @@ func test_reaction_table_uses_two_d6(a: int, b: int, expected: String, _test_par
 
 func test_morale_equality_holds_and_failure_requests_flee_or_surrender(total: int, face: int, expected: String, _test_parameters := [[7, 0, "Holds"], [8, 3, "Flees"], [12, 4, "Surrenders"]]) -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var result := await sdk.system_actions.submit("encounter.roll", {"revision": 0, "id": "morale", "kind": "morale", "actor": "enemy"})
 	assert_str(result.value.state).is_equal("pending")
 	if result.value.state != "pending":
@@ -101,7 +103,7 @@ func test_morale_equality_holds_and_failure_requests_flee_or_surrender(total: in
 func test_wraith_acts_first_without_giving_every_monster_an_extra_turn() -> void:
 	var host := _host()
 	host.actors.enemy.data.definition_id = "wrat-wraith"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	await sdk.system_actions.submit("encounter.edit", {"revision": 1, "kind": "add", "rook": "enemy-rook"})
 	await sdk.system_actions.submit("encounter.edit", {"revision": 2, "kind": "begin"})
@@ -113,7 +115,7 @@ func test_wraith_acts_first_without_giving_every_monster_an_extra_turn() -> void
 
 func test_unauthorized_stale_failed_and_interrupted_changes_leave_guidance_intact() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.game_master = false
 	var result := await sdk.system_actions.submit("encounter.edit", {"revision": 0, "kind": "add", "rook": "hero-rook"})
 	assert_str(result.value.state).is_equal("error")
@@ -141,7 +143,7 @@ func test_unauthorized_stale_failed_and_interrupted_changes_leave_guidance_intac
 
 func test_new_session_and_restarted_system_do_not_resume_pending_rolls() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await sdk.system_actions.submit("encounter.roll", {"revision": 0, "id": "old", "kind": "morale", "actor": "enemy"})
 	host.roll("old", [6, 6])
 	host.session = "reconnected"
@@ -155,7 +157,7 @@ func test_new_session_and_restarted_system_do_not_resume_pending_rolls() -> void
 
 func test_special_morale_does_not_invent_a_numeric_roll() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.actors.enemy.data.morale = {"kind": "special", "text": "Retreats when badly wounded"}
 	var result := await sdk.system_actions.submit("encounter.roll", {"revision": 0, "id": "special", "kind": "morale", "actor": "enemy"})
 	assert_str(result.value.state).is_equal("error")

@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## An announced special has no automated gameplay effects. Authority validates
 ## the exact Actor and existing rule, then records and explicitly announces the use.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -42,7 +49,7 @@ func handle(context: SDK.SystemActionContext, payload: Variant) -> Dictionary:
 		return {"ok": true} if accepted == [input.actor, input.entry] else _error("This action already has different choices.")
 	if not HEALTH.new().can_roll(data):
 		return _error("This Creature is dead. Rules and corrections remain available.")
-	for entry in ACTIONS.new().specials(data):
+	for entry in ACTIONS.new(_data_catalogue).specials(data):
 		if str(entry.id) != str(input.entry):
 			continue
 		var report := SDK.ActionLogMessage.new("Creature action")

@@ -1,0 +1,114 @@
+{
+	"PACK_CHOICES": [
+		"Nothing",
+		"Backpack",
+		"Sack",
+		"Small wagon",
+		"Donkey"
+	],
+	"FIRST_EQUIPMENT_NAMES": [
+		"Rope",
+		"Torch",
+		"Lantern with oil",
+		"Magnesium strip",
+		"Unclean scroll",
+		"Sharp needle",
+		"Medicine box",
+		"Metal file",
+		"Bear trap",
+		"Bomb",
+		"Red poison",
+		"Silver crucifix"
+	],
+	"SECOND_EQUIPMENT_NAMES": [
+		"Life elixir",
+		"Sacred scroll",
+		"Small but vicious dog",
+		"Monkeys",
+		"Exquisite perfume",
+		"Toolbox",
+		"Heavy chain",
+		"Grappling hook",
+		"Shield",
+		"Crowbar",
+		"Lard",
+		"Tent"
+	],
+	"WEAPON_RESULTS": [
+		"Femur",
+		"Staff",
+		"Shortsword",
+		"Knife",
+		"Warhammer",
+		"Sword",
+		"Bow",
+		"Flail",
+		"Crossbow",
+		"Zweihander"
+	],
+	"ARMOR_RESULTS": [
+		"No armor",
+		"Light armor",
+		"Medium armor",
+		"Heavy armor"
+	],
+	"STARTING_CREATURES": [],
+	"SOURCE_CREATURE_CHOICES": [
+		"dog-small-but-vicious",
+		"monkey",
+		"ancient-gore-hound",
+		"hawk-as-weapon"
+	],
+	"FIRST_EQUIPMENT_IDS": [
+		"rope",
+		"torch",
+		"lantern-with-oil",
+		"magnesium-strip",
+		"unclean-scroll",
+		"sharp-needle",
+		"medicine-box",
+		"metal-file",
+		"bear-trap",
+		"bomb",
+		"poison-red",
+		"crucifix-silver"
+	],
+	"SECOND_EQUIPMENT_IDS": [
+		"life-elixir",
+		"sacred-scroll",
+		"dog-small-but-vicious",
+		"monkeys",
+		"exquisite-perfume",
+		"toolbox",
+		"heavy-chain",
+		"grappling-hook",
+		"shield",
+		"crowbar",
+		"lard",
+		"tent"
+	],
+	"WEAPON_IDS": [
+		"femur",
+		"staff",
+		"shortsword",
+		"knife",
+		"warhammer",
+		"sword",
+		"bow",
+		"flail",
+		"crossbow",
+		"zweihander"
+	],
+	"ARMOR_IDS": [
+		"",
+		"light-armor",
+		"medium-armor",
+		"heavy-armor"
+	],
+	"PACK_IDS": [
+		"backpack",
+		"sack",
+		"small-wagon",
+		"donkey"
+	]
+}

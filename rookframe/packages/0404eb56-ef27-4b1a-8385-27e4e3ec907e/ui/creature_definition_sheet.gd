@@ -1,4 +1,8 @@
 extends "res://rookframe/sdk/window.gd"
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
 const PORTRAIT_CACHE = preload(ROOT + "ui/creature_portrait_cache.gd")
@@ -17,6 +21,7 @@ var _portrait_cache := PORTRAIT_CACHE.new()
 @onready var _miniature_picker := get_node(^"MiniatureWorkflow")
 
 func ready() -> void:
+	_data_catalogue.bind(sdk)
 	if sdk == null:
 		return
 	i18n.bind(sdk)
@@ -57,13 +62,17 @@ func _refresh() -> void:
 	if not found.ok:
 		get_node("Sheet").status(found.message)
 		return
-	var source = CREATURES.new()
+	var source = CREATURES.new(_data_catalogue)
 	source.resource_name = _definition.local_id
-	var data: Dictionary = source.create_data({})
-	var metadata := CONTENT.new().details(_definition.local_id)
+	var data: Dictionary = source.preview()
+	if data.is_empty():
+		get_node("Sheet").status("Creature data is unavailable.")
+		return
+	var metadata := CONTENT.new(_data_catalogue).details(_definition.local_id)
 	for key in ["classification", "rule_groups", "reference", "source"]:
 		data[key] = metadata.get(key, data.get(key))
 	data.name = found.content_entry.localized_title
+	get_node("Sheet").data_catalogue = _data_catalogue
 	get_node("Sheet").configure(data, i18n, true, not _busy and _world_error.is_empty() and sdk.context().is_gm and found.content_entry.available, _portrait())
 	if not _world_error.is_empty():
 		get_node("Sheet").status(_world_error)
@@ -95,7 +104,7 @@ func _miniature() -> Dictionary:
 	if defaults.has(id):
 		var reference: Dictionary = defaults.get(id, {})
 		return reference.duplicate(true)
-	return CREATURES.new().default_miniature(id)
+	return CREATURES.new(_data_catalogue).default_miniature(id)
 
 func _queue_create() -> void:
 	# Leave the shared sheet's signal stack before the live window reloads it.

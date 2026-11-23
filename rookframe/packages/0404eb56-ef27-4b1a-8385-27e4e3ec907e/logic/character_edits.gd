@@ -6,8 +6,8 @@ const FAVORITES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4
 var _context: SDK.SystemActionContext
 var _companion_changes: Array[SDK.ActorChange] = []
 
-func _init(actor_id: SDK.ActorId, context: SDK.SystemActionContext) -> void:
-	super(null, actor_id)
+func _init(actor_id: SDK.ActorId, context: SDK.SystemActionContext, data_catalogue: CATALOGUE) -> void:
+	super(null, actor_id, data_catalogue)
 	_context = context
 
 const ABILITIES := ["Agility", "Presence", "Strength", "Toughness"]
@@ -112,7 +112,7 @@ func _correct(data: Dictionary, field: String, text: String) -> String:
 			if traits.size() == 2:
 				traits = [traits[0]]
 		else:
-			var feature := CLASSES.new().feature("gutterborn-scum", face)
+			var feature := CLASSES.new(_data_catalogue).feature("gutterborn-scum", face)
 			feature.erase("item")
 			if slot < traits.size():
 				var existing: Dictionary = traits[slot]
@@ -242,10 +242,10 @@ func set_favorite(key: String, starred: bool) -> SDK.ActorResult:
 			if not companion.ok:
 				return companion
 			companions.append(companion.actor)
-		var entry := FAVORITES.new().find(data, _id.value, companions, key)
+		var entry := FAVORITES.new(_data_catalogue).find(data, _id.value, companions, key)
 		if entry.is_empty():
 			return _failure("This favorite source is unavailable.")
-		retained.append(FAVORITES.new().record(entry))
+		retained.append(FAVORITES.new(_data_catalogue).record(entry))
 	data["favorites"] = retained
 	return await _save(data)
 
@@ -265,11 +265,11 @@ func _companion(id: String, character: Dictionary) -> SDK.ActorResult:
 	if not result.ok or result.actor == null or result.actor.access_level != "Owner" or typeof(result.actor.data) != TYPE_DICTIONARY:
 		return _failure("Owner access is required for the companion attack.")
 	var current: Dictionary = result.actor.data
-	if str(current.get("schema", "")) != "mork-borg-adversary/v1" or not FAVORITES.new().is_companion(character, _id.value, current):
+	if str(current.get("schema", "")) != "mork-borg-adversary/v1" or not FAVORITES.new(_data_catalogue).is_companion(character, _id.value, current):
 		return _failure("This companion attack is unavailable.")
-	if not FAVORITES.new().needs_companion_identity(current):
+	if not FAVORITES.new(_data_catalogue).needs_companion_identity(current):
 		return result
-	var data: Dictionary = FAVORITES.CREATURES.new().stat_block(current)
+	var data: Dictionary = FAVORITES.CREATURES.new(_data_catalogue).stat_block(current)
 	_companion_changes.append(SDK.ActorChange.new(result.actor.id, data))
 	result.actor.data = data
 	return result

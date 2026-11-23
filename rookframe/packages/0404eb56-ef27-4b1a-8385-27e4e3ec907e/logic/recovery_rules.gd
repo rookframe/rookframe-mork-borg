@@ -1,5 +1,12 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
+
 ## Bare Bones pp.31,37 and printed class Omen dice. Rest never refills resources.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -11,7 +18,7 @@ func can_rest(data: Dictionary) -> bool:
 	return str(data.get("schema", "")) == "mork-borg-character/v1" and typeof(data.get("hit_points")) == TYPE_INT and typeof(data.get("maximum_hit_points")) == TYPE_INT and int(data.maximum_hit_points) > 0 and not CONDITION.new().is_dead(data)
 
 func omen_faces(data: Dictionary) -> int:
-	var profile := CLASSES.new().profile(str(data.get("class_id", "classless")))
+	var profile := CLASSES.new(_data_catalogue).profile(str(data.get("class_id", "classless")))
 	return int(profile.get("omen_faces", 0))
 
 func can_regain_omens(data: Dictionary) -> bool:

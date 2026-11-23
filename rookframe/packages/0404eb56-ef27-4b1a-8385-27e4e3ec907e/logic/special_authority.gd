@@ -1,9 +1,15 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Dice consequences are recorded history; manual no-roll uses explicitly announce below. Pending decisions and corrective feedback stay in the action window.
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
-const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
 const CLASSES = preload(ROOT + "logic/creation_classes.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")
 const ITEMS = preload(ROOT + "logic/actor_inventory.gd")
@@ -74,8 +80,8 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	var data: Dictionary = source.actor.data
 	if not _valid(data):
 		return _error("Character data is malformed. Correct the sheet first.")
-	var item := RULES.new().owned(data, str(input.get("item", "")))
-	var rule := RULES.new().definition(str(item.get("source_item_id", "")))
+	var item := RULES.new(_data_catalogue).owned(data, str(input.get("item", "")))
+	var rule := RULES.new(_data_catalogue).definition(str(item.get("source_item_id", "")))
 	if item.is_empty() or rule.is_empty():
 		return _error("Choose a supported item in Inventory.")
 	if rule.get("brew", false) and str(data.get("class_id", "")) != "occult-herbmaster":
@@ -163,11 +169,11 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 		terms = [SDK.DiceTerm.new("Blade treachery", 6)]
 	elif rule.get("damage", false):
 		var faces: int = rule.die
-		var plan := DAMAGE.new().plan(recipient.actor, faces, str(action.kind) == "caltrops")
+		var plan := DAMAGE.new(_data_catalogue).plan(recipient.actor, faces, str(action.kind) == "caltrops")
 		if plan.has("error"):
 			return _error(str(plan.error))
 		action["damage_plan"] = plan
-		terms = DAMAGE.new().terms(plan)
+		terms = DAMAGE.new(_data_catalogue).terms(plan)
 	elif rule.get("gob", false):
 		action["phase"] = "allowance" if input.get("new_fight", false) else "spit"
 		terms.append(SDK.DiceTerm.new("Spits this fight (d2)", 4) if input.get("new_fight", false) else SDK.DiceTerm.new("Spit accuracy", 20))
@@ -212,7 +218,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	var tested_rule: Dictionary = action.rule
 	if (not action.get("sheet", false) or action.get("phase", "") != "sheet-target" and (tested_rule.has("ability") or action.get("phase", "") in ["spit", "blade-attack"])) and not BROKEN.new().can_act(current):
 		return _end(context, action)
-	var current_item := RULES.new().owned(current, str(action.item))
+	var current_item := RULES.new(_data_catalogue).owned(current, str(action.item))
 	if not _valid(current) or current_item.is_empty() or str(current_item.get("source_item_id", "")) != str(action.kind):
 		return _end(context, action)
 	var roll := context.read_throw(str(action.request))
@@ -252,7 +258,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 	if rule.get("manual", false):
 		return _manual(context, action, roll.terms[0].results, roll.sequence)
 	if rule.has("ability"):
-		var item := RULES.new().owned(current, str(action.item))
+		var item := RULES.new(_data_catalogue).owned(current, str(action.item))
 		if item.is_empty() or not _target_current(context, action):
 			return _end(context, action)
 		var ability_data: Dictionary = current.get("abilities", {})
@@ -270,7 +276,7 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 			if uses < 1:
 				return _end(context, action)
 			var data := current.duplicate(true)
-			var items := ITEMS.new(null, source.actor.id).inventory(data)
+			var items := ITEMS.new(null, source.actor.id, _data_catalogue).inventory(data)
 			for raw in items:
 				var entry: Dictionary = raw
 				if str(entry.inventory_id) == str(action.item):
@@ -299,10 +305,10 @@ func _advance(context: SDK.SystemActionContext, action: Dictionary) -> Dictionar
 		action["message"] = text
 		return _public(action)
 	var data := current.duplicate(true)
-	var inventory := ITEMS.new(null, source.actor.id).inventory(data)
+	var inventory := ITEMS.new(null, source.actor.id, _data_catalogue).inventory(data)
 	data["inventory"] = inventory
-	var item := RULES.new().owned(data, str(action.item))
-	var resource := RULES.new().owned(data, str(action.resource))
+	var item := RULES.new(_data_catalogue).owned(data, str(action.item))
+	var resource := RULES.new(_data_catalogue).owned(data, str(action.resource))
 	var uses: int = resource.get("uses", 0)
 	if item.is_empty() or uses < 1 or not _target_current(context, action):
 		return _end(context, action)
@@ -392,7 +398,7 @@ func _error(message: String) -> Dictionary:
 func _resource(data: Dictionary, item: Dictionary) -> Dictionary:
 	if not item.has("dose_pool"):
 		return item
-	for raw in ITEMS.new(null, SDK.ActorId.new("")).inventory(data):
+	for raw in ITEMS.new(null, SDK.ActorId.new(""), _data_catalogue).inventory(data):
 		var entry: Dictionary = raw
 		var quantity: int = entry.get("quantity", 0)
 		if str(entry.get("source_item_id", "")) == str(item.dose_pool) and quantity > 0 and not entry.get("broken", false):
@@ -464,11 +470,11 @@ func _target_current(context: SDK.SystemActionContext, action: Dictionary) -> bo
 
 func _consume(data: Dictionary, action: Dictionary) -> bool:
 	var rule: Dictionary = action.rule
-	var item := RULES.new().owned(data, str(action.item))
+	var item := RULES.new(_data_catalogue).owned(data, str(action.item))
 	if item.is_empty():
 		return false
 	if rule.get("quantity_use", false):
-		var items := ITEMS.new(null, SDK.ActorId.new("")).inventory(data)
+		var items := ITEMS.new(null, SDK.ActorId.new(""), _data_catalogue).inventory(data)
 		for raw in items:
 			var entry: Dictionary = raw
 			if str(entry.inventory_id) == str(action.item):
@@ -486,7 +492,7 @@ func _consume(data: Dictionary, action: Dictionary) -> bool:
 	var uses: int = resource.get("uses", default_uses)
 	if str(resource.get("inventory_id", "")) != str(action.resource) or uses < 1:
 		return false
-	var items := ITEMS.new(null, SDK.ActorId.new("")).inventory(data)
+	var items := ITEMS.new(null, SDK.ActorId.new(""), _data_catalogue).inventory(data)
 	for raw in items:
 		var entry: Dictionary = raw
 		if str(entry.inventory_id) == str(resource.get("inventory_id", "")):
@@ -497,7 +503,7 @@ func _consume(data: Dictionary, action: Dictionary) -> bool:
 		var traits: Array = data.get("traits", [])
 		for raw in traits:
 			var feature: Dictionary = raw
-			if RULES.new().feature_matches(feature, str(action.item)):
+			if RULES.new(_data_catalogue).feature_matches(feature, str(action.item)):
 				feature["uses"] = uses - 1
 				return true
 	return false
@@ -677,10 +683,10 @@ func _book_summons(context: SDK.SystemActionContext, action: Dictionary, roll: S
 	return _public(action)
 
 func _brew(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanThrowResult, current: Dictionary) -> Dictionary:
-	if RULES.new().owned(current, str(action.item)).is_empty():
+	if RULES.new(_data_catalogue).owned(current, str(action.item)).is_empty():
 		return _end(context, action)
 	var data := current.duplicate(true)
-	var items := ITEMS.new(null, SDK.ActorId.new(str(action.source))).inventory(data)
+	var items := ITEMS.new(null, SDK.ActorId.new(str(action.source)), _data_catalogue).inventory(data)
 	var kept: Array = []
 	var serial: int = data.get("inventory_serial", 0)
 	for raw in items:
@@ -702,7 +708,7 @@ func _brew(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.Human
 			traits.append(feature)
 	var names := ""
 	for face in roll.terms[0].results:
-		var feature := CLASSES.new().decoction(face)
+		var feature := CLASSES.new(_data_catalogue).decoction(face)
 		traits.append(feature)
 		var original: Dictionary = feature.item
 		var item := original.duplicate(true)
@@ -751,7 +757,7 @@ func _choose_scrolls(context: SDK.SystemActionContext, action: Dictionary, input
 	var count: int = action.count
 	if selected.size() != count:
 		return _public(action)
-	var options: Array = SCROLLS.TABLES.get(str(action.family), [])
+	var options: Array = _data_catalogue.scrolls(str(action.family))
 	var additions: Array = []
 	for id in selected:
 		var found := false
@@ -765,7 +771,7 @@ func _choose_scrolls(context: SDK.SystemActionContext, action: Dictionary, input
 			return _public(action)
 	var current: Dictionary = source.actor.data
 	var data := current.duplicate(true)
-	var items := ITEMS.new(null, source.actor.id).inventory(data)
+	var items := ITEMS.new(null, source.actor.id, _data_catalogue).inventory(data)
 	var serial: int = data.get("inventory_serial", 0)
 	for raw in items:
 		var item: Dictionary = raw
@@ -827,7 +833,7 @@ func _gob(context: SDK.SystemActionContext, action: Dictionary, roll: SDK.HumanT
 		var traits: Array = data.get("traits", [])
 		for raw in traits:
 			var feature: Dictionary = raw
-			if RULES.new().feature_matches(feature, str(action.item)):
+			if RULES.new(_data_catalogue).feature_matches(feature, str(action.item)):
 				feature["uses"] = count
 		if not _record(context, [SDK.ActorChange.new(SDK.ActorId.new(str(action.source)), data)], "%d spits available this fight (physical d4 halved, rounded up). Raw Roll #%d." % [count, roll.sequence]):
 			return _end(context, action)
@@ -951,7 +957,7 @@ func _damage_item(context: SDK.SystemActionContext, action: Dictionary, roll: SD
 		var face: int = roll.terms[0].results[0]
 		if face == 1:
 			var data := current.duplicate(true)
-			var items := ITEMS.new(null, SDK.ActorId.new(str(action.source))).inventory(data)
+			var items := ITEMS.new(null, SDK.ActorId.new(str(action.source)), _data_catalogue).inventory(data)
 			for raw in items:
 				var item: Dictionary = raw
 				if str(item.inventory_id) == str(action.item):
@@ -964,20 +970,20 @@ func _damage_item(context: SDK.SystemActionContext, action: Dictionary, roll: SD
 		if action.get("sheet", false):
 			action["blade_critical"] = face == 20
 			return _next_throw(context, action, "blade-damage", str(action.owner), [SDK.DiceTerm.new("Blade damage", 6)], "Roll d6+1 damage; resolve the victim and protection manually.")
-		var plan := DAMAGE.new().plan(recipient.actor, 6, false)
+		var plan := DAMAGE.new(_data_catalogue).plan(recipient.actor, 6, false)
 		if plan.has("error"):
 			return _end(context, action)
 		plan["bonus"] = 1
 		plan["critical"] = face == 20
 		action["damage_plan"] = plan
-		return _next_throw(context, action, "blade-damage", str(action.owner), DAMAGE.new().terms(plan), "Throw d6+1 damage and protection.")
+		return _next_throw(context, action, "blade-damage", str(action.owner), DAMAGE.new(_data_catalogue).terms(plan), "Throw d6+1 damage and protection.")
 	if action.get("sheet", false) and phase == "blade-damage":
 		var damage: int = roll.terms[0].results[0] + 1
 		if action.get("blade_critical", false):
 			damage *= 2
 		return _resolve(context, action, [], "Blade damage %d%s. Resolve the victim, protection and critical armor consequence manually. Raw Roll #%d." % [damage, " · critical" if action.get("blade_critical", false) else "", roll.sequence])
 	var plan: Dictionary = action.damage_plan
-	var outcome := DAMAGE.new().apply(recipient.actor, plan, roll)
+	var outcome := DAMAGE.new(_data_catalogue).apply(recipient.actor, plan, roll)
 	if outcome.has("error"):
 		return _end(context, action)
 	if not str(plan.get("shield_id", "")).is_empty():
@@ -1051,7 +1057,7 @@ func _shield_public(context: SDK.SystemActionContext, action: Dictionary) -> Dic
 	if owner.has("error") or owner.id != original.id or owner.session != original.session:
 		return _end(context, action)
 	var plan: Dictionary = action.damage_plan
-	if not DAMAGE.new().protection_current(recipient.actor, plan):
+	if not DAMAGE.new(_data_catalogue).protection_current(recipient.actor, plan):
 		return _end(context, action)
 	var data: Dictionary = recipient.actor.data
 	return {"operation": "special", "id": action.id, "initiator": action.participant, "defender": owner.id, "state": "shield", "target": str(target.actor), "character": str(target.label), "hp": data.get("hit_points", 0), "loss": action.loss, "message": action.message}
@@ -1067,7 +1073,7 @@ func _choose_shield(context: SDK.SystemActionContext, action: Dictionary, input:
 	var current: Dictionary = recipient.actor.data
 	var data := current.duplicate(true)
 	var plan: Dictionary = action.damage_plan
-	var items := ITEMS.new(null, recipient.actor.id).inventory(data)
+	var items := ITEMS.new(null, recipient.actor.id, _data_catalogue).inventory(data)
 	var available := false
 	for raw in items:
 		var item: Dictionary = raw
@@ -1085,7 +1091,7 @@ func _choose_shield(context: SDK.SystemActionContext, action: Dictionary, input:
 	if str(input.choice) == "take":
 		data["hit_points"] = hp - loss
 	if plan.get("critical", false):
-		DAMAGE.new().damage_armor(recipient.actor.id, data)
+		DAMAGE.new(_data_catalogue).damage_armor(recipient.actor.id, data)
 	var sequence: int = action.damage_sequence
 	return _resolve(context, action, [SDK.ActorChange.new(recipient.actor.id, data)], "%s: %s Raw Roll #%d." % [str(target.label), "Shield broken; no damage taken." if str(input.choice) == "break" else "Takes %d damage after shield protection. %s" % [loss, str(action.get("damage_text", ""))], sequence])
 
@@ -1096,10 +1102,10 @@ func _current(context: SDK.SystemActionContext, action: Dictionary) -> bool:
 	if not source.ok or not _valid(source.actor.data):
 		return false
 	var data: Dictionary = source.actor.data
-	var item := RULES.new().owned(data, str(action.item))
+	var item := RULES.new(_data_catalogue).owned(data, str(action.item))
 	var rule: Dictionary = action.rule
 	if item.is_empty() and action.get("resource_spent", false) and rule.get("quantity_use", false):
-		for raw in ITEMS.new(null, source.actor.id).inventory(data):
+		for raw in ITEMS.new(null, source.actor.id, _data_catalogue).inventory(data):
 			var entry: Dictionary = raw
 			if str(entry.inventory_id) == str(action.item) and str(entry.get("source_item_id", "")) == str(action.kind):
 				item = entry
@@ -1115,7 +1121,7 @@ func _test_difficulty(data: Dictionary, ability: String, printed: int) -> int:
 	if ability != "Agility":
 		return printed
 	var penalty := 0
-	for raw in ITEMS.new(null, SDK.ActorId.new("")).inventory(data):
+	for raw in ITEMS.new(null, SDK.ActorId.new(""), _data_catalogue).inventory(data):
 		var item: Dictionary = raw
 		var quantity: int = item.get("quantity", 0)
 		if str(item.get("kind", "")) != "Armor" or not item.get("equipped", false) or quantity < 1:
@@ -1138,7 +1144,7 @@ func _sheet_target_result(context: SDK.SystemActionContext, action: Dictionary, 
 	var text := "%s: %s. Resolve the printed target outcome with the table. No target state changed. Raw Roll #%d." % [str(action.kind), str(values), sequence]
 	var rule: Dictionary = action.rule
 	if action.get("untargeted", false):
-		var item := RULES.new().owned(current, str(action.item))
+		var item := RULES.new(_data_catalogue).owned(current, str(action.item))
 		var label := str(item.get("name", action.kind))
 		if rule.get("book", false):
 			text = label + ": enemy resistance DR12 remains at the table. On failed resistance, resolve d2 Berserker-slayers and d6 disposition with ordinary dice. One daily use spent. No recipient was chosen and no Actors were summoned."
@@ -1160,7 +1166,7 @@ func _sheet_target_result(context: SDK.SystemActionContext, action: Dictionary, 
 	return _resolve(context, action, [SDK.ActorChange.new(source.actor.id, data)], text)
 
 func _announce_use(context: SDK.SystemActionContext, action: Dictionary, data: Dictionary, sequence: int) -> void:
-	var item := RULES.new().owned(data, str(action.item))
+	var item := RULES.new(_data_catalogue).owned(data, str(action.item))
 	var notice := SDK.Announcement.new(_announcement_text(str(data.get("name", "Character")), 128), _announcement_text("Uses " + str(item.get("name", action.kind)), 256), "item")
 	notice.log_sequence = sequence
 	context.announce(notice)

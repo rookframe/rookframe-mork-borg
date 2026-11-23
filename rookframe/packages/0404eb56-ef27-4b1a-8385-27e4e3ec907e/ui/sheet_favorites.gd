@@ -1,4 +1,8 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## Sheet composition for the same Actor Favorite model consumed by the HUD.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -8,7 +12,11 @@ const COMPANION = preload(ROOT + "ui/sheet_companion_favorite.tscn")
 const PROJECTION = preload(ROOT + "ui/sheet_projection.gd")
 signal favorite_changed(key: String, starred: bool)
 var sdk: SDK
-var _model := MODEL.new()
+var _model := MODEL.new(_data_catalogue)
+
+func bind(facade: SDK) -> void:
+	sdk = facade
+	_data_catalogue.bind(facade)
 
 func needs_identity(data: Dictionary) -> bool:
 	return _model.needs_identity(data)

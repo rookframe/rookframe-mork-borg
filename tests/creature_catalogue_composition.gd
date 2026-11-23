@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -24,7 +26,7 @@ class Boundary extends "res://tests/miniature_boundary.gd":
 			var content := loaded.instantiate()
 			# Rookframe supplies its active theme to Package surfaces.
 			content.theme = WORLD_THEME.entry()
-			content.set_meta("rookframe_sdk", self)
+			content.sdk = PACKAGE_DATA.facade(self)
 			surface_parent.add_child(content)
 			content._rookframe_open_actor(actor)
 		return {"ok": true}
@@ -44,7 +46,7 @@ func _host() -> Boundary:
 	host.game_master = true
 	host.world_data = {"creature_miniatures": {"seth-goblin": {"package_id": "external-miniatures", "local_id": "goblin"}}}
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	return host
 
@@ -53,7 +55,7 @@ func test_library_definition_opens_independent_sheet() -> void:
 	var sheet = auto_free(load(ROOT + "ui/creature_definition_sheet.tscn").instantiate())
 	# Rookframe supplies its active theme to Package surfaces.
 	sheet.theme = WORLD_THEME.entry()
-	sheet.sdk = SDK.new(host)
+	sheet.sdk = PACKAGE_DATA.facade(host)
 	var viewport: SubViewport = auto_free(SubViewport.new())
 	viewport.size = Vector2i(844, 390)
 	add_child(viewport)
@@ -90,7 +92,7 @@ func test_button_creates_actor_and_loads_live_sheet_after_create_signal_returns(
 	var sheet := scene.instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
 	sheet.theme = WORLD_THEME.entry()
-	sheet.set_meta("rookframe_sdk", host)
+	sheet.sdk = PACKAGE_DATA.facade(host)
 	viewport.add_child(sheet)
 	sheet._rookframe_open_definition(host.PackageId(), "seth-goblin")
 	await get_tree().process_frame
@@ -111,7 +113,7 @@ func test_button_creates_actor_and_loads_live_sheet_after_create_signal_returns(
 
 func test_drop_creates_linked_rook_at_selected_scene_and_position() -> void:
 	var host := _host()
-	var result = await LIBRARY.new(SDK.new(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"), SDK.SceneId.new("dungeon"), Vector2(2, -3))
+	var result = await LIBRARY.new(PACKAGE_DATA.facade(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"), SDK.SceneId.new("dungeon"), Vector2(2, -3))
 	assert_bool(result.ok).is_true()
 	assert_int(host.placed.size()).is_equal(1)
 	var rook: Dictionary = host.placed.values()[0]
@@ -123,7 +125,7 @@ func test_drop_creates_linked_rook_at_selected_scene_and_position() -> void:
 func test_failed_link_removes_partial_rook_and_actor() -> void:
 	var host := _host()
 	host.fail_link = true
-	var result = await LIBRARY.new(SDK.new(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"), SDK.SceneId.new("dungeon"))
+	var result = await LIBRARY.new(PACKAGE_DATA.facade(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"), SDK.SceneId.new("dungeon"))
 	assert_bool(result.ok).is_false()
 	assert_int(host.actors.size()).is_equal(2)
 	assert_int(host.placed.size()).is_equal(0)
@@ -132,7 +134,7 @@ func test_failed_link_removes_partial_rook_and_actor() -> void:
 func test_participant_cannot_create_creatures() -> void:
 	var host := _host()
 	host.game_master = false
-	var result = await LIBRARY.new(SDK.new(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"))
+	var result = await LIBRARY.new(PACKAGE_DATA.facade(host)).create(SDK.ContentReference.new(host.PackageId(), "seth-goblin"))
 	assert_bool(result.ok).is_false()
 	assert_int(host.actors.size()).is_equal(2)
 	assert_int(host.placed.size()).is_equal(0)

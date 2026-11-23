@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -12,13 +14,13 @@ func _host() -> BOUNDARY:
 	host.game_master = true
 	host.participant = "gm"
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	return host
 
 func test_world_default_is_copied_only_to_new_creatures_and_survives_new_implementation() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var saved := await sdk.system_actions.submit("miniature.default", {"definition": "seth-goblin", "package_id": GOBLIN.package_id, "local_id": GOBLIN.local_id})
 	assert_str(saved.value.state).is_equal("resolved")
 	var first := await sdk.system_actions.submit("miniature.create", {"definition": "seth-goblin"})
@@ -43,7 +45,7 @@ func test_world_default_is_copied_only_to_new_creatures_and_survives_new_impleme
 
 func test_refusals_preserve_world_defaults_and_actor_choice() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	host.game_master = false
 	var rejected := await sdk.system_actions.submit("miniature.default", {"definition": "seth-goblin", "package_id": GOBLIN.package_id, "local_id": GOBLIN.local_id})
 	assert_str(rejected.value.state).is_equal("error")
@@ -66,7 +68,7 @@ func test_refusals_preserve_world_defaults_and_actor_choice() -> void:
 
 func test_external_actor_choice_places_in_current_scene_and_changes_only_selected_rook() -> void:
 	var host := _host()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var id := SDK.ActorId.new("enemy")
 	host.actors.enemy.access_level = "Owner"
 	var actions := ACTIONS.new(sdk)
@@ -92,7 +94,7 @@ func test_external_actor_choice_places_in_current_scene_and_changes_only_selecte
 func test_picker_russian_selection_cancel_and_failed_save_keep_actor_unchanged() -> void:
 	var host := _host()
 	host.language = "ru"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var locale = load(ROOT + "ui/localization.gd").new()
 	locale.bind(sdk)
 	host.actors.enemy.access_level = "Owner"
@@ -122,17 +124,17 @@ func test_picker_russian_selection_cancel_and_failed_save_keep_actor_unchanged()
 func test_application_defaults_and_explicit_choices() -> void:
 	var definitions = preload(ROOT + "logic/creature_definition.gd")
 	for entry in [["bent-scum", "bandit"], ["seth-goblin", "goblin"], ["zukuma-berserker", "barbarian"]]:
-		assert_str(definitions.new().effective_miniature({"definition_id": entry[0]}).local_id).is_equal(entry[1])
-	assert_str(definitions.new().effective_miniature({"definition_id": "arbint-troll"}).local_id).is_equal("default-miniature")
-	assert_str(definitions.new().effective_miniature({}).local_id).is_equal("default-miniature")
-	assert_str(definitions.new().effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": {}}).local_id).is_equal("default-miniature")
-	assert_dict(definitions.new().effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": WARDEN})).is_equal(WARDEN)
-	assert_dict(definitions.new().effective_miniature({"preferred_miniature": {"package_id": "missing", "local_id": "saved"}})).is_equal({"package_id": "missing", "local_id": "saved"})
+		assert_str(definitions.new(PACKAGE_DATA.catalogue()).effective_miniature({"definition_id": entry[0]}).local_id).is_equal(entry[1])
+	assert_str(definitions.new(PACKAGE_DATA.catalogue()).effective_miniature({"definition_id": "arbint-troll"}).local_id).is_equal("default-miniature")
+	assert_str(definitions.new(PACKAGE_DATA.catalogue()).effective_miniature({}).local_id).is_equal("default-miniature")
+	assert_str(definitions.new(PACKAGE_DATA.catalogue()).effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": {}}).local_id).is_equal("default-miniature")
+	assert_dict(definitions.new(PACKAGE_DATA.catalogue()).effective_miniature({"definition_id": "seth-goblin", "preferred_miniature": WARDEN})).is_equal(WARDEN)
+	assert_dict(definitions.new(PACKAGE_DATA.catalogue()).effective_miniature({"preferred_miniature": {"package_id": "missing", "local_id": "saved"}})).is_equal({"package_id": "missing", "local_id": "saved"})
 
 func test_actor_summary_preview_and_drop_recheck_access() -> void:
 	var host := _host()
 	var presentation = auto_free(load(ROOT + "ui/presentation.gd").new())
-	presentation.sdk = SDK.new(host)
+	presentation.sdk = PACKAGE_DATA.facade(host)
 	host.actors.enemy.data["definition_id"] = "zukuma-berserker"
 	var summary: Dictionary = presentation._rookframe_describe_actor("enemy")
 	assert_str(summary.miniature.localId).is_equal("barbarian")

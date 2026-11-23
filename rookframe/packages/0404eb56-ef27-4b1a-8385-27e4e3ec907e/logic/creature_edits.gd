@@ -1,12 +1,13 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/actor_inventory.gd"
+
 const CREATURES = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_definition.gd")
 const PROJECTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_projection.gd")
 const DICE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/attack_sources.gd")
 const HEALTH = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/creature_health.gd")
 var _context: SDK.SystemActionContext
 
-func _init(actor_id: SDK.ActorId, context: SDK.SystemActionContext) -> void:
-	super(null, actor_id)
+func _init(actor_id: SDK.ActorId, context: SDK.SystemActionContext, data_catalogue: CATALOGUE) -> void:
+	super(null, actor_id, data_catalogue)
 	_context = context
 
 func _read() -> SDK.ActorResult:
@@ -30,16 +31,16 @@ func prepare() -> SDK.ActorResult:
 	if not result.ok:
 		return result
 	var current: Dictionary = result.actor.data
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	if not _valid_entries(data):
 		return _failure("Creature capabilities are malformed.")
 	var attacks: Array = data.get("attacks", [])
 	var entries: Array = []
 	for attack in attacks:
 		entries.append(attack)
-	for entry in PROJECTION.new().rules(data):
+	for entry in PROJECTION.new(_data_catalogue).rules(data):
 		entries.append(entry)
-	for roll in PROJECTION.new().printed(data):
+	for roll in PROJECTION.new(_data_catalogue).printed(data):
 		entries.append(roll)
 	var seen: Array[String] = []
 	for raw in entries:
@@ -57,10 +58,10 @@ func correct_many(fields: Dictionary, entry_ids: Dictionary) -> SDK.ActorResult:
 	if not source.ok:
 		return source
 	var current: Dictionary = source.actor.data
-	var data := CREATURES.new().stat_block(current)
+	var data := CREATURES.new(_data_catalogue).stat_block(current)
 	if not _valid_entries(data):
 		return _failure("Creature capabilities are malformed.")
-	var projection := PROJECTION.new()
+	var projection := PROJECTION.new(_data_catalogue)
 	var available := projection.fields(data)
 	var identities := projection.identities(data)
 	var rules_changed := false
@@ -119,7 +120,7 @@ func _correct(data: Dictionary, field: String, text: String) -> String:
 		armor[field.trim_prefix("armor:")] = text
 	else:
 		var parts := field.split(":")
-		var entries: Array = data.get("attacks", []) if parts[0] == "attack" else PROJECTION.new().printed(data) if parts[0] == "printed" else PROJECTION.new().rules(data)
+		var entries: Array = data.get("attacks", []) if parts[0] == "attack" else PROJECTION.new(_data_catalogue).printed(data) if parts[0] == "printed" else PROJECTION.new(_data_catalogue).rules(data)
 		var entry: Dictionary = entries[int(parts[1])]
 		var member := str(parts[2])
 		if member == "dice":

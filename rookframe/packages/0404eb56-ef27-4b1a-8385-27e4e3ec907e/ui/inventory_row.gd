@@ -1,5 +1,9 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 signal mutation_requested(operation: String, arguments: Array)
@@ -45,14 +49,14 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	_action_name("Edit", "Edit")
 	_action_name("Add", "Add")
 	get_node(^"Actions/Attack").visible = not catalogue and not loot_only and equipped and str(item.get("kind", "")) == "Weapon"
-	var power := POWERS.new().definition(str(item.get("source_item_id", "")))
+	var power := POWERS.new(data_catalogue).definition(str(item.get("source_item_id", "")))
 	if not catalogue and can_cast and not power.is_empty():
 		get_node(^"Actions/Attack").visible = true
 		_action_name("Attack", "Cast")
 		get_node(^"Actions/Attack").icon = preload("res://rookframe/ui/icons/sigil.svg")
 		get_node(^"Actions/Attack").disabled = read_only or not power.playable or quantity < 1
 		get_node(^"Copy/Details").text += " · " + (_t(str(power.handling)) if power.playable else _t("Not playable yet"))
-	if not catalogue and can_cast and str(item.get("kind", "")) != "Weapon" and not SPECIAL.new().definition(str(item.get("source_item_id", ""))).is_empty():
+	if not catalogue and can_cast and str(item.get("kind", "")) != "Weapon" and not SPECIAL.new(data_catalogue).definition(str(item.get("source_item_id", ""))).is_empty():
 		get_node(^"Actions/Attack").visible = true
 		_action_name("Attack", "Use")
 		get_node(^"Actions/Attack").icon = preload("res://rookframe/ui/icons/bolt.svg")
@@ -63,10 +67,10 @@ func configure(value: Dictionary, catalogue: bool = false, read_only: bool = fal
 	get_node(^"Actions/Add").pressed.connect(_add)
 
 func _attack() -> void:
-	if str(item.get("kind", "")) != "Weapon" and not SPECIAL.new().definition(str(item.get("source_item_id", ""))).is_empty():
+	if str(item.get("kind", "")) != "Weapon" and not SPECIAL.new(data_catalogue).definition(str(item.get("source_item_id", ""))).is_empty():
 		navigate_requested.emit("use-item", str(item.get("inventory_id", "")))
 		return
-	navigate_requested.emit("cast" if not POWERS.new().definition(str(item.get("source_item_id", ""))).is_empty() else "attack", str(item.get("inventory_id", "")))
+	navigate_requested.emit("cast" if not POWERS.new(data_catalogue).definition(str(item.get("source_item_id", ""))).is_empty() else "attack", str(item.get("inventory_id", "")))
 
 func _edit() -> void:
 	navigate_requested.emit("item", str(item.get("inventory_id", "")))

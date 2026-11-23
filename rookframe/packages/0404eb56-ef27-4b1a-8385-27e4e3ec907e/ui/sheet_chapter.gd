@@ -1,4 +1,6 @@
 extends VBoxContainer
+
+const PROJECTION = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd")
 const SHEET_TOKENS = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_surface_tokens.gd")
 var _tokens := SHEET_TOKENS.new()
 signal resource_requested(id: String)
@@ -166,7 +168,7 @@ func configure_route(view: Dictionary, data: Dictionary, draft: Dictionary, navi
 	_chapter_journal_panel.visible = not obscured and chapter == 3
 	get_node(^"Page/Content/AppearanceIntro").visible = false
 	get_node(^"Page/Content/AppearanceStatus").visible = not obscured and chapter == 4 and not get_node(^"Page/Content/AppearanceStatus").text.is_empty()
-	_condition_ui.visible = not obscured and chapter == 0 and not condition_reference and not preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd").new().condition(data).is_empty()
+	_condition_ui.visible = not obscured and chapter == 0 and not condition_reference and not PROJECTION.new().condition(data).is_empty()
 	_section.visible = phone and not details and chapter in [0, 1, 2, 3]
 	_quick.visible = phone and not details and chapter != 4 and not _condition_ui.visible
 	_section.clear()
@@ -178,7 +180,7 @@ func configure_route(view: Dictionary, data: Dictionary, draft: Dictionary, navi
 	_chapter_primary.visible = chapter == 2 or not phone or _section.selected == 0
 	_chapter_secondary.visible = chapter == 0 and (not phone or _section.selected != 0) or chapter == 1 and phone and _section.selected == 1
 	_chapter_resources.visible = not phone or _section.selected == 1
-	_chapter_companions.visible = chapter == 0 and (condition_reference or preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/sheet_projection.gd").new().condition(data).is_empty()) and (not phone or _section.selected == 2)
+	_chapter_companions.visible = chapter == 0 and (condition_reference or PROJECTION.new().condition(data).is_empty()) and (not phone or _section.selected == 2)
 	if phone and _condition_ui.visible:
 		_chapter_collections.visible = false
 		_section.visible = false

@@ -1,5 +1,7 @@
 extends RefCounted
 
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
+
 signal SettingsChanged
 signal TargetingChanged
 signal FeedbackActionSelected
@@ -74,11 +76,11 @@ func CreateActorsAtomically(_package: String, definition: String, choices: Varia
 	if reject_creation:
 		return {"ok": false, "message": "The World rejected the creation bundle."}
 	var definition_resource = load(ROOT + "content/" + definition + ".tres")
-	var actor := {"id": "character", "access_level": "Owner", "data": definition_resource.create_data(choices)}
+	var actor := {"id": "character", "access_level": "Owner", "data": definition_resource.create_data_with_content(choices, PACKAGE_DATA.reader())}
 	actors.append(actor)
 	for child in children:
 		var resource = load(ROOT + "content/" + str(child.local_id) + ".tres")
-		actors.append({"id": "child-%d" % actors.size(), "access_level": "Owner", "data": resource.create_data(child.choices)})
+		actors.append({"id": "child-%d" % actors.size(), "access_level": "Owner", "data": resource.create_data_with_content(child.choices, PACKAGE_DATA.reader())})
 	return {"ok": true, "value": actor}
 
 func ListActors() -> Dictionary:
@@ -199,8 +201,8 @@ func SubmitSystemIntent(name: String, payload: Variant) -> Dictionary:
 	return await _sheet_reply(name, payload)
 
 func _sheet_reply(name: String, payload: Variant) -> Dictionary:
-	var sdk = load("res://rookframe/sdk/package_sdk_facade.gd").new(self)
-	var handler = load(ROOT + "logic/sheet_authority.gd").new()
+	var sdk = PACKAGE_DATA.facade(self)
+	var handler = load(ROOT + "logic/sheet_authority.gd").new(PACKAGE_DATA.catalogue())
 	var outcome: Dictionary = await handler.handle(load("res://rookframe/sdk/system_action_context.gd").new(self, "sheet"), sdk, name, payload)
 	return {"ok": true, "value": outcome}
 

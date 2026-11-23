@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const PANEL = preload(ROOT + "ui/powers_panel.tscn")
@@ -19,7 +21,7 @@ func test_cast_controls_and_terminal_gm_report_in_phone_body() -> void:
 	viewport.add_child(panel)
 	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
 	panel.size = Vector2(351, 260)
-	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "scroll")
+	panel.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "scroll")
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var eligible: Button = panel.get_node("Cast/Options/Eligible")
@@ -63,7 +65,7 @@ func test_immediate_healing_guides_count_errors_and_reports_applied_hp() -> void
 	viewport.add_child(panel)
 	panel.action_created.connect(func(action: Node) -> void: viewport.add_child(action))
 	panel.size = Vector2(351, 260)
-	panel.configure(SDK.Actor.new(host.actors.hero), SDK.new(host), "scroll")
+	panel.configure(SDK.Actor.new(host.actors.hero), PACKAGE_DATA.facade(host), "scroll")
 	await get_tree().process_frame
 	panel.get_node("Cast/Options/Eligible").button_pressed = true
 	await panel.submit()

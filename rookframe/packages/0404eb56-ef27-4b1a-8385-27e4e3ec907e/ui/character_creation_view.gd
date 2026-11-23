@@ -1,5 +1,9 @@
 extends "res://rookframe/ui/components/surfaces/fullscreen_wizard.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var data_catalogue: CATALOGUE
+
+
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const I18N = preload(ROOT + "ui/localization.gd")
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -47,8 +51,8 @@ func _ready() -> void:
 	get_node(LEFT + "/Choices").selected.connect(_selected_row)
 	get_node(DETAIL + "/Appearance").miniature_requested.connect(_request_miniature)
 	get_node(DETAIL + "/Appearance").miniature_clear_requested.connect(_reset_miniature)
-	for index in range(DEFINITION.PACK_CHOICES.size()):
-		get_node(DETAIL + PACK_BUTTONS[index]).pressed.connect(_request_pack.bind(DEFINITION.PACK_CHOICES[index]))
+	for index in range(PACK_BUTTONS.size()):
+		get_node(DETAIL + PACK_BUTTONS[index]).pressed.connect(_request_pack.bind(index))
 	get_node(DETAIL + "/ScrollChoice/Reroll").pressed.connect(_request_scroll.bind("reroll"))
 	get_node(DETAIL + "/ScrollChoice/Eat").pressed.connect(_request_scroll.bind("eat"))
 	get_node(DETAIL + "/ScrollChoice/Paper").pressed.connect(_request_scroll.bind("toilet-paper"))
@@ -388,7 +392,7 @@ func _present_choices() -> void:
 func _class_rows() -> Array[Dictionary]:
 	var rows: Array[Dictionary] = []
 	for index in range(CLASS_IDS.size()):
-		var profile: Dictionary = CLASSES.new().profile(CLASS_IDS[index])
+		var profile: Dictionary = CLASSES.new(data_catalogue).profile(CLASS_IDS[index])
 		rows.append({"id": CLASS_IDS[index], "title": _t(str(profile.title)), "subtitle": "", "value": "✓" if _draft.get("class_id") == CLASS_IDS[index] else "", "icon": _icon(CLASS_ICONS[index])})
 	return rows
 
@@ -448,7 +452,7 @@ func _origin_result(title: String, key: String) -> Dictionary:
 		return {"value": origin, "detail": origin}
 	if title == "Decoction doses":
 		return {"value": _t("%d doses / day") % roll, "detail": _t("Shared decoction doses: %d") % roll}
-	var feature: Dictionary = CLASSES.new().decoction(roll) if title in ["First decoction", "Second decoction"] else CLASSES.new().feature(str(_draft.get("class_id", "")), roll)
+	var feature: Dictionary = CLASSES.new(data_catalogue).decoction(roll) if title in ["First decoction", "Second decoction"] else CLASSES.new(data_catalogue).feature(str(_draft.get("class_id", "")), roll)
 	return {"value": _t(str(feature.get("name", ""))), "detail": _t(str(feature.get("rules", "")))}
 
 func _conditional_result(title: String) -> Dictionary:
@@ -458,7 +462,7 @@ func _conditional_result(title: String) -> Dictionary:
 		return {"value": _t("Sacred scroll" if value == 1 else "Unclean scroll"), "detail": ""}
 	if title in ["Hermit scroll", "Sacred scroll", "Unclean scroll"]:
 		var sacred := title == "Sacred scroll" or (title == "Hermit scroll" and int(values.get("Hermit scroll family", 0)) == 1)
-		var item: Dictionary = SCROLLS.new().item("sacred" if sacred else "unclean", value)
+		var item: Dictionary = SCROLLS.new(data_catalogue).item("sacred" if sacred else "unclean", value)
 		return {"value": _t(str(item.get("name", ""))), "detail": _t(str(item.get("rules", "")))}
 	if title in ["Red poison doses", "Life elixir doses"]:
 		return {"value": _t("%d doses") % value, "detail": _t(title)}
@@ -529,14 +533,19 @@ func _present_detail() -> void:
 	get_node(DETAIL + "/RollOutcome/ResultCopy").visible = not str(row.get("explanation", "")).is_empty()
 	get_node(DETAIL + "/RollOutcome/ResultCopy").text = _t(str(row.get("explanation", "")))
 	var values: Dictionary = _draft.get("equipment_rolls", {})
-	var choices: Array[String] = DEFINITION.new().pack_choices_for_roll(int(values.get("Equipment pack", 0)))
-	get_node(DETAIL + "/PackChoices").visible = _route == "create-equipment" and _choice == "Equipment pack" and not choices.is_empty()
-	for index in range(DEFINITION.PACK_CHOICES.size()):
-		var pack: String = DEFINITION.PACK_CHOICES[index]
-		var choice := get_node(DETAIL + PACK_BUTTONS[index]) as Button
-		choice.visible = choices.has(pack)
-		choice.text = _t(pack)
-		choice.set_pressed_no_signal(not bool(_draft.get("pack_choice_pending", true)) and str(_draft.get("pack", "")) == pack)
+	var pack_step := _route == "create-equipment" and _choice == "Equipment pack"
+	var choices: Array[String] = []
+	if pack_step:
+		choices = DEFINITION.new(data_catalogue).pack_choices_for_roll(int(values.get("Equipment pack", 0)))
+	get_node(DETAIL + "/PackChoices").visible = not choices.is_empty()
+	if not choices.is_empty():
+		var packs := data_catalogue.creation_choices("PACK_CHOICES")
+		for index in range(packs.size()):
+			var pack: String = packs[index]
+			var choice := get_node(DETAIL + PACK_BUTTONS[index]) as Button
+			choice.visible = choices.has(pack)
+			choice.text = _t(pack)
+			choice.set_pressed_no_signal(not bool(_draft.get("pack_choice_pending", true)) and str(_draft.get("pack", "")) == pack)
 	get_node(DETAIL + "/ScrollChoice").visible = _route == "create-equipment" and not str(_draft.get("scroll_choice_slot", "")).is_empty()
 	if get_node(DETAIL + "/PackChoices").visible:
 		get_node(DETAIL + "/RollInfo/Flavor").text = _t("Choose your starting container or transport.")
@@ -725,11 +734,11 @@ func _equipment_meaning(title: String, draft: Dictionary) -> String:
 			return _t("No pack")
 		return _t("Choose one pack below") if bool(draft.get("pack_choice_pending", true)) else _t(str(draft.get("pack", "Nothing")))
 	if title == "Equipment first":
-		return _t(DEFINITION.FIRST_EQUIPMENT_NAMES[value - 1]) if value >= 1 and value <= 12 else ""
+		return _t(data_catalogue.creation_choices("FIRST_EQUIPMENT_NAMES")[value - 1]) if value >= 1 and value <= 12 else ""
 	if title == "Equipment second":
-		return _t(DEFINITION.SECOND_EQUIPMENT_NAMES[value - 1]) if value >= 1 and value <= 12 else ""
+		return _t(data_catalogue.creation_choices("SECOND_EQUIPMENT_NAMES")[value - 1]) if value >= 1 and value <= 12 else ""
 	if title == "Weapon" or title == "Armor":
-		return _t(DEFINITION.new().resolve_equipment_name(title, value))
+		return _t(DEFINITION.new(data_catalogue).resolve_equipment_name(title, value))
 	return ""
 
 
@@ -798,8 +807,8 @@ func _request_miniature() -> void:
 func _reset_miniature() -> void:
 	miniature_reset_requested.emit()
 
-func _request_pack(pack: String) -> void:
-	pack_selected.emit(pack)
+func _request_pack(index: int) -> void:
+	pack_selected.emit(data_catalogue.creation_choices("PACK_CHOICES")[index])
 
 func _request_scroll(disposition: String) -> void:
 	scroll_selected.emit(str(_draft.get("scroll_choice_slot", "")), disposition)

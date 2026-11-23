@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -12,8 +14,8 @@ func test_custom_loot_accepts_explicit_single_die_damage() -> void:
 	var system := SYSTEM.new()
 	add_child(auto_free(system))
 	host.handler = system
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
-	var actions := ACTIONS.new(SDK.new(host), SDK.ActorId.new("hero"))
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
+	var actions := ACTIONS.new(PACKAGE_DATA.facade(host), SDK.ActorId.new("hero"))
 	var result := await actions.add_custom({"name": "Review knife", "kind": "Weapon", "quantity": "1", "uses": "0", "damage": "1d4", "range_feet": "0", "armor_tier": "0", "reduction": "", "rules": ""})
 	assert_bool(result.ok).override_failure_message("A custom item with 1d4 damage must save: " + result.message).is_true()
 	if result.ok:
@@ -37,7 +39,7 @@ func test_custom_form_saves_typed_damage_and_keeps_creature_capabilities() -> vo
 	var host = load("res://tests/creature_appearance_boundary.gd").new()
 	host.handler = auto_free(SYSTEM.new())
 	add_child(host.handler)
-	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	host.actors.hero.access_level = "Owner"
 	var attacks: Array = host.actors.hero.data.attacks.duplicate(true)
 	var viewport: SubViewport = auto_free(SubViewport.new())
@@ -46,7 +48,7 @@ func test_custom_form_saves_typed_damage_and_keeps_creature_capabilities() -> vo
 	var surface = load(ROOT + "ui/creature_surface.tscn").instantiate()
 	# Rookframe supplies its active theme to Package surfaces.
 	surface.theme = WORLD_THEME.entry()
-	surface.set_meta("rookframe_sdk", host)
+	surface.sdk = PACKAGE_DATA.facade(host)
 	viewport.add_child(surface)
 	surface._rookframe_open_actor("hero")
 	surface._catalogue()
@@ -71,5 +73,5 @@ func test_custom_form_saves_typed_damage_and_keeps_creature_capabilities() -> vo
 	assert_str(host.actors.hero.data.inventory[-1].name).is_equal("Review knife")
 	assert_str(host.actors.hero.data.inventory[-1].damage).is_equal("d4")
 	assert_array(host.actors.hero.data.attacks).is_equal(attacks)
-	var items := ACTIONS.new(SDK.new(host), SDK.ActorId.new("hero")).inventory(host.actors.hero.data)
+	var items := ACTIONS.new(PACKAGE_DATA.facade(host), SDK.ActorId.new("hero")).inventory(host.actors.hero.data)
 	assert_str(str(items[-1].get("rules", ""))).override_failure_message("A custom item without rules must not inherit another catalogue entry's rules.").is_empty()

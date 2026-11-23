@@ -1,5 +1,9 @@
 extends RefCounted
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+
 ## Ordinary Actor inventory operations, shared by Character and Creature sheets.
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 var _sdk: SDK
@@ -7,7 +11,11 @@ var _id: SDK.ActorId
 ## The rejected correction, for field-local feedback; empty for domain failures.
 var invalid_field := ""
 
-func _init(facade: SDK, actor_id: SDK.ActorId) -> void:
+func _init(facade: SDK, actor_id: SDK.ActorId, data_catalogue: CATALOGUE = null) -> void:
+	_data_catalogue = data_catalogue
+	if _data_catalogue == null:
+		_data_catalogue = CATALOGUE.new()
+		_data_catalogue.bind(facade)
 	_sdk = facade
 	_id = actor_id
 
@@ -42,7 +50,7 @@ func inventory(data: Dictionary) -> Array:
 		if not entry.has("inventory_id"):
 			serial += 1
 			entry["inventory_id"] = str(serial)
-		var defaults: Dictionary = EQUIPMENT.new().item(str(entry.get("source_item_id", "")))
+		var defaults: Dictionary = EQUIPMENT.new(_data_catalogue).item(str(entry.get("source_item_id", "")))
 		for key in ["name", "kind", "rules", "price", "source", "damage", "reduction", "attack_ability", "ammunition", "resource_field"]:
 			if defaults.has(key) and not entry.has(key):
 				entry[key] = str(defaults.get(key, ""))
@@ -64,7 +72,7 @@ func inventory(data: Dictionary) -> Array:
 	return items
 
 func add_equipment(source_id: String) -> SDK.ActorResult:
-	var item: Dictionary = EQUIPMENT.new().item(source_id)
+	var item: Dictionary = EQUIPMENT.new(_data_catalogue).item(source_id)
 	if item.is_empty():
 		return _failure("That equipment is unavailable.")
 	return await _add(item)

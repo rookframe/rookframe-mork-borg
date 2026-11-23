@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 ## Severe first-write capability loss and stale appearance overwrite coverage.
 ## Public SDK boundary only; not application persistence, replication or picker QA.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -13,7 +15,7 @@ const PORTRAIT_CACHE = preload(ROOT + "ui/creature_portrait_cache.gd")
 const REFERENCE := {"package_id": "external-miniatures", "local_id": "warden"}
 
 func _legacy() -> Dictionary:
-	var data: Dictionary = load(ROOT + "content/seth-goblin.tres").create_data({})
+	var data: Dictionary = load(ROOT + "content/seth-goblin.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	data.erase("creature_stat_block")
 	data["creature_inventory"] = true
 	data["inventory"] = [
@@ -27,10 +29,10 @@ func _legacy() -> Dictionary:
 func test_appearance_first_writes_preserve_latest_legacy_capabilities() -> void:
 	var host := BOUNDARY.new()
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
 	host.actors.enemy.access_level = "Owner"
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var id := SDK.ActorId.new("enemy")
 	var image := Image.create(8, 4, false, Image.FORMAT_RGBA8)
 	image.fill(Color.DARK_RED)
@@ -44,7 +46,7 @@ func test_appearance_first_writes_preserve_latest_legacy_capabilities() -> void:
 		latest["rules"] = "Accepted free rule."
 		latest.inventory.append({"inventory_id": "8", "name": "Accepted loot", "quantity": 3})
 		host.before_appearance = latest
-		var expected := CREATURES.new().stat_block(latest)
+		var expected := CREATURES.new(PACKAGE_DATA.catalogue()).stat_block(latest)
 		var result: SDK.ActorResult
 		if operation == "portrait":
 			result = await ACTIONS.new(sdk, id).set_portrait(portrait, "", 0)
@@ -77,9 +79,9 @@ func test_library_filepath_defaults_snapshot_only_future_actors_and_failed_chang
 	var host := BOUNDARY.new()
 	host.game_master = true
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var image := Image.create(8, 4, false, Image.FORMAT_RGBA8)
 	image.fill(Color.DARK_RED)
 	var first_path: String = host.RetainActorPortrait(image.save_png_to_buffer()).path
@@ -110,10 +112,10 @@ func test_late_actor_upload_after_new_choice_and_reset_is_rejected_without_block
 	for actor_id in ["hero", "enemy"]:
 		var host := BOUNDARY.new()
 		host.handler = auto_free(SYSTEM.new())
-		host.handler.sdk = SDK.new(host)
+		host.handler.sdk = PACKAGE_DATA.facade(host)
 		add_child(host.handler)
 		host.actors[actor_id].access_level = "Owner"
-		var sdk := SDK.new(host)
+		var sdk := PACKAGE_DATA.facade(host)
 		var id := SDK.ActorId.new(actor_id)
 		var actions = CHARACTERS.new(sdk, id) if actor_id == "hero" else ACTIONS.new(sdk, id)
 		var image := Image.create(8, 4, false, Image.FORMAT_RGBA8)
@@ -146,9 +148,9 @@ func test_late_library_upload_after_reset_is_rejected_and_unrelated_world_change
 	var host := BOUNDARY.new()
 	host.game_master = true
 	host.handler = auto_free(SYSTEM.new())
-	host.handler.sdk = SDK.new(host)
+	host.handler.sdk = PACKAGE_DATA.facade(host)
 	add_child(host.handler)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var image := Image.create(8, 4, false, Image.FORMAT_RGBA8)
 	image.fill(Color.DARK_RED)
 	var late_path: String = host.RetainActorPortrait(image.save_png_to_buffer()).path
@@ -170,7 +172,7 @@ func test_late_library_upload_after_reset_is_rejected_and_unrelated_world_change
 
 func test_portrait_cache_retries_acquisition_and_discards_previous_session_textures() -> void:
 	var host := BOUNDARY.new()
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	var cache := PORTRAIT_CACHE.new()
 	var path := "portraits/pending.png"
 	# Replicated data may become readable before the retained original arrives.
@@ -200,7 +202,7 @@ func test_portrait_cache_retries_acquisition_and_discards_previous_session_textu
 	later.retained_portraits[path] = image.save_png_to_buffer()
 	cache.clear()
 	assert_str(cache.message).is_empty()
-	var fresh := cache.resolve(path, SDK.new(later).portraits)
+	var fresh := cache.resolve(path, PACKAGE_DATA.facade(later).portraits)
 	assert_object(fresh).is_not_same(first)
 	assert_int(later.decode_calls).is_equal(1)
 	assert_str(fresh.get_image().get_pixel(0, 0).to_html()).is_equal(Color.DARK_BLUE.to_html())

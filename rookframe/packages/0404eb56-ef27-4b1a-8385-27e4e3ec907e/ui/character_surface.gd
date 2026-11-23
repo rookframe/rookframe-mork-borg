@@ -1,6 +1,10 @@
 extends "sheet_silkbound_layout.gd"
 
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
+const CATALOGUE = preload(ROOT + "logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 const FAVORITES = preload(ROOT + "ui/sheet_favorites.gd")
 var _favorites := FAVORITES.new()
 var _favorite_busy := false
@@ -16,9 +20,11 @@ const HEALTH = preload(ROOT + "logic/health_action.gd")
 const POWER = preload(ROOT + "logic/power_action.gd")
 const SPECIAL = preload(ROOT + "logic/special_action.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")
+var _rules := RULES.new(_data_catalogue)
 const POWERS = preload(ROOT + "logic/powers.gd")
-const SCROLLS = preload(ROOT + "logic/starting_scrolls.gd")
+var _powers := POWERS.new(_data_catalogue)
 const EQUIPMENT = preload(ROOT + "logic/equipment.gd")
+var _equipment := EQUIPMENT.new(_data_catalogue)
 const MINIATURES = preload(ROOT + "logic/miniature_actions.gd")
 const I18N = preload(ROOT + "ui/localization.gd")
 @onready var _core_ui = get_node(^"Margin/Layout/Body/Core")
@@ -92,7 +98,7 @@ const CHAPTERS := ["Character", "Powers", "Inventory", "Journal", "Appearance"]
 @onready var _detail_header = _detail_ui.get_node(^"HeaderFrame/Inset/DetailHeader")
 @export var navigation: Resource
 @onready var _chapters = [_chapter_tab_character, _chapter_tab_powers, _chapter_tab_inventory, _chapter_tab_journal, _chapter_tab_appearance]
-var _projection := PROJECTION.new()
+var _projection := PROJECTION.new(_data_catalogue)
 var _draft := DRAFT.new()
 var _actor: SDK.Actor
 var _nav: Dictionary = {}
@@ -134,12 +140,13 @@ var _rendered_chapter := -1
 var _locale := I18N.new()
 
 func ready() -> void:
+	_data_catalogue.bind(sdk)
 	for button in [_quick_omens, _quick_silver]:
 		button.add_theme_font_size_override("font_size", 15)
 	_quick_omens.icon = preload("res://rookframe/ui/icons/character/dice.svg")
 	if sdk == null:
 		return
-	_favorites.sdk = sdk
+	_favorites.bind(sdk)
 	_favorites.favorite_changed.connect(_favorite_changed)
 	_favorite_button.favorite_changed.connect(_favorite_changed)
 	_locale.bind(sdk)
@@ -691,8 +698,8 @@ func _render_detail() -> void:
 			_text(str(entry.get("rules", "")))
 			if entry.has("uses"):
 				_detail_ui.append_facts([["Uses", str(entry.uses)]])
-			if parts[0] == "trait" and not RULES.new().definition(str(entry.get("id", ""))).is_empty():
-				_primary("Use feature", not _draft.active and _owner() and _use_allowed(RULES.new().definition(str(entry.get("id", "")))))
+			if parts[0] == "trait" and not _rules.definition(str(entry.get("id", ""))).is_empty():
+				_primary("Use feature", not _draft.active and _owner() and _use_allowed(_rules.definition(str(entry.get("id", "")))))
 	elif _detail.begins_with("actor:"):
 		var actor := sdk.actors.read(SDK.ActorId.new(_detail.trim_prefix("actor:")))
 		if actor.ok:
@@ -708,7 +715,7 @@ func _render_detail() -> void:
 		_primary(_detail_ui.compose_journal(data, _nav, _detail == "journal:story", _detail_tab, _phone), true)
 	elif _detail == "catalogue":
 		_detail_title.text = "Equipment catalogue"
-		for item in EQUIPMENT.new().entries():
+		for item in _equipment.entries():
 			_option(str(item.get("name", "Equipment")) + " · " + str(item.get("price", "")), _catalogue_add.bind(str(item.get("source_item_id", ""))), _owner())
 	elif _detail == "custom":
 		_detail_title.text = "Custom item"
@@ -790,8 +797,8 @@ func _item_detail(item: Dictionary) -> void:
 	else:
 		_text(str(item.get("rules", "")))
 		_detail_ui.append_facts(_projection.item_facts(_actor.data, item))
-		var power := POWERS.new().definition(str(item.get("source_item_id", "")))
-		var rule := RULES.new().definition(str(item.get("source_item_id", "")))
+		var power := _powers.definition(str(item.get("source_item_id", "")))
+		var rule := _rules.definition(str(item.get("source_item_id", "")))
 		if not power.is_empty():
 			_action_input["modifier"] = _cast_modifier
 			_workflow_field("modifier", "Situational modifier")
@@ -962,6 +969,7 @@ func _workflow(kind: String, entry: String) -> void:
 
 func _render_workflow() -> void:
 	if _action_kind in ["rest", "improve"]:
+		_workflow_ui.data_catalogue = _data_catalogue
 		_workflow_ui.configure(_data(), _action_kind, _rest, _action.snapshot if _action != null else {}, _portrait_texture)
 	if _action_kind == "rest":
 		_primary("Edit resolved resources" if _workflow_ui.is_daily() else "Done" if _action != null and _action.state in ["resolved", "ended", "error"] else "Roll recovery", _owner() and not _busy and not _action_live())
@@ -987,7 +995,7 @@ func _render_workflow() -> void:
 			return
 		if _action.state == "scroll":
 			var family := str(_action.snapshot.get("family", ""))
-			var entries: Array = SCROLLS.TABLES.get(family, [])
+			var entries: Array = _data_catalogue.scrolls(family)
 			for raw in entries:
 				var entry: Dictionary = raw
 				_option(str(entry.name), _reward_scroll.bind(str(entry.source_item_id)))
@@ -1003,7 +1011,7 @@ func _render_workflow() -> void:
 			_text("Selected scrolls: " + str(_scroll_choices))
 			_option("Clear selected scrolls", _clear_scroll_choices)
 			for family in [str(_action.snapshot.get("family", "unclean"))]:
-				var entries: Array = SCROLLS.TABLES.get(str(family), [])
+				var entries: Array = _data_catalogue.scrolls(str(family))
 				for raw in entries:
 					var entry: Dictionary = raw
 					_option(str(entry.name), _special_scroll.bind(str(entry.source_item_id)))
@@ -1047,8 +1055,8 @@ func _render_workflow() -> void:
 		_workflow_field("modifier", "Situational modifier")
 		_primary("Roll casting test", _can_act())
 	elif _action_kind == "use":
-		var item := RULES.new().owned(_actor.data, str(_action_input.get("item", "")))
-		var rule := RULES.new().definition(str(item.get("source_item_id", "")))
+		var item := _rules.owned(_actor.data, str(_action_input.get("item", "")))
+		var rule := _rules.definition(str(item.get("source_item_id", "")))
 		_text(str(item.get("name", "Item")) + "\n" + str(item.get("rules", "")))
 		if rule.get("ability_choice", false):
 			for ability in PROJECTION.ABILITIES:
@@ -1183,7 +1191,7 @@ func _primary_action() -> void:
 		_workflow("use", "feature:" + str(trait_entry.get("id", "")))
 	elif _detail.begins_with("item:"):
 		var item := _item(_detail.trim_prefix("item:"))
-		if not POWERS.new().definition(str(item.get("source_item_id", ""))).is_empty():
+		if not _powers.definition(str(item.get("source_item_id", ""))).is_empty():
 			if not _cast_modifier.is_valid_int() or int(_cast_modifier) < -20 or int(_cast_modifier) > 20:
 				_field_error("modifier", "Enter a whole number from −20 to +20.")
 				return
@@ -1193,7 +1201,7 @@ func _primary_action() -> void:
 			await _start_workflow()
 		else:
 			_workflow("use", _detail.trim_prefix("item:"))
-			var rule := RULES.new().definition(str(item.get("source_item_id", "")))
+			var rule := _rules.definition(str(item.get("source_item_id", "")))
 			if rule.get("brew", false):
 				await _start_workflow()
 	elif _detail == "custom":

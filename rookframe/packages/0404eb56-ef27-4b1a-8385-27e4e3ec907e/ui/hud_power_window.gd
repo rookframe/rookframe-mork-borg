@@ -1,5 +1,9 @@
 extends "res://rookframe/sdk/window.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 ## This task captures its Actor and exact scroll once. HUD selection is unrelated.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
@@ -19,6 +23,7 @@ func ready() -> void:
 		get_node("Layout/Actions/Close").text = sdk.translations.text("Cancel")
 
 func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
+	_data_catalogue.bind(sdk)
 	if _opened or sdk == null:
 		return
 	_opened = true
@@ -32,7 +37,7 @@ func opened_task(actor: SDK.ActorId, task: Dictionary) -> void:
 	if task.get("daily", false):
 		_panel.configure_morning(current.actor, sdk)
 		return
-	var source := FAVORITES.new().find(current.actor.data, actor.value, [], str(task.get("key", "")))
+	var source := FAVORITES.new(_data_catalogue).find(current.actor.data, actor.value, [], str(task.get("key", "")))
 	if source.is_empty() or source.category != "Powers" or str(source.item) != str(task.get("item", "")) or str(source.source) != str(task.get("source", "")) or not source.available:
 		_close()
 		return

@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Shared sheet/HUD projection. Membership is independent of source availability.
 ## Saved records retain display context when an exact owned source disappears.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -35,10 +42,10 @@ func item_entry(item: Dictionary) -> Dictionary:
 	if str(item.get("kind", "")) == "Weapon" and not str(item.get("damage", "")).is_empty():
 		action = "attack"
 		category = "Attacks"
-	elif not POWERS.new().definition(source).is_empty():
+	elif not POWERS.new(_data_catalogue).definition(source).is_empty():
 		action = "cast"
 		category = "Powers"
-	elif not RULES.new().definition(source).is_empty() and not source in PASSIVE and not source in REACTIVE_ITEMS:
+	elif not RULES.new(_data_catalogue).definition(source).is_empty() and not source in PASSIVE and not source in REACTIVE_ITEMS:
 		action = "use"
 		category = "Items"
 	if action.is_empty() or str(item.get("inventory_id", "")).is_empty():
@@ -49,9 +56,9 @@ func uses_literal_name(source: Dictionary, data: Dictionary = {}) -> bool:
 	if source.get("custom", false):
 		return true
 	var id := str(source.get("source_item_id", source.get("source", "")))
-	var original: Dictionary = {} if id.is_empty() else ITEMS.EQUIPMENT.new().item(id)
+	var original: Dictionary = {} if id.is_empty() else ITEMS.EQUIPMENT.new(_data_catalogue).item(id)
 	if original.is_empty():
-		var profile: Dictionary = CREATURES.CORE_DEFINITIONS.get(str(data.get("definition_id", "")), {})
+		var profile: Dictionary = _data_catalogue.creature_profile(str(data.get("definition_id", "")))
 		for raw in profile.get("attacks", []):
 			var attack: Dictionary = raw
 			if str(attack.get("id", "")) == str(source.get("source_attack_id", source.get("id", ""))):
@@ -63,7 +70,7 @@ func uses_literal_name(source: Dictionary, data: Dictionary = {}) -> bool:
 
 func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = []) -> Array[Dictionary]:
 	var result: Array[Dictionary] = []
-	var inventory := ITEMS.new(null, SDK.ActorId.new(actor_id)).inventory(data)
+	var inventory := ITEMS.new(null, SDK.ActorId.new(actor_id), _data_catalogue).inventory(data)
 	for raw in inventory:
 		var item: Dictionary = raw
 		var entry := item_entry(item)
@@ -78,7 +85,7 @@ func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = 
 		var source := str(feature.get("id", ""))
 		var identity := str(feature.get("favorite_entry_id", ""))
 		var gift: Dictionary = feature.get("item", {})
-		if identity.is_empty() or str(gift.get("source_item_id", "")) == source or source in PASSIVE or RULES.new().definition(source).is_empty() and source != "cowards-jab":
+		if identity.is_empty() or str(gift.get("source_item_id", "")) == source or source in PASSIVE or RULES.new(_data_catalogue).definition(source).is_empty() and source != "cowards-jab":
 			continue
 		var available := int(feature.get("uses", 1)) > 0
 		if source == "abominable-gob-lobber":
@@ -90,7 +97,7 @@ func entries(data: Dictionary, actor_id: String, companions: Array[SDK.Actor] = 
 		var other: Dictionary = companion.data
 		if companion.access_level != "Owner" or str(other.get("schema", "")) != "mork-borg-adversary/v1" or not is_companion(data, actor_id, other):
 			continue
-		var attacks := CREATURES.new().combat_attacks(other)
+		var attacks := CREATURES.new(_data_catalogue).combat_attacks(other)
 		for raw in attacks:
 			var attack: Dictionary = raw
 			if str(attack.get("kind", "")) != "Weapon" or str(attack.get("damage", "")).is_empty():
@@ -144,7 +151,7 @@ func _available(data: Dictionary, item: Dictionary, action: String, inventory: A
 	if action == "attack":
 		return ATTACKS.new().usable(item, str(data.get("schema", "")) == "mork-borg-adversary/v1") and (str(item.get("ammunition", "")).is_empty() or not preload(ROOT + "logic/ammunition.gd").new().available(inventory, str(item.ammunition)).is_empty())
 	if action == "cast":
-		if int(data.get("power_uses", 0)) < 1 or not POWERS.new().casting_restriction(data, inventory).is_empty():
+		if int(data.get("power_uses", 0)) < 1 or not POWERS.new(_data_catalogue).casting_restriction(data, inventory).is_empty():
 			return false
 	var source := str(item.get("source_item_id", ""))
 	if source == "stolen-mitre" and not item.get("equipped", false):

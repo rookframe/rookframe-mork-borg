@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -9,16 +11,17 @@ func _locale(language: String):
 	var boundary := BOUNDARY.new()
 	boundary.language = language
 	var locale := LOCALE.new()
-	locale.bind(SDK.new(boundary))
+	locale.bind(PACKAGE_DATA.facade(boundary))
 	return locale
 
 func test_russian_creation_uses_display_labels_without_changing_draft() -> void:
 	var view = auto_free(load(ROOT + "ui/character_creation_view.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	# Rookframe supplies its active theme to Package surfaces.
 	view.theme = WORLD_THEME.entry()
 	view.localize(_locale("ru_RU"))
 	add_child(view)
-	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new().profile("fanged-deserter")
+	var profile: Dictionary = load(ROOT + "logic/creation_classes.gd").new(PACKAGE_DATA.catalogue()).profile("fanged-deserter")
 	var draft := {"class_id": "fanged-deserter", "class_title": profile.title, "class_profile": profile, "class_rules": profile.rules, "name": "Strength", "description": "My character", "origin": profile.origins[0], "inventory": []}
 	var before := draft.duplicate(true)
 	view.present_creation("create-abilities", draft, true)
@@ -35,6 +38,7 @@ func test_russian_creation_uses_display_labels_without_changing_draft() -> void:
 
 func test_dynamic_inventory_and_search_preserve_source_ids() -> void:
 	var view = auto_free(load(ROOT + "ui/equipment_catalogue.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	view.localize(_locale("ru"))
 	add_child(view)
 	view.configure({}, [])
@@ -48,6 +52,7 @@ func test_dynamic_inventory_and_search_preserve_source_ids() -> void:
 	assert_str(sword.get_node("Copy/Title").text).is_equal("Меч")
 	assert_str(sword.item.name).is_equal("Sword")
 	var custom = auto_free(load(ROOT + "ui/inventory_row.tscn").instantiate())
+	custom.data_catalogue = PACKAGE_DATA.catalogue()
 	custom.localize(_locale("ru"))
 	add_child(custom)
 	custom.configure({"name": "Strength", "custom": true, "quantity": 2, "inventory_id": "custom"})
@@ -70,6 +75,7 @@ func test_editable_values_and_fallback() -> void:
 
 func test_edit_labels_translate_without_rewriting_named_content() -> void:
 	var view = auto_free(load(ROOT + "ui/character_sheet_edit.tscn").instantiate())
+	view.data_catalogue = PACKAGE_DATA.catalogue()
 	view.localize(_locale("ru"))
 	add_child(view)
 	var data := {"traits": [{"id": "custom", "name": "My trait", "rules": "My rules"}], "companion_sheets": [{"name": "My companion", "rules": "Their rules"}]}
@@ -101,13 +107,14 @@ func test_catalog_covers_all_authored_rule_content_and_preserves_formats() -> vo
 		for match in formats.search_all(translated):
 			translated_formats.append(match.get_string())
 		assert_array(translated_formats).is_equal(source_formats)
-	_assert_content(load(ROOT + "logic/creation_classes.gd").PROFILES, russian)
-	_assert_content(load(ROOT + "logic/starting_scrolls.gd").TABLES, russian)
-	var powers = load(ROOT + "logic/powers.gd").new()
-	for id in powers.HANDLING:
+	_assert_content(PACKAGE_DATA.catalogue().class_profiles(), russian)
+	for family in PACKAGE_DATA.CATALOGUE.SCROLL_FAMILIES:
+		_assert_content(PACKAGE_DATA.catalogue().scrolls(family), russian)
+	var powers = load(ROOT + "logic/powers.gd").new(PACKAGE_DATA.catalogue())
+	for id in PACKAGE_DATA.catalogue().power_handling():
 		_assert_content(powers.definition(id), russian)
-	_assert_content(load(ROOT + "logic/creature_definition.gd").CORE_DEFINITIONS, russian)
-	_assert_content(load(ROOT + "logic/equipment.gd").new().entries(), russian)
+	_assert_content(PACKAGE_DATA.catalogue().creature_profiles(), russian)
+	_assert_content(load(ROOT + "logic/equipment.gd").new(PACKAGE_DATA.catalogue()).entries(), russian)
 
 func _assert_content(value: Variant, catalog: Translation, key: String = "") -> void:
 	if value is Dictionary:

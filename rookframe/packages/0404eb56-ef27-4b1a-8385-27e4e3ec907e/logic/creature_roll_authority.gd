@@ -1,4 +1,11 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
+func _init(data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
+
 ## Record full roll arithmetic separately from the compact numeric announcement.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -55,7 +62,7 @@ func _start(context: SDK.SystemActionContext, caller: Dictionary, input: Diction
 	if not _usable(source):
 		return _error("This Creature cannot roll. Rules and corrections remain available.")
 	var data: Dictionary = source.actor.data
-	var accepted := CREATURES.new().stat_block(data)
+	var accepted := CREATURES.new(_data_catalogue).stat_block(data)
 	var choice := ROLLS.new().choice(accepted, str(input.part), str(input.entry))
 	var matching: Dictionary = {}
 	if str(input.part) == "damage" and OWN.new().supported(accepted):
@@ -160,7 +167,7 @@ func _completion_context(context: SDK.SystemActionContext, action: Dictionary) -
 	var actor := context.read_actor(SDK.ActorId.new(str(action.source)))
 	if not actor.ok:
 		return {}
-	var accepted := CREATURES.new().stat_block(actor.actor.data)
+	var accepted := CREATURES.new(_data_catalogue).stat_block(actor.actor.data)
 	if not OWN.new().supported(accepted):
 		return {}
 	var current := _matching(str(action.source), accepted, str(choice.entry))

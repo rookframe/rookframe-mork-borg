@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const DIALOG = preload(ROOT + "ui/shield_dialog.tscn")
@@ -57,7 +59,7 @@ func test_switching_actor_discards_the_previous_defence_presentation() -> void:
 	var host = preload("res://tests/defence_sdk_boundary.gd").new()
 	host.handler = auto_free(preload(ROOT + "logic/implementation.gd").new())
 	add_child(host.handler)
-	var facade = SDK.new(host)
+	var facade = PACKAGE_DATA.facade(host)
 	var started = await facade.system_actions.submit("defence.start", {"id": "sheet-switch", "source": "enemy", "rook": "enemy-rook", "attack": "knife"})
 	host.as_player()
 	var sheet = auto_free(preload(ROOT + "ui/character_sheet.tscn").instantiate())

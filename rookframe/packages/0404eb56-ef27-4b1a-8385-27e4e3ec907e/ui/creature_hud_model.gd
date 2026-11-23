@@ -1,4 +1,8 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
 ## Accepted Creature data projected into short, actionable HUD collections.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -11,6 +15,10 @@ const ART = preload(ROOT + "ui/creature_sheet_art.gd")
 const PORTRAIT = preload(ROOT + "ui/creature_portrait_cache.gd")
 const ICONS := {"Attacks": preload(ROOT + "ui/hud_art/attacks.svg"), "Special": preload(ROOT + "ui/hud_art/features.svg"), "Checks": preload(ROOT + "ui/hud_art/dice.svg"), "Scene": preload(ROOT + "ui/hud_art/people.svg")}
 var sdk: SDK
+
+func bind(facade: SDK) -> void:
+	sdk = facade
+	_data_catalogue.bind(facade)
 var _favorites: Dictionary = {}
 var _portraits: Dictionary = {}
 
@@ -58,7 +66,7 @@ func entries(data: Dictionary, category: String, rolling: bool) -> Array[ENTRY]:
 	var result: Array[ENTRY] = []
 	var alive := HEALTH.new().can_roll(data)
 	if category == "Attacks":
-		for raw in CREATURES.new().attack_options(data):
+		for raw in CREATURES.new(_data_catalogue).attack_options(data):
 			if typeof(raw) != TYPE_DICTIONARY:
 				continue
 			var source: Dictionary = raw
@@ -70,7 +78,7 @@ func entries(data: Dictionary, category: String, rolling: bool) -> Array[ENTRY]:
 				entry.detail = sdk.translations.text("Dead" if not alive else "Damage unavailable")
 			result.append(entry)
 	elif category == "Special":
-		for source in ACTIONS.new().specials(data):
+		for source in ACTIONS.new(_data_catalogue).specials(data):
 			var entry := _entry(str(source.id), str(source.get("name", "Special")), category)
 			entry.available = alive
 			entry.detail = sdk.translations.text("Resolve at the table" if alive else "Dead")

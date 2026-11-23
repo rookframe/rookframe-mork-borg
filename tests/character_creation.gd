@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const WORLD_THEME = preload("res://tests/world_theme.gd")
 
 # Deterministic rule cases use the real authored creator and generated public
@@ -148,7 +150,7 @@ func test_hit_points_and_traits_keep_their_rules_when_results_arrive_out_of_orde
 	host.complete_roll("First decoction")
 	host.complete_roll("Origin")
 	await _finish(creator)
-	var classes = load(ROOT + "logic/creation_classes.gd").new()
+	var classes = load(ROOT + "logic/creation_classes.gd").new(PACKAGE_DATA.catalogue())
 	assert_str(host.actors[0].data.traits[0].id).is_equal(classes.decoction(1).id)
 	assert_str(host.actors[0].data.traits[1].id).is_equal(classes.decoction(2).id)
 	assert_bool(host.errors.is_empty()).is_true()
@@ -374,7 +376,7 @@ func test_correct_class_uses() -> void:
 		add_child(auto_free(sheet))
 		var miniatures: Array[SDK.ContentEntry] = []
 		var choices: Array[Dictionary] = []
-		sheet.set_character(SDK.Actor.new(host.actors[0]), "inventory", "character", miniatures, choices, SDK.new(host))
+		sheet.set_character(SDK.Actor.new(host.actors[0]), "inventory", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 		await get_tree().process_frame
 		await get_tree().process_frame
 		var found := false
@@ -394,7 +396,7 @@ func test_correct_class_uses() -> void:
 				field.get_node(^"Actions/Save").pressed.emit()
 				break
 		await get_tree().process_frame
-		var stored: SDK.ActorResult = SDK.new(host).actors.read(SDK.ActorId.new("character"))
+		var stored: SDK.ActorResult = PACKAGE_DATA.facade(host).actors.read(SDK.ActorId.new("character"))
 		_check(stored.ok and stored.actor.data.inventory.any(func(item): return item.get("name", "") == case[2] and item.get("uses", -1) == 0), "Ordinary sheet save retains corrected remaining uses through public Actor state.")
 		_check(host.requests.size() == roll_count, "Corrections do not regenerate class mechanics.")
 		sheet.free()
@@ -440,7 +442,7 @@ func _descriptive_companions(host) -> void:
 	add_child(auto_free(sheet))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
-	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "companions", miniatures, choices, SDK.new(host))
+	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "companions", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var labels: Array = sheet.find_children("*", "Label", true, false)
@@ -553,7 +555,7 @@ func test_fanged_hound() -> void:
 		entries.append(_entry(id, "actor_definition"))
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
-	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	creator.configure(entries, entries[0], miniatures, true, PACKAGE_DATA.facade(host), choices)
 	creator.stage_changed.connect(_stage_changed)
 	creator.primary_changed.connect(_primary_changed)
 	creator.begin()
@@ -592,7 +594,7 @@ func test_fanged_scrolls() -> void:
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("fanged-deserter-character", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
-	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	creator.configure(entries, entries[0], miniatures, true, PACKAGE_DATA.facade(host), choices)
 	creator.stage_changed.connect(_stage_changed)
 	creator.primary_changed.connect(_primary_changed)
 	creator.scroll_choice_requested.connect(func(slot: String): creator.choose_scroll_disposition.call_deferred(slot, "eat" if slot == "first" else "toilet-paper"))
@@ -626,7 +628,7 @@ func test_gutterborn_fingersmith() -> void:
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("gutterborn-scum-character", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
-	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	creator.configure(entries, entries[0], miniatures, true, PACKAGE_DATA.facade(host), choices)
 	creator.stage_changed.connect(_stage_changed)
 	creator.primary_changed.connect(_primary_changed)
 	creator.begin()
@@ -659,7 +661,7 @@ func test_hermit_hawk() -> void:
 	var entries: Array[SDK.ContentEntry] = [_entry("classless-character", "actor_definition"), _entry("esoteric-hermit-character", "actor_definition"), _entry("hawk-as-weapon", "actor_definition")]
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
-	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	creator.configure(entries, entries[0], miniatures, true, PACKAGE_DATA.facade(host), choices)
 	creator.stage_changed.connect(_stage_changed)
 	creator.primary_changed.connect(_primary_changed)
 	creator.begin()
@@ -800,7 +802,7 @@ func test_companions_projection() -> void:
 	sheet.companion_selected.connect(func(actor: SDK.Actor): selected.append(actor.id.value))
 	var miniatures: Array[SDK.ContentEntry] = []
 	var choices: Array[Dictionary] = []
-	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "character", miniatures, choices, SDK.new(host))
+	sheet.set_character(SDK.Actor.new(host.actors[0]), "character", "character", miniatures, choices, PACKAGE_DATA.facade(host))
 	await get_tree().process_frame
 	await get_tree().process_frame
 	var overview = sheet.find_child("CharacterOverview", true, false)
@@ -855,7 +857,7 @@ func test_refresh_during_creation() -> void:
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
 	# A remote Actor update refreshes the public catalogue while creation is active.
-	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	creator.configure(entries, entries[0], miniatures, true, PACKAGE_DATA.facade(host), choices)
 	await _finish(creator)
 	_check(host.actors.size() == 1 and host.actors[0].data.class_id == "gutterborn-scum", "Catalogue refresh must preserve the selected class definition.")
 	creator.free()
@@ -896,7 +898,7 @@ func _creator_for(host, class_id: String):
 		entries.append(_entry(id, "actor_definition"))
 	var miniatures: Array[SDK.ContentEntry] = [_entry("creature-token", "miniature")]
 	var choices: Array[Dictionary] = [{"package_id": host.PackageId(), "local_id": "creature-token", "title": "Creature"}]
-	creator.configure(entries, entries[0], miniatures, true, SDK.new(host), choices)
+	creator.configure(entries, entries[0], miniatures, true, PACKAGE_DATA.facade(host), choices)
 	creator.stage_changed.connect(_stage_changed)
 	creator.primary_changed.connect(_primary_changed)
 	creator.begin()

@@ -1,5 +1,9 @@
 extends "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/token_box.gd"
 
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue := CATALOGUE.new()
+
+
 const I18N = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/localization.gd")
 var i18n := I18N.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
@@ -37,6 +41,7 @@ func _ready() -> void:
 func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	_actor = actor
 	_sdk = facade
+	_data_catalogue.bind(facade)
 	i18n.bind(_sdk)
 	localize(i18n)
 	_item = item
@@ -50,7 +55,7 @@ func configure(actor: SDK.Actor, facade: SDK, item: String) -> void:
 	for raw in inventory:
 		var entry: Dictionary = raw
 		if str(entry.inventory_id) == item:
-			_power = POWERS.new().definition(str(entry.get("source_item_id", "")))
+			_power = POWERS.new(_data_catalogue).definition(str(entry.get("source_item_id", "")))
 	if _source_rook == null and not _tabletop:
 		_source_rook = _sdk.rooks.selected()
 	if item.is_empty() and not _morning_only:
@@ -108,7 +113,7 @@ func _list(items: Array) -> void:
 		child.queue_free()
 	for raw in items:
 		var item: Dictionary = raw
-		var power := POWERS.new().definition(str(item.get("source_item_id", "")))
+		var power := POWERS.new(_data_catalogue).definition(str(item.get("source_item_id", "")))
 		var quantity: int = item.get("quantity", 0)
 		if power.is_empty() or quantity < 1:
 			continue

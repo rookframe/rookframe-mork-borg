@@ -1,4 +1,8 @@
 extends RefCounted
+
+const CATALOGUE = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/logic/catalogue.gd")
+var _data_catalogue: CATALOGUE
+
 ## Resolve the rolling side once on Authority, retaining the existing action.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -11,7 +15,8 @@ var _melee: MELEE
 var _defence: DEFENCE
 var _routes: Dictionary = {}
 
-func _init(melee: MELEE, defence: DEFENCE) -> void:
+func _init(melee: MELEE, defence: DEFENCE, data_catalogue: CATALOGUE) -> void:
+	_data_catalogue = data_catalogue
 	_melee = melee
 	_defence = defence
 
@@ -41,7 +46,7 @@ func handle(context: SDK.SystemActionContext, name: String, payload: Variant) ->
 	if not source.ok or source.actor.access_level != "Owner" or typeof(source.actor.data) != TYPE_DICTIONARY:
 		return _error("Choose this Character's authorized companion.")
 	var source_data: Dictionary = source.actor.data
-	if str(source_data.get("schema", "")) != "mork-borg-adversary/v1" or not MODEL.new().is_companion(character_data, character.actor.id.value, source_data):
+	if str(source_data.get("schema", "")) != "mork-borg-adversary/v1" or not MODEL.new(_data_catalogue).is_companion(character_data, character.actor.id.value, source_data):
 		return _error("Choose this Character's authorized companion.")
 	if not BROKEN.new().can_act(source.actor.data):
 		return _error("This companion cannot act.")
@@ -51,7 +56,7 @@ func handle(context: SDK.SystemActionContext, name: String, payload: Variant) ->
 	var values: Dictionary = caller.value
 	var route := "melee"
 	if not values.targets.is_empty():
-		var preparation := TARGETING.new().validate_creature(context, input)
+		var preparation := TARGETING.new(_data_catalogue).validate_creature(context, input)
 		if str(preparation.state) != "ready":
 			return preparation
 		route = "defence" if str(preparation.resolution) == "defence" else "melee"

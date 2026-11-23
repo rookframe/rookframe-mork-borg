@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const SYSTEM = preload(ROOT + "logic/implementation.gd")
@@ -11,10 +13,10 @@ func test_crossbow_critical_and_fumble_spend_bolts_once() -> void:
 		var system = auto_free(SYSTEM.new())
 		add_child(system)
 		host.handler = system
-		var sdk := SDK.new(host)
-		var weapon: Dictionary = EQUIPMENT.new().item("crossbow")
+		var sdk := PACKAGE_DATA.facade(host)
+		var weapon: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("crossbow")
 		weapon.merge({"inventory_id": "1", "equipped": true}, true)
-		var bolts: Dictionary = EQUIPMENT.new().item("ten-bolts")
+		var bolts: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("ten-bolts")
 		bolts.inventory_id = "2"
 		host.actors.hero.data.inventory = [weapon, bolts]
 		host.actors.hero.data.abilities["Presence"] = {"modifier": -3}
@@ -48,10 +50,10 @@ func test_rejected_targets_and_cancelled_throws_preserve_resources() -> void:
 		var system = auto_free(SYSTEM.new())
 		add_child(system)
 		host.handler = system
-		var sdk := SDK.new(host)
-		var weapon: Dictionary = EQUIPMENT.new().item("shortbow")
+		var sdk := PACKAGE_DATA.facade(host)
+		var weapon: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("shortbow")
 		weapon.merge({"inventory_id": "1", "equipped": true}, true)
-		var arrows: Dictionary = EQUIPMENT.new().item("arrow")
+		var arrows: Dictionary = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("arrow")
 		arrows.merge({"inventory_id": "2", "quantity": 1}, true)
 		host.actors.hero.data.inventory = [weapon, arrows]
 		if scenario in ["range", "mixed-targets", "all-outside"]:
@@ -66,7 +68,7 @@ func test_rejected_targets_and_cancelled_throws_preserve_resources() -> void:
 		if scenario == "missing":
 			host.actors.hero.data.inventory[1].quantity = 0
 		if scenario == "wrong-kind":
-			host.actors.hero.data.inventory[1] = EQUIPMENT.new().item("bolt")
+			host.actors.hero.data.inventory[1] = EQUIPMENT.new(PACKAGE_DATA.catalogue()).item("bolt")
 			host.actors.hero.data.inventory[1].inventory_id = "2"
 		var result: SDK.DataResult = await sdk.system_actions.submit("melee.start", _attack_input())
 		if scenario in ["cancel", "save-failure", "already-spent"]:

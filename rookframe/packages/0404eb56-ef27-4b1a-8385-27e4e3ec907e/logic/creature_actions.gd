@@ -11,7 +11,7 @@ func _read() -> SDK.ActorResult:
 	var current: Dictionary = result.actor.data
 	if str(current.get("schema", "")) != "mork-borg-adversary/v1":
 		return _failure("Creature data is unavailable.")
-	result.actor.data = CREATURES.new().stat_block(current)
+	result.actor.data = CREATURES.new(_data_catalogue).stat_block(current)
 	return result
 
 func change_item(id: String, field: String, text: String) -> SDK.ActorResult:

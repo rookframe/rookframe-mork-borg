@@ -46,7 +46,7 @@ func ready() -> void:
 		row.get_node("Favorite").toggled.connect(_favorite_row.bind(index))
 		row.get_node("FullName").pressed.connect(_full_name_row.bind(index))
 		row.get_node("Launch/Content/Copy/Title").resized.connect(_schedule_name_check)
-	_favorites.sdk = sdk
+	_favorites.bind(sdk)
 	favorite_requested.connect(_change_favorite)
 	_attacks.bind(sdk)
 	_powers.bind(sdk)

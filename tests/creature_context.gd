@@ -1,4 +1,6 @@
 extends GdUnitTestSuite
+
+const PACKAGE_DATA = preload("res://tests/package_data_boundary.gd")
 ## Severe transaction risk: critical context must follow identity and accepted commits.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
@@ -23,14 +25,14 @@ func test_context_is_immutable_identity_bound_and_consumed_only_by_matching_acce
 	add_child(host.handler)
 	host.targets = PackedStringArray()
 	host.rooks.clear()
-	host.actors.hero.data = load(ROOT + "content/hawk-as-weapon.tres").create_data({})
+	host.actors.hero.data = load(ROOT + "content/hawk-as-weapon.tres").create_data_with_content({}, PACKAGE_DATA.reader())
 	var data: Dictionary = host.actors.hero.data
 	data.attacks[0].dice = "d4+1"
 	data.inventory = [{"inventory_id": "independent", "name": "Unspent loot", "quantity": 9}]
 	data.portrait = "portraits/saved-creature.png"
 	var entry := str(data.attacks[0].id)
 	var other := str(data.attacks[1].id)
-	var sdk := SDK.new(host)
+	var sdk := PACKAGE_DATA.facade(host)
 	await _start(sdk, "first-attack", "attack", entry)
 	var result := await _finish(sdk, host, "first-attack", 20)
 	assert_str(result.state).is_equal("resolved")
@@ -41,7 +43,7 @@ func test_context_is_immutable_identity_bound_and_consumed_only_by_matching_acce
 	var prepared := await actions.prepare_corrections()
 	assert_bool(prepared.ok).is_true()
 	assert_str(str(prepared.actor.data.attacks[0].correction_entry_id)).is_not_empty()
-	var corrected := await actions.correct_many({"attack:0:dice": "d6+2", "rule:0:text": "Accepted custom own-test prose"}, PROJECTION.new().identities(prepared.actor.data))
+	var corrected := await actions.correct_many({"attack:0:dice": "d6+2", "rule:0:text": "Accepted custom own-test prose"}, PROJECTION.new(PACKAGE_DATA.catalogue()).identities(prepared.actor.data))
 	assert_bool(corrected.ok).is_true()
 	var before: Dictionary = host.actors.duplicate(true)
 	# A different named attack cannot spend the preceding context.
