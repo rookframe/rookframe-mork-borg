@@ -48,7 +48,7 @@ func show_preview(sdk: SDK, target: Control, row: Dictionary) -> void:
 
 func surface(sdk: SDK) -> SDK.ExtensionSurface:
 	var result := SDK.ExtensionSurface.new()
-	result.scene = load(ROOT + "ui/encounter_window.tscn")
+	result.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_window_entry.tscn")
 	var experience := sdk.presentation_experience()
 	result.initial_dock_width = 375 if experience.is_phone else 412
 	if experience.is_desktop:

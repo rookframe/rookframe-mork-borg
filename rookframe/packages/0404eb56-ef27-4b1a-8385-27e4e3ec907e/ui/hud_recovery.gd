@@ -9,7 +9,6 @@ const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
 const RULES = preload(ROOT + "logic/recovery_rules.gd")
-const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/hud_recovery_surface.tres")
 const ICON = preload("res://rookframe/ui/icons/character/heart.svg")
 var _sdk: SDK
 
@@ -40,7 +39,7 @@ func launch(actor: SDK.ActorId, key: String) -> void:
 		return
 	for entry in entries(current.actor):
 		if entry.id == key and entry.available:
-			var result := _sdk.windows.open_actor_task(SURFACE, actor, {"recovery": key})
+			var result := _sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_recovery_surface.tres"), actor, {"recovery": key})
 			if not result.ok:
 				var message := SDK.FeedbackMessage.new()
 				message.title = _sdk.translations.text("Recovery")

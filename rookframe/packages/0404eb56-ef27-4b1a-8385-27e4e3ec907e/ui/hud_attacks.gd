@@ -6,7 +6,6 @@ var _data_catalogue := CATALOGUE.new()
 ## HUD handoff only. The managed tabletop action owns the captured Actor/source.
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
-const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
@@ -48,7 +47,7 @@ func launch(actor: SDK.ActorId, entry: Dictionary) -> void:
 	if not available(current.actor, exact) or str(exact.get("category", "")) != "Attacks":
 		return
 	var task := {"item": str(exact.get("item", "")), "mode": "jab" if str(exact.get("source", "")) == "cowards-jab" else "attack", "entry": str(exact.get("entry", ""))}
-	var result: SDK.OperationResult = _sdk.windows.open_actor_task(SURFACE, actor, task)
+	var result: SDK.OperationResult = _sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack_surface.tres"), actor, task)
 	if not result.ok:
 		var feedback := SDK.FeedbackMessage.new()
 		feedback.title = _sdk.translations.text("Attack")

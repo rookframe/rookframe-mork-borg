@@ -21,8 +21,6 @@ const ACTIONS = preload(ROOT + "logic/creature_actions.gd")
 const REQUEST = preload(ROOT + "logic/action_request.gd")
 const ROLL = preload(ROOT + "ui/creature_hud_roll.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
-const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/creature_surface.tres")
-const ATTACK: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const CREATURE_CATEGORIES := ["Attacks", "Special", "Checks", "Scene"]
 const LAUNCH_ICONS := {
 	"Attacks": preload("res://rookframe/ui/icons/swords.svg"),
@@ -425,7 +423,7 @@ func _launch_row(index: int) -> void:
 		if not result.ok:
 			_error(result.message)
 	elif category == "Attacks":
-		var result := sdk.windows.open_actor_task(ATTACK, actor, {"item": "creature:" + entry, "mode": "attack"})
+		var result := sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack_surface.tres"), actor, {"item": "creature:" + entry, "mode": "attack"})
 		if not result.ok:
 			_error(result.message)
 	elif category == "Checks":
@@ -509,7 +507,7 @@ func _open_dice() -> void:
 func _open_sheet() -> void:
 	_close_panel()
 	if _actor != null:
-		var result := sdk.windows.open_actor(SHEET, _actor)
+		var result := sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), _actor)
 		if not result.ok:
 			_error(result.message)
 

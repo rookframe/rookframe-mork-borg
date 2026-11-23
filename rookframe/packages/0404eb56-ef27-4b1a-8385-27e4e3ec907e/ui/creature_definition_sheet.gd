@@ -125,7 +125,7 @@ func _create() -> void:
 	get_node("Sheet").status("Actor created." if result.ok else result.message)
 	_refresh()
 	if result.ok and _can_edit():
-		sdk.windows.open_actor(preload(ROOT + "ui/creature_surface.tres"), result.actor.id)
+		sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), result.actor.id)
 
 func _choose() -> void:
 	if _busy or not _can_edit():
@@ -227,7 +227,7 @@ func _publication(url: String) -> void:
 func _close() -> void:
 	_end_appearance()
 	var surface := SDK.ExtensionSurface.new()
-	surface.scene = load(ROOT + "ui/creature_definition_sheet.tscn")
+	surface.scene = load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_window.tscn")
 	sdk.windows.close(surface)
 
 func _input(event: InputEvent) -> void:

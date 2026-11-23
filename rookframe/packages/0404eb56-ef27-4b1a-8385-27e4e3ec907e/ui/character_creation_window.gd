@@ -76,7 +76,7 @@ func _created(actor: SDK.Actor) -> void:
 	_open_created()
 
 func _open_created() -> void:
-	var result := sdk.windows.open_actor(preload(ROOT + "ui/character_surface.tres"), SDK.ActorId.new(_created_actor_id))
+	var result := sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), SDK.ActorId.new(_created_actor_id))
 	if not result.ok:
 		_view.set_status(result.message, true)
 		_view.present_primary(sdk.translations.text("Open character"), false)

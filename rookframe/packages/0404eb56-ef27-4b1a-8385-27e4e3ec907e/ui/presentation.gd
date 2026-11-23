@@ -5,10 +5,7 @@ var _data_catalogue := CATALOGUE.new()
 
 
 
-const WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button.tres")
-const DESKTOP_WINDOW_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window_button_desktop.tres")
 
-const ENCOUNTER_BUTTON: SDK.WindowButton = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button.tres")
 const ENCOUNTER_STRIP = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_strip.tscn")
 
 const ENCOUNTER_ROOK = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_rook.tscn")
@@ -28,7 +25,7 @@ func compose() -> void:
 	sdk.character_hud.mount(hud)
 	if sdk.context().is_gm:
 		var combat_button := SDK.WindowButton.new()
-		combat_button.button_scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button_ru.tscn") if sdk.translations.text("en") == "ru" else ENCOUNTER_BUTTON.button_scene
+		combat_button.button_scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button_ru.tscn") if sdk.translations.text("en") == "ru" else preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_button.tscn")
 		combat_button.window = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/encounter_view.gd").new().surface(sdk)
 		rail.push(combat_button)
 		var contextual := SDK.Contribution.new()
@@ -51,9 +48,9 @@ func inspect_actor(actor: SDK.ActorId) -> void:
 	var source := sdk.actors.read(actor)
 	var data: Dictionary = source.actor.data if source.ok and typeof(source.actor.data) == TYPE_DICTIONARY else {}
 	if str(data.get("schema", "")) == "mork-borg-character/v1":
-		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), actor)
+		sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), actor)
 		return
-	sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
+	sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
 
 var _reading_defences := false
 var _seen_defences: Dictionary = {}
@@ -75,7 +72,7 @@ func _check_defences() -> void:
 						_seen_defences[fumble_id] = true
 						continue
 					fumble["operation"] = "melee"
-					var opened := sdk.windows.open_actor_task(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_consequence_surface.tres"), SDK.ActorId.new(str(fumble.source)), {"outcome": fumble, "incoming": true})
+					var opened := sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_consequence_surface.tres"), SDK.ActorId.new(str(fumble.source)), {"outcome": fumble, "incoming": true})
 					if opened.ok:
 						_seen_defences[fumble_id] = true
 					break
@@ -90,7 +87,7 @@ func _check_defences() -> void:
 			if str(outcome.initiator) == sdk.context().participant_id:
 				_seen_defences[id] = true
 				continue
-			var opened := sdk.windows.open_actor_task(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_consequence_surface.tres"), SDK.ActorId.new(str(outcome.target)), {"outcome": outcome, "incoming": true})
+			var opened := sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_consequence_surface.tres"), SDK.ActorId.new(str(outcome.target)), {"outcome": outcome, "incoming": true})
 			if opened.ok:
 				_seen_defences[id] = true
 			return
@@ -103,7 +100,7 @@ func describe_actor_definition(definition: SDK.ContentEntry) -> SDK.ActorDefinit
 	if definition.reference.package_id != sdk.package_id() or not _data_catalogue.creature_profiles().has(definition.reference.local_id):
 		return SDK.ActorDefinitionView.new()
 	var surface := SDK.ExtensionSurface.new()
-	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_sheet.tscn")
+	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_definition_window.tscn")
 	surface.initial_placement = "full-viewport"
 	return SDK.ActorDefinitionView.new(sdk.translations.text("Creatures"), surface, sdk.context().is_gm)
 

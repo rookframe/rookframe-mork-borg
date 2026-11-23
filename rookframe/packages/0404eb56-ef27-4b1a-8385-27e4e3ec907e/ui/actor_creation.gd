@@ -9,5 +9,5 @@ func ready() -> void:
 func _create() -> void:
 	var surface := SDK.ExtensionSurface.new()
 	surface.initial_placement = "full-viewport"
-	surface.scene = preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_window.tscn")
+	surface.scene = load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_creation_window.tscn")
 	sdk.windows.open(surface)

@@ -7,7 +7,6 @@ var _data_catalogue := CATALOGUE.new()
 const ROOT := "res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/"
 const SDK = preload("res://rookframe/sdk/package_sdk_facade.gd")
 const ENTRY = preload(ROOT + "ui/hud_entry.gd")
-const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/tabletop_attack_surface.tres")
 const MODEL = preload(ROOT + "logic/actor_favorites.gd")
 const CREATURES = preload(ROOT + "logic/creature_definition.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
@@ -71,7 +70,7 @@ func launch(character_id: SDK.ActorId, key: String) -> void:
 		return
 	var source := SDK.ActorId.new(str(exact.actor))
 	var task := {"item": str(exact.item), "mode": "attack", "companion": true, "character": character_id.value}
-	var opened := _sdk.windows.open_actor_task(SURFACE, source, task)
+	var opened := _sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/tabletop_attack_surface.tres"), source, task)
 	if not opened.ok:
 		var feedback := SDK.FeedbackMessage.new()
 		feedback.title = _sdk.translations.text("Companion attack")

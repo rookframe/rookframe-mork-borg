@@ -12,7 +12,6 @@ const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
 const RULES = preload(ROOT + "logic/special_rules.gd")
 const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
-const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/hud_special_surface.tres")
 const ITEM_ICON = preload("res://rookframe/ui/icons/character/bag.svg")
 const FEATURE_ICON = preload("res://rookframe/ui/icons/character/presence.svg")
 const FOOD_ICON = preload("res://rookframe/ui/icons/character/food.svg")
@@ -58,7 +57,7 @@ func launch(actor: SDK.ActorId, key: String) -> void:
 		return
 	var item := "owned-feature:" + str(source.entry) if source.category == "Features" else str(source.item)
 	var task := {"key": key, "item": item, "source": str(source.source), "rook": _source_rook(actor)}
-	var result := _sdk.windows.open_actor_task(SURFACE, actor, task)
+	var result := _sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_special_surface.tres"), actor, task)
 	if not result.ok:
 		var feedback := SDK.FeedbackMessage.new()
 		feedback.title = _sdk.translations.text(str(source.category))

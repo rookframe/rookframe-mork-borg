@@ -578,7 +578,7 @@ func _character_back_button_pressed() -> void:
 
 func _close_window() -> void:
 	var surface := SDK.ExtensionSurface.new()
-	surface.scene = load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/window.tscn")
+	surface.scene = load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/library_window.tscn")
 	sdk.windows.close(surface)
 
 

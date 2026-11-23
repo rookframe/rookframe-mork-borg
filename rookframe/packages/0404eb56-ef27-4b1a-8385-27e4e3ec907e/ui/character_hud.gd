@@ -8,7 +8,6 @@ const POWERS = preload(ROOT + "ui/hud_powers.gd")
 const ITEMS = preload(ROOT + "ui/hud_items.gd")
 const COMPANIONS = preload(ROOT + "ui/hud_companions.gd")
 const RECOVERY = preload(ROOT + "ui/hud_recovery.gd")
-const SHEET: SDK.ExtensionSurface = preload(ROOT + "ui/character_surface.tres")
 const ABILITIES := ["Strength", "Agility", "Presence", "Toughness"]
 const ABILITY_ICONS := [preload(ROOT + "ui/hud_art/abilities.svg"), preload("res://rookframe/ui/icons/character/agility.svg"), preload(ROOT + "ui/hud_art/ability-presence.svg"), preload("res://rookframe/ui/icons/character/presence.svg")]
 
@@ -245,7 +244,7 @@ func _open_sheet() -> void:
 	_close_panel()
 	if _actor == null:
 		return
-	var result := sdk.windows.open_actor(SHEET, _actor)
+	var result := sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/character_surface.tres"), _actor)
 	if not result.ok:
 		_error(result.message)
 

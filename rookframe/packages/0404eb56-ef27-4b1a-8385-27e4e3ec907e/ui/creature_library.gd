@@ -30,7 +30,7 @@ func create(definition: SDK.ContentReference, scene: SDK.SceneId = null, positio
 			var removed := await sdk.actors.delete(actor)
 			return _failure(placed.message + (" " + removed.message if not removed.ok else ""))
 	elif open_view:
-		sdk.windows.open_actor(preload("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
+		sdk.windows.open_actor(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/creature_surface.tres"), actor)
 	return sdk.actors.read(actor)
 
 func _failure(message: String) -> SDK.ActorResult:

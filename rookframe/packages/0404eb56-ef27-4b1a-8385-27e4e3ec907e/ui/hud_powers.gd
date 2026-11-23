@@ -12,7 +12,6 @@ const FAVORITES = preload(ROOT + "logic/actor_favorites.gd")
 const POWERS = preload(ROOT + "logic/powers.gd")
 const SOURCE_ROOKS = preload(ROOT + "logic/source_rooks.gd")
 const RESPONSIBILITY = preload(ROOT + "logic/ability_throw_responsibility.gd")
-const SURFACE: SDK.ExtensionSurface = preload(ROOT + "ui/hud_power_surface.tres")
 const ICON = preload("res://rookframe/ui/icons/character/book.svg")
 var _sdk: SDK
 
@@ -52,12 +51,12 @@ func launch(actor: SDK.ActorId, key: String) -> void:
 	if source.is_empty() or source.category != "Powers" or not source.available:
 		return
 	var task := {"key": key, "item": str(source.item), "source": str(source.source), "rook": _source_rook(actor), "daily": false}
-	_report(_sdk.windows.open_actor_task(SURFACE, actor, task))
+	_report(_sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_power_surface.tres"), actor, task))
 
 func morning(actor: SDK.ActorId) -> void:
 	var current := _sdk.actors.read(actor)
 	if current.ok and can_morning(current.actor):
-		_report(_sdk.windows.open_actor_task(SURFACE, actor, {"daily": true, "rook": ""}))
+		_report(_sdk.windows.open_actor_task(load("res://rookframe/packages/0404eb56-ef27-4b1a-8385-27e4e3ec907e/ui/hud_power_surface.tres"), actor, {"daily": true, "rook": ""}))
 
 func _source_rook(actor: SDK.ActorId) -> String:
 	var context := _sdk.character_hud.context()
